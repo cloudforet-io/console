@@ -64,6 +64,10 @@ export default {
         PSelectStatus,
     },
     props: {
+        filters: {
+            type: Array,
+            default: () => [],
+        },
     },
     setup(props, { emit }) {
         const pageSizeOptions = [12, 24, 36];
@@ -112,7 +116,7 @@ export default {
             ]),
             pageStart: 1,
             pageLimit: 24,
-            queryTags: [] as QueryTag[],
+            queryTags: filtersHelper.setFilters(props.filters).queryTags as QueryTag[],
             // query
             pagination: computed<Pagination>(() => ({
                 pageStart: state.pageStart,
@@ -127,7 +131,7 @@ export default {
 
                 return period;
             }),
-            filters: computed(() => filtersHelper.setFiltersAsQueryTag(state.queryTags).filters),
+            _filters: computed(() => filtersHelper.setFiltersAsQueryTag(state.queryTags).filters),
         });
 
         /* Handlers */
@@ -148,8 +152,13 @@ export default {
         watch(() => state.period, (period) => {
             emit('update-period', period);
         });
-        watch(() => state.filters, (filters) => {
+        watch(() => state._filters, (filters) => {
             emit('update-filters', filters);
+        });
+        watch(() => props.filters, (filters) => {
+            if (filters !== state._filters) {
+                state.queryTags = filtersHelper.setFilters(filters).queryTags;
+            }
         });
 
 

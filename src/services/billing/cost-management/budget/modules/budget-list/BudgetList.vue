@@ -1,6 +1,7 @@
 <template>
     <div class="budget-list">
-        <budget-toolbox @update-pagination="handleUpdatePagination"
+        <budget-toolbox :filters="_filters"
+                        @update-pagination="handleUpdatePagination"
                         @update-period="handleUpdatePeriod"
                         @update-filters="handleUpdateFilters"
                         @refresh="handleRefresh"
@@ -20,7 +21,7 @@
 <script lang="ts">
 import {
     computed,
-    reactive, toRefs,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { keyBy } from 'lodash';
@@ -48,10 +49,20 @@ interface BudgetUsageParam {
     start?: string;
 }
 
+interface Props {
+    filters: QueryStoreFilter[];
+}
+
 export default {
     name: 'BudgetList',
     components: { BudgetListCard, BudgetToolbox, BudgetStat },
-    setup() {
+    props: {
+        filters: {
+            type: Array,
+            default: () => [],
+        },
+    },
+    setup(props: Props, { emit }) {
         const budgetApiQueryHelper = new ApiQueryHelper();
         const budgetUsageQueryHelper = new QueryHelper();
 
@@ -62,18 +73,18 @@ export default {
             // query
             pageStart: 1,
             pageLimit: 24,
-            filters: [] as QueryStoreFilter[],
+            _filters: props.filters as QueryStoreFilter[],
             period: {} as Period,
             // api request params
-            budgetParam: computed(() => ({
+            budgetParam: computed<BudgetParam>(() => ({
                 query: budgetApiQueryHelper
-                    .setFilters(state.filters)
+                    .setFilters(state._filters)
                     .setPage(state.pageStart, state.pageLimit)
                     .setSort('usage', true)
                     .data,
             })),
             budgetUsageParam: computed<BudgetUsageParam>(() => {
-                const { filter } = budgetUsageQueryHelper.setFilters(state.filters)
+                const { filter } = budgetUsageQueryHelper.setFilters(state._filters)
                     .addFilter({ k: 'budget_id', v: state.budgets.map(d => d.budget_id), o: '=' })
                     .apiQuery;
 
@@ -87,6 +98,11 @@ export default {
                 return param;
             }),
         });
+
+        const setFilters = (filters: QueryStoreFilter[]) => {
+            state._filters = filters;
+            emit('update:filters', filters);
+        };
 
 
         const fetchBudgets = async () => {
@@ -137,7 +153,7 @@ export default {
         };
 
         const handleUpdateFilters = (filters: QueryStoreFilter[]) => {
-            state.filters = filters;
+            setFilters(filters);
             listBudgets();
         };
 
@@ -148,6 +164,11 @@ export default {
         const handleExport = () => {
 
         };
+
+        /* Watchers */
+        watch(() => props.filters, (filters) => {
+            if (filters !== state._filters) state._filters = filters;
+        });
 
         /* Init */
         (async () => {

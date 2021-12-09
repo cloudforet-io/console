@@ -14,12 +14,14 @@
             </template>
         </p-page-title>
         <p-divider />
-        <budget-list />
+        <budget-list :filters="filters" @update:filters="handleUpdateFilters" />
     </div>
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
 
 import {
     PBreadcrumbs, PPageTitle, PSelectDropdown, PDivider,
@@ -31,6 +33,8 @@ import BudgetList from '@/services/billing/cost-management/budget/modules/budget
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 
 export default {
     name: 'BudgetPage',
@@ -42,6 +46,10 @@ export default {
         PDivider,
     },
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        const queryHelper = new QueryHelper();
+
         const routeState = reactive({
             route: computed(() => [
                 { name: i18n.t('MENU.BILLING.BILLING'), path: '/billing' },
@@ -57,10 +65,20 @@ export default {
                     name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.CREATE._NAME,
                 },
             ],
+            filters: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).filters,
         });
 
         const handleCreateBudgetSelect = (name) => {
             SpaceRouter.router.push({ name });
+        };
+
+        const handleUpdateFilters = (filters: QueryStoreFilter[]) => {
+            state.filters = filters;
+            SpaceRouter.router.replace({
+                query: {
+                    filters: queryHelper.setFilters(filters).rawQueryStrings,
+                },
+            });
         };
 
         /* Init */
@@ -78,6 +96,7 @@ export default {
             ...toRefs(state),
             routeState,
             handleCreateBudgetSelect,
+            handleUpdateFilters,
         };
     },
 };

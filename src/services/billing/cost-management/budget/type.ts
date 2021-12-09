@@ -1,4 +1,6 @@
 import { Tags, TimeStamp } from '@/models';
+import { RouteQueryString } from '@/lib/router-query-string';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 
 interface BudgetPlannedLimit {
 	date: string;
@@ -71,4 +73,10 @@ export interface BudgetUsageData {
 	date: string;
 	domain_id?: string;
 	updated_at: TimeStamp;
+}
+
+export type BudgetPageUrlQuery = Partial<Record<'filters', RouteQueryString>>
+
+export interface BudgetPageQueryValue {
+	filters?: QueryStoreFilter[];
 }
