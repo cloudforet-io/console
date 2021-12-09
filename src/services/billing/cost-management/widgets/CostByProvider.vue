@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout title="Cost by Provider" class="cost-by-provider">
+    <cost-dashboard-card-widget-layout title="Cost by Provider" class="cost-by-provider" :widget-link="widgetLink">
         <p-chart-loader :loading="loading" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
@@ -34,6 +34,7 @@
 </template>
 
 <script lang="ts">
+import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 
@@ -58,9 +59,11 @@ import { commaFormatter } from '@spaceone/console-core-lib';
 import { CURRENCY } from '@/store/modules/display/config';
 import { store } from '@/store';
 import { gray } from '@/styles/colors';
-import dayjs from 'dayjs';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { BILLING_ROUTE } from '@/services/billing/routes';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 
 interface CostByProviderChartData extends PieChartData {
     color: string;
@@ -113,6 +116,17 @@ export default defineComponent<WidgetProps>({
             totalCount: computed(() => state.chartData.length),
             allPage: computed(() => Math.ceil(state.totalCount / state.pageSize) || 1),
             providers: computed(() => store.state.resource.provider.items),
+            widgetLink: computed(() => ({
+                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                params: {},
+                query: {
+                    chartType: primitiveToQueryString(CHART_TYPE.DONUT),
+                    granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                    groupBy: arrayToQueryString([GROUP_BY.PROVIDER]),
+                    period: objectToQueryString(props.period),
+                    filters: objectToQueryString(props.filters),
+                },
+            })),
         });
 
         const dataTableState = reactive({

@@ -125,7 +125,7 @@ export default defineComponent<Props>({
             items: [] as TableItem[],
             fields: computed<DataTableField[]>(() => {
                 const fields: DataTableField[] = [{ name: props.groupBy, label: GROUP_BY_ITEM_MAP[props.groupBy].label }];
-                const fiveMonthsAgo = dayjs.utc().subtract(5, 'month');
+                const fiveMonthsAgo = dayjs.utc(props.period.end).subtract(5, 'month');
                 range(state.thisMonthPage * 3 - 3, state.thisMonthPage * 3).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');
                     fields.push({ name: date.format('YYYY-MM'), label: date.format('MMM') });

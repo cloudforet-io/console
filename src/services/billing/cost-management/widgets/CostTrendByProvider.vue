@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout title="Cost Trend by Provider">
+    <cost-dashboard-card-widget-layout title="Cost Trend by Provider" :widget-link="widgetLink">
         <cost-dashboard-stacked-column-widget
             :group-by="GROUP_BY.PROVIDER"
             :currency="currency"
@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import {
-    defineComponent,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 import CostDashboardCardWidgetLayout
@@ -20,9 +20,12 @@ import CostDashboardCardWidgetLayout
 import CostDashboardStackedColumnWidget
     from '@/services/billing/cost-management/widgets/modules/CostDashboardStackedColumnWidget.vue';
 
-import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { CURRENCY } from '@/store/modules/display/config';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
+import { BILLING_ROUTE } from '@/services/billing/routes';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 
 export default defineComponent<WidgetProps>({
@@ -49,8 +52,23 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
     },
-    setup() {
+    setup(props: WidgetProps) {
+        const state = reactive({
+            widgetLink: computed(() => ({
+                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                params: {},
+                query: {
+                    chartType: primitiveToQueryString(CHART_TYPE.STACKED_COLUMN),
+                    granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+                    groupBy: arrayToQueryString([GROUP_BY.PROVIDER]),
+                    period: objectToQueryString(props.period),
+                    filters: objectToQueryString(props.filters),
+                },
+            })),
+        });
+
         return {
+            ...toRefs(state),
             GROUP_BY,
         };
     },

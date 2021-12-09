@@ -1,5 +1,6 @@
 <template>
     <cost-dashboard-card-widget-layout title="SPC Project-Wise Usage Summary" class="spc-project-wise-usage-summary"
+                                       :widget-link="widgetLink"
                                        :data-range="20"
     >
         <p-chart-loader :loading="loading" class="chart-wrapper">
@@ -67,6 +68,9 @@ import { gray } from '@/styles/colors';
 import dayjs from 'dayjs';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { BILLING_ROUTE } from '@/services/billing/routes';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 
 
 const categoryKey = 'category';
@@ -86,10 +90,6 @@ export default defineComponent<WidgetProps>({
         PSkeleton,
     },
     props: {
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
         period: {
             type: Object,
             default: () => ({}),
@@ -116,6 +116,17 @@ export default defineComponent<WidgetProps>({
             chartData: [] as PieChartData[],
             legends: [] as Legend[],
             projects: computed(() => store.state.resource.project.items),
+            widgetLink: computed(() => ({
+                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                params: {},
+                query: {
+                    chartType: primitiveToQueryString(CHART_TYPE.DONUT),
+                    granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                    groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
+                    period: objectToQueryString(props.period),
+                    filters: objectToQueryString(props.filters),
+                },
+            })),
         });
         const tableState = reactive({
             loading: false,

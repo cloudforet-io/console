@@ -40,32 +40,25 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { continentData } from '@/services/billing/cost-management/cost-dashboard/lib/config';
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
-import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import CostDashboardDataTable from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import dayjs from 'dayjs';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { BILLING_ROUTE } from '@/services/billing/routes';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
+import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 
 
 const categoryKey = 'title';
 const valueName = 'value';
 
-const widgetLink = {
-    name: INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-    params: {},
-    query: {},
-};
-
 export default defineComponent<WidgetProps>({
     name: 'CostByRegion',
     components: { CostDashboardDataTable, CostDashboardCardWidgetLayout },
     props: {
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
         period: {
             type: Object,
             default: () => ({}),
@@ -83,7 +76,7 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
     },
-    setup(props) {
+    setup(props: WidgetProps) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
@@ -92,6 +85,17 @@ export default defineComponent<WidgetProps>({
             providers: computed(() => store.state.resource.provider.items),
             loading: false,
             data: [] as any,
+            widgetLink: computed(() => ({
+                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                params: {},
+                query: {
+                    chartType: primitiveToQueryString(CHART_TYPE.DONUT),
+                    granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                    groupBy: arrayToQueryString([GROUP_BY.REGION]),
+                    period: objectToQueryString(props.period),
+                    filters: objectToQueryString(props.filters),
+                },
+            })),
         });
 
         const tableState = reactive({
@@ -233,7 +237,6 @@ export default defineComponent<WidgetProps>({
         return {
             ...toRefs(state),
             tableState,
-            widgetLink,
         };
     },
 });

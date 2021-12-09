@@ -91,7 +91,7 @@
 
 <script lang="ts">
 import dayjs from 'dayjs';
-import { cloneDeep, sum } from 'lodash';
+import { cloneDeep, debounce, sum } from 'lodash';
 import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 
 import {
@@ -108,25 +108,23 @@ import SetFilterModal
     from '@/services/billing/cost-management/modules/SetFilterModal.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { hideAllSeries, toggleSeries } from '@/lib/amcharts/helper';
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
-
+import { getXYChartDataAndLegends } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import {
     getConvertedFilter, getConvertedGranularity, getConvertedPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import {
-    FILTER_ITEM_MAP, GRANULARITY, GROUP_BY,
-} from '@/services/billing/cost-management/lib/config';
-import { getXYChartDataAndLegends } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
-import {
     Legend, PieChartRawData, PieChartData, XYChartData,
 } from '@/services/billing/cost-management/widgets/type';
+import {
+    FILTER_ITEM_MAP, GRANULARITY, GROUP_BY,
+} from '@/services/billing/cost-management/lib/config';
+import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+import { store } from '@/store';
+import { i18n } from '@/translations';
 
 
 export default {
@@ -239,9 +237,9 @@ export default {
         };
 
         /* api */
-        const costApiQueryHelper = new ApiQueryHelper();
+        const costQueryHelper = new QueryHelper();
         const listCostAnalysisChartData = async () => {
-            costApiQueryHelper.setFilters(getConvertedFilter(state.filters));
+            costQueryHelper.setFilters(getConvertedFilter(state.filters));
             let _granularity: GRANULARITY;
             const _period = getConvertedPeriod(state.granularity, state.chartType, state.period);
             const _groupBy = state.chartGroupBy ? [state.chartGroupBy] : [];
@@ -258,7 +256,7 @@ export default {
                     start: _period.start,
                     end: _period.end,
                     pivot_type: 'CHART',
-                    ...costApiQueryHelper.data,
+                    ...costQueryHelper.apiQuery,
                 });
                 return results;
             } catch (e) {
@@ -301,7 +299,7 @@ export default {
         const handleConfirmSetFilter = (filters) => {
             store.commit('service/costAnalysis/setFilters', filters);
         };
-        const refreshChart = async () => {
+        const refreshChart = debounce(async () => {
             state.loading = true;
 
             const rawData = await listCostAnalysisChartData();
@@ -315,7 +313,7 @@ export default {
             state.chartData = chartData;
             state.legends = legends;
             state.loading = false;
-        };
+        }, 300);
 
         watch(() => state.groupByItems, (after, before) => {
             if (!after.length) {
