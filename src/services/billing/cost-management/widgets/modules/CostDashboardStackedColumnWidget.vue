@@ -216,7 +216,7 @@ export default defineComponent<Props>({
 
             return chart;
         };
-        const getApiPeriod = (period: Period): Period => ({
+        const _getApiPeriod = (period: Period): Period => ({
             start: dayjs(period.end).subtract(5, 'month').format('YYYY-MM'),
             end: dayjs.utc(period.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
         });
@@ -227,7 +227,7 @@ export default defineComponent<Props>({
             costQueryHelper.setFilters(getConvertedFilter(filters));
             try {
                 state.tableLoading = true;
-                const apiPeriod = getApiPeriod(period);
+                const apiPeriod = _getApiPeriod(period);
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
                     group_by: [props.groupBy],
@@ -259,7 +259,7 @@ export default defineComponent<Props>({
             ]);
             try {
                 state.chartLoading = true;
-                const apiPeriod = getApiPeriod(period);
+                const apiPeriod = _getApiPeriod(period);
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
                     group_by: [props.groupBy],
