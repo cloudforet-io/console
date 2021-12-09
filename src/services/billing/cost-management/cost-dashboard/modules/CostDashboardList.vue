@@ -144,25 +144,30 @@ export default {
             }
         };
 
-        const goToDashboardPage = () => {
-            SpaceRouter.router.replace({
-                name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
-                params: { dashboardId: state.homeDashboardId },
-            }).catch(() => {});
+        const showDashboardPage = () => {
+            if (vm.$route.name === BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME) {
+                SpaceRouter.router.replace({
+                    name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                    params: { dashboardId: state.homeDashboardId },
+                }).catch(() => {});
+            }
         };
 
-        const initHomeDashboardId = () => {
-            store.dispatch('settings/setItem', {
-                key: 'homeDashboard',
-                value: state.items[0]?.dashboard_id,
-                path: '/costDashboard',
-            });
+        const initHomeDashboard = () => {
+            if (!state.homeDashboardId) {
+                store.dispatch('settings/setItem', {
+                    key: 'homeDashboard',
+                    value: state.items[0]?.dashboard_id,
+                    path: '/costDashboard',
+                });
+            }
+            state.dashboardIdFromRoute = state.items[0]?.dashboard_id;
         };
 
         (async () => {
             await listDashboard();
-            if (!state.homeDashboardId) initHomeDashboardId();
-            goToDashboardPage();
+            if (!state.homeDashboardId) initHomeDashboard();
+            showDashboardPage();
         })();
 
 

@@ -57,6 +57,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { indigo, yellow, red } from '@/styles/colors';
 import { i18n } from '@/translations';
+import { objectToQueryString } from '@/lib/router-query-string';
 
 
 interface ChartData {
@@ -64,10 +65,6 @@ interface ChartData {
     color: string;
     linkLocation: Location;
 }
-
-const widgetLink: Location = {
-    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
-};
 
 export default {
     name: 'BudgetStatus',
@@ -98,6 +95,13 @@ export default {
                 { label: '70-90%', color: indigo[500] },
                 { label: '< 70%', color: indigo[100] },
             ])),
+            widgetLink: computed(() => ({
+                name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
+                params: {},
+                query: {
+                    filters: objectToQueryString(getConvertedBudgetFilter(props.filters)[0]),
+                },
+            })),
         });
 
         /* util */
@@ -158,7 +162,6 @@ export default {
 
         return {
             ...toRefs(state),
-            widgetLink,
             BILLING_ROUTE,
             range,
         };

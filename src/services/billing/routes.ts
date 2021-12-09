@@ -34,7 +34,7 @@ export default {
         {
             path: 'cost-management',
             meta: { label: 'Cost Management' },
-            redirect: 'dashboard',
+            redirect: '/billing/cost-management/dashboard',
             component: { template: '<router-view />' },
             children: [
                 {
