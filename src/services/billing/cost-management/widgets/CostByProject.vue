@@ -13,37 +13,40 @@
 </template>
 
 <script lang="ts">
-import {
-    onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
+import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import config from '@/lib/config';
+
+import {
+    computed,
+    onUnmounted, reactive, toRefs, watch,
+} from '@vue/composition-api';
+
 import { TreeMap } from '@amcharts/amcharts4/charts';
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
-import { IDENTITY_ROUTE } from '@/services/identity/routes';
+
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import dayjs from 'dayjs';
-import { CURRENCY } from '@/store/modules/display/config';
-import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
+import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { CURRENCY } from '@/store/modules/display/config';
+import { BILLING_ROUTE } from '@/services/billing/routes';
+import config from '@/lib/config';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { store } from '@/store';
 
 
-const categoryKey = 'project_id';
-const valueName = 'usd_cost';
-
-const widgetLink = {
-    name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
-    params: {},
-    query: {},
-};
+const categoryKey = 'projectId';
+const valueName = 'cost';
 
 interface ChartData {
-    project_id: string;
-    usd_cost: number;
+    projectId: string;
+    projectName: string;
+    cost: number;
 }
 
 export default {
@@ -70,13 +73,25 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props) {
+    setup(props: WidgetProps) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as TreeMap | null,
             chartRegistry: {},
             loading: true,
             data: [] as ChartData[],
+            widgetLink: computed(() => ({
+                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                params: {},
+                query: {
+                    chartType: primitiveToQueryString(CHART_TYPE.DONUT),
+                    granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                    groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
+                    period: objectToQueryString(props.period),
+                    filters: objectToQueryString(props.filters),
+                },
+            })),
+            projects: computed(() => store.state.resource.project.items),
         });
 
         const disposeChart = (chartContext) => {
@@ -99,6 +114,12 @@ export default {
             chart.data = state.data;
             chart.dataFields.value = valueName;
             chart.dataFields.name = categoryKey;
+
+            const series = chart.seriesTemplates.create('0');
+            const seriesBullet = series.bullets.push(new am4charts.LabelBullet());
+            seriesBullet.locationY = 0.5;
+            seriesBullet.locationX = 0.5;
+            seriesBullet.label.text = '{projectName}';
         };
 
         const costQueryHelper = new QueryHelper();
@@ -118,19 +139,20 @@ export default {
                 });
                 return results;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 return [];
             }
         };
 
         const getChartData = async () => {
-            try {
-                state.loading = true;
-                state.data = await fetchData();
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
-            }
+            state.loading = true;
+            const rawData = await fetchData();
+            state.data = rawData.map(d => ({
+                projectId: d.project_id,
+                cost: d.usd_cost,
+                projectName: state.projects[d.project_id]?.label || d.project_id,
+            }));
+            state.loading = false;
         };
 
         watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
@@ -154,7 +176,6 @@ export default {
 
         return {
             ...toRefs(state),
-            widgetLink,
         };
     },
 };
