@@ -88,7 +88,7 @@ export default {
         &.outline {
             border-color: $bg-color;
             color: $bg-color;
-            background-color: transparent;
+            background-color: #fff;
             &:not(.disabled):hover {
                 background-color: $bg-color;
                 color: $text-color;

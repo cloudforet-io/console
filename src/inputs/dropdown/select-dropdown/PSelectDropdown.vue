@@ -271,18 +271,16 @@ export default defineComponent<SelectDropdownProps>({
 
 <style lang="postcss">
 .p-select-dropdown {
-    @apply bg-white text-gray-900;
+    @apply rounded-md;
     position: relative;
     display: inline-block;
     min-width: 6.5rem;
 
     .dropdown-button {
-        @apply rounded;
         min-width: unset;
         width: 100%;
         display: inline-flex;
         justify-content: space-between;
-
         padding: 0 0.25rem 0 0.5rem;
         margin-right: -1px;
         font-weight: normal;
@@ -303,7 +301,7 @@ export default defineComponent<SelectDropdownProps>({
     }
     &.default {
         .dropdown-button {
-            @apply border-gray-300;
+            @apply bg-white text-gray-900 border-gray-300;
         }
     }
     &.button {
@@ -322,7 +320,7 @@ export default defineComponent<SelectDropdownProps>({
     &.without-outline {
         min-width: unset;
         .dropdown-button {
-            @apply border-transparent;
+            @apply border-transparent bg-transparent;
             padding-left: 0;
             &:focus, &:active {
                 @apply border-transparent;
