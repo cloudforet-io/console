@@ -307,9 +307,12 @@
 					"AMOUNT_PLAN": {
 						"AMOUNT_PLANNING": "",
 						"AUTO_FILL": "",
+						"AUTO_FILL_DESC": "",
 						"LABEL_BUDGET_TOTAL": "",
 						"LABEL_END_MONTH": "",
+						"LABEL_EXPECTED_BUDGET": "",
 						"LABEL_LAST_MONTH": "",
+						"LABEL_STARTING_BUDGET": "",
 						"LABEL_START_MONTH": "",
 						"MONTHLY_PLAN": "",
 						"MONTHLY_PLAN_DESC": "",

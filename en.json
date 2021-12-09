@@ -307,9 +307,12 @@
 					"AMOUNT_PLAN": {
 						"AMOUNT_PLANNING": "Amount Planning",
 						"AUTO_FILL": "Auto-fill budget",
+						"AUTO_FILL_DESC": "Input your starting budget and, if desired, enter your expected monthly growth rate :",
 						"LABEL_BUDGET_TOTAL": "Total Budgeted Amount",
 						"LABEL_END_MONTH": "End Month",
+						"LABEL_EXPECTED_BUDGET": "Expected budget growth",
 						"LABEL_LAST_MONTH": "Last 3 Month Cost",
+						"LABEL_STARTING_BUDGET": "Starting budget",
 						"LABEL_START_MONTH": "Start Month",
 						"MONTHLY_PLAN": "Monthly Budget Planning",
 						"MONTHLY_PLAN_DESC": "Specific your budgeted amount for each budget period",
