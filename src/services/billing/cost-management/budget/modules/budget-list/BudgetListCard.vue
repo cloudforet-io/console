@@ -23,8 +23,8 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
                             </p>
                             <div class="amount-used-wrapper" :class="progressStatus">
-                                <span class="cost">{{ `$${budget.total_usage_usd_cost}` }}</span>
-                                <span class="percent">{{ `(${percentage}%)` }}</span>
+                                <span class="cost">${{ cost }}</span>
+                                <span class="percent">(${{ percentage }}%)</span>
                             </div>
                         </div>
                         <div class="label-right">
@@ -32,7 +32,7 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
                             </p>
                             <div class="cost">
-                                {{ `$${budget.limit}` }}
+                                ${{ limit }}
                             </div>
                         </div>
                     </div>
@@ -59,7 +59,7 @@ import {
 } from '@vue/composition-api';
 import { Location } from 'vue-router';
 
-import { BudgetData } from '@/services/billing/cost-management/budget/type';
+import { BudgetData, BudgetUsageData } from '@/services/billing/cost-management/budget/type';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import {
     PBreadcrumbs, PDivider, PSkeleton,
@@ -72,6 +72,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props {
     budget: BudgetData;
+    budgetUsage?: BudgetUsageData;
     budgetLoading: boolean;
 }
 
@@ -100,6 +101,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        budgetUsage: {
+            type: Object,
+            default: undefined,
+        },
         budgetLoading: {
             type: Boolean,
             default: true,
@@ -127,8 +132,16 @@ export default {
                 });
                 return costTypeList;
             }),
+            cost: computed<number>(() => {
+                if (props.budgetUsage) return props.budgetUsage.usd_cost;
+                return props.budget.total_usage_usd_cost;
+            }),
+            limit: computed<number>(() => {
+                if (props.budgetUsage) return props.budgetUsage.limit;
+                return props.budget.limit;
+            }),
             percentage: computed<number>(() => {
-                const value = parseFloat(((props.budget.total_usage_usd_cost / props.budget.limit) * 100).toFixed(1));
+                const value = parseFloat(((state.cost / state.limit) * 100).toFixed(1));
                 if (Number.isNaN(value)) return 0;
                 return value;
             }),
