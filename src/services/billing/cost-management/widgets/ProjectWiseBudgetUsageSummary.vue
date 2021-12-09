@@ -63,6 +63,7 @@ import { CURRENCY } from '@/store/modules/display/config';
 import { store } from '@/store';
 import { yellow, red, gray } from '@/styles/colors';
 import { BILLING_ROUTE } from '@/services/billing/routes';
+import { objectToQueryString } from '@/lib/router-query-string';
 
 
 interface BudgetItem {
@@ -72,12 +73,6 @@ interface BudgetItem {
     usage: number;
     shortageForecast?: string;
 }
-
-const widgetLink = {
-    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
-    params: {},
-    query: {},
-};
 
 export default {
     name: 'ProjectWiseBudgetUsageSummary',
@@ -119,6 +114,13 @@ export default {
             items: [] as BudgetItem[],
             projectGroups: computed(() => store.state.resource.projectGroup.items),
             projects: computed(() => store.state.resource.project.items),
+            widgetLink: computed(() => ({
+                name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
+                params: {},
+                query: {
+                    filters: objectToQueryString(props.filters),
+                },
+            })),
         });
 
         /* util */
@@ -194,7 +196,6 @@ export default {
 
         return {
             ...toRefs(state),
-            widgetLink,
             currencyMoneyFormatter,
             getProjectLink,
             getColor,

@@ -1,55 +1,32 @@
 <template>
-    <aside class="sidebar-menu">
-        <p class="sidebar-title">
-            {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES') }}
-        </p>
-        <p-divider class="sidebar-divider" />
-        <p class="sidebar-title">
-            {{ $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD') }}
-            <!--            <p-icon-button name="ic_plus" class="add-button"-->
-            <!--                           style-type="transparent" size="sm"-->
-            <!--            />-->
-        </p>
-        <p-divider class="sidebar-divider" />
-        <ul class="dashboard-list">
-            <li v-for="(item) in dashboardList" :key="item.dashboard_id"
-                class="menu-item"
-                :class="{'selected': item.dashboard_id === dashboardIdFromRoute}"
-                @click="showPage(item.routeName, item.dashboard_id)"
-            >
-                <!--                <p-i name="ic_bookmark" width="0.625rem" height="0.625rem"-->
-                <!--                     class="favorite-icon"-->
-                <!--                />-->
-                <span class="title">
-                    {{ item.name }}
-                </span>
-                <p-i v-if="item.scope === 'PRIVATE'" name="ic_private" class="private-icon"
-                     width="1rem"
-                     height="1rem"
-                />
-                <p-i v-if="item.dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
-                     width="1rem" height="1rem"
-                />
-                <p-select-dropdown v-model="selectedMoreMenuItem"
-                                   class="more-button"
-                                   :items="moreMenuItems"
-                                   button-style-type="transparent"
-                                   use-fixed-menu-style
-                                   menu-position="right"
-                                   type="icon-button"
-                                   button-icon="ic_more"
-                                   @select="handleSelectMoreMenu(item)"
-                />
-            </li>
-        </ul>
-        <div v-for="(item) in menuList" :key="item.label"
-             @click="showPage(item.routeName)"
+    <ul class="dashboard-list">
+        <li v-for="(item) in dashboardList" :key="item.dashboard_id"
+            class="menu-item"
+            :class="{'selected': item.dashboard_id === dashboardIdFromRoute}"
+            @click="showPage(item.routeName, item.dashboard_id)"
         >
-            <sidebar-title :title="item.label"
-                           style-type="link"
+            <span class="title">
+                {{ item.name }}
+            </span>
+            <p-i v-if="item.scope === 'PRIVATE'" name="ic_private" class="private-icon"
+                 width="1rem"
+                 height="1rem"
             />
-        </div>
-    </aside>
+            <p-i v-if="item.dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
+                 width="1rem" height="1rem"
+            />
+            <p-select-dropdown v-model="selectedMoreMenuItem"
+                               class="more-button"
+                               :items="moreMenuItems"
+                               button-style-type="transparent"
+                               use-fixed-menu-style
+                               menu-position="right"
+                               type="icon-button"
+                               button-icon="ic_more"
+                               @select="handleSelectMoreMenu(item)"
+            />
+        </li>
+    </ul>
 </template>
 
 <script lang="ts">
@@ -59,10 +36,8 @@ import {
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import {
-    PDivider, PI, PSelectDropdown,
+    PI, PSelectDropdown,
 } from '@spaceone/design-system';
-import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
-import { i18n } from '@/translations';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { SpaceRouter } from '@/router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -78,25 +53,12 @@ interface ListItem {
 export default {
     name: 'CostDashboardList',
     components: {
-        SidebarTitle,
-        PDivider,
         PI,
         PSelectDropdown,
-        // PIconButton,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            menuList: computed<ListItem[]>(() => [
-                {
-                    routeName: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.COST_ANALYSIS'),
-                },
-                {
-                    routeName: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.BUDGET'),
-                },
-            ]),
             items: [] as any,
             dashboardList: computed<DashboardItem[]>(() => state.items.map(d => ({
                 ...d,
@@ -144,8 +106,8 @@ export default {
             }
         };
 
-        const showDashboardPage = () => {
-            if (vm.$route.name === BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME) {
+        const showHomeDashboardPage = () => {
+            if (vm.$route.name === BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME && !state.dashboardIdFromRoute) {
                 SpaceRouter.router.replace({
                     name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
                     params: { dashboardId: state.homeDashboardId },
@@ -167,7 +129,7 @@ export default {
         (async () => {
             await listDashboard();
             if (!state.homeDashboardId) initHomeDashboard();
-            showDashboardPage();
+            showHomeDashboardPage();
         })();
 
 

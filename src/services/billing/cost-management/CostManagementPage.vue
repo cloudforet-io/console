@@ -1,7 +1,7 @@
 <template>
     <vertical-page-layout class="cost-management-page">
         <template #sidebar>
-            <cost-dashboard-list />
+            <cost-management-menu />
         </template>
         <template #default>
             <router-view />
@@ -11,14 +11,14 @@
 
 <script lang="ts">
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
-import CostDashboardList from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardList.vue';
 import { store } from '@/store';
+import CostManagementMenu from '@/services/billing/cost-management/modules/CostManagementMenu.vue';
 
 export default {
     name: 'CostManagementPage',
     components: {
+        CostManagementMenu,
         VerticalPageLayout,
-        CostDashboardList,
     },
     setup() {
         (async () => {

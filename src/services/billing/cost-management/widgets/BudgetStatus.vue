@@ -99,7 +99,7 @@ export default {
                 name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
                 params: {},
                 query: {
-                    filters: objectToQueryString(getConvertedBudgetFilter(props.filters)[0]),
+                    filters: objectToQueryString(props.filters),
                 },
             })),
         });

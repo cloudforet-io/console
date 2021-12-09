@@ -22,7 +22,7 @@
             <div v-if="!loading && filteredData.length > 0" class="col-span-12 lg:col-span-3 resource-info-wrapper">
                 <div class="resource-info-title">
                     <span class="resource-info-provider"
-                          :style="{color: providers[selectedProvider] ? providers[selectedProvider].color : undefined }"
+                          :style="{color: providers[selectedProvider||'aws'] ? providers[selectedProvider||'aws'].color : undefined }"
                     >
                         {{ providers[selectedProvider].label }} </span>
                     <span class="resource-info-region">{{ selectedRegion }}</span>
@@ -38,8 +38,8 @@
                             <span class="label-number text-xs text-gray-600">{{ item.count }}</span>
                         </div>
                         <p-progress-bar :percentage="(item.count / maxValue) * 100"
-                                        class="progress-bar" :class="selectedProvider"
-                                        :color="providers[selectedProvider] ? providers[selectedProvider].color : undefined"
+                                        class="progress-bar" :class="selectedProvider||'aws'"
+                                        :color="providers[selectedProvider||'aws'] ? providers[selectedProvider||'aws'].color : undefined"
                         />
                     </router-link>
                 </div>
