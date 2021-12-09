@@ -1,6 +1,7 @@
 <template>
     <div class="budget-toolbox">
         <div class="top">
+            <budget-toolbox-usage-range />
             <div class="period-box">
                 <span class="label">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PERIOD') }}</span>
                 <p-select-status v-for="(status, idx) in periodList" :key="idx"
@@ -51,6 +52,8 @@ import dayjs from 'dayjs';
 
 import { Period } from '@/services/billing/cost-management/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
+import BudgetToolboxUsageRange
+    from '@/services/billing/cost-management/budget/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
 
 export interface Pagination {
     pageStart: number;
@@ -60,6 +63,7 @@ export interface Pagination {
 export default {
     name: 'BudgetToolbox',
     components: {
+        BudgetToolboxUsageRange,
         PToolbox,
         PSelectStatus,
     },
@@ -184,7 +188,7 @@ export default {
     @apply flex flex-wrap flex-col gap-4;
     .top {
         .period-box {
-            @apply flex flex-wrap gap-4;
+            @apply inline-flex flex-wrap gap-4;
             .label {
                 @apply text-gray-500;
             }
