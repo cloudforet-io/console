@@ -1,3 +1,10 @@
+# [1.1.0-beta.200](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.199...v1.1.0-beta.200) (2021-12-09)
+
+
+### Bug Fixes
+
+* fix font-weight in button type ([#778](https://github.com/spaceone-dev/spaceone-design-system/issues/778)) ([26f31e4](https://github.com/spaceone-dev/spaceone-design-system/commit/26f31e434e6d439bceff389d4e9e4cd0a1b0bcde))
+
 # [1.1.0-beta.199](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.198...v1.1.0-beta.199) (2021-12-08)
 
 
