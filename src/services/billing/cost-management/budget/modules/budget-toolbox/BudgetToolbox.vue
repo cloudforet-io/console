@@ -95,6 +95,11 @@ export default {
                     name: 'time_unit',
                     label: 'Time Unit',
                 },
+                {
+                    name: 'cost_types',
+                    label: 'Cost Types',
+                    dataType: 'object',
+                },
             ],
         }];
 
@@ -104,6 +109,7 @@ export default {
             project_id: makeReferenceValueHandler('identity.Project'),
             project_group_id: makeReferenceValueHandler('identity.ProjectGroup'),
             time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit'),
+            cost_types: makeDistinctValueHandler('cost_analysis.Budget', 'cost_types', 'object'),
         };
 
         const filtersHelper = new QueryHelper();
