@@ -171,7 +171,7 @@ export default {
                     subMenuList: [
                         {
                             label: i18n.t('MENU.BILLING.COST_MANAGEMENT'),
-                            to: { name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME },
+                            to: { name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME },
                             show: true,
                             // isNew: true,
                         },

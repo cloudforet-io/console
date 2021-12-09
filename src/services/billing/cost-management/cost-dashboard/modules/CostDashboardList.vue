@@ -144,8 +144,25 @@ export default {
             }
         };
 
-        (() => {
-            listDashboard();
+        const goToDashboardPage = () => {
+            SpaceRouter.router.replace({
+                name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                params: { dashboardId: state.homeDashboardId },
+            }).catch(() => {});
+        };
+
+        const initHomeDashboardId = () => {
+            store.dispatch('settings/setItem', {
+                key: 'homeDashboard',
+                value: state.items[0]?.dashboard_id,
+                path: '/costDashboard',
+            });
+        };
+
+        (async () => {
+            await listDashboard();
+            if (!state.homeDashboardId) initHomeDashboardId();
+            goToDashboardPage();
         })();
 
 
