@@ -125,3 +125,8 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.p-panel-top {
+    margin-bottom: 0.5rem;
+}
+</style>

@@ -11,7 +11,7 @@
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL') }}
             </p-button>
         </div>
-        <p-divider class="my-6" />
+        <p-divider class="mb-6" />
         <div class="input-wrapper">
             <budget-form-amount-plan-month-input v-for="(_, month, index) in monthAmountInputMap" :key="month"
                                                  class="input"
@@ -170,7 +170,7 @@ export default {
     max-width: 87rem;
     .header {
         display: flex;
-        margin-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
         .title {
             flex-grow: 1;
             flex-shrink: 0;
