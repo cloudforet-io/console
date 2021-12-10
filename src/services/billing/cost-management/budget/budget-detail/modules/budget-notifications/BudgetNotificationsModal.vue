@@ -14,7 +14,12 @@
             <div class="desc">
                 <p>When <b>any</b> of the following conditions are met, a notification will be sent immediately.</p>
                 <p-anchor :text="'Set Notifications'"
-                          :href="'/'"
+                          :to="{
+                              name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+                              params: {
+                                  id: budgetTargetId
+                              }
+                          }"
                           highlight
                 />
             </div>
@@ -78,6 +83,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
+import { PROJECT_ROUTE } from '@/services/project/routes';
 
 const NOTIFICATION_UNIT = Object.freeze({
     PERCENT: 'PERCENT',
@@ -111,6 +117,10 @@ export default {
         visible: {
             type: Boolean,
             default: false,
+        },
+        budgetTargetId: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props, { emit }) {
@@ -180,6 +190,7 @@ export default {
             handleDeleteCondition,
             NOTIFICATION_UNIT,
             NOTIFICATION_TYPE,
+            PROJECT_ROUTE,
         };
     },
 };

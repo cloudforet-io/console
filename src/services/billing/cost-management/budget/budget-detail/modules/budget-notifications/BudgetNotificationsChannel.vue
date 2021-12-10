@@ -10,18 +10,20 @@
             {{ protocolFormatter(value) }}
         </template>
         <template #col-data-format="{ index, field, item }">
-            <div v-if="item.data.length > 1">
-                <p v-for="(value, index) in item.data" :key="`item-${index}`">
-                    {{ Object.values(value)[0] }}
-                </p>
-            </div>
-            <p v-else-if="item.secret_id.length > 0">
+            <p v-if="item.secret_id.length > 0">
                 <!-- masking secret data -->
                 data: *******
             </p>
-            <p v-else>
-                {{ Object.values(item.data)[0] }}
+            <p v-if="item.data && Object.keys(item.data)[0] === 'users'">
+                <span v-for="user in item.data.users" :key="`${user}-${index}`">
+                    <p-badge style-type="gray200" shape="square" class="rounded mr-1">{{ user }}</p-badge>
+                </span>
             </p>
+            <div v-else-if="item.data">
+                <p v-for="(value, index) in item.data" :key="`item-${index}`">
+                    {{ value }}
+                </p>
+            </div>
         </template>
         <template #col-notification_level-format="{value}">
             <p-badge :style-type="getBadgeColor(value)" outline>

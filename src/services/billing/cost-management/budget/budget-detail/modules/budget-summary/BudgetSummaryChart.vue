@@ -137,7 +137,7 @@ export default {
             columnSeries.columns.template.propertyFields.stroke = 'stroke';
             columnSeries.columns.template.propertyFields.strokeWidth = 'strokeWidth';
             columnSeries.columns.template.strokeOpacity = 0;
-            columnSeries.columns.template.width = am4core.percent(20);
+            columnSeries.columns.template.width = am4core.percent(17);
             columnSeries.tooltip.label.textAlign = 'middle';
 
             /* Fill column by condition */
@@ -149,7 +149,7 @@ export default {
                 if (target.dataItem?.dataContext[state.limitProperty] < target.dataItem?.dataContext?.usd_cost) {
                     return am4core.color(red[400]);
                 }
-                return fill;
+                return am4core.color(indigo[600]);
             });
 
             if (state.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL) makeTotalPlanningLineSeries(chart);

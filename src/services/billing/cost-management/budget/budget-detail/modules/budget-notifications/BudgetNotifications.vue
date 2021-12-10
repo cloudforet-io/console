@@ -29,7 +29,7 @@
                                 </li>
                             </ul>
                             <p-icon-text-button name="ic_setting" style-type="gray900" outline
-                                                @click="handleSetAlert"
+                                                @click="handleSetNotifications"
                             >
                                 Set
                             </p-icon-text-button>
@@ -37,10 +37,16 @@
                         <article class="noti-channel">
                             <span class="sub-title">Notifications Channel</span>
                             <div class="desc-wrapper">
-                                <span class="desc">Budget alert Message will be sent to the notifications channels below.</span>
-                                <p-anchor class="link-text"
+                                <span class="desc">Budget Notifications Message will be sent to the notifications channels below.</span>
+                                <p-anchor v-if="budgetTargetId"
+                                          class="link-text"
                                           :text="'Set Notifications'"
-                                          :href="'/'"
+                                          :to="{
+                                              name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+                                              params: {
+                                                  id: budgetTargetId
+                                              }
+                                          }"
                                           highlight
                                 />
                             </div>
@@ -50,10 +56,10 @@
                     <template v-else>
                         <div class="noti-not-set">
                             <p class="desc">
-                                Set budget alert if you want to send notifications when the cost exceeds the budget
+                                Set budget notifications if you want to send notifications when the cost exceeds the budget
                             </p>
                             <p-icon-text-button name="ic_setting" style-type="gray900" outline
-                                                @click="handleSetAlert"
+                                                @click="handleSetNotifications"
                             >
                                 Set
                             </p-icon-text-button>
@@ -67,9 +73,10 @@
                       :loading="checkDeleteState.loading"
                       @confirm="handleDeleteForm"
         />
-        <budget-alert-modal v-if="budgetAlertModalVisible"
-                            :visible.sync="budgetAlertModalVisible"
-                            @confirm="handleBudgetAlert"
+        <budget-notifications-modal v-if="budgetNotificationsModalVisible"
+                                    :visible.sync="budgetNotificationsModalVisible"
+                                    :budget-target-id="budgetTargetId"
+                                    @confirm="handleBudgetNotifications"
         />
     </div>
 </template>
@@ -84,18 +91,19 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import BudgetAlertModal
+import BudgetNotificationsModal
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotificationsModal.vue';
 import { BUDGET_NOTIFICATIONS_TYPE, BUDGET_NOTIFICATIONS_UNIT } from '@/services/billing/cost-management/budget/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getUUID } from '@/lib/component-util/getUUID';
 import { commaFormatter } from '@spaceone/console-core-lib';
+import { PROJECT_ROUTE } from '@/services/project/routes';
 
 export default {
     name: 'BudgetNotifications',
     components: {
-        BudgetAlertModal,
+        BudgetNotificationsModal,
         BudgetNotificationsChannel,
         PCard,
         PIconButton,
@@ -106,16 +114,17 @@ export default {
     },
     setup() {
         const state = reactive({
-            hasBudgetAlert: computed(() => (store.state.service.budget.budgetData.notifications.length > 0)),
-            notifications: computed(() => store.state.service.budget.budgetData.notifications.map(d => ({ ...d, id: getUUID() }))),
-            budgetAlertModalVisible: false,
-            budgetId: computed(() => store.state.service.budget.budgetData.budget_id),
+            hasBudgetAlert: computed(() => (store.state.service.budget.budgetData?.notifications.length > 0)),
+            notifications: computed(() => store.state.service.budget.budgetData?.notifications.map(d => ({ ...d, id: getUUID() }))),
+            budgetNotificationsModalVisible: false,
+            budgetId: computed(() => store.state.service.budget.budgetData?.budget_id),
+            budgetTargetId: computed(() => store.state.service.budget.budgetData?.project_id) || undefined,
         });
 
 
         const checkDeleteState = reactive({
             visible: false,
-            headerTitle: 'Are you sure you want to delete the budget alert?',
+            headerTitle: 'Are you sure you want to delete the budget notifications?',
             loading: true,
         });
         const handleDelete = () => {
@@ -136,12 +145,12 @@ export default {
             }
         };
 
-        const handleSetAlert = () => {
-            state.budgetAlertModalVisible = true;
+        const handleSetNotifications = () => {
+            state.budgetNotificationsModalVisible = true;
         };
 
-        const handleBudgetAlert = () => {
-            state.budgetAlertModalVisible = false;
+        const handleBudgetNotifications = () => {
+            state.budgetNotificationsModalVisible = false;
         };
 
         return {
@@ -149,11 +158,12 @@ export default {
             checkDeleteState,
             handleDelete,
             handleDeleteForm,
-            handleSetAlert,
-            handleBudgetAlert,
+            handleSetNotifications,
+            handleBudgetNotifications,
             commaFormatter,
             BUDGET_NOTIFICATIONS_UNIT,
             BUDGET_NOTIFICATIONS_TYPE,
+            PROJECT_ROUTE,
         };
     },
 };
