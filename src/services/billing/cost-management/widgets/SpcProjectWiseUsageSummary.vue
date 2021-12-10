@@ -25,13 +25,14 @@
             />
             <cost-dashboard-data-table v-if="tableState.items.length > 10"
                                        :fields="tableState.fields"
-                                       :items="tableState.secondTableItems"
+                                       :items="tableState.items"
                                        :loading="tableState.loading"
                                        :chart="chart"
                                        :legends="legends"
                                        :currency-rates="currencyRates"
                                        :currency="currency"
                                        :page-size="10"
+                                       :this-page="2"
                                        :pagination-visible="false"
                                        show-legend
                                        class="table table-right"
@@ -131,7 +132,6 @@ export default defineComponent<WidgetProps>({
         const tableState = reactive({
             loading: false,
             items: [],
-            secondTableItems: computed(() => tableState.items.slice(11, 20)),
             fields: computed(() => [
                 { name: 'project_id', label: 'Project' },
                 { name: 'usd_cost', label: 'Accumulated Spent', textAlign: 'right' },

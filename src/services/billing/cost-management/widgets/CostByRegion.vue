@@ -129,6 +129,7 @@ export default defineComponent<WidgetProps>({
             chart.geodata = am4geodataContinentsLow;
             chart.projection = new am4maps.projections.Miller();
             chart.responsive.enabled = true;
+            chart.chartContainer.wheelable = false;
 
             const polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
             polygonSeries.useGeodata = true;

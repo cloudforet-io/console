@@ -57,8 +57,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { indigo, yellow, red } from '@/styles/colors';
 import { i18n } from '@/translations';
-import { objectToQueryString } from '@/lib/router-query-string';
-
 
 interface ChartData {
     budgetId: string;
@@ -84,6 +82,7 @@ export default {
         },
     },
     setup(props: WidgetProps) {
+        const budgetQueryHelper = new QueryHelper();
         const state = reactive({
             loading: false,
             chartData: [] as ChartData[],
@@ -99,7 +98,7 @@ export default {
                 name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
                 params: {},
                 query: {
-                    filters: objectToQueryString(props.filters),
+                    filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(props.filters)).rawQueryStrings,
                 },
             })),
         });
@@ -127,7 +126,6 @@ export default {
         };
 
         /* api */
-        const budgetQueryHelper = new QueryHelper();
         const getBudgetUsageData = async (period, filters) => {
             budgetQueryHelper.setFilters(getConvertedBudgetFilter(filters));
             try {
