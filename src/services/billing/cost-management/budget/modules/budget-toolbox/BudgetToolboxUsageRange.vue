@@ -18,7 +18,7 @@ import {
 } from '@vue/composition-api';
 
 import { red, yellow, indigo } from '@/styles/colors';
-import { BudgetUsageRange } from '@/services/billing/cost-management/budget/modules/budget-toolbox/type';
+import { BudgetUsageRange } from '@/services/billing/cost-management/budget/type';
 
 const USAGE_RANGE = Object.freeze({
     overspent: 'overspent',

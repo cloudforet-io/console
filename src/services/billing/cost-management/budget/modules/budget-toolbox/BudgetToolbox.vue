@@ -1,7 +1,7 @@
 <template>
     <div class="budget-toolbox">
         <div class="top">
-            <budget-toolbox-usage-range />
+            <budget-toolbox-usage-range @update="handleUpdateUsageRange" />
             <div class="period-box">
                 <span class="label">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PERIOD') }}</span>
                 <p-select-status v-for="(status, idx) in periodList" :key="idx"
@@ -54,6 +54,7 @@ import { Period } from '@/services/billing/cost-management/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import BudgetToolboxUsageRange
     from '@/services/billing/cost-management/budget/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
+import { BudgetUsageRange } from '@/services/billing/cost-management/budget/type';
 
 export interface Pagination {
     pageStart: number;
@@ -128,6 +129,7 @@ export default {
             pageLimit: 24,
             queryTags: filtersHelper.setFilters(props.filters).queryTags as QueryTag[],
             // query
+            range: {} as BudgetUsageRange,
             pagination: computed<Pagination>(() => ({
                 pageStart: state.pageStart,
                 pageLimit: state.pageLimit,
@@ -145,6 +147,10 @@ export default {
         });
 
         /* Handlers */
+        const handleUpdateUsageRange = (range: BudgetUsageRange) => {
+            state.range = range;
+        };
+
         const handleSelectStatus = (selected: string[]) => {
             state.selectedPeriod = selected;
         };
@@ -156,6 +162,9 @@ export default {
         };
 
         /* Watchers */
+        watch(() => state.range, (range) => {
+            emit('update-range', range);
+        });
         watch(() => state.pagination, (pagination) => {
             emit('update-pagination', pagination);
         });
@@ -177,6 +186,7 @@ export default {
             pageSizeOptions,
             keyItemSets,
             valueHandlerMap,
+            handleUpdateUsageRange,
             handleSelectStatus,
             handleChangeToolbox,
         };

@@ -80,3 +80,9 @@ export type BudgetPageUrlQuery = Partial<Record<'filters', RouteQueryString>>
 export interface BudgetPageQueryValue {
 	filters?: QueryStoreFilter[];
 }
+
+export interface BudgetUsageRange {
+	min?: number;
+	max?: number;
+	condition?: 'or'|'and'; // default: 'and'
+}
