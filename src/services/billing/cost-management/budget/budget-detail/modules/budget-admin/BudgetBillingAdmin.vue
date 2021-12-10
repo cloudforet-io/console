@@ -24,7 +24,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 export default {
-    name: 'BudgetDetailSummaryTable',
+    name: 'BudgetDetailBillingAdmin',
     components: {
         PCard,
         PDataTable,
