@@ -47,7 +47,7 @@ textarea:focus:not(:focus-visible), input:focus:not(:focus-visible) {
   outline: none;
 }
 
-input[type=text]:focus {
+input:focus {
     outline: none;
 }
 

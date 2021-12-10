@@ -18,6 +18,7 @@
                 >
                     <p-text-input v-model="formattedStartBudget" placeholder="1,000"
                                   :invalid="invalidState.start"
+                                  type="number"
                     >
                         <template #right-extra>
                             ($)
@@ -27,6 +28,7 @@
 
                 <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_EXPECTED_BUDGET')">
                     <p-text-input :value="growth" placeholder="10"
+                                  type="number"
                                   @input="setForm('growth', $event)"
                     >
                         <template #right-extra>

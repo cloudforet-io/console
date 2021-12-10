@@ -199,16 +199,20 @@ export default {
     }
 }
 .budget-list-card {
+    @apply rounded-lg;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
     .card-wrapper {
         @apply border border-solid border-gray-200 rounded-lg bg-white;
         line-height: 1.2;
+        &:hover {
+            @apply bg-secondary-2;
+        }
         .card-header {
             padding: 1rem;
             .budget-name {
                 @apply text-gray-900 font-bold;
             }
         }
-
         .card-body {
             .label {
                 @apply text-gray-400;
@@ -217,6 +221,7 @@ export default {
             padding: 1rem;
             .label-wrapper {
                 @apply flex justify-between;
+                margin-bottom: 0.25rem;
                 .cost {
                     font-size: 1.125rem;
                     line-height: 1.75rem;

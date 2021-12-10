@@ -100,6 +100,7 @@ export default {
         display: inline-flex;
         flex-wrap: wrap;
         align-items: center;
+        height: 1.3125rem;
         margin-right: 1rem;
         cursor: pointer;
         .mark {
@@ -112,7 +113,6 @@ export default {
         .label {
             @apply text-gray-700;
             font-size: 0.875rem;
-            line-height: 1.5;
         }
 
         &.disabled {

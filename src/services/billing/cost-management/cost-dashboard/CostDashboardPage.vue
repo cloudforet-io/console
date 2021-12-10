@@ -155,6 +155,7 @@ export default {
     row-gap: 1rem;
     min-width: 62.25rem;
     max-width: 117rem;
+    padding-right: 1.5rem;
     .p-page-title {
         width: auto;
         margin-bottom: 0;

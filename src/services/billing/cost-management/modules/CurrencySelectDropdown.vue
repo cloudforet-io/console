@@ -46,8 +46,3 @@ export default {
     },
 };
 </script>
-<style lang="postcss" scoped>
-.p-select-dropdown {
-    background-color: transparent;
-}
-</style>

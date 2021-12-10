@@ -218,11 +218,39 @@ export default {
 <style scoped lang="postcss">
 .budget-toolbox {
     @apply flex flex-wrap flex-col gap-4;
+    padding-top: 1.5rem;
     .top {
         .period-box {
-            @apply inline-flex flex-wrap gap-4;
+            @apply relative inline-flex flex-wrap gap-4 items-center pl-4;
+            height: 1.25rem;
+
+            &::before {
+                @apply bg-gray-300;
+                position: absolute;
+                top: 50%;
+                left: 0;
+                display: inline-block;
+                width: 0.0625rem;
+                height: 1rem;
+                content: ' ';
+                margin-top: calc(-1rem / 2);
+            }
             .label {
                 @apply text-gray-500;
+                font-size: 0.875rem;
+            }
+        }
+    }
+
+    @screen mobile {
+        .top {
+            @apply flex flex-wrap gap-4;
+            .period-box {
+                @apply pl-0;
+
+                &::before {
+                    display: none;
+                }
             }
         }
     }

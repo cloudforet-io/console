@@ -207,7 +207,6 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .budget-list {
-    @apply flex flex-col flex-wrap gap-4;
     .budget-list-card-box {
         @apply grid grid-cols-2 gap-4;
 

@@ -186,48 +186,46 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .budget-stat {
-    @apply border border-gray-200 rounded-lg border-solid box-border bg-white flex;
+    @apply flex rounded-lg border-solid box-border bg-white border border-gray-200;
+    padding: 1.125rem 0;
+    margin-bottom: 1rem;
     .card-box {
-        @apply flex flex-wrap flex-col justify-center gap-1;
-        width: 100%;
-        padding: 1.125rem 0;
+        @apply border-gray-200 border-l;
+        width: 33.33%;
         text-align: center;
 
+        &:first-of-type {
+            @apply border-l-0;
+        }
         .symbol {
             @apply font-bold text-lg;
         }
         .title {
             @apply text-gray-700 text-sm;
-            line-height: 1.3125rem;
+            line-height: 1.5;
         }
         .stat {
             @apply text-2xl font-bold flex justify-center;
-            line-height: 1.75rem;
+            padding: 0.25rem 0;
+            line-height: 1.2;
         }
         .description {
             @apply text-xs text-gray-400;
-            line-height: 1.125rem;
-        }
-
-        &:first-child {
-            @apply border-r border-gray-200;
-        }
-
-        &:last-child {
-            @apply border-l border-gray-200;
+            line-height: 1.5;
         }
     }
 
     @screen mobile {
-        @apply flex flex-col;
+        @apply flex flex-col items-center;
+        padding: 0 0.75rem;
         .card-box {
-            &:first-child {
-                @apply border-b border-gray-200;
-                border-right: 0;
-            }
-            &:last-child {
-                @apply border-t border-gray-200;
-                border-left: 0;
+            @apply flex flex-col justify-center border-t border-l-0;
+
+            width: 100%;
+            min-height: 6rem;
+
+            &:first-of-type {
+                @apply border-t-0;
             }
         }
     }

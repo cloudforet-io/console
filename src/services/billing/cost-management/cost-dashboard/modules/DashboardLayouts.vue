@@ -72,9 +72,11 @@ export default {
         width: 100%;
     }
     .col-1 {
+        min-width: 60.75rem;
         width: 100%;
     }
     .col-2 {
+        min-width: 29.875rem;
         width: 50%;
     }
     .col-3 {
@@ -92,12 +94,7 @@ export default {
         }
         [class^='col-'] {
             width: 100%;
-        }
-        .col-2, .col-3 {
-            > * {
-                width: 100%;
-                min-width: 100%;
-            }
+            min-width: 100%;
         }
     }
 }

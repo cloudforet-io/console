@@ -101,9 +101,6 @@ export default {
 .p-badge {
     margin-right: 0.5rem;
 }
-.p-select-dropdown {
-    background-color: transparent;
-}
 
 @screen mobile {
     .date-filter {
