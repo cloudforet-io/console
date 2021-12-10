@@ -17,13 +17,15 @@ export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PRadio },
     template: `
-        <div class="h-full w-full overflow p-8">
-            <p-radio :value="value"
-                        v-model="proxySelected"
-                        :disabled="disabled"
-                        :predicate="predicate"
-                        :invalid="invalid"
-                        @change="onChange"
+        <div class="h-full w-full overflow p-8 flex flex-col">
+            <p-radio v-for="value in values"
+                     :key="value"
+                     :value="value"
+                     v-model="proxySelected"
+                     :disabled="disabled"
+                     :predicate="predicate"
+                     :invalid="invalid"
+                     @change="onChange"
             >
                 <span v-html="defaultSlot" />
                 <template #radio-left>
@@ -38,7 +40,8 @@ export const Template = (args, { argTypes }) => ({
     setup(props) {
         const vm = getCurrentInstance()
         const state = reactive({
-            proxySelected: makeOptionalProxy('selected', vm, props.selected)
+            proxySelected: makeOptionalProxy('selected', vm, props.selected),
+            values: [0, 1, 2, 3],
         })
         return {
             ...toRefs(state)
@@ -92,8 +95,11 @@ export const Template = (args, { argTypes }) => ({
             template: `
         <div>
             <div class="flex flex-col mb-8">
-                <p-radio v-model="selected">
-                    simple boolean radio
+                <p-radio v-model="selected" :value="true">
+                    true
+                </p-radio>
+                <p-radio v-model="selected" :value="false">
+                    false
                 </p-radio>
             </div>
             selected : {{selected}}
@@ -101,7 +107,7 @@ export const Template = (args, { argTypes }) => ({
     `,
             setup() {
                 const state = reactive({
-                    selected: false,
+                    selected: true,
                 })
                 return {
                     ...toRefs(state)

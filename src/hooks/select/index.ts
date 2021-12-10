@@ -39,15 +39,12 @@ const getSelectState = (state: UnwrapRef<SelectStateArgs>) => reactive({
         return state.selected === state.value;
     }),
 });
-const getSingleSelected = (state: UnwrapRef<SelectStateArgs>, selectState: SelectState) => {
+const getSingleSelected = (state: UnwrapRef<SelectStateArgs>) => {
     if (state.disabled) return undefined;
-    if (selectState.isSelected) return undefined;
 
     let result: any;
     if (Array.isArray(state.selected)) {
         result = [state.value];
-    } else if (typeof state.selected === 'boolean') {
-        result = !state.selected;
     } else {
         result = state.value;
     }
@@ -100,7 +97,7 @@ export const useSingleSelect = ({
         value, selected, predicate, disabled,
     });
     const selectState: UnwrapRef<SelectState> = getSelectState(state);
-    const getSelected = () => getSingleSelected(state, selectState);
+    const getSelected = () => getSingleSelected(state);
 
     return {
         ...toRefs(selectState),
@@ -116,7 +113,7 @@ export const useSelect = ({
         value, selected, predicate, disabled, multiSelectable,
     });
     const selectedState: UnwrapRef<SelectState> = getSelectState(state);
-    const getSelected = () => (state.multiSelectable ? getMultiSelected(state, selectedState) : getSingleSelected(state, selectedState));
+    const getSelected = () => (state.multiSelectable ? getMultiSelected(state, selectedState) : getSingleSelected(state));
 
     return {
         ...toRefs(selectedState),
