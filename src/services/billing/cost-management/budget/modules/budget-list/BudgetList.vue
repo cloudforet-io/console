@@ -7,6 +7,7 @@
                         @update-filters="handleUpdateFilters"
                         @refresh="handleRefresh"
                         @export="handleExport"
+                        @update-sort="handleUpdateSort"
         />
         <budget-stat :filters="_filters" :period="period" :usage-range="range" />
         <div class="budget-list-card-box">
@@ -84,12 +85,17 @@ export default {
                     .setFilters([{ k: 'budget_id', v: state.budgetUsages.map(d => d.budget_id), o: '=' }])
                     .apiQuery,
             })),
+            sort: {
+                key: 'usage',
+                desc: true,
+            },
             budgetUsageParam: computed<BudgetUsageAnalyzeRequestParam>(() => {
                 const param = {
                     group_by: ['budget_id'],
+                    include_budget_info: true,
                     ...budgetUsageApiQueryHelper.setFilters(state._filters)
                         .setPage(state.pageStart, state.pageLimit)
-                        .setSort('usage', true)
+                        .setSort(state.sort.key, state.sort.desc)
                         .data,
                 } as BudgetUsageAnalyzeRequestParam;
 
@@ -171,6 +177,11 @@ export default {
 
         };
 
+        const handleUpdateSort = (sort) => {
+            state.sort = sort;
+            listBudgets();
+        };
+
         /* Watchers */
         watch(() => props.filters, (filters) => {
             if (filters !== state._filters) state._filters = filters;
@@ -189,6 +200,7 @@ export default {
             handleUpdateFilters,
             handleRefresh,
             handleExport,
+            handleUpdateSort,
         };
     },
 };

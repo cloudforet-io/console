@@ -27,7 +27,25 @@
                    @change="handleChangeToolbox"
                    @refresh="$emit('refresh')"
                    @export="$emit('export')"
-        />
+        >
+            <template #left-area>
+                <div class="left-area">
+                    <p-select-dropdown
+                        :items="sortKeyList"
+                        :selected.sync="selectedSortKey"
+                    />
+                    <p-button
+                        class="sort-box" style-type="gray-border"
+                        @click="handleSortType"
+                    >
+                        <span>{{ sort.desc ? 'Desc' : 'Asc' }}</span>
+                        <p-i :name="sort.desc ? 'ic_arrow-down' : 'ic_arrow-up'"
+                             color="gray900" height="1rem"
+                        />
+                    </p-button>
+                </div>
+            </template>
+        </p-toolbox>
     </div>
 </template>
 
@@ -37,7 +55,9 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PToolbox, PSelectStatus } from '@spaceone/design-system';
+import {
+    PToolbox, PSelectStatus, PButton, PI, PSelectDropdown,
+} from '@spaceone/design-system';
 import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 
@@ -54,19 +74,23 @@ import { Period } from '@/services/billing/cost-management/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import BudgetToolboxUsageRange
     from '@/services/billing/cost-management/budget/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
-import { BudgetUsageRange } from '@/services/billing/cost-management/budget/type';
+import { BudgetUsageAnalyzeRequestParam, BudgetUsageRange } from '@/services/billing/cost-management/budget/type';
+import { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 
 export interface Pagination {
     pageStart: number;
     pageLimit: number;
 }
-
+type Sort = BudgetUsageAnalyzeRequestParam['sort'];
 export default {
     name: 'BudgetToolbox',
     components: {
         BudgetToolboxUsageRange,
         PToolbox,
         PSelectStatus,
+        PSelectDropdown,
+        PButton,
+        PI,
     },
     props: {
         filters: {
@@ -80,31 +104,12 @@ export default {
         const keyItemSets: KeyItemSet[] = [{
             title: 'Properties',
             items: [
-                {
-                    name: 'budget_id',
-                    label: 'Budget ID',
-                },
-                {
-                    name: 'name',
-                    label: 'Name',
-                },
-                {
-                    name: 'project_id',
-                    label: 'Project',
-                },
-                {
-                    name: 'project_group_id',
-                    label: 'Project Group',
-                },
-                {
-                    name: 'time_unit',
-                    label: 'Time Unit',
-                },
-                {
-                    name: 'cost_types',
-                    label: 'Cost Types',
-                    dataType: 'object',
-                },
+                { name: 'budget_id', label: 'Budget ID' },
+                { name: 'name', label: 'Name' },
+                { name: 'project_id', label: 'Project' },
+                { name: 'project_group_id', label: 'Project Group' },
+                { name: 'time_unit', label: 'Time Unit' },
+                { name: 'cost_types', label: 'Cost Types', dataType: 'object' },
             ],
         }];
 
@@ -144,6 +149,17 @@ export default {
                 return period;
             }),
             _filters: computed(() => filtersHelper.setFiltersAsQueryTag(state.queryTags).filters),
+            sortKeyList: computed<SelectDropdownMenu[]>(() => ([
+                { label: `% ${i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED')}`, name: 'usage' },
+                { label: `$ ${i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED')}`, name: 'usd_cost' },
+                { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_NAME'), name: 'name' },
+            ])),
+            sortDesc: true,
+            selectedSortKey: 'usage',
+            sort: computed<Sort>(() => ({
+                key: state.selectedSortKey,
+                desc: state.sortDesc,
+            })),
         });
 
         /* Handlers */
@@ -159,6 +175,10 @@ export default {
             if (options.queryTags !== undefined) state.queryTags = options.queryTags;
             if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
             if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+        };
+
+        const handleSortType = () => {
+            state.sortDesc = !state.sortDesc;
         };
 
         /* Watchers */
@@ -179,6 +199,7 @@ export default {
                 state.queryTags = filtersHelper.setFilters(filters).queryTags;
             }
         });
+        watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 
 
         return {
@@ -189,6 +210,7 @@ export default {
             handleUpdateUsageRange,
             handleSelectStatus,
             handleChangeToolbox,
+            handleSortType,
         };
     },
 };
@@ -201,6 +223,15 @@ export default {
             @apply inline-flex flex-wrap gap-4;
             .label {
                 @apply text-gray-500;
+            }
+        }
+    }
+
+    .left-area {
+        @apply flex flex-wrap gap-4;
+        .sort-box {
+            &:hover {
+                @apply bg-gray-900 text-white border-gray-900;
             }
         }
     }
