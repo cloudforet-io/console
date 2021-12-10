@@ -21,10 +21,10 @@
                 </p>
             </div>
         </template>
-        <slot />
         <div v-if="noData" class="no-data">
             No Item
         </div>
+        <slot />
     </p-card>
 </template>
 
@@ -97,6 +97,7 @@ export default {
             height: 100%;
             font-size: 0.875rem;
             line-height: 160%;
+            z-index: 1;
         }
     }
 

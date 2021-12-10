@@ -1,16 +1,14 @@
 <template>
     <p-pane-layout class="card-widget-layout">
-        <template v-if="loading">
+        <div v-if="loading">
             <p-skeleton width="11rem" height="3rem" />
             <p-skeleton width="9.5rem" height="1rem" class="mb-5" />
             <p-skeleton width="14rem" height="1.75rem" />
-        </template>
-        <template v-else-if="noData">
-            <div class="no-data">
-                No Item
-            </div>
-        </template>
-        <template v-else>
+        </div>
+        <div v-if="!loading && noData" class="no-data">
+            No Item
+        </div>
+        <div v-else-if="!loading && !noData">
             <p class="title-wrapper">
                 <span class="title">{{ title }}</span>
                 <span v-if="$scopedSlots['title-extra']" class="title-extra">
@@ -25,7 +23,7 @@
             <span class="description">{{ description }}</span>
             <p-divider v-if="showDivider" class="divider" />
             <slot />
-        </template>
+        </div>
     </p-pane-layout>
 </template>
 
