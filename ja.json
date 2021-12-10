@@ -340,8 +340,10 @@
 				},
 				"MAIN": {
 					"AMOUNT_SPENT": "",
+					"AMOUNT_USED": "",
 					"BUDGET": "",
 					"BUDGETED": "",
+					"BUDGET_NAME": "",
 					"COST_TYPE": "",
 					"CREATE_BUDGET": "",
 					"MONTHLY": "",

@@ -340,8 +340,10 @@
 				},
 				"MAIN": {
 					"AMOUNT_SPENT": "Amount Spent",
+					"AMOUNT_USED": "Amount used",
 					"BUDGET": "Budget",
 					"BUDGETED": "Budgeted",
+					"BUDGET_NAME": "Budget name",
 					"COST_TYPE": "Cost Type",
 					"CREATE_BUDGET": "Create Budget",
 					"MONTHLY": "Monthly",

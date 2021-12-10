@@ -340,8 +340,10 @@
 				},
 				"MAIN": {
 					"AMOUNT_SPENT": "",
+					"AMOUNT_USED": "사용량",
 					"BUDGET": "",
 					"BUDGETED": "",
+					"BUDGET_NAME": "예산 ",
 					"COST_TYPE": "",
 					"CREATE_BUDGET": "",
 					"MONTHLY": "",
