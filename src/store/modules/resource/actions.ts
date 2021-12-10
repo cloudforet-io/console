@@ -8,7 +8,6 @@ export const loadAll = async ({ dispatch }): Promise<void|Error> => {
         dispatch('region/load'),
         dispatch('plugin/load'),
         dispatch('user/load'),
-        dispatch('spotGroup/load'),
         dispatch('protocol/load'),
     ]);
 };

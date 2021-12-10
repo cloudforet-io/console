@@ -62,10 +62,11 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
+import { store } from '@/store';
 
 
 interface TableItem {
-    project: string;
+    project_id: string;
     [key: string]: string | number;
 }
 
@@ -117,6 +118,7 @@ export default {
                     filters: objectToQueryString(props.filters),
                 },
             })),
+            projects: computed(() => store.state.resource.project.items),
             //
             chartLoading: true,
             chartRegistry: {},
@@ -130,9 +132,13 @@ export default {
             fields: computed<DataTableField[]>(() => {
                 const fields: DataTableField[] = [{ name: GROUP_BY.PROJECT, label: 'Project' }];
                 const fiveMonthsAgo = dayjs.utc().subtract(5, 'month');
+                const thisMonth = dayjs.utc();
                 range(6).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');
-                    fields.push({ name: date.format('YYYY-MM'), label: date.format('MMM') });
+                    fields.push({
+                        name: date.format('YYYY-MM'),
+                        label: thisMonth.isSame(date, 'month') ? `${date.format('MMM')} (MTD)` : date.format('MMM'),
+                    });
                 });
                 return fields;
             }),
@@ -218,6 +224,10 @@ export default {
             start: dayjs(period.end).subtract(5, 'month').format('YYYY-MM'),
             end: dayjs.utc(period.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
         });
+        const _getConvertedTableItems = (tableItems: TableItem[]): TableItem[] => tableItems.map(d => ({
+            ...d,
+            project_id: state.projects[d.project_id]?.label || d.project_id,
+        }));
 
         /* api */
         const costQueryHelper = new QueryHelper();
@@ -238,7 +248,8 @@ export default {
                     ...costQueryHelper.apiQuery,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;
-                state.items = getTableDataFromRawData(results, [GROUP_BY.PROJECT]) as TableItem[];
+                const tableItems = getTableDataFromRawData(results, [GROUP_BY.PROJECT]) as TableItem[];
+                state.items = _getConvertedTableItems(tableItems); // project id -> project name
                 state._top15itemNames = results.map(d => d.project_id);
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -283,7 +294,9 @@ export default {
 
         watch([() => state.chartLoading, () => state.chartRef], ([chartLoading, chartContext]) => {
             if (!chartLoading && chartContext) {
-                state.chart = drawChart(chartContext, state.chartData, state.legends);
+                const slicedChartData = state.chartData.slice(0, 5);
+                const slicedLegends = state.legends.slice(0, 5);
+                state.chart = drawChart(chartContext, slicedChartData, slicedLegends);
             }
         });
         watch(() => props.currency, (currency) => {
@@ -295,6 +308,11 @@ export default {
             getCostChartData(state._top15itemNames, period, filters);
             getCostTableData(period, filters);
         }, { immediate: true });
+        watch(() => state.thisPage, (thisPage) => {
+            const slicedChartData = state.chartData.slice((thisPage * 5) - 5, thisPage * 5);
+            const slicedLegends = state.legends.slice((thisPage * 5) - 5, thisPage * 5);
+            state.chart = drawChart(state.chartRef, slicedChartData, slicedLegends);
+        }, { immediate: false });
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();

@@ -22,7 +22,7 @@
             <div class="right-part">
                 <span class="timezone-text">UTC</span>
                 <div class="filter-item">
-                    <p-datetime-picker :selected-dates="[period.start, period.end]"
+                    <p-datetime-picker :selected-dates="selectedDates"
                                        style-type="text"
                                        select-mode="range"
                                        @update:selectedDates="handleSelectedDates"
@@ -77,7 +77,10 @@ export default {
             granularity: computed(() => store.state.service.costAnalysis.granularity),
             chartType: computed(() => store.state.service.costAnalysis.chartType),
             period: computed<Period>(() => store.state.service.costAnalysis.period),
-            currency: 'USD',
+            selectedDates: computed<string[]>(() => ([
+                dayjs.utc(state.period.start).format(),
+                dayjs.utc(state.period.end).format(),
+            ])),
             //
             granularityItems: computed<MenuItem[]>(() => ([
                 {

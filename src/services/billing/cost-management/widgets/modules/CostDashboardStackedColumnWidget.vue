@@ -62,18 +62,20 @@ import {
     getCurrencyAppliedChartData, getTableDataFromRawData, getXYChartDataAndLegends,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { CURRENCY } from '@/store/modules/display/config';
 import { ChartData, Legend, WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Period } from '@/services/billing/cost-management/type';
+import { store } from '@/store';
 
 
 interface TableItem {
-    provider?: string;
-    product?: string;
-    project?: string;
     [key: string]: undefined | string | number;
+}
+
+interface ProviderTableItem extends TableItem{
+    provider: string;
 }
 
 interface Props extends WidgetProps {
@@ -113,6 +115,7 @@ export default defineComponent<Props>({
     setup(props: Props) {
         const state = reactive({
             _top15itemNames: [],
+            providers: computed(() => store.state.resource.provider.items),
             //
             chartLoading: true,
             chartRegistry: {},
@@ -126,9 +129,13 @@ export default defineComponent<Props>({
             fields: computed<DataTableField[]>(() => {
                 const fields: DataTableField[] = [{ name: props.groupBy, label: GROUP_BY_ITEM_MAP[props.groupBy].label }];
                 const fiveMonthsAgo = dayjs.utc(props.period.end).subtract(5, 'month');
+                const thisMonth = dayjs.utc();
                 range(state.thisMonthPage * 3 - 3, state.thisMonthPage * 3).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');
-                    fields.push({ name: date.format('YYYY-MM'), label: date.format('MMM') });
+                    fields.push({
+                        name: date.format('YYYY-MM'),
+                        label: thisMonth.isSame(date, 'month') ? `${date.format('MMM')} (MTD)` : date.format('MMM'),
+                    });
                 });
                 return fields;
             }),
@@ -220,6 +227,16 @@ export default defineComponent<Props>({
             start: dayjs(period.end).subtract(5, 'month').format('YYYY-MM'),
             end: dayjs.utc(period.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
         });
+        const _getConvertedTableItems = (rawData, groupBy): TableItem[] => {
+            const tableItems = getTableDataFromRawData(rawData, [groupBy]) as TableItem[];
+            if (groupBy === GROUP_BY.PROVIDER) {
+                return (tableItems as ProviderTableItem[]).map(d => ({
+                    ...d,
+                    provider: state.providers[d.provider]?.label || d.provider,
+                }));
+            }
+            return tableItems;
+        };
 
         /* api */
         const costQueryHelper = new QueryHelper();
@@ -240,7 +257,7 @@ export default defineComponent<Props>({
                     ...costQueryHelper.apiQuery,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;
-                state.items = getTableDataFromRawData(results, [props.groupBy]) as TableItem[];
+                state.items = _getConvertedTableItems(results, props.groupBy);
                 state._top15itemNames = results.map(d => d[props.groupBy]);
             } catch (e) {
                 ErrorHandler.handleError(e);
