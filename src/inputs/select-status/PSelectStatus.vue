@@ -109,6 +109,7 @@ export default defineComponent<Props>({
 
         .text {
             margin-left: 0;
+            font-size: 0.875rem;
         }
 
         &.with-icon {

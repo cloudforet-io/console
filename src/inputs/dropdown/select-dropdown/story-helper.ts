@@ -94,7 +94,7 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
             },
         },
         disabled: {
-            name: 'loading',
+            name: 'disabled',
             type: { name: 'boolean' },
             description: 'Whether to disable dropdown selection or not.',
             defaultValue: false,

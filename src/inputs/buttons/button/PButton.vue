@@ -98,7 +98,7 @@ export default {
             @apply bg-gray-200 text-gray-400 border-gray-100;
             cursor: not-allowed;
             &.outline {
-                @apply bg-transparent text-gray-300 border-gray-300;
+                @apply text-gray-300 border-gray-300;
             }
         }
         &.loading {

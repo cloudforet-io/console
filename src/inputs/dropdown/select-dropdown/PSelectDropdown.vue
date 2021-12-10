@@ -393,7 +393,7 @@ export default defineComponent<SelectDropdownProps>({
         }
         &.outline-button {
             .dropdown-button {
-                @apply border-secondary text-secondary bg-transparent;
+                @apply border-secondary text-secondary bg-white;
                 .dropdown-icon {
                     transform: rotate(180deg);
                 }
@@ -425,7 +425,7 @@ export default defineComponent<SelectDropdownProps>({
             .dropdown-button {
                 @media (hover: hover) {
                     &:not(.active):not(.disabled):hover {
-                        @apply bg-transparent text-secondary border-secondary;
+                        @apply bg-white text-secondary border-secondary;
                     }
                 }
             }
