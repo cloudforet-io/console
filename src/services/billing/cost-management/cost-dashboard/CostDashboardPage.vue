@@ -2,17 +2,17 @@
     <div class="cost-dashboard-page">
         <p-breadcrumbs :routes="routeState.route" />
         <div class="top-wrapper">
-            <p-page-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
+            <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
             <div class="left-part">
-                <favorite-button :item-id="'item-id1'"
-                                 favorite-type="project"
-                                 resource-type="identity.Project"
-                />
-                <p-icon-button name="ic_edit-text"
-                               class="edit-btn"
-                               :outline="false"
-                               @click.stop="handleClickEditDashboard"
-                />
+                <!--                <favorite-button :item-id="'item-id1'"-->
+                <!--                                 favorite-type="project"-->
+                <!--                                 resource-type="identity.Project"-->
+                <!--                />-->
+                <!--                <p-icon-button name="ic_edit-text"-->
+                <!--                               class="edit-btn"-->
+                <!--                               :outline="false"-->
+                <!--                               @click.stop="handleClickEditDashboard"-->
+                <!--                />-->
                 <cost-dashboard-more-menu :dashboard-id="dashboardId" />
             </div>
             <div class="right-part">
@@ -50,7 +50,6 @@ import {
 import { BILLING_ROUTE } from '@/services/billing/routes';
 
 import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import DashboardLayouts from '@/services/billing/cost-management/cost-dashboard/modules/DashboardLayouts.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -62,26 +61,6 @@ import CostDashboardPeriodSelectDropdown
 import { DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 
-
-const tempProjectsData = [
-    {
-        id: 'a-1',
-        name: 'project1',
-    },
-    {
-        id: 'a-2',
-        name: 'project2',
-    },
-    {
-        id: 'a-3',
-        name: 'project3',
-    },
-    {
-        id: 'a-4',
-        name: 'project4',
-    },
-];
-
 export default {
     name: 'CostDashboardPage',
     components: {
@@ -89,7 +68,6 @@ export default {
         CostDashboardMoreMenu,
         DashboardLayouts,
         CurrencySelectDropdown,
-        FavoriteButton,
         CostDashboardFilter,
         PIconButton,
         PBreadcrumbs,
@@ -103,9 +81,6 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            selectedProjects: computed(() => tempProjectsData.map(d => ({
-                ...d,
-            }))),
             dashboard: {} as DashboardInfo,
             layout: [] as any[],
             period: {} as Period,
