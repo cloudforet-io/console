@@ -8,7 +8,7 @@
                         @refresh="handleRefresh"
                         @export="handleExport"
         />
-        <budget-stat :loading="loading" :budgets="budgets" />
+        <budget-stat :filters="_filters" :period="period" :usage-range="range" />
         <div class="budget-list-card-box">
             <budget-list-card v-for="budgetUsage in budgetUsages" :key="budgetUsage.budget_id"
                               :budget="budgetMap[budgetUsage.budget_id]"
@@ -35,20 +35,19 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import BudgetListCard from '@/services/billing/cost-management/budget/modules/budget-list/BudgetListCard.vue';
 import BudgetToolbox, { Pagination } from '@/services/billing/cost-management/budget/modules/budget-toolbox/BudgetToolbox.vue';
 import BudgetStat from '@/services/billing/cost-management/budget/modules/budget-stat/BudgetStat.vue';
-import { BudgetData, BudgetUsageData, BudgetUsageRange } from '@/services/billing/cost-management/budget/type';
+import {
+    BudgetData,
+    BudgetUsageAnalyzeRequestParam,
+    BudgetUsageData,
+    BudgetUsageRange,
+} from '@/services/billing/cost-management/budget/type';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { Period } from '@/services/billing/cost-management/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { Filter, Query } from '@spaceone/console-core-lib/space-connector/type';
+import { Query } from '@spaceone/console-core-lib/space-connector/type';
 
 interface BudgetParam {
     query: Query;
-}
-interface BudgetUsageParam {
-    group_by: string[];
-    filter: Filter[];
-    start?: string;
-    usage_range: BudgetUsageRange;
 }
 
 interface Props {
@@ -85,14 +84,14 @@ export default {
                     .setFilters([{ k: 'budget_id', v: state.budgetUsages.map(d => d.budget_id), o: '=' }])
                     .apiQuery,
             })),
-            budgetUsageParam: computed<BudgetUsageParam>(() => {
+            budgetUsageParam: computed<BudgetUsageAnalyzeRequestParam>(() => {
                 const param = {
                     group_by: ['budget_id'],
                     ...budgetUsageApiQueryHelper.setFilters(state._filters)
                         .setPage(state.pageStart, state.pageLimit)
                         .setSort('usage', true)
                         .data,
-                } as BudgetUsageParam;
+                } as BudgetUsageAnalyzeRequestParam;
 
                 if (state.period.start) param.start = state.period.start;
 

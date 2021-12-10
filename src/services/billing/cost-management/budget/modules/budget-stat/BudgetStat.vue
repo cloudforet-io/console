@@ -1,39 +1,25 @@
 <template>
     <div class="budget-stat">
-        <div class="card-box">
+        <div v-for="({title, data, unit, description}) in cards" :key="title" class="card-box">
             <div class="title">
-                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.STAT.TOTAL_COST') }}</span>
+                <span>{{ title }}</span>
             </div>
-            <div v-if="!loading" class="stat">
-                <span class="symbol">$</span><span>{{ currencyMoneyFormatter(totalCost) }}</span>
-            </div>
-            <div v-if="!loading" class="description">
-                <span v-if="amountPlanningFilter==='total'">{{ formattedBudgetStart }} ~ {{ formattedBudgetEnd }}(MTD)</span>
-                <span v-else>{{ thisMonth }} (MTD)</span>
-            </div>
-        </div>
-        <div class="card-box">
-            <div class="title">
-                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.STAT.TOTAL_BUDGET') }}</span>
-            </div>
-            <div v-if="!loading" class="stat">
-                <span class="symbol">$</span><span>{{ currencyMoneyFormatter(totalBudget) }}</span>
-            </div>
-            <div v-if="!loading" class="description">
-                ${{ availableBudget.toFixed(2) }} {{ $t('BILLING.COST_MANAGEMENT.BUDGET.STAT.AVAILABLE') }}
-            </div>
-        </div>
-        <div class="card-box">
-            <div class="title">
-                <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.STAT.BUDGET_USAGE') }}</span>
-            </div>
-            <div v-if="!loading" class="stat">
-                <span>{{ noBudgets ? '--&nbsp;' : budgetUsage.toFixed(2) }}</span><span class="symbol">%</span>
-            </div>
-            <div v-if="!loading" class="description">
-                <span v-if="amountPlanningFilter==='total'">{{ formattedBudgetStart }} ~ {{ formattedBudgetEnd }}(MTD)</span>
-                <span v-else>{{ thisMonth }} (MTD)</span>
-            </div>
+            <div v-if="loading" class="loader" />
+            <template v-else>
+                <div class="stat">
+                    <template v-if="unit === UNIT.currency">
+                        <span class="symbol">{{ currencySymbol }}</span>
+                        <span>{{ currencyMoneyFormatter(data, currency, currencyRates, true) }}</span>
+                    </template>
+                    <template v-else-if="unit === UNIT.percent">
+                        <span>{{ data.toFixed(2) }}</span>
+                        <span class="symbol">&nbsp;%</span>
+                    </template>
+                </div>
+                <div class="description">
+                    {{ description }}
+                </div>
+            </template>
         </div>
     </div>
 </template>
@@ -41,77 +27,159 @@
 <script lang="ts">
 import {
     computed,
-    reactive, toRefs,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { BudgetData } from '@/services/billing/cost-management/budget/type';
-import { forEach } from 'lodash';
-import { commaFormatter } from '@spaceone/console-core-lib';
+import { TranslateResult } from 'vue-i18n';
+import { isEmpty } from 'lodash';
+
+import { commaFormatter, isNotEmpty } from '@spaceone/console-core-lib';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-import dayjs, { Dayjs } from 'dayjs';
-import { Period } from '@/services/billing/cost-management/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
+import {
+    BudgetUsageAnalyzeRequestParam,
+    BudgetUsageData,
+    BudgetUsageRange,
+} from '@/services/billing/cost-management/budget/type';
+import { Period } from '@/services/billing/cost-management/type';
+
 interface Props {
-    budgets: BudgetData[];
-    loading: boolean;
+    filters: QueryStoreFilter[];
+    period: Period;
+    usageRange: BudgetUsageRange;
 }
+
+interface Card {
+    title: TranslateResult;
+    data: number;
+    unit: UNIT;
+}
+
+const UNIT = Object.freeze({
+    currency: 'currency',
+    percent: 'percent',
+} as const);
+type UNIT = typeof UNIT[keyof typeof UNIT]
 
 export default {
     name: 'BudgetStat',
     props: {
-        budgets: {
+        filters: {
             type: Array,
             default: () => ([]),
         },
-        loading: {
-            type: Boolean,
-            default: true,
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
+        usageRange: {
+            type: Object,
+            default: () => ({}),
         },
     },
     setup(props: Props) {
         const { i18nDayjs } = useI18nDayjs();
+        const budgetUsageApiQueryHelper = new ApiQueryHelper();
         const state = reactive({
-            amountPlanningFilter: 'total' as 'total' || 'thisMonth',
-            noBudgets: computed<boolean>(() => props.budgets?.length === 0),
-            totalCost: computed<number|undefined>(() => {
-                if (state.noBudgets) return undefined;
-                let totalUsage = 0;
-                forEach(props.budgets, (budget) => { totalUsage += budget.total_usage_usd_cost; });
-                return totalUsage / props.budgets?.length;
+            budgetUsage: {} as BudgetUsageData,
+            loading: false,
+            // currency
+            currency: computed(() => store.state.display.currency),
+            currencyRates: computed(() => store.state.display.currencyRates),
+            currencySymbol: computed(() => store.getters['display/currencySymbol']),
+            // card data
+            cards: computed<Card[]>(() => [
+                // total cost
+                {
+                    title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.STAT.TOTAL_COST'),
+                    data: state.budgetUsage.usd_cost ?? 0,
+                    unit: UNIT.currency,
+                    dataType: '',
+                    description: state.formattedPeriod,
+                },
+                // total budget
+                {
+                    title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.STAT.TOTAL_BUDGET'),
+                    data: state.budgetUsage.limit ?? 0,
+                    unit: UNIT.currency,
+                    description: state.availableBudget,
+                },
+                // budget usage
+                {
+                    title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.STAT.BUDGET_USAGE'),
+                    data: state.budgetUsage.usage ?? 0,
+                    unit: UNIT.percent,
+                    description: state.formattedPeriod,
+                },
+            ]),
+            formattedPeriod: computed<string>(() => {
+                if (isEmpty(props.period)) return '';
+
+                const today = i18nDayjs.value();
+                const start = i18nDayjs.value(props.period.start);
+                const end = i18nDayjs.value(props.period.end);
+
+                const isStartFirstDateOfThisMonth = start.isSame(today, 'month') && start.isSame(1, 'date');
+                const isEndToday = end.isSame(today, 'date');
+
+                if (isStartFirstDateOfThisMonth && isEndToday) {
+                    return `${today.format('MMM YYYY')} (MTD)`;
+                }
+
+                return `${start.format('MMMM DD, YYYY')} ~ ${end.format('MMMM DD, YYYY')}`;
             }),
-            totalBudget: computed<number|undefined>(() => {
-                if (state.noBudgets) return undefined;
-                let totalBudget = 0;
-                forEach(props.budgets, (budget) => { totalBudget += budget.limit; });
-                return totalBudget / props.budgets?.length;
+            availableBudget: computed<string>(() => {
+                let availableBudget = state.budgetUsage.limit - state.budgetUsage.usd_cost;
+                availableBudget = availableBudget > 0 ? availableBudget : 0;
+
+                return `${currencyMoneyFormatter(availableBudget, state.currency, state.currencyRates)} ${i18n.t('BILLING.COST_MANAGEMENT.BUDGET.STAT.AVAILABLE')}`;
             }),
-            budgetUsage: computed<number>(() => (state.totalCost / state.totalBudget) * 100),
-            budgetPeriod: computed<Period>(() => {
-                let totalStart: Dayjs|undefined;
-                let totalEnd: Dayjs|undefined;
-                forEach(props.budgets, (budget) => {
-                    const { start, end } = budget;
-                    if (!totalStart || !totalEnd) [totalStart, totalEnd] = [dayjs(start), dayjs(end)];
-                    const [dayjsStart, dayjsEnd] = [dayjs(start), dayjs(end)];
-                    totalStart = totalStart.isBefore(dayjsStart) ? totalStart : dayjsStart;
-                    totalEnd = totalEnd.isAfter(dayjsEnd) ? totalEnd : dayjsEnd;
-                });
-                return { start: totalStart?.toISOString(), end: totalEnd?.toISOString() };
+            // api request params
+            budgetUsageParam: computed<BudgetUsageAnalyzeRequestParam>(() => {
+                const param: BudgetUsageAnalyzeRequestParam = {
+                    include_budget_count: true,
+                };
+
+                const { filter, keyword } = budgetUsageApiQueryHelper.setFilters(props.filters).data;
+                if (keyword) param.keyword = keyword;
+                if (filter?.length) param.filter = filter;
+                if (isNotEmpty(props.usageRange)) param.usage_range = props.usageRange;
+                if (props.period.start) param.start = props.period.start;
+                if (props.period.end) param.end = props.period.end;
+
+                return param;
             }),
-            availableBudget: computed<number>(() => {
-                const availableBudget = state.totalBudget - state.totalCost;
-                return (availableBudget > 0 ? availableBudget : 0);
-            }),
-            thisMonth: computed(() => i18nDayjs.value().format('MMMM, YYYY')),
-            formattedBudgetStart: computed(() => i18nDayjs.value(state.budgetPeriod.start).format('MMMM, YYYY')),
-            formattedBudgetEnd: computed(() => i18nDayjs.value(state.budgetPeriod.end).format('MMMM, YYYY')),
         });
+
+        const fetchBudgetUsage = async () => {
+            try {
+                const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
+
+                state.budgetUsage = results[0] ?? {};
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, '');
+                state.budgetUsage = {};
+            }
+        };
+
+        /* Watchers */
+        watch([() => props.filters, () => props.period, () => props.usageRange], () => {
+            fetchBudgetUsage();
+        }, { immediate: true });
 
 
         return {
             ...toRefs(state),
             commaFormatter,
             currencyMoneyFormatter,
+            UNIT,
         };
     },
 };
