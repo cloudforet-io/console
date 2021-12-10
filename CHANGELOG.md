@@ -1,3 +1,10 @@
+# [1.1.0-beta.204](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.203...v1.1.0-beta.204) (2021-12-10)
+
+
+### Bug Fixes
+
+* fix css in selectStatus, button, selectDropdown ([#783](https://github.com/spaceone-dev/spaceone-design-system/issues/783)) ([b6d5c18](https://github.com/spaceone-dev/spaceone-design-system/commit/b6d5c1887fdf567540e9a5d84a52771bc507d397))
+
 # [1.1.0-beta.203](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.202...v1.1.0-beta.203) (2021-12-10)
 
 
