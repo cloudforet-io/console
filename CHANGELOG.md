@@ -1,3 +1,10 @@
+# [1.1.0-beta.203](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.202...v1.1.0-beta.203) (2021-12-10)
+
+
+### Bug Fixes
+
+* fix select hook bug ([#782](https://github.com/spaceone-dev/spaceone-design-system/issues/782)) ([3b27026](https://github.com/spaceone-dev/spaceone-design-system/commit/3b2702655cbcbb173b1cd0725a8898d02d4d4da3))
+
 # [1.1.0-beta.202](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.201...v1.1.0-beta.202) (2021-12-09)
 
 
