@@ -4,9 +4,10 @@
         <section class="title-section">
             <p-select-dropdown :items="queryItemList" type="icon-button" button-icon="ic_list"
                                class="list-button"
+                               @select="handleClickQueryItem"
             >
                 <template #menu-item--format="{item}">
-                    <div class="query-item-wrapper" @click="handleClickQueryItem(item)">
+                    <div class="query-item-wrapper">
                         <div class="dropdown-item-modal">
                             <p-i v-if="getQueryWithKey(item.name).scope === QUERY_VISIBILITY_TYPE.PRIVATE" name="ic_security" width="1rem"
                                  height="1rem"
@@ -249,18 +250,18 @@ export default {
             }
         };
 
-        const handleClickQueryItem = async (queryItem: Required<MenuItem>) => {
-            if (queryItem.name !== state.selectedQueryId) {
+        const handleClickQueryItem = async (queryId: string) => {
+            if (queryId !== state.selectedQueryId) {
                 await SpaceRouter.router.replace({
                     name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
-                    params: { querySetId: queryItem.name },
+                    params: { querySetId: queryId },
                 });
             }
 
-            if (queryItem.name) {
-                const { options } = getQueryWithKey(queryItem.name);
+            if (queryId) {
+                const { options } = getQueryWithKey(queryId);
                 setQueryOptions(options);
-                setSelectedQueryId(queryItem.name);
+                setSelectedQueryId(queryId);
             } else {
                 setQueryOptions();
                 setSelectedQueryId();
