@@ -63,7 +63,6 @@ import {
 import Color from 'color';
 import { store } from '@/store';
 import { Location } from 'vue-router';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import config from '@/lib/config';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 
@@ -113,7 +112,6 @@ export default {
             data: [] as Data[],
             chart: null as null | any,
             chartRegistry: {},
-            regionList: [] as RegionData[],
         });
 
         /* util */
@@ -182,31 +180,10 @@ export default {
             state.chart = chart;
         };
 
-        const regionApiQuery = new ApiQueryHelper().setOnly('region_id', 'region_code', 'provider');
-
-        const getRegionList = async () => {
-            try {
-                const res = await SpaceConnector.client.inventory.region.list({
-                    query: regionApiQuery.data,
-                });
-                state.regionList = res.results;
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        const regionCodeToIdFormatter = (provider, regionCode) => {
-            if (state.regionList) {
-                const regionId = (state.regionList.find(item => item.region_code === regionCode && item.provider === provider))?.region_id;
-                return regionId;
-            } return '';
-        };
-
         const getLocation = (provider, region) => {
-            const regionId = regionCodeToIdFormatter(provider, region);
             const query: Location['query'] = {
                 provider,
-                region: regionId || '',
+                region,
             };
             if (props.label !== 'All') query.service = props.label;
 
@@ -266,10 +243,6 @@ export default {
         watch(() => props.label, async () => {
             await getData();
         }, { immediate: false });
-
-        (async () => {
-            await getRegionList();
-        })();
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();

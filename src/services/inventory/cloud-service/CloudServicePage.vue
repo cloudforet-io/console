@@ -60,7 +60,7 @@
                 <div v-for="(region, idx) in filterState.regionList" :key="idx"
                      class="region-list"
                 >
-                    <p-check-box :selected="filterState.regionFilter" :value="region.region_id"
+                    <p-check-box :selected="filterState.regionFilter" :value="region.region_code"
                                  class="flex" @change="onClickRegion"
                     >
                         <span class="region-list-text">
@@ -310,7 +310,7 @@ export default {
             vm.$store.dispatch('favorite/cloudServiceType/removeItem', item);
         };
 
-        const regionApiQuery = new ApiQueryHelper().setOnly('region_code', 'provider', 'name', 'region_id').setSort('provider');
+        const regionApiQuery = new ApiQueryHelper().setOnly('region_code', 'provider', 'name').setSort('provider');
         const getRegionQuery = (value?: string) => {
             if (value) {
                 regionApiQuery.setFilters([{
@@ -330,7 +330,7 @@ export default {
                 });
 
                 // filtering region filter
-                const regionMap = zipObject(res.results.map(d => d.region_id), res.results);
+                const regionMap = zipObject(res.results.map(d => d.region_code), res.results);
                 filterState.regionFilter = filterState.regionFilter.filter(d => regionMap[d]);
 
                 filterState.regionList = res.results;
@@ -345,18 +345,6 @@ export default {
             filterState.regionFilter = val;
         };
 
-        const regionIdToCodeFormatter = (regionIdArray) => {
-            const regionFilter = regionIdArray.map(d => filterState.regionList.find(item => item.region_id === d));
-            const regionCodeArray = regionFilter?.map(d => d?.region_code);
-            return regionCodeArray;
-        };
-
-        const providerFromRegionId = (regionIdArray) => {
-            const regionFilter = regionIdArray.map(d => filterState.regionList.find(item => item.region_id === d));
-            const providerArray = regionFilter?.map(d => d?.provider);
-            return providerArray;
-        };
-
         /**
          * Card click event
          * */
@@ -369,8 +357,7 @@ export default {
             ].includes(f.k)));
 
             if (filterState.regionFilter.length > 0) {
-                cardQueryHelper.addFilter({ k: 'region_code', o: '=', v: regionIdToCodeFormatter(filterState.regionFilter) });
-                cardQueryHelper.addFilter({ k: 'provider', v: providerFromRegionId(filterState.regionFilter), o: '=' });
+                cardQueryHelper.addFilter({ k: 'region_code', o: '=', v: filterState.regionFilter });
             }
 
             const res: Location = {
@@ -394,8 +381,7 @@ export default {
                 sidebarQueryHelper.addFilter({ k: 'provider', v: selectedProvider.value, o: '=' });
             }
             if (filterState.regionFilter.length > 0) {
-                sidebarQueryHelper.addFilter({ k: 'region_code', v: regionIdToCodeFormatter(filterState.regionFilter), o: '=' });
-                sidebarQueryHelper.addFilter({ k: 'provider', v: providerFromRegionId(filterState.regionFilter), o: '=' });
+                sidebarQueryHelper.addFilter({ k: 'region_code', v: filterState.regionFilter, o: '=' });
             }
 
             const res = {
