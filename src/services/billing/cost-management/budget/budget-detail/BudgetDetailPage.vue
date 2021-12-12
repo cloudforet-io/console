@@ -7,8 +7,7 @@
             >
                 <template #extra>
                     <div class="title-button-group">
-                        <p-icon-button name="ic_trashcan" @click="handleDelete" />
-                        <p-icon-button name="ic_setting" />
+                        <p-icon-button name="ic_trashcan" @click="handleClickDelete" />
                     </div>
                 </template>
             </p-page-title>
@@ -19,9 +18,12 @@
             <budget-notifications v-if="!loading" class="alert" />
             <budget-billing-admin v-if="!loading" class="budget" />
         </section>
-        <delete-modal :header-title="checkDeleteState.headerTitle"
-                      :visible.sync="checkDeleteState.visible"
-                      @confirm="deleteBudget"
+        <budget-delete-modal v-if="!loading"
+                             :visible="checkDeleteState.visible"
+                             :budget-id="budgetData.budget_id"
+                             :budget-name="budgetData.name"
+                             @update="handleUpdateDelete"
+                             @confirm="handleConfirmDelete"
         />
     </general-page-layout>
 </template>
@@ -36,7 +38,6 @@ import BudgetSummary
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummary.vue';
 import BudgetNotifications
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotifications.vue';
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import BudgetStoreModule from '@/services/billing/cost-management/budget/store';
 import { BudgetStoreState } from '@/services/billing/cost-management/budget/store/type';
@@ -44,10 +45,16 @@ import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import BudgetBillingAdmin
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-admin/BudgetBillingAdmin.vue';
+import { i18n } from '@/translations';
+import { BILLING_ROUTE } from '@/services/billing/routes';
+import BudgetDeleteModal from '@/services/billing/cost-management/budget/budget-detail/modules/BudgetDeleteModal.vue';
+import { BudgetData } from '@/services/billing/cost-management/budget/type';
+import { SpaceRouter } from '@/router';
 
 export default {
     name: 'BudgetDetailPage',
     components: {
+        BudgetDeleteModal,
         GeneralPageLayout,
         PBreadcrumbs,
         PPageTitle,
@@ -56,7 +63,6 @@ export default {
         BudgetSummary,
         BudgetNotifications,
         BudgetBillingAdmin,
-        DeleteModal,
     },
     props: {
         budgetId: {
@@ -69,33 +75,31 @@ export default {
 
         const state = reactive({
             loading: true,
-            budgetData: computed(() => store.state.service.budget.budgetData),
+            budgetData: computed<BudgetData>(() => store.state.service.budget.budgetData),
         });
         const routeState = reactive({
             route: computed(() => ([
-                { name: 'Billing', to: { name: '' } },
-                { name: 'Cost Management', to: { name: '' } },
-                { name: 'Budget', to: { name: '' } },
-                { name: 'Budget Name', to: { name: '' } },
+                { name: i18n.t('MENU.BILLING.BILLING'), to: { name: BILLING_ROUTE._NAME } },
+                { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), to: { name: BILLING_ROUTE.COST_MANAGEMENT._NAME } },
+                { name: 'Budget', to: { name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME } },
+                { name: state.budgetData?.name, to: { name: '' } },
             ])),
         });
 
         const checkDeleteState = reactive({
             visible: false,
-            headerTitle: 'Are you sure you want to delete the budget?',
-            // loading: true,
         });
-        const handleDelete = () => {
+
+        const handleClickDelete = () => {
             checkDeleteState.visible = true;
         };
-        const deleteBudget = async () => {
-            try {
-                console.log('Successfully deleted budget');
-            } catch (e) {
-                console.error(e);
-            } finally {
-                checkDeleteState.visible = false;
-            }
+
+        const handleUpdateDelete = (visible) => {
+            checkDeleteState.visible = visible;
+        };
+
+        const handleConfirmDelete = () => {
+            SpaceRouter.router.push({ name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME });
         };
 
         (async () => {
@@ -117,8 +121,9 @@ export default {
             ...toRefs(state),
             routeState,
             checkDeleteState,
-            handleDelete,
-            deleteBudget,
+            handleClickDelete,
+            handleUpdateDelete,
+            handleConfirmDelete,
         };
     },
 };
