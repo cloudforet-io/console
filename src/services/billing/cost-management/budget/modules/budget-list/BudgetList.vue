@@ -42,7 +42,6 @@ import {
 } from '@/services/billing/cost-management/budget/type';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { Period } from '@/services/billing/cost-management/type';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Query } from '@spaceone/console-core-lib/space-connector/type';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
@@ -67,7 +66,6 @@ export default {
         },
     },
     setup(props: Props, { emit, root }) {
-        const budgetQueryHelper = new QueryHelper();
         const budgetUsageApiQueryHelper = new ApiQueryHelper();
 
         const state = reactive({
@@ -80,11 +78,6 @@ export default {
             queryStoreFilters: props.filters as QueryStoreFilter[],
             period: {} as Period,
             // api request params
-            budgetParam: computed<BudgetParam>(() => ({
-                query: budgetQueryHelper
-                    .setFilters([{ k: 'budget_id', v: state.budgetUsages.map(d => d.budget_id), o: '=' }])
-                    .apiQuery,
-            })),
             sort: {
                 key: 'usage',
                 desc: true,

@@ -1,7 +1,12 @@
 <template>
     <div>
         <budget-form-base-info :budget-id="budgetId" @update="handleChangeBaseInfo" />
-        <budget-form-amount-plan class="mt-4" :budget-id="budgetId" @update="handleChangeAmountPlanning" />
+        <budget-form-amount-plan class="mt-4" :budget-id="budgetId"
+                                 :project-group-id="baseInfo.project_group_id"
+                                 :project-id="baseInfo.project_id"
+                                 :cost-types="baseInfo.cost_types"
+                                 @update="handleChangeAmountPlanning"
+        />
         <div class="text-right mt-4">
             <p-button style-type="primary-dark" :outline="true" class="mr-4"
                       @click="$router.go(-1)"

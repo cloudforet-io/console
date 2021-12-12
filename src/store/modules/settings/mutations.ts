@@ -5,5 +5,8 @@ export const setItem = (state: SettingsState, item: SetItemRequest): void => {
         item.path = '/';
     }
 
-    state.items[`${item.path}:${item.key}`] = item.value;
+    state.items = {
+        ...state.items,
+        [`${item.path}:${item.key}`]: item.value,
+    };
 };

@@ -8,6 +8,10 @@ import { DASHBOARD_ROUTE } from '@/services/dashboard/routes';
 import { AUTH_ROUTE } from '@/services/auth/routes';
 import { ERROR_ROUTE } from '@/router/error-routes';
 
+const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
+
+const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
+
 export class SpaceRouter {
     static router: VueRouter;
 
@@ -28,8 +32,18 @@ export class SpaceRouter {
             console.error(error);
 
             if (error.name === 'ChunkLoadError') {
-                window.location.href = nextPath || '/';
+                const lastCheckedTime = localStorage.getItem(CHUNK_LOAD_REFRESH_STORAGE_KEY);
+                if (!lastCheckedTime) {
+                    localStorage.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, getCurrentTime().toString());
+                    window.location.href = nextPath || '/';
+                } else if (getCurrentTime() - parseInt(lastCheckedTime) < 10) {
+                    window.location.href = nextPath || '/';
+                }
             }
+        });
+
+        SpaceRouter.router.onReady(() => {
+            localStorage.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, '');
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {

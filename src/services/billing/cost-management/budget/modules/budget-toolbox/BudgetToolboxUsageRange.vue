@@ -46,6 +46,8 @@ export default {
             }),
             range: computed<BudgetUsageRange>(() => {
                 /*
+                [] max: -1
+
                 [overspent, 90-100, <90] none
 
                 [90-100, <90] max: 100
@@ -56,6 +58,8 @@ export default {
                 [90-100] min: 90, max: 100
                 [overspent] min:100
                  */
+
+                if (state.selected.length === 0) return { max: -1 };
 
                 const range: BudgetUsageRange = {};
 

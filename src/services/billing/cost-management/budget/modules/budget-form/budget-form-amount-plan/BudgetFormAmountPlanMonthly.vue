@@ -5,13 +5,13 @@
                 <p>
                     <p-label>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-label> ($USD)
                 </p>
-                <budget-form-amount-plan-last-months-cost />
             </div>
             <p-button style-type="gray-border" :outline="true" @click="handleAutofillButtonClick">
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL') }}
             </p-button>
         </div>
-        <p-divider />
+        <slot name="last-3-months" />
+        <p-divider class="mt-2" />
         <div class="input-wrapper">
             <budget-form-amount-plan-month-input v-for="(_, month, index) in monthAmountInputMap" :key="month"
                                                  class="input"
@@ -39,8 +39,6 @@ import { Period } from '@/services/billing/cost-management/type';
 
 import BudgetFormAmountPlanMonthInput
 , { MonthAmountInput } from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthInput.vue';
-import BudgetFormAmountPlanLastMonthsCost
-    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
 import BudgetFormAmountPlanAutofillModal
 , { AutofillOptions } from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanAutofillModal.vue';
 import dayjs, { Dayjs } from 'dayjs';
@@ -55,7 +53,6 @@ export default {
     name: 'BudgetFormAmountPlanMonthly',
     components: {
         BudgetFormAmountPlanAutofillModal,
-        BudgetFormAmountPlanLastMonthsCost,
         BudgetFormAmountPlanMonthInput,
         PLabel,
         PButton,

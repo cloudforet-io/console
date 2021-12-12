@@ -6,10 +6,25 @@
         <div class="p-4">
             <budget-form-amount-plan-period-select class="mb-2" @update="handleUpdatePeriod" />
             <budget-form-amount-plan-unit-select class="mb-6" :selected-unit.sync="timeUnit" />
-            <budget-form-amount-plan-monthly v-if="timeUnit === 'MONTHLY'" class="mb-6" :period="period"
+            <budget-form-amount-plan-monthly v-if="timeUnit === 'MONTHLY'" class="mb-6"
+                                             :period="period"
                                              @update="handleMonthlyInputUpdate"
-            />
-            <budget-form-amount-plan-total v-else class="mb-6" @update="handleTotalAmountUpdate" />
+            >
+                <template #last-3-months>
+                    <budget-form-amount-plan-last-months-cost :project-id="projectId" :project-group-id="projectGroupId"
+                                                              :cost-types="costTypes"
+                                                              :time-unit="timeUnit"
+                    />
+                </template>
+            </budget-form-amount-plan-monthly>
+            <budget-form-amount-plan-total v-else class="mb-6" @update="handleTotalAmountUpdate">
+                <template #last-3-months>
+                    <budget-form-amount-plan-last-months-cost :project-id="projectId" :project-group-id="projectGroupId"
+                                                              :cost-types="costTypes"
+                                                              :time-unit="timeUnit"
+                    />
+                </template>
+            </budget-form-amount-plan-total>
         </div>
     </p-pane-layout>
 </template>
@@ -32,7 +47,9 @@ import BudgetFormAmountPlanMonthly
 import { BudgetData, BudgetTimeUnit } from '@/services/billing/cost-management/budget/type';
 import BudgetFormAmountPlanTotal
     from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanTotal.vue';
-import { Period } from '@/services/billing/cost-management/type';
+import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
+import BudgetFormAmountPlanLastMonthsCost
+    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
 
 export interface BudgetAmountPlanInfo {
     limit?: BudgetData['limit'];
@@ -42,9 +59,17 @@ export interface BudgetAmountPlanInfo {
     end: BudgetData['end'];
 }
 
+interface Props {
+    budgetId?: string;
+    projectId?: string;
+    projectGroupId?: string;
+    costTypes?: CostQueryFilters;
+}
+
 export default {
     name: 'BudgetFormAmountPlan',
     components: {
+        BudgetFormAmountPlanLastMonthsCost,
         BudgetFormAmountPlanTotal,
         BudgetFormAmountPlanMonthly,
         BudgetFormAmountPlanUnitSelect,
@@ -57,8 +82,20 @@ export default {
             type: String,
             default: undefined,
         },
+        projectId: {
+            type: String,
+            default: undefined,
+        },
+        projectGroupId: {
+            type: String,
+            default: undefined,
+        },
+        costTypes: {
+            type: Object,
+            default: undefined,
+        },
     },
-    setup(props, { emit }) {
+    setup(props: Props, { emit }) {
         const state = reactive({
             period: {} as Period,
             isPeriodValid: false,

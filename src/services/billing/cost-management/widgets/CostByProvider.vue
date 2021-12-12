@@ -64,6 +64,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
+import config from '@/lib/config';
 
 interface CostByProviderChartData extends PieChartData {
     color: string;
@@ -161,7 +162,7 @@ export default defineComponent<WidgetProps>({
             const chart = createChart();
             chart.data = chartData;
             chart.innerRadius = am4core.percent(65);
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
             const series = chart.series.push(new am4charts.PieSeries());
             series.dataFields.value = 'value';

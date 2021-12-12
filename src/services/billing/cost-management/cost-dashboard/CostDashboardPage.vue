@@ -60,6 +60,7 @@ import CostDashboardPeriodSelectDropdown
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
 import { DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
+import { SpaceRouter } from '@/router';
 
 export default {
     name: 'CostDashboardPage',
@@ -87,6 +88,7 @@ export default {
             filters: {} as CostQueryFilters,
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
+            homeDashboardId: computed<string|undefined>(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
         });
 
         const routeState = reactive({
@@ -130,8 +132,16 @@ export default {
             }
         };
 
-        watch(() => props.dashboardId, async (dashboardId) => {
-            if (!dashboardId) return;
+        watch([() => props.dashboardId, () => state.homeDashboardId], async ([dashboardId, homeDashboardId]) => {
+            if (!dashboardId) {
+                if (homeDashboardId) {
+                    SpaceRouter.router.replace({
+                        params: { dashboardId: homeDashboardId },
+                    });
+                }
+                return;
+            }
+
             await getDashboard(dashboardId);
             if (state.dashboard?.default_layout_id) {
                 await getLayoutData(state.dashboard.default_layout_id);

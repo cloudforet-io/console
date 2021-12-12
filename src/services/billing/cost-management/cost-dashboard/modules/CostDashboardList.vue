@@ -30,7 +30,6 @@
 </template>
 
 <script lang="ts">
-import { TranslateResult } from 'vue-i18n';
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
@@ -45,10 +44,6 @@ import { DashboardItem } from '@/services/billing/cost-management/cost-dashboard
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-interface ListItem {
-    routeName?: string;
-    label?: TranslateResult;
-}
 
 export default {
     name: 'CostDashboardList',

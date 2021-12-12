@@ -15,7 +15,7 @@
                 </template>
             </p-text-input>
         </p-field-group>
-        <budget-form-amount-plan-last-months-cost />
+        <slot name="last-3-months" />
     </div>
 </template>
 
@@ -26,16 +26,12 @@ import {
 } from '@vue/composition-api';
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
-
-import BudgetFormAmountPlanLastMonthsCost
-    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { commaFormatter, getNumberFromString } from '@spaceone/console-core-lib';
 
 export default {
     name: 'BudgetFormAmountPlanTotal',
     components: {
-        BudgetFormAmountPlanLastMonthsCost,
         PFieldGroup,
         PTextInput,
     },
