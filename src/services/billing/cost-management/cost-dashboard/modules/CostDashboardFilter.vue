@@ -84,7 +84,6 @@ export default {
                     project_id: store.state.resource.project.items,
                     service_account_id: store.state.resource.serviceAccount.items,
                     provider: store.state.resource.provider.items,
-                    region_code: store.state.resource.region.items,
                 };
 
                 Object.entries(state.proxyFilters as CostQueryFilters).forEach(([key, data]) => {

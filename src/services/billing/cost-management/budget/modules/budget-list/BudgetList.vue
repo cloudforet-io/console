@@ -1,6 +1,6 @@
 <template>
     <div class="budget-list">
-        <budget-toolbox :filters="_filters"
+        <budget-toolbox :filters="queryStoreFilters"
                         @update-range="handleUpdateRange"
                         @update-pagination="handleUpdatePagination"
                         @update-period="handleUpdatePeriod"
@@ -9,7 +9,7 @@
                         @export="handleExport"
                         @update-sort="handleUpdateSort"
         />
-        <budget-stat :filters="_filters" :period="period" :usage-range="range"
+        <budget-stat :filters="queryStoreFilters" :period="period" :usage-range="range"
                      class="budget-stat"
         />
         <div class="budget-list-card-box">
@@ -77,7 +77,7 @@ export default {
             range: {} as BudgetUsageRange,
             pageStart: 1,
             pageLimit: 24,
-            _filters: props.filters as QueryStoreFilter[],
+            queryStoreFilters: props.filters as QueryStoreFilter[],
             period: {} as Period,
             // api request params
             budgetParam: computed<BudgetParam>(() => ({
@@ -93,7 +93,7 @@ export default {
                 const param = {
                     group_by: ['budget_id'],
                     include_budget_info: true,
-                    ...budgetUsageApiQueryHelper.setFilters(state._filters)
+                    ...budgetUsageApiQueryHelper.setFilters(state.queryStoreFilters)
                         .setPage(state.pageStart, state.pageLimit)
                         .setSort(state.sort.key, state.sort.desc)
                         .data,
@@ -109,7 +109,7 @@ export default {
         });
 
         const setFilters = (filters: QueryStoreFilter[]) => {
-            state._filters = filters;
+            state.queryStoreFilters = filters;
             emit('update:filters', filters);
         };
 

@@ -40,7 +40,7 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
                             </p>
                             <div class="amount-used-wrapper" :class="progressStatus">
-                                <span class="cost">${{ commaFormatter(cost) }}</span>
+                                <span class="cost">{{ currencyMoneyFormatter(cost, currency, currencyRates, false, 10000000000) }}</span>
                                 <span class="percent">({{ percentage.toFixed(2) }}%)</span>
                             </div>
                         </div>
@@ -49,7 +49,7 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
                             </p>
                             <div class="cost">
-                                ${{ commaFormatter(limit) }}
+                                {{ currencyMoneyFormatter(limit, currency, currencyRates, false, 10000000000) }}
                             </div>
                         </div>
                     </div>
@@ -88,7 +88,7 @@ import { store } from '@/store';
 import { ProjectResourceItem } from '@/store/modules/resource/project/type';
 import { ProjectGroupResourceItem } from '@/store/modules/resource/project-group/type';
 import { ResourceMap } from '@/store/modules/resource/type';
-import { commaFormatter } from '@spaceone/console-core-lib';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
 interface Props {
@@ -198,12 +198,14 @@ export default {
             providers: computed(() => store.state.resource.provider.items),
             regions: computed(() => store.state.resource.region.items),
             serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
+            currency: computed(() => store.state.display.currency),
+            currencyRates: computed(() => store.state.display.currencyRates),
         });
 
 
         return {
             ...toRefs(state),
-            commaFormatter,
+            currencyMoneyFormatter,
         };
     },
 };

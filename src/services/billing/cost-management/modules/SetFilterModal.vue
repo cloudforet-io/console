@@ -128,7 +128,8 @@ export default {
                     if (resourceItems) {
                         itemsMap[key] = data?.map((d) => {
                             const resourceItem: ResourceItem = resourceItems[d];
-                            return { name: d, label: resourceItem?.label ?? d };
+                            const label = key === 'region_code' ? resourceItem?.name : resourceItem?.label;
+                            return { name: d, label: label ?? d };
                         });
                     } else itemsMap[key] = data?.map(d => ({ name: d, label: d }));
                 });
