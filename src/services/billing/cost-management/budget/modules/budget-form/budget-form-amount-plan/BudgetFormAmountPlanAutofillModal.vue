@@ -18,7 +18,6 @@
                 >
                     <p-text-input v-model="formattedStartBudget" placeholder="1,000"
                                   :invalid="invalidState.start"
-                                  type="number"
                     >
                         <template #right-extra>
                             ($)

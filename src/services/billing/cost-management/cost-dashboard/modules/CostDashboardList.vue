@@ -76,7 +76,7 @@ export default {
         /* util */
         const showPage = (dashboardId) => {
             if (state.dashboardIdFromRoute !== dashboardId) {
-                SpaceRouter.router.replace({
+                SpaceRouter.router.push({
                     name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
                     params: { dashboardId },
                 });
@@ -128,8 +128,8 @@ export default {
 
             const isDashboardIdFromRouteValid = !!state.items.find(d => d.dashboard_id === state.dashboardIdFromRoute);
 
-            if (!isDashboardIdFromRouteValid
-                || (vm.$route.name === BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME && !state.dashboardIdFromRoute)) {
+            if (vm.$route.name === BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME
+                && (!state.dashboardIdFromRoute || !isDashboardIdFromRouteValid)) {
                 showHomeDashboardPage();
             }
         })();
