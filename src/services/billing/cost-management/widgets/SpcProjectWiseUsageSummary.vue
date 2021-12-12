@@ -167,6 +167,7 @@ export default defineComponent<WidgetProps>({
             pieSeries.dataFields.category = categoryKey;
             pieSeries.labels.template.disabled = true;
             pieSeries.slices.template.propertyFields.fill = 'color';
+            pieSeries.slices.template.states.getKey('hover').properties.scale = 1;
             return chart;
         };
 

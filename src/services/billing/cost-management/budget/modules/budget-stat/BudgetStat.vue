@@ -200,6 +200,7 @@ export default {
         }
         .symbol {
             @apply font-bold text-lg;
+            align-self: center;
         }
         .title {
             @apply text-gray-700 text-sm;

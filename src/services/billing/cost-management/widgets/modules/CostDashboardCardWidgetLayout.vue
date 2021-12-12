@@ -7,10 +7,10 @@
             <div class="header">
                 {{ title }}
                 <p class="title-extra">
-                    <span v-if="showTopText" class="show-top-text">Showing Top {{ dataRange }}
-                        <p-i name="ic_tooltip" width="1rem" height="1rem"
-                             color="inherit transparent" class="tooltip-button"
-                        />
+                    <span v-if="showTopText" class="show-top-text mr-2">Showing Top {{ dataRange }}
+                        <!--                        <p-i name="ic_tooltip" width="1rem" height="1rem"-->
+                        <!--                             color="inherit transparent" class="tooltip-button"-->
+                        <!--                        />-->
                     </span>
                     <router-link :to="widgetLink" class="anchor-button">
                         Full data
