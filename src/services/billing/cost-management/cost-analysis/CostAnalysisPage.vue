@@ -76,7 +76,7 @@
 import { TranslateResult } from 'vue-i18n';
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -118,13 +118,12 @@ import {
     queryStringToString,
 } from '@/lib/router-query-string';
 import { CostAnalysisPageUrlQuery } from '@/services/billing/cost-management/cost-analysis/type';
+import { Location } from 'vue-router';
 
 export interface SaveQueryEmitParam {
     updatedQuery: CostQuerySetModel;
     requestType: REQUEST_TYPE;
 }
-
-type QuerySetOptions = Pick<CostAnalysisStoreState, 'chartType'|'granularity'|'groupBy'|'period'|'filters'>
 
 export default {
     name: 'CostAnalysisPage',
@@ -168,13 +167,6 @@ export default {
             selectedQuerySet: computed<CostQuerySetModel|undefined>(() => store.getters['service/costAnalysis/selectedQuerySet']),
             title: computed<string>(() => state.selectedQuerySet?.name ?? 'Cost Analysis'),
             itemIdForDeleteQuery: '',
-            currentQuerySetOptions: computed<QuerySetOptions>(() => ({
-                chartType: store.state.service.costAnalysis.chartType,
-                granularity: store.state.service.costAnalysis.granularity,
-                groupBy: store.state.service.costAnalysis.groupBy,
-                period: store.state.service.costAnalysis.period,
-                filters: store.state.service.costAnalysis.filters,
-            })),
         });
 
         const saveQueryFormState = reactive({
@@ -251,12 +243,7 @@ export default {
         };
 
         const handleClickQueryItem = async (queryId: string) => {
-            if (queryId !== state.selectedQueryId) {
-                await SpaceRouter.router.replace({
-                    name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
-                    params: { querySetId: queryId },
-                });
-            }
+            if (queryId === state.selectedQueryId) return;
 
             if (queryId) {
                 const { options } = getQueryWithKey(queryId);
@@ -270,16 +257,15 @@ export default {
 
         const handleSaveQueryConfirm = ({ updatedQuery, requestType }: SaveQueryEmitParam) => {
             if (!updatedQuery) return;
+
+            store.dispatch('service/costAnalysis/listCostQueryList');
+
             if (requestType === REQUEST_TYPE.EDIT && updatedQuery.cost_query_set_id !== state.selectedQueryId) {
-                store.dispatch('service/costAnalysis/listCostQueryList');
                 return;
             }
-            store.dispatch('service/costAnalysis/listCostQueryList');
+
             if (requestType === REQUEST_TYPE.SAVE) {
-                SpaceRouter.router.replace({
-                    name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
-                    params: { querySetId: updatedQuery.cost_query_set_id },
-                });
+                setSelectedQueryId(updatedQuery.cost_query_set_id);
             }
         };
 
@@ -306,47 +292,69 @@ export default {
             }
         };
 
+        /* Watchers */
         watch(() => saveQueryFormState.visible, () => {
             if (saveQueryFormState.visible === false) saveQueryFormState.selectedQuery = {};
         });
 
-        watch([() => props.querySetId, () => state.selectedQueryId], ([urlParamValue, selectedQueryId]) => {
-            if (urlParamValue !== selectedQueryId) SpaceRouter.router.replace({ query: {} });
-        }, { immediate: true });
+        watch(() => state.selectedQueryId, (selectedQueryId) => {
+            if (props.querySetId !== selectedQueryId) {
+                const location: Location = {
+                    params: { querySetId: selectedQueryId },
+                    query: {},
+                };
 
-        watch(() => state.currentQuerySetOptions, (options) => {
-            const query: CostAnalysisPageUrlQuery = {
-                chartType: primitiveToQueryString(options.chartType),
-                granularity: primitiveToQueryString(options.granularity),
-                groupBy: arrayToQueryString(options.groupBy),
-                period: objectToQueryString(options.period),
-                filters: objectToQueryString(options.filters),
-            };
+                SpaceRouter.router.replace(location);
+            }
+        });
 
-            if (JSON.stringify(query) !== JSON.stringify(SpaceRouter.router.currentRoute.query)) {
-                SpaceRouter.router.replace({ query });
+        let unregisterStoreWatch;
+        const registerStoreWatch = () => {
+            unregisterStoreWatch = store.watch((_, getters) => getters['service/costAnalysis/currentQuerySetOptions'], (options) => {
+                if (props.querySetId) return;
+
+                const newQuery: CostAnalysisPageUrlQuery = {
+                    chartType: primitiveToQueryString(options.chartType),
+                    granularity: primitiveToQueryString(options.granularity),
+                    groupBy: arrayToQueryString(options.groupBy),
+                    period: objectToQueryString(options.period),
+                    filters: objectToQueryString(options.filters),
+                };
+
+                const currentQuery = SpaceRouter.router.currentRoute.query;
+                if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {
+                    SpaceRouter.router.replace({ query: newQuery });
+                }
+            }, { immediate: false });
+        };
+
+        onUnmounted(() => {
+            if (unregisterStoreWatch) {
+                unregisterStoreWatch();
             }
         });
 
         /* Page Init */
         (async () => {
+            // list cost query sets
             await store.dispatch('service/costAnalysis/listCostQueryList');
 
+            // init states
             if (props.querySetId) {
                 const { name, options } = getQueryWithKey(props.querySetId);
                 if (name) {
                     setQueryOptions(options);
                     setSelectedQueryId(props.querySetId);
                 } else {
-                    SpaceRouter.router.replace({
-                        name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
-                        params: {},
-                    });
+                    setSelectedQueryId();
                 }
             } else {
                 const options = getQueryOptionsFromUrlQuery(SpaceRouter.router.currentRoute.query);
                 setQueryOptions(options);
             }
+
+            // register store watch
+            registerStoreWatch();
         })();
 
         return {
