@@ -2,7 +2,7 @@
     <div class="cost-type-balloon" :style="balloonStyle">
         <section class="header">
             <span class="header-title">Cost Type</span>
-            <span class="self-center">{{ costTypeKey }}</span>
+            <span class="self-center">{{ costTypeMap[costTypeKey] }}</span>
             <p-icon-button name="ic_delete"
                            class="close-button"
                            height="1.5em"
@@ -32,6 +32,13 @@ interface Props {
 
 const BalloonTailWidth = 12;
 const BalloonMargin = 4;
+
+const costTypeMap = {
+    region_code: 'Region',
+    service_account_id: 'Service Account',
+    provider: 'Provider',
+    product: 'Product',
+};
 
 export default {
     name: 'BudgetCostTypeBalloon',
@@ -69,6 +76,7 @@ export default {
         return {
             ...toRefs(state),
             handleClose,
+            costTypeMap,
         };
     },
 };

@@ -8,8 +8,8 @@
                 Budget Summary
             </div>
         </template>
-        <budget-summary-chart />
-        <budget-summary-table />
+        <budget-summary-chart v-if="!budgetLoading" />
+        <budget-summary-table v-if="!budgetLoading" />
     </p-card>
 </template>
 
@@ -27,9 +27,14 @@ export default {
         BudgetSummaryChart,
         BudgetSummaryTable,
     },
+    props: {
+        budgetLoading: {
+            type: Boolean,
+            default: true,
+        },
+    },
     setup() {
         return {
-
         };
     },
 };

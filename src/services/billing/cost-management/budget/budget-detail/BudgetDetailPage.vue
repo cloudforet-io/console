@@ -13,10 +13,10 @@
             </p-page-title>
         </section>
         <section class="content">
-            <budget-detail-info v-if="!loading" class="summary" />
-            <budget-summary v-if="!loading" class="summary" />
-            <budget-notifications v-if="!loading" class="alert" />
-            <budget-billing-admin v-if="!loading" class="budget" />
+            <budget-detail-info class="summary" />
+            <budget-summary :budget-loading="loading" class="summary" />
+            <budget-notifications class="alert" />
+            <budget-billing-admin class="budget" />
         </section>
         <budget-delete-modal v-if="!loading"
                              :visible="checkDeleteState.visible"

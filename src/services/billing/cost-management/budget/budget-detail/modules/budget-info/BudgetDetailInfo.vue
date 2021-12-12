@@ -5,7 +5,7 @@
                 Total Budgeted Amount
                 <span class="font-normal">(Period)</span>
             </span>
-            <p class="summary-content">
+            <p v-if="!loading" class="summary-content">
                 <b>${{ budgetData.total_usage_usd_cost }}</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
             </p>
         </p-pane-layout>
@@ -13,7 +13,7 @@
             <span class="summary-title">
                 Target
             </span>
-            <p class="summary-content">
+            <p v-if="!loading" class="summary-content">
                 <p-anchor :to="referenceRouter(
                     budgetData.project_id,
                     { resource_type: 'identity.Project' })"
@@ -25,9 +25,9 @@
         <p-pane-layout class="summary-card">
             <span class="summary-title">
                 Cost Type
-                <span class="text-gray-900 font-normal">{{ costTypeKey }}</span>
+                <span v-if="!loading" class="text-gray-900 font-normal">{{ costTypeKey }}</span>
             </span>
-            <p class="summary-content cost-type">
+            <p v-if="!loading" class="summary-content cost-type">
                 <span class="cost-type-content">{{ processedCostTypeValue }}</span>
                 <span ref="buttonRef" class="view-all" @click="handleClickViewAll">View all</span>
                 <budget-cost-type-balloon v-if="balloonVisible"
@@ -55,7 +55,7 @@ const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.k
 const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
 
 export default {
-    name: 'BudgetDetailSummary',
+    name: 'BudgetDetailInfo',
     components: {
         BudgetCostTypeBalloon,
         PPaneLayout,
@@ -65,12 +65,13 @@ export default {
         const state = reactive({
             projects: computed(() => store.state.resource.project.items),
             budgetData: computed<BudgetData>(() => store.state.service.budget.budgetData),
-            costTypeKey: computed(() => getKeyOfCostType(state.budgetData.cost_types)),
-            costTypeValue: computed(() => getValueOfCostType(state.budgetData.cost_types, state.costTypeKey)),
+            costTypeKey: computed(() => (state.budgetData ? getKeyOfCostType(state.budgetData?.cost_types) : '')),
+            costTypeValue: computed(() => (state.budgetData ? getValueOfCostType(state.budgetData?.cost_types, state.costTypeKey) : [])),
             processedCostTypeValue: computed(() => state.costTypeValue.join(', ')),
             buttonRef: null as HTMLElement | null,
             balloonWidth: 0,
             balloonVisible: false,
+            loading: computed(() => store.getters['service/budget/isBudgetLoading']),
         });
 
         const handleClickViewAll = () => {

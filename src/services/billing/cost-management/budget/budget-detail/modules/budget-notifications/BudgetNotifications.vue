@@ -12,7 +12,12 @@
             </template>
             <template #default>
                 <section class="card-body">
-                    <template v-if="hasBudgetAlert">
+                    <template v-if="$store.getters['service/budget/isBudgetLoading']">
+                        <p-lottie name="thin-spinner" :size="2.5"
+                                  auto class="spinner w-full flex justify-center"
+                        />
+                    </template>
+                    <template v-else-if="hasBudgetAlert">
                         <article class="noti-condition">
                             <span class="sub-title">Condition</span>
                             <span class="desc">Any of the following are met, <br>a notification will be sent immediately.</span>
@@ -83,7 +88,7 @@
 
 <script lang="ts">
 import {
-    PCard, PIconButton, PAnchor, PIconTextButton, PBadge,
+    PCard, PIconButton, PAnchor, PIconTextButton, PBadge, PLottie,
 } from '@spaceone/design-system';
 import BudgetNotificationsChannel
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotificationsChannel.vue';
@@ -105,6 +110,7 @@ export default {
     components: {
         BudgetNotificationsModal,
         BudgetNotificationsChannel,
+        PLottie,
         PCard,
         PIconButton,
         PIconTextButton,
@@ -120,7 +126,6 @@ export default {
             budgetId: computed(() => store.state.service.budget.budgetData?.budget_id),
             budgetTargetId: computed(() => store.state.service.budget.budgetData?.project_id) || undefined,
         });
-
 
         const checkDeleteState = reactive({
             visible: false,
@@ -237,6 +242,9 @@ export default {
             line-height: 135%;
             margin-bottom: 1rem;
         }
+    }
+    .spinner {
+        @apply flex w-full justify-center;
     }
 
     @screen tablet {

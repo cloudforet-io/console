@@ -7,10 +7,12 @@
         <template #header>
             Billing Admin
         </template>
-        <p-data-table :fields="fields" :items="data"
-                      :skeleton-rows="3"
-                      :stripe="false"
-                      :disable-copy="true"
+        <p-data-table
+            :loading="loading && $store.getters['service/budget/isBudgetLoading']"
+            :fields="fields" :items="data"
+            :skeleton-rows="3"
+            :stripe="false"
+            :disable-copy="true"
         />
     </p-card>
 </template>
@@ -28,12 +30,6 @@ export default {
     components: {
         PCard,
         PDataTable,
-    },
-    props: {
-        chartData: {
-            type: Array,
-            default: () => ([]),
-        },
     },
     setup() {
         const state = reactive({
