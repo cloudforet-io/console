@@ -3,7 +3,7 @@
         <li v-for="(item) in dashboardList" :key="item.dashboard_id"
             class="menu-item"
             :class="{'selected': item.dashboard_id === dashboardIdFromRoute}"
-            @click="showPage(item.routeName, item.dashboard_id)"
+            @click="showPage(item.dashboard_id)"
         >
             <span class="title">
                 {{ item.name }}
@@ -15,7 +15,7 @@
             <p-i v-if="item.dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
                  width="1rem" height="1rem"
             />
-            <p-select-dropdown v-model="selectedMoreMenuItem"
+            <p-select-dropdown :selected="selectedMoreMenuItem"
                                class="more-button"
                                :items="moreMenuItems"
                                button-style-type="transparent"
@@ -23,7 +23,7 @@
                                menu-position="right"
                                type="icon-button"
                                button-icon="ic_more"
-                               @select="handleSelectMoreMenu(item)"
+                               @select="handleSelectMoreMenu(item, ...arguments)"
             />
         </li>
     </ul>
@@ -63,30 +63,28 @@ export default {
             dashboardList: computed<DashboardItem[]>(() => state.items.map(d => ({
                 ...d,
                 label: d.name,
-                routeName: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
             }))),
             moreMenuItems: computed(() => [
                 { name: 'duplicate', label: 'Duplicate', disabled: true },
                 { name: 'setHome', label: 'Set as Home' },
             ]),
             selectedMoreMenuItem: '',
-            dashboardIdFromRoute: computed(() => vm.$route.params.dashboardId),
+            dashboardIdFromRoute: computed<string|undefined>(() => vm.$route.params.dashboardId),
             homeDashboardId: computed(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
         });
 
         /* util */
-        const showPage = (routeName, routeParam) => {
-            if (routeParam) {
+        const showPage = (dashboardId) => {
+            if (state.dashboardIdFromRoute !== dashboardId) {
                 SpaceRouter.router.replace({
-                    name: routeName,
-                    params: { dashboardId: routeParam },
-                }).catch(() => {});
-            } else {
-                SpaceRouter.router.replace({ name: routeName }).catch(() => {});
+                    name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                    params: { dashboardId },
+                });
             }
         };
 
-        const handleSelectMoreMenu = (item) => {
+        const handleSelectMoreMenu = (item, selectedMoreMenuItem) => {
+            state.selectedMoreMenuItem = selectedMoreMenuItem;
             if (state.selectedMoreMenuItem === 'setHome') {
                 store.dispatch('settings/setItem', {
                     key: 'homeDashboard',
@@ -107,12 +105,10 @@ export default {
         };
 
         const showHomeDashboardPage = () => {
-            if (vm.$route.name === BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME && !state.dashboardIdFromRoute) {
-                SpaceRouter.router.replace({
-                    name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
-                    params: { dashboardId: state.homeDashboardId },
-                }).catch(() => {});
-            }
+            SpaceRouter.router.replace({
+                name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                params: { dashboardId: state.homeDashboardId },
+            });
         };
 
         const initHomeDashboard = () => {
@@ -123,13 +119,19 @@ export default {
                     path: '/costDashboard',
                 });
             }
-            state.dashboardIdFromRoute = state.items[0]?.dashboard_id;
         };
 
         (async () => {
             await listDashboard();
+
             if (!state.homeDashboardId) initHomeDashboard();
-            showHomeDashboardPage();
+
+            const isDashboardIdFromRouteValid = !!state.items.find(d => d.dashboard_id === state.dashboardIdFromRoute);
+
+            if (!isDashboardIdFromRouteValid
+                || (vm.$route.name === BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME && !state.dashboardIdFromRoute)) {
+                showHomeDashboardPage();
+            }
         })();
 
 

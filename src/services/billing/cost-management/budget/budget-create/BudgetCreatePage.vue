@@ -1,9 +1,9 @@
 <template>
-    <general-page-layout>
+    <div>
         <p-breadcrumbs :routes="routeState.routes" />
         <p-page-title :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE_BUDGET')" child @goBack="$router.go(-1)" />
         <budget-form @confirm="handleFormConfirm" />
-    </general-page-layout>
+    </div>
 </template>
 
 <script lang="ts">
@@ -13,7 +13,6 @@ import {
 import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import BudgetForm from '@/services/billing/cost-management/budget/modules/budget-form/BudgetForm.vue';
@@ -23,7 +22,6 @@ export default {
     name: 'BudgetCreatePage',
     components: {
         BudgetForm,
-        GeneralPageLayout,
         PBreadcrumbs,
         PPageTitle,
     },

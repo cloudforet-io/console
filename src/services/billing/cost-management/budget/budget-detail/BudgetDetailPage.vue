@@ -1,5 +1,5 @@
 <template>
-    <general-page-layout>
+    <div>
         <p-breadcrumbs :routes="routeState.route" />
         <section class="page-title-wrapper">
             <p-page-title v-if="!loading" child :title="budgetData.name"
@@ -25,11 +25,10 @@
                              @update="handleUpdateDelete"
                              @confirm="handleConfirmDelete"
         />
-    </general-page-layout>
+    </div>
 </template>
 
 <script lang="ts">
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import { PBreadcrumbs, PPageTitle, PIconButton } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import BudgetDetailInfo
@@ -55,7 +54,6 @@ export default {
     name: 'BudgetDetailPage',
     components: {
         BudgetDeleteModal,
-        GeneralPageLayout,
         PBreadcrumbs,
         PPageTitle,
         PIconButton,
