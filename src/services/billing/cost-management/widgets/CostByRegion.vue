@@ -5,18 +5,36 @@
         :widget-link="widgetLink"
     >
         <template #default>
-            <div ref="chartRef" class="chart" />
-            <cost-dashboard-data-table
-                :fields="tableState.fields"
-                :items="tableState.items"
-                :loading="tableState.loading"
-                :this-page.sync="tableState.thisPage"
-                :page-size="8"
-                :chart="chart"
-                :show-legend="false"
-                :currency-rates="currencyRates"
-                :currency="currency"
-            />
+            <div class="widget-wrapper">
+                <p-chart-loader :loading="loading" class="chart-wrapper">
+                    <template #loader>
+                        <p-skeleton width="100%" height="50%" />
+                    </template>
+                    <div ref="chartRef" class="chart" />
+                    <div v-for="(item) in chartLegends" :key="item" class="circle-wrapper">
+                        <p v-if="providers" class="circle" :style="{background: providers[item].color}" /><span>{{ providers[item].label || '' }}</span>
+                    </div>
+                </p-chart-loader>
+                <cost-dashboard-data-table
+                    :fields="tableState.fields"
+                    :items="tableState.items"
+                    :loading="tableState.loading"
+                    :this-page.sync="tableState.thisPage"
+                    :page-size="8"
+                    :chart="chart"
+                    :show-legend="false"
+                    :currency-rates="currencyRates"
+                    :currency="currency"
+                    class="table"
+                >
+                    <template #provider-format="item">
+                        <span v-if="item.value && providers"
+                              :style="{color: providers[item.value].color}"
+                        >{{ providers[item.value].label || '' }}
+                        </span>
+                    </template>
+                </cost-dashboard-data-table>
+            </div>
         </template>
     </cost-dashboard-card-widget-layout>
 </template>
@@ -50,6 +68,7 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { PChartLoader, PSkeleton } from '@spaceone/design-system';
 
 
 const categoryKey = 'title';
@@ -57,7 +76,12 @@ const valueName = 'value';
 
 export default defineComponent<WidgetProps>({
     name: 'CostByRegion',
-    components: { CostDashboardDataTable, CostDashboardCardWidgetLayout },
+    components: {
+        CostDashboardDataTable,
+        CostDashboardCardWidgetLayout,
+        PChartLoader,
+        PSkeleton,
+    },
     props: {
         period: {
             type: Object,
@@ -96,6 +120,17 @@ export default defineComponent<WidgetProps>({
                     filters: objectToQueryString(props.filters),
                 },
             })),
+            chartLegends: computed(() => {
+                const legends = new Set();
+                state.data.forEach((item) => {
+                    if (item.pieData) {
+                        item.pieData.forEach((pieItem) => {
+                            legends.add(pieItem.provider);
+                        });
+                    }
+                });
+                return legends;
+            }),
         });
 
         const tableState = reactive({
@@ -157,6 +192,7 @@ export default defineComponent<WidgetProps>({
             pieSeriesTemplate.dataFields.value = valueName;
             pieSeriesTemplate.labels.template.disabled = true;
             pieSeriesTemplate.ticks.template.disabled = true;
+            pieSeriesTemplate.slices.template.propertyFields.fill = 'color';
 
             pieSeries.data = state.data;
         };
@@ -169,7 +205,9 @@ export default defineComponent<WidgetProps>({
                 if (target) {
                     target.pieData.push({
                         category: `${d.provider}:${state.regions[d.region_code]?.name}`,
+                        color: state.providers[d.provider]?.color || '',
                         value: d.usd_cost,
+                        provider: d.provider,
                     });
                 }
             });
@@ -204,7 +242,7 @@ export default defineComponent<WidgetProps>({
                 state.data = setPieChartData(results); // pie chart data (continent, latitude, etc.)
                 tableState.items = results.map(d => ({ // table data (usd_cost, region, provider)
                     usd_cost: d.usd_cost,
-                    provider: state.providers[d.provider]?.label,
+                    provider: d.provider || '',
                     region: state.regions[d.region_code]?.name || d.region_code,
                 }));
             } catch (e) {
@@ -244,8 +282,51 @@ export default defineComponent<WidgetProps>({
 </script>
 
 <style lang="postcss" scoped>
-.chart {
-    @apply flex;
-    height: 20rem;
+.widget-wrapper {
+    @apply flex w-full h-full flex-wrap;
+    .chart-wrapper {
+        @apply border border-gray-200;
+        flex-basis: calc(50% - 1.875rem);
+        padding: 1rem;
+        margin-right: 1.875rem;
+    }
+    .chart {
+        @apply w-full h-full;
+        height: 19rem;
+        flex-shrink: 0;
+        flex-grow: 1;
+    }
+    .table {
+        flex-basis: 50%;
+    }
+    .circle-wrapper {
+        display: inline-flex;
+        align-items: center;
+        .circle {
+            @apply inline-block;
+            margin-right: 0.25rem;
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+        }
+        span {
+            @apply mr-4 text-gray-500;
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+    }
+}
+
+@screen tablet {
+    .widget-wrapper {
+        .chart-wrapper {
+            flex-basis: 100%;
+            margin-right: 0;
+        }
+        .table {
+            flex-basis: 100%;
+            margin-top: 1rem;
+        }
+    }
 }
 </style>

@@ -17,7 +17,9 @@
                                   :text-color="getStatusTextColor(index)"
                                   @click="handleClickLegend(index)"
                         />
-                        {{ value }}
+                        <slot :name="`${name}-format`" v-bind="{ value }">
+                            {{ value }}
+                        </slot>
                     </template>
                     <template v-else-if="typeof value === 'string'">
                         {{ value }}
