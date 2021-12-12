@@ -153,21 +153,27 @@ export default defineComponent<WidgetProps>({
                 return state.chartRegistry[chartContext];
             };
             const chart = createChart();
+            chart.paddingTop = 5;
+            chart.paddingBottom = 5;
             chart.radius = am4core.percent(100);
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+
+            const pieSeries = chart.series.push(new am4charts.PieSeries());
+            pieSeries.dataFields.value = valueName;
+            pieSeries.dataFields.category = categoryKey;
+            pieSeries.labels.template.disabled = true;
+            pieSeries.slices.template.propertyFields.fill = 'color';
+            pieSeries.slices.template.clickable = false;
+            pieSeries.slices.template.states.getKey('hover').properties.scale = 1;
+
             if (state.chartData.length === 0) {
+                pieSeries.tooltip.disabled = true;
                 chart.data = [{
                     category: 'No Data',
                     value: 1,
                     color: am4core.color(gray[100]),
                 }];
             } else chart.data = state.chartData;
-            const pieSeries = chart.series.push(new am4charts.PieSeries());
-            pieSeries.dataFields.value = valueName;
-            pieSeries.dataFields.category = categoryKey;
-            pieSeries.labels.template.disabled = true;
-            pieSeries.slices.template.propertyFields.fill = 'color';
-            pieSeries.slices.template.states.getKey('hover').properties.scale = 1;
             return chart;
         };
 
