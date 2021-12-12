@@ -22,6 +22,7 @@ import CostDashboardSimpleCardWidget
 import {
     onUnmounted, computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { cloneDeep } from 'lodash';
 import { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -114,10 +115,10 @@ export default {
             categoryAxis.fontSize = 12;
 
             categoryAxis.renderer.labels.template.adapter.add('text', (text, target) => {
-                if (target.dataItem.category === state.firstMonth.format('YYYY-MM')) {
+                if (target.dataItem?.category === state.firstMonth.format('YYYY-MM')) {
                     return state.firstMonth.format('MMM');
                 }
-                if (target.dataItem.category === state.lastMonth.format('YYYY-MM')) {
+                if (target.dataItem?.category === state.lastMonth.format('YYYY-MM')) {
                     return state.lastMonth.format('MMM');
                 }
                 return '';
@@ -172,11 +173,34 @@ export default {
             }
         };
 
+        const getEnrichedChartData = (data: XYChartData[]) => {
+            const chartData = [] as XYChartData[];
+            let periodStart = cloneDeep(state.firstMonth);
+            while (periodStart.isSameOrBefore(state.thisMonth, 'month')) {
+                // eslint-disable-next-line no-loop-func
+                const existData = data.find(d => d.date === periodStart.format('YYYY-MM'));
+                if (existData) {
+                    chartData.push({
+                        date: periodStart.format('YYYY-MM'),
+                        totalCost: existData.totalCost,
+                    });
+                } else {
+                    chartData.push({
+                        date: periodStart.format('YYYY-MM'),
+                        totalCost: 0,
+                    });
+                }
+                periodStart = periodStart.add(1, 'month');
+            }
+            return chartData;
+        };
+
         const getChartData = async () => {
             try {
                 state.loading = true;
                 const results = await fetchData();
-                state.data = getXYChartData(results);
+                const chartData = getXYChartData(results);
+                state.data = getEnrichedChartData(chartData);
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {
