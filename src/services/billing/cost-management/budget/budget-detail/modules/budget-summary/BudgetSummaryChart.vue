@@ -82,8 +82,8 @@ export default {
             lineSeries.dataFields.valueY = state.limitProperty;
             lineSeries.dataFields.categoryX = categoryKey;
             lineSeries.stroke = am4core.color(gray[600]);
-            lineSeries.strokeWidth = 2;
-            lineSeries.strokeDasharray = '4, 3';
+            lineSeries.strokeWidth = 1.5;
+            lineSeries.strokeDasharray = '4, 2';
         };
 
         const makeMonthlyPlanningLineSeries = (chart: XYChart) => {
@@ -92,16 +92,16 @@ export default {
             lineSeries.name = 'Budgeted';
             lineSeries.dataFields.valueY = state.limitProperty;
             lineSeries.dataFields.categoryX = categoryKey;
-            lineSeries.stroke = am4core.color(gray[400]);
-            lineSeries.strokeWidth = 2;
-            lineSeries.strokeDasharray = '4, 3';
+            lineSeries.stroke = am4core.color(gray[600]);
+            lineSeries.strokeWidth = 1.5;
+            lineSeries.strokeDasharray = '4, 2';
 
             /* Create Bullet */
             const bullet = lineSeries.bullets.push(new am4charts.Bullet());
             bullet.fill = am4core.color(gray[600]);
             bullet.tooltipText = '[#fff font-size: 12px]{name} in {categoryX}:\n[/][#fff font-size: 12px]{valueY}[/] [#fff]{additional}[/]';
             const circle = bullet.createChild(am4core.Circle);
-            circle.radius = 5;
+            circle.radius = 4;
             circle.fill = am4core.color('white');
             circle.strokeWidth = 2;
         };
@@ -127,6 +127,13 @@ export default {
             /* Create value axis */
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
             valueAxis.fontSize = 12;
+            // valueAxis.renderer.labels.template.adapter.add('text', (text, target) => {
+            //     if (target.dataItem) {
+            //         if (target.dataItem.value) return commaFormatter(numberFormatter(target.dataItem.value));
+            //     }
+            //     return text;
+            // });
+            valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
 
             /* Create series - Column */
             const columnSeries = chart.series.push(new am4charts.ColumnSeries());

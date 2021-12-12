@@ -223,6 +223,7 @@ export default {
         .period-box {
             @apply relative inline-flex flex-wrap gap-4 items-center pl-4;
             height: 1.25rem;
+            font-size: 0.875rem;
 
             &::before {
                 @apply bg-gray-300;
