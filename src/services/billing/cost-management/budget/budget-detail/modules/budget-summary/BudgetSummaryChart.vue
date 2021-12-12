@@ -122,6 +122,7 @@ export default {
             categoryAxis.dataFields.category = categoryKey;
             categoryAxis.renderer.minGridDistance = 30;
             categoryAxis.fontSize = 12;
+            categoryAxis.renderer.labels.template.adapter.add('text', (text, target) => dayjs(target.dataItem.category).format('MMM YYYY'));
 
             /* Create value axis */
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());

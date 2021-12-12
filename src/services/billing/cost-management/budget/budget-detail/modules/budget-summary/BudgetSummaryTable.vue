@@ -118,7 +118,7 @@ export default {
             data: [],
             fields: computed(() => state.enrichedBudgetUsageData.map(d => ({
                 name: d.date,
-                label: d.date,
+                label: d.date ? dayjs(d.date).format('MMM YYYY') : ' ',
             }))),
             loading: true,
         });
