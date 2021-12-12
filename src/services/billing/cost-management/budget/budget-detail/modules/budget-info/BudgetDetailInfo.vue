@@ -6,7 +6,8 @@
                 <span class="font-normal">(Period)</span>
             </span>
             <p v-if="!loading" class="summary-content">
-                <b>${{ budgetData.total_usage_usd_cost }}</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
+                <b>{{ currencyMoneyFormatter(budgetData.total_usage_usd_cost, currency, currencyRates) }}</b>
+                ({{ budgetData.start }} ~ {{ budgetData.end }})
             </p>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
@@ -35,7 +36,7 @@
                                           :balloon-width="balloonWidth"
                                           :balloon-visible.sync="balloonVisible"
                                           :cost-type-key="costTypeKey"
-                                          :cost-type-value="costTypeValue"
+                                          :cost-type-value="processedCostTypeValue"
                 />
             </p>
         </p-pane-layout>
@@ -50,6 +51,8 @@ import { store } from '@/store';
 import { BudgetData, CostType } from '@/services/billing/cost-management/budget/type';
 import BudgetCostTypeBalloon
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-info/BudgetCostTypeBalloon.vue';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { CURRENCY } from '@/store/modules/display/config';
 
 const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];
 const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
@@ -60,6 +63,16 @@ export default {
         BudgetCostTypeBalloon,
         PPaneLayout,
         PAnchor,
+    },
+    props: {
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     setup() {
         const state = reactive({
@@ -86,6 +99,7 @@ export default {
             ...toRefs(state),
             referenceRouter,
             handleClickViewAll,
+            currencyMoneyFormatter,
         };
     },
 };

@@ -11,9 +11,7 @@
         </section>
         <hr class="divider">
         <section class="content">
-            <span v-for="item in costTypeValue" :key="`${item}-index`">
-                {{ item }}
-            </span>
+            {{ costTypeValue }}
         </section>
     </div>
 </template>
@@ -27,7 +25,7 @@ interface Props {
     balloonWidth: number;
     balloonVisible: boolean;
     costTypeKey: string;
-    costTypeValue: string[];
+    costTypeValue: string;
 }
 
 const BalloonTailWidth = 12;
@@ -59,7 +57,7 @@ export default {
             default: '',
         },
         costTypeValue: {
-            type: Array,
+            type: String,
             default: undefined,
         },
     },

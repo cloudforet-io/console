@@ -8,9 +8,12 @@
                   class="budget-summary-table"
     >
         <template #col-format="{field, value, index}">
-            <span v-if="field.name && value.path === 'usd_cost'">
+            <span v-if="field.name && value.path === 'limit'">
+                {{ currencyMoneyFormatter(value[value.path], currency, currencyRates) }}
+            </span>
+            <span v-else-if="field.name && value.path === 'usd_cost'" class="text-blue-600">
                 <router-link :to="value.link" class="link-text">
-                    {{ value[value.path] }}
+                    {{ currencyMoneyFormatter(value[value.path], currency, currencyRates) }}
                 </router-link>
             </span>
             <span v-else>{{ value[value.path] }}</span>
@@ -37,6 +40,8 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import dayjs from 'dayjs';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { CURRENCY } from '@/store/modules/display/config';
 
 const defaultTableKey = [{ name: 'Actual Cost', path: 'usd_cost' }, { name: 'Current vs Budget.', path: 'ratio' }];
 const monthlyPlanningTableKey = { name: 'Budgeted', path: 'limit' };
@@ -61,6 +66,16 @@ export default {
     name: 'BudgetDetailSummaryTable',
     components: {
         PDataTable,
+    },
+    props: {
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     setup() {
         const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageData[], period: Period) => getAccumulatedChartData(budgetUsageData, period, 'month');
@@ -142,6 +157,7 @@ export default {
 
         return {
             ...toRefs(state),
+            currencyMoneyFormatter,
         };
     },
 };

@@ -13,8 +13,10 @@
             </p-page-title>
         </section>
         <section class="content">
-            <budget-detail-info class="summary" />
-            <budget-summary :budget-loading="loading" class="summary" />
+            <budget-detail-info class="summary" :currency="currency" :currency-rates="currencyRates" />
+            <budget-summary :budget-loading="loading" :currency="currency" :currency-rates="currencyRates"
+                            class="summary"
+            />
             <budget-notifications class="alert" />
             <budget-billing-admin class="budget" />
         </section>
@@ -74,6 +76,8 @@ export default {
         const state = reactive({
             loading: true,
             budgetData: computed<BudgetData>(() => store.state.service.budget.budgetData),
+            currency: computed(() => store.state.display.currency),
+            currencyRates: computed(() => store.state.display.currencyRates),
         });
         const routeState = reactive({
             route: computed(() => ([
