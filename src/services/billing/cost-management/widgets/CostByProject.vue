@@ -3,7 +3,7 @@
         title="Cost By Project"
         :data-range="15"
         :widget-link="widgetLink"
-        :no-data="data.length === 0"
+        :no-data="!loading && data.length === 0"
         class="cost-by-project"
     >
         <template #default>
@@ -16,13 +16,12 @@
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
+import { TreeMap } from '@amcharts/amcharts4/charts';
 
 import {
-    computed,
-    onUnmounted, reactive, toRefs, watch,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { TreeMap } from '@amcharts/amcharts4/charts';
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
 
@@ -35,8 +34,9 @@ import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/confi
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import { BILLING_ROUTE } from '@/services/billing/routes';
-import config from '@/lib/config';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import config from '@/lib/config';
 import { store } from '@/store';
 
 
@@ -119,7 +119,9 @@ export default {
             const seriesBullet = series.bullets.push(new am4charts.LabelBullet());
             seriesBullet.locationY = 0.5;
             seriesBullet.locationX = 0.5;
-            seriesBullet.label.text = '{projectName}';
+            seriesBullet.label.text = `[font-size: 1rem; bold]{projectName}[/]
+[font-size: 1.125rem; text-align: center]{cost}`;
+            series.tooltip.disabled = true;
         };
 
         const costQueryHelper = new QueryHelper();
@@ -149,23 +151,20 @@ export default {
             const rawData = await fetchData();
             state.data = rawData.map(d => ({
                 projectId: d.project_id,
-                cost: d.usd_cost,
+                cost: currencyMoneyFormatter(d.usd_cost, props.currency, props.currencyRates, false, 10000000),
                 projectName: state.projects[d.project_id]?.label || d.project_id,
             }));
             state.loading = false;
         };
 
         watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
-            if (!loading && chartContext && state.data.length > 0) {
+            if (!loading && chartContext) {
                 drawChart(chartContext);
             }
         }, { immediate: false });
 
-        watch([() => props.period, () => props.filters], async (after) => {
-            if (after) {
-                await getChartData();
-                drawChart(state.chartRef);
-            }
+        watch([() => props.period, () => props.filters, () => props.currency], () => {
+            getChartData();
         });
 
         getChartData();

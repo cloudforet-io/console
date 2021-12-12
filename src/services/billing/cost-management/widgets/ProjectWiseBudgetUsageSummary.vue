@@ -15,9 +15,7 @@
                     <p-i :name="value.projectId ? 'ic_project' : 'ic_tree_project-group'" width="1rem" height="1rem"
                          class="project-icon"
                     />
-                    <p-anchor :href="getProjectLink(value.projectId || value.projectGroupId, !!value.projectId)">
-                        {{ value.projectId ? projectNameFormatter(value.projectId) : projectGroupNameFormatter(value.projectGroupId) }}
-                    </p-anchor>
+                    {{ value.projectId ? projectNameFormatter(value.projectId) : projectGroupNameFormatter(value.projectGroupId) }}
                 </div>
             </template>
             <template #col-amountSpent-format="{ value }">
@@ -44,7 +42,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PDataTable, PI, PProgressBar, PAnchor,
+    PDataTable, PI, PProgressBar,
 } from '@spaceone/design-system';
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
@@ -78,7 +76,6 @@ export default {
         PDataTable,
         PI,
         PProgressBar,
-        PAnchor,
     },
     props: {
         period: {
@@ -154,7 +151,7 @@ export default {
                 state.loading = true;
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({
                     include_budget_count: false,
-                    include_project_info: true,
+                    include_budget_info: true,
                     group_by: ['budget_id'],
                     start: dayjs.utc(period.start).format('YYYY-MM'),
                     end: dayjs.utc(period.end).format('YYYY-MM'),
