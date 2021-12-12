@@ -1,7 +1,13 @@
 <template>
     <div class="date-filter">
         <p-badge style-type="gray200">
-            <div>{{ period.start }} ~ {{ period.end }}</div>
+            <p v-if="dateFormatter(period.start, 'M') !== dateFormatter(period.end, 'M')">
+                {{ dateFormatter(period.start, 'MMMM D') }}, {{ dateFormatter(period.start, 'YYYY') }}
+                ~ {{ dateFormatter(period.end, 'MMMM D') }}, {{ dateFormatter(period.end, 'YYYY') }}
+            </p>
+            <p v-else>
+                {{ dateFormatter(period.start, 'MMMM D') }} ~ {{ dateFormatter(period.end, 'D') }}, {{ dateFormatter(period.end, 'YYYY') }}
+            </p>
         </p-badge>
         <p-select-dropdown :items="MonthMenuItems"
                            :selected="selectedMonthMenuItem"
@@ -37,6 +43,8 @@ const getMonthMenuItem = () => {
     });
     return monthData.reverse();
 };
+
+const dateFormatter = (date: string, format: string) => dayjs.utc(date).format(format);
 
 export default {
     name: 'CostDashboardPeriodSelectDropdown',
@@ -93,6 +101,7 @@ export default {
             ...toRefs(state),
             handleSelectMonthMenuItem,
             handleCustomRangeModalConfirm,
+            dateFormatter,
         };
     },
 };
