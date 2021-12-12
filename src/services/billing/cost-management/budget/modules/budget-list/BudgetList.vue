@@ -46,6 +46,10 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { Period } from '@/services/billing/cost-management/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Query } from '@spaceone/console-core-lib/space-connector/type';
+import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { i18n } from '@/translations';
+import { store } from '@/store';
 
 interface BudgetParam {
     query: Query;
@@ -64,7 +68,7 @@ export default {
             default: () => [],
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props: Props, { emit, root }) {
         const budgetQueryHelper = new QueryHelper();
         const budgetUsageApiQueryHelper = new ApiQueryHelper();
 
@@ -105,6 +109,19 @@ export default {
 
                 return param;
             }),
+            excelFields: [
+                { key: 'budget_id', name: 'Budget ID' },
+                { key: 'name', name: 'Budget Name' },
+                { key: 'project_id', name: 'Project', reference: { reference_key: 'project_id', resource_type: 'identity.Project' } },
+                { key: 'project_group_id', name: 'Project Group', reference: { reference_key: 'project_group_id', resource_type: 'identity.ProjectGroup' } },
+                { key: 'usd_cost', name: 'USD Cost' },
+                { key: 'limit', name: 'Limit' },
+                { key: 'usage', name: 'Usage (%)' },
+                { key: 'cost_types.service_account_id', name: 'Cost Type (Service Account)', reference: { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' } },
+                { key: 'cost_types.region_code', name: 'Cost Type (Region)', reference: { reference_key: 'region_code', resource_type: 'inventory.Region' } },
+                { key: 'cost_types.product', name: 'Cost Type (Product)' },
+                { key: 'cost_types.provider', name: 'Cost Type (Provider)', reference: { reference_key: 'provider', resource_type: 'identity.Provider' } },
+            ],
         });
 
         const setFilters = (filters: QueryStoreFilter[]) => {
@@ -173,8 +190,22 @@ export default {
             listBudgets();
         };
 
-        const handleExport = () => {
+        const handleExport = async () => {
+            try {
+                showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', root);
 
+                await store.dispatch('file/downloadExcel', {
+                    url: '/cost-analysis/budget-usage/analyze',
+                    param: {
+                        ...state.budgetUsageParam,
+                        query: budgetUsageApiQueryHelper.data,
+                    },
+                    fields: state.excelFields,
+                    file_name_prefix: FILE_NAME_PREFIX.budget,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
         };
 
         const handleUpdateSort = (sort) => {

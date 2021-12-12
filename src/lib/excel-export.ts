@@ -7,5 +7,6 @@ export const FILE_NAME_PREFIX = Object.freeze({
     projectWebhook: 'projectWebhook',
     alert: 'alert',
     costAnalysis: 'costAnalysis',
+    budget: 'budget',
 });
 export type FILE_NAME_PREFIX = typeof FILE_NAME_PREFIX[keyof typeof FILE_NAME_PREFIX]
