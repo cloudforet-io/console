@@ -53,7 +53,6 @@ import { DataTableField } from '@spaceone/design-system/dist/src/data-display/ta
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { Period } from '@/services/billing/cost-management/type';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { getConvertedBudgetFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -124,10 +123,6 @@ export default {
         });
 
         /* util */
-        const _getApiPeriod = (period: Period): Period => ({
-            start: dayjs(period.start).format('YYYY-MM'),
-            end: dayjs.utc(period.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
-        });
         const getProjectLink = (value: string, isProject: boolean) => {
             if (isProject) {
                 const link = SpaceRouter.router.resolve(referenceRouter(
@@ -157,13 +152,12 @@ export default {
             budgetQueryHelper.setFilters(getConvertedBudgetFilter(filters));
             try {
                 state.loading = true;
-                const apiPeriod = _getApiPeriod(period);
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({
                     include_budget_count: false,
                     include_project_info: true,
                     group_by: ['budget_id'],
-                    start: apiPeriod.start,
-                    end: apiPeriod.end,
+                    start: dayjs.utc(period.start).format('YYYY-MM'),
+                    end: dayjs.utc(period.end).format('YYYY-MM'),
                     sort: {
                         key: 'usd_cost',
                         desc: true,

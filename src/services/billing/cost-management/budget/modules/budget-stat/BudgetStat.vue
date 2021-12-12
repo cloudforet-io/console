@@ -31,6 +31,7 @@ import {
 } from '@vue/composition-api';
 import { TranslateResult } from 'vue-i18n';
 import { isEmpty } from 'lodash';
+import dayjs from 'dayjs';
 
 import { commaFormatter, isNotEmpty } from '@spaceone/console-core-lib';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
@@ -49,6 +50,7 @@ import {
     BudgetUsageRange,
 } from '@/services/billing/cost-management/budget/type';
 import { Period } from '@/services/billing/cost-management/type';
+
 
 interface Props {
     filters: QueryStoreFilter[];
@@ -133,7 +135,7 @@ export default {
                     return `${today.format('MMM YYYY')} (MTD)`;
                 }
 
-                return `${start.format('MMMM DD, YYYY')} ~ ${end.format('MMMM DD, YYYY')}`;
+                return `${start.format('MMM D, YYYY')} ~ ${end.format('MMM D, YYYY')}`;
             }),
             availableBudget: computed<string>(() => {
                 let availableBudget = state.budgetUsage.limit - state.budgetUsage.usd_cost;
@@ -151,8 +153,8 @@ export default {
                 if (keyword) param.keyword = keyword;
                 if (filter?.length) param.filter = filter;
                 if (isNotEmpty(props.usageRange)) param.usage_range = props.usageRange;
-                if (props.period.start) param.start = props.period.start;
-                if (props.period.end) param.end = props.period.end;
+                if (props.period.start) param.start = dayjs.utc(props.period.start).format('YYYY-MM');
+                if (props.period.end) param.end = dayjs.utc(props.period.end).format('YYYY-MM');
 
                 return param;
             }),
@@ -186,8 +188,7 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .budget-stat {
-    @apply flex rounded-lg border-solid box-border bg-white border border-gray-200;
-    padding: 1.125rem 0;
+    @apply flex rounded-lg border-solid box-border bg-white;
     margin-bottom: 1rem;
     .card-box {
         @apply border-gray-200 border-l;

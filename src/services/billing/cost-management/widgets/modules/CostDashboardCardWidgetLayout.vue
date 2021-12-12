@@ -7,7 +7,7 @@
             <div class="header">
                 {{ title }}
                 <p class="title-extra">
-                    <span class="show-top-text">Showing Top {{ dataRange }}
+                    <span v-if="showTopText" class="show-top-text">Showing Top {{ dataRange }}
                         <p-i name="ic_tooltip" width="1rem" height="1rem"
                              color="inherit transparent" class="tooltip-button"
                         />
@@ -53,6 +53,10 @@ export default {
         noData: {
             type: Boolean,
             default: false,
+        },
+        showTopText: {
+            type: Boolean,
+            default: true,
         },
     },
     setup() {

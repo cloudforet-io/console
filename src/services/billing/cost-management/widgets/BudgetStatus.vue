@@ -135,7 +135,7 @@ export default {
                     include_project_info: false,
                     group_by: ['budget_id'],
                     start: dayjs.utc(period.start).format('YYYY-MM'),
-                    end: dayjs.utc(period.end).add(1, 'month').format('YYYY-MM'),
+                    end: dayjs.utc(period.end).format('YYYY-MM'),
                     sort: {
                         key: 'usage',
                         desc: true,
