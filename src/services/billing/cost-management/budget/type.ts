@@ -69,12 +69,16 @@ export interface BudgetData {
 
 export interface BudgetUsageData {
 	budget_id: string;
+	name: string;
 	limit: number;
 	usd_cost: number;
 	date: string;
 	domain_id?: string;
 	updated_at: TimeStamp;
 	usage?: number;
+	project_id?: string;
+	project_group_id?: string;
+	cost_types?: Partial<Record<CostType, string[]>>;
 }
 
 export type BudgetPageUrlQuery = Partial<Record<'filters', RouteQueryString>>

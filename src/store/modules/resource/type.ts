@@ -1,4 +1,4 @@
-export interface ResourceItem {
+export interface ResourceItem<Data = Record<string, any>> {
     label?: string;
     name?: string;
     color?: string;
@@ -7,10 +7,11 @@ export interface ResourceItem {
     continent?: string;
     latitude?: string;
     longitude?: string;
+    data?: Data;
 }
 
-export type ResourceMap = Record<string, ResourceItem>;
+export type ResourceMap<ResourceItem = Record<string, any>> = Record<string, ResourceItem>;
 
-export interface ResourceState {
+export interface ResourceState<ResourceMap = Record<string, any>> {
     items?: ResourceMap;
 }

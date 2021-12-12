@@ -12,7 +12,6 @@
         <budget-stat :filters="_filters" :period="period" :usage-range="range" />
         <div class="budget-list-card-box">
             <budget-list-card v-for="budgetUsage in budgetUsages" :key="budgetUsage.budget_id"
-                              :budget="budgetMap[budgetUsage.budget_id]"
                               :budget-usage="budgetUsage"
                               :budget-loading="loading"
             />
@@ -26,8 +25,6 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { keyBy } from 'lodash';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
@@ -37,7 +34,6 @@ import BudgetListCard from '@/services/billing/cost-management/budget/modules/bu
 import BudgetToolbox, { Pagination } from '@/services/billing/cost-management/budget/modules/budget-toolbox/BudgetToolbox.vue';
 import BudgetStat from '@/services/billing/cost-management/budget/modules/budget-stat/BudgetStat.vue';
 import {
-    BudgetData,
     BudgetUsageAnalyzeRequestParam,
     BudgetUsageData,
     BudgetUsageRange,
@@ -74,8 +70,6 @@ export default {
 
         const state = reactive({
             budgetUsages: [] as BudgetUsageData[],
-            budgets: [] as BudgetData[],
-            budgetMap: computed<Record<string, BudgetData>>(() => keyBy(state.budgets, d => d.budget_id)),
             loading: false,
             // query
             range: {} as BudgetUsageRange,
@@ -129,18 +123,6 @@ export default {
             emit('update:filters', filters);
         };
 
-
-        const fetchBudgets = async () => {
-            try {
-                const { results } = await SpaceConnector.client.costAnalysis.budget.list(state.budgetParam);
-
-                state.budgets = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.budgets = [];
-            }
-        };
-
         const fetchBudgetUsages = async () => {
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
@@ -158,7 +140,6 @@ export default {
             state.loading = true;
 
             await fetchBudgetUsages();
-            await fetchBudgets();
 
             state.loading = false;
         };

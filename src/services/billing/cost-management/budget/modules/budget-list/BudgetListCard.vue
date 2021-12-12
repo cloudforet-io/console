@@ -9,9 +9,17 @@
         </div>
         <div v-else class="card-wrapper">
             <div class="card-header">
-                <p-breadcrumbs :routes="budgetRoutes" class="breadcrumbs" />
+                <div class="project-info">
+                    <span v-for="(name, index) in projects" :key="name" class="">
+                        <p-i v-if="index === projects.length - 1"
+                             :name="isProject ? 'ic_tree_project-group' : 'ic_tree_project'"
+                        />
+                        {{ name }}
+                        <template v-if="index < projects.length - 1"> > </template>
+                    </span>
+                </div>
                 <p class="budget-name">
-                    {{ budget.name }}
+                    {{ budgetUsage.name }}
                 </p>
             </div>
             <p-divider />
@@ -59,20 +67,20 @@ import {
 } from '@vue/composition-api';
 import { Location } from 'vue-router';
 
-import { BudgetData, BudgetUsageData } from '@/services/billing/cost-management/budget/type';
+import { BudgetUsageData } from '@/services/billing/cost-management/budget/type';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import {
-    PBreadcrumbs, PDivider, PSkeleton,
+    PDivider, PI, PSkeleton,
 } from '@spaceone/design-system';
 import BudgetUsageProgressBar from '@/services/billing/cost-management/modules/BudgetUsageProgressBar.vue';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { capitalize } from 'lodash';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
+import { ProjectResourceItem } from '@/store/modules/resource/project/type';
+import { ProjectGroupResourceItem } from '@/store/modules/resource/project-group/type';
 
 
 interface Props {
-    budget: BudgetData;
-    budgetUsage?: BudgetUsageData;
+    budgetUsage: BudgetUsageData;
     budgetLoading: boolean;
 }
 
@@ -91,19 +99,15 @@ export const PROVIDER_MAP = Object.freeze({
 export default {
     name: 'BudgetListCard',
     components: {
-        PBreadcrumbs,
+        PI,
         PDivider,
         PSkeleton,
         BudgetUsageProgressBar,
     },
     props: {
-        budget: {
-            type: Object,
-            default: () => ({}),
-        },
         budgetUsage: {
             type: Object,
-            default: undefined,
+            default: () => ({}),
         },
         budgetLoading: {
             type: Boolean,
@@ -115,14 +119,28 @@ export default {
             linkLocation: computed<Location>(() => ({
                 name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
                 params: {
-                    budgetId: props.budget.budget_id,
+                    budgetId: props.budgetUsage.budget_id,
                 },
             })),
-            loading: computed<boolean>(() => props.budgetLoading || state.cardInfoLoading),
-            cardInfoLoading: true,
-            budgetRoutes: [] as Route[],
+            loading: computed<boolean>(() => props.budgetLoading),
+            isProject: computed<boolean>(() => !!props.budgetUsage.project_id),
+            projects: computed(() => {
+                const projects: string[] = [];
+                if (state.isProject) {
+                    const projectId = props.budgetUsage.project_id as string;
+                    const project: ProjectResourceItem|undefined = store.state.resource.project.items[projectId];
+                    if (project?.data?.groupInfo.name) projects.push(project.data.groupInfo.name);
+                    projects.push(project?.name ?? projectId);
+                } else {
+                    const projectGroupId = props.budgetUsage.project_group_id as string;
+                    const projectGroup: ProjectGroupResourceItem|undefined = store.state.resource.projectGroup.items[projectGroupId];
+                    if (projectGroup?.data?.parentGroupInfo?.name) projects.push(projectGroup.data.parentGroupInfo.name);
+                    projects.push(projectGroup?.name ?? projectGroupId);
+                }
+                return projects;
+            }),
             costTypeList: computed<string>(() => {
-                const costTypes = props.budget.cost_types;
+                const costTypes = props.budgetUsage.cost_types;
                 let costTypeList = '';
 
                 if (!costTypes) return costTypeList;
@@ -132,14 +150,8 @@ export default {
                 });
                 return costTypeList;
             }),
-            cost: computed<number>(() => {
-                if (props.budgetUsage) return props.budgetUsage.usd_cost;
-                return props.budget.total_usage_usd_cost;
-            }),
-            limit: computed<number>(() => {
-                if (props.budgetUsage) return props.budgetUsage.limit;
-                return props.budget.limit;
-            }),
+            cost: computed<number>(() => props.budgetUsage.usd_cost),
+            limit: computed<number>(() => props.budgetUsage.limit),
             percentage: computed<number>(() => {
                 const value = parseFloat(((state.cost / state.limit) * 100).toFixed(1));
                 if (Number.isNaN(value)) return 0;
@@ -153,33 +165,6 @@ export default {
             }),
         });
 
-        const getParentProjectGroupName = async (projectId?: string, projectGroupId?: string) => {
-            try {
-                if (projectId) {
-                    const res = await SpaceConnector.client.identity.project.get({
-                        project_id: props.budget?.project_id,
-                    });
-                    return res.project_group_info.name;
-                }
-                if (projectGroupId) {
-                    const res = await SpaceConnector.client.identity.projectGroup.get({
-                        project_group_id: props.budget.project_group_id,
-                    });
-                    return res.parent_project_group_info ? res.parent_project_group_info.name : undefined;
-                }
-                return undefined;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return undefined;
-            }
-        };
-        (async () => {
-            const { project_id, project_group_id, name } = props.budget;
-            const parentProjectGroupName = await getParentProjectGroupName(project_id, project_group_id);
-
-            state.budgetRoutes = parentProjectGroupName ? [{ name: parentProjectGroupName }, { name }] : [{ name }];
-            state.cardInfoLoading = false;
-        })();
 
         return {
             ...toRefs(state),
