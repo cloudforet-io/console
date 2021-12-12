@@ -185,6 +185,7 @@ export default {
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
             valueAxis.tooltip.disabled = true;
             valueAxis.renderer.minWidth = 20;
+            valueAxis.min = 0;
             valueAxis.fontSize = 12;
             valueAxis.extraMax = 0.01;
             valueAxis.renderer.grid.template.strokeOpacity = 1;
@@ -193,7 +194,6 @@ export default {
             valueAxis.tooltip.label.fontSize = 12;
             valueAxis.renderer.labels.template.adapter.add('text', (text, target) => {
                 if (target.dataItem) {
-                    if (target.dataItem.value === 0) return '($USD) 0'; // todo: have to be changed
                     if (target.dataItem.value) return commaFormatter(numberFormatter(target.dataItem.value));
                 }
                 return text;

@@ -57,7 +57,6 @@ const createValueAxis = (chart) => {
 
     valueAxis.renderer.labels.template.adapter.add('text', (text, target) => {
         if (target.dataItem) {
-            // if (target.dataItem.value === 0) return '($USD) 0';
             if (target.dataItem.value) return commaFormatter(numberFormatter(target.dataItem.value));
         }
         return text;

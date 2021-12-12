@@ -34,6 +34,7 @@
                     <template #toggle-right="{node, path}">
                         <span>
                             <component :is="selectComponent"
+                                       v-if="node.data.item_type === 'PROJECT' || (node.data.item_type === 'PROJECT_GROUP' && projectGroupSelectable)"
                                        :selected="selectedProjects" :value="node.data"
                                        :predicate="predicate"
                                        class="mr-1"
@@ -203,7 +204,7 @@ export default {
         };
 
         const onChangeSelect = (selected: ProjectTreeItem[]) => {
-            if (state.selectedItems === selected) return;
+            if (!props.multiSelectable && state.selectedItems === selected) return;
 
             state.selectedItems = selected;
             state._selectedProjectIds = state.selectedProjects.map(d => d.id);
