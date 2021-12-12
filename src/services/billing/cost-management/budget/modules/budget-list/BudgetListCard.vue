@@ -1,6 +1,6 @@
 <template>
     <router-link :to="linkLocation" class="budget-list-card">
-        <div v-if="loading" class="skeleton-wrapper">
+        <div v-if="budgetLoading" class="skeleton-wrapper">
             <div class="top">
                 <p-skeleton width="30%" height="1rem" />
                 <p-skeleton width="23%" height="1.5rem" />
@@ -9,13 +9,22 @@
         </div>
         <div v-else class="card-wrapper">
             <div class="card-header">
-                <div class="project-info">
-                    <span v-for="(name, index) in projects" :key="name" class="">
+                <div class="flex items-center mb-1">
+                    <span v-for="(name, index) in projects"
+                          :key="name"
+                          class="project-info"
+                          :class="{target: index === projects.length - 1}"
+                    >
                         <p-i v-if="index === projects.length - 1"
-                             :name="isProject ? 'ic_tree_project-group' : 'ic_tree_project'"
+                             :name="isProject ? 'ic_tree_project' : 'ic_tree_project-group'"
+                             color="inherit"
+                             width="1em" height="1em" class="mr-1"
                         />
                         {{ name }}
-                        <template v-if="index < projects.length - 1"> > </template>
+                        <p-i v-if="index < projects.length - 1"
+                             name="ic_breadcrumb_arrow"
+                             width="1em" height="1em"
+                        />
                     </span>
                 </div>
                 <p class="budget-name">
@@ -31,8 +40,8 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
                             </p>
                             <div class="amount-used-wrapper" :class="progressStatus">
-                                <span class="cost">${{ cost }}</span>
-                                <span class="percent">(${{ percentage }}%)</span>
+                                <span class="cost">${{ commaFormatter(cost) }}</span>
+                                <span class="percent">({{ percentage.toFixed(2) }}%)</span>
                             </div>
                         </div>
                         <div class="label-right">
@@ -40,7 +49,7 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
                             </p>
                             <div class="cost">
-                                ${{ limit }}
+                                ${{ commaFormatter(limit) }}
                             </div>
                         </div>
                     </div>
@@ -52,7 +61,9 @@
                             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.COST_TYPE') }}
                         </div>
                         <div class="cost-type">
-                            <span>{{ costTypeList }}</span>
+                            <span v-for="({resourceList, costTypeLabel}) in costTypeResourceListMap" :key="costTypeLabel">
+                                {{ costTypeLabel }}: {{ resourceList.join(', ') }}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -73,10 +84,11 @@ import {
     PDivider, PI, PSkeleton,
 } from '@spaceone/design-system';
 import BudgetUsageProgressBar from '@/services/billing/cost-management/modules/BudgetUsageProgressBar.vue';
-import { capitalize } from 'lodash';
 import { store } from '@/store';
 import { ProjectResourceItem } from '@/store/modules/resource/project/type';
 import { ProjectGroupResourceItem } from '@/store/modules/resource/project-group/type';
+import { ResourceMap } from '@/store/modules/resource/type';
+import { commaFormatter } from '@spaceone/console-core-lib';
 
 
 interface Props {
@@ -84,17 +96,18 @@ interface Props {
     budgetLoading: boolean;
 }
 
-interface Route {
-    name: string;
-    path?: string;
-    to?: Location;
+type ResourceItemMap = {
+    label: string;
+    items: ResourceMap;
 }
 
-export const PROVIDER_MAP = Object.freeze({
-    google_cloud: 'Google Cloud',
-    azure: 'Azure',
-    aws: 'AWS',
-});
+type CostTypeResourceItemMap = Record<string, ResourceItemMap>
+
+type CostTypeResourceListMap = Record<string, {
+    costTypeLabel: string;
+    resourceList: string[];
+}>
+
 
 export default {
     name: 'BudgetListCard',
@@ -122,7 +135,6 @@ export default {
                     budgetId: props.budgetUsage.budget_id,
                 },
             })),
-            loading: computed<boolean>(() => props.budgetLoading),
             isProject: computed<boolean>(() => !!props.budgetUsage.project_id),
             projects: computed(() => {
                 const projects: string[] = [];
@@ -139,36 +151,59 @@ export default {
                 }
                 return projects;
             }),
-            costTypeList: computed<string>(() => {
+            resourceItemMap: computed<CostTypeResourceItemMap>(() => ({
+                provider: {
+                    label: 'Provider',
+                    items: store.state.resource.provider.items,
+                },
+                region_code: {
+                    label: 'Region',
+                    items: store.state.resource.region.items,
+                },
+                service_account_id: {
+                    label: 'Service Account',
+                    items: store.state.resource.serviceAccount.items,
+                },
+            })),
+            costTypeResourceListMap: computed<CostTypeResourceListMap>(() => {
                 const costTypes = props.budgetUsage.cost_types;
-                let costTypeList = '';
 
-                if (!costTypes) return costTypeList;
+                if (!costTypes) return {};
 
-                Object.entries(costTypes).forEach(([costType, costTypeValue]) => {
-                    if (costTypeValue) costTypeList += ` ${capitalize(costType)}: ${costTypeValue.map(value => (` ${PROVIDER_MAP[value]}`))}`;
+                const costTypeResourceListMap: CostTypeResourceListMap = {};
+                Object.entries(costTypes).forEach(([costType, resources]) => {
+                    if (Array.isArray(resources) && resources.length) {
+                        const resource = state.resourceItemMap[costType];
+
+                        costTypeResourceListMap[costType] = {
+                            costTypeLabel: resource?.label ?? costType,
+                            resourceList: resources.map(d => (resource?.items[d]?.name ?? d)),
+                        };
+                    }
                 });
-                return costTypeList;
+
+                return costTypeResourceListMap;
             }),
-            cost: computed<number>(() => props.budgetUsage.usd_cost),
-            limit: computed<number>(() => props.budgetUsage.limit),
-            percentage: computed<number>(() => {
-                const value = parseFloat(((state.cost / state.limit) * 100).toFixed(1));
-                if (Number.isNaN(value)) return 0;
-                return value;
-            }),
+            cost: computed<number>(() => props.budgetUsage.usd_cost ?? 0),
+            limit: computed<number>(() => props.budgetUsage.limit ?? 0),
+            percentage: computed<number>(() => props.budgetUsage.usage ?? 0),
             progressStatus: computed<'overspent'|'warning'|'unused'|'common'>(() => {
                 if (state.percentage >= 100) return 'overspent';
                 if (state.percentage >= 90) return 'warning';
                 if (state.percentage === 0) return 'unused';
                 return 'common';
             }),
+
+            // resource store items
+            providers: computed(() => store.state.resource.provider.items),
+            regions: computed(() => store.state.resource.region.items),
+            serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
         });
 
 
         return {
             ...toRefs(state),
-            PROVIDER_MAP,
+            commaFormatter,
         };
     },
 };
@@ -196,6 +231,16 @@ export default {
             padding: 1rem;
             .budget-name {
                 @apply text-gray-900 font-bold;
+            }
+            .project-info {
+                @apply text-gray-400;
+                display: inline-flex;
+                flex-wrap: wrap;
+                align-items: center;
+                font-size: 0.75rem;
+                &.target {
+                    @apply text-gray-700;
+                }
             }
         }
         .card-body {

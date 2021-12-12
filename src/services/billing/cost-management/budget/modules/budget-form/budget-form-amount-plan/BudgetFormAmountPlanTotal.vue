@@ -9,7 +9,6 @@
             </template>
             <p-text-input v-model="formattedAmount" placeholder="1,000"
                           :invalid="invalidState.amount"
-                          type="number"
             >
                 <template #right-extra>
                     ($)
