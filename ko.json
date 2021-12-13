@@ -344,7 +344,7 @@
 					"BUDGET": "예산",
 					"BUDGETED": "예산 금액",
 					"BUDGET_NAME": "예산 이름",
-					"COST_TYPE": "",
+					"COST_TYPE": "비용 유형",
 					"CREATE_BUDGET": "예산 생성",
 					"OVERSPENT": "초과",
 					"PERIOD": "기\u001b간",
