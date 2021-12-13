@@ -125,7 +125,7 @@ export default {
         const filtersHelper = new QueryHelper();
 
         const state = reactive({
-            selectedPeriod: [] as string[],
+            selectedPeriod: ['total'] as string[],
             periodList: computed(() => [
                 { name: 'total', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.TOTAL') },
                 { name: 'thisMonth', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.THIS_MONTH') },

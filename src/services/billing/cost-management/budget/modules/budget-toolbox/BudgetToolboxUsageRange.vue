@@ -19,6 +19,7 @@ import {
 
 import { red, yellow, indigo } from '@/styles/colors';
 import { BudgetUsageRange } from '@/services/billing/cost-management/budget/type';
+import { i18n } from '@/translations';
 
 const USAGE_RANGE = Object.freeze({
     overspent: 'overspent',
@@ -34,7 +35,7 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             items: [
-                { name: USAGE_RANGE.overspent, label: 'Overspent', color: red[400] },
+                { name: USAGE_RANGE.overspent, label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.OVERSPENT'), color: red[400] },
                 { name: USAGE_RANGE.between90And100, label: '90-100%', color: yellow[500] },
                 { name: USAGE_RANGE.lessThan90, label: '< 90%', color: indigo[500] },
             ],

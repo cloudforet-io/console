@@ -166,7 +166,7 @@ export default {
 
                 state.budgetUsage = results[0] ?? {};
             } catch (e) {
-                ErrorHandler.handleRequestError(e, '');
+                ErrorHandler.handleError(e);
                 state.budgetUsage = {};
             }
         };

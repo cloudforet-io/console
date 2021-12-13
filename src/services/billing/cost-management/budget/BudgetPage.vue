@@ -59,12 +59,12 @@ export default {
         });
 
         const state = reactive({
-            createButtonItemList: [
+            createButtonItemList: computed(() => [
                 {
-                    label: 'Single Budget',
+                    label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.SINGLE_BUDGET'),
                     name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.CREATE._NAME,
                 },
-            ],
+            ]),
             filters: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).filters,
         });
 
