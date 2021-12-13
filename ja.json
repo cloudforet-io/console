@@ -415,6 +415,28 @@
 				"START_DATE": "",
 				"YEARLY": ""
 			},
+			"DASHBOARD": {
+				"AVAILABLE": "",
+				"BUDGET": "",
+				"BUDGET_USAGE": "",
+				"COST_BY_PROJECT": "",
+				"COST_BY_REGION": "",
+				"CUSTOM": "",
+				"DECREASE": "",
+				"DUPLICATE": "",
+				"FORM": {
+					"CUSTOM_RANGE": "",
+					"FROM": "",
+					"TO": ""
+				},
+				"INCREASE": "",
+				"LAST_MONTH_TOTAL_SPEND": "",
+				"MONTH_TO_DATE_SPEND": "",
+				"SET_HOME": "",
+				"SPC_USAGE_SUMMARY": "",
+				"SPENT": "",
+				"VISIBILITY": ""
+			},
 			"MAIN": {
 				"ALT_E_EDIT_FILTER": "",
 				"ALT_S_EDIT_FILTER": "",
@@ -423,8 +445,10 @@
 				"CLOSE": "",
 				"COST_ANALYSIS": "",
 				"DASHBOARD": "",
+				"DUPLICATE": "",
 				"MONTH": "月",
 				"OVERSPENT": "",
+				"SET_HOME": "",
 				"VIEW_FILTER": ""
 			}
 		}

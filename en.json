@@ -415,6 +415,28 @@
 				"START_DATE": "Start Date",
 				"YEARLY": "Yearly"
 			},
+			"DASHBOARD": {
+				"AVAILABLE": "Available",
+				"BUDGET": "budgets",
+				"BUDGET_USAGE": "Budget Usage",
+				"COST_BY_PROJECT": "Cost By Project",
+				"COST_BY_REGION": "Cost By Region",
+				"CUSTOM": "Custom",
+				"DECREASE": "Decreased from",
+				"DUPLICATE": "Duplicate",
+				"FORM": {
+					"CUSTOM_RANGE": "Custom Range",
+					"FROM": "From",
+					"TO": "To"
+				},
+				"INCREASE": "Increased from",
+				"LAST_MONTH_TOTAL_SPEND": "Last Month Total Spend",
+				"MONTH_TO_DATE_SPEND": "Month-to-Date Spend",
+				"SET_HOME": "Set as Home Dashboard",
+				"SPC_USAGE_SUMMARY": "SPC Project-Wise Usage Summary",
+				"SPENT": "spent",
+				"VISIBILITY": "Edit Visibility"
+			},
 			"MAIN": {
 				"ALT_E_EDIT_FILTER": "Failed to Update Filter",
 				"ALT_S_EDIT_FILTER": "Successfully Updated Filter",
@@ -423,8 +445,10 @@
 				"CLOSE": "Close",
 				"COST_ANALYSIS": "Cost Analysis",
 				"DASHBOARD": "Dashboard",
+				"DUPLICATE": "Duplicate",
 				"MONTH": "Month",
 				"OVERSPENT": "Overspent",
+				"SET_HOME": "Set as Home",
 				"VIEW_FILTER": "View Filter"
 			}
 		}

@@ -415,6 +415,28 @@
 				"START_DATE": " 시작 일",
 				"YEARLY": "년"
 			},
+			"DASHBOARD": {
+				"AVAILABLE": "",
+				"BUDGET": "",
+				"BUDGET_USAGE": "",
+				"COST_BY_PROJECT": "",
+				"COST_BY_REGION": "",
+				"CUSTOM": "",
+				"DECREASE": "",
+				"DUPLICATE": "복제",
+				"FORM": {
+					"CUSTOM_RANGE": "",
+					"FROM": "",
+					"TO": ""
+				},
+				"INCREASE": "",
+				"LAST_MONTH_TOTAL_SPEND": "",
+				"MONTH_TO_DATE_SPEND": "",
+				"SET_HOME": "홈 대시보드로 설정",
+				"SPC_USAGE_SUMMARY": "",
+				"SPENT": "",
+				"VISIBILITY": ""
+			},
 			"MAIN": {
 				"ALT_E_EDIT_FILTER": "필터 편집 실패",
 				"ALT_S_EDIT_FILTER": "필터 편집 성공",
@@ -423,8 +445,10 @@
 				"CLOSE": "종료",
 				"COST_ANALYSIS": "비용 분석",
 				"DASHBOARD": "대시보드",
+				"DUPLICATE": "복제",
 				"MONTH": "월",
 				"OVERSPENT": "초과지출",
+				"SET_HOME": "홈 대시보드로 설정",
 				"VIEW_FILTER": "필터 보기"
 			}
 		}
