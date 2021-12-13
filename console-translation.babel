@@ -6158,27 +6158,6 @@
                                                 </translations>
                                             </concept_node>
                                             <concept_node>
-                                                <name>MONTHLY</name>
-                                                <definition_loaded>false</definition_loaded>
-                                                <description></description>
-                                                <comment></comment>
-                                                <default_text></default_text>
-                                                <translations>
-                                                    <translation>
-                                                        <language>en-US</language>
-                                                        <approved>false</approved>
-                                                    </translation>
-                                                    <translation>
-                                                        <language>ja-JP</language>
-                                                        <approved>false</approved>
-                                                    </translation>
-                                                    <translation>
-                                                        <language>ko-KR</language>
-                                                        <approved>false</approved>
-                                                    </translation>
-                                                </translations>
-                                            </concept_node>
-                                            <concept_node>
                                                 <name>OVERSPENT</name>
                                                 <definition_loaded>false</definition_loaded>
                                                 <description></description>
@@ -6262,27 +6241,6 @@
                                                     </translation>
                                                 </translations>
                                             </concept_node>
-                                            <concept_node>
-                                                <name>TOTAL_BUDGET</name>
-                                                <definition_loaded>false</definition_loaded>
-                                                <description></description>
-                                                <comment></comment>
-                                                <default_text></default_text>
-                                                <translations>
-                                                    <translation>
-                                                        <language>en-US</language>
-                                                        <approved>false</approved>
-                                                    </translation>
-                                                    <translation>
-                                                        <language>ja-JP</language>
-                                                        <approved>false</approved>
-                                                    </translation>
-                                                    <translation>
-                                                        <language>ko-KR</language>
-                                                        <approved>false</approved>
-                                                    </translation>
-                                                </translations>
-                                            </concept_node>
                                         </children>
                                     </folder_node>
                                     <folder_node>
@@ -6311,6 +6269,27 @@
                                             </concept_node>
                                             <concept_node>
                                                 <name>BUDGET_USAGE</name>
+                                                <definition_loaded>false</definition_loaded>
+                                                <description></description>
+                                                <comment></comment>
+                                                <default_text></default_text>
+                                                <translations>
+                                                    <translation>
+                                                        <language>en-US</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ja-JP</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ko-KR</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                </translations>
+                                            </concept_node>
+                                            <concept_node>
+                                                <name>MTD</name>
                                                 <definition_loaded>false</definition_loaded>
                                                 <description></description>
                                                 <comment></comment>

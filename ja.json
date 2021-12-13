@@ -346,16 +346,15 @@
 					"BUDGET_NAME": "",
 					"COST_TYPE": "",
 					"CREATE_BUDGET": "",
-					"MONTHLY": "",
 					"OVERSPENT": "",
 					"PERIOD": "",
 					"THIS_MONTH": "",
-					"TOTAL": "",
-					"TOTAL_BUDGET": ""
+					"TOTAL": ""
 				},
 				"STAT": {
 					"AVAILABLE": "",
 					"BUDGET_USAGE": "",
+					"MTD": "",
 					"TOTAL_BUDGET": "",
 					"TOTAL_COST": ""
 				}

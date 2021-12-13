@@ -311,7 +311,7 @@
 						"LABEL_BUDGET_TOTAL": "Total Budgeted Amount",
 						"LABEL_END_MONTH": "End Month",
 						"LABEL_EXPECTED_BUDGET": "Expected budget growth",
-						"LABEL_LAST_MONTH": "Last 3 Month Cost",
+						"LABEL_LAST_MONTH": "Last 3 Months Cost",
 						"LABEL_STARTING_BUDGET": "Starting budget",
 						"LABEL_START_MONTH": "Start Month",
 						"MONTHLY_PLAN": "Monthly Budget Planning",
@@ -343,19 +343,18 @@
 					"AMOUNT_USED": "Amount used",
 					"BUDGET": "Budget",
 					"BUDGETED": "Budgeted",
-					"BUDGET_NAME": "Budget name",
+					"BUDGET_NAME": "Budget Name",
 					"COST_TYPE": "Cost Type",
 					"CREATE_BUDGET": "Create Budget",
-					"MONTHLY": "Monthly",
 					"OVERSPENT": "Overspent",
 					"PERIOD": "Period",
 					"THIS_MONTH": "This Month",
-					"TOTAL": "Total",
-					"TOTAL_BUDGET": "Total Budget"
+					"TOTAL": "Total"
 				},
 				"STAT": {
 					"AVAILABLE": "Available",
 					"BUDGET_USAGE": "Budget Usage",
+					"MTD": "MTD",
 					"TOTAL_BUDGET": "Total Budget",
 					"TOTAL_COST": "Total Cost"
 				}
