@@ -99,7 +99,7 @@ export default {
         padding: 1rem;
         .no-data {
             @apply flex text-center justify-center items-center text-violet-300 font-bold;
-            height: 100%;
+            height: calc(100% - 2rem);
             font-size: 0.875rem;
             line-height: 160%;
             z-index: 1;

@@ -296,6 +296,7 @@ export default defineComponent<WidgetProps>({
         flex-grow: 1;
     }
     .table {
+        @apply flex flex-col;
         flex-basis: 50%;
     }
     .circle-wrapper {
