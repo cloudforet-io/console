@@ -316,6 +316,9 @@
 						"LABEL_START_MONTH": "Start Month",
 						"MONTHLY_PLAN": "Monthly Budget Planning",
 						"MONTHLY_PLAN_DESC": "Specific your budgeted amount for each budget period",
+						"REQUIRED_AMOUNT": "Please enter amount.",
+						"REQUIRED_END_MONTH": "Please select end month.",
+						"REQUIRED_START_MONTH": "Please select start month.",
 						"TOTAL_AMOUNT": "Total Amount",
 						"TOTAL_AMOUNT_DESC": "Create a budget that tracks against total amount"
 					},
@@ -323,6 +326,7 @@
 						"ACCOUNT": "Account",
 						"ALL": "All",
 						"BASE_INFORMATION": "Base Information",
+						"INVALID_COST_TYPE": "Particular cost type must be selected.",
 						"LABEL_COST_TYPE": "Cost Type",
 						"LABEL_CURRENCY": "Currency",
 						"LABEL_NAME": "Name",
@@ -331,7 +335,9 @@
 						"PROJECT": "Project",
 						"PROJECT_GROUP": "Project Group",
 						"PROVIDER": "Provider",
-						"REGION": "Region"
+						"REGION": "Region",
+						"REQUIRED_NAME": "Please enter name.",
+						"REQUIRED_TARGET": "Please select target."
 					},
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",

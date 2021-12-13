@@ -316,6 +316,9 @@
 						"LABEL_START_MONTH": "",
 						"MONTHLY_PLAN": "",
 						"MONTHLY_PLAN_DESC": "",
+						"REQUIRED_AMOUNT": "",
+						"REQUIRED_END_MONTH": "",
+						"REQUIRED_START_MONTH": "",
 						"TOTAL_AMOUNT": "",
 						"TOTAL_AMOUNT_DESC": ""
 					},
@@ -323,6 +326,7 @@
 						"ACCOUNT": "",
 						"ALL": "",
 						"BASE_INFORMATION": "",
+						"INVALID_COST_TYPE": "",
 						"LABEL_COST_TYPE": "",
 						"LABEL_CURRENCY": "",
 						"LABEL_NAME": "",
@@ -331,7 +335,9 @@
 						"PROJECT": "",
 						"PROJECT_GROUP": "",
 						"PROVIDER": "",
-						"REGION": ""
+						"REGION": "",
+						"REQUIRED_NAME": "",
+						"REQUIRED_TARGET": ""
 					},
 					"CANCEL": "",
 					"CONFIRM": "",
