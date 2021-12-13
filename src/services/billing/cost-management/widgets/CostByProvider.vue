@@ -174,8 +174,12 @@ export default defineComponent<WidgetProps>({
             sliceTemplate.clickable = false;
             sliceTemplate.properties.hoverable = false;
             sliceTemplate.states.getKey('hover').properties.scale = 1;
-            sliceTemplate.propertyFields.fill = 'color';
+            // sliceTemplate.propertyFields.fill = 'color';
             sliceTemplate.tooltipText = '{category}: $ {value}';
+            sliceTemplate.adapter.add('fill', (fill, target) => {
+                if (target.dataItem.category === 'dummy') return am4core.color(gray[100]);
+                return fill;
+            });
 
             if (isChartItemExists) {
                 series.tooltip.disabled = false;
@@ -201,13 +205,11 @@ export default defineComponent<WidgetProps>({
 
         const convertToChartData = (rawData: CostByProviderAnalysisModel[]) => {
             forEach(rawData, (d) => {
-                if (state.providers[d.provider]) {
-                    state.chartData.push({
-                        category: state.providers[d.provider]?.label || d.provider,
-                        color: state.providers[d.provider]?.color || '',
-                        value: d.usd_cost,
-                    });
-                }
+                state.chartData.push({
+                    category: state.providers[d.provider]?.label || d.provider,
+                    color: state.providers[d.provider]?.color || '',
+                    value: d.usd_cost,
+                });
             });
         };
 

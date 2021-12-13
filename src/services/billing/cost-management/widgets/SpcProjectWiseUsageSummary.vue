@@ -208,13 +208,13 @@ export default defineComponent<WidgetProps>({
                 const { chartData, legends } = getPieChartDataAndLegends(results, GROUP_BY.PROJECT);
                 state.chartData = chartData.map(d => ({
                     ...d,
-                    category: state.projects[d.category].label || d.category,
+                    category: state.projects[d.category]?.label || d.category,
                 }));
                 state.legends = legends;
 
                 tableState.items = results.map(d => ({
                     ...d,
-                    project_id: state.projects[d.project_id].label || d.project_id,
+                    project_id: d.project_id ? state.projects[d.project_id]?.label || d.project_id : 'No Project',
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);

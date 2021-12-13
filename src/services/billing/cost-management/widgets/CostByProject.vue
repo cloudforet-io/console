@@ -6,9 +6,12 @@
         :no-data="!loading && data.length === 0"
         class="cost-by-project"
     >
-        <template #default>
+        <p-chart-loader :loading="loading" class="chart-wrapper">
+            <template #loader>
+                <p-skeleton height="100%" />
+            </template>
             <div ref="chartRef" class="chart" />
-        </template>
+        </p-chart-loader>
     </cost-dashboard-card-widget-layout>
 </template>
 
@@ -38,6 +41,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import config from '@/lib/config';
 import { store } from '@/store';
+import { PChartLoader, PSkeleton } from '@spaceone/design-system';
 
 
 const categoryKey = 'projectId';
@@ -51,7 +55,11 @@ interface ChartData {
 
 export default {
     name: 'CostByProject',
-    components: { CostDashboardCardWidgetLayout },
+    components: {
+        CostDashboardCardWidgetLayout,
+        PChartLoader,
+        PSkeleton,
+    },
     props: {
         period: {
             type: Object,
@@ -78,7 +86,7 @@ export default {
             chartRef: null as HTMLElement | null,
             chart: null as TreeMap | null,
             chartRegistry: {},
-            loading: true,
+            loading: false,
             data: [] as ChartData[],
             widgetLink: computed(() => ({
                 name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
@@ -141,20 +149,24 @@ export default {
                 });
                 return results;
             } catch (e) {
-                ErrorHandler.handleError(e);
                 return [];
             }
         };
 
         const getChartData = async () => {
-            state.loading = true;
-            const rawData = await fetchData();
-            state.data = rawData.map(d => ({
-                projectId: d.project_id,
-                cost: currencyMoneyFormatter(d.usd_cost, props.currency, props.currencyRates, false, 10000000),
-                projectName: state.projects[d.project_id]?.label || d.project_id,
-            }));
-            state.loading = false;
+            try {
+                state.loading = true;
+                const rawData = await fetchData();
+                state.data = rawData.map(d => ({
+                    projectId: d.project_id,
+                    cost: currencyMoneyFormatter(d.usd_cost, props.currency, props.currencyRates, false, 10000000),
+                    projectName: d.project_id ? state.projects[d.project_id]?.label || d.project_id : 'No Project',
+                }));
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
         };
 
         watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
@@ -165,9 +177,7 @@ export default {
 
         watch([() => props.period, () => props.filters, () => props.currency], () => {
             getChartData();
-        });
-
-        getChartData();
+        }, { immediate: true });
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();

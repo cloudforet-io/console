@@ -11,9 +11,9 @@
                         <p-skeleton width="100%" height="50%" />
                     </template>
                     <div ref="chartRef" class="chart" />
-                    <div v-for="(item) in chartLegends" :key="item" class="circle-wrapper">
-                        <p v-if="providers" class="circle" :style="{background: providers[item].color}" /><span>{{ providers[item].label || '' }}</span>
-                    </div>
+                    <!--                    <div v-for="(item) in chartLegends" :key="item" class="circle-wrapper">-->
+                    <!--                        <p v-if="providers" class="circle" :style="{background: providers[item].color}" /><span>{{ providers[item].label || '' }}</span>-->
+                    <!--                    </div>-->
                 </p-chart-loader>
                 <cost-dashboard-data-table
                     :fields="tableState.fields"
@@ -27,12 +27,12 @@
                     :currency="currency"
                     class="table"
                 >
-                    <template #provider-format="item">
-                        <span v-if="item.value && providers"
-                              :style="{color: providers[item.value].color}"
-                        >{{ providers[item.value].label || '' }}
-                        </span>
-                    </template>
+                    <!--                    <template #provider-format="item">-->
+                    <!--                        <span v-if="item.value && providers"-->
+                    <!--                              :style="{color: providers[item.value].color}"-->
+                    <!--                        >{{ providers[item.value].label || '' }}-->
+                    <!--                        </span>-->
+                    <!--                    </template>-->
                 </cost-dashboard-data-table>
             </div>
         </template>
@@ -164,7 +164,6 @@ export default defineComponent<WidgetProps>({
             chart.geodata = am4geodataContinentsLow;
             chart.projection = new am4maps.projections.Miller();
             chart.responsive.enabled = true;
-            chart.chartContainer.wheelable = false;
 
             const polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
             polygonSeries.useGeodata = true;
@@ -192,7 +191,7 @@ export default defineComponent<WidgetProps>({
             pieSeriesTemplate.dataFields.value = valueName;
             pieSeriesTemplate.labels.template.disabled = true;
             pieSeriesTemplate.ticks.template.disabled = true;
-            pieSeriesTemplate.slices.template.propertyFields.fill = 'color';
+            // pieSeriesTemplate.slices.template.propertyFields.fill = 'color';
 
             pieSeries.data = state.data;
         };
