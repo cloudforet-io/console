@@ -79,7 +79,7 @@ import {
 
 import { i18n } from '@/translations';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { durationFormatter, iso8601Formatter } from '@spaceone/console-core-lib';
 
 import { ALERT_ACTION, ALERT_URGENCY, ALERT_STATE } from '@/services/monitoring/alert-manager/lib/config';
@@ -88,6 +88,7 @@ import AlertAcknowledgeModal from '@/services/monitoring/alert-manager/alert/mod
 import AlertResolveModal from '@/services/monitoring/alert-manager/alert/modules/AlertResolveModal.vue';
 import { store } from '@/store';
 import dayjs from 'dayjs';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
 
@@ -183,8 +184,7 @@ export default {
                 state.visibleDeleteModal = false;
                 emit('refresh');
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_DELETE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_DELETE'));
             } finally {
                 state.closeLoading = false;
             }

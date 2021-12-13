@@ -27,11 +27,12 @@ import {
     PButtonModal, PTextarea, PFieldGroup,
 } from '@spaceone/design-system';
 import { makeProxy } from '@/lib/helper/composition-helpers';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE } from '@/services/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';
 import { AlertStateUpdateParams } from '@/services/monitoring/alert-manager/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'AlertResolveModal',
@@ -66,7 +67,7 @@ export default {
                 if (state.noteInput) params.note = state.noteInput;
                 await SpaceConnector.client.monitoring.alert.updateState(params);
             } catch (e) {
-                console.error(e);
+                throw e;
             }
         };
 
@@ -77,8 +78,7 @@ export default {
                 emit('confirm');
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_STATE_CHANGED'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_STATE_CHANGED'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_STATE_CHANGED'));
             } finally {
                 state.proxyVisible = false;
             }
