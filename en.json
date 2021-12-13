@@ -347,6 +347,7 @@
 					"COST_TYPE": "Cost Type",
 					"CREATE_BUDGET": "Create Budget",
 					"MONTHLY": "Monthly",
+					"OVERSPENT": "Overspent",
 					"PERIOD": "Period",
 					"THIS_MONTH": "This Month",
 					"TOTAL": "Total",
