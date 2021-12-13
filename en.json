@@ -326,7 +326,6 @@
 						"ACCOUNT": "Account",
 						"ALL": "All",
 						"BASE_INFORMATION": "Base Information",
-						"INVALID_COST_TYPE": "Particular cost type must be selected.",
 						"LABEL_COST_TYPE": "Cost Type",
 						"LABEL_CURRENCY": "Currency",
 						"LABEL_NAME": "Name",
@@ -336,6 +335,7 @@
 						"PROJECT_GROUP": "Project Group",
 						"PROVIDER": "Provider",
 						"REGION": "Region",
+						"REQUIRED_COST_TYPE": "Particular cost type must be selected.",
 						"REQUIRED_NAME": "Please enter name.",
 						"REQUIRED_TARGET": "Please select target."
 					},

@@ -326,7 +326,6 @@
 						"ACCOUNT": "",
 						"ALL": "",
 						"BASE_INFORMATION": "",
-						"INVALID_COST_TYPE": "",
 						"LABEL_COST_TYPE": "",
 						"LABEL_CURRENCY": "",
 						"LABEL_NAME": "",
@@ -336,6 +335,7 @@
 						"PROJECT_GROUP": "",
 						"PROVIDER": "",
 						"REGION": "",
+						"REQUIRED_COST_TYPE": "",
 						"REQUIRED_NAME": "",
 						"REQUIRED_TARGET": ""
 					},

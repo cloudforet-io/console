@@ -326,7 +326,6 @@
 						"ACCOUNT": "계정",
 						"ALL": "모두",
 						"BASE_INFORMATION": "기본 정보",
-						"INVALID_COST_TYPE": "특정 비용 유형을 선택해야 합니다.",
 						"LABEL_COST_TYPE": "비용 타입",
 						"LABEL_CURRENCY": "통화",
 						"LABEL_NAME": "이름",
@@ -336,6 +335,7 @@
 						"PROJECT_GROUP": "프로젝트 그룹",
 						"PROVIDER": "서비스 제공자",
 						"REGION": "지역",
+						"REQUIRED_COST_TYPE": "특정 비용 유형을 선택해야 합니다.",
 						"REQUIRED_NAME": "이름을 입력하세요.",
 						"REQUIRED_TARGET": "대상을 선택하세요."
 					},
