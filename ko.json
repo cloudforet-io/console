@@ -306,21 +306,21 @@
 				"FORM": {
 					"AMOUNT_PLAN": {
 						"AMOUNT_PLANNING": "예산 계획",
-						"AUTO_FILL": "예산 자동으로 채우기",
+						"AUTO_FILL": "예산 자동 채우기",
 						"AUTO_FILL_DESC": "시작 예산을 입력하고 원하는 경우 예상 월간 성장률을 입력하세요.",
 						"LABEL_BUDGET_TOTAL": "총 예산 금액",
-						"LABEL_END_MONTH": "끝 월",
+						"LABEL_END_MONTH": "종료 월",
 						"LABEL_EXPECTED_BUDGET": "예상 성장율",
 						"LABEL_LAST_MONTH": "지난 3개월 비용",
 						"LABEL_STARTING_BUDGET": "시작 예산",
 						"LABEL_START_MONTH": "시작 월",
 						"MONTHLY_PLAN": "월간 예산 계획",
-						"MONTHLY_PLAN_DESC": "각 예산 기간에 대한 구체적인 예산 금액",
+						"MONTHLY_PLAN_DESC": "월별 구체적인 비용 추적을 위한 예산 생성 하기",
 						"REQUIRED_AMOUNT": "금액을 입력하세요.",
-						"REQUIRED_END_MONTH": "끝 월을 선택하세요.",
+						"REQUIRED_END_MONTH": "종료 월을 선택하세요.",
 						"REQUIRED_START_MONTH": "시작 월을 선택하세요.",
 						"TOTAL_AMOUNT": "총 금액",
-						"TOTAL_AMOUNT_DESC": "총 금액에 대한 예산 금액"
+						"TOTAL_AMOUNT_DESC": "전체 기간 대비 비용 추적을 위한 예산 생성 하기"
 					},
 					"BASE_INFO": {
 						"ACCOUNT": "계정",
@@ -329,7 +329,7 @@
 						"LABEL_COST_TYPE": "비용 타입",
 						"LABEL_CURRENCY": "통화",
 						"LABEL_NAME": "이름",
-						"LABEL_TARGET": "대상",
+						"LABEL_TARGET": "타겟",
 						"PRODUCT": "제품",
 						"PROJECT": "프로젝트",
 						"PROJECT_GROUP": "프로젝트 그룹",
@@ -337,7 +337,7 @@
 						"REGION": "지역",
 						"REQUIRED_COST_TYPE": "특정 비용 유형을 선택해야 합니다.",
 						"REQUIRED_NAME": "이름을 입력하세요.",
-						"REQUIRED_TARGET": "대상을 선택하세요."
+						"REQUIRED_TARGET": "타겟을 선택하세요."
 					},
 					"CANCEL": "취소",
 					"CONFIRM": "확인",
