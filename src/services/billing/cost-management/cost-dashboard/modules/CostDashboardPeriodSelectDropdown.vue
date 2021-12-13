@@ -30,6 +30,7 @@ import { Period } from '@/services/billing/cost-management/type';
 import { PBadge, PSelectDropdown } from '@spaceone/design-system';
 import CostDashboardCustomRangeModal
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardCustomRangeModal.vue';
+import { i18n } from '@/translations';
 
 const yesterday = dayjs.utc().subtract(1, 'day');
 const getMonthMenuItem = () => {
@@ -67,7 +68,7 @@ export default {
                 {
                     type: 'item',
                     name: 'custom',
-                    label: 'Custom',
+                    label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOM'),
                 },
 
             ])),

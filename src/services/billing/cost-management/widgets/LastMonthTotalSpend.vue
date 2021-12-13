@@ -1,7 +1,7 @@
 <template>
     <cost-dashboard-simple-card-widget
         class="last-month-total-spend"
-        title="Last Month Total Spend"
+        :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.LAST_MONTH_TOTAL_SPEND')"
         unit-type="CURRENCY"
         :loading="loading"
         :value="lastMonthCost"

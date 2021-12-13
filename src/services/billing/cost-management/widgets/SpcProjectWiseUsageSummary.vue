@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout title="SPC Project-Wise Usage Summary" class="spc-project-wise-usage-summary"
+    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.SPC_USAGE_SUMMARY')" class="spc-project-wise-usage-summary"
                                        :widget-link="widgetLink"
                                        :data-range="20"
     >

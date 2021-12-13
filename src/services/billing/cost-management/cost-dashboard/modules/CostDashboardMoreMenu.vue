@@ -13,6 +13,7 @@
 import { PSelectDropdown } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 export default {
     name: 'CostDashboardMoreMenu',
@@ -28,9 +29,9 @@ export default {
     setup(props) {
         const state = reactive({
             moreMenuItems: computed(() => [
-                { name: 'visibility', label: 'Edit Visibility', disabled: true },
-                { name: 'duplicate', label: 'Duplicate', disabled: true },
-                { name: 'setHome', label: 'Set as Home Dashboard' },
+                { name: 'visibility', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.VISIBILITY'), disabled: true },
+                { name: 'duplicate', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.DUPLICATE'), disabled: true },
+                { name: 'setHome', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.SET_HOME') },
             ]),
         });
         const handleSelectMoreMenu = (item) => {

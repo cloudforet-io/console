@@ -1,6 +1,6 @@
 <template>
     <cost-dashboard-simple-card-widget
-        title="Month-to-Date Spend"
+        :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.MONTH_TO_DATE_SPEND')"
         unit-type="CURRENCY"
         :loading="loading"
         :value="currencyMoneyFormatter(currentMonthCost, currency, currencyRates, true, 10000000000)"
@@ -31,7 +31,13 @@
                 </span>
             </div>
             <span class="range">
-                Decreased from {{ `${lastMonth.startOf('month').format('MMM DD')} ~ ${lastMonth.endOf('month').format('DD')}, ${lastMonth.format('YYYY')}` }}
+                <template v-if="increaseRate < 0">
+                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.DECREASE') }}
+                </template>
+                <template v-else>
+                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.INCREASE') }}
+                </template>
+                {{ `${lastMonth.startOf('month').format('MMM DD')} ~ ${lastMonth.endOf('month').format('DD')}, ${lastMonth.format('YYYY')}` }}
             </span>
         </template>
     </cost-dashboard-simple-card-widget>

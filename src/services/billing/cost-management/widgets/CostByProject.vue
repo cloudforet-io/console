@@ -1,6 +1,6 @@
 <template>
     <cost-dashboard-card-widget-layout
-        title="Cost By Project"
+        :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_PROJECT')"
         :data-range="15"
         :widget-link="widgetLink"
         :no-data="!loading && data.length === 0"

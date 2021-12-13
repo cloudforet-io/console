@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        header-title="Custom Range"
+        :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
         centered
         size="sm"
         fade
@@ -11,13 +11,13 @@
     >
         <template #body>
             <p-field-group class="period-select"
-                           label="From"
+                           :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.FROM')"
                            required
             >
                 <p-datetime-picker data-type="yearToMonth" :selected-dates.sync="startDate" />
             </p-field-group>
             <p-field-group class="period-select"
-                           label="To"
+                           :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TO')"
                            required
             >
                 <p-datetime-picker data-type="yearToMonth" :selected-dates.sync="endDate" />

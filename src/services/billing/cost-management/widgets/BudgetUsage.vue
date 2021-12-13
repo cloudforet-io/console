@@ -1,6 +1,6 @@
 <template>
     <cost-dashboard-simple-card-widget
-        title="Budget Usage"
+        :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.BUDGET_USAGE')"
         unit-type="PERCENT"
         :value="usageRate"
         :description="`${currencyMoneyFormatter(availableCost, currency, currencyRates, false, 10000000)} Available`"
@@ -10,13 +10,13 @@
             <p-i name="ic_budget" width="1em" height="1em"
                  class="mr-1"
             />
-            {{ budgetCount }} budgets
+            {{ budgetCount }} {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.BUDGET_USAGE') }}
         </template>
         <template #default>
             <budget-usage-progress-bar :usage-rate="usageRate" class="budget-progress-bar" />
             <p class="progress-bar-label">
                 <span class="usage-cost">
-                    {{ currencyMoneyFormatter(usageCost, currency, currencyRates, false, 10000000) }} <span class="spent">Spent</span>
+                    {{ currencyMoneyFormatter(usageCost, currency, currencyRates, false, 10000000) }} <span class="spent">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.SPENT') }}</span>
                 </span>
                 <span class="limit-cost">
                     {{ currencyMoneyFormatter(limitCost, currency, currencyRates, false, 10000000) }}

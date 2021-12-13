@@ -42,6 +42,7 @@ import { SpaceRouter } from '@/router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { DashboardItem } from '@/services/billing/cost-management/cost-dashboard/type';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -60,8 +61,8 @@ export default {
                 label: d.name,
             }))),
             moreMenuItems: computed(() => [
-                { name: 'duplicate', label: 'Duplicate', disabled: true },
-                { name: 'setHome', label: 'Set as Home' },
+                { name: 'duplicate', label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.DUPLICATE'), disabled: true },
+                { name: 'setHome', label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.SET_HOME') },
             ]),
             selectedMoreMenuItem: '',
             dashboardIdFromRoute: computed<string|undefined>(() => vm.$route.params.dashboardId),
@@ -178,6 +179,7 @@ export default {
     }
     .title {
         @apply truncate;
+        margin-right: 0.25rem;
     }
     .home-icon {
         flex-shrink: 0;
