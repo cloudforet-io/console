@@ -315,9 +315,9 @@
 						"LABEL_STARTING_BUDGET": "시작 예산",
 						"LABEL_START_MONTH": "시작 월",
 						"MONTHLY_PLAN": "월간 예산 계획",
-						"MONTHLY_PLAN_DESC": "",
-						"TOTAL_AMOUNT": "",
-						"TOTAL_AMOUNT_DESC": ""
+						"MONTHLY_PLAN_DESC": "각 예산 기간에 대한 구체적인 예산 금액",
+						"TOTAL_AMOUNT": "총 금액",
+						"TOTAL_AMOUNT_DESC": "총 금액에 대한 예산 금액"
 					},
 					"BASE_INFO": {
 						"ACCOUNT": "계정",
