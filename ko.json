@@ -352,7 +352,7 @@
 					"BUDGET_NAME": "예산 이름",
 					"COST_TYPE": "비용 유형",
 					"CREATE_BUDGET": "예산 생성",
-					"OVERSPENT": "초과",
+					"OVERSPENT": "초과 사용",
 					"PERIOD": "기\u001b간",
 					"SINGLE_BUDGET": "단일 예산",
 					"THIS_MONTH": "이번 달",
@@ -453,7 +453,7 @@
 				"DASHBOARD": "대시보드",
 				"DUPLICATE": "복제",
 				"MONTH": "월",
-				"OVERSPENT": "초과지출",
+				"OVERSPENT": "초과 사용",
 				"SET_HOME": "홈 대시보드로 설정",
 				"VIEW_FILTER": "필터 보기"
 			}
