@@ -348,6 +348,7 @@
 					"CREATE_BUDGET": "예산 생성",
 					"OVERSPENT": "초과",
 					"PERIOD": "기\u001b간",
+					"SINGLE_BUDGET": "단일 예산",
 					"THIS_MONTH": "이번 달",
 					"TOTAL": "전체"
 				},

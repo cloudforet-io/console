@@ -348,6 +348,7 @@
 					"CREATE_BUDGET": "Create Budget",
 					"OVERSPENT": "Overspent",
 					"PERIOD": "Period",
+					"SINGLE_BUDGET": "Single Budget",
 					"THIS_MONTH": "This Month",
 					"TOTAL": "Total"
 				},
