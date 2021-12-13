@@ -330,8 +330,8 @@
 						"PRODUCT": "제품",
 						"PROJECT": "프로젝트",
 						"PROJECT_GROUP": "프로젝트 그룹",
-						"PROVIDER": "",
-						"REGION": ""
+						"PROVIDER": "서비스 제공자",
+						"REGION": "지역"
 					},
 					"CANCEL": "취소",
 					"CONFIRM": "확인",
