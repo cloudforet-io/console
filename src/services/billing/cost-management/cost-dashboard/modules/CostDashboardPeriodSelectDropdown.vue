@@ -12,6 +12,7 @@
         <p-select-dropdown :items="MonthMenuItems"
                            :selected="selectedMonthMenuItem"
                            without-outline
+                           :disabled="Object.keys(fixedPeriod).length > 0"
                            @select="handleSelectMonthMenuItem"
         />
         <cost-dashboard-custom-range-modal v-if="customRangeModalVisible"
@@ -22,7 +23,9 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import { range } from 'lodash';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
@@ -54,11 +57,19 @@ export default {
         PSelectDropdown,
         PBadge,
     },
-    setup(_, { emit }) {
+    props: {
+        fixedPeriod: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props, { emit }) {
         const state = reactive({
             period: {
-                start: yesterday.startOf('month').format('YYYY-MM-DD'),
-                end: yesterday.endOf('month').format('YYYY-MM-DD'),
+                start: props.fixedPeriod ? dayjs(props.fixedPeriod.start).format('YYYY-MM')
+                    : yesterday.startOf('month').format('YYYY-MM-DD'),
+                end: props.fixedPeriod ? dayjs(props.fixedPeriod.end).endOf('month').format('YYYY-MM-DD')
+                    : yesterday.endOf('month').format('YYYY-MM-DD'),
             },
             MonthMenuItems: computed<MenuItem[]>(() => ([
                 ...getMonthMenuItem().reverse(),
@@ -97,6 +108,16 @@ export default {
         };
 
         initPeriod();
+
+        watch(() => props.fixedPeriod, () => {
+            state.period = {
+                start: props.fixedPeriod ? dayjs(props.fixedPeriod.start).format('YYYY-MM')
+                    : yesterday.startOf('month').format('YYYY-MM-DD'),
+                end: props.fixedPeriod ? dayjs(props.fixedPeriod.end).endOf('month').format('YYYY-MM-DD')
+                    : yesterday.endOf('month').format('YYYY-MM-DD'),
+            };
+            emit('update', state.period);
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

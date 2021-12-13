@@ -16,7 +16,7 @@
                 <cost-dashboard-more-menu :dashboard-id="dashboardId" />
             </div>
             <div class="right-part">
-                <cost-dashboard-period-select-dropdown @update="handleUpdatePeriod" />
+                <cost-dashboard-period-select-dropdown :fixed-period="fixedPeriod" @update="handleUpdatePeriod" />
                 <currency-select-dropdown />
                 <div class="left-divider download-pdf">
                     <p-icon-button name="ic_download" style-type="gray-border" size="sm" />
@@ -85,6 +85,7 @@ export default {
             dashboard: {} as DashboardInfo,
             layout: [] as any[],
             period: {} as Period,
+            fixedPeriod: {} as Period,
             filters: {} as CostQueryFilters,
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
@@ -126,6 +127,8 @@ export default {
                 });
                 state.dashboard = dashboard;
                 state.filters = dashboard.default_filter;
+                if (dashboard.period_type === 'FIXED') state.fixedPeriod = dashboard.period;
+                else state.fixedPeriod = {};
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.dashboard = {} as DashboardInfo;
