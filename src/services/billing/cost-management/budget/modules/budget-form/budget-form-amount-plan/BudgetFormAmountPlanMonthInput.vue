@@ -25,6 +25,7 @@ import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { commaFormatter, getNumberFromString } from '@spaceone/console-core-lib';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+import { i18n } from '@/translations';
 
 interface Props {
     amount: number|undefined;
@@ -70,7 +71,7 @@ export default {
         } = useFormValidator({
             _amount: props.amount,
         }, {
-            _amount: val => (val !== undefined ? '' : 'Required'),
+            _amount: val => (val !== undefined ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
         });
 
         const setAmount = (amount?: number) => {

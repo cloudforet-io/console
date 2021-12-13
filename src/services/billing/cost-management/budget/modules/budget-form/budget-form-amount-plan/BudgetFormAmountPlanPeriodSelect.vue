@@ -37,6 +37,7 @@ import { PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
 import { useFormValidator } from '@/common/composables/form-validator';
 import dayjs from 'dayjs';
 import { Period } from '@/services/billing/cost-management/type';
+import { i18n } from '@/translations';
 
 export default {
     name: 'BudgetFormAmountPlanPeriodSelect',
@@ -53,8 +54,8 @@ export default {
             startDates: [] as string[],
             endDates: [] as string[],
         }, {
-            startDates: (value: string[]) => (value[0] ? '' : 'Required'),
-            endDates: (value: string[]) => (value[0] ? '' : 'Required'),
+            startDates: (value: string[]) => (value[0] ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_START_MONTH')),
+            endDates: (value: string[]) => (value[0] ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_END_MONTH')),
         });
 
         const handleUpdateSelectedDates = (target: 'startDates'|'endDates', value) => {

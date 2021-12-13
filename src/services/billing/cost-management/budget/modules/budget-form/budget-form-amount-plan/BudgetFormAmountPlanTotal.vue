@@ -28,6 +28,7 @@ import {
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { commaFormatter, getNumberFromString } from '@spaceone/console-core-lib';
+import { i18n } from '@/translations';
 
 export default {
     name: 'BudgetFormAmountPlanTotal',
@@ -42,7 +43,7 @@ export default {
         } = useFormValidator({
             amount: undefined as number|undefined,
         }, {
-            amount: val => (val !== undefined ? '' : 'Required'),
+            amount: val => (val !== undefined ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
         });
 
         const state = reactive({

@@ -141,11 +141,11 @@ export default {
             selectedCostType: 'all' as BudgetCostType,
             selectedResources: [] as SearchDropdownMenuItem[],
         }, {
-            name(value: string) { return value.trim().length ? '' : 'Required'; },
-            selectedTargets(value: string[]) { return value.length ? '' : 'Required'; },
+            name(value: string) { return value.trim().length ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.REQUIRED_NAME'); },
+            selectedTargets(value: string[]) { return value.length ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.REQUIRED_TARGET'); },
             selectedResources(value: BudgetCostType) {
                 if (selectedCostType.value === 'all') return '';
-                return value.length ? '' : 'Required';
+                return value.length ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.REQUIRED_COST_TYPE');
             },
         }, { selectedCostType: true, selectedResources: true });
 

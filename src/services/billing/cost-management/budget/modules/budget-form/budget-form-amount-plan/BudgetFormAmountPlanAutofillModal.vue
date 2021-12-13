@@ -48,6 +48,7 @@ import {
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { commaFormatter, getNumberFromString } from '@spaceone/console-core-lib';
+import { i18n } from '@/translations';
 
 interface Props {
     visible: boolean;
@@ -84,7 +85,7 @@ export default {
             start: undefined as number|undefined,
             growth: undefined as number|undefined,
         }, {
-            start: val => (typeof val === 'number' ? '' : 'Required'),
+            start: val => (typeof val === 'number' ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
         }, { growth: true });
 
         const state = reactive({
