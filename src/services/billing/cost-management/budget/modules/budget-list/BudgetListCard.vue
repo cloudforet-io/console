@@ -61,7 +61,7 @@
                             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.COST_TYPE') }}
                         </div>
                         <div class="cost-type">
-                            <span v-for="({resourceList, costTypeLabel}) in costTypeResourceListMap" :key="costTypeLabel">
+                            <span v-for="({resourceList, costTypeLabel}) in costTypeResourceListMap" :key="costTypeLabel" class="truncate">
                                 {{ costTypeLabel }}: {{ resourceList.join(', ') }}
                             </span>
                         </div>
@@ -223,11 +223,11 @@ export default {
 .budget-list-card {
     @apply rounded-lg border border-solid border-gray-200 rounded-lg bg-white;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
+    &:hover {
+        @apply bg-secondary-2;
+    }
     .card-wrapper {
         line-height: 1.2;
-        &:hover {
-            @apply bg-secondary-2;
-        }
         .card-header {
             padding: 1rem;
             .budget-name {
@@ -294,10 +294,14 @@ export default {
                 @apply flex flex-wrap gap-2 justify-between align-middle;
 
                 .cost-type-wrapper {
-                    @apply flex flex-wrap gap-1 align-middle;
+                    @apply flex flex-wrap gap-1 align-middle w-full;
                     .cost-type {
-                        @apply text-gray-700;
+                        @apply w-full text-gray-700;
                         font-size: 0.75rem;
+                        .truncate {
+                            display: inline-block;
+                            max-width: 74.1%;
+                        }
                     }
                 }
             }

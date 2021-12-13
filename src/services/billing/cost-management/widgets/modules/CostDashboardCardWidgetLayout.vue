@@ -71,6 +71,7 @@ export default {
     min-height: 100%;
     .header {
         @apply flex items-center justify-between;
+        line-height: 1.2;
     }
     .title-extra {
         @apply inline-flex;
