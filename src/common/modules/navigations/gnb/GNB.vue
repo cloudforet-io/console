@@ -57,6 +57,7 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import config from '@/lib/config';
 
 
 const PARENT_CATEGORY = {
@@ -118,6 +119,7 @@ export default {
             showSiteMap: false,
             showPowerScheduler: computed(() => store.state.user.powerSchedulerState),
             showSpotAutomation: computed(() => store.state.user.spotAutomationState),
+            showBilling: computed(() => config.get('BILLING_ENABLED')),
             showAutomation: computed(() => state.showPowerScheduler || state.showSpotAutomation),
             isAdmin: computed((() => store.getters['user/isAdmin'])),
             hasPermission: computed((() => store.getters['user/hasPermission'])),
@@ -168,6 +170,7 @@ export default {
                     name: PARENT_CATEGORY.billing,
                     label: i18n.t('MENU.BILLING.BILLING'),
                     to: { name: BILLING_ROUTE._NAME },
+                    show: state.showBilling,
                     subMenuList: [
                         {
                             label: i18n.t('MENU.BILLING.COST_MANAGEMENT'),
