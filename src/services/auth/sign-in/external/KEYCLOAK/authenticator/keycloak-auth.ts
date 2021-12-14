@@ -1,6 +1,7 @@
 import Keycloak from 'keycloak-js';
 import { store } from '@/store';
 import { Authenticator } from '@/services/auth/authenticator';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const BASE_URL = window.location.origin;
 
@@ -56,7 +57,7 @@ class KeycloakAuth extends Authenticator {
                 await onSignInCallback();
             })
             .catch(async (e) => {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 await KeycloakAuth.onSignInFail();
             });
     }

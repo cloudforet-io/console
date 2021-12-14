@@ -208,6 +208,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
 import { timezoneList } from '@/store/modules/user/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 enum EDIT_MODE {
@@ -385,7 +386,7 @@ export default {
                     }
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }
@@ -440,7 +441,7 @@ export default {
                 });
                 return res.results[0]?.schedule_rule_id || '';
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
             return '';
         };
@@ -460,7 +461,7 @@ export default {
                     showSuccessMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_S_EDIT_SCHEDULER'), '', root);
                 }
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 if (props.mode !== 'CREATE') {
                     showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_EDIT_SCHEDULER'), e);
                 }
@@ -478,7 +479,7 @@ export default {
                     rule: settings.ruleWithUTC,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const createOrUpdate = async (scheduleId) => {

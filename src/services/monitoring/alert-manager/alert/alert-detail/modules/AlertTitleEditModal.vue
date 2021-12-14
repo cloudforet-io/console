@@ -32,9 +32,10 @@ import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/helper/composition-helpers';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -94,8 +95,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_TITLE'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_TITLE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_TITLE'));
             } finally {
                 state.loading = false;
             }

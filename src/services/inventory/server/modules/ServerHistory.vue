@@ -40,6 +40,7 @@ import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'ServerHistory',
@@ -98,7 +99,7 @@ export default {
                 state.items = res.results;
                 state.totalCount = res.total_count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }
@@ -124,7 +125,7 @@ export default {
                     file_name_prefix: FILE_NAME_PREFIX.server,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

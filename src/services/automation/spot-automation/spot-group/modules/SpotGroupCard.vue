@@ -71,6 +71,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
 import { AUTOMATION_ROUTE } from '@/services/automation/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -113,7 +114,7 @@ export default {
                 state.projectName = project.name;
                 state.projectGroupName = project.project_group_info.name;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

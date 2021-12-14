@@ -55,6 +55,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import { find } from 'lodash';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
@@ -142,7 +143,7 @@ export default {
 
                     layouts = res.details;
                 } catch (e) {
-                    console.error(e);
+                    ErrorHandler.handleError(e);
                 }
             }
 
@@ -187,9 +188,9 @@ export default {
                 if (res.total_count !== undefined) state.totalCount = res.total_count;
                 state.data = res.results || res;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.data = undefined;
                 state.totalCount = 0;
-                console.error(e);
             }
             dataMap[state.fetchOptionKey] = state.data;
         };
@@ -214,7 +215,7 @@ export default {
                         file_name_prefix: FILE_NAME_PREFIX.server,
                     });
                 } catch (e) {
-                    console.error(e);
+                    ErrorHandler.handleError(e);
                 }
             },
         };

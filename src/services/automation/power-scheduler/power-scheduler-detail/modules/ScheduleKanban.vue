@@ -138,6 +138,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { AUTOMATION_ROUTE } from '@/services/automation/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface ColumnType {
     title: string;
@@ -226,9 +227,11 @@ export default {
                     project_id: props.projectId,
                 });
                 state.columns = res.columns;
-                state.loading = false;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.columns = [];
+            } finally {
+                state.loading = false;
             }
         };
 
@@ -254,9 +257,10 @@ export default {
                 } else {
                     state.columns = res.columns;
                 }
-                state.loading = false;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
             }
         };
 
@@ -287,7 +291,6 @@ export default {
                     showSuccessMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_S_EDIT_RESOURCE_GROUP'), '', root);
                 }
             } catch (e) {
-                console.error(e);
                 showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_EDIT_RESOURCE_GROUP'), e);
             } finally {
                 state.isEditMode = false;

@@ -42,6 +42,7 @@ import { SearchTableListeners } from '@spaceone/design-system/dist/src/data-disp
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'SpotGroupDetailMember',
@@ -101,7 +102,7 @@ export default {
                 }));
                 state.totalCount = res.total_count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

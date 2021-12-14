@@ -66,9 +66,10 @@ import { PROJECT_ROUTE } from '@/services/project/routes';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 import { i18n } from '@/translations';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { ProjectItemResp } from '@/services/project/type';
 import { ALERT_URGENCY } from '@/services/monitoring/alert-manager/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'AlertFormModal',
@@ -137,7 +138,7 @@ export default {
                 state.isProjectAlertSet = true;
             } catch (e) {
                 state.isProjectAlertSet = false;
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -152,7 +153,7 @@ export default {
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_CREATE'), '', root);
                 emit('confirm');
             } catch (e) {
-                showErrorMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_CREATE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_CREATE'));
                 throw e;
             }
         };
@@ -167,7 +168,7 @@ export default {
 
                 state.proxyVisible = false;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

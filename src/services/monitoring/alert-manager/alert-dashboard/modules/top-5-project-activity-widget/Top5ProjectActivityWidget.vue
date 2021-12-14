@@ -77,6 +77,7 @@ import { red, yellow } from '@/styles/colors';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { MONITORING_ROUTE } from '@/services/monitoring/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const ACTIVITY = Object.freeze({
@@ -184,7 +185,8 @@ export default {
                 });
                 state.top5Projects = results.map(d => d.project_id);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.top5Projects = [];
             }
         };
         const getActivities = async (projectId) => {
@@ -201,8 +203,8 @@ export default {
                 });
                 state.activity[projectId] = activityFormatter(results, unit, start, end);
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.activity[projectId] = [];
-                console.error(e);
             }
         };
 

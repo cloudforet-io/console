@@ -111,7 +111,8 @@ import { languages, timezoneList } from '@/store/modules/user/config';
 import { LanguageCode, UpdateUserRequest } from '@/store/modules/user/type';
 import { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'UserAccountPage',
@@ -239,7 +240,7 @@ export default {
                 }
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
             }
         };
 
@@ -274,7 +275,7 @@ export default {
                 state.language = store.state.user.language;
                 state.timezone = store.state.user.timezone;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

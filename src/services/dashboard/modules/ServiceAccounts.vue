@@ -70,6 +70,7 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
@@ -218,7 +219,7 @@ export default {
                 }
                 // state.data.push(others);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

@@ -124,7 +124,8 @@ import EventRuleForm from '@/services/project/project-detail/project-alert/proje
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const EDIT_MODE = Object.freeze({
@@ -193,8 +194,8 @@ export default {
                     project_id: props.projectId,
                 });
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.project = {};
-                console.error(e);
             }
         };
         const listEventRule = async () => {
@@ -205,8 +206,8 @@ export default {
                 });
                 state.cardData = res.results;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.cardData = [];
-                console.error(e);
             } finally {
                 state.loading = false;
             }
@@ -261,8 +262,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_DELETE_EVENT_RULE'), '', root);
                 await listEventRule();
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_DELETE_EVENT_RULE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.EVENT_RULE.ALT_E_DELETE_EVENT_RULE'));
             } finally {
                 checkDeleteState.visible = false;
                 state.selectedOrder = undefined;

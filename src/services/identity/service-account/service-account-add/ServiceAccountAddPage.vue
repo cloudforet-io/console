@@ -154,11 +154,12 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import ProjectTreePanel from '@/services/identity/service-account/service-account-add/modules/ProjectTreePanel.vue';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ProjectGroup, ProviderModel } from '@/services/identity/service-account/type';
 import { TranslateResult } from 'vue-i18n';
 import InfoButton from '@/common/modules/portals/InfoButton.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -294,7 +295,7 @@ export default {
                 state.providerObj = res;
                 state.selectedSecretType = res.capability.supported_schema[0];
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.providerObj = {};
                 state.selectedSecretType = '';
             } finally {
@@ -347,8 +348,7 @@ export default {
                 });
                 state.serviceAccountId = res.service_account_id;
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e);
-                console.error(e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
             }
         };
         const createSecretWithForm = async () => {
@@ -378,8 +378,7 @@ export default {
                         const json = JSON.parse(formState.jsonForCredential);
                         await createSecretWithJson(json);
                     } catch (e) {
-                        console.error(e);
-                        showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e);
+                        ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
                         await deleteServiceAccount();
                         return;
                     }
@@ -388,15 +387,14 @@ export default {
                 vm.$router.back();
                 showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
                 await deleteServiceAccount();
             }
         };
 
         const onClickSave = async () => {
             if (!formState.isValid) {
-                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'),
-                    vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'));
+                ErrorHandler.handleRequestError(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
                 return;
             }
             if (formState.isTagsValid) {

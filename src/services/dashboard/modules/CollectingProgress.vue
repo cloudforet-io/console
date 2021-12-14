@@ -71,6 +71,7 @@ import { COLLECT_MODE, CollectorModel } from '@/services/plugin/collector/type';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
 import { MANAGEMENT_ROUTE } from '@/services/management/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 enum JOB_STATE {
     created = 'CREATED',
@@ -159,8 +160,8 @@ export default {
                 });
                 state.items = convertJobsToFieldItem(res.results);
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.items = [];
-                console.error(e);
             } finally {
                 state.loading = false;
             }

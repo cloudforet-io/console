@@ -155,6 +155,7 @@ import { SCOPE } from '@/services/monitoring/alert-manager/lib/config';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const NOTIFICATION_LEVELS = Object.freeze([
@@ -223,8 +224,8 @@ export default {
                 const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: getQuery() });
                 state.projectChannels = results;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.projectChannels = [];
-                console.error(e);
             }
         };
 

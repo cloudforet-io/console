@@ -84,6 +84,7 @@ import {
 } from 'lodash';
 import TryAgainButton from '@/services/automation/spot-automation/spot-group/components/TryAgainButton.vue';
 import SpotGroupAddSection from '@/services/automation/spot-automation/spot-group/components/SpotGroupAddSection.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props {
     resourceId: string;
@@ -214,7 +215,7 @@ export default {
                 state.errored = false;
                 setVariables(results);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.errored = true;
                 state.candidates = [];
                 state.types = [];

@@ -95,6 +95,7 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { AUTOMATION_ROUTE } from '@/services/automation/routes';
 import { SpaceRouter } from '@/router';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface Props {
@@ -220,7 +221,7 @@ export default {
                 state.scheduleList = res.results;
                 state.totalCount = res.total_count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.scheduleList = [];
                 state.totalCount = 0;
                 state.selectedIndexes = [];

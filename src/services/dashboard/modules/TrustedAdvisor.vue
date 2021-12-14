@@ -113,6 +113,7 @@ import { green, red, yellow } from '@/styles/colors';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 enum STATUS {
@@ -328,7 +329,8 @@ export default {
                 const res = await SpaceConnector.client.statistics.topic.trustedAdvisorSummary(props.extraParams);
                 chartState.data = res.results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                chartState.data = [];
             } finally {
                 chartState.loading = false;
             }
@@ -366,7 +368,8 @@ export default {
                 });
                 state.projectSummaryData = projectSummaryData.sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.projectSummaryData = [];
             } finally {
                 state.loading = false;
             }

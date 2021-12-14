@@ -78,6 +78,7 @@ import { makeReferenceValueHandler } from '@spaceone/console-core-lib/component-
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const CollectDataModal = () => import('@/services/plugin/collector/modules/CollectDataModal.vue');
 
@@ -182,7 +183,9 @@ export default {
                 }));
                 state.totalCount = res.total_count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.items = [];
+                state.totalCount = 0;
             } finally {
                 state.loading = false;
             }

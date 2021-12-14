@@ -40,6 +40,7 @@ import { PDataTable, PPanelTop, PButton } from '@spaceone/design-system';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props {
     resourceKey: string;
@@ -105,7 +106,7 @@ export default {
                 state.tags = tags;
             } catch (e) {
                 state.tags = {};
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

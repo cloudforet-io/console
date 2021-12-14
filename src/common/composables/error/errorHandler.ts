@@ -26,7 +26,7 @@ export default class ErrorHandler {
 
     static handleError(error) {
         if (isInstanceOfNotFoundError(error)) {
-            showErrorMessage('관리자에게 문의하세요.', error);
+            showErrorMessage('Something is Wrong! Please contact the administrator.', error);
         } else if (isInstanceOfAuthenticationError(error)) {
             const isTokenAlive = SpaceConnector.isTokenAlive;
             if (!isTokenAlive && !SpaceRouter.router.currentRoute.meta.excludeAuth) {

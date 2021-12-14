@@ -118,6 +118,7 @@ import { gray, primary1, primary2 } from '@/styles/colors';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 /* enum */
@@ -356,7 +357,7 @@ export default {
                 }
                 state.count[type] = count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getTrend = async (type) => {
@@ -415,7 +416,8 @@ export default {
                     };
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                chartState.data = [];
             }
         };
         const getApiParameter = (type) => {
@@ -503,7 +505,8 @@ export default {
                 });
                 state.summaryData = summaryData;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.summaryData = [];
             } finally {
                 state.loading = false;
             }

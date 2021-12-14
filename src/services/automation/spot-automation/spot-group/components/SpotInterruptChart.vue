@@ -17,6 +17,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { red } from '@/styles/colors';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface InterruptChartData {
     date: string;
@@ -118,7 +119,7 @@ export default {
                     }
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

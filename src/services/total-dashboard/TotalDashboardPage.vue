@@ -83,6 +83,7 @@ import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 import ServiceAccounts from '@/services/dashboard/modules/ServiceAccounts.vue';
 import CollectorProgress from '@/services/dashboard/modules/CollectingProgress.vue';
 import CloudServices from '@/services/inventory/cloud-service/modules/CloudServices.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface ExtraParams {
     domain_id?: string;
@@ -130,7 +131,8 @@ export default {
                 const { results } = await SpaceConnector.client.identity.domain.list();
                 state.domainList = results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.domainList = [];
             } finally {
                 state.loading = false;
             }

@@ -40,6 +40,7 @@ import AddNotificationLevel from '@/services/notification/modules/AddNotificatio
 import AddNotificationMemberGroup from '@/services/notification/modules/AddNotificationMemberGroup.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const CHANNEL_TYPE = {
     AWS_SNS: 'AWSSNS',
@@ -118,8 +119,8 @@ export default {
                 });
                 state.schema = res.results[0].plugin_info.metadata.data.schema;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.schema = {};
-                console.error(e);
             }
         };
 

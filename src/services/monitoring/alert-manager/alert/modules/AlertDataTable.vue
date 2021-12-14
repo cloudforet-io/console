@@ -150,6 +150,7 @@ import {
 } from '@/services/monitoring/alert-manager/type';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/monitoring/alert-manager/lib/helper';
 import AlertTriggeredBy from '@/services/monitoring/alert-manager/alert/modules/AlertTriggeredBy.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
@@ -353,9 +354,9 @@ export default {
                 state.totalCount = total_count;
                 state.selectIndex = [];
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.totalCount = 0;
                 state.items = [];
-                console.error(e);
             } finally {
                 state.loading = false;
             }
@@ -388,7 +389,7 @@ export default {
                     file_name_prefix: FILE_NAME_PREFIX.alert,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

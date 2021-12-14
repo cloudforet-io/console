@@ -1,6 +1,7 @@
 import { store } from '@/store';
 import { Authenticator } from '@/services/auth/authenticator';
 import { loadGapiInsideDOM } from 'gapi-script';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 // @ts-ignore
 let { gapi } = window;
@@ -13,7 +14,7 @@ class GoogleAuth extends Authenticator {
             await GoogleAuth.disconnectGoogleSession(auth2);
             await super.signOut();
         } catch (e) {
-            console.error(e);
+            ErrorHandler.handleError(e);
         }
     }
 

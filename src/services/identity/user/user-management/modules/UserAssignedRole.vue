@@ -49,6 +49,7 @@ import { userStateFormatter } from '@/services/identity/user/lib/helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { Tags } from '@/models';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface UserRoleItem {
     labels?: string[]|string;
@@ -123,8 +124,8 @@ export default {
                 }));
                 baseState.loading = false;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 baseState.items = [];
-                console.error(e);
             }
         };
 

@@ -22,6 +22,7 @@ import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE_FILTER } from '@/services/monitoring/alert-manager/lib/config';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -50,8 +51,8 @@ export default {
                 });
                 state.countsAssignedAlerts = results;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.countsAssignedAlerts = [];
-                console.error(e);
             }
         };
         const onClickAssignedAlerts = (alertFilter) => {

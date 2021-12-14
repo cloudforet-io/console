@@ -56,9 +56,10 @@ import {
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface WebhookType {
     plugin_id: string;
@@ -128,8 +129,8 @@ export default {
                 });
                 state.webhookTypeList = results;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.webhookTypeList = [];
-                console.error(e);
             }
         };
         const createWebhook = async () => {
@@ -145,7 +146,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '', root);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'));
             } finally {
                 state.loading = false;
                 state.proxyVisible = false;

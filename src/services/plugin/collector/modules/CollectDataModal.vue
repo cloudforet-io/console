@@ -61,11 +61,12 @@ import {
 } from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface SecretModel {
     secret_id: string;
@@ -199,8 +200,7 @@ export default {
                 await collectorApi(getCollectParams());
                 showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_COLLECT_START_TITLE'), '', vm.$root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_COLLECT_TITLE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_COLLECT_TITLE'));
             } finally {
                 state.proxyVisible = false;
             }
@@ -215,7 +215,7 @@ export default {
                 });
                 state.collector = res;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.collector = null;
             } finally {
                 state.loading = false;
@@ -232,7 +232,8 @@ export default {
                 });
                 state.credential = res;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.credential = [];
             } finally {
                 state.loading = false;
             }

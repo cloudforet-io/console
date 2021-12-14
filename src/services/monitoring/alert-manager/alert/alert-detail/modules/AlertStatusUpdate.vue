@@ -34,9 +34,10 @@ import {
     PButtonModal, PPaneLayout, PTextarea, PFieldGroup, PEmpty,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'AlertStatusUpdate',
@@ -80,8 +81,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_S_UPDATE_STATUS'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_E_UPDATE_STATUS'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_E_UPDATE_STATUS'));
             } finally {
                 state.loading = false;
             }

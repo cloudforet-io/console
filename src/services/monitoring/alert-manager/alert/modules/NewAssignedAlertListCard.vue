@@ -46,6 +46,7 @@ import { store } from '@/store';
 
 import dayjs from 'dayjs';
 import { ALERT_STATE } from '@/services/monitoring/alert-manager/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'NewAssignedAlertListCard',
@@ -87,9 +88,9 @@ export default {
                 state.items = results;
                 state.totalCount = total_count;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.items = [];
                 state.totalCount = 0;
-                console.error(e);
             } finally {
                 state.loading = false;
             }

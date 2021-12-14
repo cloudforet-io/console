@@ -44,6 +44,7 @@ import {
 } from '@/styles/colors';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface ChartData {
@@ -266,7 +267,7 @@ ${vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.TOOLTIP_SAVING_COST')}: <stro
                 });
                 setChartData(res.results);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         }, 300);
 

@@ -52,6 +52,7 @@ import { store } from '@/store';
 import { ResourceMap } from '@/store/modules/resource/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props {
     jobId: string;
@@ -111,7 +112,7 @@ export default {
                 });
                 state.job = results[0] || {};
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

@@ -46,6 +46,7 @@ import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftConta
 import { store } from '@/store';
 import config from '@/lib/config';
 import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightContainer.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'SignInPage',
@@ -90,7 +91,7 @@ export default {
                     try {
                         component = () => import(`./external/${auth}/template/${auth}.vue`);
                     } catch (e) {
-                        console.error(e);
+                        ErrorHandler.handleError(e);
                     }
                 }
                 return component;
@@ -112,13 +113,12 @@ export default {
             try {
                 await vm.$router.push(props.nextPath);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
         watch(() => vm.$route.query.error, () => {
-            if (vm.$route.query.error) state.showErrorMessage = true;
-            else state.showErrorMessage = false;
+            state.showErrorMessage = !!vm.$route.query.error;
         });
 
 

@@ -93,6 +93,7 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import numeral from 'numeral';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 enum EVENT_CATEGORY {
@@ -218,7 +219,7 @@ export default {
                     period: EVENT_PERIOD,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getEvents = async () => {
@@ -253,7 +254,8 @@ export default {
                     };
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.data = [];
             } finally {
                 state.loading = false;
             }

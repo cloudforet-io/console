@@ -31,6 +31,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'Top5ProjectActivityTooltip',
@@ -109,8 +110,8 @@ export default {
                 state.alerts = results;
                 if (total_count > 10) state.moreCount = total_count - 10;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.alerts = [];
-                console.error(e);
             } finally {
                 state.loading = false;
             }

@@ -77,6 +77,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface Value {
@@ -213,7 +214,8 @@ export default {
                     ];
                 }
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.data = [];
             } finally {
                 state.loading = false;
             }

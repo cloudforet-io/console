@@ -59,7 +59,7 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { i18n } from '@/translations';
 
@@ -74,6 +74,7 @@ import NotificationChannelItemSchedule
 import NotificationChannelItemTopic
     from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemTopic.vue';
 import { EDIT_TYPE, PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface ParamType {
@@ -135,8 +136,7 @@ export default {
                 state.isActivated = true;
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_ENABLE_PROJECT_CHANNEL'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_PROJECT_CHANNEL'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_PROJECT_CHANNEL'));
             }
         };
 
@@ -148,8 +148,7 @@ export default {
                 state.isActivated = true;
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_ENABLE_USER_CHANNEL'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_USER_CHANNEL'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_USER_CHANNEL'));
             }
         };
 
@@ -166,8 +165,7 @@ export default {
                 state.isActivated = false;
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DISABLE_PROJECT_CHANNEL'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_PROJECT_CHANNEL'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_PROJECT_CHANNEL'));
             }
         };
 
@@ -179,8 +177,7 @@ export default {
                 state.isActivated = false;
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_USER_CHANNEL'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_USER_CHANNEL'));
             }
         };
 
@@ -210,8 +207,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DELETE_PROJECT_CHANNEL'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_PROJECT_CHANNEL'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_PROJECT_CHANNEL'));
             } finally {
                 checkDeleteState.visible = false;
                 emit('confirm');
@@ -225,8 +221,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_USER_CHANNEL'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_USER_CHANNEL'));
             } finally {
                 checkDeleteState.visible = false;
                 emit('confirm');

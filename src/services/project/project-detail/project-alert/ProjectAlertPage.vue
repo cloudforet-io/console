@@ -32,10 +32,11 @@ import { PButtonTab, PButton } from '@spaceone/design-system';
 
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -76,7 +77,7 @@ export default {
                 if (!isEmpty(res)) state.isActivated = true;
             } catch (e) {
                 state.isActivated = false;
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }
@@ -91,8 +92,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ACTIVATE_ALERT'), '', root);
             } catch (e) {
                 state.isActivated = false;
-                console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_ACTIVATE_ALERT'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_ACTIVATE_ALERT'));
             }
         };
 

@@ -70,9 +70,11 @@ import {
 import { makeProxy } from '@spaceone/design-system/src/util/composition-helpers';
 
 import { CollectModalProps } from '@/common/modules/collection/collect-modal/type';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { i18n } from '@/translations';
 
 export default {
     name: 'CollectModal',
@@ -157,7 +159,7 @@ export default {
                 const res = await SpaceConnector.client.inventory.collector.list({ query: apiQuery.data });
                 state.collectors = res.results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }
@@ -171,7 +173,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('COMMON.COLLECT_MODAL.ALT_S_COLLECT_DATA'), '', context.root);
             } catch (e) {
-                showErrorMessage(vm.$t('COMMON.COLLECT_MODAL.ALT_E_COLLECT_DATA'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('COMMON.COLLECT_MODAL.ALT_E_COLLECT_DATA'));
             } finally {
                 state.proxyVisible = false;
             }

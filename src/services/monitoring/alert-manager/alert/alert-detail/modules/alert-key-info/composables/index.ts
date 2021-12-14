@@ -1,11 +1,12 @@
 import {
     ComponentRenderProxy, getCurrentInstance, reactive,
 } from '@vue/composition-api';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { EDIT_MODE } from '@/services/monitoring/alert-manager/lib/config';
 import { cloneDeep } from 'lodash';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface AlertDetailItemState {
 	isEditMode: boolean;
@@ -69,8 +70,7 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
             showSuccessMessage(getMessage(editMode, true), '', vm.$root);
             state.isEditMode = false;
         } catch (e) {
-            console.error(e);
-            showErrorMessage(getMessage(editMode, false), e);
+            ErrorHandler.handleRequestError(e, getMessage(editMode, false));
         }
     };
 

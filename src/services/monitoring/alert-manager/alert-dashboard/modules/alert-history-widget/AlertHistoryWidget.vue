@@ -56,6 +56,7 @@ import AlertHistoryChart from '@/services/monitoring/alert-manager/alert-dashboa
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const ALERT_STATE = {
@@ -150,7 +151,7 @@ export default {
                 setSummaryData(current, results);
             } catch (e) {
                 initSummaryData();
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

@@ -164,6 +164,7 @@ import { Location } from 'vue-router';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { store } from '@/store';
 import { AUTOMATION_ROUTE } from '@/services/automation/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Scheduler {
     name: string;
@@ -259,7 +260,7 @@ export default {
                     state.items[i].savingCost = (res.projects[state.items[i].project_id].saving_result || 0).toLocaleString();
                 }
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -271,7 +272,7 @@ export default {
                     state.items[i].percentage = (computed(() => (state.items[i].scheduledResources.managed_count / state.items[i].scheduledResources.total_count) * 100)).value;
                 }
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -282,7 +283,7 @@ export default {
                     state.items[i].scheduler = res.projects[state.items[i].project_id];
                 }
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -304,9 +305,10 @@ export default {
                 }));
                 await Promise.all([getScheduledResources(), getScheduleList(), getSavingCost()]);
                 state.totalCount = res.total_count || 0;
-                state.loading = false;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
             }
         };
 

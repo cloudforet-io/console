@@ -56,6 +56,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 enum DATA_TYPE {
     compute = 'compute',
@@ -156,7 +157,8 @@ export default {
                     },
                 }));
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.data = [];
             } finally {
                 state.loading = false;
             }

@@ -35,6 +35,7 @@ import {
 } from '@/styles/colors';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface InstanceResponse {
@@ -170,7 +171,8 @@ export default {
                     },
                 ];
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.data = [];
             } finally {
                 state.loading = false;
             }

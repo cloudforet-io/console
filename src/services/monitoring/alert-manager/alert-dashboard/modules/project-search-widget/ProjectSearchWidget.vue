@@ -54,6 +54,7 @@ import { makeReferenceValueHandler } from '@spaceone/console-core-lib/component-
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { store } from '@/store';
 import { PROJECT_ROUTE } from '@/services/project/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -124,7 +125,9 @@ export default {
                 state.items = results;
                 state.totalCount = total_count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.items = [];
+                state.totalCount = 0;
             } finally {
                 state.loading = false;
             }

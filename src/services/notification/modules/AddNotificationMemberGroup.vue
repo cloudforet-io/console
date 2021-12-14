@@ -17,6 +17,7 @@ import {
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'AddNotificationMemberGroup',
@@ -71,8 +72,8 @@ export default {
                 });
                 state.allMember = removeDuplicatedElement(results);
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.allMember = [];
-                console.error(e);
             } finally {
                 state.loading = false;
             }

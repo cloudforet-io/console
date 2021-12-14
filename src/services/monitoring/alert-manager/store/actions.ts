@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { AlertDataModel } from '@/services/monitoring/alert-manager/type';
 import { UpdateAlertParams } from '@/services/monitoring/alert-manager/store/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const getAlertData = async ({ commit }, alertId: string): Promise<void|Error> => {
     try {
@@ -9,7 +10,7 @@ export const getAlertData = async ({ commit }, alertId: string): Promise<void|Er
         });
         commit('setAlertData', alert);
     } catch (e) {
-        console.error(e);
+        ErrorHandler.handleError(e);
         throw new Error(e);
     }
 };
@@ -22,7 +23,7 @@ export const updateAlertData = async ({ commit }, params: UpdateAlertParams): Pr
         });
         commit('setAlertData', alert);
     } catch (e) {
-        console.error(e);
+        ErrorHandler.handleError(e);
         throw new Error(e);
     }
 };

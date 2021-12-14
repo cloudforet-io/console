@@ -55,6 +55,7 @@ import SpotGroupBillingSummary from '@/services/automation/spot-automation/modul
 
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface TableData {
@@ -152,7 +153,7 @@ export default {
                 });
                 setTableData(res.results);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

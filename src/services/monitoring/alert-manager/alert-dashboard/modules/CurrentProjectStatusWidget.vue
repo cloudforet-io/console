@@ -50,6 +50,7 @@ import {
 } from '@/styles/colors';
 import config from '@/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 enum PROJECT_STATUS {
@@ -165,7 +166,7 @@ export default {
                 state.count.healthy = total_count - state.count.issue;
                 // todo: maintenance 향후 추가 예정
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

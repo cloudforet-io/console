@@ -3,6 +3,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { Action } from 'vuex';
 import config from '@/lib/config';
 import axios from 'axios';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface HeaderMessage {
     title: string;
@@ -94,6 +95,6 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
             // commit('setDownloadSource', link);
         }
     } catch (e) {
-        console.error(e);
+        ErrorHandler.handleError(e);
     }
 };

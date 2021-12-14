@@ -35,6 +35,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE } from '@/services/monitoring/alert-manager/lib/config';
 import { PROJECT_ROUTE } from '@/services/project/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -78,7 +79,7 @@ export default {
             } catch (e) {
                 state.items = [];
                 state.totalCount = 0;
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

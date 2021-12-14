@@ -143,8 +143,8 @@ export default {
                 const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: getQuery() });
                 state.projectChannels = results;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.projectChannels = [];
-                console.error(e);
             }
         };
 
@@ -154,8 +154,8 @@ export default {
                 const res = await SpaceConnector.client.identity.user.list();
                 responderState.allMember = res.results;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 responderState.allMember = [];
-                console.error(e);
             } finally {
                 responderState.loading = false;
             }

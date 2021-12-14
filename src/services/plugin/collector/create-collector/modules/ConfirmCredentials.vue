@@ -35,6 +35,7 @@ import { PDataTable, PI } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'ConfirmCredentials',
@@ -72,7 +73,8 @@ export default {
                 });
                 state.schemaItems = res.capability.supported_schema.map(name => ({ name }));
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.schemaItems = [];
             }
         };
 
@@ -96,7 +98,7 @@ export default {
                     state.secretCount[d.name] = d.count;
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

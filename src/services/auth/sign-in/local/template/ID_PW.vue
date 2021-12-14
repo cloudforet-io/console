@@ -54,6 +54,7 @@ import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
 import { TranslateResult } from 'vue-i18n';
 import { loadAuth } from '@/services/auth/authenticator/loader';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default defineComponent({
     name: 'IDPWSignIn',
@@ -121,7 +122,7 @@ export default defineComponent({
                 context.emit('sign-in');
                 await store.dispatch('display/hideSignInErrorMessage');
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.password = '';
                 await store.dispatch('display/showSignInErrorMessage');
             }

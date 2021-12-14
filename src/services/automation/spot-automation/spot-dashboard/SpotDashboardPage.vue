@@ -153,6 +153,7 @@ import { Tags, TimeStamp } from '@/models';
 import { AUTOMATION_ROUTE } from '@/services/automation/routes';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const handlers = {
     keyItemSets: [{
@@ -269,7 +270,7 @@ export default {
                 });
                 state.spotGroups = res.results.map(d => d.spot_group_id);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -293,7 +294,7 @@ export default {
                     state.items[i].spotGroupCount = res.projects[state.items[i].project_id];
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getInstanceByProject = async (projectIds) => {
@@ -307,7 +308,7 @@ export default {
                     state.items[i].onDemandCount = res.projects[state.items[i].project_id].ondemand;
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -320,7 +321,7 @@ export default {
                     state.items[i].savingCost = (res.projects[state.items[i].project_id].saving_result).toLocaleString();
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -335,9 +336,9 @@ export default {
                 await Promise.all([getSpotGroupByProject(projects), getInstanceByProject(projects), getSavingCostResultByProject(projects)]);
                 state.dataLoading = false;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.items = [];
                 state.totalCount = 0;
-                console.error(e);
             }
         };
 

@@ -82,10 +82,11 @@ import { userStateFormatter } from '@/services/identity/user/lib/helper';
 import { TranslateResult } from 'vue-i18n';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
-    showErrorMessage, showSuccessMessage, showLoadingMessage, hideLoadingMessage,
+    showSuccessMessage, showLoadingMessage, hideLoadingMessage,
 } from '@/lib/helper/notice-alert-helper';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export interface APIKeyItem {
     // eslint-disable-next-line camelcase
@@ -199,8 +200,8 @@ export default {
                 });
                 state.items = res.results;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.items = [];
-                console.error(e);
             } finally {
                 state.loading = false;
             }
@@ -216,8 +217,7 @@ export default {
                 modalState.items = resp;
                 state.visible = true;
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.API_KEY.ALT_E_CREATE_SCHEDULER'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.API_KEY.ALT_E_CREATE_SCHEDULER'));
             } finally {
                 modalState.loading = false;
                 hideLoadingMessage(vm.$root);
@@ -236,8 +236,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'), '', vm.$root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'));
             } finally {
                 await listAPIKey(state.user);
                 checkModalState.visible = false;
@@ -251,8 +250,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_DISABLE_API_KEY'), '', vm.$root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_DISABLE_API_KEY'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_DISABLE_API_KEY'));
             } finally {
                 await listAPIKey(state.user);
                 checkModalState.visible = false;
@@ -266,8 +264,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_DELETE_API_KEY'), '', vm.$root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_DELETE_API_KEY'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_DELETE_API_KEY'));
             } finally {
                 state.selectedIndex = [];
                 await listAPIKey(state.user);
@@ -334,7 +331,8 @@ export default {
                     endpoints,
                 };
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                modalState.endpoints = {};
             } finally {
                 state.loading = false;
             }

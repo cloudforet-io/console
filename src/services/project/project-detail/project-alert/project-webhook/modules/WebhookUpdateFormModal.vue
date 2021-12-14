@@ -35,9 +35,10 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'WebhookUpdateFormModal',
@@ -85,7 +86,7 @@ export default {
                     name: state.webhookName,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -100,8 +101,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_WEBHOOK'), '', root);
                 state.proxyVisible = false;
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_WEBHOOK'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_WEBHOOK'));
             } finally {
                 state.loading = false;
                 emit('confirm');

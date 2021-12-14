@@ -52,11 +52,13 @@ import EscalationPolicyForm from '@/services/monitoring/alert-manager/escalation
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { EscalationPolicyFormModel } from '@/services/monitoring/alert-manager/type';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { i18n } from '@/translations';
 
 
 enum FORM_MODE {
@@ -151,8 +153,8 @@ export default {
                 }));
                 setSelectIndex();
             } catch (e) {
+                ErrorHandler.handleError(e);
                 tableState.items = [];
-                console.error(e);
             } finally {
                 tableState.loading = false;
             }
@@ -165,8 +167,7 @@ export default {
                 });
                 state.changedEscalationPolicyId = res.escalation_policy_id;
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_ESCALATION_POLICY'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_ESCALATION_POLICY'));
             }
         };
         const updateEscalationPolicy = async () => {
@@ -176,7 +177,7 @@ export default {
                     escalation_policy_id: state.changedEscalationPolicyId,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -193,10 +194,9 @@ export default {
             try {
                 await updateEscalationPolicy();
                 emit('confirm');
-                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_ESCALATION_POLICY'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_ESCALATION_POLICY'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_ESCALATION_POLICY'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_ESCALATION_POLICY'));
             } finally {
                 state.proxyVisible = false;
             }

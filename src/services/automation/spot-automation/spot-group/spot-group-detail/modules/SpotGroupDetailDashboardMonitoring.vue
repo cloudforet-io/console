@@ -82,6 +82,7 @@ import Monitoring from '@/services/monitoring/modules/monitoring/Monitoring.vue'
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 enum SCHEMA_TYPE {
@@ -189,7 +190,7 @@ export default {
                 });
                 state.instanceCpuUsage = get(res, `spot_groups.${spotGroupId}.cpu_utilization`);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getInstanceDiskUsage = async (spotGroupId) => {
@@ -199,7 +200,7 @@ export default {
                 });
                 state.instanceDiskUsage = get(res, `spot_groups.${spotGroupId}.total_iops`);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getInstanceState = async (spotGroupId) => {
@@ -211,7 +212,7 @@ export default {
                 instanceState.unhealthyCount = get(res, `spot_groups.${spotGroupId}.unhealthy`);
                 instanceState.status = get(res, `spot_groups.${spotGroupId}.state`);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getLoadBalancerCount = async (spotGroupId) => {
@@ -221,7 +222,7 @@ export default {
                 });
                 state.loadBalancerCount = get(res, `spot_groups.${spotGroupId}`);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -232,7 +233,7 @@ export default {
                 });
                 state.resources = res.results.map(d => ({ id: d.server_id, name: d.name }));
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getSpotGroupMetrics = async (spotGroupId) => {
@@ -253,7 +254,7 @@ export default {
                 state.metrics = metrics || [];
                 state.dataSourceId = dataSourceId;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }
@@ -267,7 +268,7 @@ export default {
                 state.cloudServiceId = res.cloud_service_id;
                 instanceState.schema = res.schema;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getInstanceQuery = () => {
@@ -288,7 +289,7 @@ export default {
                 });
                 instanceState.data = res.results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

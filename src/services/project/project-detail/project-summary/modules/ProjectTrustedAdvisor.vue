@@ -67,6 +67,7 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { green, red, yellow } from '@/styles/colors';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const TRUSTED_ADVISER = 'TrustedAdvisor';
@@ -195,8 +196,8 @@ export default {
                 });
                 state.data = res[props.projectId];
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.data = null;
-                console.error(e);
             } finally {
                 state.loading = false;
             }

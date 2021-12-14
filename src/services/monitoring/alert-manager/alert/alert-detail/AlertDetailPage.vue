@@ -76,7 +76,7 @@ import AlertTimelineAndEvent from '@/services/monitoring/alert-manager/alert/ale
 import AlertNote from '@/services/monitoring/alert-manager/alert/alert-detail/modules/AlertNote.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import AlertTitleEditModal from '@/services/monitoring/alert-manager/alert/alert-detail/modules/AlertTitleEditModal.vue';
 import AlertProjectDependency
     from '@/services/monitoring/alert-manager/alert/alert-detail/modules/AlertProjectDependency.vue';
@@ -88,6 +88,7 @@ import { store } from '@/store';
 import alertStoreModule from '@/services/monitoring/alert-manager/store';
 import { AlertStoreState } from '@/services/monitoring/alert-manager/store/type';
 import { registerServiceStore } from '@/common/composables/register-service-store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'AlertDetailPage',
@@ -148,8 +149,7 @@ export default {
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '', root);
                 await vm.$router.push({ name: MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME });
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'));
             } finally {
                 checkDeleteState.visible = false;
             }
@@ -172,7 +172,7 @@ export default {
                     store.dispatch('service/alert/getAlertData', props.id),
                 ]);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

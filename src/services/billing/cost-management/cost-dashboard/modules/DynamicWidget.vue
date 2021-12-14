@@ -15,6 +15,7 @@ import {
 } from '@vue/composition-api';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { CURRENCY } from '@/store/modules/display/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props extends WidgetProps {
     widgetId: string;
@@ -62,7 +63,7 @@ export default {
                 // TODO: throw new Error(`[] Unacceptable Layout: layout type must be one of ${...}. ${props.widgetId} is not acceptable.`);
                 state.component = async () => state.loader();
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

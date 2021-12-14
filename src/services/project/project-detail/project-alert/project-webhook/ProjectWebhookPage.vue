@@ -152,7 +152,7 @@ import { store } from '@/store';
 import { userStateFormatter } from '@/services/identity/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { showErrorMessage, showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import {
     makeDistinctValueHandler, makeEnumValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
@@ -162,6 +162,7 @@ import { i18n } from '@/translations';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { TranslateResult } from 'vue-i18n';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'ProjectWebhookPage',
@@ -292,9 +293,9 @@ export default {
                 state.totalCount = total_count;
                 state.selectIndex = [];
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.items = [];
                 state.totalCount = 0;
-                console.error(e);
             } finally {
                 state.loading = false;
             }
@@ -307,8 +308,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ENABLE_WEBHOOK'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_ENABLE_WEBHOOK'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_ENABLE_WEBHOOK'));
             } finally {
                 state.selectedIndex = [];
                 await listWebhooks();
@@ -323,8 +323,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DISABLE_WEBHOOK'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DISABLE_WEBHOOK'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DISABLE_WEBHOOK'));
             } finally {
                 state.selectedIndex = [];
                 await listWebhooks();
@@ -338,8 +337,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DELETE_WEBHOOK'), e);
+                ErrorHandler.handleRequestError(e, 'PROJECT.DETAIL.ALT_E_DELETE_WEBHOOK');
             } finally {
                 await listWebhooks();
                 formState.deleteModalVisible = false;
@@ -400,7 +398,7 @@ export default {
                     file_name_prefix: FILE_NAME_PREFIX.projectWebhook,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const onChange = async (options: any = {}) => {

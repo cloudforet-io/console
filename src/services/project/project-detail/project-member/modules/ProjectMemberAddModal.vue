@@ -177,11 +177,12 @@ import {
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const FORM_MODE = Object.freeze({
@@ -387,7 +388,7 @@ export default {
                 }
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), '', root);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALT_E_ADD_MEMBER'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.MEMBER.ALT_E_ADD_MEMBER'));
             } finally {
                 emit('confirm');
                 state.proxyVisible = false;
@@ -407,8 +408,8 @@ export default {
                 }
                 state.members = res.results;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.members = [];
-                console.error(e);
             }
         };
         const listExternalUser = debounce(async () => {
@@ -422,8 +423,8 @@ export default {
                 });
                 setExternalMenuItems(res.results);
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.externalItems = [];
-                console.error(e);
             } finally {
                 state.loading = false;
             }

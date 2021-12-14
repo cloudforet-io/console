@@ -12,6 +12,7 @@
 import { reactive, toRefs, watch } from '@vue/composition-api';
 import { PDynamicLayout } from '@spaceone/design-system';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'ServiceAccountDetails',
@@ -43,7 +44,7 @@ export default {
                 });
                 state.items = res;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.items = [];
             }
         };

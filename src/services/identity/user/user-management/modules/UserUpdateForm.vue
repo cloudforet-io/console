@@ -95,6 +95,7 @@ import {
     checkEmailFormat, checkEmptyValue, checkMinLength, checkOneLowerCase, checkOneNumber, checkOneUpperCase, checkSamePassword,
     Validation,
 } from '@/services/identity/user/lib/user-form-validations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface AuthType {
     label: string | null;
@@ -256,7 +257,8 @@ export default {
                     name: d.role_id,
                 }));
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                formState.domainRoleList = [];
             }
         };
 
@@ -270,7 +272,9 @@ export default {
                     });
                     if (res.total_count > 0) formState.domainRole = formState.domainRoleList[0].name;
                     else formState.domainRole = '';
-                } catch (e) { console.error(e); }
+                } catch (e) {
+                    ErrorHandler.handleError(e);
+                }
             } else {
                 formState.domainRole = '';
             }

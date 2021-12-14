@@ -45,6 +45,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { Tags } from '@/models';
 import { i18n } from '@/translations';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 // const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');
 
 interface Timestamp {
@@ -118,7 +119,7 @@ export default {
                 baseState.data.last_accessed_at = calculateTime(baseState.data.last_accessed_at, props.timezone as string) || 0;
                 baseState.loading = false;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

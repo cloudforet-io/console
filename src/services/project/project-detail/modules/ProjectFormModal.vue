@@ -37,9 +37,10 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import VueI18n from 'vue-i18n';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -121,7 +122,7 @@ export default {
                 await store.dispatch('resource/project/load');
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
                 throw new Error(e);
             }
         };
@@ -134,7 +135,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
                 throw new Error(e);
             }
         };
@@ -158,7 +159,7 @@ export default {
                 }
                 emit('complete', params);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
                 state.proxyVisible = false;

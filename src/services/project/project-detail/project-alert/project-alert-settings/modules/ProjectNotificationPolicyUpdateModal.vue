@@ -31,9 +31,10 @@ import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { red } from '@/styles/colors';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'ProjectNotificationPolicyUpdateModal',
@@ -76,8 +77,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_NOTIFICATION_POLICY'), '', root);
                 emit('confirm');
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_NOTIFICATION_POLICY'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_NOTIFICATION_POLICY'));
             } finally {
                 state.proxyVisible = false;
             }

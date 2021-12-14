@@ -44,6 +44,7 @@ import { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
 import { AUTH_ROUTE } from '@/services/auth/routes';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -106,7 +107,7 @@ export default {
             try {
                 await vm.$router.push(props.nextPath);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 await store.dispatch('display/showSignInErrorMessage');
             }
         };

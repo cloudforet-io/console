@@ -102,6 +102,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 enum CLOUD_SERVICE_LABEL {
@@ -317,7 +318,7 @@ export default {
                 });
                 state.chartData = chartData.reverse();
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.chartData = [];
             } finally {
                 state.loading = false;

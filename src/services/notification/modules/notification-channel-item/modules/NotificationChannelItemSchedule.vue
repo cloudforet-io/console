@@ -51,10 +51,11 @@ import {
 } from '@/services/notification/modules/notification-channel-item/type';
 import { utcToTimezoneFormatter } from '@/services/identity/user/lib/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import AddNotificationSchedule from '@/services/notification/modules/AddNotificationSchedule.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -118,8 +119,7 @@ export default {
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'));
             }
         };
         const setProjectChannelSchedule = async () => {
@@ -133,8 +133,7 @@ export default {
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'));
             }
         };
 

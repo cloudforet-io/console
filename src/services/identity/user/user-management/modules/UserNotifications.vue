@@ -69,6 +69,7 @@ import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { i18n } from '@/translations';
 import { utcToTimezoneFormatter } from '@/services/identity/user/lib/helper';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'UserNotifications',
@@ -114,8 +115,8 @@ export default {
                 });
                 state.protocolList = res.results;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.protocolList = [];
-                console.error(e);
             }
         };
 
@@ -135,8 +136,8 @@ export default {
                     protocol_type: injectProtocolName(d),
                 }));
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.items = [];
-                console.error(e);
             } finally {
                 state.loading = false;
             }

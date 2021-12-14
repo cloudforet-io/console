@@ -37,6 +37,7 @@ import {
 } from '@/styles/colors';
 import { store } from '@/store';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface ChartData {
@@ -233,7 +234,8 @@ export default {
                 });
                 state.chartData = initChartData(res.results);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.chartData = [];
             } finally {
                 state.loading = false;
             }

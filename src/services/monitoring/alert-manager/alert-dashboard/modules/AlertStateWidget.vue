@@ -118,6 +118,7 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { commaFormatter } from '@spaceone/console-core-lib';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const TAB_STATE = Object.freeze({
@@ -256,7 +257,8 @@ export default {
                 state.allPage = getAllPage(total_count, 10);
                 state.items = results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.items = [];
             } finally {
                 state.loading = false;
             }
@@ -273,7 +275,7 @@ export default {
                 tabState.tabItems.RESOLVED.count = resolvedCount;
                 tabState.tabItems.ALL.count = sum([resolvedCount, acknowledgedCount, triggeredCount]);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

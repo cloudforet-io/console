@@ -101,6 +101,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { TranslateResult } from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { spotGroupNameRegex } from '@/services/automation/spot-automation/lib/validations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'SpotGroupDetailPage',
@@ -149,7 +150,7 @@ export default {
                 state.spotGroup = await SpaceConnector.client.spotAutomation.spotGroup.get({ spot_group_id: state.spotGroupId });
                 state.spotGroupName = state.spotGroup.name;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.spotGroup = {};
                 state.spotGroupName = '';
             }
@@ -220,7 +221,7 @@ export default {
             try {
                 updateSpotGroupName(params);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.showNameValidation = false;
             }

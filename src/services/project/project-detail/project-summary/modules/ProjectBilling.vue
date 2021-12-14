@@ -130,6 +130,7 @@ import {
 } from '@/styles/colors';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface ChartData {
@@ -362,7 +363,7 @@ export default {
                     summaryState.currentCost = commaFormatter(numberFormatter(billingData.find(d => d.date === end)?.cost || 0));
                 }
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getTrend = async () => {
@@ -425,7 +426,7 @@ export default {
                     return chartData;
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 chartState.loading = false;
             }
@@ -510,7 +511,8 @@ export default {
                 });
                 tableState.data = data;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                tableState.data = [];
             } finally {
                 setTableFields();
                 tableState.loading = false;

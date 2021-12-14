@@ -168,7 +168,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
-    showErrorMessage, showSuccessMessage, showLoadingMessage,
+    showSuccessMessage, showLoadingMessage,
 } from '@/lib/helper/notice-alert-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
@@ -179,6 +179,7 @@ import { IDENTITY_ROUTE } from '@/services/identity/routes';
 /* types */
 import { Reference } from '@/lib/reference/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface ProjectItemResp {
@@ -346,7 +347,7 @@ export default {
                 tableState.items = res.results;
                 typeOptionState.totalCount = res.total_count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 tableState.items = [];
                 typeOptionState.totalCount = 0;
             } finally {
@@ -386,7 +387,7 @@ export default {
                     file_name_prefix: FILE_NAME_PREFIX.serviceAccount,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -439,7 +440,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_DELETE_ACCOUNT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_DELETE_ACCOUNT'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_DELETE_ACCOUNT'));
             } finally {
                 doubleCheckModalState.visible = false;
                 await listServiceAccountData();
@@ -473,7 +474,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_RELEASE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_RELEASE_PROJECT'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_RELEASE_PROJECT'));
             } finally {
                 await listServiceAccountData();
             }
@@ -492,7 +493,7 @@ export default {
                     });
                     showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_CHANGE_PROJECT'), '', vm.$root);
                 } catch (e) {
-                    showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_CHANGE_PROJECT'), e);
+                    ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_CHANGE_PROJECT'));
                 } finally {
                     await store.dispatch('resource/project/load');
                     await listServiceAccountData();

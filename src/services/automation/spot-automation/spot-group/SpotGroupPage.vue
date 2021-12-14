@@ -76,6 +76,7 @@ import { store } from '@/store';
 import { Tags, TimeStamp } from '@/models';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { AUTOMATION_ROUTE } from '@/services/automation/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const handlers = {
@@ -259,7 +260,7 @@ export default {
                     state.items[i].instanceCount = instanceCount;
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -274,7 +275,7 @@ export default {
                     state.items[i].instanceCpu = Math.round(instanceCpu.cpu_utilization * 100) / 100;
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -289,7 +290,7 @@ export default {
                     state.items[i].instanceDisk = Math.round(instanceDisk.total_iops * 100) / 100;
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -304,7 +305,7 @@ export default {
                     state.items[i].loadbalancerCount = loadbalancerCount;
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -319,7 +320,7 @@ export default {
                     state.items[i].cloudServiceType = cloudServiceType;
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -334,7 +335,7 @@ export default {
                     state.items[i].instanceState = instanceState;
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -351,7 +352,7 @@ export default {
                     state.items[i].interruptHistoryData = interruptHistory;
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -365,7 +366,7 @@ export default {
                     state.items[i].interruptCount = interruptCount;
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -380,7 +381,7 @@ export default {
                     state.items[i].savingResult = savingResult.toLocaleString();
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -408,7 +409,7 @@ export default {
                 ]);
                 state.cardDataLoading = false;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

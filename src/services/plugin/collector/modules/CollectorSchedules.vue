@@ -97,11 +97,12 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 
 import EditScheduleModal from '@/services/plugin/collector/modules/EditScheduleModal.vue';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'CollectorSchedules',
@@ -214,8 +215,8 @@ export default {
                 state.items = res.results;
                 state.totalCount = res.total_count;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.items = [];
-                console.error(e);
             } finally {
                 tableState.loading = false;
             }
@@ -230,8 +231,7 @@ export default {
                 showSuccessMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DELETE_SCHEDULE_TITLE', 1), '', vm.$root);
                 await listSchedules();
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_SCHEDULE_TITLE', 1), e);
+                ErrorHandler.handleRequestError(e, vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_SCHEDULE_TITLE', 1));
             } finally {
                 state.deleteVisible = false;
             }

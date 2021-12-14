@@ -114,7 +114,6 @@ export default {
                     spot_group_id: props.spotGroupId,
                 });
             } catch (e) {
-                console.error(e);
                 state.spotGroup = null;
             } finally {
                 state.loading = false;
@@ -148,7 +147,6 @@ export default {
                 state.visibleCheckModal = false;
                 state.proxyVisible = false;
             } catch (e) {
-                console.error(e);
                 state.visibleCheckModal = false;
                 showErrorMessage(i18n.t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.ALT_E_EDIT_SPOT_GROUP'), e);
             }

@@ -78,6 +78,7 @@ import {
 import { store } from '@/store';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface ChartData {
@@ -317,7 +318,7 @@ export default {
                 res = get(res, `spot_groups.${props.spotGroupId}`);
                 return res;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 return null;
             }
         };
@@ -331,7 +332,7 @@ export default {
                 res = get(res, `spot_groups.${props.spotGroupId}`);
                 return res;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 return null;
             }
         };
@@ -343,7 +344,7 @@ export default {
                 });
                 tableState.data = res.results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 tableState.loading = false;
             }

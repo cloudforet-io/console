@@ -68,6 +68,7 @@ import { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ProjectGroup } from '@/services/identity/service-account/type';
 import Vue from 'vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface Props {
@@ -139,7 +140,7 @@ export default {
                 const { items } = await SpaceConnector.client.identity.project.tree(params);
                 return items;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 return [];
             }
         };
@@ -164,7 +165,7 @@ export default {
                 });
                 return res.open_path || [];
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 return [];
             }
         };
@@ -181,7 +182,7 @@ export default {
                 const paths = await getSearchPath(targetId, 'PROJECT');
                 await state.root.fetchAndFindNode(paths.map(d => (data => data.id === d)));
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

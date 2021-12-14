@@ -73,6 +73,7 @@ import { alert, secondary } from '@/styles/colors';
 import { store } from '@/store';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import { commaFormatter } from '@spaceone/console-core-lib';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const ASSIGNED_STATE = Object.freeze({
     ALL: 'ALL',
@@ -171,7 +172,9 @@ export default {
                 state.allPage = getAllPage(total_count, 10);
                 state.items = results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.items = [];
+                state.totalCount = 0;
             } finally {
                 state.loading = false;
             }
@@ -183,7 +186,8 @@ export default {
                 });
                 state.alertStateCounts = results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.alertStateCounts = 0;
             }
         };
 

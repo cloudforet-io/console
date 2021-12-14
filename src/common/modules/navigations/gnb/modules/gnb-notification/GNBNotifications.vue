@@ -59,10 +59,10 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import GNBNotificationItem from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationItem.vue';
 import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationDateHeader.vue';
 import dayjs from 'dayjs';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -93,7 +93,7 @@ export default {
                     notifications: ids,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -124,8 +124,7 @@ export default {
                 state.notifications = state.notifications.concat(results);
                 setReadNotifications(results);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
             } finally {
                 state.loading = false;
             }

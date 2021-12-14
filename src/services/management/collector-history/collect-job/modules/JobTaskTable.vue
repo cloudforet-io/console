@@ -78,6 +78,7 @@ import { JOB_TASK_STATUS } from '@/services/management/collector-history/lib/con
 import { iso8601Formatter, durationFormatter } from '@spaceone/console-core-lib';
 import { green, primaryDark, red } from '@/styles/colors';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const COMPLETED_ICON_COLOR = green[400];
@@ -227,9 +228,9 @@ export default {
                     duration: durationFormatter(jobTask.created_at, jobTask.finished_at, state.timezone),
                 }));
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.items = [];
                 state.totalCount = 0;
-                console.error(e);
             }
             state.loading = false;
         };

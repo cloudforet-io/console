@@ -83,12 +83,14 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import { TranslateResult } from 'vue-i18n';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ProjectMemberAddModal from '@/services/project/project-detail/project-member/modules/ProjectMemberAddModal.vue';
 import ProjectMemberUpdateModal from '@/services/project/project-detail/project-member/modules/ProjectMemberUpdateModal.vue';
 import { Tags, TimeStamp } from '@/models';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { i18n } from '@/translations';
 
 
 interface MemberItem {
@@ -233,9 +235,9 @@ export default {
                 }));
                 memberTableState.totalCount = res.total_count;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 memberTableState.items = [];
                 memberTableState.totalCount = 0;
-                console.error(e);
             } finally {
                 memberTableState.loading = false;
             }
@@ -328,7 +330,7 @@ export default {
                 if (props.isProjectGroup) await deleteProjectGroupMember(items);
                 else await deleteProjectMember(items);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));
             } finally {
                 checkMemberDeleteState.visible = false;
                 await listMembers();

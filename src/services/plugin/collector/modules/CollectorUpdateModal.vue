@@ -85,10 +85,11 @@ import {
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { CollectorPluginModel, CollectorUpdateParameter, UPGRADE_MODE } from '@/services/plugin/collector/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface Props {
@@ -177,8 +178,7 @@ export default {
                 formState.inputModel.version = res.plugin_info.version;
                 formState.inputModel.isAutoUpgrade = res.plugin_info.upgrade_mode === UPGRADE_MODE.AUTO;
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_TITLE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_TITLE'));
             }
         };
 
@@ -202,8 +202,7 @@ export default {
                     }
                 });
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_VERSION_TITLE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_VERSION_TITLE'));
             }
         };
 
@@ -246,7 +245,7 @@ export default {
                     });
                     showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_TITLE'), '', vm.$root);
                 } catch (e) {
-                    showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_TITLE'), e);
+                    ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_TITLE'));
                 } finally {
                     state.loading = false;
                     state.proxyVisible = false;

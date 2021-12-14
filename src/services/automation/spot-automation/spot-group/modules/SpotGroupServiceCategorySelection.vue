@@ -30,6 +30,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { SpotGroupResourceCategory } from '@/services/automation/spot-automation/type';
 import SpotGroupAddSection from '@/services/automation/spot-automation/spot-group/components/SpotGroupAddSection.vue';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface SupportResourceGroupTypes {
     [resourceType: string]: {
@@ -105,7 +106,7 @@ export default {
             try {
                 state.supportedResourceTypes = await SpaceConnector.client.spotAutomation.spotGroup.getSupportedResourceTypes();
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.supportedResourceTypes = {};
             }
         };

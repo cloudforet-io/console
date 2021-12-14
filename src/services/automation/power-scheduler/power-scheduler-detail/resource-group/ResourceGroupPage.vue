@@ -162,6 +162,7 @@ import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/in
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { ResourceGroup, Resource, ResourceGroupItem } from '@/services/automation/power-scheduler/type';
 import { AUTOMATION_ROUTE } from '@/services/automation/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface Props {
@@ -367,7 +368,7 @@ export default {
                     }));
                 }
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -392,7 +393,7 @@ export default {
                 typeOptionState.totalCount = res.total_count;
                 validateResources();
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.data = null;
                 typeOptionState.totalCount = 0;
                 validateResources();

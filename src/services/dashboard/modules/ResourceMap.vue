@@ -81,6 +81,7 @@ import { Location } from 'vue-router';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import config from '@/lib/config';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface Provider {
@@ -155,7 +156,7 @@ export default {
                     state.maxValue = Math.max(...countArray);
                 } else state.maxValue = 0;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

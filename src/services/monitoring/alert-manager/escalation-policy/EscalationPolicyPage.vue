@@ -75,7 +75,7 @@ import EscalationPolicyDataTable from '@/services/monitoring/alert-manager/escal
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import {
     makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
@@ -84,6 +84,7 @@ import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query
 import { store } from '@/store';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/monitoring/alert-manager/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -186,8 +187,8 @@ export default {
                 }));
                 tableState.totalCount = res.total_count;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.items = [];
-                console.error(e);
             } finally {
                 tableState.loading = false;
             }
@@ -200,8 +201,7 @@ export default {
                 showSuccessMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_S_SET_AS_DEFAULT'), '', root);
                 await listEscalationPolicies();
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_SET_AS_DEFAULT'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_SET_AS_DEFAULT'));
             }
         };
         const deleteEscalationPolicy = async () => {
@@ -212,8 +212,7 @@ export default {
                 showSuccessMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_S_DELETE_POLICY'), '', root);
                 await listEscalationPolicies();
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_DELETE_POLICY'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_DELETE_POLICY'));
             } finally {
                 state.deleteModalVisible = false;
             }

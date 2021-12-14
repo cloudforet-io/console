@@ -102,7 +102,7 @@ import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import { SupervisorPluginModel } from '@/services/management/supervisor/type';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     makeDistinctValueHandler, makeEnumValueHandler,
@@ -111,6 +111,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { pluginStateFormatter } from '@/services/identity/user/lib/helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 enum STATE {
     active = 'ACTIVE',
@@ -231,8 +232,8 @@ export default {
                 state.totalCount = res.total_count || 0;
                 state.items = res.results;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.items = [];
-                console.error(e);
             }
         };
         const getPluginDetailData = async (index) => {
@@ -261,7 +262,7 @@ export default {
                 await listPlugins();
                 state.selectIndex = [];
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const onClickRecovery = async (item) => {
@@ -274,7 +275,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.ALT_S_RECOVERY_TITLE'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.ALT_E_RECOVERY_TITLE'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.ALT_E_RECOVERY_TITLE'));
             }
         };
 

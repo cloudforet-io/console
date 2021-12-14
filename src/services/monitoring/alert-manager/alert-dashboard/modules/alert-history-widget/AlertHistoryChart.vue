@@ -21,6 +21,7 @@ import { PChartLoader, PSkeleton } from '@spaceone/design-system';
 import { gray, red } from '@/styles/colors';
 import config from '@/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface ChartData {
@@ -202,8 +203,8 @@ export default {
                 });
                 state.chartData = initChartData(results);
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.chartData = [];
-                console.error(e);
             }
         };
 

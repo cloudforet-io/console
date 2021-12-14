@@ -73,9 +73,10 @@ import dayjs from 'dayjs';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { ALERT_STATE, ALERT_URGENCY } from '@/services/monitoring/alert-manager/lib/config';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface HeaderState {
@@ -155,8 +156,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_STATE'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_STATE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_URGENCY'));
             }
         };
 
@@ -170,8 +170,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_URGENCY'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_URGENCY'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_URGENCY'));
             }
         };
 

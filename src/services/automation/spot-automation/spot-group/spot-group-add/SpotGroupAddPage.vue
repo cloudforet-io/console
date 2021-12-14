@@ -179,7 +179,6 @@ export default {
                 showSuccessMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.ALT_S_CREATE_SPOT_GROUP'), '', vm.$root);
                 await vm.$router.push({ name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP._NAME });
             } catch (e) {
-                console.error(e);
                 showErrorMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.ALT_E_CREATE_SPOT_GROUP'), e);
             } finally {
                 state.loading = false;

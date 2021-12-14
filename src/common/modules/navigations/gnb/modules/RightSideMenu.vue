@@ -120,12 +120,13 @@ import { PAnchor, PI, PDivider } from '@spaceone/design-system';
 import GNBNewIcon from '@/common/components/marks/GNBNewIcon.vue';
 
 import { store } from '@/store';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { languages } from '@/store/modules/user/config';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import config from '@/lib/config';
 import GNBNotifications from '@/common/modules/navigations/gnb/modules/gnb-notification/GNBNotifications.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'RightSideMenu',
@@ -223,7 +224,7 @@ export default {
                 });
                 emit('hide-menu');
             } catch (e) {
-                showErrorMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
             }
         };
 

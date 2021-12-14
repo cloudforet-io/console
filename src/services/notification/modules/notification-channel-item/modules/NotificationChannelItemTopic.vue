@@ -53,9 +53,10 @@ import {
     PROTOCOL_TYPE,
 } from '@/services/notification/modules/notification-channel-item/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import AddNotificationTopic from '@/services/notification/modules/AddNotificationTopic.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -111,8 +112,7 @@ export default {
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'));
             }
         };
         const setProjectChannelSubscription = async () => {
@@ -126,8 +126,7 @@ export default {
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'));
             }
         };
         const onChangeTopic = (value) => {

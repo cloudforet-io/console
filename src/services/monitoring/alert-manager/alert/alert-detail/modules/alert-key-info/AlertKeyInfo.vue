@@ -73,6 +73,7 @@ import AlertInfoDescription
     from '@/services/monitoring/alert-manager/alert/alert-detail/modules/alert-key-info/modules/AlertInfoDescription.vue';
 import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/monitoring/alert-manager/lib/config';
 import AlertTriggeredBy from '@/services/monitoring/alert-manager/alert/modules/AlertTriggeredBy.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props {
     id: string;
@@ -139,7 +140,8 @@ export default {
                 });
                 state.escalationPolicyName = res.name;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.escalationPolicyName = '';
             }
         };
 

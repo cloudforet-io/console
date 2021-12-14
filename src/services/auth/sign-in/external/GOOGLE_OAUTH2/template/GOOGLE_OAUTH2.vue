@@ -12,6 +12,7 @@ import {
 import { PButton } from '@spaceone/design-system';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default defineComponent({
     name: 'GoogleSignIn',
@@ -30,7 +31,7 @@ export default defineComponent({
             try {
                 await loadAuth('GOOGLE_OAUTH2').signIn(onSignIn);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         });
         return {

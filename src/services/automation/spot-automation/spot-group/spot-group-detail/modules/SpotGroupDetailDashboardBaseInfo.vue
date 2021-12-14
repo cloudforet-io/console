@@ -90,6 +90,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 import SpotGroupUpdateOverlay from '@/services/automation/spot-automation/spot-group/modules/SpotGroupUpdateOverlay.vue';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
@@ -214,7 +215,7 @@ export default {
                 });
                 state.title = get(res, `spot_groups.${spotGroup.spot_group_id}.name`);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getInstanceType = async (spotGroup) => {
@@ -231,7 +232,7 @@ export default {
                     color: colors[idx] || gray[400],
                 }));
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

@@ -153,6 +153,7 @@ import {
 import { debounce } from 'lodash';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface AuthType {
@@ -402,8 +403,8 @@ export default {
                 });
                 await setExternalMenuItems(results);
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.externalItems = [];
-                console.error(e);
             } finally {
                 state.loading = false;
             }
@@ -428,10 +429,10 @@ export default {
                     }
                 }
             } catch (e) {
+                ErrorHandler.handleError(e);
                 formState.user_id = userId;
                 formState.name = '';
                 formState.email = '';
-                console.error(e);
             }
         };
         const onSelectExternalUser = async (userItem) => {

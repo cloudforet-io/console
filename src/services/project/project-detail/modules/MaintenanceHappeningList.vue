@@ -33,6 +33,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 export default {
@@ -65,7 +66,7 @@ export default {
 
                 state.items = results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.items = [];
             } finally {
                 state.loading = false;

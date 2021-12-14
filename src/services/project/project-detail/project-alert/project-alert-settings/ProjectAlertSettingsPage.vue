@@ -118,6 +118,7 @@ import { ACTION, SCOPE } from '@/services/monitoring/alert-manager/lib/config';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const NOTIFICATION_URGENCY = Object.freeze({
@@ -185,8 +186,8 @@ export default {
                     project_id: props.id,
                 });
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.projectAlertConfig = {};
-                console.error(e);
             }
         };
         const getEventRuleCount = async () => {
@@ -196,8 +197,8 @@ export default {
                 });
                 state.eventRuleTotalCount = total_count;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.eventRuleTotalCount = 0;
-                console.error(e);
             }
         };
         const getEscalationPolicy = async () => {
@@ -206,8 +207,8 @@ export default {
                     escalation_policy_id: state.escalationPolicyId,
                 });
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.escalationPolicy = {};
-                console.error(e);
             }
         };
 

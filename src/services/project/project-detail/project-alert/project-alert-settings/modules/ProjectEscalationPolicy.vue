@@ -72,6 +72,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { MONITORING_ROUTE } from '@/services/monitoring/routes';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -144,7 +145,7 @@ export default {
                 state.projectChannels = results;
             } catch (e) {
                 state.projectChannels = [];
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

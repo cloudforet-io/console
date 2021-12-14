@@ -81,6 +81,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { store } from '@/store';
 import { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/identity/user/type';
 import { PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'NotificationChannelList',
@@ -188,9 +189,9 @@ export default {
                 state.protocolResp = res.results;
                 state.protocolList = await enrichProtocol(res.results);
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.protocolList = [];
                 state.protocolResp = [];
-                console.error(e);
             } finally {
                 state.loading = false;
             }
@@ -221,8 +222,8 @@ export default {
                     schema: injectProtocolSchema(d),
                 }));
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.channelList = [];
-                console.error(e);
             } finally {
                 state.channelLoading = false;
             }
@@ -241,8 +242,8 @@ export default {
                     schema: injectProtocolSchema(d),
                 }));
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.channelList = [];
-                console.error(e);
             } finally {
                 state.channelLoading = false;
             }

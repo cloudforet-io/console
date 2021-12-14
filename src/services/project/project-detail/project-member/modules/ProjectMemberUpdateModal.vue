@@ -84,10 +84,12 @@ import {
     PButtonModal, PTag, PTextInput, PButton, PI,
 } from '@spaceone/design-system';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { isEqual } from 'lodash';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import VueI18n from 'vue-i18n';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { i18n } from '@/translations';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -262,8 +264,8 @@ export default {
                     if (props.isProjectGroup) await editProjectGroupMember(labels);
                     else await editProjectMember(labels);
                 } catch (e) {
-                    if (props.isProjectGroup) showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_GROUP_MEMBER'), e);
-                    else showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'), e);
+                    if (props.isProjectGroup) ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_GROUP_MEMBER'));
+                    else ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'));
                 } finally {
                     emit('confirm');
                     proxyVisible.value = false;

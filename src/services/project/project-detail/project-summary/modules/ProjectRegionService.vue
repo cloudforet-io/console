@@ -65,6 +65,7 @@ import { store } from '@/store';
 import { Location } from 'vue-router';
 import config from '@/lib/config';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface Data {
@@ -224,7 +225,8 @@ export default {
                 }));
                 state.data = data;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.data = [];
             } finally {
                 state.loading = false;
             }

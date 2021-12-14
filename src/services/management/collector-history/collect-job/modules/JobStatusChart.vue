@@ -49,6 +49,7 @@ import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
 import { JOB_STATUS } from '@/services/management/collector-history/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { coral, green } from '@/styles/colors';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const SUCCEEDED_COLOR = green[400];
@@ -115,8 +116,8 @@ export default {
                     clearInterval(interval);
                 }
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.job = {};
-                console.error(e);
             }
         };
 

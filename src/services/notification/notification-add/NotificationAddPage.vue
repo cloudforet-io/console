@@ -64,7 +64,8 @@ import AddNotificationTopic from '@/services/notification/modules/AddNotificatio
 import AddNotificationSchedule from '@/services/notification/modules/AddNotificationSchedule.vue';
 import VueI18n from 'vue-i18n';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -138,8 +139,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '', context.root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'));
             }
         };
 
@@ -160,7 +160,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_PROJECT_CHANNEL'), '', context.root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_PROJECT_CHANNEL'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_PROJECT_CHANNEL'));
             }
         };
 
@@ -170,7 +170,7 @@ export default {
                 else await createUserChannel();
                 vm.$router.back();
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

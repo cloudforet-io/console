@@ -206,7 +206,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { showErrorMessage, showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -216,6 +216,7 @@ import { TranslateResult } from 'vue-i18n';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -450,7 +451,7 @@ export default {
                 // return schema
                 return schema;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 return null;
             }
         };
@@ -485,7 +486,7 @@ export default {
 
                 return { items: res.results, totalCount: res.total_count };
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 return { items: [], totalCount: 0 };
             } finally {
                 typeOptionState.loading = false;
@@ -527,7 +528,7 @@ export default {
                     file_name_prefix: FILE_NAME_PREFIX.cloudService,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -563,7 +564,7 @@ export default {
                 sidebarState.iconUrl = get(res.results[0], ['tags', 'spaceone:icon'], '');
                 sidebarState.group = res.results[0]?.group;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -625,7 +626,7 @@ export default {
                     await api(params);
                     showSuccessMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_S_CHANGE_PROJECT'), '', root);
                 } catch (e) {
-                    showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_CHANGE_PROJECT'), e);
+                    ErrorHandler.handleRequestError(e, vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_CHANGE_PROJECT'));
                 } finally {
                     await store.dispatch('resource/project/load');
                     const { items, totalCount } = await getCloudServiceTableData();
@@ -638,7 +639,7 @@ export default {
                     await api(params);
                     showSuccessMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_S_RELEASE_PROJECT_TITLE'), '', root);
                 } catch (e) {
-                    showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_RELEASE_PROJECT_TITLE'), e);
+                    ErrorHandler.handleRequestError(e, vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_RELEASE_PROJECT_TITLE'));
                 } finally {
                     const { items, totalCount } = await getCloudServiceTableData();
                     tableState.items = items;
@@ -707,7 +708,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_S_CHECK_MODAL', { action: checkTableModalState.title }), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_E_CHECK_MODAL', { action: checkTableModalState.title }), e);
+                ErrorHandler.handleRequestError(e, vm.$t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_E_CHECK_MODAL', { action: checkTableModalState.title }));
             } finally {
                 typeOptionState.selectIndex = [];
                 resetCheckTableModalState();

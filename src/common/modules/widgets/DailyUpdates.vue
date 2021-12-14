@@ -105,6 +105,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface CloudService {
@@ -198,7 +199,8 @@ export default {
                 const res = await serverAPI(params);
                 state.serverData = res.results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.serverData = [];
             }
         };
 
@@ -213,7 +215,8 @@ export default {
                 const res = await cloudServiceAPI(params);
                 state.cloudServiceData = res.results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.cloudServiceData = [];
             }
         };
 

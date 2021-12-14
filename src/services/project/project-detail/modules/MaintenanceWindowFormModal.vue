@@ -102,8 +102,9 @@ import { makeProxy } from '@/lib/helper/composition-helpers';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { i18n } from '@/translations';
 import { store } from '@/store';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const SCHEDULE_TYPE = Object.freeze({
     startNow: 'startNow',
@@ -248,7 +249,7 @@ export default {
                     maintenance_window_id: props.maintenanceWindowId,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 return {};
             }
         };
@@ -264,7 +265,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_CREATE_MAINTENANCE_WINDOW'), '', root);
                 return res.maintenance_window_id;
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_CREATE_MAINTENANCE_WINDOW'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_CREATE_MAINTENANCE_WINDOW'));
                 throw e;
             }
         };
@@ -282,7 +283,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_UPDATE_MAINTENANCE_WINDOW'), '', root);
                 return res.maintenance_window_id;
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_UPDATE_MAINTENANCE_WINDOW'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_UPDATE_MAINTENANCE_WINDOW'));
                 throw e;
             }
         };
@@ -320,7 +321,7 @@ export default {
                 state.proxyVisible = false;
                 emit('confirm', maintenanceWindowId);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

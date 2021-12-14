@@ -67,6 +67,7 @@ import { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/pr
 
 import { store } from '@/store';
 import { ResourceMap } from '@/store/modules/resource/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'ProjectSelectDropdown',
@@ -141,7 +142,7 @@ export default {
                 });
                 return res.open_path || [];
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 return [];
             }
         };
@@ -187,7 +188,7 @@ export default {
                 const { items } = await SpaceConnector.client.identity.project.tree(params);
                 return items;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 return [];
             } finally {
                 if (state.loading) state.loading = false;

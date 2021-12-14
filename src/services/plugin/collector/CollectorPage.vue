@@ -187,7 +187,7 @@ import { CollectorModel } from '@/services/plugin/collector/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { showErrorMessage, showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-util/dynamic-layout';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { store } from '@/store';
@@ -196,6 +196,7 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { PLUGIN_ROUTE } from '@/services/plugin/routes';
 import { MANAGEMENT_ROUTE } from '@/services/management/routes';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const GeneralPageLayout = (): Component => import('@/common/modules/page-layouts/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/common/modules/tags/tags-panel/TagsPanel.vue') as Component;
@@ -379,7 +380,9 @@ export default {
                 }));
                 state.totalCount = res.total_count || 0;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.items = [];
+                state.totalCount = 0;
             } finally {
                 state.loading = false;
             }
@@ -405,7 +408,7 @@ export default {
             try {
                 await getCollectors();
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const checkModalConfirm = async (): Promise<void> => {
@@ -427,10 +430,10 @@ export default {
                     showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DELETE_TITLE', state.selectedItems.length), '', vm.$root);
                 }
             } catch (e) {
-                console.error(e);
-                if (checkModalState.mode === 'enable') showErrorMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_ENABLE_TITLE', state.selectedItems.length), e);
-                else if (checkModalState.mode === 'disable') showErrorMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DISABLE_TITLE', state.selectedItems.length), e);
-                else if (checkModalState.mode === 'delete') showErrorMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_TITLE', state.selectedItems.length), e);
+                ErrorHandler.handleError(e);
+                if (checkModalState.mode === 'enable') ErrorHandler.handleRequestError(e, i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_ENABLE_TITLE', state.selectedItems.length));
+                else if (checkModalState.mode === 'disable') ErrorHandler.handleRequestError(e, i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DISABLE_TITLE', state.selectedItems.length));
+                else if (checkModalState.mode === 'delete') ErrorHandler.handleRequestError(e, i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_TITLE', state.selectedItems.length));
             } finally {
                 if (checkModalState.mode === 'delete') state.selectedIndexes = [];
                 checkModalState.visible = false;
@@ -487,7 +490,7 @@ export default {
                     file_name_prefix: FILE_NAME_PREFIX.collector,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

@@ -33,10 +33,11 @@ import EscalationPolicyForm from '@/services/monitoring/alert-manager/escalation
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { EscalationPolicyFormModel } from '@/services/monitoring/alert-manager/type';
 import { ACTION, SCOPE } from '@/services/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -72,8 +73,7 @@ export default {
                 await SpaceConnector.client.monitoring.escalationPolicy.create(state.inputModel);
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_CREATE_POLICY'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_CREATE_POLICY'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_CREATE_POLICY'));
             } finally {
                 state.proxyVisible = false;
             }
@@ -89,8 +89,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_UPDATE_POLICY'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_UPDATE_POLICY'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_UPDATE_POLICY'));
             } finally {
                 state.proxyVisible = false;
             }

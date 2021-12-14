@@ -79,7 +79,7 @@ import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { makeDistinctValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -91,6 +91,7 @@ import MaintenanceWindowFormModal from '@/services/project/project-detail/module
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import { MAINTENANCE_WINDOW_STATE } from '@/services/project/project-detail/project-alert/project-maintenance-window/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const keyItemSets: KeyItemSet[] = [
@@ -175,9 +176,9 @@ export default {
                 state.totalCount = total_count;
                 state.items = results;
             } catch (e) {
+                ErrorHandler.handleError(e);
                 state.totalCount = 0;
                 state.items = [];
-                console.error(e);
             } finally {
                 state.loading = false;
             }
@@ -213,8 +214,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_CLOSE_MAINTENANCE_WINDOW'), '', root);
                 await getMaintenanceWindows();
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_CLOSE_MAINTENANCE_WINDOW'), e);
-                console.error(e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_CLOSE_MAINTENANCE_WINDOW'));
             } finally {
                 state.closeLoading = false;
             }

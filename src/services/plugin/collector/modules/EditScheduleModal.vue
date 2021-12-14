@@ -101,12 +101,13 @@ import {
 
 import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/services/plugin/collector/type';
 import { TranslateResult } from 'vue-i18n';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { store } from '@/store';
 import { timezoneList } from '@/store/modules/user/config';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface ScheduleHours {
@@ -279,7 +280,7 @@ export default {
                     }
                 }
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }
@@ -300,8 +301,7 @@ export default {
                 emit('success');
                 showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_ADD_SCHEDULE_TITLE'), '', vm.$root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_ADD_SCHEDULE_TITLE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_ADD_SCHEDULE_TITLE'));
             }
         };
         const updateSchedule = async () => {
@@ -323,8 +323,7 @@ export default {
                 emit('success');
                 showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', vm.$root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'));
             }
         };
 

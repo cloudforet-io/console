@@ -40,11 +40,12 @@ import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { ProjectMember } from '@/services/monitoring/alert-manager/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -94,8 +95,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_ASSIGN_MEMBER'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_ASSIGN_MEMBER'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_ASSIGN_MEMBER'));
             } finally {
                 state.proxyVisible = false;
             }
@@ -126,7 +126,7 @@ export default {
                 }));
                 state.totalCount = total_count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.items = [];
             } finally {
                 state.loading = false;

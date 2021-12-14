@@ -211,9 +211,10 @@ import { store } from '@/store';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { calculateTime, userStateFormatter } from '@/services/identity/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface UserModel {
     created_at: Timestamp;
@@ -457,7 +458,7 @@ export default {
                 }));
                 state.totalCount = res.total_count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.users = [];
                 state.totalCount = 0;
             } finally {
@@ -500,7 +501,7 @@ export default {
                     file_name_prefix: FILE_NAME_PREFIX.user,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -588,7 +589,7 @@ export default {
                 }
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
             } finally {
                 state.selectedIndex = [];
                 userFormState.visible = false;
@@ -609,7 +610,7 @@ export default {
                 }
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
             } finally {
                 await getUsers();
                 state.selectedIndex = [];
@@ -629,7 +630,7 @@ export default {
                 await SpaceConnector.client.identity.user.delete(getUsersParam(items));
                 showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', state.selectedIndex.length), '', root);
             } catch (e) {
-                showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', state.selectedIndex.length), e);
+                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', state.selectedIndex.length));
             } finally {
                 state.selectedIndex = [];
                 await getUsers();
@@ -641,7 +642,7 @@ export default {
                 await SpaceConnector.client.identity.user.enable(getUsersParam(items));
                 showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_ENABLE', state.selectedIndex.length), '', root);
             } catch (e) {
-                showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_ENABLE', state.selectedIndex.length), e);
+                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_ENABLE', state.selectedIndex.length));
             } finally {
                 await getUsers();
                 modalState.visible = false;
@@ -652,7 +653,7 @@ export default {
                 await SpaceConnector.client.identity.user.disable(getUsersParam(items));
                 showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DISABLE', state.selectedIndex.length), '', root);
             } catch (e) {
-                showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_DISABLE', state.selectedIndex.length), e);
+                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DISABLE', state.selectedIndex.length));
             } finally {
                 await getUsers();
                 modalState.visible = false;

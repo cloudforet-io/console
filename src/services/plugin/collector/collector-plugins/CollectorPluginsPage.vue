@@ -127,6 +127,7 @@ import { getPageStart } from '@spaceone/console-core-lib/component-util/paginati
 import { TimeStamp } from '@/models';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { PLUGIN_ROUTE } from '@/services/plugin/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 enum PLUGIN_STATE {
@@ -245,7 +246,9 @@ export default {
                 ];
                 state.totalCount = res.total_count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.plugins = [];
+                state.totalCount = 0;
             } finally {
                 state.loading = false;
             }
@@ -262,7 +265,9 @@ export default {
                 state.repositories = res.results;
                 state.selectedRepositoryId = res.results[0].repository_id;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.repositories = [];
+                state.selectedRepositoryId = '';
             }
         };
 

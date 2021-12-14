@@ -163,7 +163,7 @@ import {
     makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-util/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
@@ -171,6 +171,7 @@ import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/in
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface ProjectItemResp {
@@ -366,7 +367,7 @@ export default {
                 tableState.items = res.results;
                 typeOptionState.totalCount = res.total_count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 tableState.items = [];
                 typeOptionState.totalCount = 0;
             } finally {
@@ -383,7 +384,7 @@ export default {
                     file_name_prefix: FILE_NAME_PREFIX.server,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getTableSchema = async () => {
@@ -411,7 +412,7 @@ export default {
                 // set schema to tableState -> create dynamic layout
                 tableState.schema = res;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const changeProject = async (data?: ProjectItemResp|null) => {
@@ -427,7 +428,7 @@ export default {
                     await api(params);
                     showSuccessMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_S_CHANGE_PROJECT_TITLE'), '', context.root);
                 } catch (e) {
-                    showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHANGE_PROJECT_TITLE'), e);
+                    ErrorHandler.handleRequestError(e, vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHANGE_PROJECT_TITLE'));
                 } finally {
                     await store.dispatch('resource/project/load');
                     await listServerData();
@@ -438,7 +439,7 @@ export default {
                     await api(params);
                     showSuccessMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_S_RELEASE_PROJECT_TITLE'), '', context.root);
                 } catch (e) {
-                    showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_RELEASE_PROJECT_TITLE'), e);
+                    ErrorHandler.handleRequestError(e, vm.$t('INVENTORY.SERVER.MAIN.ALT_E_RELEASE_PROJECT_TITLE'));
                 } finally {
                     await listServerData();
                 }
@@ -510,7 +511,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_S_CHECK_MODAL', { action: checkTableModalState.title }), '', context.root);
             } catch (e) {
-                showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHECK_MODAL', { action: checkTableModalState.title }), e);
+                ErrorHandler.handleRequestError(e, vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHECK_MODAL', { action: checkTableModalState.title }));
             } finally {
                 typeOptionState.selectIndex = [];
                 resetCheckTableModalState();

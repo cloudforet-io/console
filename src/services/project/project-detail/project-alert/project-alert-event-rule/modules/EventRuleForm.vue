@@ -36,8 +36,9 @@ import EventRuleActionForm from '@/services/project/project-detail/project-alert
 import EventRuleConditionForm from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleConditionForm.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const CONDITIONS_POLICY = Object.freeze({
@@ -137,7 +138,7 @@ export default {
                 state.actions = res.actions;
                 state.options = res.options;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const createEventRule = async () => {
@@ -151,8 +152,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_CREATE_EVENT_RULE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.EVENT_RULE.ALT_E_CREATE_EVENT_RULE'));
             }
         };
         const updateEventRule = async () => {
@@ -166,8 +166,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_UPDATE_EVENT_RULE'), '', root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_UPDATE_EVENT_RULE'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.EVENT_RULE.ALT_E_UPDATE_EVENT_RULE'));
             }
         };
 

@@ -168,6 +168,7 @@ import {
 
 import { store } from '@/store';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface Props {
@@ -286,7 +287,6 @@ export default {
                 state.schedule.name = nameEditState.name;
                 showSuccessMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_S_EDIT_NAME'), '', root);
             } catch (e) {
-                console.error(e);
                 showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_EDIT_NAME'), e);
             } finally {
                 nameEditState.visible = false;
@@ -306,7 +306,6 @@ export default {
                 });
                 showSuccessMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_S_DELETE_SCHEDULER'), '', root);
             } catch (e) {
-                console.error(e);
                 showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_DELETE_SCHEDULER'), e);
             } finally {
                 checkDeleteState.visible = false;
@@ -321,7 +320,8 @@ export default {
                 });
                 state.status = res.status;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.status = [];
             }
         };
 
@@ -335,9 +335,9 @@ export default {
                     state.schedule = res;
                     state.created = iso8601Formatter(res.created_at, state.timezone);
                 } catch (e) {
+                    ErrorHandler.handleError(e);
                     state.schedule = { ...defaultSchedule };
                     state.created = '';
-                    console.error(e);
                 }
             } else {
                 state.schedule = { ...defaultSchedule };
@@ -360,7 +360,6 @@ export default {
                 showSuccessMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_S_CREATE_SCHEDULER'), '', root);
                 return res.schedule_id;
             } catch (e) {
-                console.error(e);
                 showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_CREATE_SCHEDULER'), e);
             } finally {
                 state.createLoading = false;

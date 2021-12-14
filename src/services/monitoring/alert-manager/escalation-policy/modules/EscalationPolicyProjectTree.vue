@@ -37,6 +37,7 @@ import {
 import { ProjectGroup } from '@/services/identity/service-account/type';
 import { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'EscalationPolicyProjectTree',
@@ -87,7 +88,7 @@ export default {
                 const { items } = await SpaceConnector.client.identity.project.tree(params);
                 return items;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 return [];
             }
         };

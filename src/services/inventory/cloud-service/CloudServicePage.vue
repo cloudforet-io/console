@@ -210,6 +210,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface RegionModel extends Tags {
@@ -335,7 +336,7 @@ export default {
 
                 filterState.regionList = res.results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const onClickService = async (region, res) => {
@@ -446,7 +447,7 @@ export default {
                     state.totalCount = 0;
                     state.loading = false;
                 } else {
-                    console.error(e);
+                    ErrorHandler.handleError(e);
                 }
             }
         };
@@ -503,7 +504,7 @@ export default {
                         excelField = dynamicFieldsToExcelDataFields(schema.options.fields);
                     }
                 } catch (e) {
-                    console.error(e);
+                    ErrorHandler.handleError(e);
                 }
             } else {
                 try {
@@ -520,7 +521,7 @@ export default {
                         excelField = dynamicFieldsToExcelDataFields(schema.options.fields);
                     }
                 } catch (e) {
-                    console.error(e);
+                    ErrorHandler.handleError(e);
                 }
             }
             return excelField;
@@ -550,7 +551,7 @@ export default {
                 );
                 state.itemsForExport = res.results;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
 
             const schemaList = await Promise.all(state.itemsForExport.map(d => getSchema(d)));
@@ -606,7 +607,7 @@ export default {
                     file_name_prefix: FILE_NAME_PREFIX.cloudService,
                 }, ...excelList]);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

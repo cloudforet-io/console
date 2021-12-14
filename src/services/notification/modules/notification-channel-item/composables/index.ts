@@ -5,8 +5,9 @@ import {
 import { ComponentRenderProxy, getCurrentInstance, reactive } from '@vue/composition-api';
 import { cloneDeep } from 'lodash';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface NotificationItemState {
 	isEditMode: boolean;
@@ -49,8 +50,7 @@ export const useNotificationItem = (obj: NotificationItemState) => {
             state.isEditMode = false;
             vm.$emit('edit', undefined);
         } catch (e) {
-            console.error(e);
-            showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'), e);
+            ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'));
         }
     };
 
@@ -69,8 +69,7 @@ export const useNotificationItem = (obj: NotificationItemState) => {
             state.isEditMode = false;
             vm.$emit('edit', undefined);
         } catch (e) {
-            console.error(e);
-            showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e);
+            ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'));
         }
     };
 

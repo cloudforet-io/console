@@ -77,13 +77,14 @@ import {
 } from '@spaceone/design-system';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 
 import ConfirmCredentials from '@/services/plugin/collector/create-collector/modules/ConfirmCredentials.vue';
 import { UPGRADE_MODE } from '@/services/plugin/collector/type';
 import { PLUGIN_ROUTE } from '@/services/plugin/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -193,8 +194,7 @@ export default {
                 state.plugin = res;
                 state.supportedSchema = res.capability.supported_schema;
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_PLUGIN_TITLE'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_PLUGIN_TITLE'));
             } finally {
                 state.loading = false;
             }
@@ -222,8 +222,7 @@ export default {
                 });
                 formState.inputModel.version = res.results[0];
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
             }
         };
 
@@ -264,8 +263,7 @@ export default {
                 showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_S_CREATE_TITLE'), '', vm.$root);
                 await vm.$router.push({ name: PLUGIN_ROUTE._NAME });
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_CREATE_TITLE'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_CREATE_TITLE'));
             } finally {
                 tabState.loading = false;
             }

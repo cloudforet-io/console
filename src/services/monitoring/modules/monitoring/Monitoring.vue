@@ -111,6 +111,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 enum MONITORING_TYPE {
@@ -255,7 +256,9 @@ export default {
                     statisticsTypes: get(res, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.average]),
                 }];
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.dataTools = [];
+                state.selectedToolId = '';
             }
         };
 
@@ -283,7 +286,8 @@ export default {
                     state.selectedToolId = state.dataTools[0].id;
                 }
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.dataTools = [];
             }
         };
         const listMetrics = async () => {
@@ -297,7 +301,8 @@ export default {
                 });
                 state.metrics = sortBy(res.metrics, m => m.name);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.metrics = [];
             }
         };
 
@@ -332,7 +337,7 @@ export default {
                 data.error = false;
                 data.resources = state.availableResources;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 data.error = true;
             } finally {
                 data.loading = false;
@@ -347,7 +352,7 @@ export default {
                     range(start, state.metricChartDataList.length).map(i => getMetricChartData(state.metricChartDataList[i])),
                 );
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         }, 300);
 

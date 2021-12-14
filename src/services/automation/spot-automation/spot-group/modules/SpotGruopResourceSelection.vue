@@ -49,6 +49,7 @@ import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/in
 import { SpotGroupResourceCategory } from '@/services/automation/spot-automation/type';
 import SpotGroupAddSection from '@/services/automation/spot-automation/spot-group/components/SpotGroupAddSection.vue';
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface Props {
@@ -141,7 +142,7 @@ export default {
                 state.data = res.results;
                 typeOptionState.totalCount = res.total_count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.data = null;
                 typeOptionState.totalCount = 0;
             } finally {
@@ -225,7 +226,7 @@ export default {
                     }), 'cloud_service_id', 'cloud_service_type', 'reference');
                 }
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.schema = null;
                 typeOptionState.selectIndex = [];
             }

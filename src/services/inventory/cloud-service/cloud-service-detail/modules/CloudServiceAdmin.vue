@@ -42,6 +42,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'CloudServiceAdmin',
@@ -103,7 +104,7 @@ export default {
                 }));
                 state.totalCount = res.total_count;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.items = [];
             } finally {
                 state.loading = false;
@@ -133,7 +134,7 @@ export default {
                     file_name_prefix: FILE_NAME_PREFIX.cloudService,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

@@ -133,6 +133,7 @@ import { MANAGEMENT_ROUTE } from '@/services/management/routes';
 import { PLUGIN_ROUTE } from '@/services/plugin/routes';
 import { peacock, green, red } from '@/styles/colors';
 import { JOB_STATUS } from '@/services/management/collector-history/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const PROGRESS_BAR_COLOR = peacock[400];
@@ -291,7 +292,7 @@ export default {
                     duration: durationFormatter(job.created_at, job.finished_at, state.timezone) || '--',
                 }));
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }
@@ -319,7 +320,7 @@ export default {
             try {
                 await getJobs();
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const onPaginationChange = () => {

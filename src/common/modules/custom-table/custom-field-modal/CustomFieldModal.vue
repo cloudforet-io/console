@@ -93,10 +93,11 @@ import SelectTagColumns from '@/common/modules/custom-table/custom-field-modal/m
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props {
     visible: boolean;
@@ -240,7 +241,7 @@ export default {
                     state.currentColumns = res.options?.fields || [];
                 }
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 schema = {};
                 if (includeOptionalFields) {
                     state.availableColumns = [];
@@ -284,8 +285,7 @@ export default {
                 emit('complete');
                 state.proxyVisible = false;
             } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_E_UPDATE_COL'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_E_UPDATE_COL'));
             } finally {
                 state.loading = false;
             }
@@ -329,7 +329,7 @@ export default {
 
                 tagState.allTags = uniq(results.map(d => Object.keys(d.tags)).flat());
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 tagState.allTags = [];
             } finally {
                 tagState.loading = false;

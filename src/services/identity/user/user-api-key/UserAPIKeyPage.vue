@@ -47,6 +47,7 @@ import UserAPIKeyTable from '@/services/identity/user/user-api-key/modules/APIKe
 import { store } from '@/store';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import UserAPIKeyHandbook from '@/services/identity/user/user-api-key/modules/APIKeyHandbook.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface EndpointItem {
     endpoint: string;
@@ -106,7 +107,8 @@ export default {
                 const res = await SpaceConnector.client.identity.endpoint.list();
                 state.items = [res.results.find(d => d.service === 'inventory')];
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
+                state.items = [];
             } finally {
                 state.loading = false;
             }

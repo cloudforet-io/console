@@ -101,7 +101,7 @@ import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/ty
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { PROJECT_ROUTE } from '@/services/project/routes';
@@ -172,14 +172,6 @@ export default {
             })),
             maintenanceHappeningListRef: null as null|Vue,
         });
-
-        // const forceRouteToProjectPage = () => {
-        //     showErrorMessage(
-        //         i18n.t('PROJECT.DETAIL.ALT_E_PROJECT_INVALID_TITLE'),
-        //         i18n.t('PROJECT.DETAIL.ALT_E_PROJECT_INVALID_DESC'),
-        //     );
-        //     vm.$router.push({ name: PROJECT_ROUTE._NAME });
-        // };
 
         /* api */
         const getProject = async (id) => {
@@ -255,7 +247,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '', root);
                 vm.$router.go(-1);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'));
             } finally {
                 formState.modalLoading = false;
                 formState.projectDeleteFormVisible = false;

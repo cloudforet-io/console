@@ -72,7 +72,8 @@ import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInput
 import FNB from '@/common/modules/navigations/FNB.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props {
     tags: object;
@@ -136,7 +137,7 @@ export default {
         const onSave = async () => {
             if (!state.isTagsValid) return;
             if (!api.value) {
-                showErrorMessage(vm.$t('COMMON.TAGS.ALT_E_UPDATE'), new Error());
+                ErrorHandler.handleRequestError(new Error(), vm.$t('COMMON.TAGS.ALT_E_UPDATE'));
                 return;
             }
 
@@ -148,8 +149,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('COMMON.TAGS.ALT_S_UPDATE'), '', vm.$root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('COMMON.TAGS.ALT_E_UPDATE'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('COMMON.TAGS.ALT_E_UPDATE'));
             } finally {
                 state.loading = false;
             }

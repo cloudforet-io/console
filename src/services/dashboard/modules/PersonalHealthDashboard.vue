@@ -77,6 +77,7 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const EVENT_PERIOD = 7;
@@ -139,7 +140,7 @@ export default {
                     };
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
