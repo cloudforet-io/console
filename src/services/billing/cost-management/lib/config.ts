@@ -21,9 +21,9 @@ export type GROUP_BY = typeof GROUP_BY[keyof typeof GROUP_BY];
 export const GROUP_BY_ITEM_MAP = Object.freeze({
     [GROUP_BY.PROJECT]: { name: GROUP_BY.PROJECT, label: 'Project' },
     [GROUP_BY.SERVICE_ACCOUNT]: { name: GROUP_BY.SERVICE_ACCOUNT, label: 'Service Account' },
+    [GROUP_BY.PROVIDER]: { name: GROUP_BY.PROVIDER, label: 'Provider' },
     [GROUP_BY.PRODUCT]: { name: GROUP_BY.PRODUCT, label: 'Product' },
     [GROUP_BY.REGION]: { name: GROUP_BY.REGION, label: 'Region' },
-    [GROUP_BY.PROVIDER]: { name: GROUP_BY.PROVIDER, label: 'Provider' },
     [GROUP_BY.TYPE]: { name: GROUP_BY.TYPE, label: 'Type' },
     [GROUP_BY.ACCOUNT]: { name: GROUP_BY.ACCOUNT, label: 'Account' },
     // [GROUP_BY.RESOURCE]: { name: GROUP_BY.RESOURCE, label: 'Resource' },
