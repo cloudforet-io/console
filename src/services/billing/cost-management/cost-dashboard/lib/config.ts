@@ -9,8 +9,8 @@ export const continentData = [{
 }, {
     continent_code: 'europe',
     title: 'Europe',
-    longitude: 19.160156,
-    latitude: 96.896104,
+    longitude: -6.362217,
+    latitude: 50.896104,
     width: 96,
     height: 96,
     pieData: [],

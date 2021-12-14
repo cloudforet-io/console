@@ -11,7 +11,7 @@ const regionMap = {
     europe: {
         continent_code: 'europe',
         continent_label: 'Europe',
-        longitude: 19.160156,
+        longitude: -6.362217,
         latitude: 50.896104,
     },
     north_america: {
