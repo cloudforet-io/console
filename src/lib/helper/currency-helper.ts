@@ -67,10 +67,10 @@ export const currencyMoneyFormatter = (
     if (typeof value === 'number') {
         const _symbol = (currency && !disableSymbol) ? CURRENCY_SYMBOL[currency] : '';
         const _money = (currency && rates) ? convertUSDToCurrency(value, currency, rates) : value;
-        const _formattedMoney = getFormattedMoney(_money, transitionValue, currency);
+        const _formattedMoney = getFormattedMoney(Math.abs(_money), transitionValue, currency);
 
-        if (disableSymbol) return _formattedMoney;
-        return `${_symbol}${_formattedMoney}`;
+        if (disableSymbol) return _money >= 0 ? _formattedMoney : `-${_formattedMoney}`;
+        return _money >= 0 ? `${_symbol}${_formattedMoney}` : `-${_symbol}${_formattedMoney}`;
     }
 
     return '--';
