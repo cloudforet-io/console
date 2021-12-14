@@ -263,6 +263,9 @@ export default {
     }
     .p-tree::v-deep {
         padding: 0.25rem;
+        .toggle-right {
+            @apply flex-shrink-0;
+        }
     }
 
     .tag-box {
