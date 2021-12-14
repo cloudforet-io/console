@@ -44,6 +44,7 @@ export const ExpertTemplate = (args, { argTypes }) => ({
                     :data-setter="dataSetter"
                     :data-fetcher="dataFetcher"
                     :get-class-names="getClassNames"
+                    fetch-on-init
                     @init="onInit"
                     @change-select="onChangeSelect"
                     @start-drag="onStartDrag"
@@ -263,7 +264,7 @@ export const Template = (args, { argTypes }) => ({
         <div class="h-full w-full p-4 overflow-auto">
             <div class="mb-4">
             </div>
-            <p-tree :data-fetcher="treeDataFetcher">
+            <p-tree :data-fetcher="treeDataFetcher" fetch-on-init>
             </p-tree>
         </div>
     `,

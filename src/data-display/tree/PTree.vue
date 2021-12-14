@@ -143,7 +143,7 @@ export default defineComponent<Props>({
         },
         fetchOnInit: {
             type: Boolean,
-            default: true,
+            default: false,
         },
         getClassNames: {
             type: Function,
