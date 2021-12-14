@@ -25,8 +25,8 @@
                         :data-setter="dataSetter"
                         :data-getter="dataGetter"
                         :data-fetcher="dataFetcher"
-                        @init="onTreeInit"
-                        @change-select="onChangeSelect"
+                        @init="handleTreeInit"
+                        @change-select="handleTreeChangeSelect"
                 >
                     <template #data="{node}">
                         <span class="ml-1">{{ node.data.name }}</span>
@@ -38,7 +38,7 @@
                                        :selected="selectedProjects" :value="node.data"
                                        :predicate="predicate"
                                        class="mr-1"
-                                       @change="changeSelectState(node, path, ...arguments)"
+                                       @change="handleChangeSelectState(node, path, ...arguments)"
                             />
                             <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_tree_project-group' : 'ic_tree_project'"
                                  width="1rem" height="1rem"
@@ -103,7 +103,11 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
+            loading: true,
+            visibleMenu: false,
+            isFocused: false,
             root: null as ProjectTreeRoot|null,
+            // selected states
             selectedItems: [] as ProjectTreeItem[],
             selectedItem: computed<ProjectTreeItem>(() => state.selectedItems[0]),
             selectedProjects: computed<ProjectItemResp[]>(() => state.selectedItems.map(d => d.node.data)),
@@ -127,23 +131,41 @@ export default {
                 if (props.multiSelectable) return PCheckBox;
                 return PRadio;
             }),
-            loading: true,
-            selectOptions: computed(() => ({
-                multiSelectable: props.multiSelectable,
-                validator({ data }) {
-                    return props.projectGroupSelectable ? true : data.item_type === 'PROJECT';
-                },
-            })),
-            visibleMenu: false,
-            isFocused: false,
         });
 
-        const predicate = (current, data) => current?.id === data.id;
+        const getSearchPath = async (id: string, type: string): Promise<string[]> => {
+            try {
+                const res = await SpaceConnector.client.identity.project.tree.search({
+                    item_id: id,
+                    item_type: type,
+                });
+                return res.open_path || [];
+            } catch (e) {
+                console.error(e);
+                return [];
+            }
+        };
 
+        const findNodes = async () => {
+            if (!state.root) return;
+
+            const pathList: string[][] = await Promise.all(props.selectedProjectIds.map(d => getSearchPath(d, 'PROJECT')));
+            const predicateList = pathList.map(paths => paths.map(d => (data => data.id === d)));
+            await state.root.fetchAndFindNodes(predicateList);
+        };
+
+        /* Tree props */
+        const predicate = (current, data) => current?.id === data.id;
         const toggleOptions = {
             validator: node => node.data.item_type === 'PROJECT_GROUP' && (node.data.has_child || node.children.length > 0),
             toggleOnNodeClick: true,
         };
+        const selectOptions = computed(() => ({
+            multiSelectable: props.multiSelectable,
+            validator({ data }) {
+                return props.projectGroupSelectable ? true : data.item_type === 'PROJECT';
+            },
+        }));
         const dataSetter = (text, node) => {
             node.data.name = text;
         };
@@ -172,28 +194,9 @@ export default {
             }
         };
 
-        const getSearchPath = async (id: string, type: string): Promise<string[]> => {
-            try {
-                const res = await SpaceConnector.client.identity.project.tree.search({
-                    item_id: id,
-                    item_type: type,
-                });
-                return res.open_path || [];
-            } catch (e) {
-                console.error(e);
-                return [];
-            }
-        };
 
-        const findNodes = async () => {
-            if (!state.root) return;
-
-            const pathList: string[][] = await Promise.all(props.selectedProjectIds.map(d => getSearchPath(d, 'PROJECT')));
-            const predicateList = pathList.map(paths => paths.map(d => (data => data.id === d)));
-            await state.root.fetchAndFindNodes(predicateList);
-        };
-
-        const onTreeInit = async (root) => {
+        /* Handlers */
+        const handleTreeInit = async (root) => {
             state.root = root;
 
             if (props.selectedProjectIds.length) {
@@ -203,7 +206,7 @@ export default {
             }
         };
 
-        const onChangeSelect = (selected: ProjectTreeItem[]) => {
+        const handleTreeChangeSelect = (selected: ProjectTreeItem[]) => {
             if (!props.multiSelectable && state.selectedItems === selected) return;
 
             state.selectedItems = selected;
@@ -218,7 +221,7 @@ export default {
             emit('select', state.selectedProjects);
         };
 
-        const changeSelectState = (node, path, selected, value) => {
+        const handleChangeSelectState = (node, path, selected, value) => {
             if (state.root) state.root.changeSelectState(node, path, value);
         };
 
@@ -231,16 +234,18 @@ export default {
             if (!value) emit('close');
         };
 
+
         return {
             ...toRefs(state),
             predicate,
             toggleOptions,
+            selectOptions,
             dataSetter,
             dataGetter,
             dataFetcher,
-            onTreeInit,
-            onChangeSelect,
-            changeSelectState,
+            handleTreeInit,
+            handleTreeChangeSelect,
+            handleChangeSelectState,
             handleDeleteTag,
             handleUpdateVisibleMenu,
         };
