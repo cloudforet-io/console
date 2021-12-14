@@ -5,7 +5,7 @@
         :loading="loading"
         :value="currencyMoneyFormatter(currentMonthCost, currency, currencyRates, true, 10000000000)"
         :currency-symbol="currencySymbol"
-        :description="`${currentMonth.startOf('month').format('MMM DD')} ~ ${currentMonth.endOf('month').format('DD')}, ${currentMonth.format('YYYY')}`"
+        :description="`${currentMonth.startOf('month').format('MMM DD')} ~ ${thisDay}, ${currentMonth.format('YYYY')}`"
         :no-data="!currentMonthCost || !lastMonthCost"
     >
         <template #default>
@@ -37,7 +37,7 @@
                 <template v-else>
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.INCREASE') }}
                 </template>
-                {{ `${lastMonth.startOf('month').format('MMM DD')} ~ ${lastMonth.endOf('month').format('DD')}, ${lastMonth.format('YYYY')}` }}
+                {{ `${lastMonth.startOf('month').format('MMM DD')} ~ ${thisDay}, ${lastMonth.format('YYYY')}` }}
             </span>
         </template>
     </cost-dashboard-simple-card-widget>
@@ -60,7 +60,7 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 
-
+const thisDay = dayjs.utc().format('DD');
 export default {
     name: 'MonthToDateSpend',
     components: {
@@ -101,7 +101,7 @@ export default {
         });
 
         const costQueryHelper = new QueryHelper();
-        const getData = async (start: Dayjs, end: Dayjs) => {
+        const getData = async (start: Dayjs, end: Dayjs|string) => {
             costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
                 state.loading = true;
@@ -122,14 +122,14 @@ export default {
         };
 
         const getCurrentMonthChartData = async () => {
-            const start = state.currentMonth.startOf('month');
-            const end = state.currentMonth.endOf('month');
+            const start = state.currentMonth.startOf('month').format('YYYY-MM-DD');
+            const end = `${state.currentMonth.endOf('month').format('YYYY-MM')}-${thisDay}`;
             state.currentMonthCost = await getData(start, end);
         };
 
         const getLastMonthChartData = async () => {
-            const start = state.lastMonth.startOf('month');
-            const end = state.currentMonth.startOf('month');
+            const start = state.lastMonth.startOf('month').format('YYYY-MM-DD');
+            const end = `${state.lastMonth.endOf('month').format('YYYY-MM')}-${thisDay}`;
             state.lastMonthCost = await getData(start, end);
         };
 
@@ -146,6 +146,7 @@ export default {
         return {
             ...toRefs(state),
             currencyMoneyFormatter,
+            thisDay,
         };
     },
 };
