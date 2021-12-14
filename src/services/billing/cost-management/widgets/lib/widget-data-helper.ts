@@ -7,7 +7,7 @@ import { CurrencyRates } from '@/store/modules/display/type';
 
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
-import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { Period } from '@/services/billing/cost-management/type';
 import {
     ChartData, Legend, PieChartData, PieChartRawData, TableData, TableRawData, XYChartData, XYChartRawData,
@@ -67,7 +67,7 @@ const _getTableRowData = (groupBy: string[], tableRawData: TableRawData): TableD
     /* extract group by data (ex. { provider: 'aws', region_code: 'us-west-1' }) */
     if (groupBy.length) {
         groupBy.forEach((name) => {
-            rowData[name] = tableRawData[name];
+            rowData[name] = tableRawData[name] ? tableRawData[name] : `No ${GROUP_BY_ITEM_MAP[name].label}`;
         });
     } else {
         rowData.totalCost = 'Total Cost';
@@ -134,7 +134,7 @@ export const getXYChartDataAndLegends = (rawData: XYChartRawData[], groupBy?: st
         if (groupBy) {
             d.values.forEach((value) => {
                 let groupByName = value[groupBy];
-                if (!groupByName) groupByName = `No ${groupBy}`;
+                if (!groupByName) groupByName = `No ${GROUP_BY_ITEM_MAP[groupBy].label}`;
                 eachChartData[groupByName] = value.usd_cost;
                 groupByNameSet.add(groupByName);
             });

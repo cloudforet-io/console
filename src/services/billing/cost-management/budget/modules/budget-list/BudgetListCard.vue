@@ -295,13 +295,11 @@ export default {
 
                 .cost-type-wrapper {
                     @apply flex flex-wrap gap-1 align-middle w-full;
+                    line-height: 1.5;
                     .cost-type {
-                        @apply w-full text-gray-700;
+                        @apply text-gray-700 truncate;
+                        width: 70.1%;
                         font-size: 0.75rem;
-                        .truncate {
-                            display: inline-block;
-                            max-width: 74.1%;
-                        }
                     }
                 }
             }

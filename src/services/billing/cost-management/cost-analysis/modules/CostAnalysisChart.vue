@@ -120,7 +120,7 @@ import {
     Legend, PieChartRawData, PieChartData, XYChartData,
 } from '@/services/billing/cost-management/widgets/type';
 import {
-    FILTER_ITEM_MAP, GRANULARITY, GROUP_BY,
+    FILTER_ITEM_MAP, GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP,
 } from '@/services/billing/cost-management/lib/config';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 import { store } from '@/store';
@@ -215,7 +215,7 @@ export default {
             if (groupBy) {
                 rawData.forEach((d) => {
                     let groupByName = d[groupBy];
-                    if (!groupByName) groupByName = `No ${groupBy}`;
+                    if (!groupByName) groupByName = `No ${GROUP_BY_ITEM_MAP[groupBy].label}`;
                     chartData.push({
                         category: groupByName,
                         value: d.usd_cost,
