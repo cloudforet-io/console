@@ -226,7 +226,7 @@ export default {
         });
         const _getConvertedTableItems = (tableItems: TableItem[]): TableItem[] => tableItems.map(d => ({
             ...d,
-            project_id: state.projects[d.project_id]?.label || d.project_id,
+            project_id: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'No Project',
         }));
 
         /* api */

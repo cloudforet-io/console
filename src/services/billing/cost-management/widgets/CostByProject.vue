@@ -160,7 +160,7 @@ export default {
                 state.data = rawData.map(d => ({
                     projectId: d.project_id,
                     cost: currencyMoneyFormatter(d.usd_cost, props.currency, props.currencyRates, false, 10000000),
-                    projectName: d.project_id ? state.projects[d.project_id]?.label || d.project_id : 'No Project',
+                    projectName: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'No Project',
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);
