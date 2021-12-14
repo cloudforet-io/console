@@ -19,6 +19,9 @@
             <span v-else-if="field.name === GROUP_BY.REGION">
                 {{ regions[value] ? regions[value].name : value }}
             </span>
+            <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT">
+                {{ serviceAccounts[value] ? serviceAccounts[value].name : value }}
+            </span>
             <span v-else-if="typeof value !== 'string'" class="text-center">
                 <p-anchor :to="value ? getLink(item) : undefined" target="_self"
                           :show-icon="false"
@@ -79,6 +82,7 @@ export default {
             projects: computed(() => store.state.resource.project.items),
             providers: computed(() => store.state.resource.provider.items),
             regions: computed(() => store.state.resource.region.items),
+            serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
             //
             granularity: computed(() => store.state.service.costAnalysis.granularity),
             period: computed(() => store.state.service.costAnalysis.period),
