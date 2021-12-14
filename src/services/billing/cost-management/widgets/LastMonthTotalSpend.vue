@@ -161,7 +161,7 @@ export default {
                     filter: [],
                     pivot_type: 'CHART',
                     start: state.firstMonth.format('YYYY-MM'),
-                    end: state.thisMonth.format('YYYY-MM'),
+                    end: state.thisMonth.endOf('month').format('YYYY-MM-DD'),
                     page: {
                         limit: 12,
                     },

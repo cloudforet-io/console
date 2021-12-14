@@ -174,12 +174,12 @@ export default defineComponent<WidgetProps>({
             sliceTemplate.clickable = false;
             sliceTemplate.properties.hoverable = false;
             sliceTemplate.states.getKey('hover').properties.scale = 1;
-            // sliceTemplate.propertyFields.fill = 'color';
+            sliceTemplate.propertyFields.fill = 'color';
             sliceTemplate.tooltipText = '{category}: $ {value}';
-            sliceTemplate.adapter.add('fill', (fill, target) => {
-                if (target.dataItem.category === 'dummy') return am4core.color(gray[100]);
-                return fill;
-            });
+            // sliceTemplate.adapter.add('fill', (fill, target) => {
+            //     if (target.dataItem.category === 'dummy') return am4core.color(gray[100]);
+            //     return fill;
+            // });
 
             if (isChartItemExists) {
                 series.tooltip.disabled = false;
@@ -223,8 +223,8 @@ export default defineComponent<WidgetProps>({
                     include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
                     group_by: [GROUP_BY.PROVIDER],
-                    start: props.period?.start,
-                    end: dayjs.utc(props.period?.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
+                    start: dayjs.utc(props.period?.start).format('YYYY-MM-DD'),
+                    end: dayjs.utc(props.period?.end).endOf('month').format('YYYY-MM-DD'),
                     page: {
                         start: 1,
                         limit: 15,

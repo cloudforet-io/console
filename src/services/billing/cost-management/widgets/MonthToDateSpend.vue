@@ -123,7 +123,7 @@ export default {
 
         const getCurrentMonthChartData = async () => {
             const start = state.currentMonth.startOf('month');
-            const end = state.currentMonth.add(1, 'month').startOf('month');
+            const end = state.currentMonth.endOf('month');
             state.currentMonthCost = await getData(start, end);
         };
 

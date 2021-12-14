@@ -224,7 +224,7 @@ export default defineComponent<Props>({
         };
         const _getApiPeriod = (period: Period): Period => ({
             start: dayjs(period.end).subtract(5, 'month').format('YYYY-MM'),
-            end: dayjs.utc(period.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
+            end: dayjs.utc(period.end).endOf('month').format('YYYY-MM-DD'),
         });
         const _getConvertedTableItems = (rawData, groupBy): TableItem[] => {
             const tableItems = getTableDataFromRawData(rawData, [groupBy]) as TableItem[];

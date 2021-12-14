@@ -153,8 +153,8 @@ export default {
                     include_budget_count: false,
                     include_budget_info: true,
                     group_by: ['budget_id'],
-                    start: dayjs.utc(period.start).format('YYYY-MM'),
-                    end: dayjs.utc(period.end).format('YYYY-MM'),
+                    start: dayjs.utc(period.start).endOf('month').format('YYYY-MM'),
+                    end: dayjs.utc(period.end).endOf('month').format('YYYY-MM'),
                     sort: {
                         key: 'usd_cost',
                         desc: true,

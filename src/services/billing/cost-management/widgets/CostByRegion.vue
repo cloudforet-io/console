@@ -11,9 +11,9 @@
                         <p-skeleton width="100%" height="50%" />
                     </template>
                     <div ref="chartRef" class="chart" />
-                    <!--                    <div v-for="(item) in chartLegends" :key="item" class="circle-wrapper">-->
-                    <!--                        <p v-if="providers" class="circle" :style="{background: providers[item].color}" /><span>{{ providers[item].label || '' }}</span>-->
-                    <!--                    </div>-->
+                    <div v-for="(item) in chartLegends" :key="item" class="circle-wrapper">
+                        <p v-if="providers" class="circle" :style="{background: providers[item].color}" /><span>{{ providers[item].label || '' }}</span>
+                    </div>
                 </p-chart-loader>
                 <cost-dashboard-data-table
                     :fields="tableState.fields"
@@ -27,12 +27,12 @@
                     :currency="currency"
                     class="table"
                 >
-                    <!--                    <template #provider-format="item">-->
-                    <!--                        <span v-if="item.value && providers"-->
-                    <!--                              :style="{color: providers[item.value].color}"-->
-                    <!--                        >{{ providers[item.value].label || '' }}-->
-                    <!--                        </span>-->
-                    <!--                    </template>-->
+                    <template #provider-format="item">
+                        <span v-if="item.value && providers"
+                              :style="{color: providers[item.value].color}"
+                        >{{ providers[item.value].label || '' }}
+                        </span>
+                    </template>
                 </cost-dashboard-data-table>
             </div>
         </template>
@@ -191,7 +191,7 @@ export default defineComponent<WidgetProps>({
             pieSeriesTemplate.dataFields.value = valueName;
             pieSeriesTemplate.labels.template.disabled = true;
             pieSeriesTemplate.ticks.template.disabled = true;
-            // pieSeriesTemplate.slices.template.propertyFields.fill = 'color';
+            pieSeriesTemplate.slices.template.propertyFields.fill = 'color';
 
             pieSeries.data = state.data;
         };
@@ -221,8 +221,8 @@ export default defineComponent<WidgetProps>({
                     include_usage_quantity: false,
                     granularity: 'ACCUMULATED',
                     group_by: ['provider', 'region_code'],
-                    start: props.period?.start,
-                    end: dayjs.utc(props.period?.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
+                    start: dayjs.utc(props.period?.start).format('YYYY-MM-DD'),
+                    end: dayjs.utc(props.period?.end).endOf('month').format('YYYY-MM-DD'),
                     page: {
                         limit: 15,
                     },

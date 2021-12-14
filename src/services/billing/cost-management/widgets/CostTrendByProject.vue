@@ -222,7 +222,7 @@ export default {
         };
         const _getApiPeriod = (period: Period): Period => ({
             start: dayjs(period.end).subtract(5, 'month').format('YYYY-MM'),
-            end: dayjs.utc(period.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
+            end: dayjs.utc(period.end).endOf('month').format('YYYY-MM-DD'),
         });
         const _getConvertedTableItems = (tableItems: TableItem[]): TableItem[] => tableItems.map(d => ({
             ...d,
