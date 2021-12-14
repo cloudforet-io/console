@@ -1,3 +1,10 @@
+# [1.1.0-beta.205](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.204...v1.1.0-beta.205) (2021-12-14)
+
+
+### Bug Fixes
+
+* change default value of fetchOnInit in Tree ([#784](https://github.com/spaceone-dev/spaceone-design-system/issues/784)) ([c2689f9](https://github.com/spaceone-dev/spaceone-design-system/commit/c2689f90e571c3ffbbbc32fd4ccfd69258811485))
+
 # [1.1.0-beta.204](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.203...v1.1.0-beta.204) (2021-12-10)
 
 
