@@ -1,3 +1,10 @@
+# [1.1.0-beta.207](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.206...v1.1.0-beta.207) (2021-12-15)
+
+
+### Bug Fixes
+
+* add colIndex, rowIndex to slot props in data table and add slot description in story of data table ([#786](https://github.com/spaceone-dev/spaceone-design-system/issues/786)) ([5840f99](https://github.com/spaceone-dev/spaceone-design-system/commit/5840f99ae3925fde6913ba7897afebd5992f675c))
+
 # [1.1.0-beta.206](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.205...v1.1.0-beta.206) (2021-12-15)
 
 
