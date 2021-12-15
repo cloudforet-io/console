@@ -105,6 +105,33 @@ interface DataTableFieldType {
 
 
 
+cost management widgets
+
+- cost analysis dynamic widget -> cost dashboard > custom widget 에 쓰임
+- cost dashboard widgets. e.g. cost trend by product
+--> spaceone dashboard
+
+
+
+
+<br/>
+
+### Slots
+
+
+|Name|Description|Props|
+|--|--|--|
+|head|It replaces table head row.|fields(`DataTableFieldType[]`)|
+|th-{field.name}|It replaces th cell corresponding to `field.name`.|field(`DataTableFieldType`), sortable(`boolean`), colIndex(`number`), index(`number`. will be DEPRECATED)|
+|th-{field.name}-format|It replaces the table head cell corresponding to `field.name` while keeping the style.|field(`DataTableFieldType`), sortable(`boolean`), colIndex(`number`), index(`number`. will be DEPRECATED)|
+|no-data|It replaces what is displayed in the no data case.|fields(`DataTableFieldType[]`)|
+|no-data-format|It replaces what is displayed in the no data case while keeping the style.|fields(`DataTableFieldType[]`)|
+|body|It replaces table body.|fields(`DataTableFieldType[]`)|
+|col-{colIndex}-format|It replaces table body cells corresponding to `colIndex` while keeping the style.|item(`props.items[colIndex]`), rowIndex(`number`), field(`DataTableFieldType`), value(Display value calculated through field and item), colIndex(`number`), index(`number`. the same with rowIndex. will be DEPRECATED)|
+|col-{field.name}-format|It replaces table body cells corresponding to `field.name` while keeping the style.|item(`props.items[colIndex]`), rowIndex(`number`), field(`DataTableFieldType`), value(Display value calculated through field and item), colIndex(`number`), index(`number`. the same with rowIndex. will be DEPRECATED)|
+|col-format|It replaces table body cells while keeping the style.|item(`props.items[colIndex]`), rowIndex(`number`), field(`DataTableFieldType`), value(Display value calculated through field and item), colIndex(`number`), index(`number`. the same with rowIndex. will be DEPRECATED)|
+
+
 <br/>
 
 ### Events and Handler Arguments

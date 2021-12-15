@@ -17,17 +17,17 @@
                                              @change="onSelectAllToggle"
                                 />
                             </th>
-                            <th v-for="(field, index) in fieldsData"
-                                :key="`th-${contextKey}-${index}`"
+                            <th v-for="(field, colIndex) in fieldsData"
+                                :key="`th-${contextKey}-${colIndex}`"
                                 :style="{
                                     minWidth: field.width || undefined,
                                     width: field.width || undefined,
                                 }"
                                 :class="{'fix-width': colCopy}"
-                                @click="onTheadClick(field, index, $event)"
+                                @click="onTheadClick(field, colIndex, $event)"
                             >
                                 <slot :name="`th-${field.name}`"
-                                      v-bind="getHeadSlotProps(field, index)"
+                                      v-bind="getHeadSlotProps(field, colIndex)"
                                 >
                                     <span class="th-contents"
                                           :class="{
@@ -37,13 +37,13 @@
                                     >
                                         <span class="th-text">
                                             <slot :name="`th-${field.name}-format`"
-                                                  v-bind="getHeadSlotProps(field, index)"
+                                                  v-bind="getHeadSlotProps(field, colIndex)"
                                             >
                                                 {{ field.label ? field.label : field.name }}
                                             </slot>
                                             <p-copy-button v-if="colCopy"
                                                            copy-manually
-                                                           @copy="onClickColCopy(index)"
+                                                           @copy="onClickColCopy(colIndex)"
                                             />
                                         </span>
 
@@ -76,18 +76,18 @@
                         </div>
                         <tr :colspan="selectable ? fieldsData.length +1 : fieldsData.length" class="fake-row" />
                     </slot>
-                    <slot name="body" :items="items">
-                        <tr v-for="(item, index) in items"
-                            :key="`tr-${contextKey}-${index}`" :data-index="index"
+                    <slot name="body" :items="items" v-bind="getDefaultSlotProps()">
+                        <tr v-for="(item, rowIndex) in items"
+                            :key="`tr-${contextKey}-${rowIndex}`" :data-index="rowIndex"
                             class="fade-in"
                             :class="{
                                 ...(getRowClassNames && getRowClassNames()),
-                                'tr-selected': getSelectedState(item, index),
+                                'tr-selected': getSelectedState(item, rowIndex),
                                 'row-height-fixed': rowHeightFixed,
                                 'row-cursor-pointer': rowCursorPointer,
                                 'no-hover': disableHover,
                             } "
-                            @click.left="onRowLeftClick( item, index, $event )"
+                            @click.left="onRowLeftClick( item, rowIndex, $event )"
                         >
                             <td v-if="selectable"
                                 class="select-checkbox"
@@ -95,27 +95,27 @@
                             >
                                 <p-check-box v-if="multiSelect"
                                              v-model="proxyState.selectIndex"
-                                             :disabled="getRowSelectable ? getRowSelectable(item, index): false"
-                                             :value="index"
+                                             :disabled="getRowSelectable ? getRowSelectable(item, rowIndex): false"
+                                             :value="rowIndex"
                                 />
                                 <p-radio v-else
                                          :selected="proxyState.selectIndex[0]"
-                                         :disabled="getRowSelectable ? getRowSelectable(item, index): false"
-                                         :value="index"
+                                         :disabled="getRowSelectable ? getRowSelectable(item, rowIndex): false"
+                                         :value="rowIndex"
                                          @change="onChangeRadioSelect"
                                 />
                             </td>
-                            <td v-for="(field, i) in fieldsData"
-                                :key="`td-${contextKey}-${index}-${i}`"
+                            <td v-for="(field, colIndex) in fieldsData"
+                                :key="`td-${contextKey}-${rowIndex}-${colIndex}`"
                                 :class="{
                                     'has-width': !!field.width,
                                     [field.textAlign]: field.textAlign ? true : false,
                                 }"
                             >
-                                <slot name="col-format" v-bind="getColSlotProps(item, index, field)">
-                                    <slot :name="`col-${field.name}-format`" v-bind="getColSlotProps(item, index, field)">
-                                        <slot :name="`col-${i}-format`" v-bind="getColSlotProps(item, index, field)">
-                                            {{ getValue(item,field) }}
+                                <slot name="col-format" v-bind="getColSlotProps(item, field, colIndex, rowIndex)">
+                                    <slot :name="`col-${field.name}-format`" v-bind="getColSlotProps(item, field, colIndex, rowIndex)">
+                                        <slot :name="`col-${colIndex}-format`" v-bind="getColSlotProps(item, field, colIndex, rowIndex)">
+                                            {{ getValue(item, field) }}
                                         </slot>
                                     </slot>
                                 </slot>
@@ -294,12 +294,12 @@ export default defineComponent<DataTableProps>({
             fields: state.fieldsData,
         });
 
-        const getHeadSlotProps = (field, index) => ({
-            field, index, sortable: props.sortable,
+        const getHeadSlotProps = (field, colIndex) => ({
+            field, index: colIndex, sortable: props.sortable, colIndex,
         });
 
-        const getColSlotProps = (item, index, field) => ({
-            item, index, field, value: getValue(item, field),
+        const getColSlotProps = (item, field, colIndex, rowIndex) => ({
+            item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
         });
 
         const getSelectedState = (item, index) => {
