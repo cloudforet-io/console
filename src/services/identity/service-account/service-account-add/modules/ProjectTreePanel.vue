@@ -47,6 +47,7 @@
                             :data-setter="dataSetter"
                             :data-getter="dataGetter"
                             :data-fetcher="dataFetcher"
+                            fetch-on-init
                             @init="onTreeInit"
                             @change-select="onChangeSelect"
                     >

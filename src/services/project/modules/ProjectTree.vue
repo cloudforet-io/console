@@ -31,6 +31,7 @@
                         :toggle-options="{disabled: true}"
                         :edit-options="{disabled: true}"
                         :drag-options="{disabled: true}"
+                        fetch-on-init
                         @init="onAllProjectTreeInit"
                         @change-select="onAllProjectChangeSelect"
                 >
@@ -49,7 +50,6 @@
                         :data-getter="dataGetter"
                         :data-fetcher="dataFetcher"
                         :get-class-names="getClassNames"
-                        :fetch-on-init="false"
                         @init="onTreeInit"
                         @finish-edit="onFinishEdit"
                         @start-drag="onStartDrag"

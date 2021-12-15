@@ -53,7 +53,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -172,7 +172,6 @@ export default {
         };
         const dataGetter = node => node.data.name;
         const dataFetcher = async (node): Promise<ProjectGroup[]> => {
-            if (!node) state.loading = true;
             try {
                 const params: any = {
                     sort: { key: 'name', desc: false },
@@ -190,8 +189,6 @@ export default {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
-            } finally {
-                if (state.loading) state.loading = false;
             }
         };
 
@@ -200,11 +197,13 @@ export default {
         const handleTreeInit = async (root) => {
             state.root = root;
 
+            state.loading = true;
             if (props.selectedProjectIds.length) {
                 await findNodes();
             } else {
                 await root.fetchData();
             }
+            state.loading = false;
         };
 
         const handleTreeChangeSelect = (selected: ProjectTreeItem[]) => {
@@ -235,6 +234,12 @@ export default {
             if (!value) emit('close');
         };
 
+        /* Watchers */
+        watch(() => props.selectedProjectIds, (selectedProjectIds) => {
+            if (selectedProjectIds !== state._selectedProjectIds) {
+                findNodes();
+            }
+        });
 
         return {
             ...toRefs(state),
