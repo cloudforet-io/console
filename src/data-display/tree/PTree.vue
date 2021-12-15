@@ -27,6 +27,7 @@
                         <slot name="toggle" v-bind="{node, path, selected: getSelectState(path)}">
                             <p-i v-if="node.loading" name="ic_working"
                                  width="1rem" height="1rem"
+                                 animation="spin"
                             />
                             <p-i v-else-if="!toggleOptions.validator || (toggleOptions.validator && toggleOptions.validator(node))"
                                  :name="node.$folded ? 'ic_tree_arrow' : 'ic_tree_arrow--opened'"
@@ -239,8 +240,10 @@ export default defineComponent<Props>({
             // single select
             if (value) {
                 if (state.selectedItems[0]) state.selectedItems[0].node.$nodeBackClass = '';
-                state.selectedItems = [targetItems[0]];
-                targetItems[0].node.$nodeBackClass = 'selected';
+                if (targetItems[0]) {
+                    state.selectedItems = [targetItems[0]];
+                    targetItems[0].node.$nodeBackClass = 'selected';
+                }
             } else {
                 resetSelect();
             }
@@ -351,7 +354,9 @@ export default defineComponent<Props>({
                         });
                     }
                 }
-            } else if (props.toggleOptions.removeChildrenOnFold || !node.children.length) await fetchData(node);
+            } else if (props.toggleOptions.removeChildrenOnFold || !node.children.length) {
+                await fetchData(node);
+            }
         };
 
         const onToggle = async (node: TreeNode, path: number[], tree: HeTree) => {
