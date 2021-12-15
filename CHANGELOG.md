@@ -1,3 +1,10 @@
+# [1.1.0-beta.206](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.205...v1.1.0-beta.206) (2021-12-15)
+
+
+### Bug Fixes
+
+* single select unselect case bug ([#785](https://github.com/spaceone-dev/spaceone-design-system/issues/785)) ([3e5e572](https://github.com/spaceone-dev/spaceone-design-system/commit/3e5e5722a5baa9bbab4b6637bf6e435dbd80d407))
+
 # [1.1.0-beta.205](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.204...v1.1.0-beta.205) (2021-12-14)
 
 
