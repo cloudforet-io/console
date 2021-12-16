@@ -32,19 +32,6 @@ export const replaceUrlQuery = async (key?: string, value?: RouteQueryString) =>
     } catch (e) {}
 };
 
-/**
- * @param queryString
- * @description convert url query string to string array. will be DEPRECATED.
- */
-export const queryStringToStringArray = (queryString: RouteQueryString): string[] => {
-    if (queryString === undefined || queryString === null) return [];
-    if (typeof queryString === 'string') return [queryString];
-    return queryString.reduce((res, d) => {
-        if (d !== null) res.push(d);
-        return res;
-    }, [] as string[]);
-};
-
 
 /** QueryString to Value Converter Helpers */
 

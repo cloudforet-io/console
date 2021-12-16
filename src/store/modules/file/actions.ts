@@ -9,7 +9,7 @@ interface HeaderMessage {
     title: string;
 }
 
-interface ExcelPayload {
+export interface ExcelPayload {
     url: string;
     param: any;
     fields: ExcelDataField[];

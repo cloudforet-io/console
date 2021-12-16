@@ -269,7 +269,7 @@ interface SidebarItemType {
 }
 
 export default {
-    name: 'CloudServicePage',
+    name: 'CloudServiceDetailPage',
     components: {
         CustomFieldModal,
         ServerMain,

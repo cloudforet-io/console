@@ -1,89 +1,16 @@
 <template>
     <p-vertical-page-layout>
-        <template #sidebar="{width}">
-            <div :style="{width}">
-                <p class="sidebar-title">
-                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES') }} <span class="count">({{ favoriteItems.length }})</span>
-                </p>
-                <p-divider class="sidebar-divider" />
-                <favorite-list :items="favoriteItems" class="favorite-list" @delete="onFavoriteDelete">
-                    <template #icon="{item}">
-                        <p-lazy-img :src="item.icon || ''"
-                                    error-icon="ic_provider_other"
-                                    :alt="item.name" width="1rem" height="1rem"
-                                    class="icon"
-                        />
-                    </template>
-                </favorite-list>
-                <p class="sidebar-title">
-                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') }}
-                </p>
-                <p-divider class="sidebar-divider" />
-                <p-radio v-for="provider in providerState.items"
-                         :key="provider.provider"
-                         v-model="selectedProvider"
-                         :value="provider.provider"
-                         class="provider-wrapper"
-                >
-                    <template #radio-left>
-                        <p-lazy-img :src="provider.icon || ''"
-                                    error-icon="ic_provider_other"
-                                    :alt="provider.provider"
-                                    width="1.5rem" height="1.5rem"
-                        />
-                        <span class="provider-name">{{ provider.label }}</span>
-                    </template>
-                </p-radio>
-                <p class="sidebar-title">
-                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY') }}
-                </p>
-                <p-divider class="sidebar-divider" />
-                <div v-for="(checked, service) in filterState.serviceCategories" :key="service"
-                     :class="{selected: checked}"
-                     class="service-categories"
-                >
-                    <p-check-box :selected="filterState.serviceFilter" :value="service"
-                                 @change="onClickService(service, ...arguments)"
-                    >
-                        <span class="service">{{ service }}</span>
-                    </p-check-box>
-                </div>
-                <p id="region-title">
-                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.REGION') }}
-                </p>
-                <p-divider class="sidebar-divider" />
-                <div v-if="filterState.regionList.length === 0">
-                    <p class="no-region">
-                        {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.NO_REGION') }}
-                    </p>
-                </div>
-                <div v-for="(region, idx) in filterState.regionList" :key="idx"
-                     class="region-list"
-                >
-                    <p-check-box :selected="filterState.regionFilter" :value="region.region_code"
-                                 class="flex" @change="onClickRegion"
-                    >
-                        <span class="region-list-text">
-                            <div class="region-type">
-                                <span class="region-provider"
-                                      :style="{color: providers[region.provider] ? providers[region.provider].color : undefined}"
-                                >
-                                    {{ providers[region.provider] ? providers[region.provider].label : region.provider }}
-                                </span>
-                                {{ region.name }}
-                            </div>
-                            <span class="region-code">{{ region.region_code }} </span>
-                        </span>
-                    </p-check-box>
-                </div>
-            </div>
+        <template #sidebar>
+            <cloud-service-menu />
         </template>
         <template #default>
             <div class="page-wrapper">
                 <div class="page-navigation">
-                    <p-breadcrumbs :routes="route" />
+                    <p-breadcrumbs :routes="routeState.route" />
                 </div>
-                <p-page-title :title="selectedProviderName" use-total-count :total-count="totalCount"
+                <p-page-title :title="providers[selectedProvider] ? providers[selectedProvider].name : selectedProvider"
+                              use-total-count
+                              :total-count="totalCount"
                               class="page-title"
                 />
                 <p-divider class="cloud-service-divider" />
@@ -95,20 +22,14 @@
                            :query-tags="tags"
                            :key-item-sets="keyItemSets"
                            :value-handler-map="valueHandlerMap"
-                           @change="onChange"
-                           @refresh="onChange"
-                           @export="exportDataToExcel"
-                >
-                    <template #left-area>
-                        <p-check-box v-model="filterState.isPrimary">
-                            <span class="show-all">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_MAJOR') }}</span>
-                        </p-check-box>
-                    </template>
-                </p-toolbox>
+                           @change="handleChange"
+                           @refresh="handleChange()"
+                           @export="handleExport"
+                />
                 <p-data-loader class="flex-grow" :data="items" :loading="loading">
                     <div class="cloud-service-type-wrapper">
                         <div v-for="(item, i) in items" :key="i" class="cloud-service-type-item">
-                            <router-link :to="getToCloudService(item)"
+                            <router-link :to="getCloudServiceDetailLink(item)"
                                          class="item-wrapper"
                             >
                                 <div class="provider-title-wrapper">
@@ -130,18 +51,7 @@
                                     <span class="service-group">{{ item.cloud_service_group }}</span>
                                 </div>
                                 <div class="service-type-list">
-                                    <!--                                    <router-link v-for="service in item.cloud_services"-->
-                                    <!--                                                 :to="getToCloudService({-->
-                                    <!--                                                     provider: item.provider,-->
-                                    <!--                                                     group: item.cloud_service_group,-->
-                                    <!--                                                     name: service.cloud_service_type,-->
-                                    <!--                                                 })"-->
-                                    <!--                                                 class="service-type-item"-->
-                                    <!--                                    >-->
-                                    <!--                                        <span class="service-type-name">{{ service.cloud_service_type }}</span>-->
-                                    <!--                                        <span class="service-type-count">{{ service.count }}</span>-->
-                                    <!--                                    </router-link>-->
-                                    <router-link :to="getToCloudService(item)"
+                                    <router-link :to="getCloudServiceDetailLink(item)"
                                                  class="service-type-item"
                                     >
                                         <span class="service-type-name">{{ item.cloud_service_type }}</span>
@@ -167,121 +77,75 @@
                         </div>
                     </template>
                 </p-data-loader>
-
-                <div class="pagination">
-                    <p-pagination :total-count="totalCount"
-                                  :this-page.sync="thisPage"
-                                  :page-size.sync="pageSize"
-                                  @change="onPaginationChange"
-                    />
-                </div>
             </div>
         </template>
     </p-vertical-page-layout>
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { Location } from 'vue-router';
-import {
-    zipObject, debounce, range,
-} from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 
 import {
-    ComponentRenderProxy, Ref,
-    computed, reactive, ref, toRefs, watch,
-    getCurrentInstance,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
-    PPageTitle, PPagination, PLazyImg, PCheckBox,
-    PIconTextButton, PBreadcrumbs, PRadio, PDivider, PToolbox, PDataLoader,
+    PBreadcrumbs, PDataLoader, PDivider, PIconTextButton,
+    PLazyImg, PPageTitle, PToolbox,
 } from '@spaceone/design-system';
 
 import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
+import CloudServiceMenu from '@/services/inventory/cloud-service/modules/CloudServiceMenu.vue';
 
 import {
     dynamicFieldsToExcelDataFields,
     makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-util/dynamic-layout';
-import { getPageStart, getThisPage } from '@spaceone/console-core-lib/component-util/pagination';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import {
-    queryStringToStringArray, replaceUrlQuery,
+    arrayToQueryString, primitiveToQueryString, queryStringToArray,
     RouteQueryString,
 } from '@/lib/router-query-string';
-import { Tags, TimeStamp } from '@/models';
-import { store } from '@/store';
-import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
-import { FavoriteItem } from '@/store/modules/favorite/type';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+
+import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
-import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { SpaceRouter } from '@/router';
+import { i18n } from '@/translations';
+import { store } from '@/store';
+import { ExcelDataField } from '@/store/modules/file/type';
+import { ExcelPayload } from '@/store/modules/file/actions';
+import { registerServiceStore } from '@/common/composables/register-service-store';
+import { CloudServiceStoreState } from '@/services/inventory/cloud-service/store/type';
+import cloudServiceStoreModule from '@/services/inventory/cloud-service/store';
 
-
-interface RegionModel extends Tags {
-    region_id: string;
-    state: string;
-    name: string;
-    created_at: TimeStamp;
-    domain_id: string;
-    deleted_at: TimeStamp;
-    region_code: string;
-    provider: string;
-    collection_info: object;
-}
 
 export default {
     name: 'CloudServiceType',
     components: {
-        FavoriteList,
-        PLazyImg,
-        PPagination,
-        PDivider,
-        PRadio,
-        PIconTextButton,
         PVerticalPageLayout,
+        CloudServiceMenu,
+        PLazyImg,
+        PDivider,
+        PIconTextButton,
         PPageTitle,
         PBreadcrumbs,
-        PCheckBox,
         PToolbox,
         PDataLoader,
     },
-    setup() {
+    setup(props, { root }) {
+        registerServiceStore<CloudServiceStoreState>('cloudService', cloudServiceStoreModule);
+
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
-
-        const selectedProvider: Ref<string> = ref('all');
-
-        const providerState = reactive({
-            items: computed(() => [
-                {
-                    provider: 'all', icon: '', color: '', label: 'All', name: 'All',
-                },
-                ...Object.keys(store.state.resource.provider.items).map(k => ({
-                    provider: k,
-                    ...store.state.resource.provider.items[k],
-                })),
-            ]),
-        });
-        const selectedProviderName = computed(() => store.state.resource.provider.items[selectedProvider.value]?.name || selectedProvider.value);
-        const filterState = reactive({
-            serviceCategories: zipObject([
-                'Compute', 'Container', 'Database', 'Networking', 'Storage', 'Security', 'Analytics', 'Application Integration', 'Management',
-            ], new Array(9).fill(false)),
-            serviceFilter: [] as string[],
-            regionList: [] as RegionModel[],
-            selectedRegionIdx: [] as number[],
-            regionFilter: [] as string[],
-            isPrimary: true,
-        });
         const handlers = makeQuerySearchPropsWithSearchSchema(
             [{
                 title: 'Properties',
@@ -296,81 +160,52 @@ export default {
             'inventory.CloudService',
         );
 
-        const excelFields = [
-            { key: 'provider', name: 'Provider' },
-            { key: 'cloud_service_type', name: 'Cloud Service Type' },
-            { key: 'cloud_service_group', name: 'Cloud Service Group' },
-            { key: 'count', name: 'Count' },
-        ];
-
         const state = reactive({
-            items: undefined as any,
-            itemsForExport: undefined as any,
-            providerName: 'All',
+            providers: computed(() => store.state.resource.provider.items),
+            serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
+            favoriteItems: computed(() => store.getters['favorite/cloudServiceType/sortedItems']),
+            //
             loading: true,
+            selectedProvider: computed(() => store.state.service.cloudService.selectedProvider),
+            selectedCategories: computed(() => store.state.service.cloudService.selectedCategories),
+            selectedRegions: computed(() => store.state.service.cloudService.selectedRegions),
+            //
+            items: undefined as any,
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
             tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             thisPage: 1,
             pageSize: 24,
             totalCount: 0,
-            providers: computed(() => vm.$store.state.resource.provider.items),
-            serviceAccounts: computed(() => vm.$store.state.resource.serviceAccount.items),
-            favoriteItems: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
+            filters: computed<QueryStoreFilter[]>(() => {
+                const filters: QueryStoreFilter[] = [];
+                if (state.selectedProvider !== 'all') {
+                    filters.push({ k: 'provider', v: state.selectedProvider, o: '=' });
+                } if (state.selectedRegions.length) {
+                    filters.push({ k: 'region_code', v: state.selectedRegions, o: '=' });
+                }
+                return filters;
+            }),
         });
 
-        const onFavoriteDelete = (item: FavoriteItem) => {
-            vm.$store.dispatch('favorite/cloudServiceType/removeItem', item);
-        };
+        const routeState = reactive({
+            route: computed(() => ([
+                { name: i18n.t('MENU.INVENTORY.INVENTORY'), path: '/inventory' },
+                { name: i18n.t('MENU.INVENTORY.CLOUD_SERVICE') },
+            ])),
+        });
 
-        const regionApiQuery = new ApiQueryHelper().setOnly('region_code', 'provider', 'name').setSort('provider');
-        const getRegionQuery = (value?: string) => {
-            if (value) {
-                regionApiQuery.setFilters([{
-                    k: 'provider',
-                    v: value,
-                    o: '=',
-                }]);
-            } else regionApiQuery.setFilters([]);
-
-            return regionApiQuery.data;
-        };
-
-        const listRegionByProvider = async (selectedProviderValue) => {
-            try {
-                const res = await SpaceConnector.client.inventory.region.list({
-                    query: getRegionQuery(selectedProviderValue === 'all' ? undefined : selectedProviderValue),
-                });
-
-                // filtering region filter
-                const regionMap = zipObject(res.results.map(d => d.region_code), res.results);
-                filterState.regionFilter = filterState.regionFilter.filter(d => regionMap[d]);
-
-                filterState.regionList = res.results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-        const onClickService = async (region, res) => {
-            filterState.serviceFilter = res;
-        };
-        const onClickRegion = async (val) => {
-            filterState.regionFilter = val;
-        };
-
-        /**
-         * Card click event
-         * */
-        const cardQueryHelper = new QueryHelper();
-        const getToCloudService = (item) => {
+        /* util */
+        const cloudServiceDetailQueryHelper = new QueryHelper();
+        const getCloudServiceDetailLink = (item) => {
             const searchFilters = queryHelper.filters;
-            cardQueryHelper.setFilters(searchFilters.filter((f: any) => f.k && ![
+            cloudServiceDetailQueryHelper.setFilters(searchFilters.filter((f: any) => f.k && ![
                 'cloud_service_type',
                 'cloud_service_group',
             ].includes(f.k)));
 
-            if (filterState.regionFilter.length > 0) {
-                cardQueryHelper.addFilter({ k: 'region_code', o: '=', v: filterState.regionFilter });
+            if (state.selectedRegions.length) {
+                cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: state.selectedRegions });
             }
 
             const res: Location = {
@@ -381,72 +216,31 @@ export default {
                     name: item.cloud_service_type,
                 },
                 query: {
-                    filters: cardQueryHelper.rawQueryStrings,
+                    filters: cloudServiceDetailQueryHelper.rawQueryStrings,
                 },
             };
             return res;
         };
 
-        const sidebarQueryHelper = new QueryHelper();
-        const sidebarFilters = computed<{filters: QueryStoreFilter[]; labels: string[]}>(() => {
-            sidebarQueryHelper.setFilters([]);
-            if (selectedProvider.value !== 'all') {
-                sidebarQueryHelper.addFilter({ k: 'provider', v: selectedProvider.value, o: '=' });
-            }
-            if (filterState.regionFilter.length > 0) {
-                sidebarQueryHelper.addFilter({ k: 'region_code', v: filterState.regionFilter, o: '=' });
-            }
-
-            const res = {
-                filters: sidebarQueryHelper.filters,
-                labels: [] as string[],
-            };
-            if (filterState.serviceFilter.length > 0) {
-                res.labels = filterState.serviceFilter;
-            }
-            return res;
-        });
-
-        const apiQuery = new ApiQueryHelper();
-        const getParams = (isTriggeredBySideFilter = false, exportable = false) => {
-            const { filters, labels } = sidebarFilters.value;
-
-            if (!exportable) {
-                apiQuery.setPageLimit(state.pageSize)
-                    .setFilters(filters)
-                    .addFilter(...queryHelper.filters)
-                    .setSort('count', true);
-
-                if (isTriggeredBySideFilter) state.thisPage = 1;
-                else apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize));
-            } else {
-                apiQuery.setPageLimit(0)
-                    .setFilters(filters)
-                    .addFilter(...queryHelper.filters)
-                    .setSort('count', true);
-            }
-
-            return {
-                is_primary: filterState.isPrimary,
-                labels,
-                query: apiQuery.data,
-            };
-        };
-
-        // ajax request
+        /* api */
+        const cloudServiceApiQueryHelper = new ApiQueryHelper()
+            .setPageStart(1).setPageLimit(state.pageSize)
+            .setSort('count', true);
         let listCloudServiceRequest: CancelTokenSource | undefined;
-        const listCloudServiceType = async (isTriggeredBySideFilter = false) => {
-            // if request is already exist, cancel the request
+        const listCloudServiceType = async () => {
             if (listCloudServiceRequest) {
                 listCloudServiceRequest.cancel('Next request has been called.');
                 listCloudServiceRequest = undefined;
             }
-            // create a new token for upcoming request (overwrite the previous one)
             listCloudServiceRequest = axios.CancelToken.source();
-            state.loading = true;
             try {
+                state.loading = true;
+                cloudServiceApiQueryHelper.setFilters(state.filters).addFilter(...queryHelper.filters);
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(
-                    getParams(isTriggeredBySideFilter),
+                    {
+                        labels: state.selectedCategories,
+                        query: cloudServiceApiQueryHelper.data,
+                    },
                     { cancelToken: listCloudServiceRequest.token },
                 );
                 state.items = res.results;
@@ -464,46 +258,29 @@ export default {
             }
         };
 
-        watch(() => sidebarFilters.value, async (after, before) => {
-            if (after !== before) {
-                await listCloudServiceType(true);
-                await replaceUrlQuery('provider', selectedProvider.value);
-                await replaceUrlQuery('region', filterState.regionFilter);
-                await replaceUrlQuery('service', filterState.serviceFilter);
+        /* excel */
+        const cloudServiceResourcesApiQueryHelper = new ApiQueryHelper()
+            .setPageLimit(0).setPageStart(1)
+            .setSort('count', true);
+        const getCloudServiceResources = async () => {
+            try {
+                cloudServiceResourcesApiQueryHelper
+                    .setFilters(state.filters)
+                    .addFilter(...queryHelper.filters);
+                const { results } = await SpaceConnector.client.statistics.topic.cloudServiceResources(
+                    {
+                        labels: state.selectedCategories,
+                        query: cloudServiceResourcesApiQueryHelper.data,
+                    },
+                );
+                return results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return [];
             }
-        }, { immediate: false });
-
-        watch<boolean, boolean>(() => filterState.isPrimary, async (after, before) => {
-            if (after !== before) {
-                await listCloudServiceType();
-                await replaceUrlQuery('primary', filterState.isPrimary.toString());
-            }
-        }, { immediate: false });
-
-        const changeQueryString = async (options) => {
-            queryHelper.setFiltersAsQueryTag(options.queryTags);
-            await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
         };
 
-        const onPaginationChange = async () => {
-            await listCloudServiceType();
-        };
-
-        const onChange = async (options: any) => {
-            if (options.queryTags !== undefined) {
-                state.tags = options.queryTags;
-                await changeQueryString(options);
-            }
-            if (options.pageLimit !== undefined) {
-                state.pageSize = options.pageLimit;
-            }
-            if (options.pageStart !== undefined) {
-                state.thisPage = getThisPage(options.pageStart, state.pageSize);
-            }
-            await listCloudServiceType();
-        };
-
-        const getSchema = async (data) => {
+        const getExcelFields = async (data): Promise<ExcelDataField[]> => {
             let schema: DynamicLayout;
             let excelField;
             if (data.resource_type === 'inventory.Server') {
@@ -538,173 +315,141 @@ export default {
             }
             return excelField;
         };
-
-        const excelApiQuery = new ApiQueryHelper();
-        const getQuery = (data, field) => {
-            const { filters } = sidebarFilters.value;
-            excelApiQuery
-                .setFilters(filters)
+        const excelApiQueryHelper = new ApiQueryHelper();
+        const getExcelQuery = (data, field) => {
+            excelApiQueryHelper
+                .setFilters(state.filters)
                 .addFilter({ k: 'provider', o: '=', v: data.provider })
                 .addFilter({ k: 'cloud_service_group', o: '=', v: data.cloud_service_group })
                 .addFilter({ k: 'cloud_service_type', o: '=', v: data.cloud_service_type })
                 .addFilter(...queryHelper.filters);
             const fields = field;
             if (fields) {
-                excelApiQuery.setOnly(...fields.map(d => d.key));
+                excelApiQueryHelper.setOnly(...fields.map(d => d.key));
             }
-            return excelApiQuery.data;
+            return excelApiQueryHelper.data;
         };
+        const getCloudServiceResourcesPayload = (): ExcelPayload => {
+            const excelFields = [
+                { key: 'provider', name: 'Provider', reference: { reference_key: 'provider', resource_type: 'identity.Provider' } },
+                { key: 'cloud_service_type', name: 'Cloud Service Type' },
+                { key: 'cloud_service_group', name: 'Cloud Service Group' },
+                { key: 'count', name: 'Count' },
+            ];
+            excelApiQueryHelper.setFilters([]);
+            return {
+                url: '/statistics/topic/cloud-service-resources',
+                param: {
+                    query: excelApiQueryHelper.data,
+                    labels: state.selectedCategories,
+                },
+                fields: excelFields,
+                sheet_name: 'Summary',
+                header_message: {
+                    title: 'Summary',
+                },
+                file_name_prefix: FILE_NAME_PREFIX.cloudService,
+            };
+        };
+        const getExcelPayloadList = async (): Promise<ExcelPayload[]> => {
+            const excelPayloadList: ExcelPayload[] = [];
+            const excelItems = await getCloudServiceResources();
+            const excelFieldList: Array<ExcelDataField[]> = await Promise.all(excelItems.map(d => getExcelFields(d)));
 
-
-        const getItemsForExport = async () => {
-            try {
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(
-                    getParams(false, true),
-                );
-                state.itemsForExport = res.results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-
-            const schemaList = await Promise.all(state.itemsForExport.map(d => getSchema(d)));
-            let excelList;
-            // eslint-disable-next-line prefer-const
-            excelList = schemaList.map((field, i) => {
-                const providerShortName = store.state.resource.provider.items[state.itemsForExport[i].provider]?.label;
-                let sheetName = `${i}.${providerShortName}.${state.itemsForExport[i].cloud_service_group}.${state.itemsForExport[i].cloud_service_type}`;
+            excelFieldList.forEach((excelField, idx) => {
+                const provider = excelItems[idx].provider;
+                const providerName = state.providers[provider]?.label || provider;
+                let sheetName = `${idx}.${providerName}.${excelItems[idx].cloud_service_group}.${excelItems[idx].cloud_service_type}`;
                 const headerMessage = {
-                    title: `[${providerShortName}] ${state.itemsForExport[i].cloud_service_group} ${state.itemsForExport[i].cloud_service_type}`,
+                    title: `[${providerName}] ${excelItems[idx].cloud_service_group} ${excelItems[idx].cloud_service_type}`,
                 };
                 if (sheetName.length > 30) sheetName = sheetName.substr(0, 30);
-                if (state.itemsForExport[i].resource_type === 'inventory.Server') {
-                    return {
-                        url: '/inventory/server/list',
-                        param: {
-                            query: getQuery(state.itemsForExport[i], field),
-                        },
-                        fields: field,
-                        sheet_name: sheetName,
-                        header_message: headerMessage,
-                    };
+
+                let excelApiUrl;
+                if (excelItems[idx].resource_type === 'inventory.Server') {
+                    excelApiUrl = '/inventory/server/list';
+                } else {
+                    excelApiUrl = '/inventory/cloud-service/list';
                 }
-                return {
-                    url: '/inventory/cloud-service/list',
+                excelPayloadList.push({
+                    url: excelApiUrl,
                     param: {
-                        query: getQuery(state.itemsForExport[i], field),
+                        query: getExcelQuery(excelItems[idx], excelField),
                     },
-                    fields: field,
+                    fields: excelField,
                     sheet_name: sheetName,
                     header_message: headerMessage,
-                };
+                });
             });
-            return excelList;
+            return excelPayloadList;
         };
-
-        const exportDataToExcel = async () => {
+        const handleExport = async () => {
             try {
-                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
-                const excelList = await getItemsForExport();
-                await store.dispatch('file/downloadExcel', [{
-                    url: '/statistics/topic/cloud-service-resources',
-                    param: {
-                        query: getParams(false, true).query,
-                        is_primary: getParams(false, true).is_primary,
-                        labels: getParams(false, true).labels,
-                    },
-                    fields: excelFields,
-                    sheet_name: 'Summary',
-                    header_message: {
-                        title: 'Summary',
-                    },
-                    file_name_prefix: FILE_NAME_PREFIX.cloudService,
-                }, ...excelList]);
+                showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', root);
+
+                const cloudServiceResourcesPayload = getCloudServiceResourcesPayload();
+                const excelPayloadList = await getExcelPayloadList();
+                await store.dispatch('file/downloadExcel', [
+                    cloudServiceResourcesPayload,
+                    ...excelPayloadList,
+                ]);
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         };
 
-
-        const routeState = reactive({
-            route: computed(() => ([
-                { name: vm.$t('MENU.INVENTORY.INVENTORY'), path: '/inventory' },
-                { name: vm.$t('MENU.INVENTORY.CLOUD_SERVICE') },
-            ])),
-        });
-
-        const checkProvider = async (queryStringForCheck): Promise<string> => {
-            let providerQueryString = queryStringForCheck;
-            const providerList = Object.keys(store.state.resource.provider.items);
-            if (!providerList.includes(queryStringForCheck)) {
-                providerQueryString = 'all';
-            }
-            return providerQueryString;
+        /* event */
+        const handleChange = async (options: any = {}) => {
+            setApiQueryWithToolboxOptions(cloudServiceApiQueryHelper, options, { queryTags: true });
+            await listCloudServiceType();
         };
 
-        const initProvider = async (): Promise<string> => {
-            let queryString: RouteQueryString = vm.$route.query.provider;
-            if (Array.isArray(queryString)) queryString = queryString[0];
-            if (providerState.items.length > 0) {
-                if (queryString) queryString = await checkProvider(queryString);
-            }
-            return queryString || 'all';
-        };
-
-        const initPrimary = async () => {
-            let queryString: RouteQueryString = vm.$route.query.primary;
-            if (typeof queryString === 'undefined' || !queryString) queryString = 'true';
-            return queryString as string;
-        };
-
-        /** Init */
+        /* Init */
         (async () => {
             await Promise.all([
-                vm.$store.dispatch('resource/provider/load'),
-                vm.$store.dispatch('resource/serviceAccount/load'),
-                vm.$store.dispatch('resource/cloudServiceType/load'),
-                vm.$store.dispatch('favorite/cloudServiceType/load'),
+                store.dispatch('resource/provider/load'),
+                store.dispatch('resource/serviceAccount/load'),
+                store.dispatch('resource/cloudServiceType/load'),
+                store.dispatch('favorite/cloudServiceType/load'),
             ]);
 
-            /* bring values from url */
-            const providerQueryString: string = await initProvider();
-            const primaryQueryString = await initPrimary();
-
             /* filter setting */
-            selectedProvider.value = providerQueryString;
-            filterState.serviceFilter = queryStringToStringArray(vm.$route.query.service);
-            filterState.regionFilter = queryStringToStringArray(vm.$route.query.region);
-            filterState.isPrimary = JSON.parse(primaryQueryString);
+            const currentQuery = SpaceRouter.router.currentRoute.query;
+            store.commit('service/cloudService/setSelectedRegions', queryStringToArray(currentQuery.region) || []);
+            store.commit('service/cloudService/setSelectedCategories', queryStringToArray(currentQuery.service) || []);
 
+            // init provider // todo: array로 넘어오는 경우 있음
+            let provider: RouteQueryString = currentQuery.provider;
+            if (Array.isArray(provider)) provider = provider[0];
+            if (!provider || !state.providers[provider]) provider = 'all';
+            store.commit('service/cloudService/setSelectedProvider', provider);
 
-            /* region list init */
-            watch<string, boolean>(() => selectedProvider.value, debounce((after) => {
-                if (!after) return;
-                if (after) {
-                    listRegionByProvider(after);
-                }
-            }, 50), { immediate: true });
-
-            /* cloud service type list init */
             await listCloudServiceType();
         })();
 
+        /* Watcher */
+        watch([() => state.selectedProvider, () => state.selectedCategories, () => state.selectedRegions], async () => {
+            const newQuery = {
+                provider: primitiveToQueryString(state.selectedProvider),
+                service: arrayToQueryString(state.selectedCategories),
+                region: arrayToQueryString(state.selectedRegions),
+            };
+            const currentQuery = SpaceRouter.router.currentRoute.query;
+            if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {
+                await SpaceRouter.router.replace({ query: newQuery });
+            }
+            state.thisPage = 1;
+            await listCloudServiceType();
+        }, { immediate: false });
+
 
         return {
-            filterState,
-            selectedProviderName,
-            listRegionByProvider,
-            onClickService,
-            onClickRegion,
-            ...toRefs(routeState),
             ...toRefs(state),
-            onFavoriteDelete,
-            selectedProvider,
-            providerState,
-            getToCloudService,
-            skeletons: range(5),
-            onPaginationChange,
-            onChange,
+            routeState,
             assetUrlConverter,
-            exportDataToExcel,
+            getCloudServiceDetailLink,
+            handleChange,
+            handleExport,
         };
     },
 };
@@ -712,111 +457,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.sidebar-title {
-    @apply text-gray-900 text-sm font-bold;
-    align-items: center;
-    padding-top: 2rem;
-    padding-left: 1rem;
-    .count {
-        font-weight: normal;
-    }
-}
-.favorite-list {
-    @apply px-4;
-}
-#region-title {
-    @apply text-gray-900 text-sm font-bold;
-    padding-top: 2.75rem;
-    padding-left: 1rem;
-}
-.sidebar-divider {
-    @apply w-full;
-    padding-left: 0;
-    margin-top: 0.4375rem;
-    margin-bottom: 0.75rem;
-}
-.provider-wrapper::v-deep {
-    display: flex;
-    min-height: 1.75rem;
-    align-items: center;
-    cursor: pointer;
-    margin: 0.25rem 0.75rem;
-    .p-lazy-img {
-        flex-shrink: 0;
-    }
-    .radio-icon {
-        flex-shrink: 0;
-    }
-    .provider-name {
-        display: inline-block;
-        margin-left: 0.5rem;
-        flex-grow: 1;
-        font-size: 0.875rem;
-        line-height: 1.5;
-    }
-    &:hover {
-        @apply bg-secondary2;
-        .provider-name {
-            @apply text-secondary;
-        }
-    }
-}
-.no-region {
-    @apply text-gray-400 text-sm;
-    padding-left: 1rem;
-    padding-bottom: 2.75rem;
-}
-.region-list {
-    display: flex;
-    padding-left: 0.75rem;
-    padding-right: 1.625rem;
-    margin-bottom: 0.75rem;
-    width: 100%;
-
-    .p-checkbox::v-deep {
-        .check-icon {
-            flex-shrink: 0;
-        }
-    }
-    &:last-of-type {
-        padding-bottom: 2.75rem;
-    }
-}
-.region-list-text {
-    @apply text-sm;
-    display: flex;
-    flex-direction: column;
-    .region-type {
-        padding-left: 0.25rem;
-    }
-    .region-provider {
-        @apply mr-1;
-    }
-    .region-code {
-        @apply text-gray-400;
-        padding-left: 0.25rem;
-    }
-    &:hover {
-        @apply text-secondary cursor-pointer;
-        .region-provider,
-        .region-code {
-            @apply text-secondary !important;
-        }
-    }
-}
-.service-categories {
-    @apply text-sm;
-    margin-left: 0.75rem;
-    padding-bottom: 0.5rem;
-    .service {
-        padding-left: 0.25rem;
-        &:hover {
-            @apply text-secondary cursor-pointer;
-        }
-    }
-}
-
-/* right contents */
 .page-wrapper {
     @apply flex flex-col w-full h-full;
 }
@@ -910,10 +550,5 @@ export default {
     .empty-cloud-service-img {
         @apply w-48 mx-auto pt-19 mb-8;
     }
-}
-.pagination {
-    text-align: center;
-    padding-top: 1.5rem;
-    bottom: 0;
 }
 </style>

@@ -17,7 +17,7 @@ export const INVENTORY_ROUTE = Object.freeze({
         SEARCH: { _NAME: 'cloudServiceSearch' },
         TYPE_SEARCH: { _NAME: 'cloudServiceTypeSearch' },
         NO_RESOURCE: { _NAME: 'noCloudService' },
-        DETAIL: { _NAME: 'cloudServicePage' },
+        DETAIL: { _NAME: 'cloudServiceDetail' },
     },
 });
 
