@@ -111,29 +111,43 @@
                             <router-link :to="getToCloudService(item)"
                                          class="item-wrapper"
                             >
-                                <p-lazy-img width="3rem" height="3rem"
-                                            :src="assetUrlConverter(item.icon) || (providers[item.provider] ? providers[item.provider].icon : '')"
-                                            error-icon="ic_provider_other"
-                                            :alt="item.name"
-                                            class="icon"
-                                />
-                                <div class="text-content">
-                                    <div class="title">
-                                        {{ item.cloud_service_group }}
-                                    </div>
-                                    <div class="sub-title">
-                                        <span class="sub-title-provider"> {{ providers[item.provider] ? providers[item.provider].label : item.provider }} </span>
-                                        <span class="sub-title-name">{{ item.cloud_service_type }}</span>
-                                        <span class="sub-title-count">
-                                            {{ item.count }}
-                                        </span>
-                                    </div>
+                                <div class="provider-title-wrapper">
+                                    <p-lazy-img width="1rem" height="1rem"
+                                                :src="providers[item.provider].icon"
+                                                error-icon="ic_provider_other"
+                                                :alt="item.name"
+                                                class="icon"
+                                    />
+                                    <span class="provider">{{ providers[item.provider] ? providers[item.provider].label : item.provider }}</span>
                                 </div>
-                                <favorite-button :item-id="item.cloud_service_type_id || ''"
-                                                 favorite-type="cloudServiceType"
-                                                 resource-type="inventory.CloudServiceType"
-                                                 class="favorite-btn"
-                                />
+                                <div class="service-group-wrapper">
+                                    <p-lazy-img width="1.5rem" height="1.5rem"
+                                                :src="assetUrlConverter(item.icon) || (providers[item.provider] ? providers[item.provider].icon : '')"
+                                                error-icon="ic_provider_other"
+                                                :alt="item.name"
+                                                class="icon"
+                                    />
+                                    <span class="service-group">{{ item.cloud_service_group }}</span>
+                                </div>
+                                <div class="service-type-list">
+                                    <!--                                    <router-link v-for="service in item.cloud_services"-->
+                                    <!--                                                 :to="getToCloudService({-->
+                                    <!--                                                     provider: item.provider,-->
+                                    <!--                                                     group: item.cloud_service_group,-->
+                                    <!--                                                     name: service.cloud_service_type,-->
+                                    <!--                                                 })"-->
+                                    <!--                                                 class="service-type-item"-->
+                                    <!--                                    >-->
+                                    <!--                                        <span class="service-type-name">{{ service.cloud_service_type }}</span>-->
+                                    <!--                                        <span class="service-type-count">{{ service.count }}</span>-->
+                                    <!--                                    </router-link>-->
+                                    <router-link :to="getToCloudService(item)"
+                                                 class="service-type-item"
+                                    >
+                                        <span class="service-type-name">{{ item.cloud_service_type }}</span>
+                                        <span class="service-type-count">{{ item.count }}</span>
+                                    </router-link>
+                                </div>
                             </router-link>
                         </div>
                     </div>
@@ -201,7 +215,6 @@ import {
 import { Tags, TimeStamp } from '@/models';
 import { store } from '@/store';
 import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
@@ -228,7 +241,6 @@ interface RegionModel extends Tags {
 export default {
     name: 'CloudServiceType',
     components: {
-        FavoriteButton,
         FavoriteList,
         PLazyImg,
         PPagination,
@@ -823,8 +835,8 @@ export default {
     gap: 1rem;
 }
 .cloud-service-type-item {
-    @apply px-6 bg-white border border-gray-200 rounded-lg;
-    height: 6rem;
+    @apply p-4 bg-white border border-gray-200 rounded-lg;
+    height: 9rem;
     filter: drop-shadow(0 2px 4px rgba(theme('colors.black'), 0.06));
     .favorite-btn {
         @apply ml-2;
@@ -841,35 +853,49 @@ export default {
         }
     }
     .item-wrapper {
-        @apply flex w-full h-full items-center;
+        @apply flex flex-col w-full h-full flex-wrap gap-2;
         .icon {
             @apply overflow-hidden flex-shrink-0 rounded-md;
         }
-        .text-content {
-            @apply ml-4 flex-grow overflow-hidden;
-            .title {
-                @apply mb-1 w-full truncate;
-                font-size: 1rem;
-                line-height: 1.4;
+        .provider-title-wrapper {
+            @apply flex flex-wrap gap-1 items-center;
+            margin: 0 0.5rem;
+
+            .provider {
+                @apply text-gray-700 text-sm;
+                line-height: 150%;
             }
-            .sub-title {
-                @apply w-full flex items-center;
-                font-size: 0.875rem;
-                line-height: 1.5;
+        }
+        .service-group-wrapper {
+            @apply flex flex-wrap gap-2 items-center;
+            padding: 0 0.5rem;
 
-                .sub-title-provider {
-                    @apply mr-2 text-gray-400;
-                    flex-shrink: 0;
+            .service-group {
+                @apply font-bold text-lg text-gray-900;
+            }
+        }
+        .service-type-list {
+            @apply flex flex-wrap flex-col-reverse;
+            height: 3rem;
+            gap: 0.125rem;
+            .service-type-item {
+                @apply flex justify-between rounded;
+                padding: 0.15rem 0.5rem;
+                .service-type-name {
+                    @apply text-sm text-gray-900;
+                }
+                .service-type-count {
+                    @apply text-gray-500;
                 }
 
-                .sub-title-name {
-                    @apply mr-2 inline-block truncate;
-                    flex-shrink: 1;
-                }
-
-                .sub-title-count {
-                    flex-shrink: 0;
-                    font-weight: bold;
+                &:hover {
+                    @apply bg-blue-200;
+                    .service-type-name {
+                        @apply text-blue-500 underline;
+                    }
+                    .service-type-count {
+                        @apply text-blue-500;
+                    }
                 }
             }
         }
