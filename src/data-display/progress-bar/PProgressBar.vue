@@ -1,5 +1,7 @@
 <template>
-    <div class="progress-bar">
+    <div class="progress-bar"
+         :class="size"
+    >
         <label v-if="label" class="label">{{ label }}</label>
         <div ref="backgroundBar" class="background-bar" />
         <transition appear @before-appear="beforeEnter" @after-appear="enter">
@@ -13,6 +15,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { ProgressBarProps } from '@/data-display/progress-bar/type';
+import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
 
 
 export default {
@@ -33,6 +36,13 @@ export default {
         gradient: {
             type: Object,
             default: undefined,
+        },
+        size: {
+            type: String,
+            default: PROGRESS_BAR_SIZE.md,
+            validate(size: any) {
+                return Object.values(PROGRESS_BAR_SIZE).includes(size);
+            },
         },
     },
     setup(props: ProgressBarProps) {
@@ -85,20 +95,38 @@ export default {
     }
 
     .background-bar {
-        @apply bg-gray-100 rounded-sm;
+        @apply bg-gray-100;
         width: 100%;
         overflow: hidden;
-        height: 0.375rem;
     }
 
     .tracker-bar {
-        @apply bg-primary rounded-sm;
+        @apply bg-primary;
         width: 0;
         max-width: 100%;
         overflow: hidden;
         transition: width 0.5s linear;
-        height: 0.375rem;
-        margin-top: -0.375rem;
+    }
+
+    @define-mixin progress-bar-size $height, $border-radius {
+        .background-bar,
+        .tracker-bar {
+            height: $height;
+            border-radius: $border-radius;
+        }
+        .tracker-bar {
+            margin-top: -$height;
+        }
+    }
+
+    &.sm {
+        @mixin progress-bar-size 0.25rem, theme('borderRadius.2xs');
+    }
+    &.md {
+        @mixin progress-bar-size 0.375rem, theme('borderRadius.xs');
+    }
+    &.lg {
+        @mixin progress-bar-size 0.75rem, theme('borderRadius.sm');
     }
 }
 </style>

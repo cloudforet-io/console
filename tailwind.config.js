@@ -23,7 +23,9 @@ module.exports = {
     theme: {
         borderRadius: {
             none: '0',
-            sm: '0.125rem', // 2px
+            '2xs': '0.063rem', // 1px
+            xs: '0.125rem', // 2px
+            sm: '0.188rem', // 3px
             md: '0.25rem', // 4px
             default: '0.25rem', // 4px
             lg: '0.375rem', // 6px

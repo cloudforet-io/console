@@ -165,7 +165,7 @@ export default {
     margin-right: 0.6875rem;
 }
 .help-search-img {
-    @apply border border-gray-200 rounded-sm;
+    @apply border border-gray-200 rounded-xs;
     margin-top: 0.625rem;
     margin-bottom: 2.5rem;
     padding: 2px;

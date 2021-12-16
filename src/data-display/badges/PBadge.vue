@@ -80,7 +80,7 @@ export default {
 
     @apply text-white bg-gray;
     &.badge-round {
-        border-radius: 100px;
+        @apply rounded-full;
     }
     &.badge-square {
         @apply rounded-md;

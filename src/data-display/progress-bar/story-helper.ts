@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
 
 export const getProgressBarArgTypes = (): ArgTypes => ({
     percentage: {
@@ -35,6 +36,25 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'text',
+        },
+    },
+    size: {
+        name: 'size',
+        type: { name: 'string' },
+        description: `Progress Bar size. ${Object.values(PROGRESS_BAR_SIZE)} are available.`,
+        defaultValue: PROGRESS_BAR_SIZE.md,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `"${PROGRESS_BAR_SIZE.md}"`,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(PROGRESS_BAR_SIZE),
         },
     },
     color: {

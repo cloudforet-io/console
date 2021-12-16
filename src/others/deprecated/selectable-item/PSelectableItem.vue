@@ -144,7 +144,7 @@ export default {
     }
     &.card {
         @mixin item-theme theme('colors.gray.200'), theme('colors.blue.200'), theme('colors.secondary'), theme('colors.blue.200');
-        border-radius: 2px;
+        border-radius: theme('borderRadius.xs');
         .contents {
             padding: 0.5rem 1rem;
         }

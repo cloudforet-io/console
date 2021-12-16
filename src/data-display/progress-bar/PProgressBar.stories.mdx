@@ -1,6 +1,8 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PProgressBar from '@/data-display/progress-bar/PProgressBar.vue';
-import { getProgressBarArgTypes } from '@/data-display/progress-bar/story-helper';
+import { getProgressBarArgTypes } from '@/data-display/progress-bar/story-helper'; import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config'; import { reactive,
+    toRefs
+} from '@vue/composition-api';
 
 <Meta title='Data Display/Progress Bar' parameters={{
     design: {
@@ -18,6 +20,7 @@ export const Template = (args,{argTypes})=>({
     <p-progress-bar
         :percentage="percentage"
         :label="label"
+        :size="size"
         :color="color"
         :style="'width: 10rem;'"
     />
@@ -43,6 +46,31 @@ export const Template = (args,{argTypes})=>({
                     :style="'width: 10rem;'"
                 />
             </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Size
+<Canvas>
+    <Story name="Size">
+        {{
+            components:{ PProgressBar },
+            template: `
+            <div style="display:flex; flex-direction: column; align-items:center; row-gap: 1.5rem;">
+                <p-progress-bar v-for="size in sizes" :key="size" :size="size"
+                    :percentage="40"
+                    :label="size"
+                    :style="'width: 10rem;'"
+                />
+            </div>`,
+            setup() {
+                const state = reactive({
+                    sizes: Object.values(PROGRESS_BAR_SIZE)
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
         }}
     </Story>
 </Canvas>

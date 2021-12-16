@@ -9,5 +9,5 @@ export interface ProgressBarProps {
     label?: string;
     color?: string;
     gradient?: Gradient;
-    borderRadius?: string;
+    size?: string;
 }

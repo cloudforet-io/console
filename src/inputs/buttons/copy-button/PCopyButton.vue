@@ -186,7 +186,7 @@ export default defineComponent<Props>({
     }
 
     .copy-button-alert {
-        @apply inline-flex text-white rounded-sm;
+        @apply inline-flex text-white rounded-xs;
         position: fixed;
         z-index: 9999;
         background-color: rgba(theme('colors.gray.900'), 0.88);

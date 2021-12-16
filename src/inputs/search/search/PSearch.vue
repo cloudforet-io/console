@@ -150,9 +150,8 @@ export default defineComponent<SearchProps>({
         @apply inline-flex items-center;
     }
     .delete-btn {
-        @apply cursor-pointer inline-block flex-shrink-0;
+        @apply cursor-pointer inline-block flex-shrink-0 rounded-full;
         position: relative;
-        border-radius: 100px;
         height: 1rem;
         width: 1rem;
         &:hover {

@@ -53,12 +53,11 @@ export default {
 
 <style lang="postcss">
 .back-to-top-button {
-    @apply inline-flex justify-center items-center cursor-pointer;
+    @apply inline-flex justify-center items-center cursor-pointer rounded-full;
     position: fixed;
     z-index: 5;
     width: 3rem;
     height: 3rem;
-    border-radius: 6.25rem;
     background: theme('colors.white');
     border: 1px solid theme('colors.gray.200');
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

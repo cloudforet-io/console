@@ -95,7 +95,7 @@ export default {
         &:hover { @apply underline; }
     }
     code {
-        @apply bg-gray-200 rounded-sm px-1;
+        @apply bg-gray-200 rounded-xs px-1;
         font-family: courier, monospace;
     }
     pre {

@@ -306,10 +306,10 @@ export default defineComponent<ToolboxTableProps>({
 
 <style lang="postcss">
 .p-toolbox-table {
-    @apply flex flex-col bg-white border border-gray-200 rounded-sm;
+    @apply flex flex-col bg-white border border-gray-200 rounded-xs;
 
     .top-wrapper {
-        @apply flex flex-col rounded-sm;
+        @apply flex flex-col rounded-xs;
     }
     .p-data-table {
         overflow: auto;

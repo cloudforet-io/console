@@ -153,7 +153,7 @@ export default defineComponent({
         align-items: center;
     }
     .filter {
-        @apply mr-4 rounded-sm;
+        @apply mr-4 rounded-xs;
         font-size: 0.75rem;
     }
     .delete-btn {
