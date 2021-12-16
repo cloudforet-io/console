@@ -20,7 +20,7 @@
                 </template>
                 <template #col-value-format="{value}">
                     <div class="cost-col-body">
-                        {{ convertCost(value) }}
+                        {{ currencyMoneyFormatter(value, currency, currencyRates) }}
                     </div>
                 </template>
             </p-data-table>
@@ -55,7 +55,6 @@ import { forEach } from 'lodash';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { commaFormatter } from '@spaceone/console-core-lib';
 import { CURRENCY } from '@/store/modules/display/config';
 import { store } from '@/store';
 import { gray } from '@/styles/colors';
@@ -65,6 +64,8 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import config from '@/lib/config';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
 
 interface CostByProviderChartData extends PieChartData {
     color: string;
@@ -204,6 +205,7 @@ export default defineComponent<WidgetProps>({
         };
 
         const convertToChartData = (rawData: CostByProviderAnalysisModel[]) => {
+            state.chartData = [];
             forEach(rawData, (d) => {
                 state.chartData.push({
                     category: state.providers[d.provider]?.label || d.provider,
@@ -216,7 +218,6 @@ export default defineComponent<WidgetProps>({
         const costQueryHelper = new QueryHelper();
         const getData = async () => {
             state.loading = true;
-            state.chartData = [];
             costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
@@ -244,12 +245,6 @@ export default defineComponent<WidgetProps>({
             }
         };
 
-        // util
-        const convertCost = (value: number): string => {
-            const data = commaFormatter(value.toFixed(2));
-            return `$${data}`;
-        };
-
         watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
             if (!loading && chartContext) {
                 drawChart(chartContext);
@@ -267,7 +262,7 @@ export default defineComponent<WidgetProps>({
         return {
             ...toRefs(state),
             dataTableState,
-            convertCost,
+            currencyMoneyFormatter,
         };
     },
 });
