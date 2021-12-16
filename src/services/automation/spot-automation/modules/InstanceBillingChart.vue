@@ -303,10 +303,10 @@ ${vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.TOOLTIP_SAVING_COST')}: <stro
                 padding-right: 1rem;
             }
             .circle {
+                @apply rounded-full;
                 display: inline-block;
                 width: 0.5rem;
                 height: 0.5rem;
-                border-radius: 50%;
                 margin-right: 0.25rem;
             }
         }

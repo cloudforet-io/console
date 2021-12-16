@@ -176,7 +176,7 @@ export default {
 
 <style lang="postcss" scoped>
 .alert-wrapper {
-    @apply bg-blue-200 rounded-sm;
+    @apply bg-blue-200 rounded-xs;
     max-width: 46rem;
     min-height: 3.625rem;
     padding: 0.5rem 1rem;

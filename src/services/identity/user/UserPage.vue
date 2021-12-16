@@ -184,10 +184,9 @@ export default {
     width: 14.75rem;
     height: 7.875rem;
     .member-icon {
-        @apply mx-auto;
+        @apply mx-auto rounded-full;
         width: 3rem;
         height: 3rem;
-        border-radius: 100%;
         margin-bottom: 0.5rem;
         overflow: hidden;
     }

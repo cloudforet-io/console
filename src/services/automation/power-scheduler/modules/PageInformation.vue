@@ -27,19 +27,19 @@ export default {
     font-size: 0.75rem;
     line-height: 0.8;
     #circle1 {
-        @apply bg-gray-300 rounded-sm;
+        @apply bg-gray-300 rounded-xs;
         margin-left: 1rem;
         width: 0.625rem;
         height: 0.625rem;
         opacity: 0.5;
     }
     #circle3 {
-        @apply bg-primary1 rounded-sm;
+        @apply bg-primary1 rounded-xs;
         width: 0.625rem;
         height: 0.625rem;
     }
     #circle5 {
-        @apply bg-primary-dark rounded-sm;
+        @apply bg-primary-dark rounded-xs;
         width: 0.625rem;
         height: 0.625rem;
     }

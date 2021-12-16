@@ -109,7 +109,7 @@ export default {
         margin-right: 1rem;
         cursor: pointer;
         .mark {
-            @apply rounded-sm;
+            @apply rounded-xs;
             width: 0.625rem;
             height: 0.625rem;
             margin-right: 0.25rem;

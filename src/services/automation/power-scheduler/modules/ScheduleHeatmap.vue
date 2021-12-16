@@ -77,7 +77,7 @@ export default {
     line-height: 1.2;
 }
 .circle {
-    @apply rounded-sm;
+    @apply rounded-xs;
     width: 0.5rem;
     height: 0.5rem;
     margin-left: 0.5rem;

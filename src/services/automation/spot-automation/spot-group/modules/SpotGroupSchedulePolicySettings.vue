@@ -373,14 +373,13 @@ export default {
         overflow: visible;
     }
     .dragger {
-        @apply text-peacock-400 border-2 border-peacock-400 bg-white;
+        @apply text-peacock-400 border-2 border-peacock-400 bg-white rounded-full;
         position: absolute;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         height: 32px;
         width: 32px;
-        border-radius: 100%;
         left: -16px;
         top: -16px;
         box-shadow: 0 2px 4px rgba(theme('colors.black'), 0.2);

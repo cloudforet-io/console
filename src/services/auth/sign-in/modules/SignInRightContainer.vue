@@ -183,8 +183,8 @@ export default {
             }
 
             .admin-icon {
+                @apply rounded-2xl;
                 margin-right: 0.5rem;
-                border-radius: 0.75rem;
             }
             .user-icon {
                 margin-right: 0.5rem;

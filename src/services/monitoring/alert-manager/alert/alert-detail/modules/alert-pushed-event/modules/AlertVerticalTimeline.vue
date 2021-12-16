@@ -53,7 +53,7 @@ export default {
     position: absolute;
     left: -0.4375rem;
     content: " ";
-    border-radius: 500%;
+    border-radius: theme('borderRadius.full');
     height: 0.875rem;
     width: 0.875rem;
 }

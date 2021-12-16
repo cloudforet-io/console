@@ -417,7 +417,7 @@ export default {
             top: 0;
             margin-top: 0.125rem;
             .date-button {
-                @apply border border-gray-200 text-gray-300 rounded-sm;
+                @apply border border-gray-200 text-gray-300 rounded-xs;
                 min-width: auto;
                 height: 1.25rem;
                 line-height: 1.6;
@@ -442,10 +442,10 @@ export default {
                     padding-right: 1rem;
                 }
                 .circle {
+                    @apply rounded-full;
                     display: inline-block;
                     width: 0.5rem;
                     height: 0.5rem;
-                    border-radius: 50%;
                     margin-right: 0.25rem;
                 }
             }
@@ -478,7 +478,7 @@ export default {
     }
     .table-section {
         .p-data-table::v-deep {
-            @apply rounded-sm;
+            @apply rounded-xs;
             min-height: 6.25rem;
             th {
                 @apply bg-gray-100 text-gray-400;

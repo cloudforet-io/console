@@ -369,8 +369,7 @@ export default {
         }
         .p-dropdown-menu-btn {
             .p-icon-button {
-                @apply border-transparent;
-                border-radius: 50%;
+                @apply border-transparent rounded-full;
                 &:hover {
                     @apply bg-blue-200 text-secondary border-transparent;
                 }

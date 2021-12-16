@@ -272,7 +272,7 @@ export default {
     }
 
     .tab-bg {
-        @apply bg-white rounded-sm pb-8;
+        @apply bg-white rounded-xs pb-8;
     }
 
     .delete-modal-content {

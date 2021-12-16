@@ -348,7 +348,7 @@ export default {
         }
     }
     .prefix-tag {
-        @apply bg-gray-200 rounded-sm px-2 text-xs mr-2 inline-flex items-center flex-shrink-0;
+        @apply bg-gray-200 rounded-xs px-2 text-xs mr-2 inline-flex items-center flex-shrink-0;
         max-width: 7rem;
         height: 1.125rem;
         line-height: 1.125rem;

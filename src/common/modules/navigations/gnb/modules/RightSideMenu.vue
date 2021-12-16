@@ -312,7 +312,7 @@ export default {
             }
         }
         .sub-menu-wrapper {
-            @apply bg-white border border-gray-200 rounded-sm;
+            @apply bg-white border border-gray-200 rounded-xs;
             position: absolute;
             top: 2.5rem;
             right: 0;
@@ -366,7 +366,7 @@ export default {
                         display: inline-flex;
                         cursor: pointer;
                         &:hover, &:focus {
-                            @apply bg-secondary-2 text-secondary rounded-sm;
+                            @apply bg-secondary-2 text-secondary rounded-xs;
                         }
                         .p-i-icon {
                             display: inline-block;

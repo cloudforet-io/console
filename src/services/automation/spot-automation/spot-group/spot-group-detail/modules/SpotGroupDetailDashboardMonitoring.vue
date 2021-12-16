@@ -442,8 +442,7 @@ export default {
                             @apply text-white;
                         }
                         .status .status-icon {
-                            @apply bg-white;
-                            border-radius: 50%;
+                            @apply bg-white rounded-full;
                         }
                     }
                 }

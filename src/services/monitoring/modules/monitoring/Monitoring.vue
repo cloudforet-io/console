@@ -459,10 +459,10 @@ section {
         margin-top: 0.625rem;
         margin-right: 1rem;
         .circle {
+            @apply rounded-full;
             display: inline-block;
             height: 0.625rem;
             width: 0.625rem;
-            border-radius: 50%;
             margin-right: 0.25rem;
         }
     }

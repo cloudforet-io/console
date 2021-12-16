@@ -424,11 +424,10 @@ export default {
             margin-top: 0.625rem;
             display: inline-flex;
             .circle {
-                @apply inline-block;
+                @apply inline-block rounded-full;
                 margin-right: 0.25rem;
                 width: 0.5rem;
                 height: 0.5rem;
-                border-radius: 50%;
             }
             span {
                 @apply mr-4 text-gray-500;
@@ -517,7 +516,7 @@ export default {
         line-height: 1.2;
     }
     &:hover {
-        @apply bg-blue-100 cursor-pointer underline rounded-sm;
+        @apply bg-blue-100 cursor-pointer underline rounded-xs;
     }
     .progress-bar {
         padding: 0;

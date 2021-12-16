@@ -82,7 +82,7 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-type-balloon {
-    @apply rounded-sm border border-gray-200 bg-white;
+    @apply rounded-xs border border-gray-200 bg-white;
     position: absolute;
     top: -3rem;
     width: 18rem;

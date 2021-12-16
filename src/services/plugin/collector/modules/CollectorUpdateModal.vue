@@ -294,7 +294,7 @@ export default {
         @apply flex;
         padding: 0 2rem 3rem 2rem;
         .p-text-input {
-            @apply text-gray-900 rounded-sm;
+            @apply text-gray-900 rounded-xs;
             width: 100%;
             max-width: 19rem;
             appearance: none;

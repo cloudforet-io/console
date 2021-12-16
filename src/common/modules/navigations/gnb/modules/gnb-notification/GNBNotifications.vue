@@ -196,7 +196,7 @@ export default {
 
 <style lang="postcss" scoped>
 .gnb-notifications {
-    @apply bg-white border border-gray-200 rounded-sm;
+    @apply bg-white border border-gray-200 rounded-xs;
     display: flex;
     flex-direction: column;
     max-width: 480px;

@@ -179,7 +179,7 @@ export default {
 <style lang="postcss" scoped>
 .service-accounts-table {
     .p-data-table::v-deep {
-        @apply rounded-sm;
+        @apply rounded-xs;
         min-height: 5rem;
         margin-top: 0.75rem;
 

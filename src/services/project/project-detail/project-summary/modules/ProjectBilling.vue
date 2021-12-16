@@ -577,7 +577,7 @@ export default {
             right: 0.5rem;
             top: 0;
             .date-button {
-                @apply border border-gray-200 text-gray-300 rounded-sm;
+                @apply border border-gray-200 text-gray-300 rounded-xs;
                 height: 1.25rem;
                 min-width: 2rem;
                 line-height: 1.25rem;
@@ -647,7 +647,7 @@ export default {
             text-align: right;
         }
         .p-data-table::v-deep {
-            @apply rounded-sm;
+            @apply rounded-xs;
             height: auto;
             text-align: right;
             margin-top: 0.5rem;

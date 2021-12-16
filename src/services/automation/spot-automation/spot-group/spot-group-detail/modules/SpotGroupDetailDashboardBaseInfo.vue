@@ -355,10 +355,10 @@ export default {
                     padding: 0 0.125rem;
                     margin-bottom: 0.25rem;
                     .circle {
+                        @apply rounded-full;
                         display: inline-block;
                         width: 0.5rem;
                         height: 0.5rem;
-                        border-radius: 50%;
                     }
                     .type {
                         padding: 0 0.25rem;

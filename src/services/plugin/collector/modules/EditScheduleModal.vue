@@ -402,7 +402,7 @@ export default {
         border-bottom-right-radius: 0.25rem;
         padding: 1.5rem;
         &:first-of-type {
-            border-radius: 0.25rem 0.25rem 0 0;
+            @apply rounded-tl-md rounded-tr-md;
         }
         &:hover {
             @apply bg-secondary2;
@@ -427,7 +427,7 @@ export default {
             grid-template-rows: auto;
 
             .time-block {
-                @apply bg-white border border-gray-300 rounded-sm;
+                @apply bg-white border border-gray-300 rounded-xs;
                 display: inline-block;
                 height: 2rem;
                 line-height: 2rem;

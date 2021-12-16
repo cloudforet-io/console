@@ -787,10 +787,10 @@ export default {
                         text-align: center;
                         padding: 0.3rem;
                         .weekday-number-text {
+                            @apply rounded-full;
                             width: 1.25rem;
                             height: 1.25rem;
                             line-height: 1.25rem;
-                            border-radius: 50%;
                             margin: auto;
                         }
                         &.today {
@@ -826,7 +826,7 @@ export default {
                             @apply border-l-0;
                         }
                         &.routine, &.selected-routine {
-                            @apply bg-point-violet rounded-sm;
+                            @apply bg-point-violet rounded-xs;
                             &.selected-one-time-run {
                                 @apply bg-point-violet;
                             }
@@ -842,7 +842,7 @@ export default {
                             }
                         }
                         &.one-time-run, &.selected-one-time-run {
-                            @apply rounded-sm;
+                            @apply rounded-xs;
                             background:
                                 repeating-linear-gradient(
                                     45deg,
@@ -853,7 +853,7 @@ export default {
                                 );
                         }
                         &.one-time-stop, &.selected-one-time-stop {
-                            @apply rounded-sm;
+                            @apply rounded-xs;
                             &:not(.routine) {
                                 @apply bg-transparent;
                             }
@@ -867,7 +867,7 @@ export default {
                     }
                 }
                 .help-block {
-                    @apply border-dashed border-secondary text-secondary rounded-sm;
+                    @apply border-dashed border-secondary text-secondary rounded-xs;
                     position: absolute;
                     display: table;
                     width: calc(100% / 7 * 5);
@@ -955,7 +955,7 @@ export default {
                     }
                 }
                 .legend-icon {
-                    @apply rounded-sm;
+                    @apply rounded-xs;
                     position: relative;
                     display: inline-block;
                     width: 0.75rem;

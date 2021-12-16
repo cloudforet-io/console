@@ -303,11 +303,10 @@ export default defineComponent<WidgetProps>({
         display: inline-flex;
         align-items: center;
         .circle {
-            @apply inline-block;
+            @apply inline-block rounded-full;
             margin-right: 0.25rem;
             width: 0.5rem;
             height: 0.5rem;
-            border-radius: 50%;
         }
         span {
             @apply mr-4 text-gray-500;

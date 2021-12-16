@@ -294,7 +294,7 @@ export default {
     @apply mx-auto;
 }
 .p-data-table::v-deep {
-    @apply rounded-sm;
+    @apply rounded-xs;
     margin-top: 1rem;
     overflow-x: hidden;
     .default th {

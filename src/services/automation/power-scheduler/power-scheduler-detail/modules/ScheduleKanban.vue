@@ -416,7 +416,7 @@ export default {
         column-gap: 0.5rem;
         grid-template-columns: repeat(auto-fit, minmax(11.75rem, 1fr));
         .resource-group-box {
-            @apply border border-violet-200 bg-white box-border rounded-sm;
+            @apply border border-violet-200 bg-white box-border rounded-xs;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
             .resource-group-header {
                 @apply bg-violet-100;
@@ -430,7 +430,7 @@ export default {
                     font-size: 0.875rem;
                 }
                 .header-decorator {
-                    @apply inline-block bg-primary3 text-primary rounded-sm;
+                    @apply inline-block bg-primary3 text-primary rounded-xs;
                     padding: 0.2rem 0.5rem;
                     margin-left: 0.5rem;
                     font-size: 0.75rem;

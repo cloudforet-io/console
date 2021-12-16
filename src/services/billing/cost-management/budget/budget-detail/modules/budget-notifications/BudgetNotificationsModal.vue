@@ -245,7 +245,7 @@ export default {
             @apply hidden;
         }
         .condition-input-wrapper {
-            @apply bg-gray-100 rounded-sm;
+            @apply bg-gray-100 rounded-xs;
             padding: 0.5rem;
         }
     }

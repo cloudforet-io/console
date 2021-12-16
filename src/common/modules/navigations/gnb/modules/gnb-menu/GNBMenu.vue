@@ -144,7 +144,7 @@ export default {
         }
     }
     .sub-menu-wrapper {
-        @apply bg-white border border-gray-200 rounded-sm;
+        @apply bg-white border border-gray-200 rounded-xs;
         position: absolute;
         top: 2.5rem;
         left: -1.125rem;

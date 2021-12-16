@@ -54,7 +54,7 @@ export default {
 
 <style lang="postcss" scoped>
 .job-task-details {
-    @apply border border-gray-200 rounded-sm;
+    @apply border border-gray-200 rounded-xs;
     padding-bottom: 2.375rem;
     min-height: 27.5rem;
 }

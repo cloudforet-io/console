@@ -314,10 +314,10 @@ export default {
         }
 
         .circle {
+            @apply rounded-full;
             display: inline-block;
             width: 0.5rem;
             height: 0.5rem;
-            border-radius: 50%;
             margin-bottom: 0.25rem;
             margin-right: 0.25rem;
         }

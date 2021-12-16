@@ -484,10 +484,10 @@ export default {
                 display: inline-flex;
                 width: 90%;
                 .legend-circle {
+                    @apply rounded-full;
                     display: inline-block;
                     width: 0.5rem;
                     height: 0.5rem;
-                    border-radius: 50%;
                     margin: auto 0.25rem auto 0;
                 }
                 .legend-text {

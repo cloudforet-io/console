@@ -139,10 +139,9 @@ export default {
         max-width: calc(100% - 1.75rem);
     }
     .icon {
-        @apply flex-shrink-0 flex overflow-hidden;
+        @apply flex-shrink-0 flex overflow-hidden rounded-sm;
         width: 1rem;
         height: 1rem;
-        border-radius: 3px;
     }
     .name {
         @apply ml-1 flex-grow truncate;

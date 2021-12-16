@@ -628,7 +628,7 @@ export default {
                 right: 0.5rem;
                 top: 0;
                 .p-button {
-                    @apply border border-gray-200 text-gray-300 rounded-sm;
+                    @apply border border-gray-200 text-gray-300 rounded-xs;
                     height: 1.25rem;
                     min-width: 2rem;
                     line-height: 1.25rem;
