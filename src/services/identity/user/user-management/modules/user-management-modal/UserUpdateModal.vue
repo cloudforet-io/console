@@ -5,8 +5,10 @@
                     size="sm"
                     :fade="true"
                     :backdrop="true"
-                    :visible.sync="proxyVisible"
+                    :visible.sync="visible"
                     @confirm="confirm"
+                    @cancel="handleClose"
+                    @close="handleClose"
     >
         <template #body>
             <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')" required>
@@ -88,7 +90,6 @@ import {
     PButtonModal, PSelectDropdown, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
 import {
@@ -96,6 +97,7 @@ import {
     Validation,
 } from '@/services/identity/user/lib/user-form-validations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { MODAL_TYPE } from '@/services/identity/user/store/type';
 
 interface AuthType {
     label: string | null;
@@ -105,7 +107,7 @@ interface AuthType {
 type AuthTypeList = AuthType[];
 
 export default {
-    name: 'UserUpdateForm',
+    name: 'UserUpdateModal',
     components: {
         PButtonModal,
         PFieldGroup,
@@ -124,10 +126,6 @@ export default {
             type: String,
             required: true,
         },
-        visible: {
-            type: Boolean,
-            default: false,
-        },
         item: {
             type: Object,
             default: undefined,
@@ -145,7 +143,10 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            visible: computed({
+                get() { return store.getters['service/user/isUpdateModalVisible']; },
+                set(val) { store.commit('service/user/setVisibleUpdateModal', val); },
+            }),
             isSameId: false,
         });
         const formState = reactive({
@@ -243,6 +244,11 @@ export default {
             } else {
                 emit('confirm', data, null);
             }
+            state.visible = false;
+        };
+
+        const handleClose = () => {
+            state.visible = false;
         };
 
         /* Set(Initialize) Form */
@@ -304,6 +310,8 @@ export default {
             formState,
             validationState,
             confirm,
+            handleClose,
+            MODAL_TYPE,
         };
     },
 };

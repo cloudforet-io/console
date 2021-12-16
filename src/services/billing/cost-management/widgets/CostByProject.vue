@@ -149,7 +149,7 @@ export default {
                 });
                 return results;
             } catch (e) {
-                return [];
+                throw e;
             }
         };
 
@@ -164,6 +164,7 @@ export default {
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);
+                state.data = [];
             } finally {
                 state.loading = false;
             }

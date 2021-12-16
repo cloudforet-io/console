@@ -230,7 +230,7 @@ export default defineComponent<WidgetProps>({
                 });
                 return results;
             } catch (e) {
-                return [];
+                throw e;
             }
         };
         const getChartData = async () => {
@@ -246,6 +246,8 @@ export default defineComponent<WidgetProps>({
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);
+                state.data = [];
+                tableState.items = [];
             } finally {
                 state.loading = false;
                 tableState.loading = false;

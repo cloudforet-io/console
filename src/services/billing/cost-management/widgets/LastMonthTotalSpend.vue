@@ -169,7 +169,7 @@ export default {
                 });
                 return results;
             } catch (e) {
-                return [];
+                throw e;
             }
         };
 
@@ -203,6 +203,7 @@ export default {
                 state.data = getEnrichedChartData(chartData);
             } catch (e) {
                 ErrorHandler.handleError(e);
+                state.data = [];
             } finally {
                 state.loading = false;
             }

@@ -194,7 +194,7 @@ export default defineComponent<WidgetProps>({
                 });
                 return results;
             } catch (e) {
-                return [];
+                throw e;
             }
         };
 

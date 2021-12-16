@@ -5,8 +5,10 @@
                     size="md"
                     :fade="true"
                     :backdrop="true"
-                    :visible.sync="proxyVisible"
+                    :visible.sync="visible"
                     @confirm="confirm"
+                    @cancel="handleClose"
+                    @close="handleClose"
     >
         <template #body>
             <p-box-tab v-model="formState.activeTab" :tabs="formState.tabs" style-type="gray"
@@ -141,7 +143,6 @@ import {
     PButtonModal, PSelectDropdown, PFieldGroup, PButton, PTextInput, PBoxTab, PSearchDropdown, PI,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
 import {
@@ -154,6 +155,7 @@ import { debounce } from 'lodash';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { MODAL_TYPE } from '@/services/identity/user/store/type';
 
 
 interface AuthType {
@@ -177,7 +179,7 @@ const authTypeMap: Record<string, AuthType> = {
 };
 
 export default {
-    name: 'UserForm',
+    name: 'UserCreateModal',
     components: {
         PButtonModal,
         PFieldGroup,
@@ -200,10 +202,6 @@ export default {
             type: String,
             required: true,
         },
-        visible: {
-            type: Boolean,
-            default: false,
-        },
         item: {
             type: Object,
             default: undefined,
@@ -215,7 +213,10 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            visible: computed({
+                get() { return store.getters['service/user/isCreateModalVisible']; },
+                set(val) { store.commit('service/user/setVisibleCreateModal', val); },
+            }),
             isSameId: false,
             // external user
             loading: false,
@@ -353,6 +354,11 @@ export default {
             } else {
                 emit('confirm', data, null);
             }
+            state.visible = false;
+        };
+
+        const handleClose = () => {
+            state.visible = false;
         };
 
         const initAuthTypeList = async () => {
@@ -476,10 +482,12 @@ export default {
             formState,
             validationState,
             confirm,
+            handleClose,
             checkUserID,
             onSelectExternalUser,
             onDeleteSelectedExternalUser,
             onSearchExternalUser,
+            MODAL_TYPE,
         };
     },
 };

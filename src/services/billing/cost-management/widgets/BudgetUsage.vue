@@ -101,7 +101,7 @@ export default {
                 });
                 return results;
             } catch (e) {
-                return [];
+                throw e;
             }
         };
 
