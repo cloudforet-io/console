@@ -1,3 +1,10 @@
+# [1.1.0-beta.208](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.207...v1.1.0-beta.208) (2021-12-16)
+
+
+### Features
+
+* add size props to progress-bar and add border-radius variables ([#787](https://github.com/spaceone-dev/spaceone-design-system/issues/787)) ([86465df](https://github.com/spaceone-dev/spaceone-design-system/commit/86465df528d4a4290900cf3f6541e7bf40362e21))
+
 # [1.1.0-beta.207](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.206...v1.1.0-beta.207) (2021-12-15)
 
 
