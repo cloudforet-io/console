@@ -56,9 +56,9 @@ export default defineComponent<ToggleButtonProps>({
     setup(props: ToggleButtonProps) {
         const state = reactive({
             colors: computed(() => {
-                if (props.theme === 'secondary') return { checked: color.blue[500], unchecked: color.gray[200] };
-                if (props.theme === 'peacock500') return { checked: color.peacock[400], unchecked: color.gray[200] };
-                return { checked: color.blue[500], unchecked: color.gray[200] };
+                if (props.theme === 'secondary') return { checked: color.blue[500], unchecked: color.gray[300] };
+                if (props.theme === 'peacock500') return { checked: color.peacock[400], unchecked: color.gray[300] };
+                return { checked: color.blue[500], unchecked: color.gray[300] };
             }),
         });
         return {
