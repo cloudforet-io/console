@@ -27,7 +27,7 @@ export const Template = (args, { argTypes }) => ({
             :menu="menu"
             :loading="loading"
             :type="type"
-            :placeholder="placeholder"
+            :placeholder="proxyPlaceholder"
             :disable-icon="disableIcon"
             :disable-handler="disableHandler"
             :exact-mode="exactMode"
@@ -39,6 +39,7 @@ export const Template = (args, { argTypes }) => ({
             :show-tag-box="showTagBox"
             :strict-select-mode="strictSelectMode"
             :invalid="invalid"
+            :disabled="disabled"
             @search="onSearch"
             @focus="onFocus"
             @blur="onBlur"
@@ -56,6 +57,7 @@ export const Template = (args, { argTypes }) => ({
         const state = reactive({
             proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, props.visibleMenu),
             proxySelected: makeOptionalProxy('selected', vm, props.selected),
+            proxyPlaceholder: makeOptionalProxy('placeholder', vm, props.placeholder),
         })
         return {
             ...toRefs(state)

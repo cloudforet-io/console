@@ -129,7 +129,6 @@ export const getTextareaArgTypes = (): ArgTypes => ({
     onUpdateValue: {
         name: 'update:value',
         description: 'Works with `v-model` and `value` props sync.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -143,7 +142,6 @@ export const getTextareaArgTypes = (): ArgTypes => ({
     onNativeEvents: {
         name: 'native events',
         description: 'All native events textarea emits.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,

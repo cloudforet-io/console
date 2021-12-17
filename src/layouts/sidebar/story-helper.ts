@@ -119,7 +119,6 @@ export const getSidebarArgTypes = (): ArgTypes => ({
     onClose: {
         name: 'close',
         description: 'Event emitted when the close button is clicked',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,

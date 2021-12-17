@@ -278,7 +278,6 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
         onSelect: {
             name: 'select',
             description: 'Event emitted when menu item was selected.',
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,
@@ -292,7 +291,6 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
         onUpdateSelected: {
             name: 'update:selected',
             description: 'Event emitted when menu item was selected. works with `selected` props sync.',
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,
@@ -306,7 +304,6 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
         onFocusMenu: {
             name: 'focus-menu',
             description: 'Event emitted when menu must be focused, but there are no menu items to focus because `menu-menu` slot was given.',
-            defaultValue: null,
             table: {
                 type: {
                     summary: null,

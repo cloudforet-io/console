@@ -24,6 +24,7 @@ export interface SearchDropdownProps extends ContextMenuFixedStyleProps {
     disableIcon?: boolean;
     isFocused?: boolean;
     invalid?: boolean;
+    disabled?: boolean;
     /* context menu props */
     menu: MenuItem[];
     loading?: boolean;

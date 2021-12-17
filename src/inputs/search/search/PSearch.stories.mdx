@@ -18,6 +18,8 @@ export const Template = (args, { argTypes }) => ({
         <p-search v-model="proxyValue"
                   :placeholder="placeholder"
                   :disable-icon="disableIcon"
+                  :invalid="invalid"
+                  :disabled="disabled"
                   :is-focused="isFocused"
                   @search="onSearch"
                   @focus="onFocus"
@@ -74,6 +76,30 @@ export const Template = (args, { argTypes }) => ({
             components: { PSearch },
             template: `
         <p-search v-model="proxyValue" invalid/>
+    `,
+            setup(props) {
+                const state = reactive({
+                    proxyValue: props.value
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disabled
+
+<Canvas>
+    <Story name="Disabled" >
+        {{
+            components: { PSearch },
+            template: `
+        <p-search v-model="proxyValue" disabled/>
     `,
             setup(props) {
                 const state = reactive({

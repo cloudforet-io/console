@@ -157,7 +157,7 @@ export const ExpertTemplate = (args, { argTypes }) => ({
                         res.forEach(d => {state.permissionInfo[d.id] = faker.random.boolean();})
                     }
                     resolve(res)
-                }, 500)
+                }, 3000)
             })
         }
         const refresh = async () => {

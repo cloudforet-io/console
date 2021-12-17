@@ -23,14 +23,14 @@ export const getSearchArgTypes = (): ArgTypes => ({
         name: 'placeholder',
         type: { name: 'string' },
         description: 'Input placeholder.',
-        defaultValue: '',
+        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: null,
+                summary: 'undefined',
             },
         },
         control: {
@@ -77,6 +77,24 @@ export const getSearchArgTypes = (): ArgTypes => ({
         name: 'invalid',
         type: { name: 'boolean' },
         description: 'Whether to apply invalid style or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    disabled: {
+        name: 'disabled',
+        type: { name: 'boolean' },
+        description: 'Whether to disable search or not.',
         defaultValue: false,
         table: {
             type: {
@@ -155,7 +173,6 @@ export const getSearchArgTypes = (): ArgTypes => ({
     onInput: {
         name: 'input',
         description: 'Emitted when input occurred.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -169,7 +186,6 @@ export const getSearchArgTypes = (): ArgTypes => ({
     onSearch: {
         name: 'search',
         description: 'Emitted when input keyup.enter event occurred.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -183,7 +199,6 @@ export const getSearchArgTypes = (): ArgTypes => ({
     onDelete: {
         name: 'delete',
         description: 'Emitted when delete button clicked.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -197,7 +212,6 @@ export const getSearchArgTypes = (): ArgTypes => ({
     onFocus: {
         name: 'focus',
         description: 'Emitted when input focused.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -211,7 +225,6 @@ export const getSearchArgTypes = (): ArgTypes => ({
     onBlur: {
         name: 'blur',
         description: 'Emitted when input blurred.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -222,10 +235,9 @@ export const getSearchArgTypes = (): ArgTypes => ({
             },
         },
     },
-    inputNativeEvents: {
+    onInputNativeEvents: {
         name: 'input native events',
         description: 'Emitted when input native events occurred.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,

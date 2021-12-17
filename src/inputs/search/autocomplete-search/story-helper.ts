@@ -99,7 +99,6 @@ const extraArgTypes: ArgTypes = {
     onHideMenu: {
         name: 'hide-menu',
         description: 'Emitted when the menu starts to hide.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -113,7 +112,6 @@ const extraArgTypes: ArgTypes = {
     onShowMenu: {
         name: 'show-menu',
         description: 'Emitted when the menu starts to show.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -127,7 +125,6 @@ const extraArgTypes: ArgTypes = {
     onFocusMenu: {
         name: 'focus-menu',
         description: 'Emitted when menu is focused.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -141,7 +138,6 @@ const extraArgTypes: ArgTypes = {
     onSelectMenu: {
         name: 'select-menu',
         description: 'Emitted when menu item is selected.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,

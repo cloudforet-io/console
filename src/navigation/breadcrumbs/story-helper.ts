@@ -39,7 +39,6 @@ export const getBreadcrumbsArgTypes = (): ArgTypes => ({
         [route: Route, index: number]
         \`
         `,
-        defaultValue: null,
         table: {
             type: {
                 summary: null,

@@ -13,12 +13,12 @@ module.exports = {
   ],
   "addons": [
     "@storybook/addon-links",
-    "@storybook/addon-essentials",
     "@storybook/addon-a11y",
     "@storybook/addon-knobs",
     "@storybook/addon-storysource",
     "@storybook/addon-google-analytics",
-    "storybook-addon-designs"
+    "storybook-addon-designs",
+    "@storybook/addon-essentials",
   ],
   webpackFinal: async (config) => {
 

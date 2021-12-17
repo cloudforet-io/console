@@ -13,15 +13,15 @@ const getObjectValue = (target: Record<string, any>|Array<any>, currentPath: str
     return target[currentPath];
 };
 
-export const getValueByPath = (data: any, path: string|null) => {
+export const getValueByPath = (data: any, path: string|null, splitDisableKeys: string[] = ['tags']) => {
     if (typeof path !== 'string') return data;
 
     let target = data;
 
-    // TODO: remove temporary codes for tags
     let pathArr;
-    if (path.startsWith('tags.')) {
-        pathArr = ['tags', path.slice(5)];
+    const key = splitDisableKeys.find(k => path.startsWith(`${k}.`));
+    if (key) {
+        pathArr = [key, path.slice(key.length + 1)];
     } else {
         pathArr = path.split('.');
     }

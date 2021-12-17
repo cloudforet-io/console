@@ -73,7 +73,6 @@ export const getButtonTabArgTypes = (): ArgTypes => ({
     onUpdateActiveTab: {
         name: 'update:activeTab',
         description: 'Event emitted when activated tab changed. Works with `v-model` and `activeTab` props sync.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -90,7 +89,6 @@ export const getButtonTabArgTypes = (): ArgTypes => ({
         Two arguments will be given to the handler that bound to this event. 
         Changed tab item's name(\`string\`) will be given as the first, 
         and the index(\`number\`) will be given as the second argument.`,
-        defaultValue: null,
         table: {
             type: {
                 summary: null,

@@ -191,7 +191,6 @@ export const getCollapsibleListArgTypes = (): ArgTypes => ({
     onUpdateUnfoldedIndices: {
         name: 'update:unfoldedIndices',
         description: 'Event emitted when each item\'s collapsed state changed. Works with `v-model` and `unfoldedIndices` props sync.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,

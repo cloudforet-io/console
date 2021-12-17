@@ -389,7 +389,6 @@ export const getToolboxArgTypes = (): ArgTypes => ({
         name: 'change',
         description: `Event emitted when pagination or sort value is changed.
          First argument is 'options'.`,
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -403,7 +402,6 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     onExport: {
         name: 'export',
         description: 'Event emitted when export button clicked',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -417,7 +415,6 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     onRefresh: {
         name: 'refresh',
         description: 'Event emitted when refresh button clicked',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -431,7 +428,6 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     onClickSettings: {
         name: 'click-settings',
         description: 'Event emitted when settings button clicked',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -445,7 +441,6 @@ export const getToolboxArgTypes = (): ArgTypes => ({
     onInitTags: {
         name: 'init-tags',
         description: 'Event emitted when query tags are initiated.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,

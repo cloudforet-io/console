@@ -2,8 +2,9 @@ export interface SearchProps {
     value: string; // sync
     placeholder?: string;
     disableIcon?: boolean;
-    isFocused?: boolean; // sync
     invalid?: boolean;
+    disabled?: boolean;
+    isFocused?: boolean; // sync
 }
 
 export interface InputListeners {

@@ -73,8 +73,7 @@ export const getCopyButtonArgTypes = (): ArgTypes => ({
     // events
     onCopy: {
         name: 'copy',
-        description: 'Event emitted when clicked copy button. Only works when `copyManually` props is `true`.',
-        defaultValue: 'Please, place any string to copy by button next to.',
+        description: 'Event emitted when clicked copy button. Only works when `copyManually` props is `true`. Please, place any string to copy by button next to.',
         table: {
             type: {
                 summary: null,
@@ -85,8 +84,7 @@ export const getCopyButtonArgTypes = (): ArgTypes => ({
     },
     onCopied: {
         name: 'copied',
-        description: 'Event emitted when actually copy happened. Only works when there is text for copy to clipboard in slot or `value` props.',
-        defaultValue: 'Please, place any string to copy by button next to.',
+        description: 'Event emitted when actually copy happened. Only works when there is text for copy to clipboard in slot or `value` props. Please, place any string to copy by button next to.',
         table: {
             type: {
                 summary: null,

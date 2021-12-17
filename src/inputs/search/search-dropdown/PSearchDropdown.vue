@@ -2,11 +2,12 @@
     <div class="p-search-dropdown">
         <p-search ref="targetRef"
                   v-model="proxyValue"
-                  :placeholder="proxyPlaceholder"
+                  :placeholder="_placeholder"
                   :disable-icon="disableIcon || proxyVisibleMenu ||
                       (type === SEARCH_DROPDOWN_TYPE.radioButton && !!proxySelected.length)"
                   :is-focused.sync="proxyIsFocused"
                   :invalid="invalid"
+                  :disabled="disabled"
                   @delete="onDeleteSearchText"
                   @click.native.stop="handleClick"
                   v-on="searchListeners"
@@ -125,6 +126,10 @@ export default defineComponent<SearchDropdownProps>({
             type: Boolean,
             default: false,
         },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
         /* context menu props */
         menu: {
             type: Array,
@@ -199,7 +204,7 @@ export default defineComponent<SearchDropdownProps>({
             proxyValue: makeOptionalProxy('value', vm, ''),
             proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
             proxySelected: makeOptionalProxy('selected', vm, []),
-            proxyPlaceholder: makeOptionalProxy('placeholder', vm, undefined),
+            _placeholder: undefined as string|undefined,
             filteredMenu: [] as SearchDropdownMenuItem[],
             bindingMenu: computed<SearchDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
             searchableItems: computed<SearchDropdownMenuItem[]>(() => props.menu.filter(d => d.type === undefined || d.type === 'item')),
@@ -264,9 +269,9 @@ export default defineComponent<SearchDropdownProps>({
 
             // placeholder
             if (props.type === SEARCH_DROPDOWN_TYPE.radioButton && (mode === 'click' || state.proxySelected.length)) {
-                state.proxyPlaceholder = '';
+                state._placeholder = '';
             } else {
-                state.proxyPlaceholder = undefined;
+                state._placeholder = props.placeholder;
             }
 
             // value
@@ -294,7 +299,7 @@ export default defineComponent<SearchDropdownProps>({
             ) {
                 // If there is an existing selected item, the value will be placeholder & filter will be initialized
                 const selectedItem = state.proxySelected[0] as SearchDropdownMenuItem;
-                state.proxyPlaceholder = selectedItem.label ?? selectedItem.name ?? '';
+                state._placeholder = selectedItem.label ?? selectedItem.name ?? '';
                 state.proxyValue = '';
                 filterMenu('');
             } else {
@@ -455,7 +460,7 @@ export default defineComponent<SearchDropdownProps>({
 
         watch(() => state.proxySelected, (proxySelected) => {
             if (!proxySelected.length) {
-                state.proxyPlaceholder = undefined;
+                state._placeholder = props.placeholder;
                 if (props.type === SEARCH_DROPDOWN_TYPE.default) state.proxyValue = '';
                 return;
             }
@@ -464,8 +469,8 @@ export default defineComponent<SearchDropdownProps>({
                 const item = state.proxySelected[0];
                 if (item) state.proxyValue = item.label ?? item.name ?? '';
                 else state.proxyValue = '';
-            } else if (props.type === SEARCH_DROPDOWN_TYPE.radioButton && state.proxyPlaceholder !== '') {
-                state.proxyPlaceholder = '';
+            } else if (props.type === SEARCH_DROPDOWN_TYPE.radioButton && state._placeholder !== '') {
+                state._placeholder = '';
             }
         }, { immediate: true });
 

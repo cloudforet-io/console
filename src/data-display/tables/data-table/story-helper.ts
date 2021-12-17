@@ -495,7 +495,6 @@ export const getDataTableArgsType = (): ArgTypes => ({
     onSelect: {
         name: 'select',
         description: 'Emitted when the row is selected.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -506,7 +505,6 @@ export const getDataTableArgsType = (): ArgTypes => ({
     onRowLeftClick: {
         name: 'rowLeftClick',
         description: 'Emitted when the left mouse clicked on the rows.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -517,7 +515,6 @@ export const getDataTableArgsType = (): ArgTypes => ({
     onChangeSort: {
         name: 'changeSort',
         description: 'Emitted when the `sortBy` or `sortDesc` are changed.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -528,7 +525,6 @@ export const getDataTableArgsType = (): ArgTypes => ({
     onUpdateSelectIndex: {
         name: 'update:selectIndex',
         description: 'Emitted when the `selectIndex` is updated.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -539,7 +535,6 @@ export const getDataTableArgsType = (): ArgTypes => ({
     onUpdateSortBy: {
         name: 'update:sortBy',
         description: 'Emitted when the `sortBy` is updated.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -550,7 +545,6 @@ export const getDataTableArgsType = (): ArgTypes => ({
     onUpdateSortDesc: {
         name: 'update:sortDesc',
         description: 'Emitted when the `sortDesc` is updated.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,

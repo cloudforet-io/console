@@ -471,7 +471,6 @@ export const argTypes = {
         name: 'init',
         description: `Event emitted just before dynamic layout created.<br/>
                     The first parameter of the handler is the entire fetch options.`,
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -486,7 +485,6 @@ export const argTypes = {
         name: 'fetch',
         description: `An event emitted by an action that needs to retrieve new data, such as a refresh or a change in the page navigation.<br/>
                     The first parameter of the handler is the entire fetch options, and as the second parameter, the fetch options with only the properties changed by the action are passed.`,
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -500,7 +498,6 @@ export const argTypes = {
     onSelect: {
         name: 'select',
         description: 'An event emitted by an select action.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -514,7 +511,6 @@ export const argTypes = {
     onExport: {
         name: 'export',
         description: 'An event emitted by an export action.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,
@@ -528,7 +524,6 @@ export const argTypes = {
     onClickSettings: {
         name: 'click-settings',
         description: 'An event emitted by an settings button click action.',
-        defaultValue: null,
         table: {
             type: {
                 summary: null,

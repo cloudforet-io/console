@@ -9,6 +9,7 @@
                 <input v-focus.lazy="proxyIsFocused"
                        :value="value"
                        :placeholder="placeholderText"
+                       :disabled="disabled"
                        v-on="inputListeners"
                 >
             </slot>
@@ -35,6 +36,7 @@ import PI from '@/foundation/icons/PI.vue';
 import { makeByPassListeners, makeOptionalProxy } from '@/util/composition-helpers';
 import { SearchProps } from '@/inputs/search/search/type';
 import { i18n } from '@/translations';
+import { TranslateResult } from 'vue-i18n';
 
 export default defineComponent<SearchProps>({
     name: 'PSearch',
@@ -63,6 +65,10 @@ export default defineComponent<SearchProps>({
             type: Boolean,
             default: false,
         },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
         /** sync */
         isFocused: {
             type: Boolean,
@@ -73,8 +79,8 @@ export default defineComponent<SearchProps>({
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
-            placeholderText: computed(() => {
-                if (typeof props.placeholder === 'undefined') return vm.$t('COMPONENT.SEARCH.PLACEHOLDER');
+            placeholderText: computed<TranslateResult>(() => {
+                if (props.placeholder === undefined) return vm.$t('COMPONENT.SEARCH.PLACEHOLDER');
                 return props.placeholder;
             }),
         });
