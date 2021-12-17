@@ -1,3 +1,12 @@
+# [1.1.0-beta.209](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.208...v1.1.0-beta.209) (2021-12-17)
+
+
+### Bug Fixes
+
+* add disabled prop to search dorpdown and storybook action binding bug fix ([#790](https://github.com/spaceone-dev/spaceone-design-system/issues/790)) ([779d6b5](https://github.com/spaceone-dev/spaceone-design-system/commit/779d6b5fe3ad98395472e7aabdcf9feee3c30ab1))
+* change unchecked color of ToggleButton ([#792](https://github.com/spaceone-dev/spaceone-design-system/issues/792)) ([d3f0b66](https://github.com/spaceone-dev/spaceone-design-system/commit/d3f0b66481b4d046380e2dbddda764e7ae0d4c38))
+* remove files related font-awesome ([#791](https://github.com/spaceone-dev/spaceone-design-system/issues/791)) ([800203d](https://github.com/spaceone-dev/spaceone-design-system/commit/800203d1cf7b8f802c82915b9aa1d8a382704ede))
+
 # [1.1.0-beta.208](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.207...v1.1.0-beta.208) (2021-12-16)
 
 
