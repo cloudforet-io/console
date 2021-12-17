@@ -3,7 +3,6 @@
           v-on="$listeners"
     >
         <p-lottie v-if="lottie" :name="lottie" :size="iconSize" />
-        <span v-else-if="isFortAwesome" class="fort-awesome"><i :class="icon.split(' ')" /></span>
         <p-i v-else-if="icon" :name="icon"
              :height="`${iconSize}rem`" :width="`${iconSize}rem`"
              :animation="iconAnimation"
@@ -13,7 +12,6 @@
     </span>
     <span v-else class="p-status" v-on="$listeners">
         <p-lottie v-if="lottie" :name="lottie" :size="iconSize" />
-        <span v-else-if="isFortAwesome" :style="{color:realIconColor||null}"><i :class="icon.split(' ')" /></span>
         <p-i v-else-if="icon" :name="icon"
              :color="realIconColor ? realIconColor : undefined"
              :animation="iconAnimation"
@@ -38,11 +36,8 @@ import { computed } from '@vue/composition-api';
 import { StatusProps } from '@/data-display/status/type';
 import { getColor } from '@/util/helpers';
 import PLottie from '@/foundation/lottie/PLottie.vue';
-import '@/styles/fontawesome.scss';
 import { themes } from '@/data-display/status/config';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
-
-const fontAwesomePrefix = RegExp('fa-');
 
 export default {
     name: 'PStatus',
@@ -95,18 +90,10 @@ export default {
         const labelColor = computed(() => getColor(props.textColor));
         const circleColor = computed(() => getColor(props.iconColor));
         const realIconColor = computed(() => getColor(props.iconColor));
-        const isFortAwesome = computed(() => {
-            if (props.icon && fontAwesomePrefix.test(props.icon)) {
-                return true;
-            }
-            return false;
-        });
-
         return {
             labelColor,
             circleColor,
             realIconColor,
-            isFortAwesome,
         };
     },
 };
@@ -115,9 +102,6 @@ export default {
 <style lang="postcss">
 .p-status {
     @define-mixin status-theme $icon-color, $circle-color {
-        .fort-awesome {
-            color: $icon-color;
-        }
         .p-i {
             color: $icon-color;
         }
