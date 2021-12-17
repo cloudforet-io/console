@@ -42,6 +42,20 @@ interface FontInfo {
 export const fontInfoMap: Record<string, FontInfo[]> = {
     default: [
         {
+            family: notoSansConfigMap.en.family,
+            source: getSources(notoSansConfigMap.en, 'regular'),
+            descriptors: {
+                weight: 400,
+            },
+        },
+        {
+            family: notoSansConfigMap.en.family,
+            source: getSources(notoSansConfigMap.en, '700'),
+            descriptors: {
+                weight: 700,
+            },
+        },
+        {
             family: robotoConfig.family,
             source: getSources(robotoConfig, 'regular'),
             descriptors: {
