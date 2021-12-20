@@ -17,9 +17,9 @@
             :value-handler-map="valueHandlerMap"
             :query-tags="tags"
             :style="{height: `${height}px`}"
-            @select="onSelect"
-            @change="onChange"
-            @refresh="onChange()"
+            @select="handleSelect"
+            @change="handleChange"
+            @refresh="handleChange()"
             @export="handleExport"
         >
             <template slot="toolbox-left">
@@ -32,7 +32,7 @@
                 <p-select-dropdown class="left-toolbox-item"
                                    :items="dropdownMenu"
 
-                                   @select="onSelectDropdown"
+                                   @select="handleSelectDropdown"
                 >
                     {{ $t('IDENTITY.USER.MAIN.ACTION') }}
                 </p-select-dropdown>
@@ -242,21 +242,19 @@ export default {
             }
         };
 
-        const onSelect = async (index) => {
-            state.selectedIndex = index;
-
-            if (index.length === 1) {
-                const res = await SpaceConnector.client.identity.roleBinding.list({
-                    resource_type: 'identity.User',
-                    resource_id: state.selectedUsers[0].user_id,
-                    role_type: 'DOMAIN',
-                });
-                if (res.total_count > 0) userFormState.roleOfSelectedUser = res.results[0].role_info.role_id;
-                else userFormState.roleOfSelectedUser = '';
-            }
+        const saveRoleOfSelectedUser = (index) => {
+            const selectedUser = state.users[index];
+            const roleBindingsData = selectedUser.role_bindings?.find(data => data.role_info?.role_type === 'DOMAIN');
+            if (roleBindingsData) userFormState.roleOfSelectedUser = roleBindingsData.role_info?.role_id;
+            else userFormState.roleOfSelectedUser = '';
         };
 
-        const onChange = async (options: any = {}) => {
+        const handleSelect = async (index) => {
+            state.selectedIndex = index;
+            if (index.length === 1) saveRoleOfSelectedUser(index);
+        };
+
+        const handleChange = async (options: any = {}) => {
             userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
             if (options.queryRags !== undefined) {
                 await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
@@ -281,6 +279,7 @@ export default {
             }
         };
 
+        /* Modal */
         const clickAdd = () => {
             userFormState.updateMode = false;
             userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.ADD_TITLE') as string;
@@ -315,7 +314,7 @@ export default {
             store.dispatch('service/user/showModal', MODAL_TYPE.MANAGEMENT);
         };
 
-        const onSelectDropdown = (name) => {
+        const handleSelectDropdown = (name) => {
             switch (name) {
             case 'enable': clickEnable(); break;
             case 'disable': clickDisable(); break;
@@ -420,10 +419,10 @@ export default {
             modalState,
             listUsers,
             clickAdd,
-            onSelectDropdown,
+            handleSelectDropdown,
             handleUserFormConfirm,
-            onSelect,
-            onChange,
+            handleSelect,
+            handleChange,
             handleExport,
             height,
         };

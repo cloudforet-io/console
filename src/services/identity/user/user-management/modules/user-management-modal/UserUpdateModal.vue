@@ -14,7 +14,7 @@
             <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')" required>
                 <template #default>
                     <div class="id-input-form">
-                        <p-text-input v-model="formState.user_id"
+                        <p-text-input v-model="user_id"
                                       disabled
                                       class="text-input"
                         />
@@ -22,7 +22,7 @@
                 </template>
             </p-field-group>
             <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')" class="input-form" required>
-                <p-text-input v-model="formState.name" class="text-input" autocomplete="username" />
+                <p-text-input v-model="name" class="text-input" autocomplete="username" />
             </p-field-group>
             <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')"
                            :invalid="validationState.isEmailValid === false"
@@ -30,13 +30,13 @@
                            class="input-form"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="formState.email" :invalid="invalid" class="text-input" />
+                    <p-text-input v-model="email" :invalid="invalid" class="text-input" />
                 </template>
             </p-field-group>
             <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')" class="input-form" required>
-                <p-select-dropdown v-model="formState.domainRole"
-                                   :items="formState.domainRoleItem"
-                                   :disabled="formState.domainRoleItem.length < 2 || isSameId"
+                <p-select-dropdown v-model="domainRole"
+                                   :items="domainRoleItem"
+                                   :disabled="domainRoleItem.length < 2 || isSameId"
                                    use-fixed-menu-style
                                    class="dropdown"
                 />
@@ -52,7 +52,7 @@
                     class="input-form"
                 >
                     <template #default="{invalid}">
-                        <p-text-input v-model="formState.password" type="password"
+                        <p-text-input v-model="password" type="password"
                                       autocomplete="current-password"
                                       class="text-input"
                                       :invalid="invalid"
@@ -67,7 +67,7 @@
                     class="input-form"
                 >
                     <template #default="{invalid}">
-                        <p-text-input v-model="formState.passwordCheck" type="password"
+                        <p-text-input v-model="passwordCheck" type="password"
                                       class="text-input"
                                       autocomplete="new-password"
                                       :invalid="invalid"
@@ -98,6 +98,7 @@ import {
 } from '@/services/identity/user/lib/user-form-validations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MODAL_TYPE } from '@/services/identity/user/store/type';
+import { User } from '@/services/identity/user/type';
 
 interface AuthType {
     label: string | null;
@@ -148,8 +149,8 @@ export default {
                 set(val) { store.commit('service/user/setVisibleUpdateModal', val); },
             }),
             isSameId: false,
-        });
-        const formState = reactive({
+            selectedUsers: computed<User[]>(() => store.state.service.user.selectedUsers),
+            //
             authTypeList: [
                 {
                     label: 'Local',
@@ -168,7 +169,7 @@ export default {
             domainRole: '',
             domainRoleItem: computed(() => [
                 { type: 'item', label: vm.$t('IDENTITY.USER.FORM.NOT_SELECT_ROLE'), name: '' },
-                ...formState.domainRoleList,
+                ...state.domainRoleList,
             ]),
             domainRoleList: [] as any[],
             password: '',
@@ -185,8 +186,8 @@ export default {
         });
 
         const checkEmail = async () => {
-            if (formState.email.trim().length > 0) {
-                const validation: Validation = await checkEmailFormat(formState.email);
+            if (state.email.trim().length > 0) {
+                const validation: Validation = await checkEmailFormat(state.email);
                 validationState.isEmailValid = validation.isValid;
                 validationState.emailInvalidText = validation.invalidText;
             } else {
@@ -214,7 +215,7 @@ export default {
             }
 
             // password2
-            const passwordCheckValidation: Validation = await checkSamePassword(formState.passwordCheck, password);
+            const passwordCheckValidation: Validation = await checkSamePassword(state.passwordCheck, password);
             validationState.isPasswordCheckValid = passwordCheckValidation.isValid;
             validationState.passwordCheckInvalidText = passwordCheckValidation.invalidText;
         };
@@ -223,7 +224,7 @@ export default {
             await checkEmail();
             if (!validationState.isEmailValid) return;
             if (props.isAdmin && props.item.backend === 'LOCAL' && props.item.user_type !== 'API Only') {
-                if (formState.password || formState.passwordCheck) await checkPassword(formState.password);
+                if (state.password || state.passwordCheck) await checkPassword(state.password);
                 else {
                     validationState.isPasswordValid = true;
                     validationState.isPasswordCheckValid = true;
@@ -232,15 +233,15 @@ export default {
                 if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
             }
             const data = {
-                user_id: formState.user_id,
-                name: formState.name,
-                email: formState.email,
+                user_id: state.user_id,
+                name: state.name,
+                email: state.email,
                 backend: props.item.backend,
                 user_type: props.item.user_type,
-                password: formState.password || '',
+                password: state.password || '',
             };
-            if (formState.domainRoleList.length > 0) {
-                emit('confirm', data, formState.domainRole);
+            if (state.domainRoleList.length > 0) {
+                emit('confirm', data, state.domainRole);
             } else {
                 emit('confirm', data, null);
             }
@@ -257,45 +258,33 @@ export default {
                 const res = await SpaceConnector.client.identity.role.list({
                     role_type: 'DOMAIN',
                 });
-                formState.domainRoleList = res.results.map(d => ({
+                state.domainRoleList = res.results.map(d => ({
                     type: 'item',
                     label: d.name,
-                    name: d.role_id,
+                    name: d.name,
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);
-                formState.domainRoleList = [];
+                state.domainRoleList = [];
             }
         };
 
         const setCurrentDomainId = async () => {
-            if (formState.domainRoleList[0]) {
-                try {
-                    const res = await SpaceConnector.client.identity.roleBinding.list({
-                        resource_type: 'identity.User',
-                        resource_id: formState.user_id,
-                        role_type: 'DOMAIN',
-                    });
-                    if (res.total_count > 0) formState.domainRole = formState.domainRoleList[0].name;
-                    else formState.domainRole = '';
-                } catch (e) {
-                    ErrorHandler.handleError(e);
-                }
-            } else {
-                formState.domainRole = '';
-            }
+            if (state.domainRoleList[0] && state.selectedUsers[0]) {
+                const roleName = state.selectedUsers[0].role_bindings?.find(data => data.role_info.role_type === 'DOMAIN')?.role_info.name;
+                state.domainRole = roleName;
+            } else state.domainRole = '';
         };
 
         const checkIsSameId = () => {
             const userAccountId = store.state.user.userId;
-            if (formState.user_id === userAccountId) state.isSameId = true;
-            else state.isSameId = false;
+            state.isSameId = state.user_id === userAccountId;
         };
 
         const setForm = async () => {
-            formState.user_id = props.item.user_id;
-            formState.name = props.item.name;
-            formState.email = props.item.email;
+            state.user_id = props.item.user_id;
+            state.name = props.item.name;
+            state.email = props.item.email;
             checkIsSameId();
             await setCurrentDomainId();
         };
@@ -307,7 +296,6 @@ export default {
 
         return {
             ...toRefs(state),
-            formState,
             validationState,
             confirm,
             handleClose,

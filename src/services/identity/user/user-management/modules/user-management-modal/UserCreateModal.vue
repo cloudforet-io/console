@@ -258,7 +258,7 @@ export default {
             passwordCheckInvalidText: '' as TranslateResult | string,
         });
 
-        /* util */
+        /* Validation */
         const setFormState = () => {
             formState.user_id = '';
             formState.name = '';
@@ -334,6 +334,35 @@ export default {
             }
         };
 
+        /* API */
+        const initAuthTypeList = async () => {
+            if (store.state.domain.extendedAuthType !== undefined) {
+                formState.tabs = [
+                    { name: 'external', label: store.getters['domain/extendedAuthTypeLabel'] },
+                    ...formState.tabs,
+                ];
+                formState.activeTab = 'external';
+            } else {
+                formState.activeTab = 'local';
+            }
+        };
+
+        const getRoleList = async () => {
+            try {
+                const { results } = await SpaceConnector.client.identity.role.list({
+                    role_type: 'DOMAIN',
+                });
+                formState.domainRoleList = results.map(d => ({
+                    type: 'item',
+                    label: d.name,
+                    name: d.role_id,
+                }));
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                formState.domainRoleList = [];
+            }
+        };
+
         const confirm = async () => {
             await checkUserID();
             if (!validationState.isUserIdValid) return;
@@ -361,29 +390,7 @@ export default {
             state.visible = false;
         };
 
-        const initAuthTypeList = async () => {
-            if (store.state.domain.extendedAuthType !== undefined) {
-                formState.tabs = [
-                    { name: 'external', label: store.getters['domain/extendedAuthTypeLabel'] },
-                    ...formState.tabs,
-                ];
-                formState.activeTab = 'external';
-            } else {
-                formState.activeTab = 'local';
-            }
-        };
-
-        const getRoleList = async () => {
-            const { results } = await SpaceConnector.client.identity.role.list({
-                role_type: 'DOMAIN',
-            });
-            formState.domainRoleList = results.map(d => ({
-                type: 'item',
-                label: d.name,
-                name: d.role_id,
-            }));
-        };
-
+        /* External Users */
         const setExternalMenuItems = (users) => {
             state.externalItems = [];
             users.forEach((user) => {
