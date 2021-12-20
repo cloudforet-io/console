@@ -51,6 +51,14 @@ This project is [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) licens
 <br/>
 <br/>
 
+### Chart License
+SpaceONE design system internally uses amCharts for Dynamic Chart. <br/>
+Before using the design system, look carefully at amCharts' license. <br/>
+If you want to purchase the amCharts license that suits you and use it on your application,
+see the license FAQ.
+
+https://www.amcharts.com/online-store/licenses-explained/
+
 ## How to Use
 
 

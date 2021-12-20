@@ -51,6 +51,7 @@
     "semantic-release": "SKIP_PRE_COMMIT=1 SKIP_COMMIT_MSG=1 semantic-release"
   },
   "dependencies": {
+    "@amcharts/amcharts4": "^4.10.10",
     "@babel/runtime": "^7.12.5",
     "@babel/runtime-corejs3": "^7.12.5",
     "@egjs/vue-flicking": "^3.5.2",

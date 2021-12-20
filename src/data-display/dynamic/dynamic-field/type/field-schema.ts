@@ -92,7 +92,7 @@ export type DynamicFieldOptions =
 
 export interface DynamicField {
     key: string;
-    name: string;
+    name?: string;
     type: DynamicFieldType;
     options?: DynamicFieldOptions;
 }

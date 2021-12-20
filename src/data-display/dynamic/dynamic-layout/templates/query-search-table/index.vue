@@ -142,7 +142,7 @@ export default {
 
                 return [{
                     title: 'Properties',
-                    items: props.options.fields.map(d => ({ label: d.name, name: d.key })),
+                    items: props.options.fields.map(d => ({ label: d.name ?? d.key, name: d.key })),
                 }];
             }),
             valueHandlerMap: computed(() => (props.typeOptions?.valueHandlerMap || {})),

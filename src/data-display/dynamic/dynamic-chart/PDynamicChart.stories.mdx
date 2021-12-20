@@ -1,0 +1,49 @@
+import { Meta, Canvas, Story, ArgsTable, Description } from '@storybook/addon-docs/blocks';
+import PDynamicChart from './PDynamicChart.vue';
+import { getDynamicChartArgTypes } from '@/data-display/dynamic/dynamic-chart/story-helper';
+import { DYNAMIC_CHART_TYPE } from '@/data-display/dynamic/dynamic-chart/config';
+
+
+<Meta title='Data Display/Dynamic/Dynamic Chart' argTypes={getDynamicChartArgTypes()}
+/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicChart },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-dynamic-chart v-bind="$props"></p-dynamic-chart>
+    </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Dynamic Chart
+<br/>
+<br/>
+
+## Supported Types
+
+<Description markdown={`
+${DYNAMIC_CHART_TYPE} are available.
+`}/>
+
+<br/>
+<br/>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
