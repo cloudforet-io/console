@@ -16,8 +16,10 @@
                 <p-divider class="cloud-service-divider" />
                 <cloud-service-toolbox :total-count="totalCount"
                                        :filters="filters"
+                                       :period.sync="period"
                                        :query-tags.sync="queryTags"
                                        @update-toolbox="handleToolbox"
+                                       @delete-period="handleDeletePeriod"
                 />
                 <p-data-loader class="flex-grow" :data="items" :loading="loading">
                     <div class="cloud-service-type-wrapper">
@@ -101,7 +103,12 @@ import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbo
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import {
-    arrayToQueryString, primitiveToQueryString, queryStringToArray, queryStringToString, replaceUrlQuery,
+    arrayToQueryString,
+    primitiveToQueryString,
+    queryStringToArray,
+    queryStringToObject,
+    queryStringToString,
+    replaceUrlQuery,
     RouteQueryString,
 } from '@/lib/router-query-string';
 import {
@@ -115,6 +122,7 @@ import cloudServiceStoreModule from '@/services/inventory/cloud-service/store';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import { Period } from '@/services/billing/cost-management/type';
 
 
 export default {
@@ -156,6 +164,7 @@ export default {
             selectedProvider: computed(() => store.state.service.cloudService.selectedProvider),
             selectedCategories: computed(() => store.state.service.cloudService.selectedCategories),
             selectedRegions: computed(() => store.state.service.cloudService.selectedRegions),
+            period: queryStringToObject(SpaceRouter.router.currentRoute.query?.period) as Period | undefined,
             //
             loading: true,
             items: [] as any[],
@@ -254,6 +263,10 @@ export default {
             }
             await listCloudServiceType();
         };
+        const handleDeletePeriod = async () => {
+            await replaceUrlQuery('period', undefined);
+            await listCloudServiceType();
+        };
 
         /* Init */
         (async () => {
@@ -269,11 +282,15 @@ export default {
             store.commit('service/cloudService/setSelectedRegions', queryStringToArray(currentQuery.region) || []);
             store.commit('service/cloudService/setSelectedCategories', queryStringToArray(currentQuery.service) || []);
 
-            // init provider // todo: array로 넘어오는 경우 있음
+            // init provider
             let provider: RouteQueryString = currentQuery.provider;
-            if (Array.isArray(provider)) provider = provider[0];
-            store.commit('service/cloudService/setSelectedProvider', queryStringToString(provider));
+            if (Array.isArray(provider)) provider = queryStringToString(provider[0]);
+            if (!provider || !state.providers[provider]) provider = 'all';
+            store.commit('service/cloudService/setSelectedProvider', provider);
 
+            if (currentQuery.provider !== primitiveToQueryString(provider)) {
+                await replaceUrlQuery('provider', primitiveToQueryString(provider));
+            }
             await listCloudServiceType();
         })();
 
@@ -301,6 +318,7 @@ export default {
             assetUrlConverter,
             getCloudServiceDetailLink,
             handleToolbox,
+            handleDeletePeriod,
         };
     },
 };

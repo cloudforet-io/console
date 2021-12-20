@@ -54,12 +54,13 @@ import {
     getTimeUnitByPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { getTableDataFromRawData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { TableData } from '@/services/billing/cost-management/widgets/type';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import { objectToQueryString } from '@/lib/router-query-string';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
@@ -151,6 +152,8 @@ export default {
             } else if (state.filters.provider?.length) {
                 query.provider = state.filters.provider;
             }
+
+            query.period = objectToQueryString(state.period);
 
             const filters: QueryStoreFilter[] = [];
             if (item.project_id) {

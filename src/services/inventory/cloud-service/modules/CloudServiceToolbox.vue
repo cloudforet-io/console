@@ -1,15 +1,27 @@
 <template>
-    <p-toolbox filters-visible
-               exportable
-               search-type="query"
-               :total-count="totalCount"
-               :query-tags="queryTags"
-               :key-item-sets="keyItemSets"
-               :value-handler-map="valueHandlerMap"
-               @change="handleChange"
-               @refresh="handleChange()"
-               @export="handleExport"
-    />
+    <div>
+        <div>
+            <span>{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTERED_BY_DATE') }}</span>
+            <template v-if="periodText">
+                <span>UTC</span>
+                <p-tag v-if="periodText" @delete="handleDeletePeriod">
+                    {{ periodText }}
+                </p-tag>
+            </template>
+            <span v-else>{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.AUTO_PERIOD') }}</span>
+        </div>
+        <p-toolbox filters-visible
+                   exportable
+                   search-type="query"
+                   :total-count="totalCount"
+                   :query-tags="queryTags"
+                   :key-item-sets="keyItemSets"
+                   :value-handler-map="valueHandlerMap"
+                   @change="handleChange"
+                   @refresh="handleChange()"
+                   @export="handleExport"
+        />
+    </div>
 </template>
 
 <script lang="ts">
@@ -18,7 +30,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToolbox,
+    PToolbox, PTag,
 } from '@spaceone/design-system';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
@@ -39,11 +51,14 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import { Period } from '@/services/billing/cost-management/type';
+import dayjs from 'dayjs';
 
 
 interface Props {
     totalCount: number;
     filters: QueryStoreFilter[];
+    period: Period | undefined;
     queryTags: QueryTag[];
 }
 
@@ -58,6 +73,7 @@ export default {
     name: 'CloudServiceToolbox',
     components: {
         PToolbox,
+        PTag,
     },
     props: {
         totalCount: {
@@ -67,6 +83,11 @@ export default {
         filters: {
             type: Array,
             default: () => ([]),
+        },
+        /* sync */
+        period: {
+            type: Object,
+            default: () => ({}),
         },
         /* sync */
         queryTags: {
@@ -96,11 +117,21 @@ export default {
             selectedRegions: computed(() => store.state.service.cloudService.selectedRegions),
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
+            periodText: computed<string | undefined>(() => {
+                if (props.period?.start) {
+                    return `${dayjs.utc(props.period.start).format('MMM, YYYY')} ~ ${dayjs.utc(props.period.end).format('MMM, YYYY')}`;
+                }
+                return undefined;
+            }),
         });
 
         /* event */
         const handleChange = async (options: ToolboxOptions = {}) => {
             emit('update-toolbox', options);
+        };
+        const handleDeletePeriod = () => {
+            emit('update:period', undefined);
+            emit('delete-period');
         };
 
         /* excel */
@@ -237,6 +268,7 @@ export default {
         return {
             ...toRefs(state),
             handleChange,
+            handleDeletePeriod,
             handleExport,
         };
     },
