@@ -75,7 +75,27 @@ Add following lines to ```main.js``` file. <br/>
 ```javascript
 import SpaceDesignSystem from '@spaceone/design-system';
 
-Vue.use(SpaceDesignSystem);
+Vue.use(SpaceDesignSystem, pluginOptions);
+```
+
+#### Plugin Options
+
+| Option | Description |
+| --- | ---- |
+| installVueRouter | Whether to install Vue Router. Some components use Vue Router, so don't give this option if you have already installed it in your application. |
+| installVueI18n | Whether to install Vue I18n. Some components use Vue I18n, so don't give this option if you have already installed it in your application. |
+| installVueCompositionApi | Whether to install the Vue Composition API. All components use the Vue Composition API, so don't give this option if you have already installed it in your application. |
+| installFragment | Whether to install Vue Fragment. Some components use Vue Fragment, so don't give this option if you have already installed it in your application. |
+| amchartsLicenses | If you use the amcharts library such as Dynamic Chart, license the amcharts as a string array. |
+
+```typescript
+interface SpaceoneDSOptions {
+    installVueRouter?: boolean;
+    installVueI18n?: boolean;
+    installVueCompositionApi?: boolean;
+    installFragment?: boolean;
+    amchartsLicenses?: string[];
+}
 ```
 
 ### 3. Set components locally

@@ -7,6 +7,7 @@ import Notifications, { NotificationOptions } from 'vue-notification';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 import VueRouter from 'vue-router';
+import { applyAmchartsGlobalSettings } from './plugins/amcharts';
 
 export interface SpaceoneDSOptions {
     installVueRouter?: boolean;
@@ -46,6 +47,7 @@ export class SpaceDSInstaller {
             classPrefix: 'p-i',
         });
         _Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
+        applyAmchartsGlobalSettings(options?.amchartsLicenses);
     }
 
     static install: PluginFunction<SpaceoneDSOptions> = (_Vue: VueConstructor, options: SpaceoneDSOptions = {}) => {

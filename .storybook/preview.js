@@ -20,6 +20,7 @@ import VTooltip from 'v-tooltip';
 
 import SpaceOneTheme from './SpaceOneTheme';
 import {i18n} from '@/translations'
+import { applyAmchartsGlobalSettings } from '@/plugins/amcharts';
 
 Vue.use(VueRouter)
 Vue.use(VueI18n);
@@ -31,6 +32,8 @@ Vue.use(SvgIcon, {
 })
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
+
+applyAmchartsGlobalSettings()
 
 Vue.prototype.toJSON = function () {
     return this;
