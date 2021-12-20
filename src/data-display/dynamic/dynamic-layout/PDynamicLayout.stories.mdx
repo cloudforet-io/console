@@ -1,12 +1,10 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PDynamicLayout from './PDynamicLayout.vue';
-import mock from './mock.ts'
 import {i18n} from '@/translations'
-import {argTypes} from './story-helper'
+import { getDynamicLayoutArgTypes } from './story-helper';
 
-<Meta title='Data Display/Dynamic/Dynamic Layout/Description' component={PDynamicLayout} argTypes={{
-    ...argTypes,
-}}/>
+<Meta title='Data Display/Dynamic/Dynamic Layout/Description'
+      argTypes={getDynamicLayoutArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
@@ -42,12 +40,13 @@ export const Template = (args, { argTypes }) => ({
                                   searchText
                               }"
                                class="w-full"
+                               @fetch="onFetch"
+                                @select="onSelect"
+                                @export="onExport"
+                                @click-settings="onClickSettings"
             >
             </p-dynamic-layout>
     `,
-    setup() {
-        return {}
-    }
 });
 
 
@@ -80,7 +79,7 @@ export const Template = (args, { argTypes }) => ({
 | simple-table | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
 | table | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
 | raw-table | ```root_path?: string translation_id?: string``` |
-| query-search-table | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
+| query-search-table | ```root_path?: string, translation_id?: string, fields: DynamicField[], search: SearchSchema``` |
 | raw | ```root_path?: string translation_id?: string``` |
 | markdown | ```translation_id?: string, markdown: string``` or <br/> ```markdown: { en: string, ko: string }``` |
 | html | ```root_path?: string, translation_id?: string``` |
@@ -193,6 +192,7 @@ interface DynamicLayoutTypeOptions {
 | fetch | Emitted when the new 'data' must be fetched.<br/> ex) when user clicked refresh button. |
 | select | Emitted when row(item) has been selected. |
 | export | Emitted when clicked export button. |
+| click-settings | Emitted when clicked settings button. |
 
 <br/>
 <br/>
@@ -201,6 +201,7 @@ interface DynamicLayoutTypeOptions {
 
 ```typescript
 interface DynamicLayoutEventListeners {
+    init: () => void|Promise<void>;
     fetch: (options: DynamicLayoutFetchOptions, layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     select: (selectIndex: number[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     export: (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
@@ -232,3 +233,15 @@ interface DynamicLayoutEventListeners {
 | list | init, fetch, select, export |
 
 <br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground" />

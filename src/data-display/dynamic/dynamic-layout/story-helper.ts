@@ -1,6 +1,7 @@
 import mock from '@/data-display/dynamic/dynamic-layout/mock';
+import { ArgTypes } from '@storybook/addons';
 
-export const argTypes = {
+export const getDynamicLayoutArgTypes = (): ArgTypes => ({
     name: {
         name: 'name',
         type: { name: 'string' },
@@ -467,20 +468,6 @@ export const argTypes = {
         },
     },
     // events
-    onInit: {
-        name: 'init',
-        description: `Event emitted just before dynamic layout created.<br/>
-                    The first parameter of the handler is the entire fetch options.`,
-        table: {
-            type: {
-                summary: null,
-            },
-            category: 'events',
-            defaultValue: {
-                summary: null,
-            },
-        },
-    },
     onFetch: {
         name: 'fetch',
         description: `An event emitted by an action that needs to retrieve new data, such as a refresh or a change in the page navigation.<br/>
@@ -534,4 +521,4 @@ export const argTypes = {
             },
         },
     },
-};
+});

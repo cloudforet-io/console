@@ -1,18 +1,10 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
-import { argTypes } from '@/data-display/dynamic/dynamic-layout/story-helper';
 import {i18n} from '@/translations'
-import mock from '@/data-display/dynamic/dynamic-layout/mock.ts'
+import { getDynamicLayoutSimpleTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/simple-table/story-helper';
 
 <Meta title='Data Display/Dynamic/Dynamic Layout/Simple Table'
-      component={PDynamicLayout} argTypes={{
-    name: argTypes.name,
-    options: argTypes.options,
-    data: argTypes.data,
-    loading: argTypes.loading,
-    timezone: argTypes.timezone,
-    colCopy: argTypes.colCopy,
-}}/>
+      argTypes={getDynamicLayoutSimpleTableArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
@@ -39,14 +31,77 @@ export const Template = (args, { argTypes }) => ({
     }
 });
 
-## Simple Table Type
+# Simple Table Type
+<br/>
+<br/>
+
+## Supported Options
+
+| Name | Supported |
+| ---- | ----------- |
+| root_path | O |
+| translation_id | O |
+| fields | O |
+| markdown | X |
+| layouts | X |
+| search | X |
+
+
+## Supported Fetch Options
+
+| Name | Supported |
+| ---- | ---- |
+| sortBy | X |
+| sortDesc | X |
+| pageStart | X |
+| pageLimit | X |
+| searchText | X |
+| queryTags | X |
+
+## Type Options
+
+| Name | Type |
+| ---- | ---- |
+| loading | boolean |
+| timezone | string |
+| colCopy | boolean |
+
+## Supported Type Options
+
+| Type Option Name | Supported |
+| ---- | ---- |
+| loading | O |
+| totalCount | X |
+| timezone | O |
+| selectIndex | X |
+| selectable | X |
+| multiSelect | X |
+| invalid | X |
+| colCopy | O |
+| excelVisible | X |
+| settingsVisible | X |
+| searchable | X |
+| keyItemSets | X |
+| valueHandlerMap | X |
+| language | X |
+
+
+## Supported Events
+
+| Event Name | Supported |
+| ---------- | ----------- |
+| fetch | X |
+| select | X |
+| export | X |
+| click-settings | X |
+
+<br/>
+<br/>
+
+## Playground
 
 <Canvas>
-    <Story name="Playground" args={{
-        type: 'simple-table',
-        data: mock.table.data,
-        options: mock.table.options
-    }}>
+    <Story name="Playground" >
         {Template.bind({})}
     </Story>
 </Canvas>

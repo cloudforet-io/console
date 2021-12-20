@@ -102,8 +102,8 @@ export default {
                 if (Array.isArray(props.data) || typeof props.data === 'string') return {};
                 return props.data;
             }),
-            loading: computed(() => (props.typeOptions === undefined ? undefined : props.typeOptions.loading)),
-            timezone: computed(() => props.typeOptions?.timezone || 'UTC'),
+            loading: computed<boolean|undefined>(() => (props.typeOptions === undefined ? undefined : props.typeOptions.loading)),
+            timezone: computed<string>(() => props.typeOptions?.timezone || 'UTC'),
         });
 
         const dynamicFieldSlots = computed(() => {

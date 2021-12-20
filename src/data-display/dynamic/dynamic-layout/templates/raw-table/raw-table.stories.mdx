@@ -1,35 +1,10 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
-import { argTypes } from '@/data-display/dynamic/dynamic-layout/story-helper';
 import {i18n} from '@/translations'
-import mock from '@/data-display/dynamic/dynamic-layout/mock.ts'
+import { getDynamicLayoutRawTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/raw-table/story-helper';
 
 <Meta title='Data Display/Dynamic/Dynamic Layout/Raw Table'
-      component={PDynamicLayout} argTypes={{
-    name: argTypes.name,
-    options: argTypes.options,
-    data: argTypes.data,
-    loading: argTypes.loading,
-    totalCount: argTypes.totalCount,
-    timezone: argTypes.timezone,
-    selectIndex: argTypes.selectIndex,
-    selectable: argTypes.selectable,
-    multiSelect: argTypes.multiSelect,
-    invalid: argTypes.invalid,
-    colCopy: argTypes.colCopy,
-    searchable: argTypes.searchable,
-    excelVisible: argTypes.excelVisible,
-    settingsVisible: argTypes.settingsVisible,
-    sortBy: argTypes.sortBy,
-    sortDesc: argTypes.sortDesc,
-    pageStart: argTypes.pageStart,
-    pageLimit: argTypes.pageLimit,
-    searchText: argTypes.searchText,
-    onFetch: argTypes.onFetch,
-    onSelect: argTypes.onSelect,
-    onExport: argTypes.onExport,
-    onClickSettings: argTypes.onClickSettings
-}}/>
+      argTypes={getDynamicLayoutRawTableArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
@@ -74,13 +49,67 @@ export const Template = (args, { argTypes }) => ({
 });
 
 
-## Raw Table Type
+# Raw Table Type
+<br/>
+<br/>
+
+## Supported Options
+
+| Name | Supported |
+| ---- | ----------- |
+| root_path | O |
+| translation_id | O |
+| fields | X |
+| markdown | X |
+| layouts | X |
+| search | X |
+
+## Supported Fetch Options
+
+| Name | Supported |
+| ---- | ---- |
+| sortBy | O |
+| sortDesc | O |
+| pageStart | O |
+| pageLimit | O |
+| searchText | O |
+| queryTags | X |
+
+
+## Supported Type Options
+
+| Type Option Name | Supported |
+| ---- | ---- |
+| loading | O |
+| totalCount | O |
+| timezone | O |
+| selectIndex | O |
+| selectable | O |
+| multiSelect | O |
+| invalid | O |
+| colCopy | O |
+| excelVisible | O |
+| settingsVisible | O |
+| searchable | O |
+| keyItemSets | X |
+| valueHandlerMap | X |
+| language | X |
+
+## Supported Events
+| Event Name | Supported |
+| ---------- | ----------- |
+| fetch | O |
+| select | O |
+| export | O |
+| click-settings | X |
+
+<br/>
+<br/>
+
+## Playground
 
 <Canvas>
-    <Story name="Playground" args={{
-        type: 'raw-table',
-        data: mock.rawTable.data,
-    }}>
+    <Story name="Playground">
         {Template.bind({})}
     </Story>
 </Canvas>
