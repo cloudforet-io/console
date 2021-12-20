@@ -6,7 +6,7 @@
         :loading="loading"
         :value="lastMonthCost"
         :currency-symbol="currencySymbol"
-        :description="lastMonth.format('MMM YYYY')"
+        :description="lastMonth.format('MMMM YYYY')"
         :show-divider="false"
     >
         <template #default>
@@ -103,7 +103,6 @@ export default {
             state.chart = chart;
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
-            chart.paddingTop = -5;
             chart.paddingBottom = 0;
 
             const categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
@@ -127,16 +126,15 @@ export default {
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
             valueAxis.renderer.labels.template.disabled = true;
             valueAxis.renderer.grid.template.strokeOpacity = 0;
-            valueAxis.renderer.baseGrid.disabled = true;
-            valueAxis.min = 0;
+            valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
 
             const series = chart.series.push(new am4charts.ColumnSeries());
             series.dataFields.valueY = valueName;
             series.dataFields.categoryX = categoryKey;
             series.columns.template.propertyFields.fill = 'color';
             series.columns.template.strokeOpacity = 0;
-            series.columns.template.column.cornerRadiusTopLeft = 6;
-            series.columns.template.column.cornerRadiusTopRight = 6;
+            series.columns.template.column.cornerRadiusTopLeft = 2;
+            series.columns.template.column.cornerRadiusTopRight = 2;
             series.columns.template.width = am4core.percent(45);
 
             series.columns.template.adapter.add('fill', (fill, target) => {

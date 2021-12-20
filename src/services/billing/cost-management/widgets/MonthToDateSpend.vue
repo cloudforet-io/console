@@ -5,7 +5,7 @@
         :loading="loading"
         :value="currencyMoneyFormatter(currentMonthCost, currency, currencyRates, true, 10000000000)"
         :currency-symbol="currencySymbol"
-        :description="`${currentMonth.startOf('month').format('MMM DD')} ~ ${thisDay}, ${currentMonth.format('YYYY')}`"
+        :description="`${currentMonth.startOf('month').format('MMMM DD')} ~ ${thisDay}, ${currentMonth.format('YYYY')}`"
         :no-data="!currentMonthCost || !lastMonthCost"
     >
         <template #default>

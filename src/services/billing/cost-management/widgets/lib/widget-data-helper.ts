@@ -83,10 +83,14 @@ const _getTableRowData = (groupBy: string[], tableRawData: TableRawData): TableD
  *       => [{ category: 'aws', value: 100 }, { category: 'azure', value: 30 }]
  * @usage SpcProjectWiseUsageSummary, CostByProvider
  */
-export const getPieChartData = (rawData: PieChartRawData[], groupBy: string): PieChartData[] => rawData.map(d => ({
-    category: d[groupBy],
-    value: d.usd_cost,
-}));
+export const getPieChartData = (rawData: PieChartRawData[], groupBy: string): PieChartData[] => rawData.map((d) => {
+    let groupByName = d[groupBy];
+    if (!groupByName) groupByName = `No ${GROUP_BY_ITEM_MAP[groupBy].label}`;
+    return {
+        category: groupByName,
+        value: d.usd_cost,
+    };
+});
 
 export const getPieChartDataAndLegends = (rawData: PieChartRawData[], groupBy: string): { chartData: PieChartData[]; legends: Legend[] } => {
     const chartData: PieChartData[] = getPieChartData(rawData, groupBy);

@@ -185,7 +185,6 @@ export default {
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
             valueAxis.tooltip.disabled = true;
             valueAxis.renderer.minWidth = 20;
-            valueAxis.min = 0;
             valueAxis.fontSize = 12;
             valueAxis.extraMax = 0.01;
             valueAxis.renderer.grid.template.strokeOpacity = 1;
