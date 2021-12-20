@@ -144,10 +144,12 @@ export default {
             if (item.region_code) {
                 query.region = item.region_code;
             } else if (state.filters.region_code?.length) {
-                query.region = state.filters.region_code[0]; // todo 일단 첫 번째 것만
+                query.region = state.filters.region_code;
             }
             if (item.provider) {
                 query.provider = item.provider;
+            } else if (state.filters.provider?.length) {
+                query.provider = state.filters.provider;
             }
 
             const filters: QueryStoreFilter[] = [];
