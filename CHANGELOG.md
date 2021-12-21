@@ -1,3 +1,10 @@
+# [1.1.0-beta.211](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.210...v1.1.0-beta.211) (2021-12-21)
+
+
+### Features
+
+* add coulmn, donut, treemap type to dynamic chart with sample design ([#798](https://github.com/spaceone-dev/spaceone-design-system/issues/798)) ([7d72be8](https://github.com/spaceone-dev/spaceone-design-system/commit/7d72be8317900b0778956c847be9ec06a9bff549))
+
 # [1.1.0-beta.210](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.209...v1.1.0-beta.210) (2021-12-20)
 
 
