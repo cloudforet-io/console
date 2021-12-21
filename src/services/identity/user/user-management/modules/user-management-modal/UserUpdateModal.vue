@@ -261,7 +261,7 @@ export default {
                 state.domainRoleList = res.results.map(d => ({
                     type: 'item',
                     label: d.name,
-                    name: d.name,
+                    name: d.role_id,
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -271,7 +271,7 @@ export default {
 
         const setCurrentDomainId = async () => {
             if (state.domainRoleList[0] && state.selectedUsers[0]) {
-                const roleName = state.selectedUsers[0].role_bindings?.find(data => data.role_info.role_type === 'DOMAIN')?.role_info.name;
+                const roleName = state.selectedUsers[0].role_bindings?.find(data => data.role_info.role_type === 'DOMAIN')?.role_info.role_id;
                 state.domainRole = roleName;
             } else state.domainRole = '';
         };
