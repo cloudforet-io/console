@@ -1,3 +1,10 @@
+# [1.1.0-beta.212](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.211...v1.1.0-beta.212) (2021-12-21)
+
+
+### Bug Fixes
+
+* remove simple style layout of toolbox ([#799](https://github.com/spaceone-dev/spaceone-design-system/issues/799)) ([10de542](https://github.com/spaceone-dev/spaceone-design-system/commit/10de5426f5b093b66820e2b3e395e619e36a2879))
+
 # [1.1.0-beta.211](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.210...v1.1.0-beta.211) (2021-12-21)
 
 
