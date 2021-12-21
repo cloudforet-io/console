@@ -60,12 +60,13 @@ module.exports = {
             ...extraPlugins,
         ],
         /*
-         Code below is for removing unnecessary modules of amcharts 4.
+        Below is a code that removes unnecessary modules to bundling.
+        The modules that are removed are modules that are already installed in the application or too large.
          Related issue: https://github.com/amcharts/amcharts4/issues/82#issuecomment-607546562
          */
         // eslint-disable-next-line consistent-return
         externals(context, request, callback) {
-            if (/xlsx|canvg|pdfmake/.test(request)) {
+            if (/^vue$|@vue\/composition-api|vue-router|vue-i18n|vue-fragment|@amcharts|xlsx|canvg|pdfmake/.test(request)) {
                 return callback(null, `commonjs ${request}`);
             }
             callback();
@@ -107,16 +108,6 @@ module.exports = {
                 opts.configFile = 'tsconfig.build.json';
                 return opts;
             });
-
-        config.externals([
-            '@vue/composition-api',
-            'vue-i18n',
-            'vue-svgicon',
-            'velocity-animate',
-            'vue-notification',
-            'vue-fragment',
-            'v-tooltip',
-        ]);
     },
     parallel: false,
 };
