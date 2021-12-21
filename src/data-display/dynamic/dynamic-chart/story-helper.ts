@@ -21,18 +21,36 @@ export const getDynamicChartArgTypes = (): ArgTypes => ({
             options: DYNAMIC_CHART_TYPE,
         },
     },
-    data: {
-        name: 'data',
-        type: { name: 'any' },
-        description: 'Data to display.',
-        defaultValue: 'data',
+    loading: {
+        name: 'loading',
+        type: { name: 'boolean' },
+        description: 'Whether to show loader or not.',
+        defaultValue: false,
         table: {
             type: {
-                summary: 'any',
+                summary: 'boolean',
             },
             category: 'props',
             defaultValue: {
-                summary: 'undefined',
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    data: {
+        name: 'data',
+        type: { name: 'array' },
+        description: 'Data to display.',
+        defaultValue: [],
+        table: {
+            type: {
+                summary: 'array',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '[]',
             },
         },
         control: {

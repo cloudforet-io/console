@@ -2,6 +2,7 @@ import { Meta, Canvas, Story, ArgsTable, Description } from '@storybook/addon-do
 import PDynamicChart from './PDynamicChart.vue';
 import { getDynamicChartArgTypes } from '@/data-display/dynamic/dynamic-chart/story-helper';
 import { DYNAMIC_CHART_TYPE } from '@/data-display/dynamic/dynamic-chart/config';
+import { getDynamicChartMockData } from '@/data-display/dynamic/dynamic-chart/mock';
 
 
 <Meta title='Data Display/Dynamic/Dynamic Chart' argTypes={getDynamicChartArgTypes()}
@@ -12,9 +13,18 @@ export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PDynamicChart },
     template: `
-    <div class="h-full w-full overflow p-8">
-        <p-dynamic-chart v-bind="$props"></p-dynamic-chart>
-    </div>
+<div class="h-full w-full overflow p-8">
+    <p-dynamic-chart
+        :type="type"
+        :loading="loading"
+        :data="data"
+        :value-options="valueOptions"
+        :name-options="nameOptions"
+        :limit="limit"
+        style="height: 500px;"
+    >
+    </p-dynamic-chart>
+</div>
     `,
     setup() {
         return {}
@@ -35,13 +45,88 @@ ${DYNAMIC_CHART_TYPE} are available.
 <br/>
 <br/>
 
+## Dynamic Chart by Types
+
+### COLUMN Type
+
+<Canvas>
+    <Story name="COLUMN Type" >
+{{
+    components: { PDynamicChart },
+    template: `
+<div class="h-full w-full overflow p-8">
+    <p-dynamic-chart
+        type="COLUMN"
+        :data="data"
+        style="height: 500px;"
+    >
+    </p-dynamic-chart>
+</div>
+    `,
+    setup() {
+        return getDynamicChartMockData('COLUMN')
+    }
+}}
+    </Story>
+</Canvas>
+
+
+### DONUT Type
+
+<Canvas>
+    <Story name="DONUT Type" >
+{{
+    components: { PDynamicChart },
+    template: `
+<div class="h-full w-full overflow p-8">
+    <p-dynamic-chart
+        type="DONUT"
+        :data="data"
+        style="height: 500px;"
+    >
+    </p-dynamic-chart>
+</div>
+    `,
+    setup() {
+        return getDynamicChartMockData('DONUT')
+    }
+}}
+    </Story>
+</Canvas>
+
+### TREEMAP Type
+
+
+<Canvas>
+    <Story name="TREEMAP Type" >
+{{
+    components: { PDynamicChart },
+    template: `
+<div class="h-full w-full overflow p-8">
+    <p-dynamic-chart
+        type="TREEMAP"
+        :data="data"
+        style="height: 500px;"
+    >
+    </p-dynamic-chart>
+</div>
+    `,
+    setup() {
+        return getDynamicChartMockData('TREEMAP')
+    }
+}}
+    </Story>
+</Canvas>
+
 <br/>
 <br/>
 
 ## Playground
 
 <Canvas>
-    <Story name="Playground">
+    <Story name="Playground" args={{
+        data: getDynamicChartMockData('COLUMN').data
+    }}>
         {Template.bind({})}
     </Story>
 </Canvas>
