@@ -3,6 +3,7 @@
         :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.MONTH_TO_DATE_SPEND')"
         unit-type="CURRENCY"
         :loading="loading"
+        :widget-link="widgetLink"
         :value="currencyMoneyFormatter(currentMonthCost, currency, currencyRates, true, 10000000000)"
         :currency-symbol="currencySymbol"
         :description="`${currentMonth.startOf('month').format('MMMM DD')} ~ ${thisDay}, ${currentMonth.format('YYYY')}`"
@@ -59,6 +60,8 @@ import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { BILLING_ROUTE } from '@/services/billing/routes';
+import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 const thisDay = dayjs.utc().format('DD');
 export default {
@@ -98,6 +101,16 @@ export default {
             currentMonth: computed<Dayjs>(() => dayjs.utc(props.period?.end)),
             lastMonth: computed<Dayjs>(() => dayjs.utc(props.period?.end).subtract(1, 'month')),
             currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
+            widgetLink: computed(() => ({
+                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                query: {
+                    granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                    period: objectToQueryString({
+                        start: state.lastMonth.startOf('month').format('YYYY-MM-DD'),
+                        end: `${state.lastMonth.endOf('month').format('YYYY-MM')}-${thisDay}`,
+                    }),
+                },
+            })),
         });
 
         const costQueryHelper = new QueryHelper();

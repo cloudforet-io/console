@@ -8,6 +8,7 @@
         :currency-symbol="currencySymbol"
         :description="lastMonth.format('MMMM YYYY')"
         :show-divider="false"
+        :widget-link="widgetLink"
     >
         <template #default>
             <div ref="chartRef" class="chart" />
@@ -36,6 +37,9 @@ import { getXYChartData } from '@/services/billing/cost-management/widgets/lib/w
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { BILLING_ROUTE } from '@/services/billing/routes';
+import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 
 
 const categoryKey = 'date';
@@ -84,6 +88,13 @@ export default {
                 return currencyMoneyFormatter(cost, props.currency, props.currencyRates, true, 10000000000);
             }),
             currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
+            widgetLink: computed(() => ({
+                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                query: {
+                    granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+                    period: objectToQueryString({ start: state.firstMonth, end: state.thisMonth.endOf('month') }),
+                },
+            })),
         });
 
         const disposeChart = (chartContext) => {

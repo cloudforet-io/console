@@ -5,6 +5,7 @@
         :value="usageRate"
         :description="`${currencyMoneyFormatter(availableCost, currency, currencyRates, false, 10000000)} Available`"
         :loading="loading"
+        :widget-link="widgetLink"
     >
         <template #title-extra>
             <p-i name="ic_budget" width="1em" height="1em"
@@ -44,6 +45,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import {
     getConvertedBudgetFilter,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { BILLING_ROUTE } from '@/services/billing/routes';
 
 export default {
     name: 'BudgetUsage',
@@ -84,6 +86,7 @@ export default {
                 if (state.limitCost - state.usageCost > 0) return state.limitCost - state.usageCost;
                 return 0;
             }),
+            widgetLink: computed(() => ({ name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME })),
         });
 
         const budgetQueryHelper = new QueryHelper();

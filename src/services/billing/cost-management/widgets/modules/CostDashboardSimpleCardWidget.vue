@@ -1,30 +1,32 @@
 <template>
-    <p-pane-layout class="card-widget-layout">
-        <div v-if="loading">
-            <p-skeleton width="11rem" height="3rem" />
-            <p-skeleton width="9.5rem" height="1rem" class="mb-5" />
-            <p-skeleton width="14rem" height="1.75rem" />
-        </div>
-        <div v-if="!loading && noData" class="no-data">
-            No Item
-        </div>
-        <div v-else-if="!loading && !noData">
-            <p class="title-wrapper">
-                <span class="title">{{ title }}</span>
-                <span v-if="$scopedSlots['title-extra']" class="title-extra">
-                    <slot name="title-extra" />
-                </span>
-            </p>
-            <p class="value-wrapper">
-                <span v-if="unitType === UNIT_TYPE.CURRENCY" class="unit-type">{{ currencySymbol }}</span>
-                <span class="value">{{ value }}</span>
-                <span v-if="unitType === UNIT_TYPE.PERCENT" class="unit-type">%</span>
-            </p>
-            <span class="description">{{ description }}</span>
-            <p-divider v-if="showDivider" class="divider" />
-            <slot />
-        </div>
-    </p-pane-layout>
+    <router-link :to="widgetLink">
+        <p-pane-layout class="card-widget-layout">
+            <div v-if="loading">
+                <p-skeleton width="11rem" height="3rem" />
+                <p-skeleton width="9.5rem" height="1rem" class="mb-5" />
+                <p-skeleton width="14rem" height="1.75rem" />
+            </div>
+            <div v-if="!loading && noData" class="no-data">
+                No Item
+            </div>
+            <div v-else-if="!loading && !noData">
+                <p class="title-wrapper">
+                    <span class="title">{{ title }}</span>
+                    <span v-if="$scopedSlots['title-extra']" class="title-extra">
+                        <slot name="title-extra" />
+                    </span>
+                </p>
+                <p class="value-wrapper">
+                    <span v-if="unitType === UNIT_TYPE.CURRENCY" class="unit-type">{{ currencySymbol }}</span>
+                    <span class="value">{{ value }}</span>
+                    <span v-if="unitType === UNIT_TYPE.PERCENT" class="unit-type">%</span>
+                </p>
+                <span class="description">{{ description }}</span>
+                <p-divider v-if="showDivider" class="divider" />
+                <slot />
+            </div>
+        </p-pane-layout>
+    </router-link>
 </template>
 
 <script lang="ts">
@@ -85,6 +87,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        widgetLink: {
+            type: [Object, String],
+            default: () => ({}),
+        },
     },
     setup() {
         return {
@@ -101,6 +107,9 @@ export default {
     height: 100%;
     padding: 1rem 1.25rem;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
+    &:hover {
+        @apply bg-blue-100 cursor-pointer;
+    }
     .title-wrapper {
         @apply flex text-gray-800;
         justify-content: space-between;
