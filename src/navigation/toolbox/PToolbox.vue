@@ -4,7 +4,7 @@
             <div v-if="$scopedSlots['left-area']" class="left-area-wrapper">
                 <slot name="left-area" />
             </div>
-            <div v-if="searchable" class="search-wrapper" :class="{simple: !$scopedSlots['left-area']}">
+            <div v-if="searchable" class="search-wrapper">
                 <p-search v-if="searchType === SEARCH_TYPES.plain"
                           v-model="proxyState.searchText"
                           @search="onSearch"
@@ -16,7 +16,7 @@
                                 @search="onSearch"
                 />
             </div>
-            <div class="tools-wrapper" :class="{simple: !$scopedSlots['left-area']}">
+            <div class="tools-wrapper">
                 <div v-if="paginationVisible" class="tool">
                     <p-text-pagination :this-page="proxyState.thisPage"
                                        :all-page="allPage"
@@ -332,22 +332,6 @@ export default defineComponent<ToolboxProps>({
     .filters-wrapper {
         @apply w-full;
         order: 4;
-    }
-
-    /* responsive */
-    @screen md {
-        .search-wrapper {
-            &.simple {
-                order: 2;
-                width: auto;
-                flex-grow: 100;
-            }
-        }
-        .tools-wrapper {
-            &.simple {
-                order: 3;
-            }
-        }
     }
 
     @screen lg {
