@@ -1,3 +1,10 @@
+# [1.1.0-beta.213](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.212...v1.1.0-beta.213) (2021-12-21)
+
+
+### Bug Fixes
+
+* change vue.config.js ([#801](https://github.com/spaceone-dev/spaceone-design-system/issues/801)) ([2d9d89c](https://github.com/spaceone-dev/spaceone-design-system/commit/2d9d89cae65d16e8e1a9cc9e07cffd97f683ee80))
+
 # [1.1.0-beta.212](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.211...v1.1.0-beta.212) (2021-12-21)
 
 
