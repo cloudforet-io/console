@@ -59,6 +59,17 @@ module.exports = {
         plugins: [
             ...extraPlugins,
         ],
+        /*
+         Code below is for removing unnecessary modules of amcharts 4.
+         Related issue: https://github.com/amcharts/amcharts4/issues/82#issuecomment-607546562
+         */
+        // eslint-disable-next-line consistent-return
+        externals(context, request, callback) {
+            if (/xlsx|canvg|pdfmake/.test(request)) {
+                return callback(null, `commonjs ${request}`);
+            }
+            callback();
+        },
         module: {
             rules: [
                 {
