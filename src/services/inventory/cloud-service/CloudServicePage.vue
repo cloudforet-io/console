@@ -340,7 +340,7 @@ export default {
 }
 .cloud-service-type-wrapper {
     @apply grid w-full;
-    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(16.93rem, 1fr));
     gap: 1rem;
 }
 .cloud-service-type-item {
@@ -376,22 +376,23 @@ export default {
             }
         }
         .service-group-wrapper {
-            @apply flex flex-wrap gap-2 items-center;
+            @apply w-full flex gap-2 items-center;
             padding: 0 0.5rem;
 
             .service-group {
-                @apply font-bold text-lg text-gray-900;
+                @apply inline-block max-w-full font-bold text-lg text-gray-900 truncate;
             }
         }
         .service-type-list {
-            @apply flex flex-wrap flex-col-reverse;
+            @apply flex flex-wrap flex-col-reverse w-full;
             height: 3rem;
             gap: 0.125rem;
             .service-type-item {
-                @apply flex justify-between rounded;
+                @apply flex justify-between w-full rounded;
                 padding: 0.15rem 0.5rem;
                 .service-type-name {
-                    @apply text-sm text-gray-900;
+                    @apply text-sm text-gray-900 truncate;
+                    max-width: 90%;
                 }
                 .service-type-count {
                     @apply text-gray-500;
@@ -418,6 +419,18 @@ export default {
     @apply w-full h-full;
     .empty-cloud-service-img {
         @apply w-48 mx-auto pt-19 mb-8;
+    }
+}
+
+@screen tablet {
+    .cloud-service-type-wrapper {
+        grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    }
+}
+
+@screen mobile {
+    .cloud-service-type-wrapper {
+        grid-template-columns: 100%;
     }
 }
 </style>

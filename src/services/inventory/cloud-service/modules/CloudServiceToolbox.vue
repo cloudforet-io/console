@@ -1,14 +1,14 @@
 <template>
     <div>
-        <div>
-            <span>{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTERED_BY_DATE') }}</span>
+        <div class="period">
+            <span class="label">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTERED_BY_DATE') }}:</span>
             <template v-if="periodText">
-                <span>UTC</span>
+                <span class="text">UTC</span>
                 <p-tag v-if="periodText" @delete="handleDeletePeriod">
                     {{ periodText }}
                 </p-tag>
             </template>
-            <span v-else>{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.AUTO_PERIOD') }}</span>
+            <span v-else class="text">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.AUTO_PERIOD') }}</span>
         </div>
         <p-toolbox filters-visible
                    exportable
@@ -274,3 +274,24 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.period {
+    @apply mb-4;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    .label {
+        @apply mr-2 font-bold;
+    }
+    .text {
+        @apply text-gray-500 mr-2;
+    }
+}
+
+@screen mobile {
+    .period {
+        .label {
+            @apply block;
+        }
+    }
+}
+</style>
