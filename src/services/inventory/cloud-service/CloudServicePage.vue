@@ -23,38 +23,11 @@
                 />
                 <p-data-loader class="flex-grow" :data="items" :loading="loading">
                     <div class="cloud-service-type-wrapper">
-                        <div v-for="(item, i) in items" :key="i" class="cloud-service-type-item">
-                            <router-link :to="getCloudServiceDetailLink(item)"
-                                         class="item-wrapper"
-                            >
-                                <div class="provider-title-wrapper">
-                                    <p-lazy-img width="1rem" height="1rem"
-                                                :src="providers[item.provider].icon"
-                                                error-icon="ic_provider_other"
-                                                :alt="item.name"
-                                                class="icon"
-                                    />
-                                    <span class="provider">{{ providers[item.provider] ? providers[item.provider].label : item.provider }}</span>
-                                </div>
-                                <div class="service-group-wrapper">
-                                    <p-lazy-img width="1.5rem" height="1.5rem"
-                                                :src="assetUrlConverter(item.icon) || (providers[item.provider] ? providers[item.provider].icon : '')"
-                                                error-icon="ic_provider_other"
-                                                :alt="item.name"
-                                                class="icon"
-                                    />
-                                    <span class="service-group">{{ item.cloud_service_group }}</span>
-                                </div>
-                                <div class="service-type-list">
-                                    <router-link :to="getCloudServiceDetailLink(item)"
-                                                 class="service-type-item"
-                                    >
-                                        <span class="service-type-name">{{ item.cloud_service_type }}</span>
-                                        <span class="service-type-count">{{ item.count }}</span>
-                                    </router-link>
-                                </div>
-                            </router-link>
-                        </div>
+                        <cloud-service-list-card v-for="(item, idx) in items" :key="`${item.provider}-${item.cloud_service_group}-${idx}`"
+                                                 :item="item"
+                                                 :query-filters="queryFilters"
+                                                 :selected-regions="selectedRegions"
+                        />
                     </div>
                     <template #no-data>
                         <div class="text-center empty-cloud-service">
@@ -78,7 +51,6 @@
 </template>
 
 <script lang="ts">
-import { Location } from 'vue-router';
 import axios, { CancelTokenSource } from 'axios';
 
 import {
@@ -86,7 +58,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PDataLoader, PDivider, PIconTextButton, PLazyImg, PPageTitle,
+    PBreadcrumbs, PDataLoader, PDivider, PIconTextButton, PPageTitle,
 } from '@spaceone/design-system';
 
 import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
@@ -101,7 +73,6 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
-import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import {
     arrayToQueryString,
     primitiveToQueryString,
@@ -123,15 +94,18 @@ import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import { Period } from '@/services/billing/cost-management/type';
+import CloudServiceListCard
+    from '@/services/inventory/cloud-service/modules/cloud-service-list/CloudServiceListCard.vue';
+import dayjs from 'dayjs';
 
 
 export default {
     name: 'CloudServicePage',
     components: {
+        CloudServiceListCard,
         CloudServiceToolbox,
         PVerticalPageLayout,
         CloudServiceMenu,
-        PLazyImg,
         PDivider,
         PIconTextButton,
         PPageTitle,
@@ -156,6 +130,7 @@ export default {
             }],
             'inventory.CloudService',
         );
+
         const queryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
             providers: computed(() => store.state.resource.provider.items),
@@ -178,10 +153,13 @@ export default {
                     filters.push({ k: 'provider', v: state.selectedProvider, o: '=' });
                 } if (state.selectedRegions.length) {
                     filters.push({ k: 'region_code', v: state.selectedRegions, o: '=' });
+                } if (state.selectedCategories.length) {
+                    filters.push({ k: 'labels', v: state.selectedCategories, o: '=' });
                 }
                 const queryFilters: QueryStoreFilter[] = queryHelper.setFiltersAsQueryTag(state.queryTags).filters;
                 return [...filters, ...queryFilters];
             }),
+            queryFilters: vm.$route.query.filters,
         });
 
         const routeState = reactive({
@@ -190,33 +168,6 @@ export default {
                 { name: i18n.t('MENU.INVENTORY.CLOUD_SERVICE') },
             ])),
         });
-
-        /* util */
-        const cloudServiceDetailQueryHelper = new QueryHelper();
-        const getCloudServiceDetailLink = (item) => {
-            const searchFilters = queryHelper.filters;
-            cloudServiceDetailQueryHelper.setFilters(searchFilters.filter((f: any) => f.k && ![
-                'cloud_service_type',
-                'cloud_service_group',
-            ].includes(f.k)));
-
-            if (state.selectedRegions.length) {
-                cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: state.selectedRegions });
-            }
-
-            const res: Location = {
-                name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                params: {
-                    provider: item.provider,
-                    group: item.cloud_service_group,
-                    name: item.cloud_service_type,
-                },
-                query: {
-                    filters: cloudServiceDetailQueryHelper.rawQueryStrings,
-                },
-            };
-            return res;
-        };
 
         /* api */
         const cloudServiceApiQueryHelper = new ApiQueryHelper()
@@ -231,14 +182,17 @@ export default {
             listCloudServiceRequest = axios.CancelToken.source();
             try {
                 state.loading = true;
-                cloudServiceApiQueryHelper.setFilters(state.filters);
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(
-                    {
-                        labels: state.selectedCategories,
-                        query: cloudServiceApiQueryHelper.data,
-                    },
-                    { cancelToken: listCloudServiceRequest.token },
-                );
+                cloudServiceApiQueryHelper.setFilters(state.filters).addFilter(...queryHelper.filters);
+                const res = await SpaceConnector.client.inventory.cloudServiceType.analyze({
+                    labels: state.selectedCategories,
+                    ...cloudServiceApiQueryHelper.data,
+                    ...(state.period && {
+                        data_range: {
+                            start: state.period?.start,
+                            end: dayjs.utc(state.period?.end).add(1, 'day').format('YYYY-MM-DD'),
+                        },
+                    }),
+                });
                 state.items = res.results;
                 state.totalCount = res.total_count || 0;
                 state.loading = false;
@@ -316,7 +270,6 @@ export default {
             ...toRefs(state),
             routeState,
             assetUrlConverter,
-            getCloudServiceDetailLink,
             handleToolbox,
             handleDeletePeriod,
         };
@@ -329,10 +282,6 @@ export default {
 .page-wrapper {
     @apply flex flex-col w-full h-full;
 }
-.show-all {
-    @apply text-sm mr-2;
-    line-height: 2rem;
-}
 .cloud-service-divider {
     @apply w-full;
     margin-top: 1.5rem;
@@ -343,74 +292,7 @@ export default {
     grid-template-columns: repeat(auto-fill, minmax(16.93rem, 1fr));
     gap: 1rem;
 }
-.cloud-service-type-item {
-    @apply p-4 bg-white border border-gray-200 rounded-lg;
-    height: 9rem;
-    filter: drop-shadow(0 2px 4px rgba(theme('colors.black'), 0.06));
-    .favorite-btn {
-        @apply ml-2;
-        flex-shrink: 0;
-        &:not(.active) {
-            display: none;
-        }
-    }
-    &:hover {
-        @apply border-l border-secondary bg-blue-100;
-        cursor: pointer;
-        .favorite-btn:not(.active) {
-            display: block;
-        }
-    }
-    .item-wrapper {
-        @apply flex flex-col w-full h-full flex-wrap gap-2;
-        .icon {
-            @apply overflow-hidden flex-shrink-0 rounded-md;
-        }
-        .provider-title-wrapper {
-            @apply flex flex-wrap gap-1 items-center;
-            margin: 0 0.5rem;
 
-            .provider {
-                @apply text-gray-700 text-sm;
-                line-height: 150%;
-            }
-        }
-        .service-group-wrapper {
-            @apply w-full flex gap-2 items-center;
-            padding: 0 0.5rem;
-
-            .service-group {
-                @apply inline-block max-w-full font-bold text-lg text-gray-900 truncate;
-            }
-        }
-        .service-type-list {
-            @apply flex flex-wrap flex-col-reverse w-full;
-            height: 3rem;
-            gap: 0.125rem;
-            .service-type-item {
-                @apply flex justify-between w-full rounded;
-                padding: 0.15rem 0.5rem;
-                .service-type-name {
-                    @apply text-sm text-gray-900 truncate;
-                    max-width: 90%;
-                }
-                .service-type-count {
-                    @apply text-gray-500;
-                }
-
-                &:hover {
-                    @apply bg-blue-200;
-                    .service-type-name {
-                        @apply text-blue-500 underline;
-                    }
-                    .service-type-count {
-                        @apply text-blue-500;
-                    }
-                }
-            }
-        }
-    }
-}
 .page-title {
     @apply capitalize;
     margin-bottom: 0;

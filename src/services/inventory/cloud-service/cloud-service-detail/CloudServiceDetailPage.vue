@@ -304,7 +304,7 @@ export default {
         },
         name: {
             type: String,
-            required: true,
+            default: undefined,
         },
     },
     setup(props, { root }) {
@@ -735,11 +735,27 @@ export default {
             sidebarState.selectedItem = find(sidebarState.items, { name: props.name }) || { name: props.name };
         };
 
+        const routeFirstItem = async () => {
+            await vm.$router.replace({
+                name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                params: {
+                    provider: props.provider,
+                    group: props.group,
+                    name: sidebarState.items[0].name,
+                },
+                query: vm.$route.query,
+            });
+            sidebarState.selectedItem = sidebarState.items[0];
+        };
+
         (async () => {
+            await initSidebar();
             await store.dispatch('resource/loadAll');
+            if (!props.name) {
+                await routeFirstItem();
+            }
             tableState.schema = await getTableSchema();
             await fetchTableData();
-            await initSidebar();
         })();
         /** ************************* */
 
