@@ -20,7 +20,7 @@
                 </template>
                 <template #col-value-format="{value}">
                     <div class="cost-col-body">
-                        {{ currencyMoneyFormatter(value, currency, currencyRates) }}
+                        {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
                     </div>
                 </template>
             </p-data-table>

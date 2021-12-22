@@ -10,7 +10,10 @@
                      @export="handleExport"
     >
         <template #col-format="{field, value, index, item}">
-            <span v-if="field.name === GROUP_BY.PROJECT">
+            <span v-if="Object.values(GROUP_BY).includes(field.name) && !value">
+                {{ `No ${GROUP_BY_ITEM_MAP[field.name].label}` }}
+            </span>
+            <span v-else-if="field.name === GROUP_BY.PROJECT">
                 {{ projects[value] ? projects[value].label : value }}
             </span>
             <span v-else-if="field.name === GROUP_BY.PROVIDER">
@@ -22,11 +25,14 @@
             <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT">
                 {{ serviceAccounts[value] ? serviceAccounts[value].name : value }}
             </span>
+            <span v-else-if="field.name === 'totalCost'">
+                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
+            </span>
             <span v-else-if="typeof value !== 'string'" class="text-center">
                 <p-anchor :to="value ? getLink(item) : undefined" target="_self"
                           :show-icon="false"
                 >
-                    {{ currencyMoneyFormatter(value, currency, currencyRates) }}
+                    {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
                 </p-anchor>
             </span>
         </template>
@@ -47,14 +53,13 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 
-import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import {
     getConvertedFilter,
     getConvertedGranularity,
     getTimeUnitByPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { getTableDataFromRawData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { TableData } from '@/services/billing/cost-management/widgets/type';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
@@ -135,7 +140,7 @@ export default {
             let now = start;
             while (now.isSameOrBefore(end, state.timeUnit)) {
                 dateFields.push({
-                    name: now.format(nameDateFormat),
+                    name: `usd_cost.${now.format(nameDateFormat)}`,
                     label: now.format(labelDateFormat),
                     textAlign: 'right',
                     sortable: true,
@@ -201,7 +206,7 @@ export default {
                     pivot_type: 'TABLE',
                     ...costApiQueryHelper.data,
                 });
-                tableState.items = getTableDataFromRawData(results, state.groupBy);
+                tableState.items = results;
                 tableState.totalCount = total_count;
             } catch (e) {
                 tableState.items = [];
@@ -233,7 +238,7 @@ export default {
                         group_by: state.groupBy,
                         start: dayjs.utc(state.period.start),
                         end: dayjs.utc(state.period.end).add(1, state.timeUnit),
-                        pivot_type: 'EXCEL',
+                        pivot_type: 'TABLE',
                         query: costApiQueryHelper.data,
                     },
                     fields: tableState.excelFields,
@@ -257,6 +262,7 @@ export default {
             ...toRefs(state),
             tableState,
             GROUP_BY,
+            GROUP_BY_ITEM_MAP,
             handleChange,
             handleRefresh,
             handleExport,

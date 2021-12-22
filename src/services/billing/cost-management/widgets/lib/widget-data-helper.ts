@@ -10,7 +10,7 @@ import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { Period } from '@/services/billing/cost-management/type';
 import {
-    ChartData, Legend, PieChartData, PieChartRawData, TableData, TableRawData, XYChartData, XYChartRawData,
+    ChartData, Legend, PieChartData, PieChartRawData, XYChartData, XYChartRawData,
 } from '@/services/billing/cost-management/widgets/type';
 
 
@@ -60,19 +60,6 @@ const _getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: string): 
         legends = [{ name: 'totalCost', label: 'Total Cost', disabled: false }];
     }
     return legends;
-};
-
-const _getTableRowData = (groupBy: string[], tableRawData: TableRawData): TableData => {
-    const rowData: TableData = {};
-    /* extract group by data (ex. { provider: 'aws', region_code: 'us-west-1' }) */
-    if (groupBy.length) {
-        groupBy.forEach((name) => {
-            rowData[name] = tableRawData[name] ? tableRawData[name] : `No ${GROUP_BY_ITEM_MAP[name].label}`;
-        });
-    } else {
-        rowData.totalCost = 'Total Cost';
-    }
-    return rowData;
 };
 
 
@@ -156,23 +143,6 @@ export const getXYChartDataAndLegends = (rawData: XYChartRawData[], groupBy?: st
         legends: _getLegendsFromGroupByNames(groupByNames, groupBy),
     };
 };
-
-
-/**
- * @name getTableDataFromRawData
- * @description Get converted table data.
- * @example [{ provider: 'aws', values: [{ date: '2021-11-01', usd_code: 100 }, { date: '2021-11-02', usd_code: 150 }] }, { provider: 'azure', values: [{ date: '2021-11-01', usd_code: 200 }] }]
- *       => [{ provider: 'aws', 2021-11-01: 100, 2021-11-02: 150 }, { provider: 'azure', 2021-11-01: 200 }]
- * @usage CostAnalysisChart, CostTrendByProduct, CostTrendByProject
- */
-export const getTableDataFromRawData = (rawData: TableRawData[], groupBy: string[]): TableData[] => rawData.map((eachRawData) => {
-    const rowData = _getTableRowData(groupBy, eachRawData);
-    eachRawData.values.forEach((value) => {
-        rowData[value.date] = value.usd_cost;
-    });
-
-    return rowData;
-});
 
 
 /**

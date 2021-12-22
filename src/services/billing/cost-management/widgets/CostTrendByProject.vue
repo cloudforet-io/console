@@ -26,22 +26,19 @@
 <script lang="ts">
 import dayjs from 'dayjs';
 import { range } from 'lodash';
+import * as am4charts from '@amcharts/amcharts4/charts';
 import { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
 
 import {
-    computed, reactive, toRefs, watch, onUnmounted,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import {
-    PChartLoader, PSkeleton,
-} from '@spaceone/design-system';
+import { PChartLoader, PSkeleton } from '@spaceone/design-system';
 
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
-import CostDashboardDataTable
-    from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
+import CostDashboardDataTable from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
 
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
@@ -56,7 +53,8 @@ import config from '@/lib/config';
 import { CURRENCY } from '@/store/modules/display/config';
 import { ChartData, Legend, WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import {
-    getCurrencyAppliedChartData, getTableDataFromRawData, getXYChartDataAndLegends,
+    getCurrencyAppliedChartData,
+    getXYChartDataAndLegends,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
@@ -134,7 +132,7 @@ export default {
                 range(6).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');
                     fields.push({
-                        name: date.format('YYYY-MM'),
+                        name: `usd_cost.${date.format('YYYY-MM')}`,
                         label: thisMonth.isSame(date, 'month') ? `${date.format('MMM')} (MTD)` : date.format('MMM'),
                     });
                 });
@@ -221,10 +219,6 @@ export default {
             start: dayjs(period.end).subtract(5, 'month').format('YYYY-MM'),
             end: dayjs.utc(period.end).endOf('month').format('YYYY-MM-DD'),
         });
-        const _getConvertedTableItems = (tableItems: TableItem[]): TableItem[] => tableItems.map(d => ({
-            ...d,
-            project_id: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'No Project',
-        }));
 
         /* api */
         const costQueryHelper = new QueryHelper();
@@ -245,8 +239,7 @@ export default {
                     ...costQueryHelper.apiQuery,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;
-                const tableItems = getTableDataFromRawData(results, [GROUP_BY.PROJECT]) as TableItem[];
-                state.items = _getConvertedTableItems(tableItems); // project id -> project name
+                state.items = results;
                 state._top15itemNames = results.map(d => d.project_id);
             } catch (e) {
                 ErrorHandler.handleError(e);

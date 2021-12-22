@@ -8,14 +8,6 @@ export interface ChartData {
     [key: string]: any;
 }
 
-interface TableRawValue {
-    date: string;
-    usd_cost?: number;
-}
-export interface TableRawData {
-    values: TableRawValue[];
-    [key: string]: any;
-}
 export interface TableData {
     [key: string]: any;
 }

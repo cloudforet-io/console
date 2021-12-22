@@ -59,10 +59,10 @@ import config from '@/lib/config';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import {
-    getCurrencyAppliedChartData, getTableDataFromRawData, getXYChartDataAndLegends,
+    getCurrencyAppliedChartData, getXYChartDataAndLegends,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { CURRENCY } from '@/store/modules/display/config';
 import { ChartData, Legend, WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -133,7 +133,7 @@ export default defineComponent<Props>({
                 range(state.thisMonthPage * 3 - 3, state.thisMonthPage * 3).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');
                     fields.push({
-                        name: date.format('YYYY-MM'),
+                        name: `usd_cost.${date.format('YYYY-MM')}`,
                         label: thisMonth.isSame(date, 'month') ? `${date.format('MMM')} (MTD)` : date.format('MMM'),
                     });
                 });
@@ -226,16 +226,6 @@ export default defineComponent<Props>({
             start: dayjs(period.end).subtract(5, 'month').format('YYYY-MM'),
             end: dayjs.utc(period.end).endOf('month').format('YYYY-MM-DD'),
         });
-        const _getConvertedTableItems = (rawData, groupBy): TableItem[] => {
-            const tableItems = getTableDataFromRawData(rawData, [groupBy]) as TableItem[];
-            if (groupBy === GROUP_BY.PROVIDER) {
-                return (tableItems as ProviderTableItem[]).map(d => ({
-                    ...d,
-                    provider: state.providers[d.provider]?.label || d.provider,
-                }));
-            }
-            return tableItems;
-        };
 
         /* api */
         const costQueryHelper = new QueryHelper();
@@ -256,7 +246,7 @@ export default defineComponent<Props>({
                     ...costQueryHelper.apiQuery,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;
-                state.items = _getConvertedTableItems(results, props.groupBy);
+                state.items = results;
                 state._top15itemNames = results.map(d => d[props.groupBy]);
             } catch (e) {
                 ErrorHandler.handleError(e);

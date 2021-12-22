@@ -78,10 +78,9 @@
                 </template>
             </p-data-loader>
         </section>
-        <set-filter-modal :visible.sync="selectFilterModalState.visible"
+        <set-filter-modal :visible.sync="filterModalVisible"
                           :selected-filters="filters"
                           :filter-items="filterItems"
-                          @confirm="handleConfirmSetFilter"
         />
     </div>
 </template>
@@ -159,10 +158,7 @@ export default {
             legends: [] as Legend[],
             chartData: [] as Array<XYChartData|PieChartData>,
             chart: null as XYChart | PieChart | null,
-        });
-
-        const selectFilterModalState = reactive({
-            visible: false,
+            filterModalVisible: false,
         });
 
         /* util */
@@ -258,7 +254,7 @@ export default {
             state.chartGroupBy = groupBy;
         };
         const handleClickSelectFilter = () => {
-            selectFilterModalState.visible = true;
+            state.filterModalVisible = true;
         };
         const handleClearAllFilters = () => {
             store.commit('service/costAnalysis/setFilters', {});
@@ -273,9 +269,6 @@ export default {
                 _filters[filterName] = undefined;
             }
             store.commit('service/costAnalysis/setFilters', _filters);
-        };
-        const handleConfirmSetFilter = (filters) => {
-            store.commit('service/costAnalysis/setFilters', filters);
         };
         const refreshChart = debounce(async () => {
             state.loading = true;
@@ -306,7 +299,6 @@ export default {
 
         return {
             ...toRefs(state),
-            selectFilterModalState,
             FILTER_ITEM_MAP,
             DISABLED_LEGEND_COLOR,
             DEFAULT_CHART_COLORS,
@@ -318,7 +310,6 @@ export default {
             handleClickSelectFilter,
             handleDeleteFilterTag,
             handleClearAllFilters,
-            handleConfirmSetFilter,
         };
     },
 };

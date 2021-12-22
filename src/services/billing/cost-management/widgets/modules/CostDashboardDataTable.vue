@@ -18,14 +18,27 @@
                                   @click="handleClickLegend(index)"
                         />
                         <slot :name="`${name}-format`" v-bind="{ value }">
-                            {{ value }}
+                            <span v-if="Object.values(GROUP_BY).includes(name) && !value">
+                                {{ `No ${GROUP_BY_ITEM_MAP[name].label}` }}
+                            </span>
+                            <span v-else-if="name === GROUP_BY.PROJECT">
+                                {{ projects[value] ? projects[value].label : value }}
+                            </span>
+                            <span v-else-if="name === GROUP_BY.PROVIDER">
+                                <span :style="{color: providers[value].color}">
+                                    {{ providers[value] ? providers[value].name : value }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                {{ value }}
+                            </span>
                         </slot>
                     </template>
                     <template v-else-if="typeof value === 'string'">
                         {{ value }}
                     </template>
                     <template v-else>
-                        {{ currencyMoneyFormatter(value, currency, currencyRates) }}
+                        {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
                     </template>
                     <!--                    <template v-else>-->
                     <!--                        <span v-if="value.isRaised" :class="{raised: value.isRaised}">-->
@@ -62,6 +75,8 @@ import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets'
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { CURRENCY } from '@/store/modules/display/config';
+import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
+import { store } from '@/store';
 
 
 // interface Item {
@@ -128,6 +143,8 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             // convertedItems: [] as Item[],
+            providers: computed(() => store.state.resource.provider.items),
+            projects: computed(() => store.state.resource.project.items),
             slicedItems: computed(() => {
                 const startIndex = state.proxyThisPage * props.pageSize - props.pageSize;
                 const endIndex = state.proxyThisPage * props.pageSize;
@@ -199,6 +216,8 @@ export default {
 
         return {
             ...toRefs(state),
+            GROUP_BY,
+            GROUP_BY_ITEM_MAP,
             getStatusText,
             getStatusIconColor,
             getStatusTextColor,

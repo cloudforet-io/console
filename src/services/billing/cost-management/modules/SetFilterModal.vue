@@ -168,8 +168,8 @@ export default {
             state.filters = _filters;
         };
         const handleFormConfirm = () => {
+            store.commit('service/costAnalysis/setFilters', state.filters);
             state.proxyVisible = false;
-            emit('confirm', state.filters);
         };
         const handleClearAll = () => {
             state.filters = {};
