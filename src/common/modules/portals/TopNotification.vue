@@ -1,16 +1,23 @@
 <template>
-    <portal to="top-notification">
-        <p-notification-bar v-model="visible"
-                            :style-type="styleType"
-        >
-            <slot />
-        </p-notification-bar>
+    <portal to="top-notification" class="top-notification">
+        <p slot-scope="{hasDefaultMessage}">
+            <p-notification-bar v-model="visible"
+                                :style-type="styleType"
+                                @close="handleClose"
+            >
+                <span v-if="hasDefaultMessage">
+                    <portal target="top-notification-message" />
+                    Permission denied. Please, Contact administrator to get a role.
+                </span>
+            </p-notification-bar>
+        </p>
     </portal>
 </template>
 
 <script lang="ts">
 import { PNotificationBar } from '@spaceone/design-system';
-import { reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
+import { store } from '@/store';
 
 export default {
     name: 'TopNotification',
@@ -23,10 +30,17 @@ export default {
     },
     setup() {
         const state = reactive({
-            visible: true,
+            visible: computed({
+                get() { return !store.getters['user/hasPermission'] || store.state.error.visibleAuthorizationError; },
+                set(val) { store.commit('error/setVisibleAuthorizationError', val); },
+            }),
         });
+        const handleClose = () => {
+            state.visible = false;
+        };
         return {
             ...toRefs(state),
+            handleClose,
         };
     },
 };

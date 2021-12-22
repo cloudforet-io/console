@@ -71,6 +71,7 @@ import { ItemType } from '@/services/project/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const LIMIT = 5;
 
@@ -237,7 +238,7 @@ export default {
             try {
                 await Promise.all([listProjectGroups(), listProjects()]);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.projectItems = [];
                 state.projectGroupItems = [];
             } finally {

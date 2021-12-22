@@ -140,11 +140,12 @@ import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { store } from '@/store';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { PROJECT_ROUTE } from '@/services/project/routes';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -252,7 +253,7 @@ export default {
                 if (!axios.isCancel(e.axiosError)) {
                     state.cardSummary = cardSummary;
                     state.cardSummaryLoading = false;
-                    console.error(e);
+                    ErrorHandler.handleError(e);
                 }
             }
         };
@@ -286,7 +287,7 @@ export default {
                     state.totalCount = 0;
                     state.loading = false;
                     store.commit('service/project/setProjectCount', 0);
-                    console.error(e);
+                    ErrorHandler.handleError(e);
                 }
             }
         };
@@ -326,7 +327,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
             } finally {
                 state.projectFormVisible = false;
                 await listProjects(state.groupId, state.searchText);

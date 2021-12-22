@@ -112,7 +112,8 @@ import {
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { store } from '@/store';
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'ProjectTree',
@@ -252,7 +253,7 @@ export default {
                 );
                 return items;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 return [];
             }
         };
@@ -309,8 +310,7 @@ export default {
                 await SpaceConnector.client.identity.projectGroup.update(params);
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm.$root);
             } catch (e) {
-                console.error(e);
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
             }
         };
 
@@ -331,7 +331,7 @@ export default {
                 await SpaceConnector.client.identity.projectGroup.update(params);
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
             }
         };
 
@@ -354,7 +354,7 @@ export default {
 
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT'), e);
+                ErrorHandler.handleRequestError(e, vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT'));
             }
         };
 

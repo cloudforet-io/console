@@ -1,11 +1,5 @@
 <template>
     <fragment>
-        <top-notification v-if="storeState.groupId && isPermissionDenied">
-            <div>
-                {{ $t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_1') }} <br>
-                {{ $t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_2') }}
-            </div>
-        </top-notification>
         <p-vertical-page-layout>
             <template #sidebar="{width}">
                 <div class="sidebar-container">
@@ -135,13 +129,13 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
 import ProjectGroupMember from '@/services/project/project-detail/project-member/modules/ProjectGroupMember.vue';
-import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import { store } from '@/store';
 import ProjectPageStoreModule from '@/services/project/store';
 import { ProjectPageState } from '@/services/project/store/type';
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
 import ProjectGroupDeleteCheckModal from '@/services/project/modules/ProjectGroupDeleteCheckModal.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -149,7 +143,6 @@ export default {
     components: {
         ProjectGroupDeleteCheckModal,
         SidebarTitle,
-        TopNotification,
         ProjectGroupMember,
         FavoriteList,
         FavoriteButton,
@@ -286,7 +279,7 @@ export default {
                     state.groupMemberCount = res.total_count;
                 } catch (e) {
                     state.groupMemberCount = undefined;
-                    console.error(e);
+                    ErrorHandler.handleError(e);
                 }
             } else {
                 state.groupMemberCount = 0;

@@ -96,6 +96,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { CATEGORY } from '@/services/inventory/cloud-service/lib/config';
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface RegionItem {
@@ -158,7 +159,7 @@ export default {
                     provider: d.provider,
                 }));
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

@@ -33,12 +33,13 @@ import {
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import VueI18n from 'vue-i18n';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -113,8 +114,7 @@ export default {
                 await store.dispatch('resource/projectGroup/load');
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '', root);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'), e);
-                throw new Error(e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
             }
         };
 
@@ -123,8 +123,7 @@ export default {
                 await store.dispatch('service/project/updateProjectGroup', item);
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', root);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e);
-                throw new Error(e);
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
             }
         };
 

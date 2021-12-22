@@ -3,7 +3,6 @@ import { SpaceRouter } from '@/router';
 import {
     isInstanceOfAPIError, isInstanceOfAuthenticationError, isInstanceOfAuthorizationError,
     isInstanceOfBadRequestError,
-    isInstanceOfNotFoundError,
 } from '@spaceone/console-core-lib/space-connector/error';
 import { isInstanceOfNoResourceError, isInstanceOfNoSearchResourceError } from '@/common/composables/error/error';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -25,9 +24,7 @@ export default class ErrorHandler {
     }
 
     static handleError(error) {
-        if (isInstanceOfNotFoundError(error)) {
-            showErrorMessage('Something is Wrong! Please contact the administrator.', error);
-        } else if (isInstanceOfAuthenticationError(error)) {
+        if (isInstanceOfAuthenticationError(error)) {
             const isTokenAlive = SpaceConnector.isTokenAlive;
             if (!isTokenAlive && !SpaceRouter.router.currentRoute.meta.excludeAuth) {
                 (async () => {
@@ -51,8 +48,10 @@ export default class ErrorHandler {
     }
 
     static handleRequestError(error, i18nKey: TranslateResult) {
-        if (isInstanceOfBadRequestError(error) && i18nKey) showErrorMessage(i18nKey, error);
-        else if (isInstanceOfAPIError(error)) showErrorMessage('Something is Wrong! Please contact the administrator.', error);
-        else console.error(error);
+        if (!isInstanceOfAuthorizationError(error)) {
+            if (isInstanceOfBadRequestError(error) && i18nKey) showErrorMessage(i18nKey, error);
+            else if (isInstanceOfAPIError(error)) showErrorMessage('Something is Wrong! Please contact the administrator.', error);
+        }
+        this.handleError(error);
     }
 }

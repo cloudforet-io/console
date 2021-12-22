@@ -130,7 +130,7 @@ export default {
                     note: state.noteInput,
                 });
             } catch (e) {
-                ErrorHandler.handleError(e);
+                ErrorHandler.handleRequestError(e, 'Failed to Create Note');
             } finally {
                 state.noteInput = '';
                 await listNote();
@@ -159,7 +159,7 @@ export default {
                     note_id: state.selectedNoteIdForDelete,
                 });
             } catch (e) {
-                ErrorHandler.handleError(e);
+                ErrorHandler.handleRequestError(e, 'Failed to Delete Note');
             } finally {
                 checkDeleteState.loading = false;
                 checkDeleteState.visible = false;

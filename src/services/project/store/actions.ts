@@ -3,6 +3,7 @@ import { ProjectPageState } from '@/services/project/store/type';
 import { ProjectGroupTreeItem, ProjectItemResp } from '@/services/project/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const initRoot: Action<ProjectPageState, any> = ({ commit }, root) => {
     commit('setRootNode', root);
@@ -28,7 +29,7 @@ export const selectNode: Action<ProjectPageState, any> = async ({ state }, group
             return node;
         }
     } catch (e) {
-        console.error(e);
+        ErrorHandler.handleError(e);
     }
 
     return null;
@@ -79,6 +80,7 @@ export const createProjectGroup: Action<ProjectPageState, any> = async ({ state,
         commit('addPermissionInfo', { [res.project_group_id]: true });
         commit('setHasProjectGroup', true);
     } catch (e) {
+        ErrorHandler.handleError(e);
         throw new Error(e);
     } finally {
         commit('setActionTargetItem', {});
@@ -101,6 +103,7 @@ export const updateProjectGroup: Action<ProjectPageState, any> = async ({ state,
         state.rootNode.updateNodeByPath(getters.actionTargetNodePath,
             { ...getters.actionTargetNodeData, ...projectGroupInfo });
     } catch (e) {
+        ErrorHandler.handleError(e);
         throw new Error(e);
     } finally {
         commit('setActionTargetItem', {});
@@ -116,9 +119,9 @@ export const deleteProjectGroup: Action<ProjectPageState, any> = async ({ state,
         await SpaceConnector.client.identity.projectGroup.delete({
             project_group_id: getters.actionTargetNodeData.id,
         });
-
         state.rootNode.deleteNodeByPath(getters.actionTargetNodePath);
     } catch (e) {
+        ErrorHandler.handleError(e);
         throw new Error(e);
     } finally {
         commit('setActionTargetItem', {});
@@ -159,7 +162,7 @@ export const refreshPermissionInfo: Action<ProjectPageState, any> = async ({ com
         if (ids) commit('addPermissionInfo', permissionInfo);
         else commit('setPermissionInfo', permissionInfo);
     } catch (e) {
-        console.error(e);
+        ErrorHandler.handleError(e);
     } finally {
         refreshPermissionInfoLoading = false;
     }
@@ -178,7 +181,7 @@ export const addPermissionInfo: Action<ProjectPageState, any> = async ({ commit,
         const permissionInfo = await getPermissionInfo(projectGroupIds);
         commit('addPermissionInfo', permissionInfo);
     } catch (e) {
-        console.error(e);
+        ErrorHandler.handleError(e);
     } finally {
         addPermissionInfoLoading = false;
     }

@@ -1,21 +1,12 @@
 <template>
     <div v-cloak id="app">
-        <!--        <button style="position: fixed; z-index: 9999999; left: 20px; top: 20px;" class="bg-coral font-bold px-4 py-2 rounded" @click="flush">-->
-        <!--            flush session-->
-        <!--        </button>-->
         <template v-if="$store.state.display.isInitialized">
             <p-notice-alert group="noticeTopLeft" position="top left" />
             <p-notice-alert group="noticeTopRight" position="top right" />
             <p-notice-alert group="noticeBottomLeft" position="bottom left" />
             <p-notice-alert group="noticeBottomRight" position="bottom right" />
             <p-toast-alert group="toastTopCenter" position="top center" />
-            <top-notification v-if="!$store.getters['user/hasPermission'] || $store.state.error.visibleAuthorizationError">
-                <i18n path="APP.TOP_NOTI.HAS_NO_ROLE">
-                    <template #needRole>
-                        <strong>{{ $t('APP.TOP_NOTI.NEED_ROLE') }}</strong>
-                    </template>
-                </i18n>
-            </top-notification>
+            <top-notification />
             <template v-if="showGNB">
                 <GNB class="gnb" />
                 <div class="app-body">
@@ -24,7 +15,9 @@
                                @close="$store.dispatch('display/hideSidebar')"
                     >
                         <main class="main">
-                            <portal-target name="top-notification" />
+                            <portal-target name="top-notification"
+                                           :slot-props="{hasDefaultMessage: true}"
+                            />
                             <router-view />
                         </main>
                         <template #title>
@@ -48,7 +41,6 @@
                           @clickButton="goToSignIn"
             />
         </template>
-
         <!-- Iframe for file download -->
         <iframe class="hidden"
                 :src="$store.state.file.downloadSource" width="1" height="1"
@@ -118,10 +110,6 @@ export default defineComponent({
             ...toRefs(state),
             goToSignIn,
             SIDEBAR_TYPE,
-            // flush() {
-            //     SpaceConnector.flushToken();
-            //     vm.$store.dispatch('user/setIsSessionExpired', true);
-            // },
         };
     },
 });
