@@ -70,7 +70,7 @@ export default {
                     component: NoResource,
                 },
                 {
-                    path: ':provider/:group/:name',
+                    path: ':provider/:group/:name?',
                     name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                     props: true,
                     meta: { label: 'Cloud Service' },
