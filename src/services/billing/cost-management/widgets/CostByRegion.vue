@@ -66,7 +66,6 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { PChartLoader, PSkeleton } from '@spaceone/design-system';
 
@@ -113,7 +112,6 @@ export default defineComponent<WidgetProps>({
                 name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                 params: {},
                 query: {
-                    chartType: primitiveToQueryString(CHART_TYPE.DONUT),
                     granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                     groupBy: arrayToQueryString([GROUP_BY.REGION]),
                     period: objectToQueryString(props.period),

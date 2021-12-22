@@ -113,7 +113,7 @@ import {
     arrayToQueryString,
     objectToQueryString,
     primitiveToQueryString,
-    queryStringToArray,
+    queryStringToArray, queryStringToBoolean,
     queryStringToObject,
     queryStringToString,
 } from '@/lib/router-query-string';
@@ -199,8 +199,8 @@ export default {
         };
 
         const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): Partial<CostQuerySetOption> => ({
-            chart_type: queryStringToString(urlQuery.chartType),
             granularity: queryStringToString(urlQuery.granularity),
+            stack: queryStringToBoolean(urlQuery.stack),
             group_by: queryStringToArray(urlQuery.groupBy),
             period: queryStringToObject(urlQuery.period),
             filters: queryStringToObject(urlQuery.filters),
@@ -272,14 +272,14 @@ export default {
         const handleSaveQueryOption = async () => {
             try {
                 const {
-                    granularity, chartType,
+                    granularity, stack,
                     period, groupBy, filters,
                 } = store.state.service.costAnalysis;
                 await SpaceConnector.client.costAnalysis.costQuerySet.update({
                     cost_query_set_id: state.selectedQueryId,
                     options: {
                         granularity,
-                        chart_type: chartType,
+                        stack,
                         period,
                         group_by: groupBy,
                         filters,
@@ -314,8 +314,8 @@ export default {
                 if (props.querySetId) return;
 
                 const newQuery: CostAnalysisPageUrlQuery = {
-                    chartType: primitiveToQueryString(options.chartType),
                     granularity: primitiveToQueryString(options.granularity),
+                    stack: primitiveToQueryString(options.stack),
                     groupBy: arrayToQueryString(options.groupBy),
                     period: objectToQueryString(options.period),
                     filters: objectToQueryString(options.filters),

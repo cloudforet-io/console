@@ -10,12 +10,11 @@
                                        @select="handleSelectGranularity"
                     />
                 </div>
-                <div class="filter-item">
-                    <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHART_TYPE') }}</b>
-                    <p-select-dropdown :items="chartTypeItems"
-                                       :selected="chartType"
-                                       without-outline
-                                       @select="handleSelectChartType"
+                <div v-if="granularity !== GRANULARITY.ACCUMULATED" class="filter-item">
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}</b>
+                    <p-toggle-button class="ml-2"
+                                     :value="stack"
+                                     @change="handleToggleStack"
                     />
                 </div>
             </div>
@@ -47,21 +46,23 @@
 </template>
 
 <script lang="ts">
+import dayjs from 'dayjs';
+
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PIconButton, PSelectDropdown, PDatetimePicker,
+    PIconButton, PSelectDropdown, PDatetimePicker, PToggleButton,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
+import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
+import CostAnalysisSetQueryModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetQueryModal.vue';
+
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { store } from '@/store';
 import { i18n } from '@/translations';
-import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
-import CostAnalysisSetQueryModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetQueryModal.vue';
 import { Period } from '@/services/billing/cost-management/type';
-import dayjs from 'dayjs';
+
 
 export default {
     name: 'CostAnalysisQueryFilter',
@@ -71,11 +72,12 @@ export default {
         PSelectDropdown,
         PDatetimePicker,
         PIconButton,
+        PToggleButton,
     },
     setup() {
         const state = reactive({
             granularity: computed(() => store.state.service.costAnalysis.granularity),
-            chartType: computed(() => store.state.service.costAnalysis.chartType),
+            stack: computed(() => store.state.service.costAnalysis.stack),
             period: computed<Period>(() => store.state.service.costAnalysis.period),
             selectedDates: computed<string[]>(() => ([
                 dayjs.utc(state.period.start).format(),
@@ -104,51 +106,17 @@ export default {
                     label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
                 },
             ])),
-            chartTypeItems: computed<MenuItem[]>(() => ([
-                // {
-                //     type: 'item',
-                //     name: CHART_TYPE.LINE,
-                //     label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LINE'),
-                // },
-                // {
-                //     type: 'item',
-                //     name: CHART_TYPE.STACKED_LINE,
-                //     label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACKED_LINE'),
-                // },
-                // {
-                //     type: 'item',
-                //     name: CHART_TYPE.COLUMN,
-                //     label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COLUMN'),
-                // },
-                {
-                    type: 'item',
-                    name: CHART_TYPE.STACKED_COLUMN,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACKED_COLUMN'),
-                },
-                {
-                    type: 'item',
-                    name: CHART_TYPE.DONUT,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DONUT'),
-                },
-            ])),
             setQueryModalVisible: false,
         });
 
         /* event */
         const handleSelectGranularity = async (granularity: string) => {
-            let chartType: CHART_TYPE;
-            if (granularity === GRANULARITY.ACCUMULATED) {
-                chartType = CHART_TYPE.DONUT;
-            } else {
-                chartType = CHART_TYPE.STACKED_COLUMN;
-            }
-            store.commit('service/costAnalysis/setChartType', chartType);
             store.commit('service/costAnalysis/setGranularity', granularity);
         };
-        const handleSelectChartType = async (chartType: CHART_TYPE) => {
-            store.commit('service/costAnalysis/setChartType', chartType);
+        const handleToggleStack = async ({ value }) => {
+            store.commit('service/costAnalysis/setStack', value);
         };
-        const handleSelectedDates = async (selectedDates: string[]) => {
+        const handleSelectedDates = (selectedDates: string[]) => {
             store.commit('service/costAnalysis/setPeriod', { start: selectedDates[0], end: selectedDates[1] });
         };
         const handleClickRefresh = async () => {
@@ -162,8 +130,9 @@ export default {
 
         return {
             ...toRefs(state),
+            GRANULARITY,
             handleSelectGranularity,
-            handleSelectChartType,
+            handleToggleStack,
             handleSelectedDates,
             handleClickRefresh,
             handleClickSetFilter,

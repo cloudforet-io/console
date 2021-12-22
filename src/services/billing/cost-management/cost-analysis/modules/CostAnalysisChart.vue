@@ -1,12 +1,9 @@
 <template>
     <div class="cost-analysis-chart">
         <section class="chart-section">
-            <template v-if="chartType === CHART_TYPE.DONUT && granularity !== GRANULARITY.ACCUMULATED">
-                <span>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD') }} {{ donutPeriodText }}</span>
-            </template>
             <cost-analysis-dynamic-widget :loading="loading"
                                           :chart.sync="chart"
-                                          :chart-type="chartType"
+                                          :stack="stack"
                                           :chart-data="chartData"
                                           :granularity="granularity"
                                           :legends="legends"
@@ -113,7 +110,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { hideAllSeries, toggleSeries } from '@/lib/amcharts/helper';
 import { getXYChartDataAndLegends } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import {
-    getConvertedFilter, getConvertedGranularity, getConvertedPeriod,
+    getConvertedFilter,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import {
@@ -124,7 +121,6 @@ import {
 } from '@/services/billing/cost-management/lib/config';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 
 export default {
@@ -142,7 +138,7 @@ export default {
     setup() {
         const state = reactive({
             granularity: computed(() => store.state.service.costAnalysis.granularity),
-            chartType: computed(() => store.state.service.costAnalysis.chartType),
+            stack: computed(() => store.state.service.costAnalysis.stack),
             period: computed(() => store.state.service.costAnalysis.period),
             filters: computed(() => store.state.service.costAnalysis.filters),
             chartGroupBy: store.state.service.costAnalysis.groupBy[0],
@@ -162,15 +158,6 @@ export default {
             loading: true,
             legends: [] as Legend[],
             chartData: [] as Array<XYChartData|PieChartData>,
-            donutPeriodText: computed(() => {
-                if (state.chartType !== CHART_TYPE.DONUT) return '';
-                if (state.granularity === GRANULARITY.DAILY) {
-                    return `${dayjs.utc(state.period.start).format('YYYY/MM/DD')} (${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY')})`;
-                } if (state.granularity === GRANULARITY.MONTHLY) {
-                    return `${dayjs.utc(state.period.end).format('MMM YYYY')} (${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY')})`;
-                }
-                return `${dayjs.utc(state.period.end).format('YYYY')} (${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY')})`;
-            }),
             chart: null as XYChart | PieChart | null,
         });
 
@@ -239,22 +226,13 @@ export default {
         /* api */
         const costQueryHelper = new QueryHelper();
         const listCostAnalysisChartData = async () => {
-            costQueryHelper.setFilters(getConvertedFilter(state.filters));
-            let _granularity: GRANULARITY;
-            const _period = getConvertedPeriod(state.granularity, state.chartType, state.period);
-            const _groupBy = state.chartGroupBy ? [state.chartGroupBy] : [];
-            if (state.chartType === CHART_TYPE.DONUT) {
-                _granularity = GRANULARITY.ACCUMULATED;
-            } else {
-                _granularity = getConvertedGranularity(state.period, state.granularity);
-            }
-
             try {
+                costQueryHelper.setFilters(getConvertedFilter(state.filters));
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    granularity: _granularity,
-                    group_by: _groupBy,
-                    start: _period.start,
-                    end: _period.end,
+                    granularity: state.granularity,
+                    group_by: state.chartGroupBy ? [state.chartGroupBy] : [],
+                    start: dayjs.utc(state.period.start).format('YYYY-MM-DD'),
+                    end: dayjs.utc(state.period.end).add(1, 'day').format('YYYY-MM-DD'),
                     pivot_type: 'CHART',
                     ...costQueryHelper.apiQuery,
                 });
@@ -305,10 +283,10 @@ export default {
             const rawData = await listCostAnalysisChartData();
             let chartData;
             let legends;
-            if (state.chartType !== CHART_TYPE.DONUT) {
-                ({ chartData, legends } = getXYChartDataAndLegends(rawData, state.chartGroupBy));
-            } else {
+            if (state.granularity === GRANULARITY.ACCUMULATED) {
                 ({ chartData, legends } = getPieChartDataAndLegends(rawData, state.chartGroupBy));
+            } else {
+                ({ chartData, legends } = getXYChartDataAndLegends(rawData, state.chartGroupBy));
             }
             state.chartData = chartData;
             state.legends = legends;
@@ -322,7 +300,7 @@ export default {
                 state.chartGroupBy = after[0].name;
             }
         });
-        watch([() => state.chartType, () => state.granularity, () => state.period, () => state.chartGroupBy, () => state.filters], () => {
+        watch([() => state.granularity, () => state.period, () => state.chartGroupBy, () => state.filters], () => {
             refreshChart();
         }, { immediate: true, deep: true });
 

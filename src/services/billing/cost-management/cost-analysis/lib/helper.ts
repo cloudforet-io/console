@@ -2,7 +2,6 @@ import dayjs, { Dayjs } from 'dayjs';
 import { TimeUnit } from '@amcharts/amcharts4/core';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 
 
@@ -54,21 +53,6 @@ export const getConvertedBudgetFilter = (filters: CostQueryFilters): QueryStoreF
         }
     });
     return result;
-};
-
-export const getConvertedPeriod = (granularity: GRANULARITY, chartType: CHART_TYPE, period: Period): Period => {
-    let start = period.start;
-    if (chartType === CHART_TYPE.DONUT && granularity !== GRANULARITY.ACCUMULATED) {
-        if (granularity === GRANULARITY.DAILY) {
-            start = period.end;
-        } else if (granularity === GRANULARITY.MONTHLY) {
-            start = dayjs.utc(period.end).startOf('month').format();
-        } else {
-            start = dayjs.utc(period.end).startOf('year').format();
-        }
-    }
-    const end = dayjs.utc(period.end).add(1, 'day').format();
-    return { start, end };
 };
 
 export const getTimeUnitByPeriod = (granularity: GRANULARITY, start: Dayjs, end: Dayjs): TimeUnit => {

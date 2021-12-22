@@ -1,6 +1,5 @@
 import { Action } from 'vuex';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { CostAnalysisStoreState, CostQuerySetModel, CostQuerySetOption } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { getInitialDates } from '@/services/billing/cost-management/cost-analysis/lib/helper';
@@ -8,8 +7,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = ({ commit }): void => {
-    commit('setChartType', CHART_TYPE.STACKED_COLUMN);
     commit('setGranularity', GRANULARITY.ACCUMULATED);
+    commit('setStack', false);
     commit('setGroupBy', []);
     commit('setPeriod', getInitialDates());
     commit('setFilters', {});
@@ -17,8 +16,8 @@ export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = (
 
 
 export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit }, options: Partial<CostQuerySetOption>): void => {
-    if (options.chart_type) commit('setChartType', options.chart_type);
     if (options.granularity) commit('setGranularity', options.granularity);
+    if (typeof options.stack === 'boolean') commit('setStack', options.stack);
     if (options.group_by?.length) commit('setGroupBy', options.group_by);
     if (options.period) commit('setPeriod', { start: options.period.start, end: options.period.end });
     if (options.filters) commit('setFilters', options.filters);
@@ -37,14 +36,14 @@ export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ c
 export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, commit }, name): Promise<CostQuerySetModel|Error> => {
     try {
         const {
-            granularity, chartType, period,
+            granularity, stack, period,
             groupBy, filters,
         } = state;
         const updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
             name,
             options: {
                 granularity,
-                chart_type: chartType,
+                stack,
                 period,
                 group_by: groupBy,
                 filter: filters,

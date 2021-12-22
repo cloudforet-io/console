@@ -12,5 +12,5 @@ export const QUERY_VISIBILITY_TYPE = Object.freeze({
 
 export type QUERY_VISIBILITY_TYPE = typeof QUERY_VISIBILITY_TYPE[keyof typeof QUERY_VISIBILITY_TYPE];
 
-export const COST_ANALYSIS_PAGE_URL_QUERY_KEY = ['period', 'groupBy', 'filters', 'chartType', 'granularity'] as const;
+export const COST_ANALYSIS_PAGE_URL_QUERY_KEY = ['period', 'groupBy', 'filters', 'stack', 'granularity'] as const;
 export type COST_ANALYSIS_PAGE_URL_QUERY_KEY = typeof COST_ANALYSIS_PAGE_URL_QUERY_KEY[number];

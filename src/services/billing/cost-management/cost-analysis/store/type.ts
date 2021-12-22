@@ -13,6 +13,7 @@ export interface CostQuerySetOption {
     chart_type: CHART_TYPE;
     group_by: GROUP_BY[]; // string[]
     granularity: GRANULARITY;
+    stack: boolean;
     period: Period;
     filters: CostQueryFilters;
 }
@@ -25,8 +26,8 @@ export interface CostQuerySetModel {
 }
 
 export interface CostAnalysisStoreState {
-    chartType: CHART_TYPE;
     granularity: GRANULARITY;
+    stack: boolean;
     groupBy: GROUP_BY[];
     period: Period;
     filters: CostQueryFilters;

@@ -86,6 +86,7 @@ export default {
             serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
             //
             granularity: computed(() => store.state.service.costAnalysis.granularity),
+            stack: computed(() => store.state.service.costAnalysis.stack),
             period: computed(() => store.state.service.costAnalysis.period),
             filters: computed(() => store.state.service.costAnalysis.filters),
             groupBy: computed(() => store.state.service.costAnalysis.groupBy),
@@ -105,10 +106,14 @@ export default {
         /* util */
         const setTableFields = (granularity: GRANULARITY, groupByItems: GroupByItem[]) => {
             /* get group by fields (ex. Provider, Region) */
-            const groupByFields: DataTableField[] = [...groupByItems];
+            const groupByFields: DataTableField[] = groupByItems.map(d => ({
+                name: d.name,
+                label: d.label,
+                sortable: false,
+            }));
             if (!groupByItems.length) {
                 groupByFields.push({
-                    name: 'totalCost', label: ' ', textAlign: 'center',
+                    name: 'totalCost', label: ' ', textAlign: 'right',
                 });
             }
 
@@ -132,7 +137,8 @@ export default {
                 dateFields.push({
                     name: now.format(nameDateFormat),
                     label: now.format(labelDateFormat),
-                    textAlign: 'center',
+                    textAlign: 'right',
+                    sortable: true,
                 });
                 now = now.add(1, state.timeUnit);
             }
@@ -161,11 +167,6 @@ export default {
             } else if (state.filters.project_id?.length) {
                 filters.push({ k: 'project_id', v: state.filters.project_id, o: '=' });
             }
-            // if (item.product) {
-            //     filters.push({ k: 'cloud_service_type', v: item.product, o: '=' });
-            // } else if (state.filters.product?.length) {
-            //     filters.push({ k: 'cloud_service_type', v: state.filters.product, o: '=' });
-            // }
             if (item.service_account_id) {
                 filters.push({ k: 'collection_info.service_accounts', v: item.service_account_id, o: '=' });
             } else if (state.filters.service_account_id?.length) {
@@ -221,14 +222,14 @@ export default {
             try {
                 showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', root);
 
-                const granularity = getConvertedGranularity(state.period, state.granularity);
-                const convertedFilters = getConvertedFilter(state.filters);
-                costApiQueryHelper.setFilters(convertedFilters);
+                const _granularity = getConvertedGranularity(state.period, state.granularity);
+                const _convertedFilters = getConvertedFilter(state.filters);
+                costApiQueryHelper.setFilters(_convertedFilters);
 
                 await store.dispatch('file/downloadExcel', {
                     url: '/cost-analysis/cost/analyze',
                     param: {
-                        granularity,
+                        granularity: _granularity,
                         group_by: state.groupBy,
                         start: dayjs.utc(state.period.start),
                         end: dayjs.utc(state.period.end).add(1, state.timeUnit),

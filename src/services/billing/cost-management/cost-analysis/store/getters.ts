@@ -37,11 +37,11 @@ export const selectedQuerySet: Getter<CostAnalysisStoreState, any> = ({ selected
     return costQueryList.find(item => item.cost_query_set_id === selectedQueryId);
 };
 
-type QuerySetOptions = Pick<CostAnalysisStoreState, 'chartType'|'granularity'|'groupBy'|'period'|'filters'>
+type QuerySetOptions = Pick<CostAnalysisStoreState, 'stack'|'granularity'|'groupBy'|'period'|'filters'>
 export const currentQuerySetOptions: Getter<CostAnalysisStoreState, any> = ({
-    chartType, granularity, groupBy, period, filters,
+    stack, granularity, groupBy, period, filters,
 }): QuerySetOptions => ({
-    chartType,
+    stack,
     granularity,
     groupBy,
     period,

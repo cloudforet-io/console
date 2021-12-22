@@ -19,17 +19,15 @@
                         @select="handleSelectGranularity"
                     />
                 </div>
-                <div class="input-wrapper">
+                <div v-if="granularity !== GRANULARITY.ACCUMULATED" class="input-wrapper">
                     <p class="input-title">
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHART_TYPE') }}
+                        <span>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}</span>
+                        <p-toggle-button class="ml-2"
+                                         sync
+                                         :value="stack"
+                                         @change="handleToggleStack"
+                        />
                     </p>
-                    <p-select-dropdown
-                        class="select-input-box"
-                        use-fixed-menu-style
-                        :items="chartTypeItems"
-                        :selected="chartType"
-                        @select="handleSelectChartType"
-                    />
                 </div>
                 <div class="input-wrapper">
                     <p class="input-title">
@@ -73,13 +71,13 @@ import {
     PButtonModal,
     PSelectDropdown,
     PDatetimePicker,
+    PToggleButton,
 } from '@spaceone/design-system';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { store } from '@/store';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { i18n } from '@/translations';
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { Period } from '@/services/billing/cost-management/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
@@ -90,6 +88,7 @@ export default {
         PButtonModal,
         PSelectDropdown,
         PDatetimePicker,
+        PToggleButton,
     },
     props: {
         visible: {
@@ -101,7 +100,7 @@ export default {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             granularity: '' as GRANULARITY,
-            chartType: '' as CHART_TYPE,
+            stack: false,
             period: {} as Period,
             currency: '' as CURRENCY,
             granularityItems: computed<MenuItem[]>(() => ([
@@ -126,18 +125,6 @@ export default {
                     label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
                 },
             ])),
-            chartTypeItems: computed<MenuItem[]>(() => ([
-                {
-                    type: 'item',
-                    name: CHART_TYPE.STACKED_COLUMN,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACKED_COLUMN'),
-                },
-                {
-                    type: 'item',
-                    name: CHART_TYPE.DONUT,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DONUT'),
-                },
-            ])),
             currencyItems: computed<MenuItem[]>(() => Object.values(CURRENCY).map(currency => ({
                 type: 'item',
                 name: currency,
@@ -146,24 +133,14 @@ export default {
         });
 
         const handleFormConfirm = () => {
-            store.commit('service/costAnalysis/setChartType', state.chartType);
             store.commit('service/costAnalysis/setGranularity', state.granularity);
+            store.commit('service/costAnalysis/setStack', state.stack);
             store.commit('service/costAnalysis/setPeriod', state.period);
             store.commit('display/setCurrency', state.currency);
             state.proxyVisible = false;
         };
         const handleSelectGranularity = (granularity: string) => {
-            let chartType: CHART_TYPE;
-            if (granularity === GRANULARITY.ACCUMULATED) {
-                chartType = CHART_TYPE.DONUT;
-            } else {
-                chartType = CHART_TYPE.STACKED_COLUMN;
-            }
-            state.chartType = chartType;
             state.granularity = granularity;
-        };
-        const handleSelectChartType = async (chartType: CHART_TYPE) => {
-            state.chartType = chartType;
         };
         const handleSelectedDates = async (selectedDates: string[]) => {
             state.period = { start: selectedDates[0], end: selectedDates[1] };
@@ -171,11 +148,15 @@ export default {
         const handleSelectCurrency = (currency: CURRENCY) => {
             state.currency = currency;
         };
+        const handleToggleStack = ({ value }) => {
+            state.stack = value;
+        };
 
         watch(() => state.proxyVisible, (after) => {
             if (after) {
+                console.log('opened!');
                 state.granularity = store.state.service.costAnalysis.granularity;
-                state.chartType = store.state.service.costAnalysis.chartType;
+                state.stack = store.state.service.costAnalysis.stack;
                 state.period = store.state.service.costAnalysis.period;
                 state.currency = store.state.display.currency;
             }
@@ -183,11 +164,12 @@ export default {
 
         return {
             ...toRefs(state),
+            GRANULARITY,
             handleFormConfirm,
             handleSelectGranularity,
-            handleSelectChartType,
             handleSelectedDates,
             handleSelectCurrency,
+            handleToggleStack,
         };
     },
 };

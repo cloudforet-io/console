@@ -46,10 +46,10 @@ import { TimeUnit } from '@amcharts/amcharts4/core';
 interface Props extends WidgetProps {
     loading: boolean;
     chart: XYChart | PieChart;
-    chartType: CHART_TYPE;
     chartData: Array<XYChartData|PieChartData>;
     legends: Legend[];
     granularity: GRANULARITY;
+    stack: boolean;
 }
 
 export default {
@@ -67,13 +67,6 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        chartType: {
-            type: String,
-            default: CHART_TYPE.STACKED_COLUMN,
-            validator(value: any) {
-                return Object.values(CHART_TYPE).includes(value);
-            },
-        },
         chartData: {
             type: Array,
             default: () => ([]),
@@ -88,6 +81,10 @@ export default {
             validator(value: any) {
                 return Object.values(GRANULARITY).includes(value);
             },
+        },
+        stack: {
+            type: Boolean,
+            default: false,
         },
         period: {
             type: Object,
@@ -125,8 +122,8 @@ export default {
             const timeUnit = getTimeUnitByPeriod(props.granularity, dayjs(props.period.start), dayjs(props.period.end));
 
             let USDChartData = cloneDeep(props.chartData);
-            if (props.chartType !== CHART_TYPE.DONUT) {
-                if (props.granularity === GRANULARITY.ACCUMULATED) {
+            if (props.granularity !== GRANULARITY.ACCUMULATED) {
+                if (props.stack) {
                     USDChartData = getAccumulatedChartData(props.chartData as XYChartData[], props.period, timeUnit);
                 } else {
                     USDChartData = fillDefaultDataOfLastDay(props.chartData as XYChartData[], props.period, timeUnit);
@@ -134,7 +131,8 @@ export default {
             }
             state.USDChartData = USDChartData;
 
-            const { chart } = useDynamicChart(props.chartType, {
+            const chartType = props.granularity === GRANULARITY.ACCUMULATED ? CHART_TYPE.DONUT : CHART_TYPE.STACKED_COLUMN;
+            const { chart } = useDynamicChart(chartType, {
                 data: getCurrencyAppliedChartData(
                     USDChartData,
                     props.currency,
@@ -149,7 +147,7 @@ export default {
                 chartContainer: chartContext,
             });
 
-            if (props.chartType !== CHART_TYPE.DONUT) {
+            if (props.granularity !== GRANULARITY.ACCUMULATED) {
                 const start = dayjs(props.period.start);
                 const end = dayjs(props.period.end);
                 const diff = end.diff(start, timeUnit);
@@ -172,6 +170,11 @@ export default {
             if (state.proxyChart) {
                 state.proxyChart.data = getCurrencyAppliedChartData(state.USDChartData, currency, props.currencyRates);
             }
+        });
+
+        watch(() => props.stack, () => {
+            const chart = drawChart(state.chartRef);
+            emit('update:chart', chart);
         });
 
         return {

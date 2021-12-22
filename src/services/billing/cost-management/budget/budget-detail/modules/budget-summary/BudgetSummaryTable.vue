@@ -37,7 +37,6 @@ import { Location } from 'vue-router';
 import { getAccumulatedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import dayjs from 'dayjs';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -94,7 +93,6 @@ export default {
                 const link = {
                     name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                     query: {
-                        chartType: primitiveToQueryString(CHART_TYPE.DONUT),
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         groupBy: arrayToQueryString([GROUP_BY.PRODUCT]),
                         period: objectToQueryString(period),

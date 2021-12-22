@@ -23,7 +23,6 @@ import CostDashboardStackedColumnWidget
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { CURRENCY } from '@/store/modules/display/config';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
@@ -58,7 +57,6 @@ export default defineComponent<WidgetProps>({
                 name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                 params: {},
                 query: {
-                    chartType: primitiveToQueryString(CHART_TYPE.STACKED_COLUMN),
                     granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
                     groupBy: arrayToQueryString([GROUP_BY.PROVIDER]),
                     period: objectToQueryString(props.period),

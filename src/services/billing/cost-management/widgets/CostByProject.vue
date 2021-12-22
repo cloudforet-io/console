@@ -33,7 +33,6 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import { BILLING_ROUTE } from '@/services/billing/routes';
@@ -92,7 +91,6 @@ export default {
                 name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                 params: {},
                 query: {
-                    chartType: primitiveToQueryString(CHART_TYPE.DONUT),
                     granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                     groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
                     period: objectToQueryString(props.period),

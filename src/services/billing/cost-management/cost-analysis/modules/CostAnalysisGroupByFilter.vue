@@ -12,19 +12,6 @@
         >
             {{ groupByItem.label }}
         </p-select-button>
-        <!--        <component :is="moreGroupBy.length ? 'p-icon-button' : 'p-icon-text-button'"-->
-        <!--                   name="ic_setting" style-type="gray900" outline-->
-        <!--                   size="sm"-->
-        <!--                   @click="handleClickMore"-->
-        <!--        >-->
-        <!--            <template v-if="!moreGroupBy.length">-->
-        <!--                More-->
-        <!--            </template>-->
-        <!--        </component>-->
-        <!--        <cost-analysis-set-more-modal :header-title="setMoreModalState.headerTitle"-->
-        <!--                                      :visible.sync="setMoreModalState.visible"-->
-        <!--                                      @confirm="handleSetMoreModalConfirm"-->
-        <!--        />-->
     </div>
 </template>
 
@@ -37,30 +24,18 @@ import {
 
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 import { GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
-
-// import CostAnalysisSetMoreModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetMoreModal.vue';
 
 
 export default {
     name: 'CostAnalysisGroupByFilter',
     components: {
         PSelectButton,
-        // PIconButton,
-        // PIconTextButton,
-        // CostAnalysisSetMoreModal,
     },
     setup() {
         const state = reactive({
             selectedGroupByItems: computed<GroupByItem[]>(() => store.getters['service/costAnalysis/groupByItems']),
             allGroupByItems: Object.values(GROUP_BY_ITEM_MAP),
-            moreGroupBy: [],
-        });
-
-        const setMoreModalState = reactive({
-            visible: false,
-            headerTitle: computed(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SET_MORE')),
         });
 
         /* util */
@@ -72,20 +47,9 @@ export default {
             store.commit('service/costAnalysis/setGroupBy', groupBy);
         };
 
-        const handleClickMore = () => {
-            setMoreModalState.visible = true;
-        };
-
-        const handleSetMoreModalConfirm = () => {
-            setMoreModalState.visible = false;
-        };
-
         return {
             ...toRefs(state),
-            setMoreModalState,
-            handleClickMore,
             handleSelectGroupByItems,
-            handleSetMoreModalConfirm,
             predicate,
         };
     },

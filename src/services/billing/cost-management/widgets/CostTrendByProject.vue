@@ -61,7 +61,6 @@ import {
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { store } from '@/store';
 
 
@@ -111,7 +110,6 @@ export default {
                 name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                 params: {},
                 query: {
-                    chartType: primitiveToQueryString(CHART_TYPE.STACKED_COLUMN),
                     granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
                     groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
                     period: objectToQueryString(props.period),
