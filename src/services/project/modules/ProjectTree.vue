@@ -144,15 +144,7 @@ export default {
                 disabled: !state.treeEditMode,
                 editStartValidator: item => (state.permissionInfo[item.data.id] || item.data.has_permission) && (item.data.item_type !== 'PROJECT'),
                 validator: text => (text && text.length > 2 && text.length < 40),
-                dataSetter(text, originData) {
-                    return {
-                        ...originData,
-                        name: text,
-                    };
-                },
-                dataGetter(data) {
-                    return data.name;
-                },
+                setDataAfterEdit: false,
             })),
             dragOptions: computed(() => ({
                 disabled: !state.treeEditMode,
@@ -300,14 +292,16 @@ export default {
             state.loading = false;
         });
 
-        const onFinishEdit = async (item) => {
+        const onFinishEdit = async (node, editText: string) => {
             try {
                 const params = {
-                    project_group_id: item.data.id,
-                    name: item.data.name,
+                    project_group_id: node.data.id,
+                    name: editText,
                 };
 
                 await SpaceConnector.client.identity.projectGroup.update(params);
+
+                dataSetter(editText, node);
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm.$root);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
