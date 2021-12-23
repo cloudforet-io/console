@@ -92,7 +92,7 @@ export const getTreeArgTypes = (): ArgTypes => ({
         },
     },
     dataSetter: {
-        name: 'dataGetter',
+        name: 'dataSetter',
         type: { name: 'function' },
         description: 'Function for setting children or node\'s data.',
         defaultValue: undefined,

@@ -50,6 +50,7 @@ export const ExpertTemplate = (args, { argTypes }) => ({
                     @start-drag="onStartDrag"
                     @update-drag="onUpdateDrag"
                     @end-drag="onEndDrag"
+                    @finish-edit="onFinishEdit"
             >
                 <template #data="{node}">
                         {{ node.data.name }} ({{node.data.id}})
@@ -226,6 +227,14 @@ export const ExpertTemplate = (args, { argTypes }) => ({
             state.dragNode = null
             state.dragParentNode = null
         }
+        const onFinishEdit = (node, editText) => {
+            console.debug('finish edit', node, editText)
+            if (Math.random() > 0.5) {
+                node.data.name = editText;
+            } else {
+                alert('Failed to update node data!')
+            }
+        }
         const changeSelectState = (node, path) => {
             state.root.changeSelectState(node, path)
         }
@@ -251,6 +260,7 @@ export const ExpertTemplate = (args, { argTypes }) => ({
             onStartDrag,
             onUpdateDrag,
             onEndDrag,
+            onFinishEdit,
             changeSelectState
         }
     }
@@ -376,12 +386,14 @@ Options for inline editing.
 |disabled|Whether to globally disable inline editing or not. Higher priority than validator.|
 |validator|Input Validator.|
 |editStartValidator|Whether to enable or disable each node's inline editing.|
+|setDataAfterEdit|Whether to set updated data to the node or not.|
 
 ```typescript
 interface EditOptions<T=any> {
     disabled?: boolean;
     validator?: (editText: string) => boolean;
     editStartValidator?: (node: TreeNode<T>) => boolean;
+    setDataAfterEdit?: boolean;
 }
 ```
 
@@ -449,7 +461,7 @@ interface DataFetcher<T=any> {
 |start-drag| Emitted when dragging start. Pass dragging node and parent node. |
 |end-drag| Emitted when finished dragging. Pass dragging node and parent of target node. |
 |update-drag| Emitted when finished dragging and all validations are passed. Pass dragging node and parent of target node. |
-|finish-edit| Emitted when finished inline editing. Pass the node. |
+|finish-edit| Emitted when finished inline editing. Pass the node and the input text. |
 
 ```typescript
  interface TreeItem<T=any> {

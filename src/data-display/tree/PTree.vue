@@ -320,9 +320,11 @@ export default defineComponent<Props>({
             state.isEditing = false;
             if (state.invalid) return;
 
-            props.dataSetter(state.editText, node);
+            if (props.editOptions?.setDataAfterEdit) {
+                props.dataSetter(state.editText, node);
+            }
 
-            emit('finish-edit', node);
+            emit('finish-edit', node, state.editText);
         };
 
         const fetchData = async (_node?: TreeNode|null): Promise<TreeNode[]> => {

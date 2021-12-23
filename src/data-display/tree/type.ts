@@ -32,6 +32,7 @@ export interface EditOptions<T=any> {
     disabled?: boolean;
     validator?: (editText: string) => boolean;
     editStartValidator?: (node: TreeNode<T>) => boolean;
+    setDataAfterEdit?: boolean;
 }
 
 export interface DragOptions {
