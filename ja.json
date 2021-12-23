@@ -403,6 +403,16 @@
 				"MY_QUERY": "",
 				"NO_FILTERS": "",
 				"NO_ITEMS": "",
+				"PERIOD": {
+					"CUSTOM_DATE_RANGE": "",
+					"LAST_14_DAYS": "",
+					"LAST_3_MONTHS": "",
+					"LAST_6_MONTHS": "",
+					"LAST_7_DAYS": "",
+					"LAST_MONTH": "",
+					"LAST_YEAR": "",
+					"THIS_MONTH": ""
+				},
 				"PRIVATE": "",
 				"PROJECT": "",
 				"PUBLIC": "",

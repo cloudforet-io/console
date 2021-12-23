@@ -403,6 +403,16 @@
 				"MY_QUERY": "내 쿼리",
 				"NO_FILTERS": "필터가 없습니다",
 				"NO_ITEMS": "아이템이 없습니다",
+				"PERIOD": {
+					"CUSTOM_DATE_RANGE": "사용자 지정 날짜 선택",
+					"LAST_14_DAYS": "최근 2주",
+					"LAST_3_MONTHS": "최근 3개월",
+					"LAST_6_MONTHS": "최근 6개월",
+					"LAST_7_DAYS": "최근 1주",
+					"LAST_MONTH": "지난 달",
+					"LAST_YEAR": "이번 달",
+					"THIS_MONTH": "이번 달"
+				},
 				"PRIVATE": "비공개",
 				"PROJECT": "프로젝트",
 				"PUBLIC": "공개",
