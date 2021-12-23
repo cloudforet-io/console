@@ -1,3 +1,10 @@
+# [1.1.0-beta.216](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.215...v1.1.0-beta.216) (2021-12-23)
+
+
+### Features
+
+* apply design to donut type in dynamic chart ([#804](https://github.com/spaceone-dev/spaceone-design-system/issues/804)) ([0334826](https://github.com/spaceone-dev/spaceone-design-system/commit/03348268a82db861cfff4967cbfccf7c167cf444))
+
 # [1.1.0-beta.215](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.214...v1.1.0-beta.215) (2021-12-23)
 
 
