@@ -1,14 +1,18 @@
 <template>
-    <div ref="chartRef" class="p-dynamic-chart-column" />
+    <div ref="chartRef" class="p-dynamic-chart-column">
+        <!--        <p-progress-bar v-for="item in data" :key="item[nameOptions.key]"></p-progress-bar>-->
+    </div>
 </template>
 
 <script lang="ts">
 import {
+    computed,
     defineComponent,
     onMounted, onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { maxBy } from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import { XYChart } from '@amcharts/amcharts4/charts';
 
@@ -16,12 +20,8 @@ import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS,
 } from '@/data-display/dynamic/dynamic-chart/config';
-import {
-    getCategoryAxis,
-    getColumnSeries,
-    getValueAxis,
-} from '@/data-display/dynamic/dynamic-chart/templates/column/helper';
 import { DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
+import { drawColumnChart } from '@/data-display/dynamic/dynamic-chart/templates/column/helper';
 
 
 export default defineComponent<DynamicChartTemplateProps>({
@@ -44,6 +44,18 @@ export default defineComponent<DynamicChartTemplateProps>({
         const state = reactive({
             chart: null as null|XYChart,
             chartRef: null as null|HTMLElement,
+            max: computed<number>(() => {
+                if (!props.data.length) return 0;
+                const valueKey = props.valueOptions.key;
+                const maxItem = maxBy(props.data, d => d[valueKey]);
+                return maxItem[valueKey];
+            }),
+            enrichedData: computed(() => {
+                const max = state.max;
+                return props.data.map(d => ({
+                    ...d, _dummy: max,
+                }));
+            }),
         });
 
         const disposeChart = () => {
@@ -56,25 +68,9 @@ export default defineComponent<DynamicChartTemplateProps>({
 
             const chart = am4core.create(ctx, XYChart);
 
-            // chart settings
-            chart.padding(40, 40, 40, 40);
-            if (chart.hasLicense()) chart.logo.disabled = true;
+            drawColumnChart(chart, props.nameOptions, props.valueOptions);
 
-            // get components of chart
-            const categoryAxis = getCategoryAxis(props.nameOptions);
-            const valueAxis = getValueAxis();
-            const series = getColumnSeries(chart, props.nameOptions, props.valueOptions);
-
-            // related tasks among components
-            categoryAxis.sortBySeries = series;
-
-            // put components into charts
-            chart.yAxes.push(categoryAxis);
-            chart.xAxes.push(valueAxis);
-            chart.series.push(series);
-
-            // put data into charts
-            chart.data = props.data;
+            chart.data = state.enrichedData;
 
             state.chart = chart;
         };
@@ -87,7 +83,7 @@ export default defineComponent<DynamicChartTemplateProps>({
             drawChart();
         });
 
-        const stopDataWatch = watch(() => props.data, (data) => {
+        const stopDataWatch = watch(() => state.enrichedData, (data) => {
             updateChartData(data);
         });
 
