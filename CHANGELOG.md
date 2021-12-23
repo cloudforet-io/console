@@ -1,3 +1,10 @@
+# [1.1.0-beta.215](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.214...v1.1.0-beta.215) (2021-12-23)
+
+
+### Features
+
+* apply design to column type oindynamic chart ([#803](https://github.com/spaceone-dev/spaceone-design-system/issues/803)) ([d4916a5](https://github.com/spaceone-dev/spaceone-design-system/commit/d4916a5c5bf4a00d9a4457707799d632ad9bdbb7))
+
 # [1.1.0-beta.214](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.213...v1.1.0-beta.214) (2021-12-23)
 
 
