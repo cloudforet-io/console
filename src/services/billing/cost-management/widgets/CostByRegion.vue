@@ -6,15 +6,16 @@
     >
         <template #default>
             <div class="widget-wrapper">
-                <p-chart-loader :loading="loading" class="chart-wrapper">
-                    <template #loader>
-                        <p-skeleton width="100%" height="50%" />
-                    </template>
+                <p-data-loader :loading="loading"
+                               loader-type="skeleton"
+                               disable-empty-case
+                               class="chart-wrapper"
+                >
                     <div ref="chartRef" class="chart" />
                     <div v-for="(item) in chartLegends" :key="item" class="circle-wrapper">
                         <p v-if="providers" class="circle" :style="{background: providers[item].color}" /><span>{{ providers[item].label || '' }}</span>
                     </div>
-                </p-chart-loader>
+                </p-data-loader>
                 <cost-dashboard-data-table
                     :fields="tableState.fields"
                     :items="tableState.items"
@@ -67,18 +68,35 @@ import { getConvertedFilter } from '@/services/billing/cost-management/cost-anal
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
-import { PChartLoader, PSkeleton } from '@spaceone/design-system';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 
 
 const categoryKey = 'title';
 const valueName = 'value';
+
+interface PieChartData {
+    category?: string;
+    color?: string;
+    provider?: string;
+    value?: number;
+}
+
+interface DefaultContinentData {
+    continent_code: string;
+    height: number;
+    width: number;
+    latitude: number;
+    longitude: number;
+    pieData: PieChartData[];
+    title: string;
+}
 
 export default defineComponent<WidgetProps>({
     name: 'CostByRegion',
     components: {
         CostDashboardDataTable,
         CostDashboardCardWidgetLayout,
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
     },
     props: {
@@ -106,8 +124,8 @@ export default defineComponent<WidgetProps>({
             chartRegistry: {},
             regions: computed(() => store.state.resource.region.items),
             providers: computed(() => store.state.resource.provider.items),
-            loading: false,
-            data: [] as any,
+            loading: true,
+            chartData: [] as DefaultContinentData[],
             widgetLink: computed(() => ({
                 name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                 params: {},
@@ -120,7 +138,7 @@ export default defineComponent<WidgetProps>({
             })),
             chartLegends: computed(() => {
                 const legends = new Set();
-                state.data.forEach((item) => {
+                state.chartData.forEach((item) => {
                     if (item.pieData) {
                         item.pieData.forEach((pieItem) => {
                             legends.add(pieItem.provider);
@@ -191,7 +209,7 @@ export default defineComponent<WidgetProps>({
             pieSeriesTemplate.ticks.template.disabled = true;
             pieSeriesTemplate.slices.template.propertyFields.fill = 'color';
 
-            pieSeries.data = state.data;
+            pieSeries.data = state.chartData;
         };
 
 
@@ -236,7 +254,7 @@ export default defineComponent<WidgetProps>({
                 state.loading = true;
                 tableState.loading = true;
                 const results = await fetchData();
-                state.data = setPieChartData(results); // pie chart data (continent, latitude, etc.)
+                state.chartData = setPieChartData(results); // pie chart data (continent, latitude, etc.)
                 tableState.items = results.map(d => ({ // table data (usd_cost, region, provider)
                     usd_cost: d.usd_cost,
                     provider: d.provider || '',
@@ -244,7 +262,7 @@ export default defineComponent<WidgetProps>({
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.data = [];
+                state.chartData = [];
                 tableState.items = [];
             } finally {
                 state.loading = false;
@@ -287,7 +305,6 @@ export default defineComponent<WidgetProps>({
         @apply border border-gray-200;
         flex-basis: calc(50% - 1.875rem);
         padding: 1rem;
-        margin-right: 1.875rem;
     }
     .chart {
         @apply w-full h-full;
@@ -298,6 +315,7 @@ export default defineComponent<WidgetProps>({
     .table {
         @apply flex flex-col;
         flex-basis: 50%;
+        margin-left: 1.875rem;
     }
     .circle-wrapper {
         display: inline-flex;
@@ -320,11 +338,11 @@ export default defineComponent<WidgetProps>({
     .widget-wrapper {
         .chart-wrapper {
             flex-basis: 100%;
-            margin-right: 0;
         }
         .table {
             flex-basis: 100%;
             margin-top: 1rem;
+            margin-left: 0;
         }
     }
 }
