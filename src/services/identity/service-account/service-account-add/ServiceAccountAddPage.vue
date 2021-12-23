@@ -344,12 +344,9 @@ export default {
             const item: any = {
                 name: formState.accountName,
                 provider: props.provider,
+                data: formState.accountModel,
                 tags: formState.tags,
             };
-
-            if (formState.accountSchema) {
-                item.data = formState.accountModel;
-            }
 
             if (formState.selectedProject) {
                 item.project_id = formState.selectedProject.id;
