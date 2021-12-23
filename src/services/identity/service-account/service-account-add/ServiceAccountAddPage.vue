@@ -46,7 +46,9 @@
                     />
                 </template>
             </p-field-group>
-            <p-json-schema-form :model.sync="accountModel" :schema="accountSchema" :is-valid.sync="isAccountModelValid" />
+            <p-json-schema-form v-if="accountSchema" :model.sync="accountModel" :schema="accountSchema"
+                                :is-valid.sync="isAccountModelValid"
+            />
             <div class="tag-title">
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_LABEL') }}
             </div>
@@ -77,7 +79,7 @@
             </tags-input-group>
         </p-pane-layout>
 
-        <p-pane-layout>
+        <p-pane-layout v-if="showCredentialInputs">
             <div class="title">
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIALS_TITLE') }}
             </div>
@@ -200,7 +202,8 @@ export default {
             selectedSecretType: '',
             serviceAccountNames: [] as string[],
             credentialNames: [] as string[],
-            secretTypes: computed(() => get(state.providerObj, 'capability.supported_schema', [])),
+            secretTypes: computed<any[]>(() => get(state.providerObj, 'capability.supported_schema', [])),
+            showCredentialInputs: computed<boolean>(() => state.secretTypes.length > 0),
         });
 
         const tabState = reactive({
@@ -255,7 +258,7 @@ export default {
             }),
             /* schema input */
             accountModel: {},
-            accountSchema: {},
+            accountSchema: null as any|null,
             isAccountModelValid: false,
             //
             credentialModel: {},
@@ -267,10 +270,15 @@ export default {
             selectedProject: null as ProjectGroup|null,
             //
             isValid: computed(() => {
+                const isAccountModelValid = formState.accountSchema ? formState.isAccountModelValid : true;
+
                 if (tabState.activeTab === 'json') {
-                    return formState.isAccountNameValid && formState.isAccountModelValid && formState.isCredentialNameValid;
+                    return formState.isAccountNameValid && isAccountModelValid && formState.isCredentialNameValid;
                 }
-                return formState.isAccountNameValid && formState.isAccountModelValid && formState.isCredentialNameValid && formState.isCredentialModelValid;
+
+                if (state.showCredentialInputs) return formState.isAccountNameValid && isAccountModelValid && formState.isCredentialNameValid && formState.isCredentialModelValid;
+
+                return formState.isAccountNameValid && isAccountModelValid;
             }),
         });
 
@@ -293,7 +301,8 @@ export default {
                     }),
                 ]);
                 state.providerObj = res;
-                state.selectedSecretType = res.capability.supported_schema[0];
+                const supportedSchema: any = res.capability.supported_schema;
+                state.selectedSecretType = supportedSchema ? supportedSchema[0] : '';
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.providerObj = {};
@@ -315,7 +324,7 @@ export default {
             state.serviceAccountNames = res.results.map(v => v.name);
         };
         const getServiceAccountSchema = async () => {
-            formState.accountSchema = state.providerObj.template.service_account.schema;
+            formState.accountSchema = state.providerObj.template?.service_account?.schema ?? null;
         };
         const getCredentialSchema = async (selectedSecretType) => {
             const res = await SpaceConnector.client.repository.schema.get({
@@ -335,17 +344,18 @@ export default {
             const item: any = {
                 name: formState.accountName,
                 provider: props.provider,
-                data: formState.accountModel,
                 tags: formState.tags,
             };
+
+            if (formState.accountSchema) {
+                item.data = formState.accountModel;
+            }
 
             if (formState.selectedProject) {
                 item.project_id = formState.selectedProject.id;
             }
             try {
-                const res = await SpaceConnector.client.identity.serviceAccount.create({
-                    ...item,
-                });
+                const res = await SpaceConnector.client.identity.serviceAccount.create(item);
                 state.serviceAccountId = res.service_account_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
@@ -371,25 +381,23 @@ export default {
                 project_id: formState.selectedProject?.id || null,
             });
         };
-        const createSecret = async () => {
+        const createSecret = async (): Promise<boolean> => {
+            let isSucceed = false;
             try {
                 if (tabState.activeTab === 'json') {
-                    try {
-                        const json = JSON.parse(formState.jsonForCredential);
-                        await createSecretWithJson(json);
-                    } catch (e) {
-                        ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
-                        await deleteServiceAccount();
-                        return;
-                    }
-                }
-                if (tabState.activeTab === 'input') await createSecretWithForm();
-                vm.$router.back();
+                    const json = JSON.parse(formState.jsonForCredential);
+                    await createSecretWithJson(json);
+                } else if (tabState.activeTab === 'input') await createSecretWithForm();
+
                 showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm.$root);
+                isSucceed = true;
             } catch (e) {
+                isSucceed = false;
                 ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
                 await deleteServiceAccount();
             }
+
+            return isSucceed;
         };
 
         const onClickSave = async () => {
@@ -403,7 +411,12 @@ export default {
                     if (formState.credentialModel.private_key) {
                         formState.credentialModel.private_key = formState.credentialModel.private_key.replace(/\\n/g, '\n');
                     }
-                    await createSecret();
+                    if (state.showCredentialInputs) {
+                        const isSucceed = await createSecret();
+                        if (isSucceed) vm.$router.back();
+                    } else {
+                        vm.$router.back();
+                    }
                 }
             }
         };
