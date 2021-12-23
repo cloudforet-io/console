@@ -1,3 +1,10 @@
+# [1.1.0-beta.214](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.213...v1.1.0-beta.214) (2021-12-23)
+
+
+### Bug Fixes
+
+* add setDataAfterEdit to editOptions in tree ([#802](https://github.com/spaceone-dev/spaceone-design-system/issues/802)) ([e2e5327](https://github.com/spaceone-dev/spaceone-design-system/commit/e2e53276234dcd039d40c755ec2bd74b8c027779))
+
 # [1.1.0-beta.213](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.212...v1.1.0-beta.213) (2021-12-21)
 
 
