@@ -1,5 +1,12 @@
 <template>
-    <div ref="chartRef" class="p-dynamic-chart-donut" />
+    <div class="p-dynamic-chart-donut">
+        <div ref="chartRef" class="donut-chart" />
+        <div>
+            <p-status v-for="(item, idx) in data" :key="item[valueOptions.key]" :icon-color="colors[idx]">
+                <span class="name">{{ item[nameOptions.key] }}</span> <span class="value">{{ item[valueOptions.key] }}</span>
+            </p-status>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -16,12 +23,15 @@ import {
     DEFAULT_VALUE_OPTIONS,
 } from '@/data-display/dynamic/dynamic-chart/config';
 
-import { getLegends, getPieSeries } from '@/data-display/dynamic/dynamic-chart/templates/donut/helper';
 import { DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
+import { drawDummyPieChart, drawPieChart } from '@/data-display/dynamic/dynamic-chart/templates/donut/helper';
+import PStatus from '@/data-display/status/PStatus.vue';
+import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
 
 export default defineComponent<DynamicChartTemplateProps>({
     name: 'PDynamicChartDonut',
+    components: { PStatus },
     props: {
         data: {
             type: Array,
@@ -40,6 +50,8 @@ export default defineComponent<DynamicChartTemplateProps>({
         const state = reactive({
             chart: null as null|PieChart,
             chartRef: null as null|HTMLElement,
+            colors: DEFAULT_CHART_COLORS,
+            isDummyChart: false,
         });
 
         const disposeChart = () => {
@@ -52,26 +64,32 @@ export default defineComponent<DynamicChartTemplateProps>({
 
             const chart = am4core.create(ctx, PieChart);
 
-            // chart settings
-            chart.innerRadius = am4core.percent(65);
-            if (chart.hasLicense()) chart.logo.disabled = true;
-
-            // get components of chart
-            const series = getPieSeries(props.nameOptions, props.valueOptions, !props.data.length);
-            const legends = getLegends();
-
-            // put components into charts
-            chart.series.push(series);
-            chart.legend = legends;
-
-            // put data into charts
-            chart.data = props.data;
+            if (props.data.length) {
+                drawPieChart(chart, props.nameOptions, props.valueOptions);
+                chart.data = props.data;
+                state.isDummyChart = false;
+            } else {
+                drawDummyPieChart(chart, props.nameOptions, props.valueOptions);
+                state.isDummyChart = true;
+            }
 
             state.chart = chart;
         };
 
         const updateChartData = (data: any[]) => {
-            if (state.chart) state.chart.data = data;
+            if (state.chart) {
+                if (!data.length && state.isDummyChart) {
+                    return;
+                }
+
+                if (data.length && !state.isDummyChart) {
+                    state.chart.data = data;
+                    return;
+                }
+
+                disposeChart();
+                drawChart();
+            }
         };
 
         onMounted(() => {
@@ -100,5 +118,11 @@ export default defineComponent<DynamicChartTemplateProps>({
 <style lang="postcss">
 .p-dynamic-chart-donut {
     width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    .donut-chart {
+        height: 50%;
+    }
 }
 </style>
