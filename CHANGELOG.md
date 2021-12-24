@@ -1,3 +1,10 @@
+# [1.1.0-beta.217](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.216...v1.1.0-beta.217) (2021-12-24)
+
+
+### Features
+
+* apply design to treemap type in dynamic chart ([#805](https://github.com/spaceone-dev/spaceone-design-system/issues/805)) ([4e8a9a7](https://github.com/spaceone-dev/spaceone-design-system/commit/4e8a9a76bf491a780ca8c3125924abe91f139924))
+
 # [1.1.0-beta.216](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.215...v1.1.0-beta.216) (2021-12-23)
 
 
