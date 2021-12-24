@@ -1,3 +1,10 @@
+# [1.1.0-beta.218](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.217...v1.1.0-beta.218) (2021-12-24)
+
+
+### Features
+
+* add dynamic widget ([#806](https://github.com/spaceone-dev/spaceone-design-system/issues/806)) ([6e8ca96](https://github.com/spaceone-dev/spaceone-design-system/commit/6e8ca96838302d63254c5611d5d1d6a056e2916f))
+
 # [1.1.0-beta.217](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.216...v1.1.0-beta.217) (2021-12-24)
 
 
