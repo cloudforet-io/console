@@ -1,0 +1,88 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import {
+    reactive, toRefs,
+} from '@vue/composition-api';
+import PDynamicWidget from './PDynamicWidget.vue';
+import { getDynamicWidgetArgTypes } from '@/data-display/dynamic/dynamic-widget/story-helper';
+import { getDynamicWidgetMockData } from '@/data-display/dynamic/dynamic-widget/mock';
+
+
+
+<Meta title='Data Display/Dynamic/Dynamic Widget'
+      argTypes={getDynamicWidgetArgTypes()}
+/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicWidget },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-dynamic-widget
+            :type="type"
+            :name="name"
+            :schema-options="{
+                value_options,
+                name_options,
+                chart_type,
+                limit
+            }"
+            :data="_data"
+            :view-options="_viewOptions"
+        ></p-dynamic-widget>
+    </div>
+    `,
+    setup(props) {
+        const mockData = getDynamicWidgetMockData(props.type)
+        const state = reactive({
+            _schemaOptions: mockData.schemaOptions,
+            _data: mockData.data,
+            _viewOptions: mockData.viewOptions
+        })
+        return toRefs(state)
+    }
+});
+
+
+# Dynamic Widget
+
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+    components: { PDynamicWidget },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-dynamic-widget
+            :type="type"
+            :name="name"
+            :schema-options="schemaOptions"
+            :data="data"
+            :view-options="viewOptions"
+        ></p-dynamic-widget>
+    </div>
+    `,
+    setup() {
+        const state = reactive(getDynamicWidgetMockData())
+        return toRefs(state)
+    }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
