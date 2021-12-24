@@ -16,7 +16,7 @@ import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS,
 } from '@/data-display/dynamic/dynamic-chart/config';
-import { getLabelBullet } from '@/data-display/dynamic/dynamic-chart/templates/treemap/helper';
+import { drawDummyTreemapChart, drawTreemapChart } from '@/data-display/dynamic/dynamic-chart/templates/treemap/helper';
 import { DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
 
 export default defineComponent<DynamicChartTemplateProps>({
@@ -39,6 +39,7 @@ export default defineComponent<DynamicChartTemplateProps>({
         const state = reactive({
             chart: null as null|TreeMap,
             chartRef: null as null|HTMLElement,
+            isDummyChart: false,
         });
 
         const disposeChart = () => {
@@ -51,27 +52,32 @@ export default defineComponent<DynamicChartTemplateProps>({
 
             const chart = am4core.create(ctx, TreeMap);
 
-            // chart settings
-            if (chart.hasLicense()) chart.logo.disabled = true;
-            chart.colors.step = 2;
-            chart.dataFields.value = props.valueOptions.key;
-            chart.dataFields.name = props.nameOptions.key;
-
-            // get components of chart
-            const series = chart.seriesTemplates.create('0');
-            const labelBullets = getLabelBullet(props.nameOptions, props.valueOptions);
-
-            // put components into charts
-            series.bullets.push(labelBullets);
-
-            // put data into charts
-            chart.data = props.data;
+            if (props.data.length) {
+                drawTreemapChart(chart, props.nameOptions, props.valueOptions);
+                chart.data = props.data;
+                state.isDummyChart = false;
+            } else {
+                drawDummyTreemapChart(chart, props.nameOptions, props.valueOptions);
+                state.isDummyChart = true;
+            }
 
             state.chart = chart;
         };
 
         const updateChartData = (data: any[]) => {
-            if (state.chart) state.chart.data = data;
+            if (state.chart) {
+                if (!data.length && state.isDummyChart) {
+                    return;
+                }
+
+                if (data.length && !state.isDummyChart) {
+                    state.chart.data = data;
+                    return;
+                }
+
+                disposeChart();
+                drawChart();
+            }
         };
 
         onMounted(() => {

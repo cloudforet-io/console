@@ -111,9 +111,17 @@ ${DYNAMIC_CHART_TYPE} are available.
     components: { PDynamicChart },
     template: `
 <div class="h-full w-full overflow p-8">
+    <p class="font-bold text-lg my-4">General Case</p>
     <p-dynamic-chart
         type="TREEMAP"
         :data="data"
+        style="height: 500px;"
+    >
+    </p-dynamic-chart>
+    <p class="font-bold text-lg my-4">Empty Case</p>
+    <p-dynamic-chart
+        type="TREEMAP"
+        :data="[]"
         style="height: 500px;"
     >
     </p-dynamic-chart>
