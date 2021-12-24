@@ -1,5 +1,6 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ProjectResourceMap } from '@/store/modules/resource/project/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     if (lazyLoad && Object.keys(state.items).length > 0) return;
@@ -26,5 +27,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
         });
 
         commit('setProjects', projects);
-    } catch (e) {}
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };

@@ -2,6 +2,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
 import { indigo } from '@/styles/colors';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const load = async ({ commit, state }, lazyLoad = false): Promise<void|Error> => {
     if (lazyLoad && Object.keys(state.items).length > 0) return;
@@ -27,5 +28,7 @@ export const load = async ({ commit, state }, lazyLoad = false): Promise<void|Er
         });
 
         commit('setProviders', providers);
-    } catch (e) {}
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };

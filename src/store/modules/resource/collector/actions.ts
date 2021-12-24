@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     if (lazyLoad && Object.keys(state.items).length > 0) return;
@@ -21,5 +22,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
         });
 
         commit('setCollectors', collectors);
-    } catch (e) {}
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };

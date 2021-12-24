@@ -1,5 +1,6 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const regionMap = {
     africa: {
@@ -59,5 +60,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
         });
 
         commit('setRegions', regions);
-    } catch (e) {}
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
