@@ -1,3 +1,11 @@
+# [1.1.0-beta.219](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.218...v1.1.0-beta.219) (2021-12-27)
+
+
+### Features
+
+* add dynamic widget type components ([#808](https://github.com/spaceone-dev/spaceone-design-system/issues/808)) ([3f0bf69](https://github.com/spaceone-dev/spaceone-design-system/commit/3f0bf698cd19d8f805b2e0a46bf632abaa72d3bd))
+* resize p-search height according to length of tag ([#807](https://github.com/spaceone-dev/spaceone-design-system/issues/807)) ([110e036](https://github.com/spaceone-dev/spaceone-design-system/commit/110e036766416db049344721d5f53c7e8785f8dd))
+
 # [1.1.0-beta.218](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.217...v1.1.0-beta.218) (2021-12-24)
 
 
