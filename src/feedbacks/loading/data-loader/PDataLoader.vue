@@ -146,6 +146,7 @@ export default defineComponent({
     @apply w-full;
     .data-loader-container {
         @apply relative w-full h-full overflow-hidden;
+        min-height: inherit;
     }
     .loader-wrapper {
         @apply absolute w-full h-full overflow-hidden;
@@ -178,6 +179,7 @@ export default defineComponent({
         font-size: 1rem;
         height: calc(100% - 2rem);
         max-height: 16.875rem;
+        min-height: inherit;
     }
 
     .data-wrapper {
