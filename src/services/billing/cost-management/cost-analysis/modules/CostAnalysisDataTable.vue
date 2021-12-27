@@ -4,12 +4,13 @@
                      :items="tableState.items"
                      :total-count="tableState.totalCount"
                      :searchable="false"
+                     sortable
                      exportable
                      @change="handleChange"
                      @refresh="handleChange()"
                      @export="handleExport"
     >
-        <template #col-format="{field, value, index, item}">
+        <template #col-format="{field, value, item}">
             <span v-if="Object.values(GROUP_BY).includes(field.name) && !value">
                 {{ `No ${GROUP_BY_ITEM_MAP[field.name].label}` }}
             </span>
@@ -60,7 +61,6 @@ import {
     getTimeUnitByPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { TableData } from '@/services/billing/cost-management/widgets/type';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -73,6 +73,15 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Location } from 'vue-router';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 
+
+interface UsdCost {
+    [key: string]: number;
+}
+
+interface TableData {
+    total_usd_cost?: number;
+    usd_cost: UsdCost;
+}
 
 export default {
     name: 'CostAnalysisDataTable',
@@ -118,7 +127,7 @@ export default {
             }));
             if (!groupByItems.length) {
                 groupByFields.push({
-                    name: 'totalCost', label: ' ', textAlign: 'right',
+                    name: 'totalCost', label: ' ', textAlign: 'right', sortable: false,
                 });
             }
 
@@ -187,12 +196,35 @@ export default {
                 },
             };
         };
+        const _getStackedTableData = (tableData: TableData[], granularity, period): TableData[] => {
+            const timeUnit = getTimeUnitByPeriod(granularity, dayjs(period.start), dayjs(period.end));
+            let dateFormat = 'YYYY-MM-DD';
+            if (timeUnit === 'month') dateFormat = 'YYYY-MM';
+            if (timeUnit === 'year') dateFormat = 'YYYY';
+            const results: TableData[] = [];
+            tableData.forEach((d) => {
+                const usdCost: UsdCost = {};
+                let now = dayjs(period.start).clone();
+                let stackedData = 0;
+                while (now.isSameOrBefore(dayjs(period.end), timeUnit)) {
+                    const currValue = d.usd_cost[now.format(dateFormat)] || 0;
+                    stackedData += currValue;
+                    usdCost[now.format(dateFormat)] = stackedData;
+                    now = now.add(1, timeUnit);
+                }
+                results.push({
+                    ...d,
+                    usd_cost: usdCost,
+                });
+            });
+            return results;
+        };
 
         /* api */
         const costApiQueryHelper = new ApiQueryHelper()
             .setPageStart(1).setPageLimit(15)
-            .setSort('total_count', true);
-        const listCostAnalysisTableData = async (granularity, groupBy, period, filters) => {
+            .setSort('total_usd_cost', true);
+        const listCostAnalysisTableData = async (granularity, groupBy, period, filters, stack) => {
             try {
                 const _granularity = getConvertedGranularity(period, granularity);
                 const _convertedFilters = getConvertedFilter(filters);
@@ -206,7 +238,9 @@ export default {
                     pivot_type: 'TABLE',
                     ...costApiQueryHelper.data,
                 });
-                tableState.items = results;
+                let items = results;
+                if (stack) items = _getStackedTableData(results, granularity, period);
+                tableState.items = items;
                 tableState.totalCount = total_count;
             } catch (e) {
                 tableState.items = [];
@@ -218,10 +252,10 @@ export default {
         /* event */
         const handleChange = async (options: any = {}) => {
             setApiQueryWithToolboxOptions(costApiQueryHelper, options, { queryTags: true });
-            await listCostAnalysisTableData(state.granularity, state.groupBy, state.period, state.filters);
+            await listCostAnalysisTableData(state.granularity, state.groupBy, state.period, state.filters, state.stack);
         };
         const handleRefresh = async () => {
-            await listCostAnalysisTableData(state.granularity, state.groupBy, state.period, state.filters);
+            await listCostAnalysisTableData(state.granularity, state.groupBy, state.period, state.filters, state.stack);
         };
         const handleExport = async () => {
             try {
@@ -249,10 +283,10 @@ export default {
             }
         };
 
-        watch([() => state.granularity, () => state.groupBy, () => state.period, () => state.filters], async ([granularity, groupBy, period, filters]) => {
+        watch([() => state.granularity, () => state.groupBy, () => state.period, () => state.filters, () => state.stack], async ([granularity, groupBy, period, filters, stack]) => {
             tableState.loading = true;
             await Promise.all([
-                listCostAnalysisTableData(granularity, groupBy, period, filters),
+                listCostAnalysisTableData(granularity, groupBy, period, filters, stack),
                 setTableFields(granularity, state.groupByItems),
             ]);
             tableState.loading = false;

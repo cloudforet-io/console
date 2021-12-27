@@ -13,7 +13,7 @@
                         <p-status v-if="showLegend"
                                   class="toggle-button"
                                   :text="getStatusText(index)"
-                                  :icon-color="getStatusIconColor(index)"
+                                  :icon-color="getStatusIconColor(name, value, index)"
                                   :text-color="getStatusTextColor(index)"
                                   @click="handleClickLegend(index)"
                         />
@@ -160,10 +160,11 @@ export default {
             const tableIndex = index + ((state.proxyThisPage - 1) * props.pageSize) + 1;
             return tableIndex.toString();
         };
-        const getStatusIconColor = (index) => {
+        const getStatusIconColor = (name, value, index) => {
             const convertedIndex = index + ((state.proxyThisPage - 1) * props.pageSize);
             const legend = props.legends[convertedIndex];
             if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+            if (name === GROUP_BY.PROVIDER) return state.providers[value].color;
             return DEFAULT_CHART_COLORS[convertedIndex];
         };
         const getStatusTextColor = (index) => {

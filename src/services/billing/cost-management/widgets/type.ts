@@ -38,6 +38,7 @@ export interface PieChartData {
 export interface Legend {
     name: string;
     label: string | TranslateResult;
+    color?: string;
     disabled?: boolean;
 }
 

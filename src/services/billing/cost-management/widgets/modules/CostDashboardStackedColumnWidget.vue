@@ -7,18 +7,11 @@
             <div ref="chartRef" class="chart" />
         </p-chart-loader>
         <div class="table-wrapper">
-            <div class="month-pagination-wrapper">
-                <span>{{ $t('BILLING.COST_MANAGEMENT.MAIN.MONTH') }}</span>
-                <p-text-pagination :all-page="allMonthPage"
-                                   :this-page.sync="thisMonthPage"
-                                   :show-page-number="false"
-                />
-            </div>
             <cost-dashboard-data-table :fields="fields"
                                        :items="items"
                                        :loading="tableLoading"
                                        :this-page.sync="thisPage"
-                                       :page-size="8"
+                                       :page-size="9"
                                        :chart="chart"
                                        :legends="legends"
                                        :currency-rates="currencyRates"
@@ -42,7 +35,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PSkeleton, PTextPagination,
+    PChartLoader, PSkeleton,
 } from '@spaceone/design-system';
 
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
@@ -88,7 +81,6 @@ export default defineComponent<Props>({
         CostDashboardDataTable,
         PChartLoader,
         PSkeleton,
-        PTextPagination,
     },
     props: {
         groupBy: {
@@ -130,7 +122,7 @@ export default defineComponent<Props>({
                 const fields: DataTableField[] = [{ name: props.groupBy, label: GROUP_BY_ITEM_MAP[props.groupBy].label }];
                 const fiveMonthsAgo = dayjs.utc(props.period.end).subtract(5, 'month');
                 const thisMonth = dayjs.utc();
-                range(state.thisMonthPage * 3 - 3, state.thisMonthPage * 3).forEach((d) => {
+                range(6).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');
                     fields.push({
                         name: `usd_cost.${date.format('YYYY-MM')}`,
@@ -141,8 +133,6 @@ export default defineComponent<Props>({
             }),
             totalCount: 15,
             thisPage: 1,
-            allMonthPage: 2,
-            thisMonthPage: 2,
         });
 
         /* util */
@@ -207,7 +197,7 @@ export default defineComponent<Props>({
                 series.tooltipText = '{name}: [bold]{valueY}[/]';
                 series.tooltip.label.fontSize = 10;
                 series.stacked = true;
-                series.columns.template.propertyFields.fillOpacity = 'fillOpacity';
+                series.fill = am4core.color(legend.color);
                 return series;
             };
 
@@ -240,9 +230,7 @@ export default defineComponent<Props>({
                     start: apiPeriod.start,
                     end: apiPeriod.end,
                     pivot_type: 'TABLE',
-                    page: {
-                        limit: 15,
-                    },
+                    limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;
@@ -321,7 +309,7 @@ export default defineComponent<Props>({
 <style lang="postcss" scoped>
 .cost-dashboard-stacked-column-widget {
     @apply grid grid-cols-12;
-    min-height: 26rem;
+    min-height: 24rem;
     .chart-wrapper {
         @apply col-span-6;
         .chart {
@@ -330,11 +318,6 @@ export default defineComponent<Props>({
     }
     .table-wrapper {
         @apply flex flex-col col-span-6;
-        .month-pagination-wrapper {
-            display: flex;
-            align-items: center;
-            margin-left: auto;
-        }
         .cost-dashboard-data-table {
             @apply flex flex-col flex-grow;
             .p-data-table {
@@ -351,11 +334,6 @@ export default defineComponent<Props>({
         .chart-wrapper,
         .table-wrapper {
             @apply col-span-12 row-span-1;
-        }
-        .table-wrapper {
-            .month-pagination-wrapper {
-                margin: 1rem 0 0.5rem auto;
-            }
         }
     }
 }

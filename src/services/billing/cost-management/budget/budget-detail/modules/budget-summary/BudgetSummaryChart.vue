@@ -21,7 +21,7 @@ import {
 } from '@/styles/colors';
 import { XYChart } from '@amcharts/amcharts4/charts';
 import { store } from '@/store';
-import { getAccumulatedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import { getStackedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import dayjs from 'dayjs';
 import { BUDGET_TIME_UNIT } from '@/services/billing/cost-management/budget/type';
@@ -51,7 +51,7 @@ export default {
         const getChartData = () => {
             try {
                 state.loading = true;
-                const accumulatedData = getAccumulatedChartData(state.budgetUsageData, {
+                const accumulatedData = getStackedChartData(state.budgetUsageData, {
                     start: state.budgetData.start,
                     end: state.budgetData.end,
                 }, 'month');

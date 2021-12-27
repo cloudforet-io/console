@@ -104,16 +104,22 @@ export default {
     setup(props: Props) {
         const state = reactive({
             _top15itemNames: [],
-            widgetLink: computed(() => ({
-                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
-                params: {},
-                query: {
-                    granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                    groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
-                    period: objectToQueryString(props.period),
-                    filters: objectToQueryString(props.filters),
-                },
-            })),
+            widgetLink: computed(() => {
+                const _period = {
+                    start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM'),
+                    end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
+                };
+                return {
+                    name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    params: {},
+                    query: {
+                        granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+                        groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
+                        period: objectToQueryString(_period),
+                        filters: objectToQueryString(props.filters),
+                    },
+                };
+            }),
             projects: computed(() => store.state.resource.project.items),
             //
             chartLoading: true,

@@ -41,6 +41,7 @@ const _getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: string): 
         const _regions = store.state.resource.region.items;
         groupByNames.forEach((d) => {
             let _label = d;
+            let _color = undefined as string | undefined;
             if (groupBy === GROUP_BY.PROJECT) {
                 _label = _projects[d]?.label || d;
             } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
@@ -49,10 +50,12 @@ const _getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: string): 
                 _label = _regions[d]?.name || d;
             } else if (groupBy === GROUP_BY.PROVIDER) {
                 _label = _providers[d]?.name || d;
+                _color = _providers[d]?.color;
             }
             legends.push({
                 name: d as string,
                 label: _label as string,
+                color: _color,
                 disabled: false,
             });
         });
@@ -146,13 +149,13 @@ export const getXYChartDataAndLegends = (rawData: XYChartRawData[], groupBy?: st
 
 
 /**
- * @name getAccumulatedChartData
+ * @name getStackedChartData
  * @description Get accumulated array of chart data. Chart data must have 'date' property.
  * @example [{ date: '2021-01', usd_cost: 10, limit: 100 }, { date: '2021-02', usd_cost: 10, limit: 0 }, { date: '2021-03', usd_cost: 10, limit: 100 }]
  *       => [{ date: '2021-01-01', usd_cost: 10, limit: 100 }, { date: '2021-02-01', usd_cost: 20, limit: 100 }, { date: '2021-03-01', usd_cost: 30, limit: 200 }]
  * @usage CostAnalysisDynamicWidget
  */
-export const getAccumulatedChartData = (chartData: XYChartData[], period: Period, timeUnit: TimeUnit): XYChartData[] => {
+export const getStackedChartData = (chartData: XYChartData[], period: Period, timeUnit: TimeUnit): XYChartData[] => {
     const accumulatedChartData = [] as XYChartData[];
     let now = dayjs(period.start).clone();
     let accumulatedData: Record<string, number> = {};

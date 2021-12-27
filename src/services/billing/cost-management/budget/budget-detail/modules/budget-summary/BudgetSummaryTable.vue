@@ -34,7 +34,7 @@ import {
 } from '@/services/billing/cost-management/budget/type';
 import { Period } from '@/services/billing/cost-management/type';
 import { Location } from 'vue-router';
-import { getAccumulatedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import { getStackedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
@@ -77,7 +77,7 @@ export default {
         },
     },
     setup() {
-        const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageData[], period: Period) => getAccumulatedChartData(budgetUsageData, period, 'month');
+        const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageData[], period: Period) => getStackedChartData(budgetUsageData, period, 'month');
 
         const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUnit: BudgetTimeUnit, totalBudgetLimit: number, costTypeKey: string, costTypeValue: string[]|null) => {
             const filters = {

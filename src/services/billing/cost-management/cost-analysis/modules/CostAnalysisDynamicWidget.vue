@@ -35,7 +35,7 @@ import { getTimeUnitByPeriod } from '@/services/billing/cost-management/cost-ana
 
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import {
-    getAccumulatedChartData, getCurrencyAppliedChartData,
+    getStackedChartData, getCurrencyAppliedChartData,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import {
     Legend, PieChartData, XYChartData, WidgetProps,
@@ -124,7 +124,7 @@ export default {
             let USDChartData = cloneDeep(props.chartData);
             if (props.granularity !== GRANULARITY.ACCUMULATED) {
                 if (props.stack) {
-                    USDChartData = getAccumulatedChartData(props.chartData as XYChartData[], props.period, timeUnit);
+                    USDChartData = getStackedChartData(props.chartData as XYChartData[], props.period, timeUnit);
                 } else {
                     USDChartData = fillDefaultDataOfLastDay(props.chartData as XYChartData[], props.period, timeUnit);
                 }
