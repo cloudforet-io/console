@@ -3,6 +3,19 @@
 
 ### Bug Fixes
 
+* add style to legend of donut chart widget ([#812](https://github.com/spaceone-dev/spaceone-design-system/issues/812)) ([9d15b56](https://github.com/spaceone-dev/spaceone-design-system/commit/9d15b56a53022b1c26f658ac5720ce12eb69f00f))
+* fix runtime type error ([#813](https://github.com/spaceone-dev/spaceone-design-system/issues/813)) ([fc4dec1](https://github.com/spaceone-dev/spaceone-design-system/commit/fc4dec1cdee8ddfb127f5661d22d9a40f087d700))
+
+
+### Features
+
+* update assets ([#810](https://github.com/spaceone-dev/spaceone-design-system/issues/810)) ([b8c2a9b](https://github.com/spaceone-dev/spaceone-design-system/commit/b8c2a9b5ce96e4b9a533af81305fe9f57c118d58))
+
+# [1.1.0-beta.221](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.220...v1.1.0-beta.221) (2021-12-27)
+
+
+### Bug Fixes
+
 * fix runtime type error ([#813](https://github.com/spaceone-dev/spaceone-design-system/issues/813)) ([fc4dec1](https://github.com/spaceone-dev/spaceone-design-system/commit/fc4dec1cdee8ddfb127f5661d22d9a40f087d700))
 
 
