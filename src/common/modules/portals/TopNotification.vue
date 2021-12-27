@@ -7,7 +7,7 @@
             >
                 <span v-if="hasDefaultMessage">
                     <portal target="top-notification-message" />
-                    Permission denied. Please, Contact administrator to get a role.
+                    {{ $t('APP.TOP_NOTI.PERMISSION_DENIED') }}
                 </span>
             </p-notification-bar>
         </p>

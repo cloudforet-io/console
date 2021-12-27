@@ -1,7 +1,6 @@
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { SpaceRouter } from '@/router';
 import {
-    isInstanceOfAPIError, isInstanceOfAuthenticationError, isInstanceOfAuthorizationError,
+    isInstanceOfAPIError, isInstanceOfAuthorizationError,
     isInstanceOfBadRequestError,
 } from '@spaceone/console-core-lib/space-connector/error';
 import { isInstanceOfNoResourceError, isInstanceOfNoSearchResourceError } from '@/common/composables/error/error';
@@ -24,15 +23,17 @@ export default class ErrorHandler {
     }
 
     static handleError(error) {
-        if (isInstanceOfAuthenticationError(error)) {
-            const isTokenAlive = SpaceConnector.isTokenAlive;
-            if (!isTokenAlive && !SpaceRouter.router.currentRoute.meta.excludeAuth) {
-                (async () => {
-                    const res = await SpaceConnector.refreshAccessToken(false);
-                    if (!res) ErrorHandler.authenticationErrorHandler();
-                })();
-            }
-        } else if (isInstanceOfAuthorizationError(error)) {
+        // if (isInstanceOfAuthenticationError(error)) {
+        //     const isTokenAlive = SpaceConnector.isTokenAlive;
+        //     if (!isTokenAlive && !SpaceRouter.router.currentRoute.meta.excludeAuth) {
+        //         (async () => {
+        //             console.log('handle error refresh token')
+        //             const res = await SpaceConnector.refreshAccessToken(false);
+        //             if (!res) ErrorHandler.authenticationErrorHandler();
+        //         })();
+        //     }
+        // } else
+        if (isInstanceOfAuthorizationError(error)) {
             ErrorHandler.authorizationErrorHandler();
             console.error(error);
         } else if (isInstanceOfNoResourceError(error)) {
