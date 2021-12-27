@@ -1,22 +1,29 @@
-import { QuerySearchProps } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
     makeReferenceValueHandler
 } from '@src/component-util/query-search';
-import { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { Filter } from '@src/space-connector/type';
 import { ConsoleDynamicField, ConsoleSearchSchema, Reference } from '@src/component-util/dynamic-layout/type';
 import { forEach } from 'lodash';
-import { EnumOptions } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import { DynamicLayoutType } from '@src/component-util/dynamic-layout/layout-schema';
+import { EnumOptions } from '@src/component-util/dynamic-layout/field-schema';
+import { KeyItemSet, ValueHandlerMap } from '@src/component-util/query-search/type';
 
 interface ExcelDataField {
     key: string;
     name: string;
     type?: 'datetime'|'enum';
-    // eslint-disable-next-line camelcase
     enum_items?: object;
     reference?: Reference;
+}
+
+interface QuerySearchProps {
+    placeholder?: string;
+    focused: boolean;
+    keyItemSets: KeyItemSet[];
+    valueHandlerMap: ValueHandlerMap;
+    value: string;
 }
 
 /**

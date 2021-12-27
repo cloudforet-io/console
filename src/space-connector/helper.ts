@@ -45,10 +45,10 @@ class ApiQueryHelper extends QueryHelper {
         return this;
     }
 
-    setSort(key: string, desc = false): ApiQueryHelper {
+    setSort(key: string, desc?: boolean): ApiQueryHelper {
         this._data.sort = {
             key,
-            desc
+            desc: desc ?? this._data.sort?.desc ?? false
         };
         return this;
     }

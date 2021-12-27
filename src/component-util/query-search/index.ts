@@ -2,7 +2,6 @@ import {
     map, size, flatMap, flatten, uniq, cloneDeep
 } from 'lodash';
 import {
-    SearchEnumItem, SearchEnums,
     KeyDataType,
     KeyItem, KeyItemSet,
     ValueHandler,
@@ -11,6 +10,7 @@ import {
 } from '@src/component-util/query-search/type';
 import { Filter } from '@src/space-connector/type';
 import { SpaceConnector } from '@src/space-connector';
+import { SearchEnumItem, SearchEnums } from '@src/component-util/dynamic-layout/layout-schema';
 
 type KeyTuple = [string, string|undefined, KeyDataType|undefined] // name, label, dataType
 type KeyParam = Array<KeyTuple | string | KeyItemSet>
@@ -82,7 +82,6 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
     const staticParam: any = {
         resource_type: resourceType,
         options: { limit: limit || 10 },
-        // eslint-disable-next-line camelcase
         distinct_key: distinct
     };
 
@@ -90,11 +89,9 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
         const param = cloneDeep(staticParam);
         param.search = inputText;
         if (currentDataType === 'object') {
-            // eslint-disable-next-line camelcase
             param.options.search_type = currentDataType === 'object' ? 'key' : 'value';
         }
         if (subPath) {
-            // eslint-disable-next-line camelcase
             param.distinct_key = `${distinct}.${subPath}`;
         }
         if (filters) {

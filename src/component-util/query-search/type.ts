@@ -8,8 +8,25 @@ type CONTEXT_MENU_TYPE = typeof CONTEXT_MENU_TYPE[keyof typeof CONTEXT_MENU_TYPE
 export const dataTypes = ['string', 'integer', 'float', 'boolean', 'datetime', 'object'] as const;
 export type KeyDataType = typeof dataTypes[number];
 
-export const operators = ['', '!', '>', '>=', '<', '<=', '=', '!=', '$'] as const;
-export type OperatorType = typeof operators[number];
+export const OPERATOR = Object.freeze({
+    contain: '',
+    notContain: '!',
+    greater: '>',
+    greaterEqual: '>=',
+    less: '<',
+    lessEqual: '<=',
+    equal: '=',
+    notEqual: '!=',
+    regex: '$'
+} as const);
+
+export const operators = Object.values(OPERATOR);
+export type OperatorType = typeof OPERATOR[keyof typeof OPERATOR];
+
+export interface ValueItem {
+    label: string;
+    name: any;
+}
 
 export interface KeyItem {
     label: string;
@@ -18,21 +35,20 @@ export interface KeyItem {
     operators?: OperatorType[];
 }
 
-export interface KeyItemSet {
-    title: string;
-    items: KeyItem[];
+export interface QueryItem {
+    key?: KeyItem;
+    operator?: OperatorType;
+    value: ValueItem;
 }
+
+export type MenuType ='ROOT_KEY'|'KEY'|'VALUE'|'OPERATOR'
 
 export interface MenuItem<T> {
     type?: CONTEXT_MENU_TYPE;
     data?: T;
 }
 
-export interface ValueItem {
-    label: string;
-    name: any;
-}
-
+export interface KeyMenuItem extends KeyItem, MenuItem<KeyItem> {}
 export interface ValueMenuItem extends ValueItem, MenuItem<ValueItem> {}
 
 export interface HandlerResponse {
@@ -41,23 +57,29 @@ export interface HandlerResponse {
     dataType?: KeyDataType;
     operators?: OperatorType[];
 }
-
 export interface ValueHandler {
     (inputText: string,
-     rootKey: KeyItem,
-     dataType?: KeyDataType,
-     subPath?: string,
-     operator?: OperatorType): Promise<HandlerResponse>|HandlerResponse;
+        rootKey: KeyItem,
+        dataType?: KeyDataType,
+        subPath?: string,
+        operator?: OperatorType): Promise<HandlerResponse>|HandlerResponse;
 }
 
 export interface ValueHandlerMap {
     [key: string]: ValueHandler|undefined;
 }
 
-export interface QueryItem {
-    key?: KeyItem;
-    operator?: OperatorType;
-    value: ValueItem;
+export interface KeyItemSet {
+    title: string;
+    items: KeyItem[];
+}
+
+export interface QuerySearchProps {
+    placeholder?: string;
+    focused: boolean;
+    keyItemSets: KeyItemSet[];
+    valueHandlerMap: ValueHandlerMap;
+    value: string;
 }
 
 export interface QueryTag extends QueryItem {
@@ -65,12 +87,18 @@ export interface QueryTag extends QueryItem {
     description?: string;
 }
 
-/** Search schema types */
-export interface SearchEnumItem {
-    label: string;
-    icon?: {
-        image?: string;
-        color?: string;
-    };
+export interface QueryTagValidator {
+    (query: QueryTag, tags: QueryTag[]): boolean;
 }
-export type SearchEnums = Record<string, SearchEnumItem|string>|string[]
+
+export interface QueryTagConverter {
+    (query: QueryItem, timezone: string): QueryTag;
+}
+
+export interface QuerySearchTagsProps {
+    tags: QueryTag[];
+    timezone: string;
+    validator?: QueryTagValidator;
+    converter?: QueryTagConverter;
+    readOnly: boolean;
+}
