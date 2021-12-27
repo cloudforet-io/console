@@ -1,5 +1,5 @@
 <template>
-    <div class="date-filter">
+    <div class="cost-dashboard-period-select-dropdown">
         <p-badge style-type="gray200">
             <p v-if="dateFormatter(period.start, 'M') !== dateFormatter(period.end, 'M')">
                 {{ dateFormatter(period.start, 'MMMM D') }}, {{ dateFormatter(period.start, 'YYYY') }}
@@ -15,9 +15,11 @@
                            :disabled="Object.keys(fixedPeriod).length > 0"
                            @select="handleSelectMonthMenuItem"
         />
-        <cost-dashboard-custom-range-modal v-if="customRangeModalVisible"
-                                           :visible.sync="customRangeModalVisible"
-                                           @confirm="handleCustomRangeModalConfirm"
+        <cost-management-custom-range-modal v-if="customRangeModalVisible"
+                                            :visible.sync="customRangeModalVisible"
+                                            :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
+                                            :datetime-picker-data-type="DATA_TYPE.yearToMonth"
+                                            @confirm="handleCustomRangeModalConfirm"
         />
     </div>
 </template>
@@ -31,29 +33,20 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import dayjs from 'dayjs';
 import { Period } from '@/services/billing/cost-management/type';
 import { PBadge, PSelectDropdown } from '@spaceone/design-system';
-import CostDashboardCustomRangeModal
-    from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardCustomRangeModal.vue';
+import CostManagementCustomRangeModal
+    from '@/services/billing/cost-management/modules/CostManagementCustomRangeModal.vue';
 import { i18n } from '@/translations';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 
 const yesterday = dayjs.utc().subtract(1, 'day');
-const getMonthMenuItem = () => {
-    const monthData: MenuItem[] = [];
-    range(12).forEach((i) => {
-        monthData.push({
-            type: 'item',
-            label: yesterday.subtract(i, 'month').format('MMMM YYYY'),
-            name: yesterday.subtract(i, 'month').format('YYYY-MM'),
-        });
-    });
-    return monthData.reverse();
-};
 
 const dateFormatter = (date: string, format: string) => dayjs.utc(date).format(format);
 
 export default {
     name: 'CostDashboardPeriodSelectDropdown',
     components: {
-        CostDashboardCustomRangeModal,
+        CostManagementCustomRangeModal,
         PSelectDropdown,
         PBadge,
     },
@@ -64,6 +57,7 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const { i18nDayjs } = useI18nDayjs();
         const state = reactive({
             period: {
                 start: props.fixedPeriod ? dayjs(props.fixedPeriod.start).format('YYYY-MM')
@@ -71,8 +65,19 @@ export default {
                 end: props.fixedPeriod ? dayjs(props.fixedPeriod.end).endOf('month').format('YYYY-MM-DD')
                     : yesterday.endOf('month').format('YYYY-MM-DD'),
             },
+            getMonthMenuItem: computed(() => {
+                const monthData: MenuItem[] = [];
+                range(12).forEach((i) => {
+                    monthData.push({
+                        type: 'item',
+                        label: i18nDayjs.value(yesterday.format('YYYY-MM-DD')).subtract(i, 'month').format('MMMM YYYY'),
+                        name: yesterday.subtract(i, 'month').format('YYYY-MM'),
+                    });
+                });
+                return monthData.reverse();
+            }),
             MonthMenuItems: computed<MenuItem[]>(() => ([
-                ...getMonthMenuItem().reverse(),
+                ...state.getMonthMenuItem.reverse(),
                 {
                     type: 'divider',
                 },
@@ -124,6 +129,7 @@ export default {
             handleSelectMonthMenuItem,
             handleCustomRangeModalConfirm,
             dateFormatter,
+            DATA_TYPE,
         };
     },
 };
@@ -134,7 +140,7 @@ export default {
 }
 
 @screen mobile {
-    .date-filter {
+    .cost-dashboard-period-select-dropdown {
         @apply flex flex-wrap justify-end items-center;
         width: 100%;
     }

@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
+        :header-title="headerTitle"
         centered
         size="sm"
         fade
@@ -14,13 +14,13 @@
                            :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.FROM')"
                            required
             >
-                <p-datetime-picker data-type="yearToMonth" :selected-dates.sync="startDate" />
+                <p-datetime-picker class="datetime-picker" :data-type="datetimePickerDataType" :selected-dates.sync="startDate" />
             </p-field-group>
             <p-field-group class="period-select"
                            :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TO')"
                            required
             >
-                <p-datetime-picker data-type="yearToMonth" :selected-dates.sync="endDate" />
+                <p-datetime-picker class="datetime-picker" :data-type="datetimePickerDataType" :selected-dates.sync="endDate" />
             </p-field-group>
         </template>
     </p-button-modal>
@@ -28,8 +28,8 @@
 
 <script lang="ts">
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
-import { reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@/lib/helper/composition-helpers';
+import { computed, reactive, toRefs } from '@vue/composition-api';
+import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 
 export default {
     name: 'CostDashboardCustomRangeModal',
@@ -43,10 +43,21 @@ export default {
             type: Boolean,
             default: false,
         },
+        headerTitle: {
+            type: String,
+            default: '',
+        },
+        datetimePickerDataType: {
+            type: String,
+            default: DATA_TYPE.yearToDate,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: computed({
+                get() { return props.visible; },
+                set(val) { emit('update:visible', val); },
+            }),
             startDate: [],
             endDate: [],
         });
@@ -66,3 +77,11 @@ export default {
     },
 };
 </script>
+
+<style scoped lang="postcss">
+.period-select {
+    .datetime-picker {
+        width: 100%;
+    }
+}
+</style>

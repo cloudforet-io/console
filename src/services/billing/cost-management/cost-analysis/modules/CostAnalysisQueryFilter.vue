@@ -20,13 +20,7 @@
             </div>
             <div class="right-part">
                 <span class="timezone-text">UTC</span>
-                <div class="filter-item">
-                    <p-datetime-picker :selected-dates="selectedDates"
-                                       style-type="text"
-                                       select-mode="range"
-                                       @update:selectedDates="handleSelectedDates"
-                    />
-                </div>
+                <cost-analysis-period-select-dropdown :fixed-period="period" @update="handleSelectedDates" />
                 <currency-select-dropdown />
                 <p-icon-button class="filter-item" name="ic_refresh" @click="handleClickRefresh" />
             </div>
@@ -51,12 +45,14 @@ import dayjs from 'dayjs';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PIconButton, PSelectDropdown, PDatetimePicker, PToggleButton,
+    PIconButton, PSelectDropdown, PToggleButton,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
 import CostAnalysisSetQueryModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetQueryModal.vue';
+import CostAnalysisPeriodSelectDropdown
+    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
 
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { store } from '@/store';
@@ -69,8 +65,8 @@ export default {
     components: {
         CurrencySelectDropdown,
         CostAnalysisSetQueryModal,
+        CostAnalysisPeriodSelectDropdown,
         PSelectDropdown,
-        PDatetimePicker,
         PIconButton,
         PToggleButton,
     },
@@ -79,10 +75,6 @@ export default {
             granularity: computed(() => store.state.service.costAnalysis.granularity),
             stack: computed(() => store.state.service.costAnalysis.stack),
             period: computed<Period>(() => store.state.service.costAnalysis.period),
-            selectedDates: computed<string[]>(() => ([
-                dayjs.utc(state.period.start).format(),
-                dayjs.utc(state.period.end).format(),
-            ])),
             //
             granularityItems: computed<MenuItem[]>(() => ([
                 {
@@ -116,8 +108,8 @@ export default {
         const handleToggleStack = async ({ value }) => {
             store.commit('service/costAnalysis/setStack', value);
         };
-        const handleSelectedDates = (selectedDates: string[]) => {
-            store.commit('service/costAnalysis/setPeriod', { start: selectedDates[0], end: selectedDates[1] });
+        const handleSelectedDates = (period) => {
+            store.commit('service/costAnalysis/setPeriod', period);
         };
         const handleClickRefresh = async () => {
             // todo
