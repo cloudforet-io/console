@@ -2,7 +2,8 @@
 	"APP": {
 		"TOP_NOTI": {
 			"HAS_NO_ROLE": "스페이스원 사용을 위해서는 {needRole}  합니다.\n관리자(Administrator)를 통해 필요한 권한을 받으세요.",
-			"NEED_ROLE": "권한(Role)이 필요"
+			"NEED_ROLE": "권한(Role)이 필요",
+			"PERMISSION_DENIED": "권한이 없습니다. 관리자를 통해 필요한 권한을 받으세요."
 		}
 	},
 	"AUTOMATION": {

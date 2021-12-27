@@ -2,7 +2,8 @@
 	"APP": {
 		"TOP_NOTI": {
 			"HAS_NO_ROLE": "Space  ONEを利用のために{need  Role}が必要です。管理者(Administrator)にお問い合わせください。",
-			"NEED_ROLE": "権限(Role)が必要"
+			"NEED_ROLE": "権限(Role)が必要",
+			"PERMISSION_DENIED": "Permission denied. Please, Contact administrator to get a role."
 		}
 	},
 	"AUTOMATION": {

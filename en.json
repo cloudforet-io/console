@@ -2,7 +2,8 @@
 	"APP": {
 		"TOP_NOTI": {
 			"HAS_NO_ROLE": "Every SpaceONE user {needRole}. Please, Contact administrator to get a role.",
-			"NEED_ROLE": "requires Role "
+			"NEED_ROLE": "requires Role ",
+			"PERMISSION_DENIED": "Permission denied. Please, Contact administrator to get a role."
 		}
 	},
 	"AUTOMATION": {
