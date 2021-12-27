@@ -36,14 +36,16 @@
     </p-button-modal>
 </template>
 <script lang="ts">
-import { reactive, computed, toRefs } from '@vue/composition-api';
+import {
+    reactive, computed, toRefs, defineComponent,
+} from '@vue/composition-api';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 import { makeByEvent, makeProxy } from '@/util/composition-helpers';
 import { sizeMapping } from '@/feedbacks/modals/type';
 import { orderBy } from 'lodash';
 
-export default {
+export default defineComponent({
     name: 'PTableCheckModal',
     components: { PButtonModal, PDataTable },
     props: {
@@ -58,7 +60,7 @@ export default {
         size: {
             type: String,
             default: 'md',
-            validator: value => Object.keys(sizeMapping).includes(value),
+            validator: (value: any) => Object.keys(sizeMapping).includes(value),
         },
         backdrop: {
             type: Boolean,
@@ -120,9 +122,7 @@ export default {
             confirm,
         };
     },
-
-
-};
+});
 </script>
 
 <style lang="postcss" scoped>

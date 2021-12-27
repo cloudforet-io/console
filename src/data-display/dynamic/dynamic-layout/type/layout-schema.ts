@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { KeyDataType } from '@/inputs/search/query-search/type';
 
@@ -18,7 +16,6 @@ export interface SearchKeyOptions {
     key: string; // Key to retrieve actual data
     name: string; // Name to display in search bar
     enums?: SearchEnums;
-    // eslint-disable-next-line camelcase
     data_type?: SearchDataType;
     icon?: string;
 }

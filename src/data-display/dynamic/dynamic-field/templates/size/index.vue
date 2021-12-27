@@ -4,6 +4,7 @@ import { SizeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/temp
 import { SizeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import bytes from 'bytes';
 import { RenderContext } from 'vue/types/options';
+import { VNode } from 'vue/types/vnode';
 
 const unitMap: Record<string, bytes.Unit> = {
     BYTES: 'B',
@@ -40,7 +41,7 @@ export default {
             default: undefined,
         },
     },
-    render(h, { props, data }: RenderContext<SizeDynamicFieldProps>) {
+    render(h, { props, data }: RenderContext<SizeDynamicFieldProps>): VNode {
         let value: number|null;
 
         if (typeof props.data === 'number') value = props.data;
@@ -60,7 +61,8 @@ export default {
             }
 
             const res = bytes(value, bytesOptions);
-            if (res.split(' ')[1] === 'B') {
+            if (!res) formattedValue = '';
+            else if (res.split(' ')[1] === 'B') {
                 formattedValue = `${value} bytes`;
             } else {
                 formattedValue = res;

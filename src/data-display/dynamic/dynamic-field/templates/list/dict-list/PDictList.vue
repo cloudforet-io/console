@@ -6,9 +6,11 @@
     </ul>
 </template>
 
-<script>
+<script lang="ts">
 
-export default {
+import { defineComponent } from '@vue/composition-api';
+
+export default defineComponent({
     name: 'PDictList',
     props: {
         dict: {
@@ -16,8 +18,7 @@ export default {
             default: () => ({}),
         },
     },
-
-};
+});
 </script>
 <style lang="postcss">
 .p-dict-list {

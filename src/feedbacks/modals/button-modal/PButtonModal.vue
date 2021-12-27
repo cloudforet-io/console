@@ -72,7 +72,7 @@
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { sizeMapping } from '@/feedbacks/modals/type';
 import {
-    computed, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeProxy } from '@/util/composition-helpers';
 import { ButtonModalProps } from '@/feedbacks/modals/button-modal/type';
@@ -81,7 +81,7 @@ import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 
 
-export default {
+export default defineComponent({
     name: 'PButtonModal',
     components: {
         PIconButton,
@@ -104,7 +104,7 @@ export default {
         size: {
             type: String,
             default: 'md',
-            validator: value => Object.keys(sizeMapping).includes(value),
+            validator: (value: string) => Object.keys(sizeMapping).includes(value),
         },
         backdrop: {
             type: Boolean,
@@ -200,7 +200,7 @@ export default {
             onConfirmClick,
         };
     },
-};
+});
 
 </script>
 <style lang="postcss">

@@ -18,7 +18,7 @@
 import vueFilePond from 'vue-filepond';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import { FileUploaderProps } from '@/inputs/file-uploader/type';
@@ -33,7 +33,7 @@ const ACCEPTED_FILE_TYPES = [
     'application/x-msdownload',
     'text/csv',
 ];
-export default {
+export default defineComponent<FileUploaderProps>({
     name: 'PFileUploader',
     components: {
         FilePond,
@@ -44,7 +44,7 @@ export default {
     },
     props: {
         uploadedFiles: {
-            type: Array,
+            type: Array as () => File[],
             default: () => ([]),
         },
         serverEndpoint: {
@@ -52,7 +52,7 @@ export default {
             default: '',
         },
     },
-    setup(props: FileUploaderProps) {
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             proxyUploadedFiles: makeOptionalProxy<File[]>('uploadedFiles', vm, props.uploadedFiles),
@@ -98,7 +98,7 @@ export default {
             handleUpdateFiles,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">

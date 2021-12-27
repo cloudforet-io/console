@@ -8,7 +8,6 @@ const SpaceoneDS: PluginObject<SpaceoneDSOptions> = {
 
 export default SpaceoneDS;
 
-
 /* Languages */
 export { messages } from './translations';
 
@@ -84,7 +83,6 @@ export { default as PRawData } from './data-display/raw-data/PRawData.vue';
 export { default as PAutocompleteSearch } from './inputs/search/autocomplete-search/PAutocompleteSearch.vue';
 export { default as PSearchDropdown } from './inputs/search/search-dropdown/PSearchDropdown.vue';
 export { default as PQuerySearch } from './inputs/search/query-search/PQuerySearch.vue';
-export { default as PQuerySearchGuide } from './inputs/search/query-search-guide/PQuerySearchGuide.vue';
 export { default as PQuerySearchTags } from './inputs/search/query-search-tags/PQuerySearchTags.vue';
 export { default as PDataTable } from './data-display/tables/data-table/PDataTable.vue';
 export { default as PDefinitionTable } from './data-display/tables/definition-table/PDefinitionTable.vue';

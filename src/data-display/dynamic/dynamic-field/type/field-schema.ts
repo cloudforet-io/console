@@ -1,6 +1,3 @@
-/* eslint-disable camelcase */
-
-
 /** Metadata schema types for Dynamic field */
 
 export const dynamicFieldTypes = ['text', 'badge', 'datetime', 'state', 'enum', 'size', 'dict', 'list'];
