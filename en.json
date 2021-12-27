@@ -1995,9 +1995,11 @@
 			"ALT_S_UPDATE_PROJECT": "Successfully Updated Project ",
 			"ALT_S_UPDATE_PROJECT_GROUP": "Successfully Updated Project Group ",
 			"CLOUD_SERVICES": "Cloud Services",
+			"COMPUTE": "Compute",
 			"CREATE": "Create",
 			"CREATE_GROUP": "Create Group",
 			"CREATE_PROJECT": "Create Project",
+			"DATABASE": "Database",
 			"EMPTY_PERMISSION_REQUIRED": "Permission required for using Project groups & Projects.",
 			"EMPTY_PROJECT_GROUP_CREATE_BTN": "Create Project Group",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT": "Manage your resources through projects.",
@@ -2033,6 +2035,7 @@
 			"SERVICE_ACCOUNTS": "Service Accounts",
 			"SHOW_ALL": "Show all project",
 			"SHOW_ALL_TOOLTIP": "Show all projects of sub project groups",
+			"STORAGE": "Storage",
 			"TOP_NOTI_PERMISSION_REQUIRED_1": "Permission required for using Project groups & Projects. ",
 			"TOP_NOTI_PERMISSION_REQUIRED_2": "Please, Request valid permission to project Admin/Domain Administrator."
 		}

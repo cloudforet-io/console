@@ -1995,9 +1995,11 @@
 			"ALT_S_UPDATE_PROJECT": "プロジェクト編集完了",
 			"ALT_S_UPDATE_PROJECT_GROUP": "プロジェクトグループの編集完了",
 			"CLOUD_SERVICES": "クラウドサービス",
+			"COMPUTE": "",
 			"CREATE": "作成",
 			"CREATE_GROUP": "プロジェクトグループ作成",
 			"CREATE_PROJECT": "プロジェクト作成",
+			"DATABASE": "",
 			"EMPTY_PERMISSION_REQUIRED": "プロジェクトグループ/プロジェクトの使用のためには権限が必要です。",
 			"EMPTY_PROJECT_GROUP_CREATE_BTN": "プロジェクトグループ作成",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT": "プロジェクトでリソースを管理してください",
@@ -2033,6 +2035,7 @@
 			"SERVICE_ACCOUNTS": "サービスアカウント",
 			"SHOW_ALL": "すべてのプロジェクトを見る",
 			"SHOW_ALL_TOOLTIP": "プロジェクトグループのすべてのサブプロジェクトを見る",
+			"STORAGE": "",
 			"TOP_NOTI_PERMISSION_REQUIRED_1": "プロジェクトグループとプロジェクトの操作を実行するアクセス許可が必要です",
 			"TOP_NOTI_PERMISSION_REQUIRED_2": "プロジェクト管理者/ドメイン管理者に使用許可を要求してください。"
 		}

@@ -1995,9 +1995,11 @@
 			"ALT_S_UPDATE_PROJECT": "프로젝트 편집 완료",
 			"ALT_S_UPDATE_PROJECT_GROUP": "프로젝트 그룹 편집 완료",
 			"CLOUD_SERVICES": "클라우드 서비스 ",
+			"COMPUTE": "",
 			"CREATE": "생성 ",
 			"CREATE_GROUP": "프로젝트 그룹 생성",
 			"CREATE_PROJECT": "프로젝트 생성 ",
+			"DATABASE": "데이터베이스",
 			"EMPTY_PERMISSION_REQUIRED": "프로젝트 그룹 / 프로젝트의 사용을 위해서는 권한이 필요합니다. ",
 			"EMPTY_PROJECT_GROUP_CREATE_BTN": "프로젝트 그룹 생성하기 ",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT": "프로젝트를 통해 리소스를 관리하세요. ",
@@ -2033,6 +2035,7 @@
 			"SERVICE_ACCOUNTS": "서비스 계정 ",
 			"SHOW_ALL": "모든 프로젝트 보기 ",
 			"SHOW_ALL_TOOLTIP": "프로젝트 그룹 하위의 모든 프로젝트 보기",
+			"STORAGE": "저장소",
 			"TOP_NOTI_PERMISSION_REQUIRED_1": "프로젝트 그룹 / 프로젝트의 사용 권한이 필요합니다. ",
 			"TOP_NOTI_PERMISSION_REQUIRED_2": "프로젝트 담당자 또는 도메인 관리자에게 권한을 요청하세요."
 		}
