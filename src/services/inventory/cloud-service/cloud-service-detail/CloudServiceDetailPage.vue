@@ -3,7 +3,7 @@
         <template #sidebar>
             <div class="sidebar-title">
                 <p-lazy-img :src="assetUrlConverter(sidebarState.iconUrl)"
-                            :loading="!sidebarState.items[0]"
+                            :loading="!sidebarState.cloudServiceTypeList[0]"
                             width="1.5rem" height="1.5rem"
                 />
                 <p class="sidebar-title-text">
@@ -11,9 +11,9 @@
                 </p>
             </div>
             <p-divider class="sidebar-divider" />
-            <div v-for="(item) in sidebarState.items" :key="item.id"
+            <div v-for="(item) in sidebarState.cloudServiceTypeList" :key="item.cloud_service_type_id"
                  class="sidebar-list-item"
-                 :class="{'selected': item.name === sidebarState.selectedItem.name}"
+                 :class="{'selected': sidebarState.selectedItem && item.cloud_service_type_id === sidebarState.selectedItem.cloud_service_type_id}"
                  @click="onClickSidebarItem(item)"
             >
                 {{ item.name }}
@@ -24,18 +24,18 @@
                 <p-breadcrumbs :routes="routeState.route" />
             </div>
             <template v-if="sidebarState.hasServer">
-                <server-main v-show="sidebarState.selectedItem.type === 'inventory.Server'"
+                <server-main v-show="sidebarState.selectedItem && sidebarState.selectedItem.resource_type === 'inventory.Server'"
                              :is-cloud-service="true"
                              :provider="provider"
                              :cloud-service-type="sidebarState.serverCloudServiceType"
                              :cloud-service-group="group"
                 >
                     <template #usage-overview>
-                        <cloud-service-usage-overview :cloud-service-type-item="sidebarState.selectedItem" />
+                        <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem" is-server />
                     </template>
                 </server-main>
             </template>
-            <template v-if="sidebarState.selectedItem.type !== 'inventory.Server'">
+            <template v-if="sidebarState.selectedItem && sidebarState.selectedItem.resource_type !== 'inventory.Server'">
                 <p-page-title :title="name"
                               child
                               use-total-count
@@ -44,7 +44,7 @@
                               :selected-count="tableState.selectedItems.length"
                               @goBack="$router.go(-1)"
                 />
-                <p-horizontal-layout :height="tableState.tableHeight" @drag:end="onTableHeightChange">
+                <p-horizontal-layout :height="tableState.tableHeight" @drag-end="onTableHeightChange">
                     <template #container="{ height }">
                         <template v-if="tableState.schema">
                             <p-dynamic-layout type="query-search-table"
@@ -76,7 +76,7 @@
                                     </p-select-dropdown>
                                 </template>
                                 <template #toolbox-bottom>
-                                    <cloud-service-usage-overview :cloud-service-type-item="sidebarState.selectedItem" />
+                                    <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem" />
                                 </template>
                             </p-dynamic-layout>
                         </template>
@@ -174,7 +174,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { get, find, some } from 'lodash';
 
 import {
@@ -226,53 +225,18 @@ import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import CloudServiceUsageOverview
     from '@/services/inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverview.vue';
-import { CloudServiceTypeItem } from '@/services/inventory/cloud-service/cloud-service-detail/type';
+import { CloudServiceTypeInfo } from '@/services/inventory/cloud-service/cloud-service-detail/type';
 
 const DEFAULT_PAGE_SIZE = 15;
 
 // TODO: move this code to store
 const STORAGE_PREFIX = 'inventory/cloudService';
-const cloudServiceStore = {
-    getItem<T>(name: string, type = 'string'): T {
-        const res = localStorage.getItem(`${STORAGE_PREFIX}/${name}`);
-        switch (type) {
-        case 'number': {
-            if (res) return Number(res) as unknown as T;
-            return undefined as unknown as T;
-        }
-        case 'object': {
-            try {
-                if (res) return JSON.parse(res) as unknown as T;
-            } catch (e) {}
-            return undefined as unknown as T;
-        }
-        default: return (res || undefined) as unknown as T;
-        }
-    },
 
-    setItem(name: string, data: any, type = 'string') {
-        let res;
-        switch (type) {
-        case 'number': {
-            res = Number(data);
-            break;
-        }
-        case 'object': {
-            try {
-                res = JSON.stringify(data);
-            } catch (e) {}
-            break;
-        }
-        default: {
-            res = data;
-            break;
-        }
-        }
-        localStorage.setItem(`${STORAGE_PREFIX}/${name}`, res);
-    },
-};
-
-type SidebarItemType = CloudServiceTypeItem
+type SidebarItemType = {
+    id?: string;
+    name: string;
+    type?: string;
+}
 
 export default {
     name: 'CloudServiceDetailPage',
@@ -330,18 +294,18 @@ export default {
 
         /** Sidebar */
         const sidebarState = reactive({
-            items: [] as SidebarItemType[],
-            group: '',
-            iconUrl: '',
-            selectedItem: {} as SidebarItemType,
-            hasServer: computed(() => some(sidebarState.items, { type: 'inventory.Server' })),
-            serverCloudServiceType: computed(() => find(sidebarState.items, { type: 'inventory.Server' })?.name),
+            cloudServiceTypeList: [] as CloudServiceTypeInfo[],
+            group: computed(() => sidebarState.cloudServiceTypeList[0]?.group),
+            iconUrl: computed<string>(() => get(sidebarState.cloudServiceTypeList[0], ['tags', 'spaceone:icon'], '')),
+            selectedItem: undefined as CloudServiceTypeInfo|undefined,
+            hasServer: computed<boolean>(() => some(sidebarState.cloudServiceTypeList, { resource_type: 'inventory.Server' })),
+            serverCloudServiceType: computed<string|undefined>(() => find(sidebarState.cloudServiceTypeList, { resource_type: 'inventory.Server' })?.name),
         });
 
         /** Main Table */
         const fetchOptionState = reactive({
             pageStart: 1,
-            pageLimit: cloudServiceStore.getItem<number>('pageLimit', 'number') || DEFAULT_PAGE_SIZE,
+            pageLimit: store.getters['settings/getItem']('pageLimit', STORAGE_PREFIX) || DEFAULT_PAGE_SIZE,
             sortDesc: true,
             sortBy: 'created_at',
             queryTags: [] as QueryTag[],
@@ -403,7 +367,7 @@ export default {
                 return res;
             }),
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
-            tableHeight: cloudServiceStore.getItem('tableHeight', 'number'),
+            tableHeight: store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX),
             visibleCustomFieldModal: false,
         });
 
@@ -419,7 +383,11 @@ export default {
 
         const onTableHeightChange = (height) => {
             tableState.tableHeight = height;
-            cloudServiceStore.setItem('tableHeight', height, 'number');
+            store.dispatch('settings/setItem', {
+                key: 'tableHeight',
+                value: height,
+                path: STORAGE_PREFIX,
+            });
         };
 
         const onSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
@@ -507,7 +475,11 @@ export default {
             }
             if (changed.pageLimit !== undefined) {
                 fetchOptionState.pageLimit = changed.pageLimit;
-                cloudServiceStore.setItem('pageLimit', changed.pageLimit);
+                store.dispatch('settings/setItem', {
+                    key: 'pageLimit',
+                    value: changed.pageLimit,
+                    path: STORAGE_PREFIX,
+                });
             }
             if (changed.pageStart !== undefined) {
                 fetchOptionState.pageStart = changed.pageStart;
@@ -563,20 +535,14 @@ export default {
                 const res = await SpaceConnector.client.inventory.cloudServiceType.list({
                     query: getCloudServiceTypeQuery(),
                 });
-                sidebarState.items = res.results.map(d => ({
-                    id: d.cloud_service_type_id,
-                    name: d.name,
-                    type: d.resource_type,
-                }));
-                sidebarState.iconUrl = get(res.results[0], ['tags', 'spaceone:icon'], '');
-                sidebarState.group = res.results[0]?.group;
+                sidebarState.cloudServiceTypeList = res.results;
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         };
 
-        const onClickSidebarItem = async (item) => {
-            if (sidebarState.selectedItem.name !== item.name) {
+        const onClickSidebarItem = async (item: CloudServiceTypeInfo) => {
+            if (sidebarState.selectedItem?.name !== item.name) {
                 await vm.$router.replace({
                     name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                     params: {
@@ -589,7 +555,7 @@ export default {
 
                 sidebarState.selectedItem = item;
 
-                if (item.type !== 'inventory.Server') {
+                if (item.resource_type !== 'inventory.Server') {
                     typeOptionState.loading = true;
                     const schema = await getTableSchema();
                     const { items, totalCount } = await getCloudServiceTableData(schema);
@@ -739,7 +705,7 @@ export default {
         /** ******* Page Init ******* */
         const initSidebar = async () => {
             await listCloudServiceTypeData();
-            sidebarState.selectedItem = find(sidebarState.items, { name: props.name }) || { name: props.name };
+            sidebarState.selectedItem = find(sidebarState.cloudServiceTypeList, { name: props.name });
         };
 
         const routeFirstItem = async () => {
@@ -748,11 +714,11 @@ export default {
                 params: {
                     provider: props.provider,
                     group: props.group,
-                    name: sidebarState.items[0].name,
+                    name: sidebarState.cloudServiceTypeList[0].name,
                 },
                 query: vm.$route.query,
             });
-            sidebarState.selectedItem = sidebarState.items[0];
+            sidebarState.selectedItem = sidebarState.cloudServiceTypeList[0];
         };
 
         (async () => {

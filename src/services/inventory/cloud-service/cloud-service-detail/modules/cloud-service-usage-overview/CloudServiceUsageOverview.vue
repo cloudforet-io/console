@@ -9,7 +9,7 @@
                     Show All
                 </p-button>
             </template>
-            <div v-for="(schema, idx) in summarySchemaList" :key="`${cloudServiceTypeId}-${idx}`" class="stat-summary">
+            <div v-for="(schema, idx) in widgetSchemaList" :key="`${cloudServiceTypeId}-${idx}`" class="stat-summary">
                 <p-dynamic-widget :type="schema.type"
                                   :name="schema.name"
                                   :data="data[idx]"
@@ -18,8 +18,8 @@
             </div>
         </p-card>
         <cloud-service-usage-overview-detail-modal v-model="usageOverviewDetailModalVisible"
-                                                   :cloud-service-type-item="cloudServiceTypeItem"
-                                                   :widget-schema-list="widgetSchemaList"
+                                                   :cloud-service-type-info="cloudServiceTypeInfo"
+                                                   :is-server="isServer"
         />
     </fragment>
 </template>
@@ -33,12 +33,15 @@ import {
 import { PButton, PCard, PDynamicWidget } from '@spaceone/design-system';
 import CloudServiceUsageOverviewDetailModal
     from '@/services/inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewDetailModal.vue';
-import { CloudServiceTypeItem } from '@/services/inventory/cloud-service/cloud-service-detail/type';
+import {
+    CloudServiceTypeInfo,
+} from '@/services/inventory/cloud-service/cloud-service-detail/type';
 import { DynamicWidgetSchema } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props {
-    cloudServiceTypeItem: CloudServiceTypeItem;
+    cloudServiceTypeInfo?: CloudServiceTypeInfo;
+    isServer?: boolean;
 }
 
 interface Data {
@@ -54,19 +57,22 @@ export default defineComponent<Props>({
         PDynamicWidget,
     },
     props: {
-        cloudServiceTypeItem: {
-            type: Object as () => CloudServiceTypeItem,
-            required: true,
+        cloudServiceTypeInfo: {
+            type: Object as () => CloudServiceTypeInfo|undefined,
+            default: undefined,
+        },
+        isServer: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props) {
         const state = reactive({
             usageOverviewDetailModalVisible: false,
             widgetSchemaList: [] as DynamicWidgetSchema[],
-            summarySchemaList: computed<DynamicWidgetSchema[]>(() => state.widgetSchemaList.slice(0, 3)),
             data: [] as Data[],
             loading: false,
-            cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeItem.id ?? ''),
+            cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo?.cloud_service_type_id ?? ''),
         });
 
         const fetchWidgetSchemaList = async (): Promise<DynamicWidgetSchema[]> => {

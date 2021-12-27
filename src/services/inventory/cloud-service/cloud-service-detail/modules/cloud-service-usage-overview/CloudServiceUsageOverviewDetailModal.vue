@@ -13,11 +13,12 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { PButtonModal } from '@spaceone/design-system';
-import { CloudServiceTypeItem } from '@/services/inventory/cloud-service/cloud-service-detail/type';
+import { CloudServiceTypeInfo } from '@/services/inventory/cloud-service/cloud-service-detail/type';
 
 interface Props {
     visible: boolean;
-    cloudServiceTypeItem: CloudServiceTypeItem;
+    cloudServiceTypeInfo?: CloudServiceTypeInfo;
+    isServer?: boolean;
 }
 
 export default defineComponent<Props>({
@@ -34,15 +35,15 @@ export default defineComponent<Props>({
             type: Boolean,
             required: true,
         },
-        cloudServiceTypeItem: {
-            type: Object as () => CloudServiceTypeItem,
-            required: true,
+        cloudServiceTypeInfo: {
+            type: Object as () => CloudServiceTypeInfo|undefined,
+            default: undefined,
         },
     },
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: props.visible,
-            header: computed(() => `Usage Overview of ${props.cloudServiceTypeItem.name}`),
+            header: computed(() => `Usage Overview of ${props.cloudServiceTypeInfo?.name}`),
             widgetSchemaList: [] as any[],
             loading: false,
             data: [] as any[],
