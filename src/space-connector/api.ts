@@ -69,29 +69,29 @@ class API {
         this.refreshToken = refreshToken;
         window.localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
         window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-        this.unsetRefreshingState();
+        API.unsetRefreshingState();
     }
 
     getRefreshToken(): string|undefined {
         return this.refreshToken;
     }
 
-    checkRefreshingState(): string|null {
+    static checkRefreshingState(): string|null {
         return window.localStorage.getItem(IS_REFRESHING_KEY);
     }
 
-    setRefreshingState(): void {
+    static setRefreshingState(): void {
         return window.localStorage.setItem(IS_REFRESHING_KEY, 'true');
     }
 
-    unsetRefreshingState(): void {
+    static unsetRefreshingState(): void {
         return window.localStorage.removeItem(IS_REFRESHING_KEY);
     }
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean> {
-        if (this.checkRefreshingState() !== 'true') {
+        if (API.checkRefreshingState() !== 'true') {
             try {
-                this.setRefreshingState();
+                API.setRefreshingState();
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
                 this.setToken(response.data.access_token, response.data.refresh_token);
                 return true;
