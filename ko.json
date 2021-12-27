@@ -429,6 +429,7 @@
 				"STACKED_COLUMN": "누적 컬럼",
 				"STACKED_LINE": "누적 라인",
 				"START_DATE": " 시작 일",
+				"TOO_MANY_ITEMS": "상위 15개 항목만을 보여줍니다. 자세한 보기를 위해 필터를 설정하세요.",
 				"TOTAL_COST": "총 비용",
 				"YEARLY": "년"
 			},
