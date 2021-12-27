@@ -41,7 +41,9 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: npm run semantic-release
+        run: |
+          git config --global http.postBuffer 1048576000
+          npm run semantic-release
 
       - name: Slack
         if: always()
