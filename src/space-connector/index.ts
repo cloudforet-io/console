@@ -17,8 +17,11 @@ export class SpaceConnector {
 
     private _client: any = {};
 
-    constructor(endpoint: string, sessionTimeoutCallback: SessionTimeoutCallback = () => undefined, mockInfo: MockInfo) {
-        this.api = new API(endpoint, sessionTimeoutCallback, mockInfo);
+    private mockInfo: MockInfo|undefined;
+
+    constructor(endpoint: string, sessionTimeoutCallback: SessionTimeoutCallback = () => undefined, mockInfo?: MockInfo) {
+        this.mockInfo = mockInfo;
+        this.api = new API(endpoint, sessionTimeoutCallback, this.mockInfo ?? {});
         try {
             setInterval(() => this.api.getActivatedToken(), CHECK_TOKEN_TIME);
         } catch (e) {
@@ -26,7 +29,7 @@ export class SpaceConnector {
         }
     }
 
-    static async init(endpoint: string, sessionTimeoutCallback?: SessionTimeoutCallback, mockInfo: MockInfo = {}): Promise<void> {
+    static async init(endpoint: string, sessionTimeoutCallback?: SessionTimeoutCallback, mockInfo?: MockInfo): Promise<void> {
         if (!SpaceConnector.instance) {
             SpaceConnector.instance = new SpaceConnector(endpoint, sessionTimeoutCallback, mockInfo);
             await SpaceConnector.instance.loadAPI();
@@ -83,6 +86,7 @@ export class SpaceConnector {
                 // Bind APIHandler if last index
                 if ((apiInfoArr.length - 1) === idx) {
                     currentPath[objCamel] = this.APIHandler(apiInfo.path);
+                    if (this.mockInfo) currentPath[objCamel].mock = this.APIMockHandler(apiInfo.path);
                 } else {
                     currentPath[objCamel] = {};
                 }
@@ -94,6 +98,18 @@ export class SpaceConnector {
     protected APIHandler(path: string) {
         return async (params: object = {}, config?: AxiosRequestConfig): Promise<any> => {
             const response: AxiosPostResponse = await this.api.instance.post(path, params, config);
+            return response.data;
+        };
+    }
+
+    protected APIMockHandler(path: string) {
+        return async (params: object = {}, extraPath?: string, config?: AxiosRequestConfig): Promise<any> => {
+            const response: AxiosPostResponse = await this.api.instance.post(path + extraPath, params, {
+                headers: {
+                    ...(config?.headers && config.headers), MOCK_MODE: true
+                },
+                ...(config && config)
+            });
             return response.data;
         };
     }
