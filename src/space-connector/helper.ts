@@ -1,5 +1,5 @@
 import { QueryHelper } from '@src/query';
-import { Query } from '@src/space-connector/type';
+import { Query, Sort } from '@src/space-connector/type';
 
 class ApiQueryHelper extends QueryHelper {
     private _data: Query = {};
@@ -53,14 +53,11 @@ class ApiQueryHelper extends QueryHelper {
         return this;
     }
 
-    setSortKey(key: string): ApiQueryHelper {
+    setMultiSort(sort: Sort[]): ApiQueryHelper {
         if (!this._data.sort) {
-            this._data.sort = {
-                desc: false
-            };
+            this._data.sort = {};
         }
-
-        this._data.sort.key = key;
+        this._data.sort.keys = sort;
         return this;
     }
 
