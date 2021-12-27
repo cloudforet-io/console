@@ -230,18 +230,19 @@ export default defineComponent<SelectDropdownProps>({
 
 
         /* Event Handlers */
-        const onSelectMenu = (item: MenuItem, index) => {
+        const onSelectMenu = (item: MenuItem, index, event) => {
             if (props.indexMode) {
-                emit('select', index);
+                emit('select', index, event);
                 state.proxySelected = index;
             } else {
-                emit('select', item.name);
+                emit('select', item.name, event);
                 state.proxySelected = item.name;
             }
             contextMenuFixedStyleState.proxyVisibleMenu = false;
         };
-        const onClick = () => {
+        const onClick = (e: MouseEvent) => {
             contextMenuFixedStyleState.proxyVisibleMenu = !contextMenuFixedStyleState.proxyVisibleMenu;
+            e.stopPropagation();
         };
         const onClickOutside = (): void => {
             contextMenuFixedStyleState.proxyVisibleMenu = false;
