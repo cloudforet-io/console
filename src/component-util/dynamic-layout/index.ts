@@ -70,7 +70,7 @@ export const getApiActionByLayoutType = (type: DynamicLayoutType): string => {
 };
 
 export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): ExcelDataField[] => fields.map((d) => {
-    const res: ExcelDataField = { key: d.key, name: d.name };
+    const res: ExcelDataField = { key: d.key, name: d.name ?? d.key };
 
     // lis type case will be deprecated
     if (d.type === 'list' && (d.options as any)?.sub_key) {

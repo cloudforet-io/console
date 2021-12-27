@@ -8,7 +8,7 @@
     "tsc-alias:watch": "tsc-alias -w",
     "babel": "babel src --out-dir dist --extensions \".ts\" --source-maps inline --copy-files",
     "tsc": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "prepare": "husky install",
+    "prepare": "node -e \"if(require('fs').existsSync('.git')){process.exit(1)}\" || is-ci || husky install",
     "lint": "eslint --ext .js,.ts src",
     "lint:fix": "eslint --fix --ext .js,.ts src",
     "test": "cross-env mocha --require ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
@@ -22,7 +22,7 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/spaceone-dev/console-core-lib#readme",
   "dependencies": {
-    "@spaceone/design-system": "^1.1.0-beta.198",
+    "@spaceone/design-system": "^1.1.0-beta.219",
     "@vue/composition-api": ">= 0.6.7",
     "axios": "^0.21.2",
     "axios-auth-refresh": "^3.1.0",
