@@ -64,6 +64,9 @@
                 </div>
             </div>
             <p-data-loader :loading="loading" :data="legends" class="legend-wrapper">
+                <p v-if="legends.length > 15" class="too-many-text">
+                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOO_MANY_ITEMS') }}
+                </p>
                 <div v-for="(legend, idx) in legends" :key="`legend-${legend.name}`"
                      class="legend"
                      @click="handleClickLegend(idx)"
@@ -89,6 +92,7 @@
 import dayjs from 'dayjs';
 import { cloneDeep, debounce, sum } from 'lodash';
 import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
+import axios, { CancelTokenSource } from 'axios';
 
 import {
     computed, reactive, toRefs, watch,
@@ -220,18 +224,27 @@ export default {
         };
 
         /* api */
+        let listCostAnalysisRequest: CancelTokenSource | undefined;
         const costQueryHelper = new QueryHelper();
         const listCostAnalysisChartData = async () => {
+            if (listCostAnalysisRequest) {
+                listCostAnalysisRequest.cancel('Next request has been called.');
+                listCostAnalysisRequest = undefined;
+            }
+            listCostAnalysisRequest = axios.CancelToken.source();
             try {
                 costQueryHelper.setFilters(getConvertedFilter(state.filters));
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
+                    include_etc: !!state.chartGroupBy,
                     granularity: state.granularity,
                     group_by: state.chartGroupBy ? [state.chartGroupBy] : [],
                     start: dayjs.utc(state.period.start).format('YYYY-MM-DD'),
                     end: dayjs.utc(state.period.end).add(1, 'day').format('YYYY-MM-DD'),
+                    limit: 15,
                     pivot_type: 'CHART',
                     ...costQueryHelper.apiQuery,
                 });
+                listCostAnalysisRequest = undefined;
                 return results;
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -362,6 +375,11 @@ export default {
             overflow-y: auto;
             padding: 0.5rem 0;
 
+            .too-many-text {
+                @apply text-gray-400;
+                font-size: 0.75rem;
+                padding: 0 1rem 0.5rem 1rem;
+            }
             .legend {
                 height: 25px;
                 display: flex;

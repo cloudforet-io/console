@@ -14,6 +14,7 @@ export interface TableData {
 
 interface XYChartRawValue {
     usd_cost: number;
+    is_etc?: boolean;
     [key: string]: any;
 }
 export interface XYChartRawData {

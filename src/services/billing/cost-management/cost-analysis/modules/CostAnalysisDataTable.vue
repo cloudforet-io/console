@@ -11,7 +11,8 @@
                      @export="handleExport"
     >
         <template #col-format="{field, value, item}">
-            <span v-if="Object.values(GROUP_BY).includes(field.name) && !value">
+            <span v-if="tableState.loading" />
+            <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
                 {{ `No ${GROUP_BY_ITEM_MAP[field.name].label}` }}
             </span>
             <span v-else-if="field.name === GROUP_BY.PROJECT">
@@ -57,7 +58,6 @@ import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/compon
 import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import {
     getConvertedFilter,
-    getConvertedGranularity,
     getTimeUnitByPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -72,6 +72,8 @@ import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Location } from 'vue-router';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { Period } from '@/services/billing/cost-management/type';
+import axios, { CancelTokenSource } from 'axios';
 
 
 interface UsdCost {
@@ -118,23 +120,10 @@ export default {
         });
 
         /* util */
-        const setTableFields = (granularity: GRANULARITY, groupByItems: GroupByItem[]) => {
-            /* get group by fields (ex. Provider, Region) */
-            const groupByFields: DataTableField[] = groupByItems.map(d => ({
-                name: d.name,
-                label: d.label,
-                sortable: false,
-            }));
-            if (!groupByItems.length) {
-                groupByFields.push({
-                    name: 'totalCost', label: ' ', textAlign: 'right', sortable: false,
-                });
-            }
-
-            /* get date fields (ex. 11/1, 11/2) */
+        const _getTableDateFields = (period: Period): DataTableField[] => {
             const dateFields: DataTableField[] = [];
-            const start = dayjs(state.period.start);
-            const end = dayjs(state.period.end);
+            const start = dayjs(period.start);
+            const end = dayjs(period.end);
 
             let nameDateFormat = 'YYYY-MM-DD';
             let labelDateFormat = 'M/D';
@@ -156,8 +145,31 @@ export default {
                 });
                 now = now.add(1, state.timeUnit);
             }
+            return dateFields;
+        };
+        const _getTableFields = (granularity: GRANULARITY, groupByItems: GroupByItem[], period: Period) => {
+            const groupByFields: DataTableField[] = groupByItems.map(d => ({
+                name: d.name,
+                label: d.label,
+                sortable: false,
+            }));
 
-            tableState.fields = groupByFields.concat(dateFields);
+            if (granularity === GRANULARITY.ACCUMULATED) {
+                const label = `${dayjs(period.start).format('M/D')}~${dayjs(period.end).format('M/D')}`;
+                groupByFields.push({
+                    name: 'usd_cost', label, textAlign: 'right', sortable: false,
+                });
+                return groupByFields;
+            }
+
+            if (!groupByItems.length) {
+                groupByFields.push({
+                    name: 'totalCost', label: ' ', textAlign: 'right', sortable: false,
+                });
+            }
+
+            const dateFields = _getTableDateFields(period);
+            return groupByFields.concat(dateFields);
         };
         const getLink = (item) => {
             const queryHelper = new QueryHelper();
@@ -197,20 +209,19 @@ export default {
             };
         };
         const _getStackedTableData = (tableData: TableData[], granularity, period): TableData[] => {
-            const timeUnit = getTimeUnitByPeriod(granularity, dayjs(period.start), dayjs(period.end));
             let dateFormat = 'YYYY-MM-DD';
-            if (timeUnit === 'month') dateFormat = 'YYYY-MM';
-            if (timeUnit === 'year') dateFormat = 'YYYY';
+            if (granularity === GRANULARITY.MONTHLY) dateFormat = 'YYYY-MM';
+            if (granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
             const results: TableData[] = [];
             tableData.forEach((d) => {
                 const usdCost: UsdCost = {};
                 let now = dayjs(period.start).clone();
                 let stackedData = 0;
-                while (now.isSameOrBefore(dayjs(period.end), timeUnit)) {
+                while (now.isSameOrBefore(dayjs(period.end), state.timeUnit)) {
                     const currValue = d.usd_cost[now.format(dateFormat)] || 0;
                     stackedData += currValue;
                     usdCost[now.format(dateFormat)] = stackedData;
-                    now = now.add(1, timeUnit);
+                    now = now.add(1, state.timeUnit);
                 }
                 results.push({
                     ...d,
@@ -221,17 +232,22 @@ export default {
         };
 
         /* api */
+        let listCostAnalysisRequest: CancelTokenSource | undefined;
         const costApiQueryHelper = new ApiQueryHelper()
             .setPageStart(1).setPageLimit(15)
             .setSort('total_usd_cost', true);
         const listCostAnalysisTableData = async (granularity, groupBy, period, filters, stack) => {
+            if (listCostAnalysisRequest) {
+                listCostAnalysisRequest.cancel('Next request has been called.');
+                listCostAnalysisRequest = undefined;
+            }
+            listCostAnalysisRequest = axios.CancelToken.source();
             try {
-                const _granularity = getConvertedGranularity(period, granularity);
                 const _convertedFilters = getConvertedFilter(filters);
                 costApiQueryHelper.setFilters(_convertedFilters);
 
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    granularity: _granularity,
+                    granularity,
                     group_by: groupBy,
                     start: dayjs.utc(period.start),
                     end: dayjs.utc(period.end).add(1, state.timeUnit),
@@ -239,9 +255,10 @@ export default {
                     ...costApiQueryHelper.data,
                 });
                 let items = results;
-                if (stack) items = _getStackedTableData(results, granularity, period);
+                if (granularity !== GRANULARITY.ACCUMULATED && stack) items = _getStackedTableData(results, granularity, period);
                 tableState.items = items;
                 tableState.totalCount = total_count;
+                listCostAnalysisRequest = undefined;
             } catch (e) {
                 tableState.items = [];
                 tableState.totalCount = 0;
@@ -261,14 +278,13 @@ export default {
             try {
                 showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', root);
 
-                const _granularity = getConvertedGranularity(state.period, state.granularity);
                 const _convertedFilters = getConvertedFilter(state.filters);
                 costApiQueryHelper.setFilters(_convertedFilters);
 
                 await store.dispatch('file/downloadExcel', {
                     url: '/cost-analysis/cost/analyze',
                     param: {
-                        granularity: _granularity,
+                        granularity: state.granularity,
                         group_by: state.groupBy,
                         start: dayjs.utc(state.period.start),
                         end: dayjs.utc(state.period.end).add(1, state.timeUnit),
@@ -287,7 +303,7 @@ export default {
             tableState.loading = true;
             await Promise.all([
                 listCostAnalysisTableData(granularity, groupBy, period, filters, stack),
-                setTableFields(granularity, state.groupByItems),
+                tableState.fields = _getTableFields(granularity, state.groupByItems, period),
             ]);
             tableState.loading = false;
         }, { immediate: true, deep: true });

@@ -128,7 +128,10 @@ export const getXYChartDataAndLegends = (rawData: XYChartRawData[], groupBy?: st
         if (groupBy) {
             d.values.forEach((value) => {
                 let groupByName = value[groupBy];
-                if (!groupByName) groupByName = `No ${GROUP_BY_ITEM_MAP[groupBy].label}`;
+                if (!groupByName) {
+                    if (value.is_etc) groupByName = 'Aggregation of the rest';
+                    else groupByName = `No ${GROUP_BY_ITEM_MAP[groupBy].label}`;
+                }
                 eachChartData[groupByName] = value.usd_cost;
                 groupByNameSet.add(groupByName);
             });

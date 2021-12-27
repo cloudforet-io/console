@@ -5,16 +5,6 @@ import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 
 
-export const getConvertedGranularity = (period: Period, granularity: GRANULARITY): GRANULARITY => {
-    const start = dayjs(period.start);
-    const end = dayjs(period.end);
-
-    if (granularity !== GRANULARITY.ACCUMULATED) return granularity;
-    if (end.diff(start, 'month') < 2) return GRANULARITY.DAILY;
-    if (end.diff(start, 'year') < 2) return GRANULARITY.MONTHLY;
-    return GRANULARITY.YEARLY;
-};
-
 export const getConvertedFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
     const result: QueryStoreFilter[] = [];
     Object.entries(filters).forEach(([key, data]) => {
