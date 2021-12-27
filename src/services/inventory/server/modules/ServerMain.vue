@@ -39,6 +39,9 @@
                             </p-select-dropdown>
                         </div>
                     </template>
+                    <template #toolbox-bottom>
+                        <slot name="usage-overview" />
+                    </template>
                 </p-dynamic-layout>
             </template>
         </p-horizontal-layout>

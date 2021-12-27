@@ -29,7 +29,11 @@
                              :provider="provider"
                              :cloud-service-type="sidebarState.serverCloudServiceType"
                              :cloud-service-group="group"
-                />
+                >
+                    <template #usage-overview>
+                        <cloud-service-usage-overview :cloud-service-type-item="sidebarState.selectedItem" />
+                    </template>
+                </server-main>
             </template>
             <template v-if="sidebarState.selectedItem.type !== 'inventory.Server'">
                 <p-page-title :title="name"
