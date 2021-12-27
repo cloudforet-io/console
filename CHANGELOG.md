@@ -1,3 +1,10 @@
+# [1.1.0-beta.220](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.219...v1.1.0-beta.220) (2021-12-27)
+
+
+### Bug Fixes
+
+* click event in select dropdown component ([#809](https://github.com/spaceone-dev/spaceone-design-system/issues/809)) ([a844913](https://github.com/spaceone-dev/spaceone-design-system/commit/a8449137522113fb79fa1327162c5aa18cf3b14a))
+
 # [1.1.0-beta.219](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.218...v1.1.0-beta.219) (2021-12-27)
 
 
