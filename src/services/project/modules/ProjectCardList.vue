@@ -13,43 +13,24 @@
                                  :to="{ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: item.project_id }}"
                     >
                         <div class="card-top-wrapper">
-                            <div class="group-name">
-                                <template v-if="parentGroups.length > 0">
-                                    {{ parentGroups[parentGroups.length - 1].name }} >
-                                </template>
-                                {{ item.project_group_info.name }}
+                            <div class="group-name-wrapper">
+                                <div class="group-name">
+                                    <template v-if="parentGroups.length > 0">
+                                        {{ parentGroups[parentGroups.length - 1].name }} >
+                                    </template>
+                                    {{ item.project_group_info.name }}
+                                </div>
+                                <div class="favorite-wrapper">
+                                    <favorite-button :item-id="item.project_id"
+                                                     favorite-type="project"
+                                                     resource-type="identity.Project"
+                                    />
+                                </div>
                             </div>
                             <p class="project-name">
                                 {{ item.name }}
                             </p>
-                            <div class="project-summary">
-                                <template v-if="cardSummaryLoading">
-                                    <div v-for="v in skeletons" :key="v" class="skeleton-loading">
-                                        <p-skeleton />
-                                    </div>
-                                </template>
-                                <span v-else>
-                                    <span class="summary-item-text">{{ $t('PROJECT.LANDING.SERVER') }}</span>
-                                    <router-link v-if="cardSummary[item.project_id]"
-                                                 class="summary-item-num"
-                                                 :to="getLocation(item.project_id, INVENTORY_ROUTE.SERVER._NAME)"
-                                    >{{ cardSummary[item.project_id].serverCount }}</router-link>
-                                    <span v-else class="summary-item-num none">N/A</span>
-                                    <span class="mx-2 text-gray-300 divider">|</span>
-                                    <span class="summary-item-text">{{ $t('PROJECT.LANDING.CLOUD_SERVICES') }}</span>
-                                    <router-link v-if="cardSummary[item.project_id]"
-                                                 class="summary-item-num"
-                                                 :to="getLocation(item.project_id, INVENTORY_ROUTE.CLOUD_SERVICE._NAME)"
-                                    >{{ cardSummary[item.project_id].cloudServiceCount }}
-                                    </router-link>
-                                    <span v-else class="summary-item-num none">N/A</span>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="card-bottom-wrapper">
                             <div class="accounts">
-                                <span v-if="getDistinctProviders(item.providers).length" class="label">{{ $t('PROJECT.LANDING.SERVICE_ACCOUNTS') }}</span>
                                 <div class="provider-icon-wrapper">
                                     <div class="provider">
                                         <router-link v-for="(provider, index) in getDistinctProviders(item.providers)"
@@ -64,21 +45,41 @@
                                                      }"
                                         />
                                     </div>
+                                    <router-link v-if="getDistinctProviders(item.providers).length !== 0" class="icon-wrapper" :to="{ name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME }">
+                                        <p-i name="ic_plus_thin" scale="0.8" color="inherit" />
+                                    </router-link>
                                 </div>
-                                <div class="account-add">
-                                    <router-link class="icon-wrapper" :to="{ name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME }">
+                                <div v-if="getDistinctProviders(item.providers).length === 0" class="account-add">
+                                    <router-link :to="{ name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME }">
                                         <p-i name="ic_plus_thin" scale="0.8" color="inherit" />
                                     </router-link>
                                     <router-link :to="{ name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME }">
-                                        <span v-if="getDistinctProviders(item.providers).length === 0" class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
+                                        <span class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
                                     </router-link>
                                 </div>
                             </div>
-                            <div class="favorite-wrapper">
-                                <favorite-button :item-id="item.project_id"
-                                                 favorite-type="project"
-                                                 resource-type="identity.Project"
-                                />
+                        </div>
+                        <div class="card-bottom-wrapper">
+                            <div class="project-summary">
+                                <template v-if="cardSummaryLoading">
+                                    <div v-for="v in skeletons" :key="v" class="skeleton-loading">
+                                        <p-skeleton />
+                                    </div>
+                                </template>
+                                <template v-else>
+                                    <div v-for="summary in projectSummaryList" :key="`summary-${summary.title}-${item.project_id}`" class="project-summary-item">
+                                        <div class="summary-item-text">
+                                            {{ summary.title }}
+                                        </div>
+                                        <router-link v-if="cardSummary[item.project_id]"
+                                                     class="summary-item-num"
+                                                     :to="getLocation(item.project_id, INVENTORY_ROUTE.SERVER._NAME)"
+                                        >
+                                            {{ cardSummary[item.project_id].serverCount }}
+                                        </router-link>
+                                        <span v-else class="summary-item-num none">N/A</span>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </router-link>
@@ -146,6 +147,7 @@ import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { i18n } from '@/translations';
 
 
 export default {
@@ -188,6 +190,11 @@ export default {
                 get() { return store.state.service.project.projectFormVisible; },
                 set(val) { store.commit('service/project/setProjectFormVisible', val); },
             }),
+            projectSummaryList: computed(() => [
+                { title: i18n.t('PROJECT.LANDING.COMPUTE') },
+                { title: i18n.t('PROJECT.LANDING.DATABASE') },
+                { title: i18n.t('PROJECT.LANDING.STORAGE') },
+            ]),
         });
 
         const getProvider = name => vm.$store.state.resource.provider.items[name] || {};
@@ -422,60 +429,38 @@ export default {
 }
 .favorite-wrapper {
     @apply flex-shrink-0 h-full inline-flex items-center justify-center;
-    width: 3rem;
+    width: 0.875rem;
 }
 
 .card-top-wrapper {
-    @apply flex-grow mx-4 my-6 flex flex-col;
-    .group-name {
-        @apply flex-shrink-0 text-gray-500 text-xs truncate;
-        margin-bottom: 0.25rem;
-    }
-    .project-name {
-        @apply flex-grow flex-shrink-0 font-bold overflow-hidden;
-        display: -webkit-box;
-        text-overflow: ellipsis;
-        word-wrap: break-word;
-        font-size: 1.125rem;
-        line-height: 1.2;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-    }
-    .project-summary {
-        @apply flex-shrink-0;
-        .summary-item-text {
-            @apply text-sm text-left inline-block;
-        }
-        .summary-item-num {
-            @apply ml-2 font-bold;
-            &:hover:not(.none) {
-                @apply text-secondary;
-                text-decoration: underline;
-                cursor: pointer;
-            }
-            &.none {
-                @apply text-gray-300;
-            }
-        }
-        .skeleton-loading {
-            @apply flex items-center pb-2 pr-15;
+    @apply flex-grow flex flex-col;
+    margin: 1rem 1rem 0.5rem 1rem;
+    .group-name-wrapper {
+        @apply flex justify-between items-center;
+        .group-name {
+            @apply flex-shrink-0 text-gray-500 text-xs truncate;
+            line-height: 1.5;
         }
     }
-}
-.card-bottom-wrapper {
-    @apply flex-shrink-0 flex-grow-0 flex items-center justify-between border-t border-gray-100 text-xs text-gray-500;
-    height: 3rem;
     .accounts {
-        @apply flex-grow-0 overflow-x-hidden flex items-center justify-between pl-4;
-        .label {
-            @apply flex-shrink-0 flex-grow-0 mr-2;
-        }
+        @apply flex-grow-0 overflow-x-hidden flex;
         .provider-icon-wrapper {
             @apply flex-shrink inline-flex items-center truncate;
             .provider {
                 @apply truncate;
                 min-width: 0;
                 height: 1.25rem;
+            }
+            .icon-wrapper {
+                @apply bg-gray-100 rounded-full inline-flex justify-center items-center;
+                height: 1.25rem;
+                width: 1.25rem;
+            }
+            &:hover {
+                @apply text-secondary font-bold;
+                .icon-wrapper {
+                    @apply bg-blue-300;
+                }
             }
             .icon-link {
                 @apply flex-shrink-0 inline-block mr-2;
@@ -491,25 +476,62 @@ export default {
             }
         }
         .account-add {
-            @apply flex-shrink-0 inline-flex items-center text-gray-900;
+            @apply flex-shrink-0 inline-flex text-gray-900;
             .add-label {
-                @apply ml-2;
+                @apply text-xs;
                 line-height: 1.2;
             }
-            .icon-wrapper {
-                @apply bg-gray-100 rounded-full inline-flex justify-center items-center;
-                height: 1.25rem;
-                width: 1.25rem;
-            }
             &:hover {
-                @apply text-secondary font-bold;
-                .icon-wrapper {
-                    @apply bg-blue-300;
-                }
                 .add-label {
                     text-decoration: underline;
                 }
             }
+        }
+    }
+    .project-name {
+        @apply flex-grow flex-shrink-0 font-bold overflow-hidden;
+        display: -webkit-box;
+        text-overflow: ellipsis;
+        word-wrap: break-word;
+        font-size: 1.125rem;
+        line-height: 1.2;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        max-width: 90%;
+        max-height: 2.6875rem;
+        margin-bottom: 0.25rem;
+    }
+}
+.card-bottom-wrapper {
+    @apply flex-shrink-0 flex-grow-0 flex items-center justify-between border-t border-gray-100 text-xs text-gray-500;
+    .project-summary {
+        @apply flex-shrink-0 flex w-full;
+        padding: 0.75rem 1rem;
+        .project-summary-item {
+            @apply flex-grow border-gray-100 border-r mr-2;
+            .summary-item-text {
+                @apply text-left;
+                font-size: 0.625rem;
+                line-height: 1rem;
+            }
+            .summary-item-num {
+                @apply text-xs;
+                line-height: 1.125rem;
+                &:hover:not(.none) {
+                    @apply text-secondary;
+                    text-decoration: underline;
+                    cursor: pointer;
+                }
+                &.none {
+                    @apply text-gray-300;
+                }
+            }
+            &:last-child {
+                @apply border-0;
+            }
+        }
+        .skeleton-loading {
+            @apply flex items-center pb-2 pr-15;
         }
     }
 }
