@@ -1,7 +1,7 @@
 <template>
     <div class="p-dynamic-chart-donut">
         <div ref="chartRef" class="donut-chart" />
-        <div>
+        <div class="legend-group">
             <p-status v-for="(item, idx) in data" :key="item[valueOptions.key]" :icon-color="colors[idx]">
                 <span class="name">{{ item[nameOptions.key] }}</span> <span class="value">{{ item[valueOptions.key] }}</span>
             </p-status>
@@ -123,6 +123,30 @@ export default defineComponent<DynamicChartTemplateProps>({
     flex-direction: column;
     .donut-chart {
         height: 50%;
+    }
+    .legend-group {
+        @apply flex flex-col;
+        .p-status {
+            @apply w-full;
+            margin-top: 0.125rem;
+            &:first-of-type {
+                margin-top: 0;
+            }
+            .text {
+                @apply flex items-center flex-grow text-gray-900;
+                font-size: 0.875rem;
+                line-height: 1.43;
+                .name {
+                    @apply mb-0;
+                    font-size: inherit;
+                    color: inherit;
+                }
+                .value {
+                    @apply ml-auto;
+                    color: inherit;
+                }
+            }
+        }
     }
 }
 </style>
