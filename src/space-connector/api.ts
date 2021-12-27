@@ -15,6 +15,7 @@ import {
 const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/refresh';
+const IS_REFRESHING_KEY = 'spaceConnector/isRefreshing';
 
 const setMockMode = (request: AxiosRequestConfig, mockEndpoint?: string) => {
     if (mockEndpoint) request.baseURL = mockEndpoint;
@@ -25,7 +26,7 @@ class API {
 
     private refreshInstance: AxiosInstance;
 
-    private accessToken?: string;
+    private accessToken?: string|null;
 
     private refreshToken?: string;
 
@@ -68,40 +69,51 @@ class API {
         this.refreshToken = refreshToken;
         window.localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
         window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        this.unsetRefreshingState();
     }
 
     getRefreshToken(): string|undefined {
         return this.refreshToken;
     }
 
+    checkRefreshingState(): string|null {
+        return window.localStorage.getItem(IS_REFRESHING_KEY);
+    }
+
+    setRefreshingState(): void {
+        return window.localStorage.setItem(IS_REFRESHING_KEY, 'true');
+    }
+
+    unsetRefreshingState(): void {
+        return window.localStorage.removeItem(IS_REFRESHING_KEY);
+    }
+
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean> {
-        try {
-            const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
-            this.setToken(response.data.access_token, response.data.refresh_token);
-            return true;
-        } catch (e) {
-            this.flushToken();
-            if (executeSessionTimeoutCallback) {
-                this.sessionTimeoutCallback();
+        if (this.checkRefreshingState() !== 'true') {
+            try {
+                this.setRefreshingState();
+                const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
+                this.setToken(response.data.access_token, response.data.refresh_token);
+                return true;
+            } catch (e) {
+                this.flushToken();
+                if (executeSessionTimeoutCallback) this.sessionTimeoutCallback();
+                return false;
             }
-            return false;
-        }
+        } else return true;
     }
 
     async getActivatedToken() {
         if (this.accessToken) {
             const isTokenValid = API.checkToken();
-            if (!isTokenValid) {
-                await this.refreshAccessToken();
-            }
-        } else {
-            await this.refreshAccessToken();
+            if (isTokenValid) this.accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
+            else await this.refreshAccessToken();
         }
     }
 
     static checkToken(): boolean {
         const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY) || undefined;
-        return (API.getTokenExpirationTime(storedAccessToken) - API.getCurrentTime()) > 60;
+        return (API.getTokenExpirationTime(storedAccessToken) - API.getCurrentTime()) > 10;
     }
 
     static getExpirationTime(): number {
@@ -167,7 +179,8 @@ class API {
             if (!request.headers) request.headers = {};
 
             // Set the access token
-            request.headers.Authorization = `Bearer ${this.accessToken}`;
+            const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
+            request.headers.Authorization = `Bearer ${storedAccessToken}`;
             // Set mock mode
             if (request.headers.MOCK_MODE) {
                 setMockMode(request, this.mockInfo.endpoint);

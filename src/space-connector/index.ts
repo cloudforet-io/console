@@ -22,11 +22,7 @@ export class SpaceConnector {
     constructor(endpoint: string, sessionTimeoutCallback: SessionTimeoutCallback = () => undefined, mockInfo?: MockInfo) {
         this.mockInfo = mockInfo;
         this.api = new API(endpoint, sessionTimeoutCallback, this.mockInfo ?? {});
-        try {
-            setInterval(() => this.api.getActivatedToken(), CHECK_TOKEN_TIME);
-        } catch (e) {
-            console.error(e);
-        }
+        setInterval(() => this.api.getActivatedToken(), CHECK_TOKEN_TIME);
     }
 
     static async init(endpoint: string, sessionTimeoutCallback?: SessionTimeoutCallback, mockInfo?: MockInfo): Promise<void> {
