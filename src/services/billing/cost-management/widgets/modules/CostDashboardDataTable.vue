@@ -241,6 +241,13 @@ export default {
         .raised {
             @apply text-alert;
         }
+        ::v-deep tr:nth-of-type(even) {
+            @apply bg-gray-100;
+        }
+
+        ::v-deep td {
+            @apply border-none;
+        }
     }
 }
 </style>
