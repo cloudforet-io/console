@@ -71,6 +71,9 @@
                                         {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.ACTION') }}
                                     </p-select-dropdown>
                                 </template>
+                                <template #toolbox-bottom>
+                                    <cloud-service-usage-overview :cloud-service-type-item="sidebarState.selectedItem" />
+                                </template>
                             </p-dynamic-layout>
                         </template>
                     </template>
@@ -217,6 +220,9 @@ import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/C
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import CloudServiceUsageOverview
+    from '@/services/inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverview.vue';
+import { CloudServiceTypeItem } from '@/services/inventory/cloud-service/cloud-service-detail/type';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -262,15 +268,12 @@ const cloudServiceStore = {
     },
 };
 
-interface SidebarItemType {
-    id?: string;
-    name: string;
-    type?: string;
-}
+type SidebarItemType = CloudServiceTypeItem
 
 export default {
     name: 'CloudServiceDetailPage',
     components: {
+        CloudServiceUsageOverview,
         CustomFieldModal,
         ServerMain,
         PLazyImg,
