@@ -14,7 +14,7 @@ export const setApiQueryWithToolboxOptions = (apiQueryHelper: ApiQueryHelper, op
     if (options.pageStart !== undefined && !exclude.pageStart) apiQueryHelper.setPageStart(options.pageStart);
     if (options.pageLimit !== undefined && !exclude.pageLimit) apiQueryHelper.setPageLimit(options.pageLimit);
 
-    if (options.sortBy !== undefined && !exclude.sortBy) apiQueryHelper.setSortKey(options.sortBy);
+    if (options.sortBy !== undefined && !exclude.sortBy) apiQueryHelper.setSort(options.sortBy);
     if (options.sortDesc !== undefined && !exclude.sortDesc) apiQueryHelper.setSortDesc(options.sortDesc);
 
     if (options.queryTags !== undefined && !exclude.sortDesc) {
