@@ -104,7 +104,7 @@ export class SpaceConnector {
 
     protected APIMockHandler(path: string) {
         return async (params: object = {}, extraPath?: string, config?: AxiosRequestConfig): Promise<any> => {
-            const response: AxiosPostResponse = await this.api.instance.post(path + extraPath, params, {
+            const response: AxiosPostResponse = await this.api.instance.post(path + (extraPath ?? ''), params, {
                 headers: {
                     ...(config?.headers && config.headers), MOCK_MODE: true
                 },
