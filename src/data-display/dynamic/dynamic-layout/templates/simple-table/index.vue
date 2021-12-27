@@ -41,7 +41,7 @@ import {
     SimpleTableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/simple-table/type';
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import { getValueByPath } from '@/data-display/dynamic/dynamic-layout/helper';
+import { getValueByPath } from '@/data-display/dynamic/helper';
 
 
 export default {

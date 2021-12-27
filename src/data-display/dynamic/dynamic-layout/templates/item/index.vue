@@ -30,7 +30,7 @@ import {
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { DynamicField, ListOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import { getValueByPath } from '@/data-display/dynamic/dynamic-layout/helper';
+import { getValueByPath } from '@/data-display/dynamic/helper';
 
 export default {
     name: 'PDynamicLayoutItem',

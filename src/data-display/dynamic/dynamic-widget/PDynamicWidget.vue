@@ -14,7 +14,7 @@ import {
     computed, defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { DynamicWidgetProps } from '@/data-display/dynamic/dynamic-widget/type';
+import { DYNAMIC_WIDGET_TYPE, DynamicWidgetProps } from '@/data-display/dynamic/dynamic-widget/type';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 
@@ -59,7 +59,9 @@ export default defineComponent<DynamicWidgetProps>({
             try {
                 await state.loader();
 
-                // TODO: throw new Error(`[] Unacceptable Widget Types: widget type must be one of ${...}. ${props.type} is not acceptable.`);
+                if (!DYNAMIC_WIDGET_TYPE.includes(props.type)) {
+                    throw new Error(`[Dynamic Widget] Unacceptable widget type: widget type must be one of ${DYNAMIC_WIDGET_TYPE}. ${props.type} is not acceptable.`);
+                }
                 state.component = async () => state.loader();
             } catch (e) {
                 console.error(e);

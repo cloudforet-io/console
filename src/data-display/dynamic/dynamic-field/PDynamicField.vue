@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import {
-    computed, onMounted, reactive, toRefs,
+    computed, defineComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import { dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
@@ -44,11 +44,10 @@ interface State {
 }
 const RECURSIVE_TYPE = ['list', 'enum'];
 
-const PDynamicField = import('@/data-display/dynamic/dynamic-field/PDynamicField.vue');
 
-export default {
+export default defineComponent<DynamicFieldProps>({
     name: 'PDynamicField',
-    components: { PTextList, PDynamicField },
+    components: { PTextList, PDynamicField: () => import('@/data-display/dynamic/dynamic-field/PDynamicField.vue') },
     props: {
         type: {
             type: String,
@@ -140,5 +139,5 @@ export default {
             proxy,
         };
     },
-};
+});
 </script>

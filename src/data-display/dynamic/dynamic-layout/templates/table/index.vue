@@ -69,7 +69,7 @@ import { get } from 'lodash';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { Options } from '@/data-display/tables/query-search-table/type';
-import { getValueByPath } from '@/data-display/dynamic/dynamic-layout/helper';
+import { getValueByPath } from '@/data-display/dynamic/helper';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 
 export default {

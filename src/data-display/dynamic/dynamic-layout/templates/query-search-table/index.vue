@@ -76,7 +76,7 @@ import {
 } from '@/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
 import { Options } from '@/data-display/tables/query-search-table/type';
 import { DataTableFieldType } from '@/data-display/tables/data-table/type';
-import { getValueByPath } from '@/data-display/dynamic/dynamic-layout/helper';
+import { getValueByPath } from '@/data-display/dynamic/helper';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 
 

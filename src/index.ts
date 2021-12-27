@@ -113,3 +113,4 @@ export { default as PTextarea } from './inputs/textarea/PTextarea.vue';
 export { default as PCollapsibleList } from './data-display/collapsibles/collapsible-list/PCollapsibleList.vue';
 
 export { default as PDynamicChart } from './data-display/dynamic/dynamic-chart/PDynamicChart.vue';
+export { default as PDynamicWidget } from './data-display/dynamic/dynamic-widget/PDynamicWidget.vue';

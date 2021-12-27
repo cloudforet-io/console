@@ -18,12 +18,14 @@
 
 <script lang="ts">
 import { get } from 'lodash';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from '@vue/composition-api';
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
 import { TextListItem, TextListProps } from '@/others/console/text-list/type';
 import { isNotEmpty } from '@/util/helpers';
 
-export default {
+export default defineComponent({
     name: 'PTextList',
     components: { PAnchor },
     props: {
@@ -82,7 +84,7 @@ export default {
             getHref,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">

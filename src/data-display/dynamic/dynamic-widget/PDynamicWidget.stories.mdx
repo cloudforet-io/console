@@ -1,10 +1,14 @@
-import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { Meta, Canvas, Story, ArgsTable, Description } from '@storybook/addon-docs/blocks';
 import {
     reactive, toRefs,
 } from '@vue/composition-api';
 import PDynamicWidget from './PDynamicWidget.vue';
 import { getDynamicWidgetArgTypes } from '@/data-display/dynamic/dynamic-widget/story-helper';
-import { getDynamicWidgetMockData } from '@/data-display/dynamic/dynamic-widget/mock';
+import {
+    getDynamicWidgetChartTypeMockData,
+    getDynamicWidgetMockData
+} from '@/data-display/dynamic/dynamic-widget/mock';
+import { DYNAMIC_WIDGET_TYPE } from '@/data-display/dynamic/dynamic-widget/type';
 
 
 
@@ -27,20 +31,12 @@ export const Template = (args, { argTypes }) => ({
                 chart_type,
                 limit
             }"
-            :data="_data"
-            :view-options="_viewOptions"
+            :data="data"
+            :loading="loading"
+            :view-options="viewOptions"
         ></p-dynamic-widget>
     </div>
     `,
-    setup(props) {
-        const mockData = getDynamicWidgetMockData(props.type)
-        const state = reactive({
-            _schemaOptions: mockData.schemaOptions,
-            _data: mockData.data,
-            _viewOptions: mockData.viewOptions
-        })
-        return toRefs(state)
-    }
 });
 
 
@@ -49,25 +45,76 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Basic
+## Supported Types
+
+<Description markdown={`
+${DYNAMIC_WIDGET_TYPE.map(d => `\`${d}\``).join(', ')} types are available.
+`}/>
+
+<br/>
+<br/>
+
+## Schema Options
+
+Options required to display data by type of Dynamic Widget.
+
+| Name | Description |
+| -- | -- |
+| value_options | Display options for value. `DynamicField` type.|
+| name_options | Display options for name. `DynamicField` type.|
+| chart_type | The type of chart. One of DynamicChart's type.|
+| limit | Maximum size of data to display. |
+
+<br/>
+
+```typescript
+interface DynamicWidgetSchemaOptions {
+    value_options?: DynamicField;
+    name_options?: DynamicField;
+    chart_type?: DynamicChartType;
+    limit?: number;
+}
+```
+<br/>
+
+## Dynamic Widget by Types
+
+<br/>
+<br/>
+
+### Card Type
+
+<br/>
+
+#### Supported Schema Options
+
+| Name | Supported |
+| -- | -- |
+| value_options | O |
+| name_options | X |
+| chart_type | X |
+| limit | X |
+
+<br/>
 
 <Canvas>
-    <Story name="Basic">
+    <Story name="Card Type">
         {{
     components: { PDynamicWidget },
     template: `
     <div class="h-full w-full overflow p-8">
         <p-dynamic-widget
-            :type="type"
+            type="card"
             :name="name"
             :schema-options="schemaOptions"
             :data="data"
+            :loading="loading"
             :view-options="viewOptions"
         ></p-dynamic-widget>
     </div>
     `,
     setup() {
-        const state = reactive(getDynamicWidgetMockData())
+        const state = reactive(getDynamicWidgetMockData('card'))
         return toRefs(state)
     }
         }}
@@ -77,10 +124,85 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+### Chart Type
+
+<br/>
+
+#### Supported Schema Options
+
+| Name | Supported |
+| -- | -- |
+| value_options | O |
+| name_options | O|
+| chart_type | O |
+| limit | O |
+
+<br/>
+
+<Canvas>
+    <Story name="Chart Type">
+    {{
+        components: { PDynamicWidget },
+        template: `
+<div class="h-full w-full overflow p-8">
+        <p class="text-lg font-bold my-4">Chart Type: COLUMN</p>
+        <p-dynamic-widget
+            type="chart"
+            :name="name"
+            :schema-options="column.schemaOptions"
+            :data="column.data"
+            :loading="loading"
+            :view-options="viewOptions"
+        ></p-dynamic-widget>
+        <p class="text-lg font-bold my-4">Chart Type: DONUT</p>
+        <p-dynamic-widget
+            type="chart"
+            :name="name"
+            :schema-options="donut.schemaOptions"
+            :data="donut.data"
+            :loading="loading"
+            :view-options="viewOptions"
+        ></p-dynamic-widget>
+        <p class="text-lg font-bold my-4">Chart Type: TREEMAP</p>
+        <p-dynamic-widget
+            type="chart"
+            :name="name"
+            :schema-options="treemap.schemaOptions"
+            :data="treemap.data"
+            :loading="loading"
+            :view-options="viewOptions"
+        ></p-dynamic-widget>
+</div>
+`,
+        setup() {
+            const state = reactive({
+                ...getDynamicWidgetMockData('chart'),
+                column: getDynamicWidgetChartTypeMockData('COLUMN'),
+                donut: getDynamicWidgetChartTypeMockData('DONUT'),
+                treemap: getDynamicWidgetChartTypeMockData('TREEMAP')
+            })
+            return toRefs(state)
+        }
+    }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Playground
 
 <Canvas>
-    <Story name="Playground">
+    <Story name="Playground" args={(() => {
+        const mockData = getDynamicWidgetMockData('card')
+        return {
+            name: mockData.name,
+            type: mockData.type,
+            data: mockData.data,
+            loading: false,
+            ...mockData.schemaOptions,
+        }
+    })()}>
         {Template.bind({})}
     </Story>
 </Canvas>
