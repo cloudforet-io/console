@@ -148,6 +148,9 @@ export default defineComponent<SearchProps>({
         &::placeholder {
             @apply text-gray-300;
         }
+        &:placeholder-shown {
+            text-overflow: ellipsis;
+        }
         &:focus {
             outline: none;
         }

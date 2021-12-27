@@ -328,8 +328,9 @@ export const Template = (args, { argTypes }) => ({
             setup() {
                 const existItem = {name: 'exist in menu items', label: 'This item is exist in menu items'}
                 const notExistItem = {name: 'not in menu items', label: 'This item is not in menu items'}
+                const longItem = {name: 'long text item', label: 'This is long text Item long text Item long text Item long text Item long text Item long text Item long text Item long text Item long text Item long text Item long text Item long text Item long text Item long text Item long text Item long text Item long text Item long text Item'}
                 const state = reactive({
-                    menu: [...getSearchDropdownMenu(), existItem],
+                    menu: [...getSearchDropdownMenu(), existItem, longItem],
                     defaultSelected: [notExistItem],
                     radioSelected: [notExistItem],
                     checkboxSelected: [notExistItem, existItem],

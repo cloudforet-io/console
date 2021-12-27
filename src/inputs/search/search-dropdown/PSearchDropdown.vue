@@ -8,6 +8,7 @@
                   :is-focused.sync="proxyIsFocused"
                   :invalid="invalid"
                   :disabled="disabled"
+                  :style="{height: `${searchHeight}px`}"
                   @delete="onDeleteSearchText"
                   @click.native.stop="handleClick"
                   v-on="searchListeners"
@@ -16,6 +17,7 @@
                        proxySelected.length &&
                        !proxyVisibleMenu &&
                        !proxyIsFocused"
+                   ref="tagRef"
                    @delete="onDeleteTag(proxySelected[0], 0)"
             >
                 {{ proxySelected[0].label || proxySelected[0].name }}
@@ -201,6 +203,7 @@ export default defineComponent<SearchDropdownProps>({
 
         const state = reactive({
             menuRef: null,
+            tagRef: null as null|HTMLElement,
             proxyValue: makeOptionalProxy('value', vm, ''),
             proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
             proxySelected: makeOptionalProxy('selected', vm, []),
@@ -219,9 +222,13 @@ export default defineComponent<SearchDropdownProps>({
                 if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
                 return res;
             }, {})),
+            searchHeight: computed<number>(() => {
+                if (!state.tagRef) return 32;
+                if (!contextMenuFixedStyleState.proxyVisibleMenu && state.proxySelected.length && props.type === SEARCH_DROPDOWN_TYPE.radioButton) return state.tagRef.$el.clientHeight + 12;
+                return 32;
+            }),
         });
 
-        /* util */
         const defaultHandler = (inputText: string, list: SearchDropdownMenuItem[]) => {
             let results: SearchDropdownMenuItem[] = [...list];
             const trimmed = inputText.trim();
@@ -266,7 +273,6 @@ export default defineComponent<SearchDropdownProps>({
 
         const hideMenu = (mode?: string) => {
             if (!contextMenuFixedStyleState.proxyVisibleMenu) return;
-
             // placeholder
             if (props.type === SEARCH_DROPDOWN_TYPE.radioButton && (mode === 'click' || state.proxySelected.length)) {
                 state._placeholder = '';
@@ -506,6 +512,7 @@ export default defineComponent<SearchDropdownProps>({
     }
     .dropdown-button {
         cursor: pointer;
+        flex-shrink: 0;
     }
     .p-context-menu {
         @apply font-normal;
