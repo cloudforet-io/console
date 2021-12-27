@@ -62,6 +62,11 @@ export interface Filter {
     o: FilterOperator;
 }
 
+export interface Sort {
+    key: string;
+    desc?: boolean;
+}
+
 export interface Query {
     filter?: Array<Filter>;
     filter_or?: Array<Filter>;
@@ -71,6 +76,7 @@ export interface Query {
     };
     sort?: {
         key?: string;
+        keys?: Sort[];
         name?: string;
         desc?: boolean;
     };
