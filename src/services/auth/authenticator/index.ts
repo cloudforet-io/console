@@ -20,7 +20,10 @@ abstract class Authenticator {
 
     static async signOut(): Promise<void> {
         try {
-            if (SpaceRouter.router) await SpaceRouter.router.app.$store.dispatch('user/signOut');
+            if (SpaceRouter.router) {
+                await SpaceRouter.router.app.$store.dispatch('user/signOut');
+                await SpaceRouter.router.app.$store.dispatch('error/resetErrorState');
+            }
         } catch (e) {
             console.error('user sign out failed', e);
         }

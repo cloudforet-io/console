@@ -5,3 +5,7 @@ export const showSessionExpiredError = ({ commit }): void => {
 export const showAuthorizationError = ({ commit }): void => {
     commit('setVisibleAuthorizationError', true);
 };
+
+export const resetErrorState = ({ commit }): void => {
+    commit('resetState');
+};
