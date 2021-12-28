@@ -2,7 +2,11 @@
     <div class="progress-bar"
          :class="size"
     >
-        <label v-if="label" class="label">{{ label }}</label>
+        <label v-if="label || $scopedSlots.label" class="label">
+            <slot name="label">
+                {{ label }}
+            </slot>
+        </label>
         <div ref="backgroundBar" class="background-bar" />
         <transition appear @before-appear="beforeEnter" @after-appear="enter">
             <div ref="progressBar" class="tracker-bar" :style="progressBarStyle" />
@@ -12,13 +16,13 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { ProgressBarProps } from '@/data-display/progress-bar/type';
 import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
 
 
-export default {
+export default defineComponent<ProgressBarProps>({
     name: 'PProgressBar',
     props: {
         percentage: {
@@ -40,12 +44,12 @@ export default {
         size: {
             type: String,
             default: PROGRESS_BAR_SIZE.md,
-            validate(size: any) {
+            validator(size: any) {
                 return Object.values(PROGRESS_BAR_SIZE).includes(size);
             },
         },
     },
-    setup(props: ProgressBarProps) {
+    setup(props) {
         const linearGradientProperty = `linear-gradient(90deg, ${props.gradient?.startColor} ${props.gradient?.gradientPoint}%, ${props.gradient?.endColor} 100%)`;
         const defaultTrackerBarColor = 'rgba(theme(\'colors.primary\'))';
 
@@ -78,7 +82,7 @@ export default {
             enter,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">

@@ -5,16 +5,21 @@
                :data="data"
                :loading="loading"
                :view-options="viewOptions"
+               :field-handler="fieldHandler"
                class="p-dynamic-widget"
     />
 </template>
 
 <script lang="ts">
 import {
-    computed, defineComponent,
+    computed, defineComponent, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { DYNAMIC_WIDGET_TYPE, DynamicWidgetProps } from '@/data-display/dynamic/dynamic-widget/type';
+import {
+    DYNAMIC_WIDGET_TYPE,
+    DynamicWidgetFieldHandler,
+    DynamicWidgetProps,
+} from '@/data-display/dynamic/dynamic-widget/type';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 
@@ -46,6 +51,10 @@ export default defineComponent<DynamicWidgetProps>({
         viewOptions: {
             type: Object,
             default: () => ({}),
+        },
+        fieldHandler: {
+            type: Function as PropType<DynamicWidgetFieldHandler|undefined>,
+            default: undefined,
         },
     },
     setup(props) {

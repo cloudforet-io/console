@@ -1,5 +1,6 @@
-import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import { DynamicField, DynamicFieldOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { DynamicChartType } from '@/data-display/dynamic/dynamic-chart/type';
+import { DynamicFieldHandler, DynamicFieldTypeOptions } from '@/data-display/dynamic/dynamic-field/type';
 
 export const DYNAMIC_WIDGET_TYPE = ['card', 'chart'] as const;
 export type DynamicWidgetType = typeof DYNAMIC_WIDGET_TYPE[number];
@@ -25,6 +26,13 @@ export interface DynamicWidgetViewOptions {
     // TODO
 }
 
+export type DynamicWidgetFieldHandler<T = undefined> = DynamicFieldHandler<
+    DynamicFieldOptions,
+    DynamicFieldTypeOptions,
+    DynamicField & T
+    >
+
+
 export interface DynamicWidgetProps<T=any> {
     // data from schema
     type: DynamicWidgetType;
@@ -34,4 +42,5 @@ export interface DynamicWidgetProps<T=any> {
     data: T;
     loading: boolean;
     viewOptions: DynamicWidgetViewOptions;
+    fieldHandler?: DynamicWidgetFieldHandler;
 }

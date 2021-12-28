@@ -5,7 +5,7 @@
 <script lang="ts">
 import {
     defineComponent,
-    onMounted, onUnmounted,
+    onMounted, onUnmounted, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -17,7 +17,7 @@ import {
     DEFAULT_VALUE_OPTIONS,
 } from '@/data-display/dynamic/dynamic-chart/config';
 import { drawTreemapChart } from '@/data-display/dynamic/dynamic-chart/templates/treemap/helper';
-import { DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
+import { DynamicChartFieldHandler, DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
 
 export default defineComponent<DynamicChartTemplateProps>({
     name: 'PDynamicChartTreemap',
@@ -33,6 +33,10 @@ export default defineComponent<DynamicChartTemplateProps>({
         nameOptions: {
             type: Object as () => DynamicChartTemplateProps['nameOptions'],
             default: () => ({ ...DEFAULT_NAME_OPTIONS }),
+        },
+        fieldHandler: {
+            type: Function as PropType<DynamicChartFieldHandler|undefined>,
+            default: undefined,
         },
     },
     setup(props) {

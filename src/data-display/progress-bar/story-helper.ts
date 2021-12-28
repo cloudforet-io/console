@@ -93,4 +93,22 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
             type: 'object',
         },
     },
+    /* slots */
+    labelSlot: {
+        name: 'label',
+        description: 'Slot for label.',
+        defaultValue: '',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
 });

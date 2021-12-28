@@ -1,6 +1,28 @@
 <template>
-    <div ref="chartRef" class="p-dynamic-chart-column">
-        <!--        <p-progress-bar v-for="item in data" :key="item[nameOptions.key]"></p-progress-bar>-->
+    <div class="p-dynamic-chart-column">
+        <div v-for="(value, idx) in values"
+             :key="`${contextKey}-${idx}`"
+        >
+            <div class="label-wrapper">
+                <span class="name">
+                    <p-dynamic-field :type="nameOptions.type"
+                                     :data="names[idx]"
+                                     :options="nameOptions.options"
+                                     :extra-data="nameOptions"
+                                     :handler="fieldHandler"
+                    />
+                </span>
+                <span class="value">
+                    <p-dynamic-field :type="valueOptions.type"
+                                     :data="commaFormatter(value)"
+                                     :options="valueOptions.options"
+                                     :extra-data="valueOptions"
+                                     :handler="fieldHandler"
+                    />
+                </span>
+            </div>
+            <p-progress-bar :percentage="getPercentage(value)" />
+        </div>
     </div>
 </template>
 
@@ -8,27 +30,29 @@
 import {
     computed,
     defineComponent,
-    onMounted, onUnmounted,
+    onUnmounted, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { max } from 'lodash';
 
-import { maxBy } from 'lodash';
-import * as am4core from '@amcharts/amcharts4/core';
-import { XYChart } from '@amcharts/amcharts4/charts';
-
+import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
+import { commaFormatter, getContextKey } from '@/util/helpers';
 import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS,
 } from '@/data-display/dynamic/dynamic-chart/config';
-import { DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
-import { drawColumnChart } from '@/data-display/dynamic/dynamic-chart/templates/column/helper';
+import { DynamicChartFieldHandler, DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
+import PProgressBar from '@/data-display/progress-bar/PProgressBar.vue';
+import { getValueByPath } from '@/data-display/dynamic/helper';
+import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 
 
 export default defineComponent<DynamicChartTemplateProps>({
     name: 'PDynamicChartColumn',
+    components: { PDynamicField, PProgressBar },
     props: {
         data: {
-            type: Array,
+            type: Array as PropType<DynamicChartTemplateProps['data']>,
             default: () => [],
         },
         valueOptions: {
@@ -39,64 +63,51 @@ export default defineComponent<DynamicChartTemplateProps>({
             type: Object as () => DynamicChartTemplateProps['nameOptions'],
             default: () => ({ ...DEFAULT_NAME_OPTIONS }),
         },
+        fieldHandler: {
+            type: Function as PropType<DynamicChartFieldHandler|undefined>,
+            default: undefined,
+        },
     },
     setup(props) {
         const state = reactive({
-            chart: null as null|XYChart,
-            chartRef: null as null|HTMLElement,
-            max: computed<number>(() => {
-                if (!props.data.length) return 0;
+            names: computed<number[]>(() => {
+                const nameKey = props.nameOptions.key;
+                return props.data.map(d => getValueByPath(d, nameKey));
+            }),
+            values: computed<number[]>(() => {
                 const valueKey = props.valueOptions.key;
-                const maxItem = maxBy(props.data, d => d[valueKey]);
-                return maxItem ? maxItem[valueKey] : 0;
+                return props.data.map((d) => {
+                    let value = getValueByPath(d, valueKey);
+                    if (typeof value !== 'number') value = 0;
+                    return value;
+                });
             }),
-            enrichedData: computed(() => {
-                const max = state.max;
-                return props.data.map(d => ({
-                    ...d, _dummy: max,
-                }));
+            max: computed<number>(() => {
+                if (!state.values.length) return 0;
+                return max(state.values) ?? 0;
             }),
+            contextKey: getContextKey(),
         });
 
-        const disposeChart = () => {
-            if (state.chart) state.chart.dispose();
+        const getPercentage = (value: number) => {
+            const maxValue = state.max;
+            return maxValue === 0 ? 0 : value / maxValue * 100;
         };
 
-        const drawChart = () => {
-            const ctx = state.chartRef;
-            if (!ctx) return;
-
-            const chart = am4core.create(ctx, XYChart);
-
-            drawColumnChart(chart, props.nameOptions, props.valueOptions);
-
-            chart.data = state.enrichedData;
-
-            state.chart = chart;
-        };
-
-        const updateChartData = (data: any[]) => {
-            if (state.chart) state.chart.data = data;
-        };
-
-        onMounted(() => {
-            drawChart();
-        });
-
-        const stopDataWatch = watch(() => state.enrichedData, (data) => {
-            updateChartData(data);
+        const stopDataWatch = watch(() => props.data, () => {
+            state.contextKey = getContextKey();
         });
 
         onUnmounted(() => {
             if (stopDataWatch) stopDataWatch();
-            disposeChart();
         });
 
         return {
             ...toRefs(state),
-            disposeChart,
-            drawChart,
-            updateChartData,
+            getValueByPath,
+            commaFormatter,
+            getPercentage,
+            DEFAULT_CHART_COLORS,
         };
     },
 });
@@ -105,5 +116,18 @@ export default defineComponent<DynamicChartTemplateProps>({
 <style lang="postcss">
 .p-dynamic-chart-column {
     width: 100%;
+    .label-wrapper {
+        display: flex;
+        justify-content: space-between;
+        > .name {
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        > .value {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            font-weight: bold;
+        }
+    }
 }
 </style>

@@ -111,6 +111,22 @@ export const getDynamicWidgetArgTypes = (): ArgTypes => {
                 type: 'object',
             },
         },
+        fieldHandler: {
+            name: 'fieldHandler',
+            type: { name: 'func' },
+            description: 'Handler that executed for handling dynamic field props that bound to dynamic field component.',
+            defaultValue: undefined,
+            table: {
+                type: {
+                    summary: 'func',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: null,
+                },
+            },
+            control: null,
+        },
     };
 
     const dynamicChartArgTypes = getDynamicChartArgTypes();

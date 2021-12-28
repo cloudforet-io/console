@@ -40,9 +40,6 @@
                                  :data="getValueByPath(rootData[index], field.name)"
                                  :handler="fieldHandler"
                 />
-                <span v-else :key="slotName">
-                    test
-                </span>
             </template>
 
             <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" v-slot:[headerSlot]>
@@ -64,11 +61,11 @@
 <script lang="ts">
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, PropType, reactive, toRefs,
 } from '@vue/composition-api';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
+import { DynamicFieldHandler, DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import { KeyItemSet } from '@/inputs/search/query-search/type';
 import { get } from 'lodash';
 import {
@@ -109,7 +106,7 @@ export default {
             default: undefined,
         },
         fieldHandler: {
-            type: Function,
+            type: Function as PropType<DynamicFieldHandler|undefined>,
             default: undefined,
         },
     },

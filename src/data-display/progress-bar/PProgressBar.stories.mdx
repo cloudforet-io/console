@@ -23,7 +23,11 @@ export const Template = (args,{argTypes})=>({
         :size="size"
         :color="color"
         :style="'width: 10rem;'"
-    />
+    >
+        <template #label>
+            <span v-if="labelSlot" v-html="labelSlot"></span>
+        </template>
+    </p-progress-bar>
 </div>`,
 })
 
@@ -31,9 +35,9 @@ export const Template = (args,{argTypes})=>({
 
 <br/>
 <br/>
-<br/>
 
 ## Label
+
 <Canvas>
     <Story name="Label">
         {{
@@ -49,6 +53,9 @@ export const Template = (args,{argTypes})=>({
         }}
     </Story>
 </Canvas>
+
+<br/>
+<br/>
 
 ## Size
 <Canvas>
@@ -75,6 +82,9 @@ export const Template = (args,{argTypes})=>({
     </Story>
 </Canvas>
 
+<br/>
+<br/>
+
 ## Color
 <Canvas>
     <Story name="Color">
@@ -92,6 +102,8 @@ export const Template = (args,{argTypes})=>({
     </Story>
 </Canvas>
 
+<br/>
+<br/>
 
 ## Gradient
 <Canvas>
@@ -110,6 +122,8 @@ export const Template = (args,{argTypes})=>({
     </Story>
 </Canvas>
 
+<br/>
+<br/>
 
 ## Playground
 

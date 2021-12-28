@@ -8,6 +8,7 @@
                        :data="data"
                        :value-options="valueOptions"
                        :name-options="nameOptions"
+                       :field-handler="fieldHandler"
                        class="chart"
             />
         </p-data-loader>
@@ -17,12 +18,13 @@
 <script lang="ts">
 import {
     computed,
-    defineComponent,
+    defineComponent, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 
 import {
+    DynamicChartFieldHandler,
     DynamicChartProps,
 } from '@/data-display/dynamic/dynamic-chart/type';
 import {
@@ -54,6 +56,10 @@ export default defineComponent<DynamicChartProps>({
         nameOptions: {
             type: Object as () => DynamicChartProps['nameOptions'],
             default: () => ({ ...DEFAULT_NAME_OPTIONS }),
+        },
+        fieldHandler: {
+            type: Function as PropType<DynamicChartFieldHandler|undefined>,
+            default: undefined,
         },
     },
     setup(props) {
@@ -91,7 +97,6 @@ export default defineComponent<DynamicChartProps>({
 </script>
 <style lang="postcss">
 .p-dynamic-chart {
-    height: 100%;
     .p-data-loader {
         height: 100%;
         .chart {

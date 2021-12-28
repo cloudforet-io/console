@@ -2,8 +2,23 @@
     <div class="p-dynamic-chart-donut">
         <div ref="chartRef" class="donut-chart" />
         <div class="legend-group">
-            <p-status v-for="(item, idx) in data" :key="item[valueOptions.key]" :icon-color="colors[idx]">
-                <span class="name">{{ item[nameOptions.key] }}</span> <span class="value">{{ item[valueOptions.key] }}</span>
+            <p-status v-for="(item, idx) in data" :key="`${contextKey}-${idx}`" :icon-color="colors[idx]">
+                <span class="name">
+                    <p-dynamic-field :type="nameOptions.type"
+                                     :data="getValueByPath(item, nameOptions.key)"
+                                     :options="nameOptions.options"
+                                     :extra-data="nameOptions"
+                                     :handler="fieldHandler"
+                    />
+                </span>
+                <span class="value">
+                    <p-dynamic-field :type="valueOptions.type"
+                                     :data="getValue(item)"
+                                     :options="valueOptions.options"
+                                     :extra-data="valueOptions"
+                                     :handler="fieldHandler"
+                    />
+                </span>
             </p-status>
         </div>
     </div>
@@ -11,7 +26,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, onMounted, onUnmounted,
+    defineComponent, onMounted, onUnmounted, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -23,15 +38,18 @@ import {
     DEFAULT_VALUE_OPTIONS,
 } from '@/data-display/dynamic/dynamic-chart/config';
 
-import { DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
+import { DynamicChartFieldHandler, DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
 import { drawPieChart } from '@/data-display/dynamic/dynamic-chart/templates/donut/helper';
 import PStatus from '@/data-display/status/PStatus.vue';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
+import { getValueByPath } from '@/data-display/dynamic/helper';
+import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
+import { commaFormatter, getContextKey } from '@/util/helpers';
 
 
 export default defineComponent<DynamicChartTemplateProps>({
     name: 'PDynamicChartDonut',
-    components: { PStatus },
+    components: { PDynamicField, PStatus },
     props: {
         data: {
             type: Array,
@@ -45,13 +63,24 @@ export default defineComponent<DynamicChartTemplateProps>({
             type: Object as () => DynamicChartTemplateProps['nameOptions'],
             default: () => ({ ...DEFAULT_NAME_OPTIONS }),
         },
+        fieldHandler: {
+            type: Function as PropType<DynamicChartFieldHandler|undefined>,
+            default: undefined,
+        },
     },
     setup(props) {
         const state = reactive({
             chart: null as null|PieChart,
             chartRef: null as null|HTMLElement,
             colors: DEFAULT_CHART_COLORS,
+            contextKey: getContextKey(),
         });
+
+        const getValue = (item: any): string|number|undefined => {
+            const value = getValueByPath(item, props.valueOptions.key);
+            if (typeof value === 'number') return commaFormatter(value) ?? '';
+            return '';
+        };
 
         const disposeChart = () => {
             if (state.chart) state.chart.dispose();
@@ -81,6 +110,7 @@ export default defineComponent<DynamicChartTemplateProps>({
         });
 
         const stopDataWatch = watch(() => props.data, (data) => {
+            state.contextKey = getContextKey();
             updateChartData(data);
         });
 
@@ -94,6 +124,8 @@ export default defineComponent<DynamicChartTemplateProps>({
             disposeChart,
             drawChart,
             updateChartData,
+            getValueByPath,
+            getValue,
         };
     },
 });

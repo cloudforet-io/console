@@ -12,16 +12,18 @@
                          :value-options="schemaOptions.value_options"
                          :name-options="schemaOptions.name_options"
                          :limit="schemaOptions.limit || 10"
+                         :field-handler="fieldHandler"
         />
     </p-pane-layout>
 </template>
 
 <script lang="ts">
 import {
-    defineComponent,
+    defineComponent, PropType,
     reactive, toRefs,
 } from '@vue/composition-api';
 import {
+    DynamicWidgetFieldHandler,
     DynamicWidgetProps,
     DynamicWidgetSchemaOptions,
     DynamicWidgetViewOptions,
@@ -56,6 +58,10 @@ export default defineComponent<DynamicWidgetChartProps>({
             type: Object as () => DynamicWidgetViewOptions,
             default: () => ({}),
         },
+        fieldHandler: {
+            type: Function as PropType<DynamicWidgetFieldHandler|undefined>,
+            default: undefined,
+        },
     },
     setup() {
         const state = reactive({});
@@ -79,6 +85,9 @@ export default defineComponent<DynamicWidgetChartProps>({
         line-height: 1.6;
         font-size: 1rem;
         margin-bottom: 1rem;
+    }
+    .p-dynamic-chart {
+        flex-grow: 1;
     }
 }
 </style>
