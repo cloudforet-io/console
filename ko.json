@@ -426,6 +426,7 @@
 				"SET_FILTER": "필터 선택",
 				"SET_MORE": "추가 설정",
 				"SET_QUERY": "쿼리 설정",
+				"SHOW_ALL": "모두 보기",
 				"STACK": "누적",
 				"STACKED_COLUMN": "누적 컬럼",
 				"STACKED_LINE": "누적 라인",
