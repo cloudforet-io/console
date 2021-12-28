@@ -93,6 +93,24 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    showDataFromScratch: {
+        name: 'showDataFromScratch',
+        type: { name: 'boolean' },
+        description: 'Whether to show data from scratch or after fetching data at least once.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     minLoadingTime: {
         name: 'minLoadingTime',
         type: { name: 'number' },
@@ -107,7 +125,7 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
             },
         },
         control: {
-            type: 'boolean',
+            type: 'number',
         },
     },
     lazyLoadingTime: {
@@ -124,7 +142,7 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
             },
         },
         control: {
-            type: 'boolean',
+            type: 'number',
         },
     },
     /* slots */

@@ -1,13 +1,13 @@
 <template>
     <div class="p-data-loader">
         <div class="data-loader-container">
-            <div v-if="!disableEmptyCase && isEmpty" key="no-data" class="no-data-wrapper">
+            <div v-show="(showDataFromScratch || dataLoadOccurred) && showEmptyCase" key="no-data" class="no-data-wrapper">
                 <slot name="no-data">
                     {{ $t('COMPONENT.DATA_LOADER.NO_DATA') }}
                 </slot>
             </div>
 
-            <div v-else key="data" class="data-wrapper">
+            <div v-show="(showDataFromScratch || dataLoadOccurred) && !showEmptyCase" key="data" class="data-wrapper">
                 <slot />
             </div>
 
@@ -36,7 +36,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, ComputedRef, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 import PLottie from '@/foundation/lottie/PLottie.vue';
@@ -49,10 +49,11 @@ interface Props {
     data?: any;
     loaderType: LOADER_TYPES;
     disableEmptyCase: boolean;
+    showDataFromScratch: boolean;
     minLoadingTime: number;
     lazyLoadingTime: number;
 }
-export default defineComponent({
+export default defineComponent<Props>({
     name: 'PDataLoader',
     components: { PSkeleton, PLottie },
     i18n,
@@ -80,62 +81,111 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
+        showDataFromScratch: {
+            type: Boolean,
+            default: false,
+        },
         minLoadingTime: {
             type: Number,
             default: 0,
+            validator(minLoadingTime: number) {
+                return minLoadingTime >= 0;
+            },
         },
         lazyLoadingTime: {
             type: Number,
             default: 0,
+            validator(lazyLoadingTime: number) {
+                return lazyLoadingTime >= 0;
+            },
         },
     },
-    setup(props: Props) {
+    setup(props) {
         const state = reactive({
+            dataLoadOccurred: false,
+            showEmptyCase: computed(() => !props.disableEmptyCase && state.isEmpty),
             isEmpty: computed(() => {
                 if (!props.data) return false;
                 if (Array.isArray(props.data)) return props.data.length === 0;
                 return isEmpty(props.data);
             }),
-            showLoader: computed(() => {
-                if (props.lazyLoadingTime) return state.lazyLoading;
-                if (props.minLoadingTime) return state.minTimeLoading || props.loading;
-                return props.loading;
-            }),
-            minTimeLoading: props.loading,
-            lazyLoading: false,
+            lazyLoading: props.loading,
+            minLoading: props.loading,
         });
 
-        let minLoadingHandler;
-        let lazyLoadingHandler;
-        watch(() => props.loading, (after, before) => {
-            if (after === before) return;
-            if (after) {
-                if (props.minLoadingTime) {
-                    state.minTimeLoading = true;
+        const registerLazyLoadingWatch = () => {
+            let lazyLoadingHandler;
+            watch(() => props.loading, (loading) => {
+                if (loading) {
+                    if (!state.dataLoadOccurred) {
+                        state.lazyLoading = true;
+                        return;
+                    }
 
-                    if (minLoadingHandler) clearTimeout(minLoadingHandler);
-                    minLoadingHandler = setTimeout(() => {
-                        state.minTimeLoading = false;
-                    }, props.minLoadingTime);
-                }
-
-
-                if (props.lazyLoadingTime) {
                     state.lazyLoading = false;
 
                     if (lazyLoadingHandler) clearTimeout(lazyLoadingHandler);
                     lazyLoadingHandler = setTimeout(() => {
                         state.lazyLoading = true;
                     }, props.lazyLoadingTime);
+                } else {
+                    if (lazyLoadingHandler) clearTimeout(lazyLoadingHandler);
+                    state.lazyLoading = false;
                 }
-            } else if (props.lazyLoadingTime) {
-                if (lazyLoadingHandler) clearTimeout(lazyLoadingHandler);
-                state.lazyLoading = false;
+            }, { immediate: true });
+
+            if (props.minLoadingTime) {
+                let minLoadingHandler;
+                watch(() => state.lazyLoading, (lazyLoading) => {
+                    if (lazyLoading) {
+                        state.minLoading = true;
+
+                        if (minLoadingHandler) clearTimeout(minLoadingHandler);
+                        minLoadingHandler = setTimeout(() => {
+                            state.minLoading = false;
+                        }, props.minLoadingTime);
+                    }
+                }, { immediate: true });
+            }
+        };
+
+        const registerMinLoadingWatch = () => {
+            let minLoadingHandler;
+            watch(() => props.loading, (loading) => {
+                if (loading) {
+                    state.minLoading = true;
+
+                    if (minLoadingHandler) clearTimeout(minLoadingHandler);
+                    minLoadingHandler = setTimeout(() => {
+                        state.minLoading = false;
+                    }, props.minLoadingTime);
+                }
+            }, { immediate: true });
+        };
+
+
+        let showLoader: ComputedRef<boolean>;
+        if (props.lazyLoadingTime) {
+            if (props.minLoadingTime) showLoader = computed<boolean>(() => state.minLoading || state.lazyLoading);
+            else showLoader = computed<boolean>(() => state.lazyLoading);
+            registerLazyLoadingWatch();
+        } else if (props.minLoadingTime) {
+            showLoader = computed<boolean>(() => state.minLoading || props.loading);
+            registerMinLoadingWatch();
+        } else showLoader = computed<boolean>(() => props.loading);
+
+
+        const stopDataLoadCheckWatch = watch(() => showLoader.value, (after, before) => {
+            if (before && !after) {
+                state.dataLoadOccurred = true;
+                if (stopDataLoadCheckWatch) stopDataLoadCheckWatch();
             }
         }, { immediate: true });
+
         return {
             LOADER_TYPES,
             ...toRefs(state),
+            showLoader,
         };
     },
 });
