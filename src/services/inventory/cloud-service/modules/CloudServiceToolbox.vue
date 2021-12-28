@@ -1,15 +1,6 @@
 <template>
     <div>
-        <div class="period">
-            <span class="label">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTERED_BY_DATE') }}:</span>
-            <template v-if="periodText">
-                <span class="text">UTC</span>
-                <p-tag v-if="periodText" @delete="handleDeletePeriod">
-                    {{ periodText }}
-                </p-tag>
-            </template>
-            <span v-else class="text">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.AUTO_PERIOD') }}</span>
-        </div>
+        <slot name="period" />
         <p-toolbox filters-visible
                    exportable
                    search-type="query"
@@ -30,7 +21,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToolbox, PTag,
+    PToolbox,
 } from '@spaceone/design-system';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
@@ -51,14 +42,11 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { store } from '@/store';
-import { Period } from '@/services/billing/cost-management/type';
-import dayjs from 'dayjs';
 
 
 interface Props {
     totalCount: number;
     filters: QueryStoreFilter[];
-    period: Period | undefined;
     queryTags: QueryTag[];
 }
 
@@ -73,7 +61,6 @@ export default {
     name: 'CloudServiceToolbox',
     components: {
         PToolbox,
-        PTag,
     },
     props: {
         totalCount: {
@@ -83,11 +70,6 @@ export default {
         filters: {
             type: Array,
             default: () => ([]),
-        },
-        /* sync */
-        period: {
-            type: Object,
-            default: () => ({}),
         },
         /* sync */
         queryTags: {
@@ -117,21 +99,11 @@ export default {
             selectedRegions: computed(() => store.state.service.cloudService.selectedRegions),
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
-            periodText: computed<string | undefined>(() => {
-                if (props.period?.start) {
-                    return `${dayjs.utc(props.period.start).format('MMM, YYYY')} ~ ${dayjs.utc(props.period.end).format('MMM, YYYY')}`;
-                }
-                return undefined;
-            }),
         });
 
         /* event */
         const handleChange = async (options: ToolboxOptions = {}) => {
             emit('update-toolbox', options);
-        };
-        const handleDeletePeriod = () => {
-            emit('update:period', undefined);
-            emit('delete-period');
         };
 
         /* excel */
@@ -268,30 +240,8 @@ export default {
         return {
             ...toRefs(state),
             handleChange,
-            handleDeletePeriod,
             handleExport,
         };
     },
 };
 </script>
-<style lang="postcss" scoped>
-.period {
-    @apply mb-4;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    .label {
-        @apply mr-2 font-bold;
-    }
-    .text {
-        @apply text-gray-500 mr-2;
-    }
-}
-
-@screen mobile {
-    .period {
-        .label {
-            @apply block;
-        }
-    }
-}
-</style>

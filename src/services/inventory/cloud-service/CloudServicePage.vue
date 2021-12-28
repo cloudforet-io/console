@@ -16,11 +16,15 @@
                 <p-divider class="cloud-service-divider" />
                 <cloud-service-toolbox :total-count="totalCount"
                                        :filters="filters"
-                                       :period.sync="period"
                                        :query-tags.sync="queryTags"
-                                       @update-toolbox="handleToolbox"
-                                       @delete-period="handleDeletePeriod"
-                />
+                >
+                    <template #period>
+                        <cloud-service-period-filter :period.sync="period"
+                                                     @update-toolbox="handleToolbox"
+                                                     @delete-period="handleDeletePeriod"
+                        />
+                    </template>
+                </cloud-service-toolbox>
                 <p-data-loader class="flex-grow" :data="items" :loading="loading">
                     <div class="cloud-service-type-wrapper">
                         <cloud-service-list-card v-for="(item, idx) in items" :key="`${item.provider}-${item.cloud_service_group}-${idx}`"
@@ -97,11 +101,13 @@ import { Period } from '@/services/billing/cost-management/type';
 import CloudServiceListCard
     from '@/services/inventory/cloud-service/modules/cloud-service-list/CloudServiceListCard.vue';
 import dayjs from 'dayjs';
+import CloudServicePeriodFilter from '@/services/inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
 
 
 export default {
     name: 'CloudServicePage',
     components: {
+        CloudServicePeriodFilter,
         CloudServiceListCard,
         CloudServiceToolbox,
         PVerticalPageLayout,
