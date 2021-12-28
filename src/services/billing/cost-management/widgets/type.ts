@@ -24,11 +24,13 @@ export interface XYChartRawData {
 export interface XYChartData {
     date: string;
     totalCost?: number;
+    aggregation?: number;
     [key: string]: any;
 }
 
 export interface PieChartRawData {
     usd_cost: number;
+    is_etc?: boolean;
     [key: string]: any;
 }
 export interface PieChartData {

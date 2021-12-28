@@ -13,3 +13,14 @@ export interface CostAnalysisPageQueryValue {
     stack?: boolean;
     granularity?: GRANULARITY;
 }
+
+export interface UsdCost {
+    [key: string]: number;
+}
+
+export interface CostAnalyzeModel {
+    total_usd_cost: number;
+    usd_cost: UsdCost;
+    is_etc?: boolean;
+    [key: string]: any;
+}

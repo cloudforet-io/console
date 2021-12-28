@@ -56,6 +56,12 @@ export const getTimeUnitByPeriod = (granularity: GRANULARITY, start: Dayjs, end:
     return 'year';
 };
 
+export const getDateFormatByTimeUnit = (timeUnit: TimeUnit): string => {
+    if (timeUnit === 'month') return 'YYYY-MM';
+    if (timeUnit === 'year') return 'YYYY';
+    return 'YYYY-MM-DD';
+};
+
 export const getInitialDates = (): Period => {
     const start = dayjs.utc().startOf('month').format();
     const end = dayjs.utc().startOf('date').format();

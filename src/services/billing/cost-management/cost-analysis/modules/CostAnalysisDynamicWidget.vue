@@ -28,9 +28,7 @@ import {
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { CURRENCY } from '@/store/modules/display/config';
 
-
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
-import { Period } from '@/services/billing/cost-management/type';
 import { getTimeUnitByPeriod } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
@@ -40,7 +38,6 @@ import {
 import {
     Legend, PieChartData, XYChartData, WidgetProps,
 } from '@/services/billing/cost-management/widgets/type';
-import { TimeUnit } from '@amcharts/amcharts4/core';
 
 
 interface Props extends WidgetProps {
@@ -107,27 +104,12 @@ export default {
         });
 
         /* util */
-        const fillDefaultDataOfLastDay = (chartData: XYChartData[], period: Period, timeUnit: TimeUnit): XYChartData[] => {
-            const convertedChartData = [...chartData];
-            const dataOfLastDate = chartData.find(d => dayjs(period.end).isSame(d.date, timeUnit));
-            if (!dataOfLastDate) {
-                convertedChartData.push({
-                    date: dayjs(period.end).format(),
-                });
-            }
-            return convertedChartData;
-        };
-
         const drawChart = (chartContext) => {
             const timeUnit = getTimeUnitByPeriod(props.granularity, dayjs(props.period.start), dayjs(props.period.end));
 
             let USDChartData = cloneDeep(props.chartData);
-            if (props.granularity !== GRANULARITY.ACCUMULATED) {
-                if (props.stack) {
-                    USDChartData = getStackedChartData(props.chartData as XYChartData[], props.period, timeUnit);
-                } else {
-                    USDChartData = fillDefaultDataOfLastDay(props.chartData as XYChartData[], props.period, timeUnit);
-                }
+            if (props.granularity !== GRANULARITY.ACCUMULATED && props.stack) {
+                USDChartData = getStackedChartData(props.chartData as XYChartData[], props.period, timeUnit);
             }
             state.USDChartData = USDChartData;
 

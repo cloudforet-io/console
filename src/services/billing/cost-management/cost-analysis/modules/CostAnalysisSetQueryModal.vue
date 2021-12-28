@@ -154,7 +154,6 @@ export default {
 
         watch(() => state.proxyVisible, (after) => {
             if (after) {
-                console.log('opened!');
                 state.granularity = store.state.service.costAnalysis.granularity;
                 state.stack = store.state.service.costAnalysis.stack;
                 state.period = store.state.service.costAnalysis.period;

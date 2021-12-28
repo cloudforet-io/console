@@ -94,7 +94,7 @@ export default {
             selectedPeriodMenuItem: undefined,
             customRangeModalVisible: false,
         });
-        const dateFormatter = (date: string, format: string) => i18nDayjs.value(date).utc().format(format);
+        const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
 
         const setPeriod = (period: Period) => {
             state.period = period;

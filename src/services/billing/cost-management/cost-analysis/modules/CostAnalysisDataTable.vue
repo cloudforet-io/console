@@ -43,6 +43,7 @@
 
 <script lang="ts">
 import dayjs from 'dayjs';
+import axios, { CancelTokenSource } from 'axios';
 
 import {
     computed, reactive, toRefs, watch,
@@ -73,17 +74,8 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Location } from 'vue-router';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { Period } from '@/services/billing/cost-management/type';
-import axios, { CancelTokenSource } from 'axios';
+import { CostAnalyzeModel, UsdCost } from '@/services/billing/cost-management/cost-analysis/type';
 
-
-interface UsdCost {
-    [key: string]: number;
-}
-
-interface TableData {
-    total_usd_cost?: number;
-    usd_cost: UsdCost;
-}
 
 export default {
     name: 'CostAnalysisDataTable',
@@ -94,7 +86,7 @@ export default {
     props: {},
     setup(props, { root }) {
         const state = reactive({
-            timeUnit: computed(() => getTimeUnitByPeriod(state.granularity, dayjs(state.period.start), dayjs(state.period.end))),
+            timeUnit: computed(() => getTimeUnitByPeriod(state.granularity, dayjs.utc(state.period.start), dayjs.utc(state.period.end))),
             //
             projects: computed(() => store.state.resource.project.items),
             providers: computed(() => store.state.resource.provider.items),
@@ -115,7 +107,7 @@ export default {
             loading: true,
             fields: [] as DataTableField[],
             excelFields: computed(() => tableState.fields.map(d => ({ key: d.name, name: d.label }))),
-            items: [] as TableData[],
+            items: [] as CostAnalyzeModel[],
             totalCount: 0,
         });
 
@@ -208,16 +200,16 @@ export default {
                 },
             };
         };
-        const _getStackedTableData = (tableData: TableData[], granularity, period): TableData[] => {
+        const _getStackedTableData = (rawData: CostAnalyzeModel[], granularity, period): CostAnalyzeModel[] => {
             let dateFormat = 'YYYY-MM-DD';
             if (granularity === GRANULARITY.MONTHLY) dateFormat = 'YYYY-MM';
             if (granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
-            const results: TableData[] = [];
-            tableData.forEach((d) => {
+            const results: CostAnalyzeModel[] = [];
+            rawData.forEach((d) => {
                 const usdCost: UsdCost = {};
-                let now = dayjs(period.start).clone();
+                let now = dayjs.utc(period.start).clone();
                 let stackedData = 0;
-                while (now.isSameOrBefore(dayjs(period.end), state.timeUnit)) {
+                while (now.isSameOrBefore(dayjs.utc(period.end), state.timeUnit)) {
                     const currValue = d.usd_cost[now.format(dateFormat)] || 0;
                     stackedData += currValue;
                     usdCost[now.format(dateFormat)] = stackedData;

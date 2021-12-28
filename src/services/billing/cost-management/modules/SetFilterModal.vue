@@ -19,13 +19,11 @@
                         :unfolded-indices.sync="unfoldedIndices"
                     >
                         <template #default="{name, isCollapsed}">
-                            <keep-alive>
-                                <cost-analysis-filter-item
-                                    v-if="!isCollapsed"
-                                    :type="name"
-                                    :selected.sync="filters[name]"
-                                />
-                            </keep-alive>
+                            <cost-analysis-filter-item
+                                v-if="!isCollapsed"
+                                :type="name"
+                                :selected.sync="filters[name]"
+                            />
                         </template>
                     </p-collapsible-list>
                 </div>
