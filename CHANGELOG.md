@@ -1,3 +1,10 @@
+# [1.1.0-beta.223](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.222...v1.1.0-beta.223) (2021-12-28)
+
+
+### Bug Fixes
+
+* fix data loader watch bug and dynamic chart type error ([#816](https://github.com/spaceone-dev/spaceone-design-system/issues/816)) ([60493ca](https://github.com/spaceone-dev/spaceone-design-system/commit/60493ca40ce5b5c7368f6bed93ccc06ba1d71e8e))
+
 # [1.1.0-beta.222](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.221...v1.1.0-beta.222) (2021-12-28)
 
 
