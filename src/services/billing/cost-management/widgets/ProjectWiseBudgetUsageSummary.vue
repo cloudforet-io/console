@@ -5,7 +5,8 @@
                                        :no-data="!items.length"
                                        :data-range="20"
     >
-        <p-data-table :items="items"
+        <p-data-table v-if="items.length"
+                      :items="items"
                       :loading="loading"
                       :fields="fields"
                       table-style-type="simple"

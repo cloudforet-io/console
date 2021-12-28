@@ -33,13 +33,14 @@ export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ c
     }
 };
 
-export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, commit }, name): Promise<CostQuerySetModel|Error> => {
+export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, commit, rootState }, name): Promise<CostQuerySetModel|Error> => {
     try {
         const {
             granularity, stack, period,
             groupBy, filters,
         } = state;
         const updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
+            user_id: rootState.user.userId,
             name,
             options: {
                 granularity,

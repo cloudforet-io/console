@@ -197,7 +197,7 @@ export default defineComponent<Props>({
                 series.tooltipText = '{name}: [bold]{valueY}[/]';
                 series.tooltip.label.fontSize = 10;
                 series.stacked = true;
-                series.fill = am4core.color(legend.color);
+                if (legend.color) series.fill = am4core.color(legend.color);
                 return series;
             };
 

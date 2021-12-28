@@ -61,8 +61,8 @@ export default {
             default: () => {},
         },
         queryFilters: {
-            type: String,
-            default: undefined,
+            type: Array,
+            default: () => [],
         },
         selectedRegions: {
             type: Array,

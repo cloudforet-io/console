@@ -133,7 +133,7 @@ export default {
             items: [] as TableItem[],
             fields: computed<DataTableField[]>(() => {
                 const fields: DataTableField[] = [{ name: GROUP_BY.PROJECT, label: 'Project' }];
-                const fiveMonthsAgo = dayjs.utc().subtract(5, 'month');
+                const fiveMonthsAgo = dayjs.utc(props.period.end).subtract(5, 'month');
                 const thisMonth = dayjs.utc();
                 range(6).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');
@@ -239,9 +239,7 @@ export default {
                     start: apiPeriod.start,
                     end: apiPeriod.end,
                     pivot_type: 'TABLE',
-                    page: {
-                        limit: 15,
-                    },
+                    limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;

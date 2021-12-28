@@ -140,9 +140,7 @@ export default {
                     group_by: ['project_id'],
                     start: dayjs.utc(props.period?.start).format('YYYY-MM-DD'),
                     end: dayjs.utc(props.period?.end).endOf('month').format('YYYY-MM-DD'),
-                    page: {
-                        limit: 15,
-                    },
+                    limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
                 return results;

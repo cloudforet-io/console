@@ -142,7 +142,7 @@ export default {
             period: queryStringToObject(SpaceRouter.router.currentRoute.query?.period) as Period | undefined,
             //
             loading: true,
-            items: [] as any[],
+            items: undefined as any,
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
             queryTags: [] as QueryTag[],
@@ -239,6 +239,7 @@ export default {
             // init provider
             let provider: RouteQueryString = currentQuery.provider;
             if (Array.isArray(provider)) provider = queryStringToString(provider[0]);
+            else provider = queryStringToString(provider);
             if (!provider || !state.providers[provider]) provider = 'all';
             store.commit('service/cloudService/setSelectedProvider', provider);
 

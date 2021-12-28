@@ -65,7 +65,7 @@ import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/st
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
-import { objectToQueryString } from '@/lib/router-query-string';
+import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
@@ -180,7 +180,7 @@ export default {
                 query.region = state.filters.region_code;
             }
             if (item.provider) {
-                query.provider = item.provider;
+                query.provider = primitiveToQueryString(item.provider);
             } else if (state.filters.provider?.length) {
                 query.provider = state.filters.provider;
             }
@@ -243,6 +243,7 @@ export default {
             }
             listCostAnalysisRequest = axios.CancelToken.source();
             try {
+                tableState.loading = true;
                 const _convertedFilters = getConvertedFilter(filters);
                 costApiQueryHelper.setFilters(_convertedFilters);
 
@@ -263,6 +264,8 @@ export default {
                 tableState.items = [];
                 tableState.totalCount = 0;
                 ErrorHandler.handleError(e);
+            } finally {
+                tableState.loading = false;
             }
         };
 
@@ -300,12 +303,10 @@ export default {
         };
 
         watch([() => state.granularity, () => state.groupBy, () => state.period, () => state.filters, () => state.stack], async ([granularity, groupBy, period, filters, stack]) => {
-            tableState.loading = true;
             await Promise.all([
                 listCostAnalysisTableData(granularity, groupBy, period, filters, stack),
                 tableState.fields = _getTableFields(granularity, state.groupByItems, period),
             ]);
-            tableState.loading = false;
         }, { immediate: true, deep: true });
 
         return {
