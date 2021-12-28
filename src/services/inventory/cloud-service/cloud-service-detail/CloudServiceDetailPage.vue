@@ -23,19 +23,22 @@
             <div class="page-navigation">
                 <p-breadcrumbs :routes="routeState.route" />
             </div>
-            <template v-if="sidebarState.hasServer">
-                <server-main v-show="sidebarState.selectedItem && sidebarState.selectedItem.resource_type === 'inventory.Server'"
-                             :is-cloud-service="true"
-                             :provider="provider"
-                             :cloud-service-type="sidebarState.serverCloudServiceType"
-                             :cloud-service-group="group"
-                >
-                    <template #usage-overview>
-                        <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem" is-server />
-                    </template>
-                </server-main>
-            </template>
-            <template v-if="sidebarState.selectedItem && sidebarState.selectedItem.resource_type !== 'inventory.Server'">
+            <server-main v-show="sidebarState.selectedItem && sidebarState.isServer"
+                         :is-cloud-service="true"
+                         :disabled="!sidebarState.selectedItem || !sidebarState.isServer"
+                         :provider="provider"
+                         :cloud-service-type="sidebarState.serverCloudServiceType"
+                         :cloud-service-group="group"
+            >
+                <template #usage-overview>
+                    <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem"
+                                                  :filters="tableState.searchFilters"
+                                                  is-server
+                                                  :disabled="!sidebarState.isServer"
+                    />
+                </template>
+            </server-main>
+            <div v-show="sidebarState.selectedItem && !sidebarState.isServer">
                 <p-page-title :title="name"
                               child
                               use-total-count
@@ -44,7 +47,6 @@
                               :selected-count="tableState.selectedItems.length"
                               @goBack="$router.go(-1)"
                 />
-                <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem" />
                 <p-horizontal-layout :height="tableState.tableHeight" @drag-end="onTableHeightChange">
                     <template #container="{ height }">
                         <template v-if="tableState.schema">
@@ -75,6 +77,12 @@
                                     >
                                         {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.ACTION') }}
                                     </p-select-dropdown>
+                                </template>
+                                <template #toolbox-bottom>
+                                    <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem"
+                                                                  :filters="tableState.searchFilters"
+                                                                  :disabled="sidebarState.isServer"
+                                    />
                                 </template>
                             </p-dynamic-layout>
                         </template>
@@ -166,16 +174,16 @@
                                     :options="{provider, cloudServiceGroup: group, cloudServiceType: name}"
                                     @complete="reloadTable"
                 />
-            </template>
+            </div>
         </template>
     </vertical-page-layout>
 </template>
 
 <script lang="ts">
-import { get, find, some } from 'lodash';
+import { get, find } from 'lodash';
 
 import {
-    reactive, computed, getCurrentInstance, ComponentRenderProxy,
+    reactive, computed, getCurrentInstance, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
 import {
@@ -224,6 +232,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import CloudServiceUsageOverview
     from '@/services/inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverview.vue';
 import { CloudServiceTypeInfo } from '@/services/inventory/cloud-service/cloud-service-detail/type';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -296,7 +305,7 @@ export default {
             group: computed(() => sidebarState.cloudServiceTypeList[0]?.group),
             iconUrl: computed<string>(() => get(sidebarState.cloudServiceTypeList[0], ['tags', 'spaceone:icon'], '')),
             selectedItem: undefined as CloudServiceTypeInfo|undefined,
-            hasServer: computed<boolean>(() => some(sidebarState.cloudServiceTypeList, { resource_type: 'inventory.Server' })),
+            isServer: computed<boolean>(() => sidebarState.selectedItem?.resource_type === 'inventory.Server'),
             serverCloudServiceType: computed<string|undefined>(() => find(sidebarState.cloudServiceTypeList, { resource_type: 'inventory.Server' })?.name),
         });
 
@@ -367,6 +376,7 @@ export default {
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
             tableHeight: store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX),
             visibleCustomFieldModal: false,
+            searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
         });
 
         const checkTableModalState = reactive({
@@ -433,7 +443,7 @@ export default {
         const getQuery = (schema?) => {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilters(queryHelper.filters)
+                .setFilters(tableState.searchFilters)
                 .addFilter(
                     { k: 'provider', o: '=', v: props.provider },
                     { k: 'cloud_service_group', o: '=', v: props.group },
@@ -484,16 +494,22 @@ export default {
             }
             if (changed.queryTags !== undefined) {
                 fetchOptionState.queryTags = changed.queryTags;
-                /* api query setting */
-                queryHelper.setFiltersAsQueryTag(changed.queryTags);
-                /* sync updated query tags to url query string */
-                replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             }
 
             const { items, totalCount } = await getCloudServiceTableData();
             tableState.items = items;
             typeOptionState.totalCount = totalCount;
         };
+
+
+        const replaceQueryHelper = new QueryHelper();
+        watch(() => tableState.searchFilters, (searchFilters) => {
+            replaceQueryHelper.setFilters(searchFilters);
+            const filterQueryString = vm.$route.query.filters ?? '';
+            if (replaceQueryHelper.rawQueryString !== JSON.stringify(filterQueryString)) {
+                replaceUrlQuery('filters', replaceQueryHelper.rawQueryStrings);
+            }
+        });
 
         const exportCloudServiceData = async () => {
             try {
