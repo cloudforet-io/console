@@ -1,3 +1,10 @@
+# [1.1.0-beta.225](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.224...v1.1.0-beta.225) (2021-12-28)
+
+
+### Bug Fixes
+
+* apply dynamic field to dynamic widget ([#818](https://github.com/spaceone-dev/spaceone-design-system/issues/818)) ([c2556b6](https://github.com/spaceone-dev/spaceone-design-system/commit/c2556b6f7d37ae164eef47b193b28a7674c611a9))
+
 # [1.1.0-beta.224](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.223...v1.1.0-beta.224) (2021-12-28)
 
 
