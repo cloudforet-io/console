@@ -36,7 +36,7 @@
 
 <script lang="ts">
 import {
-    computed, ComputedRef, defineComponent, reactive, toRefs, watch,
+    computed, ComputedRef, defineComponent, reactive, toRefs, watch, WatchStopHandle,
 } from '@vue/composition-api';
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 import PLottie from '@/foundation/lottie/PLottie.vue';
@@ -175,8 +175,11 @@ export default defineComponent<Props>({
         } else showLoader = computed<boolean>(() => props.loading);
 
 
-        const stopDataLoadCheckWatch = watch(() => showLoader.value, (after, before) => {
-            if (before && !after) {
+        let stopDataLoadCheckWatch: WatchStopHandle;
+        // CAUTION: Do not make stopDataLoadCheckWatch as const variable. Related issue: https://github.com/webpack/webpack/issues/12724
+        // eslint-disable-next-line prefer-const
+        stopDataLoadCheckWatch = watch(() => showLoader.value, (loading) => {
+            if (!loading) {
                 state.dataLoadOccurred = true;
                 if (stopDataLoadCheckWatch) stopDataLoadCheckWatch();
             }

@@ -48,7 +48,7 @@ export default defineComponent<DynamicChartTemplateProps>({
                 if (!props.data.length) return 0;
                 const valueKey = props.valueOptions.key;
                 const maxItem = maxBy(props.data, d => d[valueKey]);
-                return maxItem[valueKey];
+                return maxItem ? maxItem[valueKey] : 0;
             }),
             enrichedData: computed(() => {
                 const max = state.max;

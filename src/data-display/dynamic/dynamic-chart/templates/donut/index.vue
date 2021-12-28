@@ -24,7 +24,7 @@ import {
 } from '@/data-display/dynamic/dynamic-chart/config';
 
 import { DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
-import { drawDummyPieChart, drawPieChart } from '@/data-display/dynamic/dynamic-chart/templates/donut/helper';
+import { drawPieChart } from '@/data-display/dynamic/dynamic-chart/templates/donut/helper';
 import PStatus from '@/data-display/status/PStatus.vue';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
@@ -51,7 +51,6 @@ export default defineComponent<DynamicChartTemplateProps>({
             chart: null as null|PieChart,
             chartRef: null as null|HTMLElement,
             colors: DEFAULT_CHART_COLORS,
-            isDummyChart: false,
         });
 
         const disposeChart = () => {
@@ -64,31 +63,16 @@ export default defineComponent<DynamicChartTemplateProps>({
 
             const chart = am4core.create(ctx, PieChart);
 
-            if (props.data.length) {
-                drawPieChart(chart, props.nameOptions, props.valueOptions);
-                chart.data = props.data;
-                state.isDummyChart = false;
-            } else {
-                drawDummyPieChart(chart, props.nameOptions, props.valueOptions);
-                state.isDummyChart = true;
-            }
+            drawPieChart(chart, props.nameOptions, props.valueOptions);
+
+            chart.data = props.data;
 
             state.chart = chart;
         };
 
         const updateChartData = (data: any[]) => {
             if (state.chart) {
-                if (!data.length && state.isDummyChart) {
-                    return;
-                }
-
-                if (data.length && !state.isDummyChart) {
-                    state.chart.data = data;
-                    return;
-                }
-
-                disposeChart();
-                drawChart();
+                state.chart.data = data;
             }
         };
 

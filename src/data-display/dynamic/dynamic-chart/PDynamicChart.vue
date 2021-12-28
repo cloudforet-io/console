@@ -1,14 +1,13 @@
 <template>
     <div class="p-dynamic-chart">
         <p-data-loader :loading="loading"
-                       disable-empty-case
+                       :data="data"
                        loader-type="skeleton"
         >
             <component :is="component"
-                       :data="slicedData"
+                       :data="data"
                        :value-options="valueOptions"
                        :name-options="nameOptions"
-                       :limit="limit"
                        class="chart"
             />
         </p-data-loader>
@@ -27,7 +26,6 @@ import {
     DynamicChartProps,
 } from '@/data-display/dynamic/dynamic-chart/type';
 import {
-    DEFAULT_LIMIT,
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_TYPE,
 } from '@/data-display/dynamic/dynamic-chart/config';
@@ -57,21 +55,12 @@ export default defineComponent<DynamicChartProps>({
             type: Object as () => DynamicChartProps['nameOptions'],
             default: () => ({ ...DEFAULT_NAME_OPTIONS }),
         },
-        limit: {
-            type: Number,
-            default: DEFAULT_LIMIT,
-        },
     },
     setup(props) {
         // noinspection TypeScriptCheckImport
         const state = reactive({
             component: null as any,
             loader: computed<() => Promise<any>>(() => () => import(/* webpackMode: "eager" */ `./templates/${props.type.toLowerCase()}/index.vue`)) as unknown as () => Promise<any>,
-            slicedData: computed(() => {
-                if (!Array.isArray(props.data)) return [];
-                if (props.limit) return props.data.slice(0, props.limit - 1);
-                return props.data.slice(0, DEFAULT_LIMIT);
-            }),
         });
 
         const getComponent = async () => {

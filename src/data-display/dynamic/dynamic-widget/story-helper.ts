@@ -119,7 +119,6 @@ export const getDynamicWidgetArgTypes = (): ArgTypes => {
         type: 'chart_type',
         valueOptions: 'value_options',
         nameOptions: 'name_options',
-        limit: 'limit',
     };
 
     Object.keys(dynamicChartPropsToSchemaOptions).forEach((chartProp) => {

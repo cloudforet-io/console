@@ -93,22 +93,4 @@ export const getDynamicChartArgTypes = (): ArgTypes => ({
             type: 'object',
         },
     },
-    limit: {
-        name: 'limit',
-        type: { name: 'number' },
-        description: 'The limit count of table data row.',
-        defaultValue: 10,
-        table: {
-            type: {
-                summary: 'number',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 10,
-            },
-        },
-        control: {
-            type: 'number',
-        },
-    },
 });

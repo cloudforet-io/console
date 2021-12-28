@@ -12,5 +12,4 @@ export interface DynamicChartTemplateProps<T=any> {
 export interface DynamicChartProps<T=any> extends DynamicChartTemplateProps<T> {
     type: DynamicChartType;
     loading: boolean;
-    limit: number;
 }

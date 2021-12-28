@@ -16,7 +16,7 @@ import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS,
 } from '@/data-display/dynamic/dynamic-chart/config';
-import { drawDummyTreemapChart, drawTreemapChart } from '@/data-display/dynamic/dynamic-chart/templates/treemap/helper';
+import { drawTreemapChart } from '@/data-display/dynamic/dynamic-chart/templates/treemap/helper';
 import { DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
 
 export default defineComponent<DynamicChartTemplateProps>({
@@ -39,7 +39,6 @@ export default defineComponent<DynamicChartTemplateProps>({
         const state = reactive({
             chart: null as null|TreeMap,
             chartRef: null as null|HTMLElement,
-            isDummyChart: false,
         });
 
         const disposeChart = () => {
@@ -52,31 +51,16 @@ export default defineComponent<DynamicChartTemplateProps>({
 
             const chart = am4core.create(ctx, TreeMap);
 
-            if (props.data.length) {
-                drawTreemapChart(chart, props.nameOptions, props.valueOptions);
-                chart.data = props.data;
-                state.isDummyChart = false;
-            } else {
-                drawDummyTreemapChart(chart, props.nameOptions, props.valueOptions);
-                state.isDummyChart = true;
-            }
+            drawTreemapChart(chart, props.nameOptions, props.valueOptions);
+
+            chart.data = props.data;
 
             state.chart = chart;
         };
 
         const updateChartData = (data: any[]) => {
             if (state.chart) {
-                if (!data.length && state.isDummyChart) {
-                    return;
-                }
-
-                if (data.length && !state.isDummyChart) {
-                    state.chart.data = data;
-                    return;
-                }
-
-                disposeChart();
-                drawChart();
+                state.chart.data = data;
             }
         };
 
