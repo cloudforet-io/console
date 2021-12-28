@@ -59,3 +59,11 @@ export type ProjectGroupTreeItem = Partial<ProjectTreeItem>
 
 
 export type MAINTENANCE_WINDOW_STATE = typeof MAINTENANCE_WINDOW_STATE[keyof typeof MAINTENANCE_WINDOW_STATE]
+
+export const SUMMARY_TYPE = Object.freeze({
+    COMPUTE: 'Compute',
+    DATABASE: 'Database',
+    STORAGE: 'Storage',
+} as const);
+
+export type SUMMARY_TYPE = typeof SUMMARY_TYPE[keyof typeof SUMMARY_TYPE];

@@ -67,15 +67,15 @@
                                     </div>
                                 </template>
                                 <template v-else>
-                                    <div v-for="summary in projectSummaryList" :key="`summary-${summary.title}-${item.project_id}`" class="project-summary-item">
+                                    <div v-for="{ title, summaryType } in projectSummaryList" :key="`summary-${title}-${item.project_id}`" class="project-summary-item">
                                         <div class="summary-item-text">
-                                            {{ summary.title }}
+                                            {{ title }}
                                         </div>
                                         <router-link v-if="cardSummary[item.project_id]"
                                                      class="summary-item-num"
-                                                     :to="getLocation(item.project_id, INVENTORY_ROUTE.SERVER._NAME)"
+                                                     :to="getLocation(summaryType, INVENTORY_ROUTE.CLOUD_SERVICE._NAME, item.project_id)"
                                         >
-                                            {{ cardSummary[item.project_id].serverCount }}
+                                            {{ getItemSummaryCount(summaryType, item.project_id) }}
                                         </router-link>
                                         <span v-else class="summary-item-num none">N/A</span>
                                     </div>
@@ -148,7 +148,17 @@ import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { i18n } from '@/translations';
+import bytes from 'bytes';
+import { SUMMARY_TYPE } from '@/services/project/type';
+import { arrayToQueryString } from '@/lib/router-query-string';
 
+interface CardSummary {
+    [projectId: string]: {
+        Compute: number;
+        Database: number;
+        Storage: number;
+    };
+}
 
 export default {
     name: 'ProjectCardList',
@@ -177,7 +187,7 @@ export default {
             pageStart: 1,
             pageSize: 24,
             allPage: computed(() => getAllPage(state.totalCount, (state.pageSize))),
-            cardSummary: {},
+            cardSummary: {} as CardSummary,
             // showAllProjects: false,
             noProject: computed(() => state.totalCount === 0),
             hoveredProjectId: '',
@@ -191,12 +201,21 @@ export default {
                 set(val) { store.commit('service/project/setProjectFormVisible', val); },
             }),
             projectSummaryList: computed(() => [
-                { title: i18n.t('PROJECT.LANDING.COMPUTE') },
-                { title: i18n.t('PROJECT.LANDING.DATABASE') },
-                { title: i18n.t('PROJECT.LANDING.STORAGE') },
+                { title: i18n.t('PROJECT.LANDING.COMPUTE'), summaryType: SUMMARY_TYPE.COMPUTE },
+                { title: i18n.t('PROJECT.LANDING.DATABASE'), summaryType: SUMMARY_TYPE.DATABASE },
+                { title: i18n.t('PROJECT.LANDING.STORAGE'), summaryType: SUMMARY_TYPE.STORAGE },
             ]),
         });
 
+        const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
+        const getItemSummaryCount = (summaryType, projectId) => {
+            if (state.cardSummary) {
+                let summaryCount = state.cardSummary[projectId][summaryType];
+                if (summaryType === SUMMARY_TYPE.STORAGE) summaryCount = summaryCount ? byteFormatter(summaryCount) : 0;
+                return summaryCount;
+            }
+            return {};
+        };
         const getProvider = name => vm.$store.state.resource.provider.items[name] || {};
         const goToServiceAccount = (provider) => {
             vm.$router.push({
@@ -238,19 +257,18 @@ export default {
             }
 
             getCardToken = axios.CancelToken.source();
-            const cardSummary = {};
+            const cardSummary: CardSummary = {};
             state.cardSummaryLoading = true;
             try {
                 const ids = items?.map(item => item.project_id);
                 const res = await SpaceConnector.client.statistics.topic.projectPage({
                     projects: ids,
                 }, { cancelToken: getCardToken.token });
-
                 res.results.forEach((d) => {
                     cardSummary[d.project_id] = {
-                        ...d,
-                        cloudServiceCount: d.cloud_service_count || 0,
-                        serverCount: d.server_count || 0,
+                        Compute: d.compute_count || 0,
+                        Database: d.database_count || 0,
+                        Storage: d.storage_size || 0,
                     };
                 });
                 getCardToken = undefined;
@@ -321,9 +339,13 @@ export default {
         };
 
         const queryHelper = new QueryHelper();
-        const getLocation = (projectId, name) => ({
+        const getLocation = (serviceType: SUMMARY_TYPE, name, projectId) => ({
             name,
-            query: { filters: queryHelper.setFilters([{ k: 'project_id', v: projectId, o: '=' }]).rawQueryStrings },
+            query: {
+                provider: 'all',
+                service: arrayToQueryString([serviceType]),
+                filters: queryHelper.setFilters([{ k: 'project_id', v: [projectId], o: '=' }]).rawQueryStrings[0],
+            },
         });
 
         const createProject = async (item) => {
@@ -362,6 +384,9 @@ export default {
             listProjects,
             getLocation,
             createProject,
+            byteFormatter,
+            getItemSummaryCount,
+            SUMMARY_TYPE,
         };
     },
 };
