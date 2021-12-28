@@ -135,10 +135,6 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.budget-progress-bar {
-    margin-top: 1rem;
-}
-
 >>> .progress-bar {
     .background-bar {
         height: 0.75rem;

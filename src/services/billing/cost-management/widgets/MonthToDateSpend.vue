@@ -197,7 +197,7 @@ export default {
     }
 }
 .range {
-    @apply text-gray-500;
+    @apply text-gray-600;
     font-size: 0.875rem;
     line-height: 150%;
 }
