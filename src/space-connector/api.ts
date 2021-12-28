@@ -4,7 +4,7 @@ import axios, {
 import jwt from 'jsonwebtoken';
 import {
     AxiosPostResponse,
-    MockInfo, SessionTimeoutCallback
+    SessionTimeoutCallback
 } from '@src/space-connector/type';
 import {
     APIError, AuthenticationError,
@@ -16,10 +16,6 @@ const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/refresh';
 const IS_REFRESHING_KEY = 'spaceConnector/isRefreshing';
-
-const setMockMode = (request: AxiosRequestConfig, mockEndpoint?: string) => {
-    if (mockEndpoint) request.baseURL = mockEndpoint;
-};
 
 class API {
     instance: AxiosInstance;
@@ -38,11 +34,8 @@ class API {
         }
     };
 
-    private mockInfo: MockInfo = {};
-
-    constructor(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback, mockInfo: MockInfo) {
+    constructor(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback) {
         this.sessionTimeoutCallback = sessionTimeoutCallback;
-        this.mockInfo = mockInfo;
 
         const axiosConfig = this.getAxiosConfig(baseURL);
         this.instance = axios.create(axiosConfig);
@@ -146,10 +139,6 @@ class API {
             this.defaultAxiosConfig.baseURL = baseURL;
         }
 
-        if (this.mockInfo.all) {
-            setMockMode(this.defaultAxiosConfig, this.mockInfo.endpoint);
-        }
-
         return this.defaultAxiosConfig;
     }
 
@@ -181,10 +170,6 @@ class API {
             // Set the access token
             const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
             request.headers.Authorization = `Bearer ${storedAccessToken}`;
-            // Set mock mode
-            if (request.headers.MOCK_MODE) {
-                setMockMode(request, this.mockInfo.endpoint);
-            }
 
             return request;
         });
