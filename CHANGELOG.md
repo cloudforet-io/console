@@ -1,3 +1,10 @@
+# [1.1.0-beta.224](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.223...v1.1.0-beta.224) (2021-12-28)
+
+
+### Bug Fixes
+
+* fix wrong prop drilling bug in Dynamic Widget chart type ([#817](https://github.com/spaceone-dev/spaceone-design-system/issues/817)) ([b55ac05](https://github.com/spaceone-dev/spaceone-design-system/commit/b55ac0549e53f399b18e1c3a990071f47aaf2bce))
+
 # [1.1.0-beta.223](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.222...v1.1.0-beta.223) (2021-12-28)
 
 
