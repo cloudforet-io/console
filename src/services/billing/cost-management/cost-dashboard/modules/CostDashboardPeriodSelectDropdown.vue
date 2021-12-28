@@ -19,6 +19,8 @@
                                             :visible.sync="customRangeModalVisible"
                                             :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
                                             :datetime-picker-data-type="DATA_TYPE.yearToMonth"
+                                            :min-date="minDate"
+                                            :max-date="maxDate"
                                             @confirm="handleCustomRangeModalConfirm"
         />
     </div>
@@ -90,6 +92,8 @@ export default {
             ])),
             selectedMonthMenuItem: undefined,
             customRangeModalVisible: false,
+            minDate: dayjs.utc().subtract(11, 'month').format('YYYY-MM'),
+            maxDate: dayjs.utc().format('YYYY-MM'),
         });
         const savePeriod = (start, end) => {
             const _start = dayjs(start).startOf('month').format('YYYY-MM-DD');

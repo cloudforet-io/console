@@ -14,13 +14,17 @@
                            :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.FROM')"
                            required
             >
-                <p-datetime-picker class="datetime-picker" :data-type="datetimePickerDataType" :selected-dates.sync="startDate" />
+                <p-datetime-picker class="datetime-picker" :data-type="datetimePickerDataType" :selected-dates.sync="startDate"
+                                   :min-date="minDate" :max-date="maxDate"
+                />
             </p-field-group>
             <p-field-group class="period-select"
                            :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TO')"
                            required
             >
-                <p-datetime-picker class="datetime-picker" :data-type="datetimePickerDataType" :selected-dates.sync="endDate" />
+                <p-datetime-picker class="datetime-picker" :data-type="datetimePickerDataType" :selected-dates.sync="endDate"
+                                   :min-date="minDate" :max-date="maxDate"
+                />
             </p-field-group>
         </template>
     </p-button-modal>
@@ -50,6 +54,14 @@ export default {
         datetimePickerDataType: {
             type: String,
             default: DATA_TYPE.yearToDate,
+        },
+        minDate: {
+            type: String,
+            default: undefined,
+        },
+        maxDate: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props, { emit }) {
