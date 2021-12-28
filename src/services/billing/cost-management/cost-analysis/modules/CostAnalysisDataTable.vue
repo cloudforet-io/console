@@ -4,7 +4,6 @@
                      :items="tableState.items"
                      :total-count="tableState.totalCount"
                      :searchable="false"
-                     sortable
                      exportable
                      @change="handleChange"
                      @refresh="handleChange()"
@@ -13,7 +12,7 @@
         <template #col-format="{field, value, item}">
             <span v-if="tableState.loading" />
             <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
-                {{ `No ${GROUP_BY_ITEM_MAP[field.name].label}` }}
+                --
             </span>
             <span v-else-if="field.name === GROUP_BY.PROJECT">
                 {{ projects[value] ? projects[value].label : value }}
@@ -295,10 +294,8 @@ export default {
         };
 
         watch([() => state.granularity, () => state.groupBy, () => state.period, () => state.filters, () => state.stack], async ([granularity, groupBy, period, filters, stack]) => {
-            await Promise.all([
-                listCostAnalysisTableData(granularity, groupBy, period, filters, stack),
-                tableState.fields = _getTableFields(granularity, state.groupByItems, period),
-            ]);
+            await listCostAnalysisTableData(granularity, groupBy, period, filters, stack);
+            tableState.fields = _getTableFields(granularity, state.groupByItems, period);
         }, { immediate: true, deep: true });
 
         return {

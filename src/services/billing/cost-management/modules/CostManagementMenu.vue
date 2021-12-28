@@ -1,6 +1,6 @@
 <template>
     <aside class="sidebar-menu">
-        <sidebar-title :title="$t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES')" />
+        <!--        <sidebar-title :title="$t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES')" />-->
         <sidebar-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
         <cost-dashboard-list />
         <div v-for="(item) in menuList" :key="item.label"

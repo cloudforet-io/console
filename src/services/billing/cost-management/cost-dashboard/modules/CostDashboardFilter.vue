@@ -4,19 +4,18 @@
             <span class="label">{{ $t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER') }}:</span>
             {{ appliedFilterDescription }}
         </p>
-        <p-button
-            style-type="gray-border"
-            size="sm"
-            @click.stop="handleClickViewFilter"
+        <p-button v-if="!isAdmin && !noFilter"
+                  style-type="gray-border"
+                  size="sm"
+                  @click.stop="handleClickViewFilter"
         >
             {{ $t('BILLING.COST_MANAGEMENT.MAIN.VIEW_FILTER') }}
         </p-button>
-        <div class="left-divider">
-            <p-icon-button name="ic_setting" style-type="gray900" size="sm"
-                           outline
-                           @click="handleClickSelectFilter"
-            />
-        </div>
+        <p-icon-button v-if="isAdmin"
+                       name="ic_setting" style-type="gray900" size="sm"
+                       outline
+                       @click="handleClickSelectFilter"
+        />
         <view-filter-modal :visible.sync="viewFilterModalVisible"
                            :selected-filters="proxyFilters"
         />
@@ -29,6 +28,8 @@
 </template>
 
 <script lang="ts">
+import { isEmpty } from 'lodash';
+
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { PButton, PIconButton } from '@spaceone/design-system';
@@ -72,6 +73,7 @@ export default {
     },
     setup(props: Props, { emit, root }) {
         const state = reactive({
+            isAdmin: computed(() => store.getters['user/isAdmin']),
             proxyFilters: makeProxy('filters', props, emit),
             filterItems: [
                 { name: FILTER.PROJECT, title: FILTER_ITEM_MAP[FILTER.PROJECT].label },
@@ -97,6 +99,7 @@ export default {
                 });
                 return itemsMap;
             }),
+            noFilter: computed(() => isEmpty(state.filterItemsMap) || Object.values(state.proxyFilters).every(d => !d)),
             viewFilterModalVisible: false,
             selectFilterModalVisible: false,
             appliedFilterDescription: computed<string>(() => {

@@ -120,10 +120,10 @@ export default defineComponent<Props>({
             items: [] as TableItem[],
             fields: computed<DataTableField[]>(() => {
                 const fields: DataTableField[] = [{ name: props.groupBy, label: GROUP_BY_ITEM_MAP[props.groupBy].label }];
-                const fiveMonthsAgo = dayjs.utc(props.period.end).subtract(5, 'month');
+                const startMonth = dayjs.utc(props.period.end).subtract(3, 'month');
                 const thisMonth = dayjs.utc();
-                range(6).forEach((d) => {
-                    const date = fiveMonthsAgo.add(d, 'month');
+                range(4).forEach((d) => {
+                    const date = startMonth.add(d, 'month');
                     fields.push({
                         name: `usd_cost.${date.format('YYYY-MM')}`,
                         label: thisMonth.isSame(date, 'month') ? `${date.format('MMM')} (MTD)` : date.format('MMM'),
@@ -213,7 +213,7 @@ export default defineComponent<Props>({
             return chart;
         };
         const _getApiPeriod = (period: Period): Period => ({
-            start: dayjs(period.end).subtract(5, 'month').format('YYYY-MM'),
+            start: dayjs(period.end).subtract(3, 'month').format('YYYY-MM'),
             end: dayjs.utc(period.end).endOf('month').format('YYYY-MM-DD'),
         });
 
@@ -311,13 +311,13 @@ export default defineComponent<Props>({
     @apply grid grid-cols-12;
     min-height: 24rem;
     .chart-wrapper {
-        @apply col-span-6;
+        @apply col-span-5;
         .chart {
             height: 100%;
         }
     }
     .table-wrapper {
-        @apply flex flex-col col-span-6;
+        @apply flex flex-col col-span-7;
         .cost-dashboard-data-table {
             @apply flex flex-col flex-grow;
             .p-data-table {

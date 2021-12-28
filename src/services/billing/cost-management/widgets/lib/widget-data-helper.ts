@@ -7,7 +7,7 @@ import { CurrencyRates } from '@/store/modules/display/type';
 
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
-import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
+import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { Period } from '@/services/billing/cost-management/type';
 import {
     ChartData, Legend, PieChartData, PieChartRawData, XYChartData, XYChartRawData,
@@ -75,7 +75,7 @@ const _getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: string): 
  */
 export const getPieChartData = (rawData: PieChartRawData[], groupBy: string): PieChartData[] => rawData.map((d) => {
     let groupByName = d[groupBy];
-    if (!groupByName) groupByName = `No ${GROUP_BY_ITEM_MAP[groupBy].label}`;
+    if (!groupByName) groupByName = 'Unknown';
     return {
         category: groupByName,
         value: d.usd_cost,
@@ -130,7 +130,7 @@ export const getXYChartDataAndLegends = (rawData: XYChartRawData[], groupBy?: st
                 let groupByName = value[groupBy];
                 if (!groupByName) {
                     if (value.is_etc) groupByName = 'Aggregation of the rest';
-                    else groupByName = `No ${GROUP_BY_ITEM_MAP[groupBy].label}`;
+                    else groupByName = 'Unknown';
                 }
                 eachChartData[groupByName] = value.usd_cost;
                 groupByNameSet.add(groupByName);

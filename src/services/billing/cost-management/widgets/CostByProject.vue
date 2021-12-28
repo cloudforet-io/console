@@ -43,12 +43,13 @@ import { store } from '@/store';
 import { PChartLoader, PSkeleton } from '@spaceone/design-system';
 
 const categoryKey = 'projectId';
-const valueName = 'usd_cost';
+const valueName = 'usdCost';
 
 interface ChartData {
     projectId: string;
     projectName: string;
-    cost: number;
+    usdCost: number;
+    cost: number | string;
 }
 
 export default {
@@ -152,12 +153,18 @@ export default {
             try {
                 state.loading = true;
                 const rawData = await fetchData();
-                state.data = rawData.map(d => ({
-                    projectId: d.project_id,
-                    usd_cost: d.usd_cost > 0 ? d.usd_cost : 0,
-                    cost: currencyMoneyFormatter(d.usd_cost, props.currency, props.currencyRates, false, 10000000),
-                    projectName: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'No Project',
-                }));
+                const chartData: ChartData[] = [];
+                rawData.forEach((d) => {
+                    if (d.usd_cost > 0) {
+                        chartData.push({
+                            projectId: d.project_id,
+                            usdCost: d.usd_cost,
+                            cost: currencyMoneyFormatter(d.usd_cost, props.currency, props.currencyRates, false, 10000000),
+                            projectName: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'No Project',
+                        });
+                    }
+                });
+                state.data = chartData;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.data = [];

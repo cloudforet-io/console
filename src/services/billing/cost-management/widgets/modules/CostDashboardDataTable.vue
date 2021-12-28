@@ -19,7 +19,7 @@
                         />
                         <slot :name="`${name}-format`" v-bind="{ value }">
                             <span v-if="Object.values(GROUP_BY).includes(name) && !value">
-                                {{ `No ${GROUP_BY_ITEM_MAP[name].label}` }}
+                                Unknown
                             </span>
                             <span v-else-if="name === GROUP_BY.PROJECT">
                                 {{ projects[value] ? projects[value].label : value }}
@@ -75,7 +75,7 @@ import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets'
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { CURRENCY } from '@/store/modules/display/config';
-import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
+import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { store } from '@/store';
 
 
@@ -218,7 +218,6 @@ export default {
         return {
             ...toRefs(state),
             GROUP_BY,
-            GROUP_BY_ITEM_MAP,
             getStatusText,
             getStatusIconColor,
             getStatusTextColor,

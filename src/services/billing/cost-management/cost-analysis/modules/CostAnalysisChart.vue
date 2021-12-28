@@ -32,18 +32,22 @@
                     />
                 </div>
             </div>
-            <p-data-loader :loading="false" :data="filterItemsMap" class="filter-wrapper">
-                <template v-for="(selectedItems, filterName, idx) in filterItemsMap">
-                    <p-tag v-for="(item, itemIdx) in selectedItems" :key="`selected-tag-${idx}-${item.name}`"
-                           @delete="handleDeleteFilterTag(filterName, itemIdx)"
-                    >
-                        <b>{{ FILTER_ITEM_MAP[filterName].label }}: </b>{{ item.label }}
-                    </p-tag>
+            <div class="filter-wrapper">
+                <template v-if="noFilter">
+                    <p-empty>
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_FILTERS') }}
+                    </p-empty>
                 </template>
-                <template #no-data>
-                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_FILTERS') }}
+                <template v-else>
+                    <template v-for="(selectedItems, filterName, idx) in filterItemsMap">
+                        <p-tag v-for="(item, itemIdx) in selectedItems" :key="`selected-tag-${idx}-${item.name}`"
+                               @delete="handleDeleteFilterTag(filterName, itemIdx)"
+                        >
+                            <b>{{ FILTER_ITEM_MAP[filterName].label }}: </b>{{ item.label }}
+                        </p-tag>
+                    </template>
                 </template>
-            </p-data-loader>
+            </div>
 
             <!--legend-->
             <div class="title-wrapper">
@@ -84,13 +88,16 @@
         <set-filter-modal :visible.sync="filterModalVisible"
                           :selected-filters="filters"
                           :filter-items="filterItems"
+                          @confirm="handleConfirmFilterModal"
         />
     </div>
 </template>
 
 <script lang="ts">
 import dayjs from 'dayjs';
-import { cloneDeep, debounce, sum } from 'lodash';
+import {
+    cloneDeep, debounce, sum, isEmpty,
+} from 'lodash';
 import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 import axios, { CancelTokenSource } from 'axios';
 
@@ -99,7 +106,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButton, PIconButton, PSelectDropdown, PStatus, PTag, PDataLoader,
+    PButton, PIconButton, PSelectDropdown, PStatus, PTag, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
 
 import CostAnalysisDynamicWidget
@@ -112,20 +119,26 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helper';
 import {
-    getConvertedFilter, getDateFormatByTimeUnit, getTimeUnitByPeriod,
+    getConvertedFilter, getTimeUnitByPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import {
     Legend, PieChartRawData, PieChartData, XYChartData,
 } from '@/services/billing/cost-management/widgets/type';
 import {
-    FILTER_ITEM_MAP, GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP,
+    FILTER_ITEM_MAP, GRANULARITY, GROUP_BY,
 } from '@/services/billing/cost-management/lib/config';
 import { CostAnalyzeModel } from '@/services/billing/cost-management/cost-analysis/type';
 import { Period } from '@/services/billing/cost-management/type';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 import { store } from '@/store';
 
+
+const DATE_FORMAT = Object.freeze({
+    day: 'YYYY-MM-DD',
+    month: 'YYYY-MM',
+    year: 'YYYY',
+});
 
 export default {
     name: 'CostAnalysisChart',
@@ -138,6 +151,7 @@ export default {
         PStatus,
         PTag,
         PDataLoader,
+        PEmpty,
     },
     setup() {
         const state = reactive({
@@ -147,6 +161,7 @@ export default {
             filters: computed(() => store.state.service.costAnalysis.filters),
             chartGroupBy: store.state.service.costAnalysis.groupBy[0],
             //
+            noFilter: computed(() => isEmpty(state.filterItemsMap) || Object.values(state.filters).every(d => !d)),
             groupByItems: computed(() => store.getters['service/costAnalysis/groupByItems']),
             filterItemsMap: computed(() => store.getters['service/costAnalysis/filterItemsMap']),
             filterItems: computed(() => Object.values(FILTER_ITEM_MAP).map(item => ({
@@ -194,7 +209,7 @@ export default {
                             _label = 'Aggregation of the rest';
                         } else {
                             _name = `no_${groupBy}`;
-                            _label = `No ${GROUP_BY_ITEM_MAP[groupBy].label}`;
+                            _label = 'Unknown';
                         }
                     }
                     legends.push({
@@ -210,7 +225,7 @@ export default {
         const getXYChartData = (rawData: CostAnalyzeModel[], granularity: GRANULARITY, period: Period, groupBy?: GROUP_BY): XYChartData[] => {
             const chartData: XYChartData[] = [];
             const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
-            const dateFormat = getDateFormatByTimeUnit(timeUnit);
+            const dateFormat = DATE_FORMAT[timeUnit];
 
             let now = dayjs.utc(period.start).clone();
             while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
@@ -248,7 +263,7 @@ export default {
             } else if (rawData.length) {
                 chartData = [{
                     category: 'Total Cost',
-                    value: rawData[0]?.usd_cost || 0,
+                    value: rawData[0]?.usd_cost ?? 0,
                 }];
             }
             return chartData;
@@ -333,6 +348,9 @@ export default {
             }
             store.commit('service/costAnalysis/setFilters', _filters);
         };
+        const handleConfirmFilterModal = (filters) => {
+            store.commit('service/costAnalysis/setFilters', filters);
+        };
 
         watch(() => state.groupByItems, (after, before) => {
             if (!after.length) {
@@ -358,6 +376,7 @@ export default {
             handleClickSelectFilter,
             handleDeleteFilterTag,
             handleClearAllFilters,
+            handleConfirmFilterModal,
         };
     },
 };
