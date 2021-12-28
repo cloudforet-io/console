@@ -102,7 +102,7 @@ export default defineComponent<Props>({
             usageOverviewDetailModalVisible: false,
             widgetSchemaList: [] as DynamicWidgetSchema[],
             layoutLoading: true,
-            dataList: [] as Data[][], // statistics api data is always list type.
+            dataList: [] as Data[],
             dataLoading: false,
             cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo?.cloud_service_type_id ?? ''),
             apiFilter: computed<Filter[]|undefined>(() => {
@@ -131,7 +131,7 @@ export default defineComponent<Props>({
                     options,
                 }, {
                     mockMode: true,
-                    mockPath: '?schema=widget',
+                    mockPath: '?schema=widget&widget_type=card',
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -139,7 +139,7 @@ export default defineComponent<Props>({
             }
         };
 
-        const fetchDataWithSchema = async (schema: DynamicWidgetSchema): Promise<Data[]> => {
+        const fetchDataWithSchema = async (schema: DynamicWidgetSchema): Promise<Data> => {
             try {
                 const { results } = await SpaceConnector.client.inventory.cloudService.stat({
                     query: schema.query,
@@ -149,10 +149,10 @@ export default defineComponent<Props>({
                 }, {
                     mockMode: true,
                 });
-                return results;
+                return results[0] ?? {};
             } catch (e) {
                 ErrorHandler.handleError(e);
-                return [];
+                return {};
             }
         };
 
@@ -169,7 +169,7 @@ export default defineComponent<Props>({
             const results = await Promise.allSettled(state.widgetSchemaList.map(schema => fetchDataWithSchema(schema)));
             state.dataList = results.map((d) => {
                 if (d.status === 'fulfilled') return d.value;
-                return [];
+                return {};
             });
             state.dataLoading = false;
         };
