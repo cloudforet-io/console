@@ -9,8 +9,8 @@
         <p-dynamic-chart :type="schemaOptions.chart_type || 'COLUMN'"
                          :data="data"
                          :loading="loading"
-                         :value-options="schemaOptions.value_options || {}"
-                         :name-options="schemaOptions.name_options || {}"
+                         :value-options="schemaOptions.value_options"
+                         :name-options="schemaOptions.name_options"
                          :limit="schemaOptions.limit || 10"
         />
     </p-pane-layout>

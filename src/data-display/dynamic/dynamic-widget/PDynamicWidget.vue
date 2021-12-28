@@ -82,3 +82,9 @@ export default defineComponent<DynamicWidgetProps>({
     },
 });
 </script>
+
+<style lang="postcss">
+.p-dynamic-widget {
+    @apply overflow-hidden;
+}
+</style>
