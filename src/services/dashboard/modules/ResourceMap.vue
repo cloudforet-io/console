@@ -14,7 +14,7 @@
                     <div id="chartRef" ref="chartRef" class="chart" />
                 </p-chart-loader>
                 <div v-if="!loading" class="circle-wrapper">
-                    <div v-for="(item) in chartState.providerList" :key="item.name">
+                    <div v-for="(item) in chartState.providers" :key="item.name">
                         <p class="circle" :style="{background: item.color}" /><span>{{ item.name }}</span>
                     </div>
                 </div>
@@ -126,10 +126,11 @@ export default {
             registry: {},
             chartData: [] as object[],
             skeletons: range(5),
-            providerList: computed(() => Object.values(state.providers as Provider[]).map(d => ({
-                name: d.label,
-                color: d.color,
-            }))),
+            providers: computed(() => state.data.map(d => ({
+                name: state.providers[d.provider]?.label,
+                color: state.providers[d.provider]?.color as string,
+            }))
+                .filter((data, index, arr) => arr.findIndex(item => item.name === data.name) === index)),
             marker: null,
         });
 
