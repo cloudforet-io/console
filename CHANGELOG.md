@@ -1,3 +1,10 @@
+# [1.1.0-beta.222](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.221...v1.1.0-beta.222) (2021-12-28)
+
+
+### Features
+
+* add immediate mode and optionally register watch in data loader ([#815](https://github.com/spaceone-dev/spaceone-design-system/issues/815)) ([cd61f1a](https://github.com/spaceone-dev/spaceone-design-system/commit/cd61f1a92ed5a23223908530a03bc99938d335f2))
+
 # [1.1.0-beta.221](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.220...v1.1.0-beta.221) (2021-12-27)
 
 
