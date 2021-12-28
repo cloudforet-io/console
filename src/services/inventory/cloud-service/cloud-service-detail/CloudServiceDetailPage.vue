@@ -44,6 +44,7 @@
                               :selected-count="tableState.selectedItems.length"
                               @goBack="$router.go(-1)"
                 />
+                <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem" />
                 <p-horizontal-layout :height="tableState.tableHeight" @drag-end="onTableHeightChange">
                     <template #container="{ height }">
                         <template v-if="tableState.schema">
@@ -74,9 +75,6 @@
                                     >
                                         {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.ACTION') }}
                                     </p-select-dropdown>
-                                </template>
-                                <template #toolbox-bottom>
-                                    <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem" />
                                 </template>
                             </p-dynamic-layout>
                         </template>

@@ -7,6 +7,7 @@
                       :child="isCloudService"
                       @goBack="$router.go(-1)"
         />
+        <slot name="usage-overview" />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-dynamic-layout v-if="tableState.schema"
@@ -38,9 +39,6 @@
                                 {{ $t('INVENTORY.SERVER.MAIN.ACTION') }}
                             </p-select-dropdown>
                         </div>
-                    </template>
-                    <template #toolbox-bottom>
-                        <slot name="usage-overview" />
                     </template>
                 </p-dynamic-layout>
             </template>
