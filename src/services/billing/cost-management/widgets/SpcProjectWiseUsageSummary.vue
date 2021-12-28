@@ -206,9 +206,10 @@ export default defineComponent<WidgetProps>({
                 const results = await fetchData();
 
                 const { chartData, legends } = getPieChartDataAndLegends(results, GROUP_BY.PROJECT);
+                console.log(chartData);
                 state.chartData = chartData.map(d => ({
-                    ...d,
                     category: state.projects[d.category]?.label || d.category,
+                    value: d.value > 0 ? d.value : 0,
                 }));
                 state.legends = legends;
 

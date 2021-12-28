@@ -6,7 +6,7 @@
                 <span class="font-normal">(Period)</span>
             </span>
             <p v-if="!loading" class="summary-content">
-                <b>{{ currencyMoneyFormatter(budgetData.total_usage_usd_cost, currency, currencyRates) }}</b>
+                <b>{{ currencyMoneyFormatter(budgetData.limit, currency, currencyRates) }}</b>
                 ({{ budgetData.start }} ~ {{ budgetData.end }})
             </p>
         </p-pane-layout>
@@ -15,11 +15,12 @@
                 Target
             </span>
             <p v-if="!loading" class="summary-content">
-                <p-anchor :to="referenceRouter(
-                    budgetData.project_id,
-                    { resource_type: 'identity.Project' })"
+                <p-anchor v-if="budgetData.project_group_id || budgetData.project_id"
+                          :to="referenceRouter(
+                              (budgetData.project_id ? budgetData.project_id : budgetData.project_group_id),
+                              { resource_type: budgetData.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
                 >
-                    {{ projects[budgetData.project_id] ? projects[budgetData.project_id].label : budgetData.project_id }}
+                    {{ projects[budgetData.project_id] ? projects[budgetData.project_id].label : projectGroups[budgetData.project_group_id].label }}
                 </p-anchor>
             </p>
         </p-pane-layout>
@@ -77,10 +78,11 @@ export default {
     setup() {
         const state = reactive({
             projects: computed(() => store.state.resource.project.items),
+            projectGroups: computed(() => store.state.resource.projectGroup.items),
             budgetData: computed<BudgetData>(() => store.state.service.budget.budgetData),
             costTypeKey: computed(() => (state.budgetData ? getKeyOfCostType(state.budgetData?.cost_types) : '')),
             costTypeValue: computed(() => (state.budgetData ? getValueOfCostType(state.budgetData?.cost_types, state.costTypeKey) : [])),
-            processedCostTypeValue: computed(() => state.costTypeValue.join(', ')),
+            processedCostTypeValue: computed(() => state.costTypeValue?.join(', ') || 'All'),
             buttonRef: null as HTMLElement | null,
             balloonWidth: 0,
             balloonVisible: false,

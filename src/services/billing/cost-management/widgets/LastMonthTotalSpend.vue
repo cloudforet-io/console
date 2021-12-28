@@ -92,7 +92,7 @@ export default {
                 name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                 query: {
                     granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                    period: objectToQueryString({ start: state.firstMonth, end: state.thisMonth.endOf('month') }),
+                    period: objectToQueryString({ start: state.lastMonth.startOf('month'), end: state.lastMonth.endOf('month') }),
                 },
             })),
         });

@@ -2,7 +2,7 @@
     <div class="cost-type-balloon" :style="balloonStyle">
         <section class="header">
             <span class="header-title">Cost Type</span>
-            <span class="self-center">{{ costTypeMap[costTypeKey] }}</span>
+            <span class="self-center">{{ costTypeMap[costTypeKey] || 'All' }}</span>
             <p-icon-button name="ic_delete"
                            class="close-button"
                            height="1.5em"

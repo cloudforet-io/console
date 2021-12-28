@@ -42,9 +42,8 @@ import config from '@/lib/config';
 import { store } from '@/store';
 import { PChartLoader, PSkeleton } from '@spaceone/design-system';
 
-
 const categoryKey = 'projectId';
-const valueName = 'cost';
+const valueName = 'usd_cost';
 
 interface ChartData {
     projectId: string;
@@ -115,7 +114,7 @@ export default {
             };
             const chart = createChart();
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-            chart.colors.step = 2;
+            chart.colors.step = 1;
 
             chart.data = state.data;
             chart.dataFields.value = valueName;
@@ -127,7 +126,7 @@ export default {
             seriesBullet.locationX = 0.5;
             seriesBullet.label.text = `[font-size: 1rem; bold]{projectName}[/]
 [font-size: 1.125rem; text-align: center]{cost}`;
-            series.tooltip.disabled = true;
+            // series.tooltip.disabled = true;
         };
 
         const costQueryHelper = new QueryHelper();
@@ -155,6 +154,7 @@ export default {
                 const rawData = await fetchData();
                 state.data = rawData.map(d => ({
                     projectId: d.project_id,
+                    usd_cost: d.usd_cost > 0 ? d.usd_cost : 0,
                     cost: currencyMoneyFormatter(d.usd_cost, props.currency, props.currencyRates, false, 10000000),
                     projectName: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'No Project',
                 }));
