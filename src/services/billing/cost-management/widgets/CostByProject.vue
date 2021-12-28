@@ -190,5 +190,12 @@ export default {
 <style lang="postcss" scoped>
 .cost-by-project {
     height: 20rem;
+
+    .chart-wrapper {
+        @apply h-full;
+    }
+    .chart {
+        @apply h-full w-full;
+    }
 }
 </style>
