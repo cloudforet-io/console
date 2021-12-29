@@ -1,5 +1,7 @@
 <template>
-    <p-pane-layout class="card-widget-layout">
+    <p-pane-layout class="card-widget-layout"
+                   :class="{'inactive': !loading && noData}"
+    >
         <div v-if="loading" class="flex flex-col">
             <p-skeleton width="11rem" height="3rem" />
             <p-skeleton width="9.5rem" height="1rem" class="mt-1 mb-6" />
@@ -107,7 +109,7 @@ export default {
     min-height: 12.8125rem;
     padding: 1rem 1.25rem;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
-    &:hover {
+    &:hover:not(.inactive) {
         @apply bg-blue-100 cursor-pointer;
     }
     .title-wrapper {
@@ -148,7 +150,6 @@ export default {
         font-size: 0.875rem;
         line-height: 160%;
     }
-
     a {
         @apply absolute top-0 left-0 w-full h-full;
     }

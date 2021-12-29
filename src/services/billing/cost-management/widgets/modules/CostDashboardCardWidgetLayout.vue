@@ -87,7 +87,8 @@ export default {
         .anchor-button {
             @apply flex items-center flex-shrink-0 text-sm text-blue-600 font-normal cursor-pointer;
             font-size: 0.75rem;
-            line-height: 120%;
+            line-height: 150%;
+            margin-top: 0.1rem;
             &:hover {
                 @apply text-secondary underline;
             }

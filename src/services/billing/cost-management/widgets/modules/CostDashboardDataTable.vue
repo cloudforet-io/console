@@ -8,7 +8,7 @@
                       disable-hover
         >
             <template #col-format="{field: { name }, value, index}">
-                <div class="flex">
+                <div>
                     <template v-if="fields[0].name === name">
                         <p-status v-if="showLegend"
                                   class="toggle-button"

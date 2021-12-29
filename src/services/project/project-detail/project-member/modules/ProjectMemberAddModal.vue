@@ -600,9 +600,8 @@ export default {
                 padding-top: 1.125rem;
 
                 .p-radio {
-                    display: inline-block;
-                    margin-bottom: 0.25rem;
-                    margin-right: 0.25rem;
+                    display: block;
+                    margin-bottom: 0.5rem;
                 }
 
                 .label-input-wrapper {
