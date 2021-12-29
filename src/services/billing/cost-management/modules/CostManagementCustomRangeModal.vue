@@ -70,9 +70,7 @@ export default {
                 const timeUnit = props.datetimePickerDataType === DATA_TYPE.yearToDate ? 'day' : 'month';
                 const startDate = dayjs.utc(state.startDate[0]);
                 const endDate = dayjs.utc(state.endDate[0]);
-
-                if (props.datetimePickerDataType === DATA_TYPE.yearToMonth && endDate.diff(startDate, 'year') >= 1) return true;
-                return startDate.isAfter(endDate, timeUnit);
+                return startDate.isAfter(endDate, timeUnit) || endDate.diff(startDate, 'year') >= 1;
             }),
             startDate: [],
             endDate: [],
