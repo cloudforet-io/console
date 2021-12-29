@@ -2,9 +2,11 @@
     <p-button-modal :visible="proxyVisible"
                     :header-title="header"
                     :scrollable="false"
+                    hide-footer-close-button
                     size="lg"
                     class="cloud-service-usage-overview-detail-modal"
                     @update:visible="handleUpdateVisible"
+                    @confirm="handleUpdateVisible(false)"
     >
         <template #body>
             <cloud-service-period-filter read-only :period="period" />
@@ -26,6 +28,9 @@
                     />
                 </template>
             </p-data-loader>
+        </template>
+        <template #confirm-button>
+            Close
         </template>
     </p-button-modal>
 </template>
