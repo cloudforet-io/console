@@ -47,8 +47,13 @@ export function queryStringToArray<T = any>(queryString: RouteQueryString): T[]|
                 return d;
             });
         }
-        const value = JSON.parse(queryString);
-        if (Array.isArray(value)) return value;
+
+        try {
+            const value = JSON.parse(queryString);
+            if (Array.isArray(value)) return value;
+        } catch (e) {
+            return [queryString] as unknown as T[];
+        }
     }
 
     return undefined;
@@ -66,10 +71,16 @@ export function queryStringToObject<T = any>(queryString: RouteQueryString): T|u
             const firstItem = queryString[0];
             if (!firstItem) return undefined;
 
-            value = JSON.parse(firstItem);
+            value = firstItem;
         } else {
-            value = JSON.parse(queryString);
+            value = queryString;
         }
+    }
+
+    try {
+        value = JSON.parse(value);
+    } catch (e) {
+        return undefined;
     }
 
     return typeof value === 'object' ? value : undefined;

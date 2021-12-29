@@ -3,7 +3,7 @@
         <span class="label">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTERED_BY_DATE') }}:</span>
         <template v-if="periodText">
             <span class="text">UTC</span>
-            <p-tag v-if="periodText" @delete="handleDeletePeriod">
+            <p-tag v-if="periodText" :deletable="!readOnly" @delete="handleDeletePeriod">
                 {{ periodText }}
             </p-tag>
         </template>
@@ -22,6 +22,7 @@ import { Period } from '@/services/billing/cost-management/type';
 
 interface Props {
     period?: Period;
+    readOnly?: boolean;
 }
 
 export default defineComponent<Props>({
@@ -34,6 +35,10 @@ export default defineComponent<Props>({
         period: {
             type: Object as () => Period|undefined,
             default: undefined,
+        },
+        readOnly: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {

@@ -17,10 +17,10 @@
                 <cloud-service-toolbox :total-count="totalCount"
                                        :filters="filters"
                                        :query-tags.sync="queryTags"
+                                       @update-toolbox="handleToolbox"
                 >
                     <template #period>
                         <cloud-service-period-filter :period.sync="period"
-                                                     @update-toolbox="handleToolbox"
                                                      @delete-period="handleDeletePeriod"
                         />
                     </template>

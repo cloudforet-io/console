@@ -29,10 +29,17 @@
                          :provider="provider"
                          :cloud-service-type="sidebarState.serverCloudServiceType"
                          :cloud-service-group="group"
+                         :period="overviewState.period"
             >
-                <template #usage-overview>
+                <template #period-filter>
+                    <cloud-service-period-filter :period="overviewState.period"
+                                                 @update:period="handlePeriodUpdate"
+                    />
+                </template>
+                <template #usage-overview="{filters}">
                     <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem"
-                                                  :filters="tableState.searchFilters"
+                                                  :filters="filters"
+                                                  :period="overviewState.period"
                                                   is-server
                                                   :disabled="!sidebarState.isServer"
                     />
@@ -46,6 +53,9 @@
                               :total-count="typeOptionState.totalCount"
                               :selected-count="tableState.selectedItems.length"
                               @goBack="$router.go(-1)"
+                />
+                <cloud-service-period-filter :period="overviewState.period"
+                                             @update:period="handlePeriodUpdate"
                 />
                 <p-horizontal-layout :height="tableState.tableHeight" @drag-end="onTableHeightChange">
                     <template #container="{ height }">
@@ -81,6 +91,7 @@
                                 <template #toolbox-bottom>
                                     <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem"
                                                                   :filters="tableState.searchFilters"
+                                                                  :period="overviewState.period"
                                                                   :disabled="sidebarState.isServer"
                                     />
                                 </template>
@@ -209,7 +220,7 @@ import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 import { MonitoringProps, MonitoringResourceType } from '@/services/monitoring/modules/monitoring/type';
 import { ProjectItemResp } from '@/services/project/type';
 
-import { replaceUrlQuery } from '@/lib/router-query-string';
+import { objectToQueryString, queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string';
 import {
     dynamicFieldsToExcelDataFields,
     makeQuerySearchPropsWithSearchSchema,
@@ -233,6 +244,8 @@ import CloudServiceUsageOverview
     from '@/services/inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverview.vue';
 import { CloudServiceTypeInfo } from '@/services/inventory/cloud-service/cloud-service-detail/type';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import CloudServicePeriodFilter from '@/services/inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
+import { Period } from '@/services/billing/cost-management/type';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -248,6 +261,7 @@ type SidebarItemType = {
 export default {
     name: 'CloudServiceDetailPage',
     components: {
+        CloudServicePeriodFilter,
         CloudServiceUsageOverview,
         CustomFieldModal,
         ServerMain,
@@ -287,7 +301,7 @@ export default {
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const queryHelper = new QueryHelper();
 
         /** Breadcrumb */
         const routeState = reactive({
@@ -315,7 +329,7 @@ export default {
             pageLimit: store.getters['settings/getItem']('pageLimit', STORAGE_PREFIX) || DEFAULT_PAGE_SIZE,
             sortDesc: true,
             sortBy: 'created_at',
-            queryTags: [] as QueryTag[],
+            queryTags: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).queryTags as QueryTag[],
         });
 
         const typeOptionState = reactive({
@@ -717,6 +731,17 @@ export default {
         });
 
 
+        /** Usage Overview */
+        const overviewState = reactive({
+            period: queryStringToObject(vm.$route.query.period) as Period|undefined,
+        });
+
+        const handlePeriodUpdate = (period?: Period) => {
+            overviewState.period = period;
+            replaceUrlQuery('period', objectToQueryString(period));
+        };
+
+
         /** ******* Page Init ******* */
         const initSidebar = async () => {
             await listCloudServiceTypeData();
@@ -783,6 +808,10 @@ export default {
 
             /* Monitoring Tab */
             monitoringState,
+
+            /* Usage Overview */
+            overviewState,
+            handlePeriodUpdate,
 
             /* Helper */
             assetUrlConverter,
