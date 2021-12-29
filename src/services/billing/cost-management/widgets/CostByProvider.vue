@@ -166,6 +166,7 @@ export default defineComponent<WidgetProps>({
             series.dataFields.category = 'category';
             series.labels.template.disabled = true;
             series.tooltip.disabled = true;
+            series.tooltip.fontSize = 10;
 
             const sliceTemplate = series.slices.template;
             sliceTemplate.clickable = false;
