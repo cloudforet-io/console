@@ -43,11 +43,10 @@ import { store } from '@/store';
 import { PChartLoader, PSkeleton } from '@spaceone/design-system';
 
 const categoryKey = 'projectId';
-const valueName = 'usdCost';
+const valueName = 'cost';
 
 interface ChartData {
     projectId: string;
-    projectName: string;
     usdCost: number;
     cost: number | string;
 }
@@ -120,12 +119,13 @@ export default {
             chart.data = state.data;
             chart.dataFields.value = valueName;
             chart.dataFields.name = categoryKey;
+            chart.zoomOutButton.disabled = true;
 
             const series = chart.seriesTemplates.create('0');
             const seriesBullet = series.bullets.push(new am4charts.LabelBullet());
             seriesBullet.locationY = 0.5;
             seriesBullet.locationX = 0.5;
-            seriesBullet.label.text = `[font-size: 1rem; bold]{projectName}[/]
+            seriesBullet.label.text = `[font-size: 1rem; bold]{projectId}[/]
 [font-size: 1.125rem; text-align: center]{cost}`;
             // series.tooltip.disabled = true;
         };
@@ -156,10 +156,9 @@ export default {
                 rawData.forEach((d) => {
                     if (d.usd_cost > 0) {
                         chartData.push({
-                            projectId: d.project_id,
+                            projectId: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'No Project',
                             usdCost: d.usd_cost,
                             cost: currencyMoneyFormatter(d.usd_cost, props.currency, props.currencyRates, false, 10000000),
-                            projectName: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'No Project',
                         });
                     }
                 });
