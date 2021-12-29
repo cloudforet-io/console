@@ -135,7 +135,6 @@ export default {
             costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
                     group_by: ['project_id'],
                     start: dayjs.utc(props.period?.start).format('YYYY-MM-DD'),

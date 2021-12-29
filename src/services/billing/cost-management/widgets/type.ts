@@ -8,19 +8,6 @@ export interface ChartData {
     [key: string]: any;
 }
 
-export interface TableData {
-    [key: string]: any;
-}
-
-interface XYChartRawValue {
-    usd_cost: number;
-    is_etc?: boolean;
-    [key: string]: any;
-}
-export interface XYChartRawData {
-    date: string;
-    values: XYChartRawValue[];
-}
 export interface XYChartData {
     date: string;
     totalCost?: number;
@@ -28,11 +15,6 @@ export interface XYChartData {
     [key: string]: any;
 }
 
-export interface PieChartRawData {
-    usd_cost: number;
-    is_etc?: boolean;
-    [key: string]: any;
-}
 export interface PieChartData {
     category: string;
     value: number;
@@ -43,6 +25,17 @@ export interface Legend {
     label: string | TranslateResult;
     color?: string;
     disabled?: boolean;
+}
+
+export interface UsdCost {
+    [key: string]: number;
+}
+
+export interface CostAnalyzeModel {
+    total_usd_cost?: number;
+    usd_cost: UsdCost | number;
+    is_etc?: boolean;
+    [key: string]: any;
 }
 
 

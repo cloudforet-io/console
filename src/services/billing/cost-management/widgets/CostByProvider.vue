@@ -49,7 +49,9 @@ import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
 
 import { PieChart } from '@amcharts/amcharts4/charts';
-import { PieChartData, PieChartRawData, WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import {
+    CostAnalyzeModel, PieChartData, WidgetProps,
+} from '@/services/billing/cost-management/widgets/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { forEach } from 'lodash';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
@@ -62,16 +64,12 @@ import { getConvertedFilter } from '@/services/billing/cost-management/cost-anal
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import config from '@/lib/config';
 
 
 interface CostByProviderChartData extends PieChartData {
     color: string;
-}
-
-interface CostByProviderAnalysisModel extends PieChartRawData {
-    provider: string;
 }
 
 export default defineComponent<WidgetProps>({
@@ -202,7 +200,7 @@ export default defineComponent<WidgetProps>({
             state.chart = chart;
         };
 
-        const convertToChartData = (rawData: CostByProviderAnalysisModel[]) => {
+        const convertToChartData = (rawData: CostAnalyzeModel[]) => {
             state.chartData = [];
             forEach(rawData, (d) => {
                 state.chartData.push({
@@ -219,15 +217,11 @@ export default defineComponent<WidgetProps>({
             costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
                     group_by: [GROUP_BY.PROVIDER],
                     start: dayjs.utc(props.period?.start).format('YYYY-MM-DD'),
                     end: dayjs.utc(props.period?.end).endOf('month').format('YYYY-MM-DD'),
-                    page: {
-                        start: 1,
-                        limit: 15,
-                    },
+                    limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
 

@@ -6,3 +6,9 @@ export const CHART_TYPE = Object.freeze({
     DONUT: 'DONUT',
 });
 export type CHART_TYPE = typeof CHART_TYPE[keyof typeof CHART_TYPE];
+
+export const DATE_FORMAT = Object.freeze({
+    day: 'YYYY-MM-DD',
+    month: 'YYYY-MM',
+    year: 'YYYY',
+});

@@ -1,6 +1,6 @@
 <template>
     <div class="cost-dashboard-stacked-column-widget">
-        <p-chart-loader :loading="chartLoading" class="chart-wrapper">
+        <p-chart-loader :loading="loading" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
@@ -9,7 +9,7 @@
         <div class="table-wrapper">
             <cost-dashboard-data-table :fields="fields"
                                        :items="items"
-                                       :loading="tableLoading"
+                                       :loading="loading"
                                        :this-page.sync="thisPage"
                                        :page-size="9"
                                        :chart="chart"
@@ -52,24 +52,17 @@ import config from '@/lib/config';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import {
-    getCurrencyAppliedChartData, getXYChartDataAndLegends,
+    getCurrencyAppliedChartData, getLegends, getXYChartData,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { CURRENCY } from '@/store/modules/display/config';
-import { ChartData, Legend, WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import {
+    ChartData, CostAnalyzeModel, Legend, WidgetProps,
+} from '@/services/billing/cost-management/widgets/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { Period } from '@/services/billing/cost-management/type';
 import { store } from '@/store';
 
-
-interface TableItem {
-    [key: string]: undefined | string | number;
-}
-
-interface ProviderTableItem extends TableItem{
-    provider: string;
-}
 
 interface Props extends WidgetProps {
     groupBy: string;
@@ -106,18 +99,20 @@ export default defineComponent<Props>({
     },
     setup(props: Props) {
         const state = reactive({
-            _top15itemNames: [],
             providers: computed(() => store.state.resource.provider.items),
+            _period: computed(() => ({
+                start: dayjs(props.period.end).subtract(3, 'month').format('YYYY-MM'),
+                end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
+            })),
             //
-            chartLoading: true,
             chartRegistry: {},
             chart: null as XYChart | null,
             chartRef: null as HTMLElement | null,
             chartData: [] as ChartData[],
             legends: [] as Legend[],
             //
-            tableLoading: true,
-            items: [] as TableItem[],
+            loading: true,
+            items: [] as CostAnalyzeModel[],
             fields: computed<DataTableField[]>(() => {
                 const fields: DataTableField[] = [{ name: props.groupBy, label: GROUP_BY_ITEM_MAP[props.groupBy].label }];
                 const startMonth = dayjs.utc(props.period.end).subtract(3, 'month');
@@ -136,13 +131,17 @@ export default defineComponent<Props>({
         });
 
         /* util */
+        const setChartDataAndLegends = () => {
+            state.chartData = getXYChartData(state.items, GRANULARITY.MONTHLY, state._period, props.groupBy as GROUP_BY);
+            state.legends = getLegends(state.items, props.groupBy as GROUP_BY);
+        };
         const disposeChart = (chartContext) => {
             if (state.chartRegistry[chartContext]) {
                 state.chartRegistry[chartContext].dispose();
                 delete state.chartRegistry[chartContext];
             }
         };
-        const drawChart = (chartContext, chartData, legends) => {
+        const drawChart = (chartContext) => {
             const createChart = () => {
                 disposeChart(chartContext);
                 state.chartRegistry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
@@ -152,7 +151,7 @@ export default defineComponent<Props>({
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
-            chart.data = getCurrencyAppliedChartData(chartData, props.currency, props.currencyRates);
+            chart.data = getCurrencyAppliedChartData(state.chartData, props.currency, props.currencyRates);
 
             chart.dateFormatter.inputDateFormat = 'yyyy-MM';
             const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
@@ -201,7 +200,7 @@ export default defineComponent<Props>({
                 return series;
             };
 
-            legends.forEach((legend) => {
+            state.legends.forEach((legend) => {
                 createSeries(legend);
             });
 
@@ -212,63 +211,26 @@ export default defineComponent<Props>({
 
             return chart;
         };
-        const _getApiPeriod = (period: Period): Period => ({
-            start: dayjs(period.end).subtract(3, 'month').format('YYYY-MM'),
-            end: dayjs.utc(period.end).endOf('month').format('YYYY-MM-DD'),
-        });
 
         /* api */
         const costQueryHelper = new QueryHelper();
-        const getCostTableData = async (period, filters) => {
+        const listCostAnalysisData = async (period, filters): Promise<CostAnalyzeModel[]> => {
             costQueryHelper.setFilters(getConvertedFilter(filters));
             try {
-                state.tableLoading = true;
-                const apiPeriod = _getApiPeriod(period);
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
                     group_by: [props.groupBy],
-                    start: apiPeriod.start,
-                    end: apiPeriod.end,
+                    start: period.start,
+                    end: period.end,
                     pivot_type: 'TABLE',
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;
-                state.items = results;
-                state._top15itemNames = results.map(d => d[props.groupBy]);
+                return results;
             } catch (e) {
                 ErrorHandler.handleError(e);
-            } finally {
-                state.tableLoading = false;
-            }
-        };
-        const getCostChartData = async (top15itemNames, period, filters) => {
-            costQueryHelper.setFilters([
-                ...getConvertedFilter(filters),
-                {
-                    k: props.groupBy,
-                    v: top15itemNames,
-                    o: '=',
-                },
-            ]);
-            try {
-                state.chartLoading = true;
-                const apiPeriod = _getApiPeriod(period);
-                const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    granularity: GRANULARITY.MONTHLY,
-                    group_by: [props.groupBy],
-                    start: apiPeriod.start,
-                    end: apiPeriod.end,
-                    pivot_type: 'CHART',
-                    ...costQueryHelper.apiQuery,
-                });
-                const { chartData, legends } = getXYChartDataAndLegends(results, props.groupBy);
-                state.chartData = chartData;
-                state.legends = legends;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                state.chartLoading = false;
+                return [];
             }
         };
 
@@ -277,19 +239,17 @@ export default defineComponent<Props>({
             state.legends[index].disabled = !state.legends[index]?.disabled;
         };
 
-        watch([() => state.chartLoading, () => state.chartRef], ([chartLoading, chartContext]) => {
-            if (!chartLoading && chartContext) {
-                state.chart = drawChart(chartContext, state.chartData, state.legends);
-            }
-        }, { immediate: false });
         watch(() => props.currency, (currency) => {
             if (state.chart) {
                 state.chart.data = getCurrencyAppliedChartData(state.chartData, currency, props.currencyRates);
             }
         });
-        watch([() => props.period, () => props.filters], async ([period, filters]) => {
-            await getCostTableData(period, filters);
-            await getCostChartData(state._top15itemNames, period, filters);
+        watch([() => state._period, () => props.filters], async ([_period, filters]) => {
+            state.loading = true;
+            state.items = await listCostAnalysisData(_period, filters);
+            await setChartDataAndLegends();
+            state.chart = drawChart(state.chartRef);
+            state.loading = false;
         }, { immediate: true });
 
         onUnmounted(() => {
