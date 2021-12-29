@@ -113,9 +113,9 @@ export default {
                 query: {
                     granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                     period: objectToQueryString({
-                        start: state.lastMonth.startOf('month').format('YYYY-MM-DD'),
-                        end: checkThisMonth() ? `${state.lastMonth.endOf('month').format('YYYY-MM')}-${thisDay}`
-                            : state.lastMonth.endOf('month').format('YYYY-MM-DD'),
+                        start: state.currentMonth.startOf('month').format('YYYY-MM-DD'),
+                        end: checkThisMonth() ? `${state.currentMonth.endOf('month').format('YYYY-MM')}-${thisDay}`
+                            : state.currentMonth.endOf('month').format('YYYY-MM-DD'),
                     }),
                 },
             })),
