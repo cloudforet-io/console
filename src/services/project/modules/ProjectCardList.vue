@@ -24,6 +24,7 @@
                                     <favorite-button :item-id="item.project_id"
                                                      favorite-type="project"
                                                      resource-type="identity.Project"
+                                                     scale="0.7"
                                     />
                                 </div>
                             </div>
@@ -441,8 +442,17 @@ export default {
     }
 }
 
+.favorite-wrapper {
+    @apply flex-shrink-0 inline-flex items-center justify-center;
+    position: absolute;
+    right: 1.20625rem;
+    top: 1.20625rem;
+    width: 0.875rem;
+}
+
 .card {
     @apply flex flex-col w-full h-full;
+    position: relative;
     .favorite-wrapper .favorite-btn::v-deep:not(.active) {
         display: none;
     }
@@ -451,10 +461,6 @@ export default {
             display: block;
         }
     }
-}
-.favorite-wrapper {
-    @apply flex-shrink-0 h-full inline-flex items-center justify-center;
-    width: 0.875rem;
 }
 
 .card-top-wrapper {
