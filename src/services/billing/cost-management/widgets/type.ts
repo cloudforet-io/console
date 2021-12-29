@@ -18,6 +18,7 @@ export interface XYChartData {
 export interface PieChartData {
     category: string;
     value: number;
+    color?: string;
 }
 
 export interface Legend {

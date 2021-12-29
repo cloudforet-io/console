@@ -76,8 +76,8 @@
                      @click="handleClickLegend(idx)"
                 >
                     <p-status :text="legend.label"
-                              :icon-color="legend.disabled ? DISABLED_LEGEND_COLOR : DEFAULT_CHART_COLORS[idx % DEFAULT_CHART_COLORS.length]"
-                              :text-color="legend.disabled ? DISABLED_LEGEND_COLOR : null"
+                              :icon-color="getLegendIconColor(idx)"
+                              :text-color="getLegendTextColor(idx)"
                     />
                 </div>
                 <template #no-data>
@@ -180,6 +180,19 @@ export default {
             filterModalVisible: false,
         });
 
+        /* util */
+        const getLegendIconColor = (index) => {
+            const legend = state.legends[index];
+            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+            if (legend?.color) return legend.color;
+            return DEFAULT_CHART_COLORS[index];
+        };
+        const getLegendTextColor = (index) => {
+            const legend = state.legends[index];
+            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+            return null;
+        };
+
         /* api */
         let listCostAnalysisRequest: CancelTokenSource | undefined;
         const costQueryHelper = new QueryHelper();
@@ -281,6 +294,8 @@ export default {
             DEFAULT_CHART_COLORS,
             CHART_TYPE,
             GRANULARITY,
+            getLegendIconColor,
+            getLegendTextColor,
             handleClickLegend,
             handleToggleAllLegends,
             handleSelectChartGroupByItem,
