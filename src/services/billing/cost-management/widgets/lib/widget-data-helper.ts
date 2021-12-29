@@ -105,6 +105,10 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY)
                 const _providers = store.state.resource.provider.items;
                 _color = _providers[_category]?.color;
             }
+            if (groupBy === GROUP_BY.PROJECT) {
+                const _projects = store.state.resource.project.items;
+                _category = _projects[_category]?.label || _category;
+            }
             chartData.push({
                 category: _category,
                 value: (d.usd_cost > 0 ? d.usd_cost : 0) as number,

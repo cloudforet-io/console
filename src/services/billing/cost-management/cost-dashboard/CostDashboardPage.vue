@@ -96,7 +96,7 @@ export default {
             route: computed(() => [
                 { name: i18n.t('MENU.BILLING.BILLING'), to: { name: BILLING_ROUTE._NAME } },
                 { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), to: { name: BILLING_ROUTE.COST_MANAGEMENT._NAME } },
-                { name: props.dashboardId },
+                { name: state.dashboard.name || props.dashboardId },
             ]),
         });
 

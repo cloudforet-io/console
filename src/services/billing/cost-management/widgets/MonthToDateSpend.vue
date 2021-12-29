@@ -7,7 +7,7 @@
         :value="currencyMoneyFormatter(currentMonthCost, currency, currencyRates, true, 10000000000)"
         :currency-symbol="currencySymbol"
         :description="thisMonthFormatter(currentMonth)"
-        :no-data="!currentMonthCost || !lastMonthCost"
+        :no-data="!loading && !currentMonthCost"
     >
         <template #default>
             <div class="cost-trend-wrapper flex">
@@ -104,7 +104,8 @@ export default {
             currentMonthCost: 0,
             lastMonthCost: 0,
             increaseCost: computed(() => state.currentMonthCost - state.lastMonthCost),
-            increaseRate: computed(() => Math.round((state.currentMonthCost / state.lastMonthCost) * 100) - 100),
+            increaseRate: computed(() => (state.lastMonthCost !== 0 ? Math.round(((state.currentMonthCost - state.lastMonthCost) / state.lastMonthCost) * 100)
+                : Math.round(state.currentMonthCost))),
             currentMonth: computed<Dayjs>(() => dayjs.utc(props.period?.end)),
             lastMonth: computed<Dayjs>(() => dayjs.utc(props.period?.end).subtract(1, 'month')),
             currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
@@ -125,7 +126,6 @@ export default {
         const getData = async (start: Dayjs, end: Dayjs|string) => {
             costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
-                state.loading = true;
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
@@ -137,8 +137,6 @@ export default {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return undefined;
-            } finally {
-                state.loading = false;
             }
         };
 
@@ -153,11 +151,13 @@ export default {
             const start = state.lastMonth.startOf('month').format('YYYY-MM-DD');
             const end = checkThisMonth() ? `${state.lastMonth.endOf('month').format('YYYY-MM')}-${thisDay}`
                 : state.lastMonth.endOf('month').format('YYYY-MM-DD');
-            state.lastMonthCost = await getData(start, end);
+            state.lastMonthCost = await getData(start, end) || 0;
         };
 
         const getChartData = async () => {
+            state.loading = true;
             await Promise.allSettled([getCurrentMonthChartData(), getLastMonthChartData()]);
+            state.loading = false;
         };
 
         watch([() => props.period, () => props.filters], async (after) => {
