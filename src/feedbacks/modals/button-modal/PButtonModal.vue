@@ -8,25 +8,25 @@
                      aria-labelledby="headerTitle"
                      tabindex="1"
                 >
-                    <article class="modal-content" :class="[`modal-${themeColor}`, {'no-footer': !footerVisible}]">
+                    <article class="modal-content" :class="[`modal-${themeColor}`, {'no-footer': hideFooter}]">
                         <h3 class="header">
-                            <div v-if="headerVisible" class="modal-header">
+                            <div v-if="!hideHeader" class="modal-header">
                                 <p-lottie name="lottie_error" auto :size="1.5"
                                           :class="[`modal-${themeColor}`]" class="header-lottie"
                                 />{{ headerTitle }}
                             </div>
-                            <p-icon-button v-if="headerCloseButtonVisible"
+                            <p-icon-button v-if="!hideHeaderCloseButton"
                                            name="ic_delete" color="inherit"
                                            class="close-button"
                                            :class="[{disabled: loading},
-                                                    {'no-footer': !footerVisible}]"
+                                                    {'no-footer': hideFooter}]"
                                            @click.stop="onCloseClick"
                             />
                         </h3>
-                        <div v-if="bodyVisible" class="modal-body" :class="allBodyClass">
+                        <div v-if="!hideBody" class="modal-body" :class="allBodyClass">
                             <slot name="body" />
                         </div>
-                        <div v-if="footerVisible" class="modal-footer">
+                        <div v-if="!hideFooter" class="modal-footer">
                             <slot :slot-scope="$props" name="footer-extra" />
                             <p-button
                                 v-if="footerResetButtonVisible"
@@ -39,18 +39,19 @@
                                     Reset
                                 </slot>
                             </p-button>
-                            <p-button
-                                class="modal-button cancel-button"
-                                style-type="transparent"
-                                :disabled="loading"
-                                @click="onCancelClick"
+                            <p-button v-if="!hideFooterCloseButton"
+                                      class="modal-button cancel-button"
+                                      style-type="transparent"
+                                      :disabled="loading"
+                                      @click="onCancelClick"
                             >
                                 <slot name="close-button" v-bind="$props">
                                     {{ $t('COMPONENT.BUTTON_MODAL.CANCEL') }}
                                 </slot>
                             </p-button>
                             <p-button
-                                class="modal-button"
+                                class="modal-button confirm-button"
+                                :class="{'no-cancel-button': hideFooterCloseButton}"
                                 :style-type="themeColor"
                                 :loading="loading"
                                 :disabled="disabled"
@@ -75,25 +76,25 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeProxy } from '@/util/composition-helpers';
-import { ButtonModalProps } from '@/feedbacks/modals/button-modal/type';
+import { ButtonModalProps, THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
 import '../modal.pcss';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 
 
-export default defineComponent({
+export default defineComponent<ButtonModalProps>({
     name: 'PButtonModal',
     components: {
         PIconButton,
         PLottie,
         PButton,
     },
+    model: {
+        prop: 'visible',
+        event: 'update:visible',
+    },
     props: {
         visible: { // sync
-            type: Boolean,
-            default: false,
-        },
-        fade: {
             type: Boolean,
             default: false,
         },
@@ -113,26 +114,33 @@ export default defineComponent({
         themeColor: {
             type: String,
             default: 'primary',
-        },
-        headerVisible: {
-            type: Boolean,
-            default: true,
-        },
-        bodyVisible: {
-            type: Boolean,
-            default: true,
-        },
-        footerVisible: {
-            type: Boolean,
-            default: true,
+            validator(themeColor: any) {
+                return THEME_COLORS.includes(themeColor);
+            },
         },
         headerTitle: {
             type: String,
             default: '',
         },
-        headerCloseButtonVisible: {
+        hideHeader: {
             type: Boolean,
-            default: true,
+            default: false,
+        },
+        hideBody: {
+            type: Boolean,
+            default: false,
+        },
+        hideFooter: {
+            type: Boolean,
+            default: false,
+        },
+        hideHeaderCloseButton: {
+            type: Boolean,
+            default: false,
+        },
+        hideFooterCloseButton: {
+            type: Boolean,
+            default: false,
         },
         footerResetButtonVisible: {
             type: Boolean,
@@ -147,7 +155,7 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props: ButtonModalProps, { emit }) {
+    setup(props, { emit }) {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             allBodyClass: computed(() => {
@@ -293,6 +301,10 @@ export default defineComponent({
                 @screen xs {
                     display: flex;
                 }
+            }
+
+            .confirm-button.no-cancel-button {
+                margin-left: auto;
             }
         }
     }

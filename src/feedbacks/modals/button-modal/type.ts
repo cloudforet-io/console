@@ -18,24 +18,25 @@ export const THEME_COLORS = [
     'alert',
     'gray900',
     'gray',
-];
+] as const;
 
 export type ModalThemeColor = typeof THEME_COLORS[number];
 
 export interface ButtonModalProps {
-    fade: boolean;
+    visible: boolean; // sync
     scrollable: boolean;
     size: ModalSizeType;
-    visible: boolean; // sync
     backdrop: boolean;
-
     themeColor: ModalThemeColor;
-    headerVisible: boolean;
-    bodyVisible: boolean;
-    footerVisible: boolean;
-
     headerTitle: string;
-    headerCloseButtonVisible: boolean;
+
+    hideHeader: boolean;
+    hideBody: boolean;
+    hideFooter: boolean;
+
+    hideHeaderCloseButton: boolean;
+    hideFooterCloseButton: boolean;
+    footerResetButtonVisible: boolean;
 
     loading: boolean;
     disabled: boolean;
