@@ -179,6 +179,8 @@ export default defineComponent<WidgetProps>({
 
             chart.geodata = am4geodataContinentsLow;
             chart.projection = new am4maps.projections.Miller();
+            chart.minWidth = 300;
+            chart.minHeight = 300;
             chart.responsive.enabled = true;
             chart.chartContainer.wheelable = false;
 
@@ -186,7 +188,7 @@ export default defineComponent<WidgetProps>({
             polygonSeries.useGeodata = true;
             polygonSeries.exclude = ['antarctica'];
             polygonSeries.mapPolygons.template.fill = am4core.color(gray[200]);
-            // polygonSeries.calculateVisualCenter = true;
+            polygonSeries.calculateVisualCenter = true;
 
             const pieSeries = chart.series.push(new am4maps.MapImageSeries());
             const pieTemplate = pieSeries.mapImages.template;
@@ -200,8 +202,8 @@ export default defineComponent<WidgetProps>({
             });
             pieChartTemplate.propertyFields.width = 'width';
             pieChartTemplate.propertyFields.height = 'height';
-            // pieChartTemplate.horizontalCenter = 'middle';
-            // pieChartTemplate.verticalCenter = 'middle';
+            pieChartTemplate.horizontalCenter = 'middle';
+            pieChartTemplate.verticalCenter = 'middle';
 
             const pieSeriesTemplate = pieChartTemplate.series.push(new am4charts.PieSeries());
             pieSeriesTemplate.dataFields.category = categoryKey;
