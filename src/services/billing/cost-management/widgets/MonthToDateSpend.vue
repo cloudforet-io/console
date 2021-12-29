@@ -6,7 +6,7 @@
         :widget-link="widgetLink"
         :value="currencyMoneyFormatter(currentMonthCost, currency, currencyRates, true, 10000000000)"
         :currency-symbol="currencySymbol"
-        :description="`${currentMonth.startOf('month').format('MMMM DD')} ~ ${thisDay}, ${currentMonth.format('YYYY')}`"
+        :description="thisMonthFormatter(currentMonth)"
         :no-data="!currentMonthCost || !lastMonthCost"
     >
         <template #default>
@@ -38,7 +38,7 @@
                 <template v-else>
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.INCREASE') }}
                 </template>
-                {{ `${lastMonth.startOf('month').format('MMM DD')} ~ ${thisDay}, ${lastMonth.format('YYYY')}` }}
+                {{ thisMonthFormatter(lastMonth) }}
             </span>
         </template>
     </cost-dashboard-simple-card-widget>
@@ -64,6 +64,7 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 const thisDay = dayjs.utc().format('DD');
+const thisMonth = dayjs.utc().format('MM');
 export default {
     name: 'MonthToDateSpend',
     components: {
@@ -92,6 +93,12 @@ export default {
         },
     },
     setup(props: WidgetProps) {
+        const checkThisMonth = () => dayjs.utc(props.period?.end).format('MM') === thisMonth;
+        const thisMonthFormatter = (targetDate: Dayjs) => {
+            if (checkThisMonth()) {
+                return `${targetDate.startOf('month').format('MMM DD')} ~ ${thisDay}, ${targetDate.format('YYYY')}`;
+            } return `${targetDate.startOf('month').format('MMM DD')} ~ ${targetDate.endOf('month').format('MMM DD')}, ${targetDate.format('YYYY')}`;
+        };
         const state = reactive({
             loading: true,
             currentMonthCost: 0,
@@ -107,7 +114,8 @@ export default {
                     granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                     period: objectToQueryString({
                         start: state.lastMonth.startOf('month').format('YYYY-MM-DD'),
-                        end: `${state.lastMonth.endOf('month').format('YYYY-MM')}-${thisDay}`,
+                        end: checkThisMonth() ? `${state.lastMonth.endOf('month').format('YYYY-MM')}-${thisDay}`
+                            : state.lastMonth.endOf('month').format('YYYY-MM-DD'),
                     }),
                 },
             })),
@@ -136,13 +144,15 @@ export default {
 
         const getCurrentMonthChartData = async () => {
             const start = state.currentMonth.startOf('month').format('YYYY-MM-DD');
-            const end = `${state.currentMonth.endOf('month').format('YYYY-MM')}-${thisDay}`;
+            const end = checkThisMonth() ? `${state.currentMonth.endOf('month').format('YYYY-MM')}-${thisDay}`
+                : state.currentMonth.endOf('month').format('YYYY-MM-DD');
             state.currentMonthCost = await getData(start, end);
         };
 
         const getLastMonthChartData = async () => {
             const start = state.lastMonth.startOf('month').format('YYYY-MM-DD');
-            const end = `${state.lastMonth.endOf('month').format('YYYY-MM')}-${thisDay}`;
+            const end = checkThisMonth() ? `${state.lastMonth.endOf('month').format('YYYY-MM')}-${thisDay}`
+                : state.lastMonth.endOf('month').format('YYYY-MM-DD');
             state.lastMonthCost = await getData(start, end);
         };
 
@@ -160,6 +170,8 @@ export default {
             ...toRefs(state),
             currencyMoneyFormatter,
             thisDay,
+            checkThisMonth,
+            thisMonthFormatter,
         };
     },
 };
