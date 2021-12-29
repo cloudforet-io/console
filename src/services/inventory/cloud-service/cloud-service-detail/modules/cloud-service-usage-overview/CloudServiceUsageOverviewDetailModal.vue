@@ -7,17 +7,24 @@
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
+            <cloud-service-period-filter :period="proxyPeriod" @update:period="handleUpdatePeriod" />
+            <p-divider class="flex-shrink-0" />
+            <p-query-search-tags :tags="queryTags" read-only />
             <p-data-loader v-if="cloudServiceTypeId" :loading="layoutLoading"
+                           :disable-empty-case="layoutLoading || dataLoading"
                            :data="widgetSchemaList" class="widget-wrapper"
             >
-                <p-dynamic-widget v-for="(schema, idx) in widgetSchemaList" :key="`${cloudServiceTypeId}-${idx}`"
-                                  :type="schema.type"
-                                  :name="schema.name"
-                                  :data="dataList[idx]"
-                                  :loading="dataLoading"
-                                  :schema-options="schema.options"
-                                  :class="schema.type"
-                />
+                <template v-for="(schema, idx) in widgetSchemaList">
+                    <p-dynamic-widget :key="`${cloudServiceTypeId}-${idx}`"
+                                      :type="schema.type"
+                                      :name="schema.name"
+                                      :data="dataList[idx]"
+                                      :loading="dataLoading"
+                                      :schema-options="schema.options"
+                                      :field-handler="fieldHandler"
+                                      :class="{'line-break': widgetSchemaList[idx + 1] && widgetSchemaList[idx + 1].type !== schema.type}"
+                    />
+                </template>
             </p-data-loader>
         </template>
     </p-button-modal>
@@ -28,21 +35,35 @@ import {
     computed, defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { PButtonModal, PDataLoader, PDynamicWidget } from '@spaceone/design-system';
-import { DynamicWidgetSchema } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
+
+import {
+    PButtonModal, PDataLoader, PDivider, PDynamicWidget, PQuerySearchTags,
+} from '@spaceone/design-system';
+import {
+    DynamicWidgetFieldHandler,
+    DynamicWidgetSchema,
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
+import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { Filter } from '@spaceone/console-core-lib/space-connector/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { Reference } from '@/lib/reference/type';
+import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+
 import { CloudServiceTypeInfo } from '@/services/inventory/cloud-service/cloud-service-detail/type';
 import { Period } from '@/services/billing/cost-management/type';
+import CloudServicePeriodFilter from '@/services/inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
 
 interface Props {
     visible: boolean;
     cloudServiceTypeInfo?: CloudServiceTypeInfo;
-    isServer?: boolean;
-    filters?: QueryStoreFilter[];
+    isServer: boolean;
+    filters: QueryStoreFilter[];
     period?: Period;
 }
 
@@ -54,9 +75,12 @@ interface Data {
 export default defineComponent<Props>({
     name: 'CloudServiceUsageOverviewDetailModal',
     components: {
+        CloudServicePeriodFilter,
         PButtonModal: PButtonModal as any,
         PDataLoader,
         PDynamicWidget,
+        PDivider,
+        PQuerySearchTags,
     },
     model: {
         prop: 'visible',
@@ -76,8 +100,8 @@ export default defineComponent<Props>({
             default: false,
         },
         filters: {
-            type: Array as () => QueryStoreFilter[]|undefined,
-            default: undefined,
+            type: Array as () => QueryStoreFilter[],
+            default: () => [],
         },
         period: {
             type: Object as () => Period|undefined,
@@ -87,41 +111,38 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const queryHelper = new QueryHelper();
 
+
         const state = reactive({
             proxyVisible: props.visible,
+            proxyPeriod: props.period as Period|undefined,
             header: computed(() => `Usage Overview of ${props.cloudServiceTypeInfo?.name}`),
             widgetSchemaList: [] as DynamicWidgetSchema[],
             layoutLoading: true,
             dataList: [] as Data[][],
             dataLoading: true,
             cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo?.cloud_service_type_id ?? ''),
-            apiFilter: computed<Filter[]|undefined>(() => {
-                if (props.filters) {
-                    const { filter } = queryHelper.setFilters(props.filters).apiQuery;
-                    return filter;
-                }
-                return undefined;
-            }),
+            queryTags: [] as QueryTag[],
+            apiFilter: [] as Filter[],
         });
 
 
         const fetchSchemaList = async (): Promise<DynamicWidgetSchema[]> => {
             try {
                 const { provider, group, name } = props.cloudServiceTypeInfo as CloudServiceTypeInfo;
-                const options = props.isServer ? {} : {
-                    provider,
-                    cloud_service_group: group,
-                    cloud_service_type: name,
-                };
+                const options: any = {};
+                if (!props.isServer) {
+                    options.provider = provider;
+                    options.cloud_service_group = group;
+                    options.cloud_service_type = name;
+                }
 
-                return SpaceConnector.client.addOns.pageSchema.get({
+                const { widget } = await SpaceConnector.client.addOns.pageSchema.get({
                     resource_type: props.isServer ? 'inventory.Server' : 'inventory.CloudService',
                     schema: 'widget',
                     options,
-                }, {
-                    mockMode: true,
-                    mockPath: '?schema=widget',
                 });
+
+                return widget ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
@@ -130,15 +151,11 @@ export default defineComponent<Props>({
 
         const fetchDataWithSchema = async (schema: DynamicWidgetSchema): Promise<Data[]> => {
             try {
-                const { results } = await SpaceConnector.client.inventory.cloudService.stat({
-                    query: schema.query,
+                const { results } = await SpaceConnector.client.inventory.cloudService.analyze({
+                    default_query: schema.query,
                     filter: state.apiFilter,
                     limit: schema.options?.limit,
-                    period: props.period,
-                }, {
-                    mockMode: true,
-                    // eslint-disable-next-line no-nested-ternary
-                    mockPath: schema.type === 'card' ? '?type=card' : (schema.options?.limit ? `?limit=${schema.options.limit}` : ''),
+                    date_range: props.period,
                 });
                 return results;
             } catch (e) {
@@ -149,9 +166,14 @@ export default defineComponent<Props>({
 
         const cachedSchemaList = {};
         const getWidgetSchemaList = async () => {
+            state.layoutLoading = true;
             const schemaList = cachedSchemaList[state.cloudServiceTypeId];
             if (schemaList) state.widgetSchemaList = schemaList;
-            else state.widgetSchemaList = await fetchSchemaList();
+            else {
+                state.widgetSchemaList = await fetchSchemaList();
+                cachedSchemaList[state.cloudServiceTypeId] = state.widgetSchemaList;
+            }
+            state.layoutLoading = false;
         };
 
 
@@ -165,10 +187,36 @@ export default defineComponent<Props>({
             state.dataLoading = false;
         };
 
+        /* Component Props */
+        const fieldHandler: DynamicWidgetFieldHandler<Record<'reference', Reference>> = (field) => {
+            if (field.extraData?.reference) {
+                return referenceFieldFormatter(field.extraData.reference, field.data);
+            }
+            return {};
+        };
+
+        /* Event Handlers */
         const handleUpdateVisible = (visible) => {
             state.proxyVisible = visible;
             emit('update:visible', visible);
         };
+
+        const handleUpdatePeriod = (period) => {
+            state.proxyPeriod = period;
+            emit('update:period', period);
+        };
+
+        /* Watchers */
+        watch(() => props.period, (period) => {
+            if (period !== state.proxyPeriod) state.proxyPeriod = period;
+        });
+
+        watch(() => props.filters, (filters) => {
+            const { filter } = queryHelper.setFilters(filters).apiQuery;
+
+            state.apiFilter = filter;
+            state.queryTags = queryHelper.queryTags;
+        }, { immediate: true });
 
         watch(() => props.visible, (visible) => {
             if (visible !== state.proxyVisible) state.proxyVisible = visible;
@@ -178,24 +226,39 @@ export default defineComponent<Props>({
             if (visible && state.cloudServiceTypeId) {
                 await getWidgetSchemaList();
                 await getDataListWithSchema();
-                if (state.layoutLoading) state.layoutLoading = false;
+            } else {
+                state.widgetSchemaList = [];
+                state.dataList = [];
             }
         }, { immediate: true });
+
+
         return {
             ...toRefs(state),
             handleUpdateVisible,
+            handleUpdatePeriod,
+            fieldHandler,
         };
     },
 });
 </script>
 
 <style lang="postcss" scoped>
-.cloud-service-usage-overview-detail-modal {
-    .widget-wrapper::v-deep {
+.cloud-service-usage-overview-detail-modal::v-deep {
+    .modal-body {
+        display: flex;
+        flex-direction: column;
+        height: 744px;
+        padding: 1rem 2.5rem;
+    }
+    .widget-wrapper {
+        padding: 0.5rem 0;
+        flex: 1;
         > .data-loader-container > .data-wrapper {
+            height: 100%;
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            grid-gap: 1rem;
+            grid-gap: 0.5rem;
         }
     }
 }
