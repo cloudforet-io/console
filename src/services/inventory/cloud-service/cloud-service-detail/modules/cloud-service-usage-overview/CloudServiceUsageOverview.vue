@@ -1,13 +1,13 @@
 <template>
     <fragment>
-        <p-card class="cloud-service-usage-overview" size="lg">
+        <p-card class="cloud-service-usage-overview">
             <template #header>
-                Usage Overview
+                {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.USAGE_OVERVIEW') }}
                 <p-button size="sm" style-type="primary-dark" :outline="true"
                           font-weight="bold" class="show-button"
                           @click="handleClickShowAll"
                 >
-                    Show All
+                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_ALL') }}
                 </p-button>
             </template>
             <p-data-loader :loading="layoutLoading" :data="widgetSchemaList" class="stat-wrapper">
@@ -250,26 +250,68 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .cloud-service-usage-overview::v-deep {
-    margin: 1rem 0;
+    padding: 0 1rem 1.5rem;
+
+    header {
+        @apply flex items-center;
+        .show-button {
+            @apply ml-auto;
+        }
+    }
+
+    .body {
+        padding: 1rem;
+    }
+
     .stat-wrapper {
         height: 100%;
-        min-height: 4rem;
+        .data-wrapper {
+            @apply flex;
+            flex-wrap: wrap;
+            row-gap: 1.25rem;
+        }
+        .stat-summary {
+            @apply border-gray-200;
+            width: 33.3%;
+            min-width: auto;
+            height: auto;
+            min-height: 1.75rem;
+            padding: 0 1rem;
+            border-width: 0 0 0 1px;
+            &:nth-of-type(3n-2) {
+                @apply border-l-0;
+            }
+            .name {
+                @apply text-gray-700;
+                font-size: 1rem;
+                line-height: 1.2;
+            }
+            .value {
+                @apply flex-shrink-0 ml-2;
+            }
+        }
     }
 }
 
 @screen tablet {
     .cloud-service-usage-overview::v-deep {
         .body {
-            @apply flex-col;
-            padding: 0 1.25rem;
+            padding: 0 1rem;
         }
 
-        .stat-summary {
-            @apply flex items-center w-full border-l-0 border-t;
-            min-height: 4.25rem;
-            .p-dynamic-widget-card {
-                @apply w-full h-full;
-                padding: 1.25rem 0;
+        .stat-wrapper {
+            .data-wrapper {
+                @apply flex-col;
+                row-gap: 0;
+                padding: 0;
+            }
+            .stat-summary {
+                @apply flex items-center w-full border-l-0 border-t;
+                height: 4.25rem;
+                padding: 0;
+                &:nth-of-type(1) {
+                    @apply border-t-0;
+                }
             }
         }
     }
@@ -277,9 +319,14 @@ export default defineComponent<Props>({
 
 @screen mobile {
     .cloud-service-usage-overview::v-deep {
-        .stat-summary {
-            .p-dynamic-widget-card {
+        .stat-wrapper {
+            .data-wrapper {
+                row-gap: 0;
+            }
+
+            .stat-summary {
                 @apply flex-col items-start;
+                height: 5.0625rem;
                 padding: 1rem 0;
             }
         }

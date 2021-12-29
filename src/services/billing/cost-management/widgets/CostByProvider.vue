@@ -271,8 +271,15 @@ export default defineComponent<WidgetProps>({
     }
 
     .table-wrapper {
-        .table {
+        .table::v-deep {
             height: initial;
+
+            tr:nth-of-type(even) {
+                @apply bg-gray-100;
+            }
+            td {
+                @apply border-none;
+            }
         }
 
         .pagination {
