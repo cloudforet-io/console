@@ -92,11 +92,11 @@ export default {
                     name: GRANULARITY.MONTHLY,
                     label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY'),
                 },
-                {
-                    type: 'item',
-                    name: GRANULARITY.YEARLY,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
-                },
+                // {
+                //     type: 'item',
+                //     name: GRANULARITY.YEARLY,
+                //     label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
+                // },
             ])),
             setQueryModalVisible: false,
         });
