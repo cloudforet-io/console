@@ -42,6 +42,7 @@ const createSeries = (chart, legends: Legend[]) => {
     series.slices.template.togglable = false;
     series.slices.template.clickable = false;
     series.slices.template.tooltipText = '{category}: [bold]{value} ({value.percent.formatNumber(\'#.0\')}%)[/]';
+    series.slices.template.propertyFields.fill = 'color';
     series.tooltip.label.fontSize = 10;
 
     const slice = series.slices.template;

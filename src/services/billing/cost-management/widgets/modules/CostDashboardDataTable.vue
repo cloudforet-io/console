@@ -12,14 +12,14 @@
                     <template v-if="fields[0].name === name">
                         <p-status v-if="showLegend"
                                   class="toggle-button"
-                                  :text="statusTextFormatter(index)"
-                                  :icon-color="getStatusIconColor(name, value, index)"
-                                  :text-color="getStatusTextColor(index)"
+                                  :text="(getConvertedIndex(index) + 1).toString()"
+                                  :icon-color="getLegendIconColor(index)"
+                                  :text-color="getLegendTextColor(index)"
                                   @click="handleClickLegend(index)"
                         />
                         <slot :name="`${name}-format`" v-bind="{ value }">
-                            <span :style="{color: (legends && legends[indexFormatter(index)]) ? legends[indexFormatter(index)].color : 'text-gray-900'}">
-                                {{ (legends && legends[indexFormatter(index)]) ? legends[indexFormatter(index)].label : '' }}
+                            <span :style="{ color: labelColorFormatter(index) }">
+                                {{ labelTextFormatter(index) }}
                             </span>
                         </slot>
                     </template>
@@ -144,19 +144,21 @@ export default {
         });
 
         /* util */
-        const indexFormatter = index => index + ((state.proxyThisPage - 1) * props.pageSize);
-        const statusTextFormatter = (index) => {
+        const getConvertedIndex = index => index + ((state.proxyThisPage - 1) * props.pageSize);
+        const labelColorFormatter = index => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].color : 'text-gray-900');
+        const labelTextFormatter = index => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].label : '');
+        const getIndexNumber = (index) => {
             const tableIndex = index + ((state.proxyThisPage - 1) * props.pageSize) + 1;
             return tableIndex.toString();
         };
-        const getStatusIconColor = (groupBy, value, index) => {
-            const legend = props.legends[indexFormatter(index)];
+        const getLegendIconColor = (index) => {
+            const legend = props.legends[getConvertedIndex(index)];
             if (legend?.disabled) return DISABLED_LEGEND_COLOR;
             if (legend?.color) return legend.color;
-            return DEFAULT_CHART_COLORS[indexFormatter(index)];
+            return DEFAULT_CHART_COLORS[getConvertedIndex(index)];
         };
-        const getStatusTextColor = (index) => {
-            const legend = props.legends[indexFormatter(index)];
+        const getLegendTextColor = (index) => {
+            const legend = props.legends[getConvertedIndex(index)];
             if (legend?.disabled) return DISABLED_LEGEND_COLOR;
             return null;
         };
@@ -191,8 +193,8 @@ export default {
 
         /* event */
         const handleClickLegend = (index) => {
-            toggleSeries(props.chart as XYChart | PieChart | TreeMap, indexFormatter(index));
-            emit('toggle-legend', indexFormatter(index));
+            toggleSeries(props.chart as XYChart | PieChart | TreeMap, getConvertedIndex(index));
+            emit('toggle-legend', getConvertedIndex(index));
         };
 
         // watch([() => props.showSharpRises, () => props.items], ([showSharpRises, items]) => {
@@ -204,11 +206,13 @@ export default {
         return {
             ...toRefs(state),
             GROUP_BY,
-            getStatusIconColor,
-            getStatusTextColor,
+            getIndexNumber,
+            getConvertedIndex,
+            getLegendIconColor,
+            getLegendTextColor,
             handleClickLegend,
-            statusTextFormatter,
-            indexFormatter,
+            labelColorFormatter,
+            labelTextFormatter,
             currencyMoneyFormatter,
         };
     },

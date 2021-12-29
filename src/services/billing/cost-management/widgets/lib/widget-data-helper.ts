@@ -96,13 +96,19 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY)
     if (groupBy) {
         rawData.forEach((d) => {
             let _category = d[groupBy];
+            let _color;
             if (!_category) {
                 if (d.is_etc) _category = 'aggregation';
                 else _category = `no_${groupBy}`;
             }
+            if (groupBy === GROUP_BY.PROVIDER) {
+                const _providers = store.state.resource.provider.items;
+                _color = _providers[_category]?.color;
+            }
             chartData.push({
                 category: _category,
                 value: (d.usd_cost > 0 ? d.usd_cost : 0) as number,
+                color: _color,
             });
         });
     } else if (rawData.length) {

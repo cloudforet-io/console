@@ -75,6 +75,7 @@ const createSeries = (chart, legend, timeUnit) => {
     series.tooltip.label.fontSize = 10;
     series.stacked = true;
     series.columns.template.propertyFields.fillOpacity = 'fillOpacity';
+    if (legend.color) series.columns.template.fill = legend.color;
 
     const today = dayjs.utc();
     series.columns.template.adapter.add('fillOpacity', (fillOpacity, target) => {

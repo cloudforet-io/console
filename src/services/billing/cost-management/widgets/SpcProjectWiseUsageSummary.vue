@@ -12,7 +12,7 @@
         <div class="table-wrapper">
             <cost-dashboard-data-table :fields="tableState.fields"
                                        :items="tableState.items"
-                                       :loading="tableState.loading"
+                                       :loading="loading"
                                        :chart="chart"
                                        :legends="legends"
                                        :currency-rates="currencyRates"
@@ -26,7 +26,7 @@
             <cost-dashboard-data-table v-if="tableState.items.length > 10"
                                        :fields="tableState.fields"
                                        :items="tableState.items"
-                                       :loading="tableState.loading"
+                                       :loading="loading"
                                        :chart="chart"
                                        :legends="legends"
                                        :currency-rates="currencyRates"
@@ -44,9 +44,7 @@
 
 <script lang="ts">
 import {
-    computed,
-    defineComponent,
-    onUnmounted, reactive, toRefs, watch,
+    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -57,13 +55,13 @@ import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/co
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
-import {
-    Legend, PieChartData, WidgetProps,
-} from '@/services/billing/cost-management/widgets/type';
+import { Legend, PieChartData, WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import CostDashboardDataTable from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
 import {
-    getLegends, getPieChartData,
+    getCurrencyAppliedChartData,
+    getLegends,
+    getPieChartData,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { store } from '@/store';
 import { PChartLoader, PSkeleton } from '@spaceone/design-system';
@@ -127,7 +125,6 @@ export default defineComponent<WidgetProps>({
             })),
         });
         const tableState = reactive({
-            loading: false,
             items: [],
             fields: computed(() => [
                 { name: 'project_id', label: 'Project' },
@@ -155,22 +152,30 @@ export default defineComponent<WidgetProps>({
             chart.radius = am4core.percent(100);
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
-            const pieSeries = chart.series.push(new am4charts.PieSeries());
-            pieSeries.dataFields.value = valueName;
-            pieSeries.dataFields.category = categoryKey;
-            pieSeries.labels.template.disabled = true;
-            pieSeries.slices.template.propertyFields.fill = 'color';
-            pieSeries.slices.template.clickable = false;
-            pieSeries.slices.template.states.getKey('hover').properties.scale = 1;
+            const series = chart.series.push(new am4charts.PieSeries());
+            series.dataFields.value = valueName;
+            series.dataFields.category = categoryKey;
+            series.labels.template.disabled = true;
+            series.slices.template.togglable = false;
+            series.slices.template.clickable = false;
+            series.slices.template.states.getKey('hover').properties.scale = 1;
+            series.slices.template.tooltipText = '{category}: [bold]{value} ({value.percent.formatNumber(\'#.0\')}%)[/]';
+            series.tooltip.label.fontSize = 10;
 
             if (state.chartData.length === 0) {
-                pieSeries.tooltip.disabled = true;
+                series.tooltip.disabled = true;
                 chart.data = [{
                     category: 'No Data',
                     value: 1,
                     color: am4core.color(gray[100]),
                 }];
-            } else chart.data = state.chartData;
+            } else {
+                chart.data = getCurrencyAppliedChartData(
+                    state.chartData,
+                    props.currency,
+                    props.currencyRates,
+                );
+            }
             return chart;
         };
 
@@ -196,7 +201,6 @@ export default defineComponent<WidgetProps>({
         const getData = async () => {
             try {
                 state.loading = true;
-                tableState.loading = true;
 
                 const results = await fetchData();
                 state.chartData = getPieChartData(results, GROUP_BY.PROJECT);
@@ -211,7 +215,6 @@ export default defineComponent<WidgetProps>({
                 state.chartData = [];
             } finally {
                 state.loading = false;
-                tableState.loading = false;
             }
         };
 
@@ -225,13 +228,19 @@ export default defineComponent<WidgetProps>({
             }
         }, { immediate: false });
 
-        onUnmounted(() => {
-            if (state.chart) state.chart.dispose();
-        });
-
         watch([() => props.period, () => props.filters], () => {
             getData();
         }, { immediate: true });
+
+        watch(() => props.currency, (currency) => {
+            if (state.chart) {
+                state.chart.data = getCurrencyAppliedChartData(state.chartData, currency, props.currencyRates);
+            }
+        });
+
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
+        });
 
         return {
             ...toRefs(state),
