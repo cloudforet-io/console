@@ -37,6 +37,11 @@ import {
     defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import { debounce, isEmpty } from 'lodash';
+import axios, { CancelTokenSource } from 'axios';
+import dayjs from 'dayjs';
+
 import {
     PButton, PCard, PDataLoader, PDynamicWidget,
 } from '@spaceone/design-system';
@@ -44,19 +49,23 @@ import {
     DynamicWidgetFieldHandler,
     DynamicWidgetSchema,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { Filter } from '@spaceone/console-core-lib/space-connector/type';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { Reference } from '@/lib/reference/type';
+import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+
 import CloudServiceUsageOverviewDetailModal
     from '@/services/inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewDetailModal.vue';
 import {
     CloudServiceTypeInfo,
 } from '@/services/inventory/cloud-service/cloud-service-detail/type';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Period } from '@/services/billing/cost-management/type';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { Filter } from '@spaceone/console-core-lib/space-connector/type';
-import { Reference } from '@/lib/reference/type';
-import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+
 
 interface Props {
     cloudServiceTypeInfo?: CloudServiceTypeInfo;
@@ -118,6 +127,14 @@ export default defineComponent<Props>({
                 }
                 return undefined;
             }),
+            dateRange: computed<Period|undefined>(() => {
+                if (isEmpty(props.period)) return undefined;
+                const period = props.period as Period;
+                const dateRange: Period = {};
+                if (period.start) dateRange.start = dayjs.utc(period.start).format('YYYY-MM-DD');
+                if (period.end) dateRange.end = dayjs.utc(period.end).format('YYYY-MM-DD');
+                return dateRange;
+            }),
         });
 
         const fetchSchemaList = async (): Promise<DynamicWidgetSchema[]> => {
@@ -145,17 +162,24 @@ export default defineComponent<Props>({
             }
         };
 
-        const fetchDataWithSchema = async (schema: DynamicWidgetSchema): Promise<Data> => {
+        let fetchDataTokenList: Array<CancelTokenSource|undefined> = [];
+
+        const fetchDataWithSchema = async (schema: DynamicWidgetSchema, idx: number): Promise<Data> => {
+            fetchDataTokenList[idx] = axios.CancelToken.source();
+
             try {
-                const { results } = await SpaceConnector.client.inventory.cloudService.analyze({
+                const { results } = await SpaceConnector.client.inventory[props.isServer ? 'server' : 'cloudService'].analyze({
                     default_query: schema.query,
                     filter: state.apiFilter,
                     limit: schema.options?.limit,
-                    date_range: props.period,
+                    date_range: state.dateRange,
                 });
+                fetchDataTokenList[idx] = undefined;
                 return results[0] ?? {};
             } catch (e) {
-                ErrorHandler.handleError(e);
+                if (!axios.isCancel(e.axiosError)) {
+                    ErrorHandler.handleError(e);
+                }
                 return {};
             }
         };
@@ -167,16 +191,25 @@ export default defineComponent<Props>({
             else state.widgetSchemaList = await fetchSchemaList();
         };
 
+        const cancelPreviousDataFetchRequests = () => {
+            fetchDataTokenList.forEach((fetchDataToken) => {
+                if (fetchDataToken) {
+                    fetchDataToken.cancel('Next request will called.');
+                }
+            });
+            fetchDataTokenList = [];
+        };
 
-        const getDataListWithSchema = async () => {
+        const getDataListWithSchema = debounce(async () => {
             state.dataLoading = true;
-            const results = await Promise.allSettled(state.widgetSchemaList.map(schema => fetchDataWithSchema(schema)));
+            cancelPreviousDataFetchRequests();
+            const results = await Promise.allSettled(state.widgetSchemaList.map((schema, i) => fetchDataWithSchema(schema, i)));
             state.dataList = results.map((d) => {
                 if (d.status === 'fulfilled') return d.value;
                 return {};
             });
             state.dataLoading = false;
-        };
+        }, 300);
 
         /* Component Props */
         const fieldHandler: DynamicWidgetFieldHandler<Record<'reference', Reference>> = (field) => {
@@ -192,8 +225,10 @@ export default defineComponent<Props>({
         };
 
         /* Watchers */
-        watch([() => props.filters, () => props.period], () => {
-            getDataListWithSchema();
+        watch([() => props.filters, () => state.dateRange], () => {
+            if (!props.disabled && state.cloudServiceTypeId) {
+                getDataListWithSchema();
+            }
         });
 
         watch(() => state.cloudServiceTypeId, async (cloudServiceTypeId) => {

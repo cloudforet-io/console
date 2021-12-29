@@ -7,6 +7,7 @@
                       :child="isCloudService"
                       @goBack="$router.go(-1)"
         />
+        <slot name="period-filter" />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-dynamic-layout v-if="tableState.schema"
@@ -40,7 +41,7 @@
                         </div>
                     </template>
                     <template #toolbox-bottom>
-                        <slot name="usage-overview" />
+                        <slot name="usage-overview" :filters="tableState.searchFilters" />
                     </template>
                 </p-dynamic-layout>
             </template>
@@ -175,6 +176,8 @@ import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-s
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { Period } from '@/services/billing/cost-management/type';
 
 
 interface ProjectItemResp {
@@ -228,10 +231,14 @@ export default {
             type: Boolean,
             default: false,
         },
+        period: {
+            type: Object as () => Period|undefined,
+            default: undefined,
+        },
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const queryHelper = new QueryHelper();
         const apiQuery = new ApiQueryHelper();
         const pageTitle = computed(() => (props.isCloudService ? props.cloudServiceType : vm.$t('INVENTORY.SERVER.MAIN.TITLE')));
 
@@ -285,13 +292,15 @@ export default {
             }),
             selectedServerIds: computed(() => tableState.selectedItems.map(d => d.server_id)),
             visibleCustomFieldModal: false,
+            // eslint-disable-next-line no-use-before-define
+            searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
         });
         const fetchOptionState = reactive({
             pageStart: 1,
             pageLimit: store.getters['settings/getItem']('pageLimit', STORAGE_PREFIX) || DEFAULT_PAGE_SIZE,
             sortDesc: true,
             sortBy: 'created_at',
-            queryTags: [] as QueryTag[],
+            queryTags: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).queryTags as QueryTag[],
         });
         const checkTableModalState = reactive({
             visible: false,
@@ -358,7 +367,7 @@ export default {
         const getQuery = () => {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilters(queryHelper.filters);
+                .setFilters(tableState.searchFilters);
 
             if (props.isCloudService) {
                 apiQuery.addFilter({ k: 'provider', o: '=', v: props.provider },
@@ -475,10 +484,6 @@ export default {
                 }
                 if (changed.queryTags !== undefined) {
                     fetchOptionState.queryTags = changed.queryTags;
-                    /* api query setting */
-                    queryHelper.setFiltersAsQueryTag(changed.queryTags);
-                    /* sync updated query tags to url query string */
-                    await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
                 }
             }
 
@@ -544,6 +549,14 @@ export default {
             await listServerData();
         };
 
+        const replaceQueryHelper = new QueryHelper();
+        watch(() => tableState.searchFilters, (searchFilters) => {
+            replaceQueryHelper.setFilters(searchFilters);
+            const filterQueryString = vm.$route.query.filters ?? '';
+            if (replaceQueryHelper.rawQueryString !== JSON.stringify(filterQueryString)) {
+                replaceUrlQuery('filters', replaceQueryHelper.rawQueryStrings);
+            }
+        });
 
         watch(() => props.disabled, (disabled) => {
             if (!disabled) init();

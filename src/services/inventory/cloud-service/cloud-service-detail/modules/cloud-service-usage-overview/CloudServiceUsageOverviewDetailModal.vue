@@ -7,7 +7,7 @@
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <cloud-service-period-filter :period="proxyPeriod" @update:period="handleUpdatePeriod" />
+            <cloud-service-period-filter read-only :period="period" />
             <p-divider class="flex-shrink-0" />
             <p-query-search-tags :tags="queryTags" read-only />
             <p-data-loader v-if="cloudServiceTypeId" :loading="layoutLoading"
@@ -36,6 +36,9 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import dayjs from 'dayjs';
+import { isEmpty } from 'lodash';
+
 import {
     PButtonModal, PDataLoader, PDivider, PDynamicWidget, PQuerySearchTags,
 } from '@spaceone/design-system';
@@ -58,6 +61,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import { CloudServiceTypeInfo } from '@/services/inventory/cloud-service/cloud-service-detail/type';
 import { Period } from '@/services/billing/cost-management/type';
 import CloudServicePeriodFilter from '@/services/inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
+
 
 interface Props {
     visible: boolean;
@@ -114,7 +118,6 @@ export default defineComponent<Props>({
 
         const state = reactive({
             proxyVisible: props.visible,
-            proxyPeriod: props.period as Period|undefined,
             header: computed(() => `Usage Overview of ${props.cloudServiceTypeInfo?.name}`),
             widgetSchemaList: [] as DynamicWidgetSchema[],
             layoutLoading: true,
@@ -123,6 +126,14 @@ export default defineComponent<Props>({
             cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo?.cloud_service_type_id ?? ''),
             queryTags: [] as QueryTag[],
             apiFilter: [] as Filter[],
+            dateRange: computed<Period|undefined>(() => {
+                if (isEmpty(props.period)) return undefined;
+                const period = props.period as Period;
+                const dateRange: Period = {};
+                if (period.start) dateRange.start = dayjs.utc(period.start).format('YYYY-MM-DD');
+                if (period.end) dateRange.end = dayjs.utc(period.end).format('YYYY-MM-DD');
+                return dateRange;
+            }),
         });
 
 
@@ -151,11 +162,11 @@ export default defineComponent<Props>({
 
         const fetchDataWithSchema = async (schema: DynamicWidgetSchema): Promise<Data[]> => {
             try {
-                const { results } = await SpaceConnector.client.inventory.cloudService.analyze({
+                const { results } = await SpaceConnector.client.inventory[props.isServer ? 'server' : 'cloudService'].analyze({
                     default_query: schema.query,
                     filter: state.apiFilter,
                     limit: schema.options?.limit,
-                    date_range: props.period,
+                    date_range: state.dateRange,
                 });
                 return results;
             } catch (e) {
@@ -201,16 +212,8 @@ export default defineComponent<Props>({
             emit('update:visible', visible);
         };
 
-        const handleUpdatePeriod = (period) => {
-            state.proxyPeriod = period;
-            emit('update:period', period);
-        };
 
         /* Watchers */
-        watch(() => props.period, (period) => {
-            if (period !== state.proxyPeriod) state.proxyPeriod = period;
-        });
-
         watch(() => props.filters, (filters) => {
             const { filter } = queryHelper.setFilters(filters).apiQuery;
 
@@ -236,7 +239,6 @@ export default defineComponent<Props>({
         return {
             ...toRefs(state),
             handleUpdateVisible,
-            handleUpdatePeriod,
             fieldHandler,
         };
     },
