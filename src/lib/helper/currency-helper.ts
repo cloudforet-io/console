@@ -1,5 +1,5 @@
 import { convert as cashifyConvert } from 'cashify';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/display/config';
 import { CurrencyRates } from '@/store/modules/display/type';
 
 /** cashify library: https://www.npmjs.com/package/cashify */
@@ -17,33 +17,19 @@ export const convertUSDToCurrency = (money: number, currency: CURRENCY, rates: C
     to: currency,
 });
 
-/**
- * @name getFormattedMoney
- * @param money
- * @param transitionValue
- * @param currency
- * @description Get formatted money according to transition value.
- * @example
- * money 1,000, transitionValue 1,000 -> 1K
- * money 1,000, transitionValue 10,000 -> 1,000
+/*
+  IANA Language Subtag Registry: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
  */
-const getFormattedMoney = (money: number, transitionValue: number, currency?: CURRENCY): number|string => {
-    let _formattedMoney;
-    if (currency === CURRENCY.KRW || currency === CURRENCY.JPY) {
-        _formattedMoney = Math.round(money); // 123.456 -> 123
-    } else {
-        _formattedMoney = Math.round(money * 100) / 100; // 123.456 -> 123.46
-    }
-
-    if (Math.abs(money) < transitionValue) {
-        const _digits = (currency === CURRENCY.KRW || currency === CURRENCY.JPY) ? 0 : 2;
-        return _formattedMoney.toLocaleString('en', { minimumFractionDigits: _digits }); // 1234.56 -> 1,234.56
-    }
-
-    const options = { notation: 'compact', signDisplay: 'auto', maximumFractionDigits: 2 };
-    return Intl.NumberFormat('en', options).format(money); // 1234.56 -> 1.23K
+const currencyToLocaleMap: Record<CURRENCY, string> = {
+    [CURRENCY.KRW]: 'ko',
+    [CURRENCY.JPY]: 'ja',
+    [CURRENCY.USD]: 'en',
 };
-
+const currencyToMinimumFractionDigitsMap: Record<CURRENCY, number> = {
+    [CURRENCY.KRW]: 0,
+    [CURRENCY.JPY]: 0,
+    [CURRENCY.USD]: 2,
+};
 
 /**
  * @name currencyMoneyFormatter
@@ -59,18 +45,26 @@ const getFormattedMoney = (money: number, transitionValue: number, currency?: CU
  */
 export const currencyMoneyFormatter = (
     value?: number,
-    currency?: CURRENCY,
+    currency: CURRENCY = CURRENCY.USD,
     rates?: CurrencyRates,
     disableSymbol = false,
     transitionValue = 10000,
 ): string|number => {
     if (typeof value === 'number') {
-        const _symbol = (currency && !disableSymbol) ? CURRENCY_SYMBOL[currency] : '';
-        const _money = (currency && rates) ? convertUSDToCurrency(value, currency, rates) : value;
-        const _formattedMoney = getFormattedMoney(Math.abs(_money), transitionValue, currency);
+        const money = (currency && rates) ? convertUSDToCurrency(value, currency, rates) : value;
 
-        if (disableSymbol) return _money >= 0 ? _formattedMoney : `-${_formattedMoney}`;
-        return _money >= 0 ? `${_symbol}${_formattedMoney}` : `-${_symbol}${_formattedMoney}`;
+        const shorten: boolean = Math.abs(money) >= transitionValue;
+        const digit = currencyToMinimumFractionDigitsMap[currency];
+        const options = {
+            notation: shorten ? 'compact' : 'standard',
+            maximumFractionDigits: shorten ? 2 : digit,
+            minimumFractionDigits: shorten ? 0 : digit,
+            style: disableSymbol ? 'decimal' : 'currency',
+            currency,
+            currencyDisplay: 'narrowSymbol',
+        };
+
+        return Intl.NumberFormat(currencyToLocaleMap[currency], options).format(money);
     }
 
     return '--';
