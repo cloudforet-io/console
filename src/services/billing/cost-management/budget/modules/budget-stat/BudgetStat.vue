@@ -8,11 +8,13 @@
             <template v-else>
                 <div class="stat">
                     <template v-if="unit === UNIT.currency">
-                        <span class="symbol">{{ currencySymbol }}</span>
-                        <span>{{ currencyMoneyFormatter(data, currency, currencyRates, true) }}</span>
+                        <span>{{ currencyMoneyFormatter(data, currency, currencyRates) }}</span>
                     </template>
                     <template v-else-if="unit === UNIT.percent">
-                        <span>{{ data.toFixed(2) }}</span>
+                        <span>
+                            <template v-if="data < 0">0.00</template>
+                            <template v-else>{{ data.toFixed(2) }}</template>
+                        </span>
                         <span class="symbol">&nbsp;%</span>
                     </template>
                 </div>

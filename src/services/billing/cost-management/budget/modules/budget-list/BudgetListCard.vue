@@ -41,7 +41,8 @@
                             </p>
                             <div class="amount-used-wrapper" :class="progressStatus">
                                 <span class="cost">{{ currencyMoneyFormatter(cost, currency, currencyRates, false, 10000000000) }}</span>
-                                <span class="percent">({{ percentage.toFixed(2) }}%)</span>
+                                <span class="percent">(<template v-if="percentage < 0">0.00</template>
+                                    <template v-else>{{ percentage.toFixed(2) }}</template>%)</span>
                             </div>
                         </div>
                         <div class="label-right">

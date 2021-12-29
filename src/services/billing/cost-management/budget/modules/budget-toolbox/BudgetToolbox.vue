@@ -109,7 +109,7 @@ export default {
                 { name: 'project_id', label: 'Project' },
                 { name: 'project_group_id', label: 'Project Group' },
                 { name: 'time_unit', label: 'Time Unit' },
-                { name: 'cost_types', label: 'Cost Types', dataType: 'object' },
+                { name: 'cost_types', label: 'Cost Type', dataType: 'object' },
             ],
         }];
 
@@ -122,7 +122,7 @@ export default {
             cost_types: makeDistinctValueHandler('cost_analysis.Budget', 'cost_types', 'object'),
         };
 
-        const filtersHelper = new QueryHelper();
+        const filtersHelper = new QueryHelper().setKeyItemSets(keyItemSets);
 
         const state = reactive({
             selectedPeriod: ['total'] as string[],
