@@ -92,7 +92,7 @@ export default {
                 params: {
                     provider: item.provider,
                     group: item.cloud_service_group,
-                    name: item.cloudServiceTypeName ? item.cloudServiceTypeName : undefined,
+                    name: item.cloudServiceTypeName ?? item.resources[0].cloud_service_type,
                 },
                 query: {
                     filters: cloudServiceDetailQueryHelper.rawQueryStrings,
