@@ -141,7 +141,7 @@ export default defineComponent<Props>({
                 delete state.chartRegistry[chartContext];
             }
         };
-        const drawChart = (chartContext) => {
+        const drawChart = (chartContext, chartData, legends) => {
             const createChart = () => {
                 disposeChart(chartContext);
                 state.chartRegistry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
@@ -151,7 +151,7 @@ export default defineComponent<Props>({
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
-            chart.data = getCurrencyAppliedChartData(state.chartData, props.currency, props.currencyRates);
+            chart.data = getCurrencyAppliedChartData(chartData, props.currency, props.currencyRates);
 
             chart.dateFormatter.inputDateFormat = 'yyyy-MM';
             const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
@@ -194,13 +194,14 @@ export default defineComponent<Props>({
                 series.strokeWidth = 0;
                 series.columns.template.width = am4core.percent(60);
                 series.tooltipText = '{name}: [bold]{valueY}[/]';
+                series.columns.template.propertyFields.fill = legend.color;
                 series.tooltip.label.fontSize = 10;
                 series.stacked = true;
                 if (legend.color) series.fill = am4core.color(legend.color);
                 return series;
             };
 
-            state.legends.forEach((legend) => {
+            legends.forEach((legend) => {
                 createSeries(legend);
             });
 
@@ -248,7 +249,7 @@ export default defineComponent<Props>({
             state.loading = true;
             state.items = await listCostAnalysisData(_period, filters);
             await setChartDataAndLegends();
-            state.chart = drawChart(state.chartRef);
+            state.chart = drawChart(state.chartRef, state.chartData, state.legends);
             state.loading = false;
         }, { immediate: true });
 
