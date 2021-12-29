@@ -16,7 +16,6 @@
                            required
             >
                 <p-datetime-picker class="datetime-picker" :data-type="datetimePickerDataType" :selected-dates.sync="startDate"
-                                   :min-date="minDate" :max-date="maxDate"
                                    :invalid="!!startDate.length && !!endDate.length && invalid"
                 />
             </p-field-group>
@@ -25,7 +24,6 @@
                            required
             >
                 <p-datetime-picker class="datetime-picker" :data-type="datetimePickerDataType" :selected-dates.sync="endDate"
-                                   :min-date="minDate" :max-date="maxDate"
                                    :invalid="!!startDate.length && !!endDate.length && invalid"
                 />
             </p-field-group>
@@ -38,6 +36,7 @@ import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-sys
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
+
 
 export default {
     name: 'CostDashboardCustomRangeModal',
@@ -59,14 +58,6 @@ export default {
             type: String,
             default: DATA_TYPE.yearToDate,
         },
-        minDate: {
-            type: String,
-            default: undefined,
-        },
-        maxDate: {
-            type: String,
-            default: undefined,
-        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -77,9 +68,11 @@ export default {
             invalid: computed(() => {
                 if (!state.startDate.length || !state.endDate.length) return true;
                 const timeUnit = props.datetimePickerDataType === DATA_TYPE.yearToDate ? 'day' : 'month';
-                const startData = dayjs.utc(state.startDate[0]);
+                const startDate = dayjs.utc(state.startDate[0]);
                 const endDate = dayjs.utc(state.endDate[0]);
-                return startData.isAfter(endDate, timeUnit);
+
+                if (props.datetimePickerDataType === DATA_TYPE.yearToMonth && endDate.diff(startDate, 'year') >= 1) return true;
+                return startDate.isAfter(endDate, timeUnit);
             }),
             startDate: [],
             endDate: [],
