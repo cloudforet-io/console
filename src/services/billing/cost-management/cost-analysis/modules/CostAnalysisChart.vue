@@ -119,26 +119,24 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helper';
 import {
-    getConvertedFilter, getTimeUnitByPeriod,
+    getConvertedFilter,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import {
-    Legend, PieChartRawData, PieChartData, XYChartData,
+    Legend, PieChartData, XYChartData,
 } from '@/services/billing/cost-management/widgets/type';
 import {
     FILTER_ITEM_MAP, GRANULARITY, GROUP_BY,
 } from '@/services/billing/cost-management/lib/config';
-import { CostAnalyzeModel } from '@/services/billing/cost-management/cost-analysis/type';
 import { Period } from '@/services/billing/cost-management/type';
+import {
+    getLegends,
+    getPieChartData,
+    getXYChartData,
+} from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 import { store } from '@/store';
 
-
-const DATE_FORMAT = Object.freeze({
-    day: 'YYYY-MM-DD',
-    month: 'YYYY-MM',
-    year: 'YYYY',
-});
 
 export default {
     name: 'CostAnalysisChart',
@@ -181,93 +179,6 @@ export default {
             chart: null as XYChart | PieChart | null,
             filterModalVisible: false,
         });
-
-        /* util */
-        const getLegends = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY): Legend[] => {
-            if (groupBy) {
-                const _providers = store.state.resource.provider.items;
-                const _serviceAccounts = store.state.resource.serviceAccount.items;
-                const _projects = store.state.resource.project.items;
-                const _regions = store.state.resource.region.items;
-
-                const legends: Legend[] = [];
-                rawData.forEach((d) => {
-                    let _name = d[groupBy];
-                    let _label = d[groupBy];
-                    if (groupBy === GROUP_BY.PROJECT) {
-                        _label = _projects[_name]?.label || _name;
-                    } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
-                        _label = _serviceAccounts[_name]?.label || _name;
-                    } else if (groupBy === GROUP_BY.REGION) {
-                        _label = _regions[_name]?.name || _name;
-                    } else if (groupBy === GROUP_BY.PROVIDER) {
-                        _label = _providers[_name]?.name || _name;
-                    }
-                    if (!_name) {
-                        if (d.is_etc) {
-                            _name = 'aggregation';
-                            _label = 'Aggregation of the rest';
-                        } else {
-                            _name = `no_${groupBy}`;
-                            _label = 'Unknown';
-                        }
-                    }
-                    legends.push({
-                        name: _name,
-                        label: _label,
-                        disabled: false,
-                    });
-                });
-                return legends;
-            }
-            return [{ name: 'totalCost', label: 'Total Cost', disabled: false }];
-        };
-        const getXYChartData = (rawData: CostAnalyzeModel[], granularity: GRANULARITY, period: Period, groupBy?: GROUP_BY): XYChartData[] => {
-            const chartData: XYChartData[] = [];
-            const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
-            const dateFormat = DATE_FORMAT[timeUnit];
-
-            let now = dayjs.utc(period.start).clone();
-            while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
-                const _date = now.format(dateFormat);
-                const chartDataByDate: XYChartData = { date: _date };
-                rawData.forEach((d) => {
-                    if (groupBy) {
-                        let groupByName = d[groupBy];
-                        if (!groupByName) {
-                            if (d.is_etc) groupByName = 'aggregation';
-                            else groupByName = `no_${groupBy}`;
-                        }
-                        if (d.usd_cost[_date]) chartDataByDate[groupByName] = d.usd_cost[_date];
-                    } else if (d.usd_cost[_date]) chartDataByDate.totalCost = d.usd_cost[_date];
-                });
-                chartData.push(chartDataByDate);
-                now = now.add(1, timeUnit);
-            }
-            return chartData;
-        };
-        const getPieChartData = (rawData: PieChartRawData[], groupBy?: GROUP_BY): PieChartData[] => {
-            let chartData: PieChartData[] = [];
-            if (groupBy) {
-                rawData.forEach((d) => {
-                    let _category = d[groupBy];
-                    if (!_category) {
-                        if (d.is_etc) _category = 'aggregation';
-                        else _category = `no_${groupBy}`;
-                    }
-                    chartData.push({
-                        category: _category,
-                        value: d.usd_cost,
-                    });
-                });
-            } else if (rawData.length) {
-                chartData = [{
-                    category: 'Total Cost',
-                    value: rawData[0]?.usd_cost ?? 0,
-                }];
-            }
-            return chartData;
-        };
 
         /* api */
         let listCostAnalysisRequest: CancelTokenSource | undefined;

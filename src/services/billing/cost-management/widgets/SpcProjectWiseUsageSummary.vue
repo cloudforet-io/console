@@ -58,11 +58,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import {
-    Legend, PieChartData, PieChartRawData, WidgetProps,
+    Legend, PieChartData, WidgetProps,
 } from '@/services/billing/cost-management/widgets/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import CostDashboardDataTable from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
-import { getPieChartDataAndLegends } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import {
+    getLegends, getPieChartData,
+} from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { store } from '@/store';
 import { PChartLoader, PSkeleton } from '@spaceone/design-system';
 import { gray } from '@/styles/colors';
@@ -76,11 +78,6 @@ import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/confi
 
 const categoryKey = 'category';
 const valueName = 'value';
-
-interface ChartData extends PieChartRawData {
-    project_id: string;
-    usd_cost: number;
-}
 
 export default defineComponent<WidgetProps>({
     name: 'SpcProjectWiseUsageSummary',
@@ -184,12 +181,10 @@ export default defineComponent<WidgetProps>({
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
-                    group_by: ['project_id'],
+                    group_by: [GROUP_BY.PROJECT],
                     start: dayjs.utc(props.period?.start).startOf('month').format('YYYY-MM-DD'),
                     end: dayjs.utc(props.period?.end).endOf('month').format('YYYY-MM-DD'),
-                    page: {
-                        limit: 20,
-                    },
+                    limit: 20,
                     ...costQueryHelper.apiQuery,
                 });
                 return results;
@@ -204,18 +199,12 @@ export default defineComponent<WidgetProps>({
                 tableState.loading = true;
 
                 const results = await fetchData();
-
-                const { chartData, legends } = getPieChartDataAndLegends(results, GROUP_BY.PROJECT);
-                console.log(chartData);
-                state.chartData = chartData.map(d => ({
-                    category: state.projects[d.category]?.label || d.category,
-                    value: d.value > 0 ? d.value : 0,
-                }));
-                state.legends = legends;
+                state.chartData = getPieChartData(results, GROUP_BY.PROJECT);
+                state.legends = getLegends(results, GROUP_BY.PROJECT);
 
                 tableState.items = results.map(d => ({
                     ...d,
-                    project_id: d.project_id ? state.projects[d.project_id]?.label || d.project_id : 'No Project',
+                    project_id: d.project_id ? state.projects[d.project_id]?.label || d.project_id : 'Unknown',
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);

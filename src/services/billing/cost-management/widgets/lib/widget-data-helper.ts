@@ -7,11 +7,13 @@ import { CurrencyRates } from '@/store/modules/display/type';
 
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
-import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { Period } from '@/services/billing/cost-management/type';
 import {
-    ChartData, Legend, PieChartData, PieChartRawData, XYChartData, XYChartRawData,
+    ChartData, CostAnalyzeModel, Legend, PieChartData, XYChartData,
 } from '@/services/billing/cost-management/widgets/type';
+import { getTimeUnitByPeriod } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { DATE_FORMAT } from '@/services/billing/cost-management/widgets/lib/config';
 
 
 /**
@@ -32,37 +34,50 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
     return mergedData;
 };
 
-const _getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: string): Legend[] => {
-    let legends: Legend[] = [];
+
+/**
+ * @name getLegends
+ * @description Extract legends from raw data.
+ * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary
+ */
+export const getLegends = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY): Legend[] => {
     if (groupBy) {
         const _providers = store.state.resource.provider.items;
         const _serviceAccounts = store.state.resource.serviceAccount.items;
         const _projects = store.state.resource.project.items;
         const _regions = store.state.resource.region.items;
-        groupByNames.forEach((d) => {
-            let _label = d;
-            let _color = undefined as string | undefined;
+
+        const legends: Legend[] = [];
+        rawData.forEach((d) => {
+            let _name = d[groupBy];
+            let _label = d[groupBy];
             if (groupBy === GROUP_BY.PROJECT) {
-                _label = _projects[d]?.label || d;
+                _label = _projects[_name]?.label || _name;
             } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
-                _label = _serviceAccounts[d]?.label || d;
+                _label = _serviceAccounts[_name]?.label || _name;
             } else if (groupBy === GROUP_BY.REGION) {
-                _label = _regions[d]?.name || d;
+                _label = _regions[_name]?.name || _name;
             } else if (groupBy === GROUP_BY.PROVIDER) {
-                _label = _providers[d]?.name || d;
-                _color = _providers[d]?.color;
+                _label = _providers[_name]?.name || _name;
+            }
+            if (!_name) {
+                if (d.is_etc) {
+                    _name = 'aggregation';
+                    _label = 'Aggregation of the rest';
+                } else {
+                    _name = `no_${groupBy}`;
+                    _label = 'Unknown';
+                }
             }
             legends.push({
-                name: d as string,
-                label: _label as string,
-                color: _color,
+                name: _name,
+                label: _label,
                 disabled: false,
             });
         });
-    } else {
-        legends = [{ name: 'totalCost', label: 'Total Cost', disabled: false }];
+        return legends;
     }
-    return legends;
+    return [{ name: 'totalCost', label: 'Total Cost', disabled: false }];
 };
 
 
@@ -71,83 +86,61 @@ const _getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: string): 
  * @description Convert raw data to PieChart data.
  * @example [{ provider: 'aws', usd_cost: 100 }, { provider: 'azure', usd_cost: 30 }]
  *       => [{ category: 'aws', value: 100 }, { category: 'azure', value: 30 }]
- * @usage SpcProjectWiseUsageSummary, CostByProvider
+ * @usage SpcProjectWiseUsageSummary, CostAnalysisChart
  */
-export const getPieChartData = (rawData: PieChartRawData[], groupBy: string): PieChartData[] => rawData.map((d) => {
-    let groupByName = d[groupBy];
-    if (!groupByName) groupByName = 'Unknown';
-    return {
-        category: groupByName,
-        value: d.usd_cost,
-    };
-});
-
-export const getPieChartDataAndLegends = (rawData: PieChartRawData[], groupBy: string): { chartData: PieChartData[]; legends: Legend[] } => {
-    const chartData: PieChartData[] = getPieChartData(rawData, groupBy);
-    const groupByNames = rawData.map(d => d[groupBy]);
-    return {
-        chartData,
-        legends: _getLegendsFromGroupByNames(groupByNames, groupBy),
-    };
+export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY): PieChartData[] => {
+    let chartData: PieChartData[] = [];
+    if (groupBy) {
+        rawData.forEach((d) => {
+            let _category = d[groupBy];
+            if (!_category) {
+                if (d.is_etc) _category = 'aggregation';
+                else _category = `no_${groupBy}`;
+            }
+            chartData.push({
+                category: _category,
+                value: (d.usd_cost > 0 ? d.usd_cost : 0) as number,
+            });
+        });
+    } else if (rawData.length) {
+        chartData = [{
+            category: 'Total Cost',
+            value: (rawData[0]?.usd_cost ?? 0) as number,
+        }];
+    }
+    return chartData;
 };
 
 
 /**
  * @name getXYChartData
  * @description Convert raw data to XYChart data.
- * @example [{ date: '2021-11-01', values: [{ provider: 'aws', usd_cost: 100 }] }, { date: '2021-11-02', values: [{ provider: 'aws', usd_cost: 300 }] }]
- *       => [{ date: '2021-11-01', aws: 100 }, { date: '2021-11-02', aws: 300 }]
- * @usage BudgetSummaryChart, LastMonthTotalSpend
+ * @example [{ date: '2021-11-01', aws: 100, azure: 300 }, { date: '2021-11-02', aws: 300, azure: 100 }]
+ * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary, LastMonthTotalSpend, BudgetSummaryChart
  */
-export const getXYChartData = (rawData: XYChartRawData[], groupBy?: string): XYChartData[] => rawData.map((d) => {
-    const eachChartData: XYChartData = { date: d.date };
-    if (groupBy) {
-        d.values.forEach((value) => {
-            eachChartData[groupBy] = value.usd_cost;
-        });
-    } else {
-        d.values.forEach((value) => {
-            eachChartData.totalCost = value.usd_cost;
-        });
-    }
-    return eachChartData;
-});
-
-
-/**
- * @name getXYChartDataAndLegends
- * @description Get converted chart data and legends. If you don't need legends, use getXYChartData().
- * @usage CostAnalysisChart, CostTrendByProduct, CostTrendByProject
- */
-export const getXYChartDataAndLegends = (rawData: XYChartRawData[], groupBy?: string): { chartData: XYChartData[]; legends: Legend[] } => {
+export const getXYChartData = (rawData: CostAnalyzeModel[], granularity: GRANULARITY, period: Period, groupBy?: GROUP_BY): XYChartData[] => {
     const chartData: XYChartData[] = [];
-    const groupByNameSet = new Set<string>();
+    const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
+    const dateFormat = DATE_FORMAT[timeUnit];
 
-    rawData.forEach((d) => {
-        const eachChartData: XYChartData = { date: d.date };
-        if (groupBy) {
-            d.values.forEach((value) => {
-                let groupByName = value[groupBy];
+    let now = dayjs.utc(period.start).clone();
+    while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
+        const _date = now.format(dateFormat);
+        const chartDataByDate: XYChartData = { date: _date };
+        rawData.forEach((d) => {
+            if (groupBy) {
+                let groupByName = d[groupBy];
                 if (!groupByName) {
-                    if (value.is_etc) groupByName = 'Aggregation of the rest';
-                    else groupByName = 'Unknown';
+                    if (d.is_etc) groupByName = 'aggregation';
+                    else groupByName = `no_${groupBy}`;
                 }
-                eachChartData[groupByName] = value.usd_cost;
-                groupByNameSet.add(groupByName);
-            });
-        } else {
-            d.values.forEach((value) => {
-                eachChartData.totalCost = value.usd_cost;
-            });
-        }
-        chartData.push(eachChartData);
-    });
-
-    const groupByNames = [...groupByNameSet];
-    return {
-        chartData,
-        legends: _getLegendsFromGroupByNames(groupByNames, groupBy),
-    };
+                if (d.usd_cost[_date]) chartDataByDate[groupByName] = d.usd_cost[_date];
+            } else if (d.usd_cost[_date]) chartDataByDate.totalCost = d.usd_cost[_date];
+        });
+        chartData.push(chartDataByDate);
+        now = now.add(1, timeUnit);
+    }
+    return chartData;
 };
 
 
@@ -197,7 +190,7 @@ export const getCurrencyAppliedChartData = (
             data ?? 0,
             currency,
             currencyRates,
-        ) : data;
+        ).toFixed(2) : data;
     });
     return results;
 });

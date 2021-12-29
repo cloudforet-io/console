@@ -73,7 +73,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Location } from 'vue-router';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { Period } from '@/services/billing/cost-management/type';
-import { CostAnalyzeModel, UsdCost } from '@/services/billing/cost-management/cost-analysis/type';
+import { CostAnalyzeModel, UsdCost } from '@/services/billing/cost-management/widgets/type';
 
 
 export default {

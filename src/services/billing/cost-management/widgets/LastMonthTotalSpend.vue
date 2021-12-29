@@ -23,7 +23,6 @@ import CostDashboardSimpleCardWidget
 import {
     onUnmounted, computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { cloneDeep } from 'lodash';
 import { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -165,15 +164,10 @@ export default {
             costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    include_usage_quantity: false,
-                    granularity: 'MONTHLY',
-                    filter: [],
-                    pivot_type: 'CHART',
+                    granularity: GRANULARITY.MONTHLY,
                     start: state.firstMonth.format('YYYY-MM'),
                     end: state.thisMonth.endOf('month').format('YYYY-MM-DD'),
-                    page: {
-                        limit: 12,
-                    },
+                    pivot_type: 'TABLE',
                     ...costQueryHelper.apiQuery,
                 });
                 return results;
@@ -182,34 +176,15 @@ export default {
             }
         };
 
-        const getEnrichedChartData = (data: XYChartData[]) => {
-            const chartData = [] as XYChartData[];
-            let periodStart = cloneDeep(state.firstMonth);
-            while (periodStart.isSameOrBefore(state.thisMonth, 'month')) {
-                // eslint-disable-next-line no-loop-func
-                const existData = data.find(d => d.date === periodStart.format('YYYY-MM'));
-                if (existData) {
-                    chartData.push({
-                        date: periodStart.format('YYYY-MM'),
-                        totalCost: existData.totalCost,
-                    });
-                } else {
-                    chartData.push({
-                        date: periodStart.format('YYYY-MM'),
-                        totalCost: 0,
-                    });
-                }
-                periodStart = periodStart.add(1, 'month');
-            }
-            return chartData;
-        };
-
         const getChartData = async () => {
             try {
                 state.loading = true;
                 const results = await fetchData();
-                const chartData = getXYChartData(results);
-                state.data = getEnrichedChartData(chartData);
+                const _period = {
+                    start: state.firstMonth.format('YYYY-MM'),
+                    end: state.thisMonth.endOf('month').format('YYYY-MM-DD'),
+                };
+                state.data = getXYChartData(results, GRANULARITY.MONTHLY, _period);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.data = [];
