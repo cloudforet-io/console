@@ -1112,8 +1112,10 @@
 				"REGION": "リージョン",
 				"SERVICE_CATEGORY": "サービスカテゴリー",
 				"SERVICE_PROVIDER": "サービスプロバイダー",
+				"SHOW_ALL": "",
 				"SHOW_MAJOR": "主なサービスを見る",
-				"TITLE": "{provider} クラウドサービス"
+				"TITLE": "{provider} クラウドサービス",
+				"USAGE_OVERVIEW": ""
 			},
 			"PAGE": {
 				"ACTION": "作業",

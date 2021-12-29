@@ -1112,8 +1112,10 @@
 				"REGION": "지역",
 				"SERVICE_CATEGORY": "서비스 분류",
 				"SERVICE_PROVIDER": "서비스 제공자",
+				"SHOW_ALL": "모두 보기",
 				"SHOW_MAJOR": "주요 서비스 보기 ",
-				"TITLE": "{provider} 클라우드 서비스 "
+				"TITLE": "{provider} 클라우드 서비스 ",
+				"USAGE_OVERVIEW": "Usage Overview"
 			},
 			"PAGE": {
 				"ACTION": "작업",

@@ -1112,8 +1112,10 @@
 				"REGION": "Regions",
 				"SERVICE_CATEGORY": "Service Categories",
 				"SERVICE_PROVIDER": "Service Providers",
+				"SHOW_ALL": "Show all",
 				"SHOW_MAJOR": "Show Major Services ",
-				"TITLE": "{provider} Cloud Service"
+				"TITLE": "{provider} Cloud Service",
+				"USAGE_OVERVIEW": "Usage Overview"
 			},
 			"PAGE": {
 				"ACTION": "Action",
