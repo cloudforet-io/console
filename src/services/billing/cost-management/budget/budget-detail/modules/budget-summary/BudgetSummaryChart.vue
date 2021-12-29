@@ -141,7 +141,7 @@ export default {
             columnSeries.dataFields.valueY = columnChartValueName;
             columnSeries.dataFields.categoryX = 'date';
 
-            columnSeries.columns.template.tooltipText = '[#fff font-size: 12px]{name} in {categoryX}:\n[/][#fff font-size: 12px]{valueY}[/] [#fff]{additional}[/]';
+            columnSeries.columns.template.tooltipText = '[#fff font-size: 12px]{name} in {categoryX}:\n[/][#fff font-size: 12px bold]{valueY}[/] [#fff]{additional}[/]';
             columnSeries.columns.template.propertyFields.stroke = 'stroke';
             columnSeries.columns.template.propertyFields.strokeWidth = 'strokeWidth';
             columnSeries.columns.template.strokeOpacity = 0;

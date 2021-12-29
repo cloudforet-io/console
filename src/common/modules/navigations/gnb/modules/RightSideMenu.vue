@@ -283,7 +283,7 @@ export default {
             }
 
             &.new-icon {
-                margin-right: 0.5rem;
+                @apply relative;
             }
             &.account {
 

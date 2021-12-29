@@ -199,6 +199,9 @@ export default {
 
 <style lang="postcss" scoped>
 .project-wise-budget-usage-summary {
+    &::v-deep .no-data {
+        min-height: 10rem;
+    }
     .p-data-table {
         .col-project {
             display: flex;
@@ -210,12 +213,14 @@ export default {
         .col-usage {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            justify-content: space-between;
+            width: 14rem;
             .progress-bar {
                 width: 7.5rem;
             }
             .usage-text {
-                width: 3rem;
+                min-width: 3.375rem;
+                margin-left: 1rem;
                 text-align: right;
             }
         }
