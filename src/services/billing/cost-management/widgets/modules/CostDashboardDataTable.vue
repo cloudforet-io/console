@@ -8,29 +8,18 @@
                       disable-hover
         >
             <template #col-format="{field: { name }, value, index}">
-                <div>
+                <div class="flex">
                     <template v-if="fields[0].name === name">
                         <p-status v-if="showLegend"
                                   class="toggle-button"
-                                  :text="getStatusText(index)"
+                                  :text="statusTextFormatter(index)"
                                   :icon-color="getStatusIconColor(name, value, index)"
                                   :text-color="getStatusTextColor(index)"
                                   @click="handleClickLegend(index)"
                         />
                         <slot :name="`${name}-format`" v-bind="{ value }">
-                            <span v-if="Object.values(GROUP_BY).includes(name) && !value">
-                                Unknown
-                            </span>
-                            <span v-else-if="name === GROUP_BY.PROJECT">
-                                {{ projects[value] ? projects[value].label : value }}
-                            </span>
-                            <span v-else-if="name === GROUP_BY.PROVIDER">
-                                <span :style="{color: providers[value].color}">
-                                    {{ providers[value] ? providers[value].name : value }}
-                                </span>
-                            </span>
-                            <span v-else>
-                                {{ value }}
+                            <span :style="{color: (legends && legends[indexFormatter(index)]) ? legends[indexFormatter(index)].color : 'text-gray-900'}">
+                                {{ (legends && legends[indexFormatter(index)]) ? legends[indexFormatter(index)].label : '' }}
                             </span>
                         </slot>
                     </template>
@@ -142,7 +131,6 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            // convertedItems: [] as Item[],
             providers: computed(() => store.state.resource.provider.items),
             projects: computed(() => store.state.resource.project.items),
             slicedItems: computed(() => {
@@ -156,20 +144,19 @@ export default {
         });
 
         /* util */
-        const getStatusText = (index) => {
+        const indexFormatter = index => index + ((state.proxyThisPage - 1) * props.pageSize);
+        const statusTextFormatter = (index) => {
             const tableIndex = index + ((state.proxyThisPage - 1) * props.pageSize) + 1;
             return tableIndex.toString();
         };
-        const getStatusIconColor = (name, value, index) => {
-            const convertedIndex = index + ((state.proxyThisPage - 1) * props.pageSize);
-            const legend = props.legends[convertedIndex];
+        const getStatusIconColor = (groupBy, value, index) => {
+            const legend = props.legends[indexFormatter(index)];
             if (legend?.disabled) return DISABLED_LEGEND_COLOR;
-            if (name === GROUP_BY.PROVIDER) return state.providers[value].color;
-            return DEFAULT_CHART_COLORS[convertedIndex];
+            if (legend?.color) return legend.color;
+            return DEFAULT_CHART_COLORS[indexFormatter(index)];
         };
         const getStatusTextColor = (index) => {
-            const convertedIndex = index + ((state.proxyThisPage - 1) * props.pageSize);
-            const legend = props.legends[convertedIndex];
+            const legend = props.legends[indexFormatter(index)];
             if (legend?.disabled) return DISABLED_LEGEND_COLOR;
             return null;
         };
@@ -204,9 +191,8 @@ export default {
 
         /* event */
         const handleClickLegend = (index) => {
-            const convertedIndex = index + ((state.proxyThisPage - 1) * props.pageSize);
-            toggleSeries(props.chart as XYChart | PieChart | TreeMap, convertedIndex);
-            emit('toggle-legend', convertedIndex);
+            toggleSeries(props.chart as XYChart | PieChart | TreeMap, indexFormatter(index));
+            emit('toggle-legend', indexFormatter(index));
         };
 
         // watch([() => props.showSharpRises, () => props.items], ([showSharpRises, items]) => {
@@ -218,10 +204,11 @@ export default {
         return {
             ...toRefs(state),
             GROUP_BY,
-            getStatusText,
             getStatusIconColor,
             getStatusTextColor,
             handleClickLegend,
+            statusTextFormatter,
+            indexFormatter,
             currencyMoneyFormatter,
         };
     },
@@ -237,6 +224,7 @@ export default {
     .p-data-table {
         .toggle-button {
             cursor: pointer;
+            padding-right: 1rem;
         }
         .raised {
             @apply text-alert;

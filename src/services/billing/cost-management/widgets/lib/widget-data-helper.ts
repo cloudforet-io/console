@@ -51,6 +51,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY): Leg
         rawData.forEach((d) => {
             let _name = d[groupBy];
             let _label = d[groupBy];
+            let _color;
             if (groupBy === GROUP_BY.PROJECT) {
                 _label = _projects[_name]?.label || _name;
             } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
@@ -59,6 +60,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY): Leg
                 _label = _regions[_name]?.name || _name;
             } else if (groupBy === GROUP_BY.PROVIDER) {
                 _label = _providers[_name]?.name || _name;
+                _color = _providers[_name]?.color;
             }
             if (!_name) {
                 if (d.is_etc) {
@@ -73,6 +75,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY): Leg
                 name: _name,
                 label: _label,
                 disabled: false,
+                color: _color,
             });
         });
         return legends;

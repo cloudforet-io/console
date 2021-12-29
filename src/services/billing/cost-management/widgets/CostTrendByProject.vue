@@ -295,8 +295,14 @@ export default {
             height: 100%;
         }
     }
-    .table-wrapper {
+    .table-wrapper::v-deep {
         padding-top: 1rem;
+
+        .cost-dashboard-data-table {
+            .p-data-table {
+                height: 13.5rem;
+            }
+        }
     }
 }
 </style>
