@@ -18,7 +18,7 @@
                             class="summary"
             />
             <budget-notifications class="alert" />
-            <budget-billing-admin class="budget" />
+            <!--            <budget-billing-admin class="budget" />-->
         </section>
         <budget-delete-modal v-if="!loading"
                              :visible="checkDeleteState.visible"
@@ -44,8 +44,6 @@ import BudgetStoreModule from '@/services/billing/cost-management/budget/store';
 import { BudgetStoreState } from '@/services/billing/cost-management/budget/store/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import BudgetBillingAdmin
-    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-admin/BudgetBillingAdmin.vue';
 import { i18n } from '@/translations';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import BudgetDeleteModal from '@/services/billing/cost-management/budget/budget-detail/modules/BudgetDeleteModal.vue';
@@ -62,7 +60,6 @@ export default {
         BudgetDetailInfo,
         BudgetSummary,
         BudgetNotifications,
-        BudgetBillingAdmin,
     },
     props: {
         budgetId: {

@@ -61,6 +61,16 @@ interface EnrichedBudgetUsageData {
     link?: Location | string;
 }
 
+interface BudgetCostType {
+    key: string;
+    value?: string[]|null;
+}
+
+interface BudgetTarget {
+    projectId?: string;
+    projectGroupId?: string;
+}
+
 export default {
     name: 'BudgetDetailSummaryTable',
     components: {
@@ -79,10 +89,13 @@ export default {
     setup() {
         const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageData[], period: Period) => getStackedChartData(budgetUsageData, period, 'month');
 
-        const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUnit: BudgetTimeUnit, totalBudgetLimit: number, costTypeKey: string, costTypeValue: string[]|null) => {
-            const filters = {
-                [costTypeKey]: costTypeValue,
+        const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUnit: BudgetTimeUnit, totalBudgetLimit: number, costType: BudgetCostType, budgetTarget: BudgetTarget) => {
+            const costTypeFilters = {
+                [costType.key]: costType.value,
             };
+            let targetFilters = {};
+            if (budgetTarget.projectGroupId) targetFilters = { project_group_id: [budgetTarget.projectGroupId] };
+            else if (budgetTarget.projectId) targetFilters = { project_id: [budgetTarget.projectId] };
             return accumulatedBudgetData.map((d) => {
                 const period = {
                     start: dayjs.utc(d.date).startOf('month').format('YYYY-MM-DD'),
@@ -96,7 +109,7 @@ export default {
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         groupBy: arrayToQueryString([GROUP_BY.PRODUCT]),
                         period: objectToQueryString(period),
-                        filters: objectToQueryString(filters),
+                        filters: objectToQueryString({ ...costTypeFilters, ...targetFilters }),
                     },
                 };
                 return {
@@ -106,11 +119,11 @@ export default {
         };
 
         const getEnrichedBudgetUsageData = (budgetUsageData: BudgetUsageData[], period: Period, budgetTimeUnit: BudgetTimeUnit,
-            totalBudgetLimit: number, costTypeKey: string, costTypeValue: string[]|null): EnrichedBudgetUsageData[] => {
+            totalBudgetLimit: number, costType: BudgetCostType, budgetTarget: BudgetTarget): EnrichedBudgetUsageData[] => {
             const _budgetUsageData = cloneDeep(budgetUsageData);
             const accumulatedBudgetData = getAccumulatedBudgetUsageData(_budgetUsageData, period);
             const budgetUsageDataWithRatioAndLink = getBudgetUsageDataWithRatioAndLink(accumulatedBudgetData, budgetTimeUnit,
-                totalBudgetLimit, costTypeKey, costTypeValue);
+                totalBudgetLimit, costType, budgetTarget);
             return [firstColumnData, ...budgetUsageDataWithRatioAndLink] as unknown as EnrichedBudgetUsageData[];
         };
 
@@ -122,11 +135,19 @@ export default {
                 start: state.budgetData?.start,
                 end: state.budgetData?.end,
             })),
-            budgetCostTypeKey: computed<string>(() => getKeyOfCostType(state.budgetData?.cost_types)),
-            budgetCostTypeValue: computed<string[]|null>(() => getValueOfCostType(state.budgetData?.cost_types, state.budgetCostTypeKey)),
+            budgetCostType: computed<BudgetCostType|null>(() => ({
+                key: getKeyOfCostType(state.budgetData?.cost_types),
+                value: getValueOfCostType(state.budgetData?.cost_types, getKeyOfCostType(state.budgetData?.cost_types)),
+            })),
+            budgetTarget: computed<BudgetTarget>(() => ({
+                projectId: state.budgetData?.project_id,
+                projectGroupId: state.budgetData?.project_group_id,
+            })),
             totalBudgetLimit: computed<number>(() => state.budgetData?.limit),
             enrichedBudgetUsageData: computed<EnrichedBudgetUsageData[]>(
-                () => getEnrichedBudgetUsageData(state.budgetUsageData, state.budgetPeriod, state.budgetTimeUnit, state.totalBudgetLimit, state.budgetCostTypeKey, state.budgetCostTypeValue),
+                () => getEnrichedBudgetUsageData(state.budgetUsageData, state.budgetPeriod,
+                    state.budgetTimeUnit, state.totalBudgetLimit,
+                    state.budgetCostType, state.budgetTarget),
             ),
             data: [],
             fields: computed(() => state.enrichedBudgetUsageData.map(d => ({

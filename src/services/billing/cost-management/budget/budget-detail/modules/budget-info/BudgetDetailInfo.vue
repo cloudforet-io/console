@@ -17,17 +17,17 @@
             <p v-if="!loading" class="summary-content">
                 <p-anchor v-if="budgetData.project_group_id || budgetData.project_id"
                           :to="referenceRouter(
-                              (budgetData.project_id ? budgetData.project_id : budgetData.project_group_id),
+                              (budgetData.project_id || budgetData.project_group_id),
                               { resource_type: budgetData.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
                 >
-                    {{ projects[budgetData.project_id] ? projects[budgetData.project_id].label : projectGroups[budgetData.project_group_id].label }}
+                    {{ getTargetLabel() }}
                 </p-anchor>
             </p>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
             <span class="summary-title">
                 Cost Type
-                <span v-if="!loading" class="text-gray-900 font-normal">{{ costTypeKey }}</span>
+                <span v-if="!loading" class="text-gray-900 font-normal">{{ costTypeMap[costTypeKey] || 'All' }}</span>
             </span>
             <p v-if="!loading" class="summary-content cost-type">
                 <span class="cost-type-content">{{ processedCostTypeValue }}</span>
@@ -57,6 +57,13 @@ import { CURRENCY } from '@/store/modules/display/config';
 
 const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];
 const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
+
+const costTypeMap = {
+    region_code: 'Region',
+    service_account_id: 'Service Account',
+    provider: 'Provider',
+    product: 'Product',
+};
 
 export default {
     name: 'BudgetDetailInfo',
@@ -96,12 +103,20 @@ export default {
             state.balloonVisible = true;
         };
 
+        const getTargetLabel = () => {
+            if (state.budgetData?.project_id) return state.projects[state.budgetData.project_id]?.label ?? '';
+            if (state.budgetData?.project_group_id) return state.projectGroups[state.budgetData.project_group_id]?.label ?? '';
+            return 'No Item';
+        };
+
 
         return {
             ...toRefs(state),
             referenceRouter,
             handleClickViewAll,
             currencyMoneyFormatter,
+            getTargetLabel,
+            costTypeMap,
         };
     },
 };

@@ -74,7 +74,13 @@ export default {
         PDataTable,
         PBadge,
     },
-    setup() {
+    props: {
+        projectId: {
+            type: String,
+            default: undefined,
+        },
+    },
+    setup(props) {
         const state = reactive({
             loading: false,
             fields: computed(() => [
@@ -91,6 +97,7 @@ export default {
 
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
+            .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }])
             .setOrFilters([{ k: 'is_subscribe', v: false, o: '=' }, { k: 'subscriptions', v: 'cost_analysis.Budget', o: '=' }]);
 
         const listNotificationsChannel = async () => {

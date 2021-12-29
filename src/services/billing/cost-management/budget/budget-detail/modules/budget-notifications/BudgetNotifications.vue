@@ -7,7 +7,7 @@
             <template #header>
                 <section class="header">
                     <span class="title">Budget Notifications</span>
-                    <p-icon-button name="ic_trashcan" @click="handleDelete" />
+                    <p-icon-button v-if="hasBudgetAlert" name="ic_trashcan" @click="handleDelete" />
                 </section>
             </template>
             <template #default>
@@ -55,7 +55,7 @@
                                           highlight
                                 />
                             </div>
-                            <budget-notifications-channel />
+                            <budget-notifications-channel :project-id="budgetTargetId" />
                         </article>
                     </template>
                     <template v-else>

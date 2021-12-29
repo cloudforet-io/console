@@ -8,7 +8,7 @@
             Billing Admin
         </template>
         <p-data-table
-            :loading="loading && $store.getters['service/budget/isBudgetLoading']"
+            :loading="loading && budgetLoading"
             :fields="fields" :items="data"
             :skeleton-rows="3"
             :stripe="false"
@@ -19,11 +19,12 @@
 
 <script lang="ts">
 import { PDataTable, PCard } from '@spaceone/design-system';
-import { reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { store } from '@/store';
 
 export default {
     name: 'BudgetDetailBillingAdmin',
@@ -34,6 +35,7 @@ export default {
     setup() {
         const state = reactive({
             loading: true,
+            budgetLoading: computed(() => store.getters['service/budget/isBudgetLoading']),
             fields: [
                 { name: 'resource_id', label: 'User ID' },
                 { name: 'resource_id', label: 'User Name' },
@@ -42,27 +44,42 @@ export default {
                 { name: 'labels', label: 'Label' },
             ] as unknown as DataTableField,
             data: [],
+            budgetTargetProjectId: computed(() => store.state.service.budget.budgetData?.project_id) || undefined,
+            budgetTargetProjectGroupId: computed(() => store.state.service.budget.budgetData?.project_group_id) || undefined,
         });
 
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters([{ k: 'role.name', v: 'Billing Admin', o: '=' }]);
+
         const listBillingAdmin = async () => {
             state.loading = true;
             try {
-                const { results } = await SpaceConnector.client.identity.project.member.list({
-                    include_parent_member: true,
-                    project_id: 'project-18655561c535',
-                    query: apiQueryHelper.data,
-                });
-                state.data = results;
+                if (!state.budgetTargetProjectGroupId && !state.budgetTargetProjectId) return;
+                if (state.budgetTargetProjectId) {
+                    const { results } = await SpaceConnector.client.identity.project.member.list({
+                        include_parent_member: true,
+                        project_id: state.budgetTargetProjectId,
+                        query: apiQueryHelper.data,
+                    });
+                    state.data = results;
+                } else if (state.budgetTargetProjectGroupId) {
+                    const { results } = await SpaceConnector.client.identity.projectGroup.member.list({
+                        include_parent_member: true,
+                        project_group_id: state.budgetTargetProjectGroupId,
+                        query: apiQueryHelper.data,
+                    });
+                    state.data = results;
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
+                state.data = [];
+            } finally {
+                state.loading = false;
             }
         };
 
-        (async () => {
-            await listBillingAdmin();
-        })();
+        if (!state.budgetLoading) listBillingAdmin();
+
 
         return {
             ...toRefs(state),
