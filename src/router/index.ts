@@ -65,7 +65,6 @@ export class SpaceRouter {
                 const res = await SpaceConnector.refreshAccessToken(false);
                 if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
             }
-
             next(nextLocation);
         });
 
