@@ -269,4 +269,36 @@ export default defineComponent<Props>({
         }
     }
 }
+
+@screen laptop {
+    .cloud-service-usage-overview-detail-modal::v-deep {
+        .widget-wrapper {
+            > .data-loader-container > .data-wrapper {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+    }
+}
+
+@screen tablet {
+    .cloud-service-usage-overview-detail-modal::v-deep {
+        .modal-body {
+            height: 70vh;
+        }
+        .widget-wrapper {
+            > .data-loader-container > .data-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+    }
+}
+
+@screen mobile {
+    .cloud-service-usage-overview-detail-modal::v-deep {
+        .modal-body {
+            padding: 0;
+        }
+    }
+}
+
 </style>

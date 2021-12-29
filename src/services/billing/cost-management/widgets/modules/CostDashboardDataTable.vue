@@ -225,7 +225,7 @@ export default {
         text-align: center;
         font-size: 0.875rem;
     }
-    .p-data-table {
+    .p-data-table::v-deep {
         .toggle-button {
             cursor: pointer;
             padding-right: 1rem;
@@ -233,11 +233,10 @@ export default {
         .raised {
             @apply text-alert;
         }
-        ::v-deep tr:nth-of-type(even) {
+        tr:nth-of-type(even) {
             @apply bg-gray-100;
         }
-
-        ::v-deep td {
+        td {
             @apply border-none;
         }
     }
