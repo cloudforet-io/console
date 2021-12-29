@@ -109,7 +109,10 @@ export default {
                 { name: 'project_id', label: 'Project' },
                 { name: 'project_group_id', label: 'Project Group' },
                 { name: 'time_unit', label: 'Time Unit' },
-                { name: 'cost_types', label: 'Cost Type', dataType: 'object' },
+                { name: 'cost_types.provider', label: '[Cost Type] Provider' },
+                { name: 'cost_types.service_account_id', label: '[Cost Type] Service Account' },
+                { name: 'cost_types.region_code', label: '[Cost Type] Region' },
+                { name: 'cost_types.product', label: '[Cost Type] Product' },
             ],
         }];
 
@@ -119,7 +122,10 @@ export default {
             project_id: makeReferenceValueHandler('identity.Project'),
             project_group_id: makeReferenceValueHandler('identity.ProjectGroup'),
             time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit'),
-            cost_types: makeDistinctValueHandler('cost_analysis.Budget', 'cost_types', 'object'),
+            'cost_types.provider': makeReferenceValueHandler('identity.Provider'),
+            'cost_types.service_account_id': makeReferenceValueHandler('identity.ServiceAccount'),
+            'cost_types.region_code': makeReferenceValueHandler('inventory.Region'),
+            'cost_types.product': makeDistinctValueHandler('cost_analysis.Budget', 'cost_types.product'),
         };
 
         const filtersHelper = new QueryHelper().setKeyItemSets(keyItemSets);
