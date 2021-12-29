@@ -159,7 +159,7 @@ export default defineComponent<WidgetProps>({
             series.slices.template.togglable = false;
             series.slices.template.clickable = false;
             series.slices.template.states.getKey('hover').properties.scale = 1;
-            series.slices.template.tooltipText = '{category}: [bold]{value} ({value.percent.formatNumber(\'#.0\')}%)[/]';
+            series.slices.template.tooltipText = '{category}: [bold]{value} ({value.percent.formatNumber(\'#.00\')}%)[/]';
             series.tooltip.label.fontSize = 10;
 
             if (state.chartData.length === 0) {
@@ -203,6 +203,7 @@ export default defineComponent<WidgetProps>({
                 state.loading = true;
 
                 const results = await fetchData();
+
                 state.chartData = getPieChartData(results, GROUP_BY.PROJECT);
                 state.legends = getLegends(results, GROUP_BY.PROJECT);
 
