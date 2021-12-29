@@ -108,20 +108,11 @@ export default {
             state.customRangeModalVisible = false;
         };
 
-        const initPeriod = () => {
-            emit('update', state.period);
-        };
-
-        initPeriod();
-
         watch(() => props.fixedPeriod, () => {
-            state.period = {
-                start: props.fixedPeriod ? dayjs(props.fixedPeriod.start).format('YYYY-MM')
-                    : yesterday.startOf('month').format('YYYY-MM-DD'),
-                end: props.fixedPeriod ? dayjs(props.fixedPeriod.end).endOf('month').format('YYYY-MM-DD')
-                    : yesterday.endOf('month').format('YYYY-MM-DD'),
-            };
-            emit('update', state.period);
+            if (props.fixedPeriod?.start) {
+                savePeriod(props.fixedPeriod.start, props.fixedPeriod.end);
+                state.selectedMonthMenuItem = 'custom';
+            } else savePeriod(state.period.start, state.period.end);
         }, { immediate: true });
 
         return {
