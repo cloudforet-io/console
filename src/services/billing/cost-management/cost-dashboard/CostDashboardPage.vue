@@ -18,9 +18,9 @@
             <div class="right-part">
                 <cost-dashboard-period-select-dropdown :fixed-period="fixedPeriod" @update="handleUpdatePeriod" />
                 <currency-select-dropdown />
-                <div class="left-divider download-pdf">
-                    <p-icon-button name="ic_download" style-type="gray-border" size="sm" />
-                </div>
+                <!--                <div class="left-divider download-pdf">-->
+                <!--                    <p-icon-button name="ic_download" style-type="gray-border" size="sm" />-->
+                <!--                </div>-->
                 <!--                <div class="left-divider">-->
                 <!--                    <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm">-->
                 <!--                        Customize-->
@@ -44,7 +44,7 @@ import {
 } from '@vue/composition-api';
 import { i18n } from '@/translations';
 import {
-    PBreadcrumbs, PIconButton, PPageTitle,
+    PBreadcrumbs, PPageTitle,
 } from '@spaceone/design-system';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
@@ -70,7 +70,7 @@ export default {
         DashboardLayouts,
         CurrencySelectDropdown,
         CostDashboardFilter,
-        PIconButton,
+        // PIconButton,
         PBreadcrumbs,
         PPageTitle,
     },

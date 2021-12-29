@@ -74,6 +74,7 @@ import { Location } from 'vue-router';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { Period } from '@/services/billing/cost-management/type';
 import { CostAnalyzeModel, UsdCost } from '@/services/billing/cost-management/widgets/type';
+import { ExcelDataField } from '@/store/modules/file/type';
 
 
 export default {
@@ -105,7 +106,14 @@ export default {
         const tableState = reactive({
             loading: true,
             fields: [] as DataTableField[],
-            excelFields: computed(() => tableState.fields.map(d => ({ key: d.name, name: d.label }))),
+            excelFields: computed<ExcelDataField[]>(() => tableState.fields.map((d) => {
+                const field: ExcelDataField = { key: d.name, name: d.label };
+                if (d.name === GROUP_BY.PROJECT) field.reference = { reference_key: 'project_id', resource_type: 'identity.Project' };
+                if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
+                if (d.name === GROUP_BY.REGION) field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
+                if (d.name === GROUP_BY.PROVIDER) field.reference = { reference_key: 'provider', resource_type: 'identity.Provider' };
+                return field;
+            })),
             items: [] as CostAnalyzeModel[],
             totalCount: 0,
         });
