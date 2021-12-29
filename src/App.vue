@@ -83,7 +83,7 @@ export default defineComponent({
 
         const state = reactive({
             showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
-            isExpired: computed(() => vm.$store.state.user.isSessionExpired === true && !vm.$route.meta.excludeAuth),
+            isExpired: computed(() => !SpaceConnector.isTokenAlive && vm.$store.state.user.isSessionExpired === true && !vm.$route.meta.excludeAuth),
         });
 
         const goToSignIn = async () => {
