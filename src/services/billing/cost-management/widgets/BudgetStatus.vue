@@ -13,7 +13,7 @@
                     <template v-for="rowIdx in rowRange">
                         <router-link v-if="!!chartData[colIdx * 10 + rowIdx]"
                                      :key="`status-box-${colIdx}-${rowIdx}`"
-                                     v-tooltip.bottom="chartData[colIdx * 10 + rowIdx].budgetId"
+                                     v-tooltip.bottom="chartData[colIdx * 10 + rowIdx].budgetName"
                                      :to="chartData[colIdx * 10 + rowIdx].linkLocation"
                                      class="box status-box"
                                      :style="{ 'background-color': chartData[colIdx * 10 + rowIdx].color }"
@@ -60,6 +60,7 @@ import { i18n } from '@/translations';
 
 interface ChartData {
     budgetId: string;
+    budgetName: string;
     color: string;
     linkLocation: Location;
 }
@@ -113,6 +114,7 @@ export default {
                 if (d.usage >= 70) color = red[400];
                 chartData.push({
                     budgetId: d.budget_id,
+                    budgetName: d.name,
                     color,
                     linkLocation: {
                         name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
@@ -133,6 +135,7 @@ export default {
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({
                     include_budget_count: false,
                     include_project_info: false,
+                    include_budget_info: true,
                     group_by: ['budget_id'],
                     start: dayjs.utc(period.start).format('YYYY-MM'),
                     end: dayjs.utc(period.end).format('YYYY-MM'),
