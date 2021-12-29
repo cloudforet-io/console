@@ -2,7 +2,7 @@
     <cost-dashboard-card-widget-layout title="Project-wise Budget Usage Summary"
                                        class="project-wise-budget-usage-summary"
                                        :widget-link="widgetLink"
-                                       :no-data="!items.length"
+                                       :no-data="!loading && !items.length"
                                        :data-range="20"
     >
         <p-data-table v-if="items.length"
