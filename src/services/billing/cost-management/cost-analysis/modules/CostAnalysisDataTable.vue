@@ -147,9 +147,11 @@ export default {
 
             if (granularity === GRANULARITY.ACCUMULATED) {
                 const label = `${dayjs(period.start).format('M/D')}~${dayjs(period.end).format('M/D')}`;
-                groupByFields.push({
-                    name: 'totalCost', label: ' ', sortable: false,
-                });
+                if (!groupByItems.length) {
+                    groupByFields.push({
+                        name: 'totalCost', label: ' ', sortable: false,
+                    });
+                }
                 groupByFields.push({
                     name: 'usd_cost', label, textAlign: 'right', sortable: false,
                 });
