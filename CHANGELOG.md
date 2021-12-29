@@ -1,3 +1,10 @@
+# [1.1.0-beta.226](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.225...v1.1.0-beta.226) (2021-12-29)
+
+
+### Bug Fixes
+
+* refactor and add hideFooterCloseButton in Button Modal ([#819](https://github.com/spaceone-dev/spaceone-design-system/issues/819)) ([bf5aa4b](https://github.com/spaceone-dev/spaceone-design-system/commit/bf5aa4b278b04e82fe49667b186c49a16ca8a0f3))
+
 # [1.1.0-beta.225](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.224...v1.1.0-beta.225) (2021-12-28)
 
 
