@@ -23,7 +23,7 @@
             </div>
             <div class="service-type-list">
                 <router-link v-for="(cloudServiceType, idx) in item.resources"
-                             :key="idx"
+                             :key="`${cloudServiceType}-${idx}`"
                              :to="getCloudServiceDetailLink({ ...item, cloudServiceTypeName: cloudServiceType.cloud_service_type })"
                              class="service-type-item"
                 >

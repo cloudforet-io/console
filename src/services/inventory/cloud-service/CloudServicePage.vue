@@ -188,7 +188,10 @@ export default {
             listCloudServiceRequest = axios.CancelToken.source();
             try {
                 state.loading = true;
-                cloudServiceApiQueryHelper.setFilters(state.filters).addFilter(...queryHelper.filters);
+                cloudServiceApiQueryHelper.setFilters(state.filters)
+                    .addFilter(...queryHelper.filters)
+                    .setMultiSort([{ key: 'is_primary', desc: true }, { key: 'name', desc: false }]);
+
                 const res = await SpaceConnector.client.inventory.cloudServiceType.analyze({
                     labels: state.selectedCategories,
                     ...cloudServiceApiQueryHelper.data,

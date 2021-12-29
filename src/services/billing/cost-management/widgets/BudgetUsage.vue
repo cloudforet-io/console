@@ -11,7 +11,7 @@
             <p-i name="ic_budget" width="1em" height="1em"
                  class="mr-1"
             />
-            {{ budgetCount }} {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.BUDGET_USAGE') }}
+            {{ budgetCount }} Budgets
         </template>
         <template #default>
             <budget-usage-progress-bar :usage-rate="usageRate" class="budget-progress-bar" />
