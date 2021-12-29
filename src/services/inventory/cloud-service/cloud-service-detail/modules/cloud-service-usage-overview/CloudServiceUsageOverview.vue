@@ -18,6 +18,7 @@
                                   :data="dataList[idx]"
                                   :loading="dataLoading"
                                   :schema-options="schema.options"
+                                  :field-handler="fieldHandler"
                 />
             </p-data-loader>
         </p-card>
@@ -39,18 +40,23 @@ import {
 import {
     PButton, PCard, PDataLoader, PDynamicWidget,
 } from '@spaceone/design-system';
+import {
+    DynamicWidgetFieldHandler,
+    DynamicWidgetSchema,
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
 import CloudServiceUsageOverviewDetailModal
     from '@/services/inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewDetailModal.vue';
 import {
     CloudServiceTypeInfo,
 } from '@/services/inventory/cloud-service/cloud-service-detail/type';
-import { DynamicWidgetSchema } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Period } from '@/services/billing/cost-management/type';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { Filter } from '@spaceone/console-core-lib/space-connector/type';
+import { Reference } from '@/lib/reference/type';
+import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
 interface Props {
     cloudServiceTypeInfo?: CloudServiceTypeInfo;
@@ -117,22 +123,22 @@ export default defineComponent<Props>({
         const fetchSchemaList = async (): Promise<DynamicWidgetSchema[]> => {
             try {
                 const { provider, group, name } = props.cloudServiceTypeInfo as CloudServiceTypeInfo;
-                const options = props.isServer ? {} : {
-                    provider,
-                    cloud_service_group: group,
-                    cloud_service_type: name,
-                };
-
-                return SpaceConnector.client.addOns.pageSchema.get({
-                    resource_type: props.isServer ? 'inventory.Server' : 'inventory.CloudService',
-                    schema: 'widget',
+                const options: any = {
                     widget_type: 'card',
                     limit: 3,
+                };
+                if (!props.isServer) {
+                    options.provider = provider;
+                    options.cloud_service_group = group;
+                    options.cloud_service_type = name;
+                }
+
+                const { widget } = await SpaceConnector.client.addOns.pageSchema.get({
+                    resource_type: props.isServer ? 'inventory.Server' : 'inventory.CloudService',
+                    schema: 'widget',
                     options,
-                }, {
-                    mockMode: true,
-                    mockPath: '?schema=widget&widget_type=card',
                 });
+                return widget ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
@@ -141,13 +147,11 @@ export default defineComponent<Props>({
 
         const fetchDataWithSchema = async (schema: DynamicWidgetSchema): Promise<Data> => {
             try {
-                const { results } = await SpaceConnector.client.inventory.cloudService.stat({
-                    query: schema.query,
+                const { results } = await SpaceConnector.client.inventory.cloudService.analyze({
+                    default_query: schema.query,
                     filter: state.apiFilter,
                     limit: schema.options?.limit,
-                    period: props.period,
-                }, {
-                    mockMode: true,
+                    date_range: props.period,
                 });
                 return results[0] ?? {};
             } catch (e) {
@@ -174,9 +178,23 @@ export default defineComponent<Props>({
             state.dataLoading = false;
         };
 
+        /* Component Props */
+        const fieldHandler: DynamicWidgetFieldHandler<Record<'reference', Reference>> = (field) => {
+            if (field.extraData?.reference) {
+                return referenceFieldFormatter(field.extraData.reference, field.data);
+            }
+            return {};
+        };
+
+        /* Event Handlers */
         const handleClickShowAll = () => {
             state.usageOverviewDetailModalVisible = true;
         };
+
+        /* Watchers */
+        watch([() => props.filters, () => props.period], () => {
+            getDataListWithSchema();
+        });
 
         watch(() => state.cloudServiceTypeId, async (cloudServiceTypeId) => {
             if (!props.disabled && cloudServiceTypeId) {
@@ -189,6 +207,7 @@ export default defineComponent<Props>({
         return {
             ...toRefs(state),
             handleClickShowAll,
+            fieldHandler,
         };
     },
 });
