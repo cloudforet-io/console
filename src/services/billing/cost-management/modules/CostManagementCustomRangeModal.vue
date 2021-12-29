@@ -7,6 +7,7 @@
         :scrollable="false"
         backdrop
         :visible.sync="proxyVisible"
+        :disabled="invalid"
         @confirm="handleConfirm"
     >
         <template #body>
@@ -16,6 +17,7 @@
             >
                 <p-datetime-picker class="datetime-picker" :data-type="datetimePickerDataType" :selected-dates.sync="startDate"
                                    :min-date="minDate" :max-date="maxDate"
+                                   :invalid="!!startDate.length && !!endDate.length && invalid"
                 />
             </p-field-group>
             <p-field-group class="period-select"
@@ -24,6 +26,7 @@
             >
                 <p-datetime-picker class="datetime-picker" :data-type="datetimePickerDataType" :selected-dates.sync="endDate"
                                    :min-date="minDate" :max-date="maxDate"
+                                   :invalid="!!startDate.length && !!endDate.length && invalid"
                 />
             </p-field-group>
         </template>
@@ -34,6 +37,7 @@
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
+import dayjs from 'dayjs';
 
 export default {
     name: 'CostDashboardCustomRangeModal',
@@ -69,6 +73,13 @@ export default {
             proxyVisible: computed({
                 get() { return props.visible; },
                 set(val) { emit('update:visible', val); },
+            }),
+            invalid: computed(() => {
+                if (!state.startDate.length || !state.endDate.length) return true;
+                const timeUnit = props.datetimePickerDataType === DATA_TYPE.yearToDate ? 'day' : 'month';
+                const startData = dayjs.utc(state.startDate[0]);
+                const endDate = dayjs.utc(state.endDate[0]);
+                return startData.isAfter(endDate, timeUnit);
             }),
             startDate: [],
             endDate: [],
