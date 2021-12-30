@@ -270,7 +270,7 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .cost-dashboard-stacked-column-widget {
-    @apply grid grid-cols-12;
+    @apply grid grid-cols-12 gap-4;
     min-height: 24rem;
     .chart-wrapper {
         @apply col-span-5;

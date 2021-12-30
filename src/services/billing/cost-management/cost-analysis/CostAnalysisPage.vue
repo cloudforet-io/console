@@ -435,6 +435,7 @@ export default {
     }
 
     .cost-analysis-chart {
+        @apply relative z-10;
         margin-bottom: 1rem;
     }
 
