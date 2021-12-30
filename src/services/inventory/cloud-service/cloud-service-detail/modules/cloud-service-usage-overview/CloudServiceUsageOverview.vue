@@ -271,7 +271,7 @@ export default defineComponent<Props>({
             row-gap: 1.25rem;
         }
         .stat-summary {
-            @apply border-gray-200;
+            @apply border-gray-200 rounded-none;
             width: 33.3%;
             min-width: auto;
             height: auto;
@@ -282,12 +282,12 @@ export default defineComponent<Props>({
                 @apply border-l-0;
             }
             .name {
-                @apply text-gray-700;
+                @apply text-gray-700 mr-2;
                 font-size: 1rem;
                 line-height: 1.2;
             }
             .value {
-                @apply flex-shrink-0 ml-2;
+                @apply flex-shrink-0;
             }
         }
     }
@@ -307,7 +307,7 @@ export default defineComponent<Props>({
             }
             .stat-summary {
                 @apply flex items-center w-full border-l-0 border-t;
-                height: 4.25rem;
+                min-height: 4.25rem;
                 padding: 0;
                 &:nth-of-type(1) {
                     @apply border-t-0;
@@ -326,7 +326,7 @@ export default defineComponent<Props>({
 
             .stat-summary {
                 @apply flex-col items-start;
-                height: 5.0625rem;
+                min-height: 5.0625rem;
                 padding: 1rem 0;
             }
         }
