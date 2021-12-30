@@ -17,7 +17,7 @@ export interface XYChartData {
 
 export interface PieChartData {
     category: string;
-    value: number;
+    value: number | UsdCost;
     color?: string;
 }
 

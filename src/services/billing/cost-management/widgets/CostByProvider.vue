@@ -7,28 +7,22 @@
             <div ref="chartRef" class="chart" />
         </p-chart-loader>
         <div class="table-wrapper">
-            <p-data-table :fields="dataTableState.fields"
-                          :items="dataTableState.slicedItem"
-                          :total-count="chartData.length"
-                          :loading="loading"
-                          table-style-type="simple"
-                          disable-hover
-                          class="table"
+            <cost-dashboard-data-table
+                :fields="dataTableState.fields"
+                :items="chartData"
+                :loading="loading"
+                :this-page.sync="thisPage"
+                :page-size="pageSize"
+                :chart="chart"
+                :show-legend="false"
+                :currency-rates="currencyRates"
+                :currency="currency"
+                class="table"
             >
-                <template #col-provider-format="{item}">
-                    {{ item.category }}
+                <template #category-format="{value}">
+                    {{ value }}
                 </template>
-                <template #col-value-format="{value}">
-                    <div class="cost-col-body">
-                        {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
-                    </div>
-                </template>
-            </p-data-table>
-            <div class="pagination">
-                <p-text-pagination v-if="!!chartData.length" :all-page="allPage"
-                                   :this-page.sync="thisPage"
-                />
-            </div>
+            </cost-dashboard-data-table>
         </div>
     </cost-dashboard-card-widget-layout>
 </template>
@@ -47,6 +41,7 @@ import {
 } from '@spaceone/design-system';
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
+import CostDashboardDataTable from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
 
 import { PieChart } from '@amcharts/amcharts4/charts';
 import {
@@ -64,7 +59,6 @@ import { getConvertedFilter } from '@/services/billing/cost-management/cost-anal
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import config from '@/lib/config';
 
 
@@ -80,6 +74,7 @@ export default defineComponent<WidgetProps>({
         PChartLoader,
         PSkeleton,
         PTextPagination,
+        CostDashboardDataTable,
     },
     props: {
         options: {
@@ -112,8 +107,6 @@ export default defineComponent<WidgetProps>({
             chart: null as PieChart | null,
             pageSize: 5,
             thisPage: 1,
-            totalCount: computed(() => state.chartData.length),
-            allPage: computed(() => Math.ceil(state.totalCount / state.pageSize) || 1),
             providers: computed(() => store.state.resource.provider.items),
             widgetLink: computed(() => ({
                 name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
@@ -129,15 +122,9 @@ export default defineComponent<WidgetProps>({
 
         const dataTableState = reactive({
             fields: [
-                { name: GROUP_BY.PROVIDER, label: 'Provider' },
+                { name: 'category', label: 'Provider' },
                 { name: 'value', label: 'Cost', textAlign: 'right' },
             ] as DataTableField[],
-            slicedItem: computed<CostByProviderChartData[]>(() => {
-                const startIndex = state.thisPage * state.pageSize - state.pageSize;
-                const endIndex = state.thisPage * state.pageSize;
-                return state.chartData.slice(startIndex, endIndex);
-            }),
-            contextKey: Math.floor(Math.random() * Date.now()),
         });
 
         const disposeChart = (chartContext) => {
@@ -251,11 +238,9 @@ export default defineComponent<WidgetProps>({
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
         });
-
         return {
             ...toRefs(state),
             dataTableState,
-            currencyMoneyFormatter,
         };
     },
 });
@@ -271,20 +256,8 @@ export default defineComponent<WidgetProps>({
     }
 
     .table-wrapper {
-        .table::v-deep {
-            height: initial;
-
-            tr:nth-of-type(even) {
-                @apply bg-gray-100;
-            }
-            td {
-                @apply border-none;
-            }
-        }
-
-        .pagination {
-            @apply flex justify-center;
-            margin-top: 0.5rem;
+        .table {
+            @apply w-full;
         }
     }
 }
