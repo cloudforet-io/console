@@ -138,7 +138,7 @@ export default {
             'inventory.CloudService',
         );
 
-        const queryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters);
+        const queryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets);
         const state = reactive({
             providers: computed(() => store.state.resource.provider.items),
             serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
@@ -152,7 +152,7 @@ export default {
             items: undefined as any,
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
-            queryTags: [] as QueryTag[],
+            queryTags: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).queryTags as QueryTag[],
             totalCount: 0,
             filters: computed<QueryStoreFilter[]>(() => {
                 const filters: QueryStoreFilter[] = [];
