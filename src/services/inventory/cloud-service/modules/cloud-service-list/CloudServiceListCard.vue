@@ -36,17 +36,21 @@
 </template>
 
 <script lang="ts">
-import { PLazyImg } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Location } from 'vue-router';
-import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+
+import { PLazyImg } from '@spaceone/design-system';
+
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+
 import { store } from '@/store';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 
 interface Props {
     item: any;
-    queryFilters: string;
+    queryFilters: QueryStoreFilter[];
     selectedRegions: string[];
 }
 
@@ -70,15 +74,12 @@ export default {
         },
     },
     setup(props: Props) {
-        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(props.queryFilters);
-
         const state = reactive({
             providers: computed(() => store.state.resource.provider.items),
         });
         const cloudServiceDetailQueryHelper = new QueryHelper();
         const getCloudServiceDetailLink = (item) => {
-            const searchFilters = queryHelper.filters;
-            cloudServiceDetailQueryHelper.setFilters(searchFilters.filter((f: any) => f.k && ![
+            cloudServiceDetailQueryHelper.setFilters(props.queryFilters.filter((f: any) => f.k && ![
                 'cloud_service_type',
                 'cloud_service_group',
             ].includes(f.k)));
