@@ -124,10 +124,10 @@ export default {
             const start = dayjs(period.start);
             const end = dayjs(period.end);
 
-            let nameDateFormat = 'YYYY-MM-DD';
+            let nameDateFormat = 'YYYY-M-D';
             let labelDateFormat = 'M/D';
             if (state.timeUnit === 'month') {
-                nameDateFormat = 'YYYY-MM';
+                nameDateFormat = 'YYYY-M';
                 labelDateFormat = 'MMM YYYY';
             } else if (state.timeUnit === 'year') {
                 nameDateFormat = 'YYYY';
@@ -213,8 +213,8 @@ export default {
             };
         };
         const _getStackedTableData = (rawData: CostAnalyzeModel[], granularity, period): CostAnalyzeModel[] => {
-            let dateFormat = 'YYYY-MM-DD';
-            if (granularity === GRANULARITY.MONTHLY) dateFormat = 'YYYY-MM';
+            let dateFormat = 'YYYY-M-D';
+            if (granularity === GRANULARITY.MONTHLY) dateFormat = 'YYYY-M';
             if (granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
             const results: CostAnalyzeModel[] = [];
             rawData.forEach((d) => {
