@@ -112,8 +112,12 @@ export default {
             try {
                 state.loading = true;
                 const results = await fetchData();
+
+                let usageRate = Number(results[0]?.usage.toFixed(2)) ?? 0;
+                if (usageRate < 0) usageRate = 0;
+
                 state.usageCost = results[0]?.usd_cost || 0;
-                state.usageRate = Number(results[0]?.usage.toFixed(2)) || 0;
+                state.usageRate = usageRate;
                 state.limitCost = results[0]?.limit || 0;
                 state.budgetCount = results[0]?.budget_count || 0;
             } catch (e) {
