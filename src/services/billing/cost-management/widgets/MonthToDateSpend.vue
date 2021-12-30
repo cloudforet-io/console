@@ -33,12 +33,12 @@
             </div>
             <span class="range">
                 <template v-if="increaseRate < 0">
-                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.DECREASE') }}
+                    <span class="range"> {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.DECREASE') }} </span>
                 </template>
                 <template v-else>
-                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.INCREASE') }}
+                    <span class="range"> {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.INCREASE') }} </span>
                 </template>
-                {{ thisMonthFormatter(lastMonth) }}
+                <span class="range"> {{ thisMonthFormatter(lastMonth) }}</span>
             </span>
         </template>
     </cost-dashboard-simple-card-widget>

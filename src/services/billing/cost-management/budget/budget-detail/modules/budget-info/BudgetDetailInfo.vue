@@ -2,13 +2,18 @@
     <section class="budget-detail-summary">
         <p-pane-layout class="summary-card">
             <span class="summary-title">
-                Total Budgeted Amount
-                <span class="font-normal">(Period)</span>
+                {{ budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL ? 'Total Budgeted Amount' : 'Start ~ End Months' }}
+                <span v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL" class="font-normal">(Period)</span>
             </span>
-            <p v-if="!loading" class="summary-content">
-                <b>{{ currencyMoneyFormatter(budgetData.limit, currency, currencyRates) }}</b>
-                ({{ budgetData.start }} ~ {{ budgetData.end }})
-            </p>
+            <div v-if="!loading">
+                <p v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL" class="summary-content">
+                    <b>{{ currencyMoneyFormatter(budgetData.limit, currency, currencyRates) }}</b>
+                    ({{ budgetData.start }} ~ {{ budgetData.end }})
+                </p>
+                <p v-else class="summary-content">
+                    {{ budgetData.start }} ~ {{ budgetData.end }}
+                </p>
+            </div>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
             <span class="summary-title">
@@ -49,7 +54,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { PPaneLayout, PAnchor } from '@spaceone/design-system';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
-import { BudgetData, CostType } from '@/services/billing/cost-management/budget/type';
+import { BUDGET_TIME_UNIT, BudgetData, CostType } from '@/services/billing/cost-management/budget/type';
 import BudgetCostTypeBalloon
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-info/BudgetCostTypeBalloon.vue';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -117,6 +122,7 @@ export default {
             currencyMoneyFormatter,
             getTargetLabel,
             costTypeMap,
+            BUDGET_TIME_UNIT,
         };
     },
 };

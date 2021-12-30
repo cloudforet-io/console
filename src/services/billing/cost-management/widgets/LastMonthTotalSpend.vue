@@ -9,6 +9,7 @@
         :description="lastMonth.format('MMMM YYYY')"
         :show-divider="false"
         :widget-link="widgetLink"
+        :no-data="noData"
     >
         <template #default>
             <div ref="chartRef" class="chart" />
@@ -94,6 +95,7 @@ export default {
                     period: objectToQueryString({ start: state.lastMonth.startOf('month'), end: state.lastMonth.endOf('month') }),
                 },
             })),
+            noData: computed(() => state.data.find(d => d.totalCost > 0) === undefined),
         });
 
         const disposeChart = (chartContext) => {
