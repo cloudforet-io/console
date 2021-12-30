@@ -129,9 +129,10 @@ export default {
                 items: [
                     { key: 'cloud_service_type', name: 'Cloud Service Type' },
                     { key: 'cloud_service_group', name: 'Cloud Service Group' },
+                    { key: 'service_code', name: 'Product', reference: 'inventory.CloudServiceType' },
                     { key: 'project_id', name: 'Project', reference: 'identity.Project' },
                     { key: 'collection_info.service_accounts', name: 'Service Account', reference: 'identity.ServiceAccount' },
-                    { key: 'collection_info.secrets', name: 'Secret', reference: 'secret.Secret' },
+                    { key: 'account', name: 'Account ID' },
                 ],
             }],
             'inventory.CloudService',
