@@ -41,8 +41,6 @@ import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/ty
 
 const yesterday = dayjs.utc().subtract(1, 'day');
 
-const dateFormatter = (date: string, format: string) => dayjs.utc(date).format(format);
-
 export default {
     name: 'CostDashboardPeriodSelectDropdown',
     components: {
@@ -58,6 +56,9 @@ export default {
     },
     setup(props, { emit }) {
         const { i18nDayjs } = useI18nDayjs();
+
+        const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
+
         const state = reactive({
             period: {
                 start: props.fixedPeriod ? dayjs(props.fixedPeriod.start).format('YYYY-MM')
