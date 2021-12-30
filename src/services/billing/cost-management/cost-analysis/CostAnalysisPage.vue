@@ -43,9 +43,9 @@
                     <div class="title-extra-wrapper">
                         <span />
                         <div class="button-wrapper">
-                            <p-icon-text-button name="ic_download" style-type="gray-border">
-                                PDF
-                            </p-icon-text-button>
+                            <!--                            <p-icon-text-button name="ic_download" style-type="gray-border">-->
+                            <!--                                PDF-->
+                            <!--                            </p-icon-text-button>-->
                             <p-button v-if="selectedQueryId" style-type="gray-border" @click="handleSaveQueryOption">
                                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
                             </p-button>
@@ -80,7 +80,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle, PIconButton, PSelectDropdown, PI, PIconTextButton, PButton,
+    PBreadcrumbs, PPageTitle, PIconButton, PSelectDropdown, PI, PButton,
 } from '@spaceone/design-system';
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -137,7 +137,7 @@ export default {
         PIconButton,
         PSelectDropdown,
         PI,
-        PIconTextButton,
+        // PIconTextButton,
         PButton,
         SaveQueryFormModal,
         DeleteModal,
