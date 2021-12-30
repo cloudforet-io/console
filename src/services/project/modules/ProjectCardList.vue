@@ -534,7 +534,7 @@ export default {
     }
 }
 .card-bottom-wrapper {
-    @apply flex-shrink-0 flex-grow-0 flex items-center justify-between border-t border-gray-100 text-xs text-gray-500;
+    @apply flex-shrink-0 flex-grow-0 flex items-center justify-between border-t border-gray-100 text-xs text-gray-700;
     .project-summary {
         @apply flex-shrink-0 flex w-full;
         padding: 0.75rem 1rem;
@@ -546,7 +546,7 @@ export default {
                 line-height: 1rem;
             }
             .summary-item-num {
-                @apply text-xs;
+                @apply text-xs text-gray-900;
                 line-height: 1.125rem;
                 &:hover:not(.none) {
                     @apply text-secondary;
