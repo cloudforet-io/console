@@ -199,8 +199,10 @@ export default {
 
 <style lang="postcss" scoped>
 .project-wise-budget-usage-summary {
-    &::v-deep .no-data {
-        min-height: 10rem;
+    &::v-deep {
+        .body, .no-data {
+            min-height: 10rem;
+        }
     }
     .p-data-table {
         .col-project {
