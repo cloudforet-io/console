@@ -1,7 +1,7 @@
 <template>
     <section class="budget-detail-summary">
         <p-pane-layout class="summary-card">
-            <span class="summary-title">
+            <span v-if="!loading" class="summary-title">
                 {{ budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL ? 'Total Budgeted Amount' : 'Start ~ End Months' }}
                 <span v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL" class="font-normal">(Period)</span>
             </span>
