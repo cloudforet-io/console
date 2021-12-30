@@ -215,7 +215,7 @@ export default {
                 series.dataFields.dateX = 'date';
                 series.dataFields.valueY = legend.name;
                 series.tooltipText = '{name}: [bold]{valueY}[/]';
-                series.tooltip.label.fontSize = 10;
+                series.tooltip.label.fontSize = 12;
                 return series;
             };
 

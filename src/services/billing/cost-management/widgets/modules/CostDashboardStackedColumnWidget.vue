@@ -196,7 +196,7 @@ export default defineComponent<Props>({
                 series.columns.template.width = am4core.percent(60);
                 series.tooltipText = '{name}: [bold]{valueY}[/]';
                 series.columns.template.propertyFields.fill = legend.color;
-                series.tooltip.label.fontSize = 10;
+                series.tooltip.label.fontSize = 12;
                 series.stacked = true;
                 if (legend.color) series.fill = am4core.color(legend.color);
                 return series;

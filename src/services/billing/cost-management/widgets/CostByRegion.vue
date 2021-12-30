@@ -206,6 +206,7 @@ export default defineComponent<WidgetProps>({
             pieChartTemplate.verticalCenter = 'middle';
 
             const pieSeriesTemplate = pieChartTemplate.series.push(new am4charts.PieSeries());
+            pieSeriesTemplate.tooltip.fontSize = 12;
             pieSeriesTemplate.dataFields.category = categoryKey;
             pieSeriesTemplate.dataFields.value = valueName;
             pieSeriesTemplate.labels.template.disabled = true;

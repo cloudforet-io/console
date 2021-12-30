@@ -33,7 +33,6 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 
 import {
     dynamicFieldsToExcelDataFields,
-    makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-util/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { ExcelDataField } from '@/store/modules/file/type';
@@ -42,11 +41,13 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 
 
 interface Props {
     totalCount: number;
     filters: QueryStoreFilter[];
+    handlers: { keyItemSets: KeyItemSet[]; valueHandlerMap: ValueHandlerMap };
     queryTags: QueryTag[];
 }
 
@@ -71,6 +72,10 @@ export default {
             type: Array,
             default: () => ([]),
         },
+        handlers: {
+            type: Object,
+            default: () => ({}),
+        },
         /* sync */
         queryTags: {
             type: Array,
@@ -78,28 +83,13 @@ export default {
         },
     },
     setup(props: Props, { emit, root }) {
-        const handlers = makeQuerySearchPropsWithSearchSchema(
-            [{
-                title: 'Properties',
-                items: [
-                    { key: 'cloud_service_type', name: 'Cloud Service Type' },
-                    { key: 'cloud_service_group', name: 'Cloud Service Group' },
-                    { key: 'service_code', name: 'Product', reference: 'inventory.CloudServiceType' },
-                    { key: 'project_id', name: 'Project', reference: 'identity.Project' },
-                    { key: 'collection_info.service_accounts', name: 'Service Account', reference: 'identity.ServiceAccount' },
-                    { key: 'account', name: 'Account ID' },
-                ],
-            }],
-            'inventory.CloudService',
-        );
-
         const state = reactive({
             providers: computed(() => store.state.resource.provider.items),
             selectedProvider: computed(() => store.state.service.cloudService.selectedProvider),
             selectedCategories: computed(() => store.state.service.cloudService.selectedCategories),
             selectedRegions: computed(() => store.state.service.cloudService.selectedRegions),
-            keyItemSets: handlers.keyItemSets,
-            valueHandlerMap: handlers.valueHandlerMap,
+            keyItemSets: props.handlers.keyItemSets,
+            valueHandlerMap: props.handlers.valueHandlerMap,
         });
 
         /* event */

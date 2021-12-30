@@ -16,6 +16,7 @@
                 <p-divider class="cloud-service-divider" />
                 <cloud-service-toolbox :total-count="totalCount"
                                        :filters="filters"
+                                       :handlers="handlers"
                                        :query-tags.sync="queryTags"
                                        @update-toolbox="handleToolbox"
                 >
@@ -86,9 +87,6 @@ import {
     replaceUrlQuery,
     RouteQueryString,
 } from '@/lib/router-query-string';
-import {
-    makeQuerySearchPropsWithSearchSchema,
-} from '@/lib/component-util/dynamic-layout';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -102,6 +100,11 @@ import CloudServiceListCard
     from '@/services/inventory/cloud-service/modules/cloud-service-list/CloudServiceListCard.vue';
 import dayjs from 'dayjs';
 import CloudServicePeriodFilter from '@/services/inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
+import { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
+import {
+    makeDistinctValueHandler,
+    makeReferenceValueHandler,
+} from '@spaceone/console-core-lib/component-util/query-search';
 
 
 export default {
@@ -123,20 +126,27 @@ export default {
 
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const handlers = makeQuerySearchPropsWithSearchSchema(
-            [{
+        const handlers = {
+            keyItemSets: [{
                 title: 'Properties',
                 items: [
-                    { key: 'cloud_service_type', name: 'Cloud Service Type' },
-                    { key: 'cloud_service_group', name: 'Cloud Service Group' },
-                    { key: 'service_code', name: 'Product', reference: 'inventory.CloudServiceType' },
-                    { key: 'project_id', name: 'Project', reference: 'identity.Project' },
-                    { key: 'collection_info.service_accounts', name: 'Service Account', reference: 'identity.ServiceAccount' },
-                    { key: 'account', name: 'Account ID' },
+                    { name: 'cloud_service_type', label: 'Cloud Service Type' },
+                    { name: 'cloud_service_group', label: 'Cloud Service Group' },
+                    { name: 'service_code', label: 'Product' },
+                    { name: 'project_id', label: 'Project' },
+                    { name: 'collection_info.service_accounts', label: 'Service Account' },
+                    { name: 'account', label: 'Account ID' },
                 ],
-            }],
-            'inventory.CloudService',
-        );
+            }] as KeyItemSet[],
+            valueHandlerMap: {
+                cloud_service_type: makeDistinctValueHandler('inventory.CloudService', 'cloud_service_type'),
+                cloud_service_group: makeDistinctValueHandler('inventory.CloudService', 'cloud_service_group'),
+                service_code: makeDistinctValueHandler('inventory.CloudServiceType', 'service_code'),
+                project_id: makeReferenceValueHandler('identity.Project'),
+                'collection_info.service_accounts': makeReferenceValueHandler('identity.ServiceAccount'),
+                account: makeDistinctValueHandler('inventory.CloudService', 'account'),
+            } as ValueHandlerMap,
+        };
 
         const queryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
@@ -150,8 +160,6 @@ export default {
             //
             loading: true,
             items: undefined as any,
-            keyItemSets: handlers.keyItemSets,
-            valueHandlerMap: handlers.valueHandlerMap,
             queryTags: queryHelper.queryTags as QueryTag[],
             totalCount: 0,
             filters: computed<QueryStoreFilter[]>(() => {
@@ -280,6 +288,7 @@ export default {
         return {
             ...toRefs(state),
             routeState,
+            handlers,
             assetUrlConverter,
             handleToolbox,
             handleDeletePeriod,

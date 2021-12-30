@@ -56,6 +56,7 @@ import { CURRENCY } from '@/store/modules/display/config';
 import { store } from '@/store';
 import { gray } from '@/styles/colors';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { getCurrencyAppliedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -137,14 +138,22 @@ export default defineComponent<WidgetProps>({
         const drawChart = (chartContext) => {
             const isChartItemExists = !!state.chartData.length;
             const noItemsChartData: CostByProviderChartData[] = [{ category: 'dummy', value: 1, color: gray[100] }];
-            const chartData = isChartItemExists ? state.chartData : noItemsChartData;
             const createChart = () => {
                 disposeChart(chartContext);
                 state.chartRegistry[chartContext] = am4core.create(chartContext, am4charts.PieChart);
                 return state.chartRegistry[chartContext];
             };
             const chart = createChart();
-            chart.data = chartData;
+            if (isChartItemExists) {
+                chart.data = getCurrencyAppliedChartData(
+                    state.chartData,
+                    props.currency,
+                    props.currencyRates,
+                );
+            } else {
+                chart.data = noItemsChartData;
+            }
+
             chart.innerRadius = am4core.percent(65);
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
@@ -153,14 +162,14 @@ export default defineComponent<WidgetProps>({
             series.dataFields.category = 'category';
             series.labels.template.disabled = true;
             series.tooltip.disabled = true;
-            series.tooltip.fontSize = 10;
+            series.tooltip.fontSize = 12;
 
             const sliceTemplate = series.slices.template;
             sliceTemplate.clickable = false;
             sliceTemplate.properties.hoverable = false;
             sliceTemplate.states.getKey('hover').properties.scale = 1;
             sliceTemplate.propertyFields.fill = 'color';
-            sliceTemplate.tooltipText = '{category}: $ {value}';
+            sliceTemplate.tooltipText = '{category}: {value}';
             // sliceTemplate.adapter.add('fill', (fill, target) => {
             //     if (target.dataItem.category === 'dummy') return am4core.color(gray[100]);
             //     return fill;
@@ -234,6 +243,12 @@ export default defineComponent<WidgetProps>({
         watch([() => props.period, () => props.filters], () => {
             getData();
         }, { immediate: true });
+
+        watch(() => props.currency, (currency) => {
+            if (state.chart) {
+                state.chart.data = getCurrencyAppliedChartData(state.chartData, currency, props.currencyRates);
+            }
+        });
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();

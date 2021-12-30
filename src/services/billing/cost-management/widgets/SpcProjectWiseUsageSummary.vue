@@ -160,7 +160,7 @@ export default defineComponent<WidgetProps>({
             series.slices.template.clickable = false;
             series.slices.template.states.getKey('hover').properties.scale = 1;
             series.slices.template.tooltipText = '{category}: [bold]{value} ({value.percent.formatNumber(\'#.00\')}%)[/]';
-            series.tooltip.label.fontSize = 10;
+            series.tooltip.label.fontSize = 12;
 
             if (state.chartData.length === 0) {
                 series.tooltip.disabled = true;
