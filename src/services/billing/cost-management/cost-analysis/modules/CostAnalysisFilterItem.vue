@@ -86,7 +86,7 @@ export default {
                     }));
                 } if (props.type === FILTER.PROVIDER) {
                     return Object.keys(state.providers).map(k => ({
-                        name: k, label: state.providers[k].label,
+                        name: k, label: state.providers[k].name,
                     }));
                 } if (props.type === FILTER.REGION) {
                     return Object.keys(state.regions).map(k => ({

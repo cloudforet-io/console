@@ -30,11 +30,11 @@
                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
             </span>
             <span v-else-if="typeof value !== 'string'" class="text-center">
-                <p-anchor :to="value ? getLink(item) : undefined" target="_self"
-                          :show-icon="false"
-                >
-                    {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
-                </p-anchor>
+                {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
+                <!--                <p-anchor :to="value ? getLink(item) : undefined" target="_self"-->
+                <!--                          :show-icon="false"-->
+                <!--                >-->
+                <!--                </p-anchor>-->
             </span>
         </template>
     </p-toolbox-table>
@@ -48,7 +48,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PToolboxTable, PAnchor } from '@spaceone/design-system';
+import { PToolboxTable } from '@spaceone/design-system';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -81,7 +81,7 @@ export default {
     name: 'CostAnalysisDataTable',
     components: {
         PToolboxTable,
-        PAnchor,
+        // PAnchor,
     },
     props: {},
     setup(props, { root }) {
