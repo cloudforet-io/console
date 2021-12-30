@@ -16,7 +16,13 @@
                  :class="{'selected': sidebarState.selectedItem && item.cloud_service_type_id === sidebarState.selectedItem.cloud_service_type_id}"
                  @click="onClickSidebarItem(item)"
             >
-                {{ item.name }}
+                <div>{{ item.name }}</div>
+                <favorite-button :item-id="item.cloud_service_type_id || ''"
+                                 favorite-type="cloudServiceType"
+                                 resource-type="inventory.CloudServiceType"
+                                 class="favorite-btn"
+                                 scale="0.8"
+                />
             </div>
         </template>
         <template #default>
@@ -246,6 +252,7 @@ import { CloudServiceTypeInfo } from '@/services/inventory/cloud-service/cloud-s
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import CloudServicePeriodFilter from '@/services/inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
 import { Period } from '@/services/billing/cost-management/type';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -284,6 +291,7 @@ export default {
         ProjectTreeModal,
         SCollectModal,
         Monitoring,
+        FavoriteButton,
     },
     props: {
         provider: {
@@ -763,7 +771,10 @@ export default {
 
         (async () => {
             await initSidebar();
-            await store.dispatch('resource/loadAll');
+            await Promise.all([
+                store.dispatch('resource/loadAll'),
+                store.dispatch('favorite/cloudServiceType/load'),
+            ]);
             if (!props.name) {
                 await routeFirstItem();
             }
@@ -852,14 +863,27 @@ export default {
 }
 
 .sidebar-list-item {
-    @apply truncate rounded;
+    @apply truncate rounded flex justify-between items-center;
     height: 2rem;
     margin: 0 0.75rem;
     padding: 0.375rem 1rem;
     font-size: 0.875rem;
     line-height: 140%;
+    .favorite-btn {
+        display: none;
+    }
     &:hover {
         @apply bg-blue-100 cursor-pointer;
+        .favorite-btn {
+            display: block;
+        }
+    }
+    &::v-deep {
+        .favorite-btn {
+            &.active {
+                display: block;
+            }
+        }
     }
     &:active {
         @apply bg-blue-200 text-blue-500 cursor-pointer;
