@@ -37,12 +37,12 @@
                     />
                 </template>
                 <template #usage-overview="{filters}">
-                    <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem"
-                                                  :filters="filters"
-                                                  :period="overviewState.period"
-                                                  is-server
-                                                  :disabled="!sidebarState.isServer"
-                    />
+                    <!--                    <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem"-->
+                    <!--                                                  :filters="filters"-->
+                    <!--                                                  :period="overviewState.period"-->
+                    <!--                                                  is-server-->
+                    <!--                                                  :disabled="!sidebarState.isServer"-->
+                    <!--                    />-->
                 </template>
             </server-main>
             <div v-show="sidebarState.selectedItem && !sidebarState.isServer">
@@ -89,11 +89,11 @@
                                     </p-select-dropdown>
                                 </template>
                                 <template #toolbox-bottom>
-                                    <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem"
-                                                                  :filters="tableState.searchFilters"
-                                                                  :period="overviewState.period"
-                                                                  :disabled="sidebarState.isServer"
-                                    />
+                                    <!--                                    <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem"-->
+                                    <!--                                                                  :filters="tableState.searchFilters"-->
+                                    <!--                                                                  :period="overviewState.period"-->
+                                    <!--                                                                  :disabled="sidebarState.isServer"-->
+                                    <!--                                    />-->
                                 </template>
                             </p-dynamic-layout>
                         </template>
@@ -240,8 +240,8 @@ import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/C
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import CloudServiceUsageOverview
-    from '@/services/inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverview.vue';
+// import CloudServiceUsageOverview
+//     from '@/services/inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverview.vue';
 import { CloudServiceTypeInfo } from '@/services/inventory/cloud-service/cloud-service-detail/type';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import CloudServicePeriodFilter from '@/services/inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
@@ -262,7 +262,7 @@ export default {
     name: 'CloudServiceDetailPage',
     components: {
         CloudServicePeriodFilter,
-        CloudServiceUsageOverview,
+        // CloudServiceUsageOverview,
         CustomFieldModal,
         ServerMain,
         PLazyImg,
