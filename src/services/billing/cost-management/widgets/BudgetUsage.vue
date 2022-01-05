@@ -113,11 +113,11 @@ export default {
                 state.loading = true;
                 const results = await fetchData();
 
-                let usageRate = Number(results[0]?.usage.toFixed(2)) ?? 0;
+                let usageRate = results[0]?.usage ?? 0;
                 if (usageRate < 0) usageRate = 0;
+                state.usageRate = usageRate;
 
                 state.usageCost = results[0]?.usd_cost || 0;
-                state.usageRate = usageRate;
                 state.limitCost = results[0]?.limit || 0;
                 state.budgetCount = results[0]?.budget_count || 0;
             } catch (e) {
