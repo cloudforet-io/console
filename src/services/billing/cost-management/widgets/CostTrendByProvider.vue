@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout title="Cost Trend by Provider" :widget-link="widgetLink">
+    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROVIDER')" :widget-link="widgetLink">
         <cost-dashboard-stacked-column-widget
             :group-by="GROUP_BY.PROVIDER"
             :currency="currency"

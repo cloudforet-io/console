@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        :header-title="'Set Budget Notifications Condition'"
+        :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.SET_BUDGET_NOTIFICATIONS_CONDITION')"
         centered
         size="md"
         fade
@@ -12,8 +12,8 @@
     >
         <template #body>
             <div class="desc">
-                <p>When <b>any</b> of the following conditions are met, a notification will be sent immediately.</p>
-                <p-anchor :text="'Set Notifications'"
+                <p>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.BUDGET_NOTI_HELP_TEXT') }}</p>
+                <p-anchor :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
                           :to="{
                               name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                               params: {
@@ -27,13 +27,13 @@
                                 style-type="gray900"
                                 @click="handleAddCondition"
             >
-                Add Condition
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ADD_CONDITION') }}
             </p-icon-text-button>
             <section class="condition-wrapper">
                 <p v-if="conditions.length > 0" class="condition-header">
-                    <span>Unit</span>
-                    <span>Threshold</span>
-                    <span>Type</span>
+                    <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.UNIT') }}</span>
+                    <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.THRESHOLD') }}</span>
+                    <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.TYPE') }}</span>
                 </p>
                 <template v-for="(condition, idx) of conditions">
                     <div :key="`condition-${idx}`" class="condition-input-wrapper">
@@ -84,6 +84,7 @@ import { makeProxy } from '@/lib/helper/composition-helpers';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
 import { PROJECT_ROUTE } from '@/services/project/routes';
+import { i18n } from '@/translations';
 
 const NOTIFICATION_UNIT = Object.freeze({
     PERCENT: 'PERCENT',
@@ -131,21 +132,21 @@ export default {
             units: computed(() => ([
                 {
                     name: NOTIFICATION_UNIT.ACTUAL_COST,
-                    label: 'Actual Cost',
+                    label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ACTUAL_COST'),
                 },
                 {
                     name: NOTIFICATION_UNIT.PERCENT,
-                    label: '% of Budget',
+                    label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.BUDGET_USAGE', { symbol: '%' }),
                 },
             ])),
             types: computed(() => ([
                 {
                     name: NOTIFICATION_TYPE.WARNING,
-                    label: 'Warning',
+                    label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.WARNING'),
                 },
                 {
                     name: NOTIFICATION_TYPE.CRITICAL,
-                    label: 'Critical',
+                    label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.CRITICAL'),
                 },
             ])),
             thresholdPlaceholder: '',

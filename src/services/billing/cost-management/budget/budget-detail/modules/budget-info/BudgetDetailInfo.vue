@@ -2,8 +2,7 @@
     <section class="budget-detail-summary">
         <p-pane-layout class="summary-card">
             <span v-if="!loading" class="summary-title">
-                {{ budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL ? 'Total Budgeted Amount' : 'Start ~ End Months' }}
-                <span v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL" class="font-normal">(Period)</span>
+                {{ budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL ? $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_BUDGETED_AMOUNT') : 'Start ~ End Months' }}
             </span>
             <div v-if="!loading">
                 <p v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL" class="summary-content">
@@ -16,9 +15,7 @@
             </div>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
-            <span class="summary-title">
-                Target
-            </span>
+            <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TARGET') }}</span>
             <p v-if="!loading" class="summary-content">
                 <p-anchor v-if="budgetData.project_group_id || budgetData.project_id"
                           :to="referenceRouter(
@@ -30,8 +27,7 @@
             </p>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
-            <span class="summary-title">
-                Cost Type
+            <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }}
                 <span v-if="!loading" class="text-gray-900 font-normal">{{ costTypeMap[costTypeKey] || 'All' }}</span>
             </span>
             <p v-if="!loading" class="summary-content cost-type">

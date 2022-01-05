@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout title="Budget Status"
+    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.BUDGET_STATUS')"
                                        :data-range="200"
                                        class="budget-status"
                                        :widget-link="widgetLink"

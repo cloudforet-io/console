@@ -5,7 +5,7 @@
     >
         <template #header>
             <div class="header">
-                Budget Summary
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_SUMMARY') }}
             </div>
         </template>
         <budget-summary-chart v-if="!budgetLoading" />

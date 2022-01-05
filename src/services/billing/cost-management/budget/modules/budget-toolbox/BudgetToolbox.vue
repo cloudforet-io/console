@@ -38,7 +38,7 @@
                         class="sort-box" style-type="gray-border"
                         @click="handleSortType"
                     >
-                        <span>{{ sort.desc ? 'Desc' : 'Asc' }}</span>
+                        <span>{{ sort.desc ? $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DESC') : $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ASC') }}</span>
                         <p-i :name="sort.desc ? 'ic_arrow-down' : 'ic_arrow-up'"
                              color="gray900" height="1rem"
                         />
@@ -76,11 +76,17 @@ import BudgetToolboxUsageRange
     from '@/services/billing/cost-management/budget/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
 import { BudgetUsageAnalyzeRequestParam, BudgetUsageRange } from '@/services/billing/cost-management/budget/type';
 import { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
+import { TranslateResult } from 'vue-i18n';
 
 export interface Pagination {
     pageStart: number;
     pageLimit: number;
 }
+
+type I18nSelectDropdownMenu = SelectDropdownMenu | {
+    label: string | TranslateResult;
+}
+
 type Sort = BudgetUsageAnalyzeRequestParam['sort'];
 export default {
     name: 'BudgetToolbox',
@@ -155,9 +161,9 @@ export default {
                 return period;
             }),
             _filters: computed(() => filtersHelper.setFiltersAsQueryTag(state.queryTags).filters),
-            sortKeyList: computed<SelectDropdownMenu[]>(() => ([
-                { label: `% ${i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED')}`, name: 'usage' },
-                { label: `$ ${i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED')}`, name: 'usd_cost' },
+            sortKeyList: computed<I18nSelectDropdownMenu[]>(() => ([
+                { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.USAGE', { symbol: '%' }), name: 'usage' },
+                { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED', { symbol: '$' }), name: 'usd_cost' },
                 { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_NAME'), name: 'name' },
             ])),
             sortDesc: true,

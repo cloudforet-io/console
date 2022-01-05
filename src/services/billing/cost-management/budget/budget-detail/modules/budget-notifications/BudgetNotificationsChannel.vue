@@ -50,6 +50,7 @@ import { ChannelItem } from '@/services/identity/user/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { i18n } from '@/translations';
 
 const getBadgeColor = (level: string) => {
     switch (level) {
@@ -84,11 +85,11 @@ export default {
         const state = reactive({
             loading: false,
             fields: computed(() => [
-                { name: 'protocol_id', label: 'Channel' },
-                { name: 'name', label: 'Channel Name' },
-                { name: 'data', label: 'Details' },
-                { name: 'notification_level', label: 'Notifications Level' },
-                { name: 'schedule', label: 'Schedule ' },
+                { name: 'protocol_id', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.FIELD.CHANNEL') },
+                { name: 'name', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.FIELD.CHANNEL_NAME') },
+                { name: 'data', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.FIELD.DETAILS') },
+                { name: 'notification_level', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.FIELD.NOTIFICATIONS_LEVEL') },
+                { name: 'schedule', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.FIELD.SCHEDULE') },
             ]),
             items: [] as ChannelItem[],
             timezone: computed(() => store.state.user.timezone),

@@ -155,7 +155,7 @@ export default {
             defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
             costQueryList: computed<CostQuerySetModel[]>(() => store.state.service.costAnalysis.costQueryList),
             queryItemList: computed<MenuItem[]>(() => ([
-                { name: 'header', label: 'Saved Query', type: 'header' },
+                { name: 'header', label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVED_QUERY'), type: 'header' },
                 { name: undefined, label: 'Cost Analysis', type: 'item' },
                 ...state.costQueryList.map((item: CostQuerySetModel): MenuItem => ({
                     name: item.cost_query_set_id,

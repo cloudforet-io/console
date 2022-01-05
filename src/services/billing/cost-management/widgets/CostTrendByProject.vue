@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout title="Cost Trend by Project" :widget-link="widgetLink" class="cost-trend-by-project">
+    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROJECT')" :widget-link="widgetLink" class="cost-trend-by-project">
         <p-chart-loader :loading="loading" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />

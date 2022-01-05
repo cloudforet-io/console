@@ -34,11 +34,11 @@ export default {
     name: 'BudgetToolboxUsageRange',
     setup(props, { emit }) {
         const state = reactive({
-            items: [
+            items: computed(() => [
                 { name: USAGE_RANGE.overspent, label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.OVERSPENT'), color: red[400] },
                 { name: USAGE_RANGE.between90And100, label: '90-100%', color: yellow[500] },
                 { name: USAGE_RANGE.lessThan90, label: '< 90%', color: indigo[500] },
-            ],
+            ]),
             selected: [USAGE_RANGE.overspent, USAGE_RANGE.between90And100, USAGE_RANGE.lessThan90] as USAGE_RANGE[],
             selectedMap: computed<SelectedMap>(() => {
                 const selectedMap: SelectedMap = {};

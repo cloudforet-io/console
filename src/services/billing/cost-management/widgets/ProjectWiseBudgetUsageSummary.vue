@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout title="Project-wise Budget Usage Summary"
+    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.PROJECT_WISE_BUDGET_USAGE_SUMMARY')"
                                        class="project-wise-budget-usage-summary"
                                        :widget-link="widgetLink"
                                        :no-data="!loading && !items.length"
@@ -61,6 +61,8 @@ import { CURRENCY } from '@/store/modules/display/config';
 import { store } from '@/store';
 import { yellow, red, gray } from '@/styles/colors';
 import { BILLING_ROUTE } from '@/services/billing/routes';
+import { i18n } from '@/translations';
+import { TranslateResult } from 'vue-i18n';
 
 interface BudgetItem {
     project: {projectId: string; projectGroupId: string};
@@ -69,7 +71,9 @@ interface BudgetItem {
     usage: number;
     shortageForecast?: string;
 }
-
+type I18nDataTableField = DataTableField | {
+    label: string | TranslateResult;
+}
 export default {
     name: 'ProjectWiseBudgetUsageSummary',
     components: {
@@ -101,12 +105,12 @@ export default {
 
         const state = reactive({
             loading: false,
-            fields: computed<DataTableField[]>(() => ([
-                { name: 'project', label: 'Target' },
-                { name: 'amountSpent', label: 'Amount Spent', textAlign: 'right' },
-                { name: 'totalBudget', label: 'Total Budget', textAlign: 'right' },
+            fields: computed<I18nDataTableField[]>(() => ([
+                { name: 'project', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.TARGET') },
+                { name: 'amountSpent', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.AMOUNT_SPENT'), textAlign: 'right' },
+                { name: 'totalBudget', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.TOTAL_BUDGET'), textAlign: 'right' },
                 { name: 'usage', label: ' ', textAlign: 'right' },
-                { name: 'shortageForecast', label: 'Shortage Forecast', textAlign: 'center' },
+                { name: 'shortageForecast', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.SHORTAGE_FORECAST'), textAlign: 'center' },
             ])),
             items: [] as BudgetItem[],
             projectGroups: computed(() => store.state.resource.projectGroup.items),

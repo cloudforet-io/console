@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout title="Budget Usage Summary"
+    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.BUDGET_USAGE_SUMMARY')"
                                        :widget-link="widgetLink"
                                        :show-top-text="false"
     >

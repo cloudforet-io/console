@@ -7,13 +7,13 @@
             <div class="header">
                 {{ title }}
                 <p class="title-extra">
-                    <span v-if="showTopText" class="show-top-text mr-2">Showing Top {{ dataRange }}
+                    <span v-if="showTopText" class="show-top-text mr-2">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.SHOWING_TOP_NUM', { num : dataRange }) }}
                         <!--                        <p-i name="ic_tooltip" width="1rem" height="1rem"-->
                         <!--                             color="inherit transparent" class="tooltip-button"-->
                         <!--                        />-->
                     </span>
                     <router-link :to="widgetLink" class="anchor-button">
-                        Full data
+                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
                         <p-i name="ic_arrow_right" width="1rem" height="1rem"
                              color="inherit transparent"
                         />

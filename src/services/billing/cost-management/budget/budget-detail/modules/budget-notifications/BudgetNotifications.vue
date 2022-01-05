@@ -6,7 +6,7 @@
         >
             <template #header>
                 <section class="header">
-                    <span class="title">Budget Notifications</span>
+                    <span class="title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS') }}</span>
                     <p-icon-button v-if="hasBudgetAlert" name="ic_trashcan" @click="handleDelete" />
                 </section>
             </template>
@@ -19,8 +19,8 @@
                     </template>
                     <template v-else-if="hasBudgetAlert">
                         <article class="noti-condition">
-                            <span class="sub-title">Condition</span>
-                            <span class="desc">Any of the following are met, <br>a notification will be sent immediately.</span>
+                            <span class="sub-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.CONDITION') }}</span>
+                            <span class="desc">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTI_HELP_TEXT_1') }}</span>
                             <ul class="condition-list">
                                 <li v-for="item in notifications" :key="item.id">
                                     <span class="bullet">•</span>
@@ -29,23 +29,25 @@
                                     >
                                         {{ item.notification_type === 'WARNING' ? 'Warning' : 'Critical' }}
                                     </p-badge>
-                                    <span v-if="item.unit !== BUDGET_NOTIFICATIONS_UNIT.PERCENT">Actual Cost > ${{ commaFormatter(item.threshold) }}</span>
+                                    <span v-if="item.unit !== BUDGET_NOTIFICATIONS_UNIT.PERCENT">
+                                        {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }} > ${{ commaFormatter(item.threshold) }}
+                                    </span>
                                     <span v-else>% of budget > {{ item.threshold }}%</span>
                                 </li>
                             </ul>
                             <p-icon-text-button name="ic_setting" style-type="gray900" outline
                                                 @click="handleSetNotifications"
                             >
-                                Set
+                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET') }}
                             </p-icon-text-button>
                         </article>
                         <article class="noti-channel">
-                            <span class="sub-title">Notifications Channel</span>
+                            <span class="sub-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NOTIFICATIONS_CHANNEL') }}</span>
                             <div class="desc-wrapper">
-                                <span class="desc">Budget Notifications Message will be sent to the notifications channels below.</span>
+                                <span class="desc">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTI_HELP_TEXT_2') }}</span>
                                 <p-anchor v-if="budgetTargetId"
                                           class="link-text"
-                                          :text="'Set Notifications'"
+                                          :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
                                           :to="{
                                               name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                                               params: {

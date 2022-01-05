@@ -72,6 +72,7 @@ import { getConvertedFilter } from '@/services/billing/cost-management/cost-anal
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
+import { i18n } from '@/translations';
 
 
 const categoryKey = 'category';
@@ -128,7 +129,7 @@ export default defineComponent<WidgetProps>({
             items: [],
             fields: computed(() => [
                 { name: 'project_id', label: 'Project' },
-                { name: 'usd_cost', label: 'Accumulated Spent', textAlign: 'right' },
+                { name: 'usd_cost', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.ACCUMULATED_SPENT'), textAlign: 'right' },
             ]),
             totalCount: 20,
         });
