@@ -304,6 +304,40 @@
 				"ALT_S_CREATE_BUDGET": "",
 				"ALT_S_DELETE_BUDGET": "",
 				"ALT_S_UPDATE_BUDGET": "",
+				"DETAIL": {
+					"BUDGET_NOTIFICATIONS": "",
+					"BUDGET_NOTI_HELP_TEXT_1": "",
+					"BUDGET_NOTI_HELP_TEXT_2": "",
+					"BUDGET_SUMMARY": "",
+					"CONDITION": "",
+					"COST_TYPE": "",
+					"FIELD": {
+						"ACTUAL_COST": "",
+						"BUDGET_SPENT": "",
+						"CHANNEL": "",
+						"CHANNEL_NAME": "",
+						"DETAILS": "",
+						"NOTIFICATIONS_LEVEL": "",
+						"SCHEDULE": ""
+					},
+					"MODAL": {
+						"ACTUAL_COST": "",
+						"ADD_CONDITION": "",
+						"BUDGET_NOTI_HELP_TEXT": "",
+						"BUDGET_USAGE": "",
+						"CRITICAL": "",
+						"SET_BUDGET_NOTIFICATIONS_CONDITION": "",
+						"THRESHOLD": "",
+						"TYPE": "",
+						"UNIT": "",
+						"WARNING": ""
+					},
+					"NOTIFICATIONS_CHANNEL": "",
+					"SET": "",
+					"SET_NOTIFICATION_CHANNEL": "",
+					"TARGET": "",
+					"TOTAL_BUDGETED_AMOUNT": ""
+				},
 				"FORM": {
 					"AMOUNT_PLAN": {
 						"AMOUNT_PLANNING": "",
@@ -346,18 +380,22 @@
 					"UPDATE_BUDGET": ""
 				},
 				"MAIN": {
+					"AMOUNT_PAID": "",
 					"AMOUNT_SPENT": "",
 					"AMOUNT_USED": "",
+					"ASC": "",
 					"BUDGET": "",
 					"BUDGETED": "",
 					"BUDGET_NAME": "",
 					"COST_TYPE": "",
 					"CREATE_BUDGET": "",
+					"DESC": "",
 					"OVERSPENT": "",
 					"PERIOD": "",
 					"SINGLE_BUDGET": "",
 					"THIS_MONTH": "",
-					"TOTAL": ""
+					"TOTAL": "",
+					"USAGE": ""
 				},
 				"STAT": {
 					"AVAILABLE": "",
@@ -418,6 +456,7 @@
 				"PROJECT": "",
 				"PUBLIC": "",
 				"SAVE": "",
+				"SAVED_QUERY": "",
 				"SAVE_AS": "",
 				"SAVE_QUERY": "",
 				"SEARCH_PLACEHOLDER": "",
@@ -438,23 +477,41 @@
 			"DASHBOARD": {
 				"AVAILABLE": "",
 				"BUDGET": "",
+				"BUDGET_STATUS": "",
 				"BUDGET_USAGE": "",
+				"BUDGET_USAGE_SUMMARY": "",
 				"COST_BY_PROJECT": "",
+				"COST_BY_PROVIDER": "",
 				"COST_BY_REGION": "",
+				"COST_TREND_BY_PRODUCT": "",
+				"COST_TREND_BY_PROJECT": "",
+				"COST_TREND_BY_PROVIDER": "",
 				"CUSTOM": "",
 				"DECREASE": "",
 				"DUPLICATE": "",
+				"FIELD_LABEL": {
+					"ACCUMULATED_SPENT": "",
+					"AMOUNT_SPENT": "",
+					"SHORTAGE_FORECAST": "",
+					"TARGET": "",
+					"TOTAL_BUDGET": ""
+				},
 				"FORM": {
 					"CUSTOM_RANGE": "",
 					"FROM": "",
 					"TO": ""
 				},
+				"FULL_DATA": "",
 				"INCREASE": "",
 				"LAST_MONTH_TOTAL_SPEND": "",
 				"MONTH_TO_DATE_SPEND": "",
+				"PROJECT_WISE_BUDGET_USAGE_SUMMARY": "",
 				"SET_HOME": "",
+				"SHOWING_TOP_NUM": "",
 				"SPC_USAGE_SUMMARY": "",
 				"SPENT": "",
+				"TOTAL_BUDGET_USAGE": "",
+				"TOTAL_COST": "",
 				"VISIBILITY": ""
 			},
 			"MAIN": {
