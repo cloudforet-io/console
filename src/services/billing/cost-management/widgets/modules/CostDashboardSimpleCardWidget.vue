@@ -19,7 +19,7 @@
             </p>
             <p class="value-wrapper">
                 <span v-if="unitType === UNIT_TYPE.CURRENCY" class="unit-type">{{ currencySymbol }}</span>
-                <span class="value">{{ value }}</span>
+                <span class="value">{{ formattedValue }}</span>
                 <span v-if="unitType === UNIT_TYPE.PERCENT" class="unit-type">%</span>
             </p>
             <span class="description">{{ description }}</span>
@@ -33,6 +33,10 @@
 <script lang="ts">
 import { PDivider, PPaneLayout, PSkeleton } from '@spaceone/design-system';
 import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import {
+    computed, defineComponent, PropType, reactive, toRefs,
+} from '@vue/composition-api';
+import { Location } from 'vue-router';
 
 
 const UNIT_TYPE = Object.freeze({
@@ -42,7 +46,20 @@ const UNIT_TYPE = Object.freeze({
 
 type UNIT_TYPE = typeof UNIT_TYPE[keyof typeof UNIT_TYPE];
 
-export default {
+interface Props {
+    loading: boolean;
+    title: string;
+    currencySymbol: CURRENCY_SYMBOL;
+    unitType: UNIT_TYPE;
+    value?: number|string;
+    showDivider: boolean;
+    description: string;
+    noData: boolean;
+    widgetLink: Location|string;
+
+}
+
+export default defineComponent<Props>({
     name: 'CostDashboardSimpleCardWidget',
     components: {
         PPaneLayout,
@@ -59,21 +76,21 @@ export default {
             default: '',
         },
         currencySymbol: {
-            type: String,
-            default: '$',
+            type: String as PropType<CURRENCY_SYMBOL>,
+            default: CURRENCY_SYMBOL.USD,
             validator(value: CURRENCY_SYMBOL) {
                 return Object.values(CURRENCY_SYMBOL).includes(value);
             },
         },
         unitType: {
-            type: String,
+            type: String as PropType<UNIT_TYPE>,
             default: UNIT_TYPE.CURRENCY,
             validator(value: UNIT_TYPE) {
                 return Object.values(UNIT_TYPE).includes(value);
             },
         },
         value: {
-            type: [Number, String],
+            type: [Number, String] as PropType<number|string>,
             default: 0,
         },
         showDivider: {
@@ -89,16 +106,25 @@ export default {
             default: false,
         },
         widgetLink: {
-            type: [Object, String],
+            type: [Object, String] as PropType<Location|string>,
             default: () => ({}),
         },
     },
-    setup() {
+    setup(props) {
+        const state = reactive({
+            formattedValue: computed<string|number>(() => {
+                if (props.value === undefined) return 0;
+                if (typeof props.value === 'string') return props.value;
+                if (props.unitType === UNIT_TYPE.PERCENT) return props.value.toFixed(2);
+                return props.value;
+            }),
+        });
         return {
+            ...toRefs(state),
             UNIT_TYPE,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
