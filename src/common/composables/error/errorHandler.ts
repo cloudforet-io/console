@@ -26,7 +26,12 @@ export default class ErrorHandler {
     static handleError(error) {
         if (isInstanceOfAuthenticationError(error)) {
             const isTokenAlive = SpaceConnector.isTokenAlive;
-            if (!isTokenAlive && !SpaceRouter.router.currentRoute.meta.excludeAuth) ErrorHandler.authenticationErrorHandler();
+            if (!isTokenAlive && !SpaceRouter.router.currentRoute.meta.excludeAuth) {
+                (async () => {
+                    const res = await SpaceConnector.refreshAccessToken(false);
+                    if (!res) ErrorHandler.authenticationErrorHandler();
+                })();
+            }
         } else if (isInstanceOfAuthorizationError(error)) {
             ErrorHandler.authorizationErrorHandler();
             console.error(error);
