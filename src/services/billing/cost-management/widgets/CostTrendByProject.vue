@@ -60,6 +60,7 @@ import {
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
+import { Period } from '@/services/billing/cost-management/type';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { store } from '@/store';
 
@@ -122,10 +123,6 @@ export default {
                 };
             }),
             projects: computed(() => store.state.resource.project.items),
-            _period: computed(() => ({
-                start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM'),
-                end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
-            })),
             //
             chartRegistry: {},
             chart: null as XYChart | null,
@@ -155,7 +152,11 @@ export default {
         /* util */
         const setSlicedChartDataAndLegends = () => {
             const slicedItems = state.items.slice((state.thisPage * 5) - 5, state.thisPage * 5);
-            state.chartData = getXYChartData(slicedItems, GRANULARITY.MONTHLY, state._period, GROUP_BY.PROJECT);
+            const _period = {
+                start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM-01'),
+                end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
+            };
+            state.chartData = getXYChartData(slicedItems, GRANULARITY.MONTHLY, _period, GROUP_BY.PROJECT);
             state.legends = getLegends(slicedItems, GROUP_BY.PROJECT);
         };
         const disposeChart = (chartContext) => {
@@ -233,14 +234,14 @@ export default {
 
         /* api */
         const costQueryHelper = new QueryHelper();
-        const listCostAnalysisData = async (period, filters): Promise<CostAnalyzeModel[]> => {
+        const listCostAnalysisData = async (period: Period, filters): Promise<CostAnalyzeModel[]> => {
             costQueryHelper.setFilters(getConvertedFilter(filters));
             try {
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
                     group_by: [GROUP_BY.PROJECT],
-                    start: period.start,
-                    end: period.end,
+                    start: dayjs.utc(period.end).subtract(5, 'month').format('YYYY-MM-01'),
+                    end: dayjs.utc(period.end).add(1, 'month').format('YYYY-MM-01'),
                     pivot_type: 'TABLE',
                     limit: 15,
                     ...costQueryHelper.apiQuery,
@@ -263,9 +264,9 @@ export default {
                 state.chart.data = getCurrencyAppliedChartData(state.chartData, currency, props.currencyRates);
             }
         });
-        watch([() => state._period, () => props.filters], async ([_period, filters]) => {
+        watch([() => props.period, () => props.filters], async ([period, filters]) => {
             state.loading = true;
-            state.items = await listCostAnalysisData(_period, filters);
+            state.items = await listCostAnalysisData(period, filters);
             await setSlicedChartDataAndLegends();
             state.chart = drawChart(state.chartRef, state.chartData, state.legends);
             state.loading = false;

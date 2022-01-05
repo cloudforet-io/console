@@ -142,15 +142,15 @@ export default {
 
         const getCurrentMonthChartData = async () => {
             const start = state.currentMonth.startOf('month').format('YYYY-MM-DD');
-            const end = checkThisMonth() ? `${state.currentMonth.endOf('month').format('YYYY-MM')}-${thisDay}`
-                : state.currentMonth.endOf('month').format('YYYY-MM-DD');
+            const end = checkThisMonth() ? dayjs.utc().add(1, 'day').format('YYYY-MM-DD')
+                : state.currentMonth.add(1, 'month').format('YYYY-MM-01');
             state.currentMonthCost = await getData(start, end);
         };
 
         const getLastMonthChartData = async () => {
             const start = state.lastMonth.startOf('month').format('YYYY-MM-DD');
-            const end = checkThisMonth() ? `${state.lastMonth.endOf('month').format('YYYY-MM')}-${thisDay}`
-                : state.lastMonth.endOf('month').format('YYYY-MM-DD');
+            const end = checkThisMonth() ? dayjs.utc().add(1, 'day').format('YYYY-MM-DD')
+                : state.lastMonth.add(1, 'month').format('YYYY-MM-01');
             state.lastMonthCost = await getData(start, end) || 0;
         };
 

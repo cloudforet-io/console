@@ -254,8 +254,8 @@ export default {
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity,
                     group_by: groupBy,
-                    start: dayjs.utc(period.start),
-                    end: dayjs.utc(period.end).add(1, state.timeUnit),
+                    start: dayjs.utc(period.start).format('YYYY-MM-DD'),
+                    end: dayjs.utc(period.end).add(1, 'day').format('YYYY-MM-DD'),
                     pivot_type: 'TABLE',
                     ...costApiQueryHelper.data,
                 });
