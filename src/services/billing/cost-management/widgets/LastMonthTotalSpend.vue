@@ -167,8 +167,8 @@ export default {
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
-                    start: state.firstMonth.format('YYYY-MM'),
-                    end: state.thisMonth.endOf('month').format('YYYY-MM-DD'),
+                    start: state.firstMonth.format('YYYY-MM-01'),
+                    end: state.thisMonth.add(1, 'month').format('YYYY-MM-01'),
                     pivot_type: 'TABLE',
                     ...costQueryHelper.apiQuery,
                 });

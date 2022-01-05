@@ -62,6 +62,7 @@ import {
 } from '@/services/billing/cost-management/widgets/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { store } from '@/store';
+import { Period } from '@/services/billing/cost-management/type';
 
 
 interface Props extends WidgetProps {
@@ -100,10 +101,6 @@ export default defineComponent<Props>({
     setup(props: Props) {
         const state = reactive({
             providers: computed(() => store.state.resource.provider.items),
-            _period: computed(() => ({
-                start: dayjs(props.period.end).subtract(3, 'month').format('YYYY-MM'),
-                end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
-            })),
             //
             chartRegistry: {},
             chart: null as XYChart | null,
@@ -133,7 +130,11 @@ export default defineComponent<Props>({
 
         /* util */
         const setChartDataAndLegends = () => {
-            state.chartData = getXYChartData(state.items, GRANULARITY.MONTHLY, state._period, props.groupBy as GROUP_BY);
+            const _period = {
+                start: dayjs(props.period.end).subtract(3, 'month').format('YYYY-MM-01'),
+                end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
+            };
+            state.chartData = getXYChartData(state.items, GRANULARITY.MONTHLY, _period, props.groupBy as GROUP_BY);
             state.legends = getLegends(state.items, props.groupBy as GROUP_BY);
         };
         const disposeChart = (chartContext) => {
@@ -216,14 +217,14 @@ export default defineComponent<Props>({
 
         /* api */
         const costQueryHelper = new QueryHelper();
-        const listCostAnalysisData = async (period, filters): Promise<CostAnalyzeModel[]> => {
+        const listCostAnalysisData = async (period: Period, filters): Promise<CostAnalyzeModel[]> => {
             costQueryHelper.setFilters(getConvertedFilter(filters));
             try {
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
                     group_by: [props.groupBy],
-                    start: period.start,
-                    end: period.end,
+                    start: dayjs.utc(period.end).subtract(3, 'month').format('YYYY-MM-01'),
+                    end: dayjs.utc(period.end).add(1, 'month').format('YYYY-MM-01'),
                     pivot_type: 'TABLE',
                     limit: 15,
                     ...costQueryHelper.apiQuery,
@@ -246,9 +247,9 @@ export default defineComponent<Props>({
                 state.chart.data = getCurrencyAppliedChartData(state.chartData, currency, props.currencyRates);
             }
         });
-        watch([() => state._period, () => props.filters], async ([_period, filters]) => {
+        watch([() => props.period, () => props.filters], async ([period, filters]) => {
             state.loading = true;
-            state.items = await listCostAnalysisData(_period, filters);
+            state.items = await listCostAnalysisData(period, filters);
             await setChartDataAndLegends();
             state.chart = drawChart(state.chartRef, state.chartData, state.legends);
             state.loading = false;

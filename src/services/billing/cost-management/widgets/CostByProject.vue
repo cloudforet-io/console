@@ -16,6 +16,7 @@
 </template>
 
 <script lang="ts">
+import { sum } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -122,12 +123,22 @@ export default {
             chart.zoomOutButton.disabled = true;
 
             const series = chart.seriesTemplates.create('0');
+            series.columns.template.stroke = am4core.color('white');
+            series.columns.template.strokeWidth = 3;
+            series.columns.template.strokeOpacity = 1;
             const seriesBullet = series.bullets.push(new am4charts.LabelBullet());
             seriesBullet.locationY = 0.5;
             seriesBullet.locationX = 0.5;
-            seriesBullet.label.text = `[font-size: 1rem; bold]{projectId}[/]
+            const totalCost = sum(state.data.map(d => d.usdCost));
+            seriesBullet.label.adapter.add('text', (text, target) => {
+                if (target.dataItem?.value) {
+                    if (((100 * target.dataItem.value) / totalCost) >= 5) {
+                        return `[font-size: 1rem; bold]{projectId}[/]
 [font-size: 1.125rem; text-align: center]{cost}`;
-            // series.tooltip.disabled = true;
+                    }
+                }
+                return '';
+            });
         };
 
         const costQueryHelper = new QueryHelper();
@@ -138,7 +149,7 @@ export default {
                     granularity: GRANULARITY.ACCUMULATED,
                     group_by: ['project_id'],
                     start: dayjs.utc(props.period?.start).format('YYYY-MM-DD'),
-                    end: dayjs.utc(props.period?.end).endOf('month').format('YYYY-MM-DD'),
+                    end: dayjs.utc(props.period?.end).add(1, 'month').format('YYYY-MM-01'),
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
