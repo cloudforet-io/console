@@ -13,7 +13,7 @@
                     <template v-for="rowIdx in rowRange">
                         <router-link v-if="!!chartData[colIdx * 10 + rowIdx]"
                                      :key="`status-box-${colIdx}-${rowIdx}`"
-                                     v-tooltip.bottom="chartData[colIdx * 10 + rowIdx].budgetName"
+                                     v-tooltip.bottom="`${chartData[colIdx * 10 + rowIdx].budgetName} (${chartData[colIdx * 10 + rowIdx].usage}%)`"
                                      :to="chartData[colIdx * 10 + rowIdx].linkLocation"
                                      class="box status-box"
                                      :style="{ 'background-color': chartData[colIdx * 10 + rowIdx].color }"
@@ -62,6 +62,7 @@ interface ChartData {
     budgetId: string;
     budgetName: string;
     color: string;
+    usage: string;
     linkLocation: Location;
 }
 
@@ -108,14 +109,19 @@ export default {
         const getConvertedChartData = (rawData): ChartData[] => {
             const chartData: ChartData[] = [];
             rawData.forEach((d) => {
-                let color = indigo[100];
-                if (d.usage >= 70) color = indigo[500];
-                if (d.usage >= 90) color = yellow[500];
-                if (d.usage >= 70) color = red[400];
+                let color;
+                let usage = d.usage;
+                if (usage === undefined || usage < 0) usage = 0;
+
+                if (usage < 70) color = indigo[100];
+                else if (usage < 90) color = indigo[500];
+                else if (usage < 100) color = yellow[500];
+                else color = red[400];
                 chartData.push({
                     budgetId: d.budget_id,
                     budgetName: d.name,
                     color,
+                    usage: usage.toFixed(2),
                     linkLocation: {
                         name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
                         params: {
