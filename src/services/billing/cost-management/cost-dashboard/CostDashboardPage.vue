@@ -29,7 +29,8 @@
             </div>
             <cost-dashboard-filter :dashboard-id="dashboardId" :filters.sync="filters" />
         </div>
-        <dashboard-layouts :layout="layout"
+        <dashboard-layouts :loading="loading"
+                           :layout="layout"
                            :period="period"
                            :filters="filters"
                            :currency="currency"
@@ -83,6 +84,7 @@ export default {
     setup(props) {
         const state = reactive({
             dashboard: {} as DashboardInfo,
+            loading: true,
             layout: [] as any[],
             period: {} as Period,
             fixedPeriod: {} as Period,
@@ -109,33 +111,48 @@ export default {
             state.period = period;
         };
 
-        const getLayoutData = async (layoutId: string) => {
+        const fetchLayoutData = async (layoutId: string): Promise<any[]> => {
             try {
                 // noinspection TypeScriptCheckImport
                 const res = await import(`./dashboard-layouts/${layoutId}.json`);
-                state.layout = res.default;
+                return res.default;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.layout = [];
+                return [];
             }
         };
 
-        const getDashboard = async (dashboardId: string) => {
+        const fetchDashboard = async (dashboardId: string): Promise<DashboardInfo> => {
             try {
                 const dashboard = await SpaceConnector.client.costAnalysis.dashboard.get({
                     dashboard_id: dashboardId,
                 });
-                state.dashboard = dashboard;
-                state.filters = dashboard.default_filter;
-                if (dashboard.period_type === 'FIXED') state.fixedPeriod = dashboard.period;
-                else state.fixedPeriod = {};
+                return dashboard;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.dashboard = {} as DashboardInfo;
+                return {} as DashboardInfo;
             }
         };
 
-        watch([() => props.dashboardId, () => state.homeDashboardId], async ([dashboardId, homeDashboardId]) => {
+        const getDashboardLayout = async (dashboardId: string) => {
+            state.loading = true;
+
+            const dashboard = await fetchDashboard(dashboardId);
+            let layout;
+            if (dashboard?.default_layout_id) {
+                layout = await fetchLayoutData(dashboard.default_layout_id);
+            }
+
+            state.dashboard = dashboard;
+            state.layout = layout;
+            state.filters = dashboard.default_filter;
+            if (dashboard.period_type === 'FIXED') state.fixedPeriod = dashboard.period ?? {};
+            else state.fixedPeriod = {};
+
+            state.loading = false;
+        };
+
+        watch([() => props.dashboardId, () => state.homeDashboardId], ([dashboardId, homeDashboardId], before) => {
             if (!dashboardId) {
                 if (homeDashboardId) {
                     SpaceRouter.router.replace({
@@ -145,10 +162,9 @@ export default {
                 return;
             }
 
-            await getDashboard(dashboardId);
-            if (state.dashboard?.default_layout_id) {
-                await getLayoutData(state.dashboard.default_layout_id);
-            }
+            if (before && dashboardId === before[0]) return;
+
+            getDashboardLayout(dashboardId);
         }, { immediate: true });
 
 
@@ -163,6 +179,11 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.cost-dashboard-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
 .top-wrapper {
     @apply flex flex-wrap;
     row-gap: 1rem;
