@@ -1,4 +1,5 @@
 import { Tags, TimeStamp } from '@/models';
+import { Period } from '@/services/billing/cost-management/type';
 
 const DASHBOARD_SCOPE = {
     PRIVATE: 'PRIVATE',
@@ -18,13 +19,15 @@ export interface DashboardInfo {
     updated_at: TimeStamp;
     custom_layouts: string[];
     dashboard_id: string;
-    default_filter?: DefaultFilter;
+    default_filter: DefaultFilter;
     default_layout_id: string;
     domain_id?: string;
     name: string;
     scope: DASHBOARD_SCOPE;
     tags: Tags;
     user_id: string;
+    period_type: string;
+    period?: Period;
 }
 
 export interface DashboardItem extends DashboardInfo {
