@@ -39,16 +39,16 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import { store } from '@/store';
 
-const today = dayjs().utc();
+const today = dayjs.utc();
 const basicFormat = (date: Dayjs) => date.format('YYYY-MM-DD');
 const subDate = (value: number, unit: string) => today.subtract(value, unit);
 export const PERIOD_MENU_LIST = Object.freeze({
     last7days: { start: basicFormat(subDate(6, 'day')), end: basicFormat(today) },
     last14days: { start: basicFormat(subDate(14, 'day')), end: basicFormat(today) },
-    thisMonth: { start: basicFormat(today.startOf('month')), end: basicFormat(today) },
+    thisMonth: { start: basicFormat(today.startOf('month')), end: basicFormat(today.endOf('month')) },
     lastMonth: { start: basicFormat(subDate(1, 'month').startOf('month')), end: basicFormat(subDate(1, 'month').endOf('month')) },
-    last3months: { start: basicFormat(subDate(2, 'month').startOf('month')), end: basicFormat(today) },
-    last6months: { start: basicFormat(subDate(5, 'month').startOf('month')), end: basicFormat(today) },
+    last3months: { start: basicFormat(subDate(2, 'month').startOf('month')), end: basicFormat(today.endOf('month')) },
+    last6months: { start: basicFormat(subDate(5, 'month').startOf('month')), end: basicFormat(today.endOf('month')) },
 });
 
 export default {
@@ -91,7 +91,7 @@ export default {
                 },
 
             ])),
-            selectedPeriodMenuItem: undefined,
+            selectedPeriodMenuItem: 'thisMonth',
             customRangeModalVisible: false,
         });
         const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
