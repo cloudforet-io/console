@@ -58,6 +58,6 @@ export const getTimeUnitByPeriod = (granularity: GRANULARITY, start: Dayjs, end:
 
 export const getInitialDates = (): Period => {
     const start = dayjs.utc().startOf('month').format();
-    const end = dayjs.utc().startOf('date').format();
+    const end = dayjs.utc().endOf('month').format();
     return { start, end };
 };
