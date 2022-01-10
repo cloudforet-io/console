@@ -167,7 +167,7 @@ export default {
                 rawData.forEach((d) => {
                     if (d.usd_cost > 0) {
                         chartData.push({
-                            projectId: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'No Project',
+                            projectId: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'Unknown',
                             usdCost: d.usd_cost,
                             cost: currencyMoneyFormatter(d.usd_cost, props.currency, props.currencyRates, false, 10000000),
                         });

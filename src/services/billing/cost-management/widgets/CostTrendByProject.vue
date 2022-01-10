@@ -63,6 +63,7 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 import { Period } from '@/services/billing/cost-management/type';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { store } from '@/store';
+import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
 
 interface TableItem {
@@ -139,7 +140,7 @@ export default {
                 range(6).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');
                     fields.push({
-                        name: `usd_cost.${date.format('YYYY-MM')}`,
+                        name: `usd_cost.${date.format('YYYY-M')}`,
                         label: thisMonth.isSame(date, 'month') ? `${date.format('MMM')} (MTD)` : date.format('MMM'),
                     });
                 });
@@ -210,9 +211,10 @@ export default {
                 return text;
             });
 
-            const createSeries = (legend) => {
+            const createSeries = (legend, idx) => {
                 const series = chart.series.push(new am4charts.LineSeries());
                 series.name = legend.label;
+                series.stroke = am4core.color(DEFAULT_CHART_COLORS[(state.thisPage * 5 - 5) + idx]);
                 series.dataFields.dateX = 'date';
                 series.dataFields.valueY = legend.name;
                 series.tooltipText = '{name}: [bold]{valueY}[/]';
@@ -220,8 +222,8 @@ export default {
                 return series;
             };
 
-            legends.forEach((legend) => {
-                createSeries(legend);
+            legends.forEach((legend, idx) => {
+                createSeries(legend, idx);
             });
 
             chart.cursor = new am4charts.XYCursor();
