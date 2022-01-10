@@ -117,7 +117,7 @@ export default defineComponent<Props>({
                 range(4).forEach((d) => {
                     const date = startMonth.add(d, 'month');
                     fields.push({
-                        name: `usd_cost.${date.format('YYYY-MM')}`,
+                        name: `usd_cost.${date.format('YYYY-M')}`,
                         label: thisMonth.isSame(date, 'month') ? `${date.format('MMM')} (MTD)` : date.format('MMM'),
                         textAlign: 'right',
                     });
