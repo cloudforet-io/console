@@ -146,7 +146,7 @@ export default {
         /* util */
         const getConvertedIndex = index => index + ((state.proxyThisPage - 1) * props.pageSize);
         const labelColorFormatter = index => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].color : 'text-gray-900');
-        const labelTextFormatter = index => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].label : 'Unknown');
+        const labelTextFormatter = index => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].label : '');
         const getIndexNumber = (index) => {
             const tableIndex = index + ((state.proxyThisPage - 1) * props.pageSize) + 1;
             return tableIndex.toString();
@@ -193,7 +193,7 @@ export default {
 
         /* event */
         const handleClickLegend = (index) => {
-            toggleSeries(props.chart as XYChart | PieChart | TreeMap, getConvertedIndex(index));
+            toggleSeries(props.chart as XYChart | PieChart | TreeMap, index);
             emit('toggle-legend', getConvertedIndex(index));
         };
 

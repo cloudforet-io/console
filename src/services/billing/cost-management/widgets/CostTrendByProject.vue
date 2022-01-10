@@ -151,14 +151,15 @@ export default {
         });
 
         /* util */
-        const setSlicedChartDataAndLegends = () => {
+        const getSlicedChartDataAndLegends = () => {
             const slicedItems = state.items.slice((state.thisPage * 5) - 5, state.thisPage * 5);
             const _period = {
                 start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM-01'),
                 end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
             };
-            state.chartData = getXYChartData(slicedItems, GRANULARITY.MONTHLY, _period, GROUP_BY.PROJECT);
-            state.legends = getLegends(slicedItems, GROUP_BY.PROJECT);
+            const slicedChartData = getXYChartData(slicedItems, GRANULARITY.MONTHLY, _period, GROUP_BY.PROJECT);
+            const slicedLegends = state.legends.slice((state.thisPage * 5) - 5, state.thisPage * 5);
+            return { slicedChartData, slicedLegends };
         };
         const disposeChart = (chartContext) => {
             if (state.chartRegistry[chartContext]) {
@@ -248,6 +249,7 @@ export default {
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
+                state.legends = getLegends(results, GROUP_BY.PROJECT);
                 state.totalCount = total_count > 15 ? 15 : total_count;
                 return results;
             } catch (e) {
@@ -269,13 +271,16 @@ export default {
         watch([() => props.period, () => props.filters], async ([period, filters]) => {
             state.loading = true;
             state.items = await listCostAnalysisData(period, filters);
-            await setSlicedChartDataAndLegends();
-            state.chart = drawChart(state.chartRef, state.chartData, state.legends);
+            const { slicedChartData, slicedLegends } = await getSlicedChartDataAndLegends();
+            state.chart = drawChart(state.chartRef, slicedChartData, slicedLegends);
             state.loading = false;
         }, { immediate: true });
         watch(() => state.thisPage, async () => {
-            await setSlicedChartDataAndLegends();
-            state.chart = drawChart(state.chartRef, state.chartData, state.legends);
+            const { slicedChartData, slicedLegends } = await getSlicedChartDataAndLegends();
+            state.chart = drawChart(state.chartRef, slicedChartData, slicedLegends);
+            state.legends.forEach((d, idx) => {
+                state.legends[idx].disabled = false;
+            });
         }, { immediate: false });
 
         onUnmounted(() => {
