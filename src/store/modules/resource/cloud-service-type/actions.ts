@@ -10,7 +10,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             query: {
                 only: ['cloud_service_type_id', 'name', 'group', 'provider', 'tags'],
             },
-        }, { timeout: 2000 });
+        }, { timeout: 3000 });
         const cloudServiceTypes: ResourceMap = {};
 
         response.results.forEach((cloudServiceTypeInfo: any): void => {

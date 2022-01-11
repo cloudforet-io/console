@@ -10,7 +10,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             query: {
                 only: ['collector_id', 'name', 'tags'],
             },
-        }, { timeout: 2000 });
+        }, { timeout: 3000 });
         const collectors: ResourceMap = {};
 
         response.results.forEach((collectorInfo: any): void => {
