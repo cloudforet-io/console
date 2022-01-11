@@ -9,7 +9,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             query: {
                 only: ['service_account_id', 'name'],
             },
-        }, { timeout: 2000 });
+        }, { timeout: 3000 });
         const serviceAccounts: ResourceMap = {};
 
         response.results.forEach((serviceAccountInfo: any): void => {

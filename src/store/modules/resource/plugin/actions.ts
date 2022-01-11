@@ -10,7 +10,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             query: {
                 only: ['repository_id'],
             },
-        });
+        }, { timeout: 3000 });
 
         const plugins: ResourceMap = {};
 
@@ -20,7 +20,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                     only: ['plugin_id', 'name', 'tags'],
                 },
                 repository_id: repoInfo.repository_id,
-            }, { timeout: 2000 });
+            }, { timeout: 3000 });
 
 
             pluginResponse.results.forEach((pluginInfo: any): void => {

@@ -9,7 +9,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             query: {
                 only: ['protocol_id', 'name'],
             },
-        }, { timeout: 2000 });
+        }, { timeout: 3000 });
         const protocols: ResourceMap = {};
 
         response.results.forEach((protocolInfo: any): void => {

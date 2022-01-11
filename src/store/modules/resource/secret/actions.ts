@@ -9,7 +9,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             query: {
                 only: ['secret_id', 'name'],
             },
-        }, { timeout: 2000 });
+        }, { timeout: 3000 });
         const secrets: ResourceMap = {};
 
         response.results.forEach((secretInfo: any): void => {

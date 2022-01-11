@@ -48,7 +48,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             query: {
                 only: ['name', 'region_code', 'tags', 'provider'],
             },
-        }, { timeout: 2000 });
+        }, { timeout: 3000 });
         const regions: ResourceMap = {};
 
         response.results.forEach((regionInfo: any): void => {
