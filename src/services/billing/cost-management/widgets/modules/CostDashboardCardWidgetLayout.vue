@@ -24,7 +24,7 @@
         <div v-if="noData" class="no-data">
             No Item
         </div>
-        <slot />
+        <slot v-else />
     </p-card>
 </template>
 

@@ -11,7 +11,7 @@
                                        :items="items"
                                        :loading="loading"
                                        :this-page.sync="thisPage"
-                                       :page-size="9"
+                                       :page-size="PAGE_SIZE"
                                        :chart="chart"
                                        :legends="legends"
                                        :currency-rates="currencyRates"
@@ -28,7 +28,7 @@ import { range } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import { XYChart } from '@amcharts/amcharts4/charts';
+import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
@@ -49,7 +49,6 @@ import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import {
     getCurrencyAppliedChartData, getLegends, getXYChartData,
@@ -61,6 +60,7 @@ import {
     ChartData, CostAnalyzeModel, Legend, WidgetProps,
 } from '@/services/billing/cost-management/widgets/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { toggleSeries } from '@/lib/amcharts/helper';
 import { store } from '@/store';
 import { Period } from '@/services/billing/cost-management/type';
 
@@ -68,6 +68,8 @@ import { Period } from '@/services/billing/cost-management/type';
 interface Props extends WidgetProps {
     groupBy: string;
 }
+
+const PAGE_SIZE = 9;
 
 export default defineComponent<Props>({
     name: 'CostDashboardStackedColumnWidget',
@@ -239,7 +241,9 @@ export default defineComponent<Props>({
 
         /* event */
         const handleToggleLegend = (index) => {
-            state.legends[index].disabled = !state.legends[index]?.disabled;
+            const convertedIndex = index + ((state.thisPage - 1) * PAGE_SIZE);
+            toggleSeries(state.chart as XYChart | PieChart | TreeMap, convertedIndex);
+            state.legends[convertedIndex].disabled = !state.legends[convertedIndex]?.disabled;
         };
 
         watch(() => props.currency, (currency) => {
@@ -261,8 +265,7 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            DEFAULT_CHART_COLORS,
-            DISABLED_LEGEND_COLOR,
+            PAGE_SIZE,
             handleToggleLegend,
         };
     },

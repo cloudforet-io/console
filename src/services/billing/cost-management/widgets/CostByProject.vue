@@ -38,7 +38,7 @@ import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { convertUSDToCurrency, currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import config from '@/lib/config';
 import { store } from '@/store';
 import { PChartLoader, PSkeleton } from '@spaceone/design-system';
@@ -50,6 +50,7 @@ interface ChartData {
     projectId: string;
     usdCost: number;
     cost: number | string;
+    label: number | string;
 }
 
 export default {
@@ -134,7 +135,7 @@ export default {
                 if (target.dataItem?.value) {
                     if (((100 * target.dataItem.value) / totalCost) >= 5) {
                         return `[font-size: 1rem; bold]{projectId}[/]
-[font-size: 1.125rem; text-align: center]{cost}`;
+[font-size: 1.125rem; text-align: center]{label}`;
                     }
                 }
                 return '';
@@ -169,7 +170,8 @@ export default {
                         chartData.push({
                             projectId: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'Unknown',
                             usdCost: d.usd_cost,
-                            cost: currencyMoneyFormatter(d.usd_cost, props.currency, props.currencyRates, false, 10000000),
+                            cost: convertUSDToCurrency(d.usd_cost, props.currency, props.currencyRates).toFixed(2),
+                            label: currencyMoneyFormatter(d.usd_cost, props.currency, props.currencyRates, false, 10000000),
                         });
                     }
                 });

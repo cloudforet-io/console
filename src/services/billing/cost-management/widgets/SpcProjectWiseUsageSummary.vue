@@ -17,13 +17,13 @@
                                        :legends="legends"
                                        :currency-rates="currencyRates"
                                        :currency="currency"
-                                       :page-size="10"
+                                       :page-size="PAGE_SIZE"
                                        :pagination-visible="false"
                                        show-legend
                                        class="table table-left"
-                                       @toggle-legend="handleToggleLegend"
+                                       @toggle-legend="handleToggleLegend1"
             />
-            <cost-dashboard-data-table v-if="tableState.items.length > 10"
+            <cost-dashboard-data-table v-if="tableState.items.length > PAGE_SIZE"
                                        :fields="tableState.fields"
                                        :items="tableState.items"
                                        :loading="loading"
@@ -31,12 +31,12 @@
                                        :legends="legends"
                                        :currency-rates="currencyRates"
                                        :currency="currency"
-                                       :page-size="10"
+                                       :page-size="PAGE_SIZE"
                                        :this-page="2"
                                        :pagination-visible="false"
                                        show-legend
                                        class="table table-right"
-                                       @toggle-legend="handleToggleLegend"
+                                       @toggle-legend="handleToggleLegend2"
             />
         </div>
     </cost-dashboard-card-widget-layout>
@@ -48,7 +48,7 @@ import {
 } from '@vue/composition-api';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import { PieChart } from '@amcharts/amcharts4/charts';
+import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 import config from '@/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
@@ -72,10 +72,13 @@ import { getConvertedFilter } from '@/services/billing/cost-management/cost-anal
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
+import { toggleSeries } from '@/lib/amcharts/helper';
 
 
 const categoryKey = 'category';
 const valueName = 'value';
+
+const PAGE_SIZE = 10;
 
 export default defineComponent<WidgetProps>({
     name: 'SpcProjectWiseUsageSummary',
@@ -219,8 +222,14 @@ export default defineComponent<WidgetProps>({
             }
         };
 
-        const handleToggleLegend = (index) => {
+        const handleToggleLegend1 = (index) => {
+            toggleSeries(state.chart as XYChart | PieChart | TreeMap, index);
             state.legends[index].disabled = !state.legends[index]?.disabled;
+        };
+        const handleToggleLegend2 = (index) => {
+            const convertedIndex = index + PAGE_SIZE;
+            toggleSeries(state.chart as XYChart | PieChart | TreeMap, convertedIndex);
+            state.legends[convertedIndex].disabled = !state.legends[convertedIndex]?.disabled;
         };
 
         watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
@@ -246,7 +255,9 @@ export default defineComponent<WidgetProps>({
         return {
             ...toRefs(state),
             tableState,
-            handleToggleLegend,
+            PAGE_SIZE,
+            handleToggleLegend1,
+            handleToggleLegend2,
         };
     },
 });
