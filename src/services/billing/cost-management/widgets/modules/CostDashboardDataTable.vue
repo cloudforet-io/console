@@ -48,8 +48,6 @@
 </template>
 
 <script lang="ts">
-import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
-
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
@@ -59,7 +57,6 @@ import {
 } from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
-import { toggleSeries } from '@/lib/amcharts/helper';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -193,8 +190,7 @@ export default {
 
         /* event */
         const handleClickLegend = (index) => {
-            toggleSeries(props.chart as XYChart | PieChart | TreeMap, index);
-            emit('toggle-legend', getConvertedIndex(index));
+            emit('toggle-legend', index);
         };
 
         // watch([() => props.showSharpRises, () => props.items], ([showSharpRises, items]) => {

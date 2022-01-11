@@ -11,7 +11,7 @@
                                        :items="items"
                                        :loading="loading"
                                        :this-page.sync="thisPage"
-                                       :page-size="5"
+                                       :page-size="PAGE_SIZE"
                                        :chart="chart"
                                        :legends="legends"
                                        :currency-rates="currencyRates"
@@ -27,7 +27,7 @@
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import { XYChart } from '@amcharts/amcharts4/charts';
+import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 
 import {
@@ -64,6 +64,7 @@ import { Period } from '@/services/billing/cost-management/type';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { store } from '@/store';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
+import { toggleSeries } from '@/lib/amcharts/helper';
 
 
 interface TableItem {
@@ -74,6 +75,8 @@ interface TableItem {
 interface Props extends WidgetProps {
     groupBy: string;
 }
+
+const PAGE_SIZE = 5;
 
 export default {
     name: 'CostTrendByProject',
@@ -192,6 +195,8 @@ export default {
             dateAxis.tooltip.disabled = true;
             dateAxis.renderer.grid.template.strokeOpacity = 1;
             dateAxis.renderer.grid.template.location = 0;
+            dateAxis.startLocation = 0.45;
+            dateAxis.endLocation = 0.55;
             dateAxis.renderer.labels.template.fill = am4core.color(gray[600]);
             dateAxis.tooltip.label.fontSize = 12;
             dateAxis.renderer.grid.template.strokeOpacity = 0;
@@ -260,7 +265,9 @@ export default {
 
         /* event */
         const handleToggleLegend = (index) => {
-            state.legends[index].disabled = !state.legends[index]?.disabled;
+            const convertedIndex = index + ((state.thisPage - 1) * PAGE_SIZE);
+            toggleSeries(state.chart as XYChart | PieChart | TreeMap, index);
+            state.legends[convertedIndex].disabled = !state.legends[convertedIndex]?.disabled;
         };
 
         watch(() => props.currency, (currency) => {
@@ -289,6 +296,7 @@ export default {
 
         return {
             ...toRefs(state),
+            PAGE_SIZE,
             handleToggleLegend,
         };
     },
