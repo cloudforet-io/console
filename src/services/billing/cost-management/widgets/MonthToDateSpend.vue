@@ -7,7 +7,7 @@
         :value="currencyMoneyFormatter(currentMonthCost, currency, currencyRates, true, 10000000000)"
         :currency-symbol="currencySymbol"
         :description="thisMonthFormatter(currentMonth)"
-        :no-data="!loading && !currentMonthCost"
+        :no-data="!loading && !currentMonthCost && !lastMonthCost"
     >
         <template #default>
             <div class="cost-trend-wrapper flex">
@@ -141,7 +141,7 @@ export default {
         const getCurrentMonthChartData = async () => {
             const start = state.currentMonth.startOf('month').format('YYYY-MM-DD');
             const end = state.currentMonth.add(1, 'month').format('YYYY-MM-01');
-            state.currentMonthCost = await getData(start, end);
+            state.currentMonthCost = await getData(start, end) || 0;
         };
 
         const getLastMonthChartData = async () => {

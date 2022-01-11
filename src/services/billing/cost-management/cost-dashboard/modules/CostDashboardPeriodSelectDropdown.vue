@@ -40,6 +40,9 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 
 const yesterday = dayjs.utc().subtract(1, 'day');
+const initialPeriodStart = yesterday.startOf('month').format('YYYY-MM-DD');
+const initialPeriodEnd = yesterday.endOf('month').format('YYYY-MM-DD');
+const initialSelectedMonth = initialPeriodStart.substr(0, 7);
 
 export default {
     name: 'CostDashboardPeriodSelectDropdown',
@@ -62,9 +65,9 @@ export default {
         const state = reactive({
             period: {
                 start: props.fixedPeriod ? dayjs(props.fixedPeriod.start).format('YYYY-MM')
-                    : yesterday.startOf('month').format('YYYY-MM-DD'),
+                    : initialPeriodStart,
                 end: props.fixedPeriod ? dayjs(props.fixedPeriod.end).endOf('month').format('YYYY-MM-DD')
-                    : yesterday.endOf('month').format('YYYY-MM-DD'),
+                    : initialPeriodEnd,
             },
             getMonthMenuItem: computed(() => {
                 const monthData: MenuItem[] = [];
@@ -89,7 +92,7 @@ export default {
                 },
 
             ])),
-            selectedMonthMenuItem: undefined,
+            selectedMonthMenuItem: initialSelectedMonth,
             customRangeModalVisible: false,
         });
         const savePeriod = (start, end) => {
@@ -113,8 +116,11 @@ export default {
             if (props.fixedPeriod?.start) {
                 savePeriod(props.fixedPeriod.start, props.fixedPeriod.end);
                 state.selectedMonthMenuItem = 'custom';
-            } else savePeriod(state.period.start, state.period.end);
-        }, { immediate: true });
+            } else {
+                savePeriod(initialPeriodStart, initialPeriodEnd);
+                state.selectedMonthMenuItem = initialSelectedMonth;
+            }
+        });
 
         return {
             ...toRefs(state),
