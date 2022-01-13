@@ -152,7 +152,7 @@ export default {
         margin-left: 2rem;
     }
     .logo-text {
-        width: 146px;
+        width: auto;
         height: 40px;
         margin-top: 2.5rem;
     }
