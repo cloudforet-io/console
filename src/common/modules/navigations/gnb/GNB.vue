@@ -49,7 +49,6 @@ import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import { PLUGIN_ROUTE } from '@/services/plugin/routes';
 import { MANAGEMENT_ROUTE } from '@/services/management/routes';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/routes';
-import { AUTOMATION_ROUTE } from '@/services/automation/routes';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import { MONITORING_ROUTE } from '@/services/monitoring/routes';
@@ -60,20 +59,35 @@ import { i18n } from '@/translations';
 import config from '@/lib/config';
 
 
-const PARENT_CATEGORY = {
+const PARENT_MENU = Object.freeze({
     project: 'project',
     inventory: 'inventory',
     identity: 'identity',
     monitoring: 'monitoring',
     billing: 'billing',
-    automation: 'automation',
     plugin: 'plugin',
     management: 'management',
-};
-type PARENT_CATEGORY = typeof PARENT_CATEGORY[keyof typeof PARENT_CATEGORY]
+} as const);
+
+const SUB_MENU = Object.freeze({
+    'inventory.cloudService': 'inventory.cloudService',
+    'inventory.server': 'inventory.server',
+    'identity.serviceAccount': 'identity.serviceAccount',
+    'identity.user': 'identity.user',
+    'monitoring.alertManager': 'monitoring.alertManager',
+    'billing.costManagement': 'billing.costManagement',
+    'plugin.collector': 'plugin.collector',
+    'management.collectorHistory': 'management.collectorHistory',
+} as const);
+
+const MENU = Object.freeze({
+    ...PARENT_MENU,
+    ...SUB_MENU,
+});
+type MENU = typeof MENU[keyof typeof MENU]
 
 interface Menu {
-    name?: PARENT_CATEGORY;
+    name: MENU;
     label: TranslateResult;
     to: Location;
     show?: boolean;
@@ -84,10 +98,12 @@ interface Menu {
 
 const ALLOWED_MENUS_FOR_ALL_USERS = ['support', 'account', 'notifications'];
 
-const filterMenuByRoute = (menuList: Menu[], router: VueRouter): Menu[] => menuList.reduce((results, _menu) => {
+const filterMenuByRoute = (menuList: Menu[], disabledMenu: string[], router: VueRouter): Menu[] => menuList.reduce((results, _menu) => {
+    if (disabledMenu.includes(_menu.name)) return results;
+
     const menu = { ..._menu };
     if (menu.subMenuList) {
-        menu.subMenuList = filterMenuByRoute(menu.subMenuList, router);
+        menu.subMenuList = filterMenuByRoute(menu.subMenuList, disabledMenu, router);
         if (menu.subMenuList.length) {
             results.push(menu);
             return results;
@@ -118,108 +134,104 @@ export default {
             openedMenu: '',
             showSiteMap: false,
             showPowerScheduler: computed(() => store.state.user.powerSchedulerState),
-            showSpotAutomation: computed(() => store.state.user.spotAutomationState),
             showBilling: computed(() => config.get('BILLING_ENABLED')),
-            showAutomation: computed(() => state.showPowerScheduler || state.showSpotAutomation),
+            disabledMenu: computed(() => config.get('DISABLED_MENU')),
             isAdmin: computed((() => store.getters['user/isAdmin'])),
             hasPermission: computed((() => store.getters['user/hasPermission'])),
             dashboardLink: computed(() => (state.hasPermission ? { name: DASHBOARD_ROUTE._NAME } : undefined)),
             allMenuList: computed<Menu[]>(() => [
                 {
-                    name: PARENT_CATEGORY.project,
+                    name: PARENT_MENU.project,
                     label: i18n.t('MENU.PROJECT.PROJECT'),
                     to: state.hasPermission ? { name: PROJECT_ROUTE._NAME } : {},
-                    subMenuList: [],
                 },
                 {
-                    name: PARENT_CATEGORY.inventory,
+                    name: PARENT_MENU.inventory,
                     label: i18n.t('MENU.INVENTORY.INVENTORY'),
                     to: { name: INVENTORY_ROUTE._NAME },
                     subMenuList: [
-                        { label: i18n.t('MENU.INVENTORY.CLOUD_SERVICE'), to: { name: INVENTORY_ROUTE.CLOUD_SERVICE._NAME }, show: true },
-                        { label: i18n.t('MENU.INVENTORY.SERVER'), to: { name: INVENTORY_ROUTE.SERVER._NAME }, show: true },
+                        {
+                            name: SUB_MENU['inventory.cloudService'],
+                            label: i18n.t('MENU.INVENTORY.CLOUD_SERVICE'),
+                            to: { name: INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
+                        },
+                        {
+                            name: SUB_MENU['inventory.server'],
+                            label: i18n.t('MENU.INVENTORY.SERVER'),
+                            to: { name: INVENTORY_ROUTE.SERVER._NAME },
+                        },
                     ],
                 },
                 {
-                    name: PARENT_CATEGORY.identity,
+                    name: PARENT_MENU.identity,
                     label: i18n.t('MENU.IDENTITY.IDENTITY'),
                     to: { name: IDENTITY_ROUTE._NAME },
                     subMenuList: [
                         {
+                            name: SUB_MENU['identity.serviceAccount'],
                             label: i18n.t('MENU.IDENTITY.SERVICE_ACCOUNT'),
                             to: { name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME },
-                            show: true,
                         },
-                        { label: i18n.t('MENU.IDENTITY.USER'), to: { name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME }, show: state.isAdmin },
+                        {
+                            name: SUB_MENU['identity.user'],
+                            label: i18n.t('MENU.IDENTITY.USER'),
+                            to: { name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME },
+                            show: state.isAdmin,
+                        },
                     ],
                 },
                 {
-                    name: PARENT_CATEGORY.monitoring,
+                    name: PARENT_MENU.monitoring,
                     label: i18n.t('MENU.MONITORING.MONITORING'),
                     to: { name: MONITORING_ROUTE._NAME },
                     subMenuList: [
                         {
+                            name: SUB_MENU['monitoring.alertManager'],
                             label: i18n.t('MENU.MONITORING.ALERT_MANAGER'),
                             to: { name: MONITORING_ROUTE.ALERT_MANAGER._NAME },
                             isBeta: true,
-                            show: true,
                         },
                     ],
                 },
                 {
-                    name: PARENT_CATEGORY.billing,
+                    name: PARENT_MENU.billing,
                     label: i18n.t('MENU.BILLING.BILLING'),
                     to: { name: BILLING_ROUTE._NAME },
                     show: state.showBilling,
                     subMenuList: [
                         {
+                            name: SUB_MENU['billing.costManagement'],
                             label: i18n.t('MENU.BILLING.COST_MANAGEMENT'),
                             to: { name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME },
-                            show: true,
-                            // isNew: true,
                         },
                     ],
                 },
                 {
-                    name: PARENT_CATEGORY.automation,
-                    label: i18n.t('MENU.AUTOMATION.AUTOMATION'),
-                    show: state.showAutomation,
-                    to: { name: AUTOMATION_ROUTE._NAME },
-                    subMenuList: [
-                        {
-                            label: i18n.t('MENU.AUTOMATION.POWER_SCHEDULER'),
-                            to: { name: AUTOMATION_ROUTE.POWER_SCHEDULER._NAME },
-                            isNew: true,
-                            show: state.showPowerScheduler,
-                        },
-                        {
-                            label: i18n.t('MENU.AUTOMATION.SPOT_AUTOMATION'),
-                            to: { name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP._NAME },
-                            isNew: true,
-                            show: state.showSpotAutomation,
-                        },
-                    ],
-                },
-                {
-                    name: PARENT_CATEGORY.plugin,
+                    name: PARENT_MENU.plugin,
                     label: i18n.t('MENU.PLUGIN.PLUGIN'),
                     to: { name: PLUGIN_ROUTE._NAME },
                     subMenuList: [
-                        { label: i18n.t('MENU.PLUGIN.COLLECTOR'), to: { name: PLUGIN_ROUTE.COLLECTOR._NAME }, show: true },
+                        {
+                            name: SUB_MENU['plugin.collector'],
+                            label: i18n.t('MENU.PLUGIN.COLLECTOR'),
+                            to: { name: PLUGIN_ROUTE.COLLECTOR._NAME },
+                        },
                     ],
                 },
                 {
-                    name: PARENT_CATEGORY.management,
+                    name: PARENT_MENU.management,
                     label: i18n.t('MENU.MANAGEMENT.MANAGEMENT'),
                     to: { name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME },
                     subMenuList: [
                         {
-                            label: i18n.t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), to: { name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME }, show: true,
+                            name: SUB_MENU['management.collectorHistory'],
+                            label: i18n.t('MENU.MANAGEMENT.COLLECTOR_HISTORY'),
+                            to: { name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME },
                         },
                     ],
                 },
             ]),
-            menuList: computed<Menu[]>(() => filterMenuByRoute(state.allMenuList, vm.$router)),
+            menuList: computed<Menu[]>(() => filterMenuByRoute(state.allMenuList, state.disabledMenu, vm.$router)),
             selectedMenu: computed(() => {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;
