@@ -19,11 +19,11 @@
                             /> {{ menu.label }}
                         </li>
                     </router-link>
-                    <div v-if="menu.subMenuList.length > 0">
+                    <div v-if="menu.subMenuList && menu.subMenuList.length > 0">
                         <div v-for="(subMenu, sIdx) in menu.subMenuList"
                              :key="sIdx"
                         >
-                            <div v-if="subMenu.show">
+                            <div v-if="subMenu.show !== false">
                                 <router-link v-if="subMenu" :to="subMenu.to">
                                     <li class="submenu" @click="hideMenu">
                                         {{ subMenu.label }}
