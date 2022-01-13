@@ -1,7 +1,7 @@
 <template>
     <div class="sign-in-left-container" :class="{ admin: isAdmin }">
         <div class="lottie-wrapper">
-            <img v-if="images" :src="images.signIn">
+            <img v-if="signInImage" :src="signInImage">
             <p-lottie v-else
                       :name="isAdmin ? 'lottie_planet_signin' : 'lottie_floating-astronaut_signin'"
                       auto
@@ -25,11 +25,12 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
     PLottie, PAnchor, PBadge,
 } from '@spaceone/design-system';
+import config from '@/lib/config';
 
 export default {
     name: 'SignInLeftContainer',
@@ -43,14 +44,11 @@ export default {
             type: Boolean,
             default: false,
         },
-        images: {
-            type: Object,
-            default: undefined,
-        },
     },
     setup() {
         const state = reactive({
             version: process.env.VUE_APP_VERSION,
+            signInImage: computed(() => config.get('DOMAIN_IMAGE.SIGN_IN')),
         });
 
         return {
