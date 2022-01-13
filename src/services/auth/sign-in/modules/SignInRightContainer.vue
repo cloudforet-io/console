@@ -11,7 +11,7 @@
             </div>
 
             <div class="flex xs:hidden">
-                <img v-if="images" class="logo-character" :src="images.ciLogo">
+                <img v-if="ciLogoImage" class="logo-character" :src="ciLogoImage">
                 <img v-else class="logo-character" src="@/assets/images/brand/brand_logo.png">
             </div>
 
@@ -51,9 +51,12 @@
 import {
     PI,
 } from '@spaceone/design-system';
-import { ComponentRenderProxy, getCurrentInstance } from '@vue/composition-api';
+import {
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
 import { AUTH_ROUTE } from '@/services/auth/routes';
 import { store } from '@/store';
+import config from '@/lib/config';
 
 
 export default {
@@ -66,10 +69,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        images: {
-            type: Object,
-            default: undefined,
-        },
         showErrorMessage: {
             type: Boolean,
             default: false,
@@ -77,6 +76,9 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const state = reactive({
+            ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
+        });
 
         /* event */
         const hideErrorMessage = () => {
@@ -93,6 +95,7 @@ export default {
         };
 
         return {
+            ...toRefs(state),
             hideErrorMessage,
             goToAdminSignIn,
             goToUserSignIn,

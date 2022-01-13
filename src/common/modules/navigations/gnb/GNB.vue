@@ -98,12 +98,12 @@ interface Menu {
 
 const ALLOWED_MENUS_FOR_ALL_USERS = ['support', 'account', 'notifications'];
 
-const filterMenuByRoute = (menuList: Menu[], disabledMenu: string[], router: VueRouter): Menu[] => menuList.reduce((results, _menu) => {
-    if (disabledMenu.includes(_menu.name)) return results;
+const filterMenuByRoute = (menuList: Menu[], disabledMenu: string[], isAdmin: boolean, router: VueRouter): Menu[] => menuList.reduce((results, _menu) => {
+    if (disabledMenu.includes(_menu.name) && !isAdmin) return results;
 
     const menu = { ..._menu };
     if (menu.subMenuList) {
-        menu.subMenuList = filterMenuByRoute(menu.subMenuList, disabledMenu, router);
+        menu.subMenuList = filterMenuByRoute(menu.subMenuList, disabledMenu, isAdmin, router);
         if (menu.subMenuList.length) {
             results.push(menu);
             return results;
@@ -231,7 +231,7 @@ export default {
                     ],
                 },
             ]),
-            menuList: computed<Menu[]>(() => filterMenuByRoute(state.allMenuList, state.disabledMenu, vm.$router)),
+            menuList: computed<Menu[]>(() => filterMenuByRoute(state.allMenuList, state.disabledMenu, state.isAdmin, vm.$router)),
             selectedMenu: computed(() => {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;

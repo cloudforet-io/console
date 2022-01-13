@@ -1,22 +1,17 @@
 <template>
     <div class="wrapper">
         <div class="ci-wrapper">
-            <template v-if="images">
-                <img class="logo-character" :src="images.ciLogo">
-                <img class="logo-text" :src="images.ciTextWithType">
-            </template>
-            <template v-else>
-                <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
-                <img class="logo-text" src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg">
-            </template>
+            <img v-if="ciLogoImage" class="logo-character" :src="ciLogoImage">
+            <img v-else class="logo-character" src="@/assets/images/brand/brand_logo.png">
+
+            <img v-if="ciTextWithTypeImage" class="logo-text" :src="ciTextWithTypeImage">
+            <img v-else class="logo-text" src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg">
         </div>
         <sign-in-left-container
             :is-admin="true"
-            :images="images"
         />
         <sign-in-right-container
             :is-admin="true"
-            :images="images"
             :show-error-message="showErrorMessage"
         >
             <template #input>
@@ -30,8 +25,6 @@
 </template>
 
 <script lang="ts">
-import { isEmpty } from 'lodash';
-
 import {
     toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
@@ -79,17 +72,8 @@ export default {
         const state = reactive({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
             authType: computed(() => store.state.domain.extendedAuthType),
-            images: computed(() => {
-                const domainImage = config.get('DOMAIN_IMAGE');
-                if (!isEmpty(domainImage)) {
-                    return {
-                        ciLogo: config.get('DOMAIN_IMAGE.CI_LOGO'),
-                        ciTextWithType: config.get('DOMAIN_IMAGE.CI_TEXT_WITH_TYPE'),
-                        signIn: config.get('DOMAIN_IMAGE.SIGN_IN'),
-                    };
-                }
-                return undefined;
-            }),
+            ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
+            ciTextWithTypeImage: computed(() => config.get('DOMAIN_IMAGE.CI_TEXT_WITH_TYPE')),
             showErrorMessage: computed(() => store.state.display.isSignInFailed),
             userId: '' as string | undefined,
             password: '',

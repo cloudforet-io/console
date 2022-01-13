@@ -4,14 +4,11 @@
                    class="inline-block" :to="to"
         >
             <div class="logo-wrapper">
-                <template v-if="images">
-                    <img class="logo-character" :src="images.ciLogo">
-                    <img class="logo-text" :src="images.ciText">
-                </template>
-                <template v-else>
-                    <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
-                    <img class="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA v1.9.svg">
-                </template>
+                <img v-if="ciLogoImage" class="logo-character" :src="ciLogoImage">
+                <img v-else class="logo-character" src="@/assets/images/brand/brand_logo.png">
+
+                <img v-if="ciTextImage" class="logo-text" :src="ciTextImage">
+                <img v-else class="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA v1.9.svg">
             </div>
         </component>
     </span>
@@ -23,7 +20,7 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 import config from '@/lib/config';
-import { isEmpty } from 'lodash';
+
 
 export default {
     name: 'GNBLogo',
@@ -35,17 +32,8 @@ export default {
     },
     setup() {
         const state = reactive({
-            images: computed(() => {
-                const domainImage = config.get('DOMAIN_IMAGE');
-                if (!isEmpty(domainImage)) {
-                    return {
-                        ciLogo: config.get('DOMAIN_IMAGE.CI_LOGO'),
-                        ciText: config.get('DOMAIN_IMAGE.CI_TEXT'),
-                        signIn: config.get('DOMAIN_IMAGE.SIGN_IN'),
-                    };
-                }
-                return undefined;
-            }),
+            ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
+            ciTextImage: computed(() => config.get('DOMAIN_IMAGE.CI_TEXT')),
         });
 
         return {
