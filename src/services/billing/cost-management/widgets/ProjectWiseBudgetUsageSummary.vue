@@ -169,8 +169,8 @@ export default {
                     project: { projectId: d.project_id, projectGroupId: d.project_group_id },
                     amountSpent: d.usd_cost,
                     totalBudget: d.limit,
-                    progress: d.usage,
-                    usage: d.usage,
+                    progress: d.usage ?? 0,
+                    usage: d.usage ?? 0,
                     // shortageForecast: d.
                 }));
             } catch (e) {

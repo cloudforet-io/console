@@ -121,7 +121,7 @@ export default {
                     budgetId: d.budget_id,
                     budgetName: d.name,
                     color,
-                    usage: usage.toFixed(2),
+                    usage: usage?.toFixed(2) ?? 0,
                     linkLocation: {
                         name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
                         params: {

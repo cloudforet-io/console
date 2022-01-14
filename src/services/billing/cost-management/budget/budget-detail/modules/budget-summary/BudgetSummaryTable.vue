@@ -89,6 +89,12 @@ export default {
     setup() {
         const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageData[], period: Period) => getStackedChartData(budgetUsageData, period, 'month');
 
+        const getBudgetRatio = (budgetTimeUnit, usdCost, totalBudgetLimit, monthlyLimit) => {
+            if (totalBudgetLimit === 0 || monthlyLimit === 0) return '-';
+            return (budgetTimeUnit === BUDGET_TIME_UNIT.TOTAL) ? `${Math.round((usdCost / totalBudgetLimit) * 100)}%`
+                : `${Math.round((usdCost / monthlyLimit) * 100)}%`;
+        };
+
         const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUnit: BudgetTimeUnit, totalBudgetLimit: number, costType: BudgetCostType, budgetTarget: BudgetTarget) => {
             const costTypeFilters = {
                 [costType.key]: costType.value,
@@ -101,8 +107,9 @@ export default {
                     start: dayjs.utc(d.date).startOf('month').format('YYYY-MM-DD'),
                     end: dayjs.utc(d.date).endOf('month').format('YYYY-MM-DD'),
                 };
-                const ratio = (budgetTimeUnit === BUDGET_TIME_UNIT.TOTAL) ? `${Math.round((d.usd_cost / totalBudgetLimit) * 100)}%`
-                    : `${Math.round((d.usd_cost / d.limit) * 100)}%`;
+                const ratio = getBudgetRatio(budgetTimeUnit, d.usd_cost, totalBudgetLimit, d.limit);
+                // const ratio = (budgetTimeUnit === BUDGET_TIME_UNIT.TOTAL) ? `${Math.round((d.usd_cost / totalBudgetLimit) * 100)}%`
+                //     : `${Math.round((d.usd_cost / d.limit) * 100)}%`;
                 const link = {
                     name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                     query: {
@@ -143,7 +150,7 @@ export default {
                 projectId: state.budgetData?.project_id,
                 projectGroupId: state.budgetData?.project_group_id,
             })),
-            totalBudgetLimit: computed<number>(() => state.budgetData?.limit),
+            totalBudgetLimit: computed<number>(() => state.budgetData?.limit ?? 0),
             enrichedBudgetUsageData: computed<EnrichedBudgetUsageData[]>(
                 () => getEnrichedBudgetUsageData(state.budgetUsageData, state.budgetPeriod,
                     state.budgetTimeUnit, state.totalBudgetLimit,
@@ -153,7 +160,7 @@ export default {
             fields: computed(() => state.enrichedBudgetUsageData.map(d => ({
                 name: d.date,
                 label: d.date ? dayjs(d.date).format('MMM YYYY') : ' ',
-                textAlign: 'right',
+                // textAlign: 'right',
             }))),
             loading: true,
         });
