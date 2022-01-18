@@ -303,6 +303,12 @@ export default {
             }
         });
 
+        watch(() => state.isPermissionDenied, (isPermissionDenied) => {
+            if (!isPermissionDenied) {
+                store.commit('error/setVisibleAuthorizationError', false);
+            }
+        });
+
         /* Init */
         (async () => {
             await Promise.all([
