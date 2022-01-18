@@ -11,6 +11,7 @@
                     />
                 </div>
                 <div v-if="granularity !== GRANULARITY.ACCUMULATED" class="filter-item">
+                    <span class="v-divider" />
                     <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}</b>
                     <p-toggle-button class="ml-2"
                                      :value="stack"
@@ -21,15 +22,14 @@
             <div class="right-part">
                 <span class="timezone-text">UTC</span>
                 <cost-analysis-period-select-dropdown :fixed-period="period" @update="handleSelectedDates" />
+                <span class="v-divider" />
                 <currency-select-dropdown />
             </div>
         </div>
         <div class="filter-wrapper tablet-on">
-            <div class="left-part">
-                <span class="timezone-text">UTC</span>
-                <span>{{ `${dateFormatter(period.start)} ~ ${dateFormatter(period.end)}` }}</span>
-            </div>
             <div class="right-part">
+                <cost-analysis-period-select-dropdown :fixed-period="period" @update="handleSelectedDates" />
+                <span class="v-divider" />
                 <p-icon-button class="filter-item" name="ic_setting" @click="handleClickSetFilter" />
             </div>
         </div>
@@ -135,7 +135,6 @@ export default {
         justify-content: space-between;
         font-size: 0.875rem;
         padding-bottom: 1rem;
-
         .timezone-text {
             @apply text-gray-400;
             font-size: 0.875rem;
@@ -143,7 +142,6 @@ export default {
             line-height: 1.5;
             padding-right: 0.5rem;
         }
-
         .left-part {
             display: flex;
             align-items: center;
@@ -160,28 +158,15 @@ export default {
         .filter-item {
             display: flex;
             align-items: center;
-            margin-right: 0.5rem;
-            &::after {
-                @apply bg-gray-300;
-                display: inline-block;
-                position: relative;
-                content: '';
-                width: 1px;
-                height: 1rem;
-            }
-            &:last-child {
-                &::after {
-                    display: none;
-                }
-            }
-
-            @screen tablet {
-                &::after {
-                    display: none;
-                }
-            }
         }
-
+        .v-divider {
+            @apply bg-gray-300;
+            display: inline-block;
+            position: relative;
+            width: 1px;
+            height: 1rem;
+            margin: 0 0.5rem;
+        }
         .p-select-dropdown {
             @apply bg-transparent;
         }
@@ -199,6 +184,22 @@ export default {
             justify-content: space-between;
             font-size: 0.875rem;
             padding-bottom: 1rem;
+        }
+        .right-part {
+            margin-left: auto;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+    }
+
+    @screen mobile {
+        .filter-wrapper {
+            .cost-analysis-period-select-dropdown {
+                width: 100%;
+            }
+            .v-divider {
+                @apply hidden;
+            }
         }
     }
 }
