@@ -14,7 +14,7 @@
                 {{ $t('COMMON.SIGN_IN.VERSION') }} {{ version }}
             </p-badge>
             <span class="help-msg">{{ $t('COMMON.SIGN_IN.NEED_HELP') }}
-                <p-anchor href="mailto:support@spaceone.dev" target="_blank"
+                <p-anchor :href="contactLink ? contactLink : 'mailto:support@spaceone.dev'" target="_blank"
                           :show-icon="false" highlight
                 >
                     <span class="text-blue-600 ml-2">{{ $t('COMMON.SIGN_IN.CONTACT') }}</span>
@@ -49,6 +49,7 @@ export default {
         const state = reactive({
             version: process.env.VUE_APP_VERSION,
             signInImage: computed(() => config.get('DOMAIN_IMAGE.SIGN_IN')),
+            contactLink: computed(() => config.get('CONTACT_LINK')),
         });
 
         return {

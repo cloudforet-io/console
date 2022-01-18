@@ -26,5 +26,6 @@
     { "label": "GitHub", "link": "https://github.com/spaceone-dev" }
   ],
   "BILLING_ENABLED": true,
-  "DISABLED_MENU": []
+  "DISABLED_MENU": [],
+  "CONTACT_LINK": ""
 }
