@@ -1,3 +1,10 @@
+# [1.1.0-beta.227](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.226...v1.1.0-beta.227) (2022-01-18)
+
+
+### Bug Fixes
+
+* check chart.logo ([#822](https://github.com/spaceone-dev/spaceone-design-system/issues/822)) ([956c4d3](https://github.com/spaceone-dev/spaceone-design-system/commit/956c4d3d6b1ea24a6609cb4578ccaca970793ef5))
+
 # [1.1.0-beta.226](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.225...v1.1.0-beta.226) (2021-12-29)
 
 
