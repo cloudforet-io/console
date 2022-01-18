@@ -188,9 +188,11 @@ export default defineComponent<WidgetProps>({
             costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
+                    include_budget_count: false,
+                    include_budget_info: false,
                     include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
-                    group_by: [GROUP_BY.PROJECT],
+                    group_by: [GROUP_BY.PROJECT, GROUP_BY.PROJECT_GROUP],
                     start: dayjs.utc(props.period?.start).format('YYYY-MM-01'),
                     end: dayjs.utc(props.period?.end).add(1, 'month').format('YYYY-MM-01'),
                     limit: 20,
