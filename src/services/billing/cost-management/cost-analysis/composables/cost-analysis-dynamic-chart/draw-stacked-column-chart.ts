@@ -9,16 +9,10 @@ import { XYChart } from '@amcharts/amcharts4/charts';
 
 
 const createCategoryAxis = (chart, categoryOptions) => {
-    chart.dateFormatter.inputDateFormat = 'yyyy-MM-dd';
-    const timeUnit = categoryOptions.timeUnit || 'day';
-    const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-    dateAxis.baseInterval = {
-        timeUnit,
-        count: 1,
-    };
-    dateAxis.dateFormats.setKey('day', 'M/d');
-    dateAxis.dateFormats.setKey('month', 'MMM YYYY');
-    dateAxis.dateFormats.setKey('year', 'YYYY');
+    const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+    let dateFormat = 'M/d';
+    if (categoryOptions.timeUnit === 'month') dateFormat = 'MMM YYYY';
+    else if (categoryOptions.timeUnit === 'year') dateFormat = 'YYYY';
 
     dateAxis.dataFields.category = 'date';
     dateAxis.renderer.minGridDistance = 35;
@@ -28,19 +22,7 @@ const createCategoryAxis = (chart, categoryOptions) => {
     dateAxis.tooltip.label.fontSize = 12;
     dateAxis.renderer.grid.template.strokeOpacity = 0;
 
-    // const range = dateAxis.axisRanges.create();
-    // range.category = '2021-10-02';
-    // range.endCategory = '2021-10-03';
-    // range.axisFill.fill = am4core.color(red[300]);
-    // range.axisFill.fillOpacity = 0.15;
-    // range.label.disabled = true;
-    // range.label.text = 'Rapid increase';
-    // range.label.inside = true;
-    // range.label.rotation = 90;
-    // range.label.horizontalCenter = 'right';
-    // range.label.verticalCenter = 'top';
-    // range.label.fill = am4core.color(red[400]);
-
+    dateAxis.renderer.labels.template.adapter.add('text', (text, target) => dayjs.utc(target.dataItem.category).format(dateFormat));
     return dateAxis;
 };
 
@@ -67,19 +49,18 @@ const createValueAxis = (chart) => {
 const createSeries = (chart, legend, timeUnit) => {
     const series = chart.series.push(new am4charts.ColumnSeries());
     series.name = legend.label;
-    series.dataFields.dateX = 'date';
+    series.dataFields.categoryX = 'date';
     series.dataFields.valueY = legend.name;
     series.strokeWidth = 0;
     series.columns.template.width = am4core.percent(60);
-    series.tooltipText = '{name}: [bold]{valueY}[/]';
+    series.columns.template.tooltipText = '{name}: [bold]{valueY}[/]';
     series.tooltip.label.fontSize = 10;
     series.stacked = true;
-    series.columns.template.propertyFields.fillOpacity = 'fillOpacity';
     if (legend.color) series.columns.template.fill = legend.color;
 
     const today = dayjs.utc();
     series.columns.template.adapter.add('fillOpacity', (fillOpacity, target) => {
-        if (today.isSame(dayjs(target.dataItem.dateX), timeUnit)) {
+        if (today.isSame(dayjs(target.dataItem?.dataContext?.date), timeUnit)) {
             return 0.5;
         }
         return fillOpacity;

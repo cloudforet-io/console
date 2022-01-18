@@ -38,6 +38,7 @@ import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import { store } from '@/store';
+import { SpaceRouter } from '@/router';
 
 const today = dayjs.utc();
 const basicFormat = (date: Dayjs) => date.format('YYYY-MM-DD');
@@ -110,6 +111,10 @@ export default {
             setPeriod(period);
             state.customRangeModalVisible = false;
         };
+
+        (() => {
+            if (SpaceRouter.router.currentRoute.query.period) state.selectedPeriodMenuItem = 'custom';
+        })();
 
         return {
             ...toRefs(state),

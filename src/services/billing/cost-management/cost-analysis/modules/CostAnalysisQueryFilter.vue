@@ -22,7 +22,6 @@
                 <span class="timezone-text">UTC</span>
                 <cost-analysis-period-select-dropdown :fixed-period="period" @update="handleSelectedDates" />
                 <currency-select-dropdown />
-                <p-icon-button class="filter-item" name="ic_refresh" @click="handleClickRefresh" />
             </div>
         </div>
         <div class="filter-wrapper tablet-on">
@@ -32,7 +31,6 @@
             </div>
             <div class="right-part">
                 <p-icon-button class="filter-item" name="ic_setting" @click="handleClickSetFilter" />
-                <p-icon-button class="filter-item" name="ic_refresh" @click="handleClickRefresh" />
             </div>
         </div>
         <cost-analysis-set-query-modal :visible.sync="setQueryModalVisible" />
@@ -111,9 +109,6 @@ export default {
         const handleSelectedDates = (period) => {
             store.commit('service/costAnalysis/setPeriod', period);
         };
-        const handleClickRefresh = async () => {
-            // todo
-        };
         const handleClickSetFilter = () => {
             state.setQueryModalVisible = true;
         };
@@ -126,7 +121,6 @@ export default {
             handleSelectGranularity,
             handleToggleStack,
             handleSelectedDates,
-            handleClickRefresh,
             handleClickSetFilter,
             dateFormatter,
         };

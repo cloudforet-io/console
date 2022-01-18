@@ -21,26 +21,12 @@
                 </div>
                 <div v-if="granularity !== GRANULARITY.ACCUMULATED" class="input-wrapper">
                     <p class="input-title">
-                        <span>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}</span>
-                        <p-toggle-button class="ml-2"
-                                         sync
-                                         :value="stack"
-                                         @change="handleToggleStack"
-                        />
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}
                     </p>
-                </div>
-                <div class="input-wrapper">
-                    <p class="input-title">
-                        {{ `${$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.START_DATE')} ~ ${$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.END_DATE')} (UTC)` }}
-                    </p>
-                    <div class="filter-item">
-                        <p-datetime-picker
-                            class="select-input-box"
-                            :selected-dates="[period.start, period.end]"
-                            select-mode="range"
-                            @update:selectedDates="handleSelectedDates"
-                        />
-                    </div>
+                    <p-toggle-button sync
+                                     :value="stack"
+                                     @change="handleToggleStack"
+                    />
                 </div>
                 <div class="input-wrapper">
                     <p class="input-title">
@@ -70,7 +56,6 @@ import {
 import {
     PButtonModal,
     PSelectDropdown,
-    PDatetimePicker,
     PToggleButton,
 } from '@spaceone/design-system';
 import { makeProxy } from '@/lib/helper/composition-helpers';
@@ -78,7 +63,6 @@ import { store } from '@/store';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { i18n } from '@/translations';
-import { Period } from '@/services/billing/cost-management/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 
@@ -87,7 +71,6 @@ export default {
     components: {
         PButtonModal,
         PSelectDropdown,
-        PDatetimePicker,
         PToggleButton,
     },
     props: {
@@ -101,7 +84,6 @@ export default {
             proxyVisible: makeProxy('visible', props, emit),
             granularity: '' as GRANULARITY,
             stack: false,
-            period: {} as Period,
             currency: '' as CURRENCY,
             granularityItems: computed<MenuItem[]>(() => ([
                 {
@@ -135,15 +117,11 @@ export default {
         const handleFormConfirm = () => {
             store.commit('service/costAnalysis/setGranularity', state.granularity);
             store.commit('service/costAnalysis/setStack', state.stack);
-            store.commit('service/costAnalysis/setPeriod', state.period);
             store.commit('display/setCurrency', state.currency);
             state.proxyVisible = false;
         };
         const handleSelectGranularity = (granularity: string) => {
             state.granularity = granularity;
-        };
-        const handleSelectedDates = async (selectedDates: string[]) => {
-            state.period = { start: selectedDates[0], end: selectedDates[1] };
         };
         const handleSelectCurrency = (currency: CURRENCY) => {
             state.currency = currency;
@@ -156,7 +134,6 @@ export default {
             if (after) {
                 state.granularity = store.state.service.costAnalysis.granularity;
                 state.stack = store.state.service.costAnalysis.stack;
-                state.period = store.state.service.costAnalysis.period;
                 state.currency = store.state.display.currency;
             }
         });
@@ -166,7 +143,6 @@ export default {
             GRANULARITY,
             handleFormConfirm,
             handleSelectGranularity,
-            handleSelectedDates,
             handleSelectCurrency,
             handleToggleStack,
         };
