@@ -10,7 +10,7 @@ import { XYChart } from '@amcharts/amcharts4/charts';
 
 const createCategoryAxis = (chart, categoryOptions) => {
     const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-    let dateFormat = 'M/d';
+    let dateFormat = 'M/D';
     if (categoryOptions.timeUnit === 'month') dateFormat = 'MMM YYYY';
     else if (categoryOptions.timeUnit === 'year') dateFormat = 'YYYY';
 
