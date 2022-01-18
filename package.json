@@ -43,7 +43,7 @@
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^8.5.1",
     "keycloak-js": "^10.0.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "lottie-web": "^5.7.6",
     "luxon": "^1.22.0",
     "numeral": "^2.0.6",
