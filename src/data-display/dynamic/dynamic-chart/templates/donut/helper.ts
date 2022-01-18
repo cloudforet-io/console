@@ -29,7 +29,7 @@ const drawPieSeries = (chart: PieChart, nameOptions: DynamicField, valueOptions:
 
 export const drawDummyPieChart = (chart: PieChart, nameOptions: DynamicField, valueOptions: DynamicField) => {
     chart.innerRadius = am4core.percent(65);
-    if (chart.hasLicense()) chart.logo.disabled = true;
+    if (chart.hasLicense() && chart.logo) chart.logo.disabled = true;
 
     const series = chart.series.push(new PieSeries());
     series.dataFields.value = valueOptions.key;
@@ -57,7 +57,7 @@ export const drawDummyPieChart = (chart: PieChart, nameOptions: DynamicField, va
 
 export const drawPieChart = (chart: PieChart, nameOptions: DynamicField, valueOptions: DynamicField) => {
     chart.innerRadius = am4core.percent(65);
-    if (chart.hasLicense()) chart.logo.disabled = true;
+    if (chart.hasLicense() && chart.logo) chart.logo.disabled = true;
 
     const series = drawPieSeries(chart, nameOptions, valueOptions);
 

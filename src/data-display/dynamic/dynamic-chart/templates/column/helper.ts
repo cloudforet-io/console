@@ -108,7 +108,7 @@ const drawDummyColumnSeries = (chart: XYChart, nameOptions: DynamicField, valueO
 export const drawColumnChart = (chart: XYChart, nameOptions: DynamicField, valueOptions: DynamicField): void => {
     chart.padding(40, 40, 40, 40);
     chart.colors.step = 2;
-    if (chart.hasLicense()) chart.logo.disabled = true;
+    if (chart.hasLicense() && chart.logo) chart.logo.disabled = true;
 
     drawCategoryAxis(chart, nameOptions);
     drawValueAxis(chart);

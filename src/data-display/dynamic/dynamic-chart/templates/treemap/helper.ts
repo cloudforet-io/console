@@ -16,7 +16,7 @@ const drawSeriesLabelBullet = (series: TreeMapSeries, nameOptions: DynamicField,
 };
 
 export const drawTreemapChart = (chart: TreeMap, nameOptions: DynamicField, valueOptions: DynamicField) => {
-    if (chart.hasLicense()) chart.logo.disabled = true;
+    if (chart.hasLicense() && chart.logo) chart.logo.disabled = true;
 
     chart.dataFields.value = valueOptions.key;
     chart.dataFields.name = nameOptions.key;
@@ -30,7 +30,7 @@ export const drawTreemapChart = (chart: TreeMap, nameOptions: DynamicField, valu
 };
 
 export const drawDummyTreemapChart = (chart: TreeMap, nameOptions: DynamicField, valueOptions: DynamicField) => {
-    if (chart.hasLicense()) chart.logo.disabled = true;
+    if (chart.hasLicense() && chart.logo) chart.logo.disabled = true;
 
     chart.dataFields.value = valueOptions.key;
     chart.dataFields.name = nameOptions.key;
