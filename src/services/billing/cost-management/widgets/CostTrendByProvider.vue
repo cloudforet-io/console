@@ -6,6 +6,7 @@
             :currency-rates="currencyRates"
             :period="period"
             :filters="filters"
+            widget-type="LONG"
         />
     </cost-dashboard-card-widget-layout>
 </template>

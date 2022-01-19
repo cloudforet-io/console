@@ -1,12 +1,12 @@
 <template>
     <div class="cost-dashboard-stacked-column-widget">
-        <p-chart-loader :loading="loading" class="chart-wrapper">
+        <p-chart-loader :loading="loading" class="chart-wrapper" :class="widgetType">
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
             <div ref="chartRef" class="chart" />
         </p-chart-loader>
-        <div class="table-wrapper">
+        <div class="table-wrapper" :class="widgetType">
             <cost-dashboard-data-table :fields="fields"
                                        :items="items"
                                        :loading="loading"
@@ -24,7 +24,6 @@
 </template>
 
 <script lang="ts">
-import { range } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -65,11 +64,16 @@ import { store } from '@/store';
 import { Period } from '@/services/billing/cost-management/type';
 
 
-interface Props extends WidgetProps {
-    groupBy: string;
-}
+const widgetTypes = ['SHORT', 'LONG'] as const;
+type WidgetType = typeof widgetTypes[number];
 
 const PAGE_SIZE = 9;
+const SHORT_TYPE_RANGE = 4;
+
+interface Props extends WidgetProps {
+    widgetType?: WidgetType;
+    groupBy: string;
+}
 
 export default defineComponent<Props>({
     name: 'CostDashboardStackedColumnWidget',
@@ -79,6 +83,13 @@ export default defineComponent<Props>({
         PSkeleton,
     },
     props: {
+        widgetType: {
+            type: String,
+            default: 'SHORT',
+            validator(value: WidgetType) {
+                return widgetTypes.includes(value);
+            },
+        },
         groupBy: {
             type: String,
             default: undefined,
@@ -114,16 +125,17 @@ export default defineComponent<Props>({
             items: [] as CostAnalyzeModel[],
             fields: computed<DataTableField[]>(() => {
                 const fields: DataTableField[] = [{ name: props.groupBy, label: GROUP_BY_ITEM_MAP[props.groupBy].label }];
-                const startMonth = dayjs.utc(props.period.end).subtract(3, 'month');
+                let start = props.widgetType === 'SHORT' ? dayjs.utc(props.period.end).subtract(SHORT_TYPE_RANGE - 1, 'month') : dayjs.utc(props.period.start);
+                const end = dayjs.utc(props.period.end);
                 const thisMonth = dayjs.utc();
-                range(4).forEach((d) => {
-                    const date = startMonth.add(d, 'month');
+                while (start.isSameOrBefore(end, 'month')) {
                     fields.push({
-                        name: `usd_cost.${date.format('YYYY-M')}`,
-                        label: thisMonth.isSame(date, 'month') ? `${date.format('MMM')} (MTD)` : date.format('MMM'),
+                        name: `usd_cost.${start.format('YYYY-M')}`,
+                        label: thisMonth.isSame(start, 'month') ? `${start.format('MMM')} (MTD)` : start.format('MMM'),
                         textAlign: 'right',
                     });
-                });
+                    start = start.add(1, 'month');
+                }
                 return fields;
             }),
             totalCount: 15,
@@ -132,8 +144,9 @@ export default defineComponent<Props>({
 
         /* util */
         const setChartDataAndLegends = () => {
+            const start = props.widgetType === 'SHORT' ? dayjs.utc(props.period.end).subtract(SHORT_TYPE_RANGE - 1, 'month') : dayjs.utc(props.period.start);
             const _period = {
-                start: dayjs(props.period.end).subtract(3, 'month').format('YYYY-MM-01'),
+                start: start.format('YYYY-MM-01'),
                 end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
             };
             state.chartData = getXYChartData(state.items, GRANULARITY.MONTHLY, _period, props.groupBy as GROUP_BY);
@@ -222,10 +235,11 @@ export default defineComponent<Props>({
         const listCostAnalysisData = async (period: Period, filters): Promise<CostAnalyzeModel[]> => {
             costQueryHelper.setFilters(getConvertedFilter(filters));
             try {
+                const start = props.widgetType === 'SHORT' ? dayjs.utc(props.period.end).subtract(SHORT_TYPE_RANGE - 1, 'month') : dayjs.utc(props.period.start);
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
                     group_by: [props.groupBy],
-                    start: dayjs.utc(period.end).subtract(3, 'month').format('YYYY-MM-01'),
+                    start: start.format('YYYY-MM-01'),
                     end: dayjs.utc(period.end).add(1, 'month').format('YYYY-MM-01'),
                     pivot_type: 'TABLE',
                     limit: 15,
@@ -277,13 +291,25 @@ export default defineComponent<Props>({
     @apply grid grid-cols-12 gap-4;
     min-height: 24rem;
     .chart-wrapper {
-        @apply col-span-5;
+        &.SHORT {
+            @apply col-span-5;
+        }
+        &.LONG {
+            @apply col-span-12;
+            height: 22.5rem;
+        }
         .chart {
             height: 100%;
         }
     }
     .table-wrapper {
-        @apply flex flex-col col-span-7;
+        @apply flex flex-col;
+        &.SHORT {
+            @apply col-span-7;
+        }
+        &.LONG {
+            @apply col-span-12;
+        }
         .cost-dashboard-data-table {
             @apply flex flex-col flex-grow;
             .p-data-table {
