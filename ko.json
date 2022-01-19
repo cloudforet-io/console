@@ -1,5 +1,9 @@
 {
 	"APP": {
+		"MAIN": {
+			"NO": "아니요",
+			"YES": "네"
+		},
 		"TOP_NOTI": {
 			"HAS_NO_ROLE": "스페이스원 사용을 위해서는 {needRole}  합니다.\n관리자(Administrator)를 통해 필요한 권한을 받으세요.",
 			"NEED_ROLE": "권한(Role)이 필요",
@@ -882,6 +886,7 @@
 				"CANCEL": "취소",
 				"CREDENTIALS_NAME_PLACEHOLDER": "암호화 키 이름",
 				"CREDENTIALS_TITLE": "암호화 키",
+				"CREDENTIAL_HELP_TEXT": "{provider} 암호화 키를 보유하고 계신가요?",
 				"NAME_DUPLICATED": "중복된 이름입니다.",
 				"NAME_INVALID": "2 글자 이상 입력해주세요.",
 				"NAME_LABEL": "이름",

@@ -1,5 +1,9 @@
 {
 	"APP": {
+		"MAIN": {
+			"NO": "",
+			"YES": ""
+		},
 		"TOP_NOTI": {
 			"HAS_NO_ROLE": "Space  ONEを利用のために{need  Role}が必要です。管理者(Administrator)にお問い合わせください。",
 			"NEED_ROLE": "権限(Role)が必要",
@@ -882,6 +886,7 @@
 				"CANCEL": "キャンセル",
 				"CREDENTIALS_NAME_PLACEHOLDER": "暗号化キー名",
 				"CREDENTIALS_TITLE": "暗号化キー",
+				"CREDENTIAL_HELP_TEXT": "",
 				"NAME_DUPLICATED": "重複した名前です。",
 				"NAME_INVALID": "2文字以上を入力してください",
 				"NAME_LABEL": "名前",

@@ -1,5 +1,9 @@
 {
 	"APP": {
+		"MAIN": {
+			"NO": "No",
+			"YES": "Yes"
+		},
 		"TOP_NOTI": {
 			"HAS_NO_ROLE": "Every SpaceONE user {needRole}. Please, Contact administrator to get a role.",
 			"NEED_ROLE": "requires Role ",
@@ -882,6 +886,7 @@
 				"CANCEL": "Cancel",
 				"CREDENTIALS_NAME_PLACEHOLDER": "Credentials Name",
 				"CREDENTIALS_TITLE": "Credentials",
+				"CREDENTIAL_HELP_TEXT": "Do you have {provider} credential keys?",
 				"NAME_DUPLICATED": "Name is duplicated.",
 				"NAME_INVALID": "Must longer than 2 characters",
 				"NAME_LABEL": "name",
