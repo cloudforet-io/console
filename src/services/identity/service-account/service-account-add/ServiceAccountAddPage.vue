@@ -16,7 +16,7 @@
         </div>
         <p-page-title class="mb-6"
                       child
-                      @goBack="onClickGoBack"
+                      @goBack="handleGoBack"
         >
             <template #title>
                 <div class="page-title">
@@ -79,57 +79,56 @@
             </tags-input-group>
         </p-pane-layout>
 
-        <p-pane-layout v-if="showCredentialInputs">
-            <div class="title">
-                {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIALS_TITLE') }}
-            </div>
-            <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
-                           :invalid-text="credentialNameInvalidText"
-                           :invalid="credentialName && !isCredentialNameValid"
-                           :required="true"
-            >
-                <template #default="{invalid}">
-                    <p-text-input v-model="credentialName"
-                                  class="block"
-                                  :invalid="invalid"
-                                  :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIALS_NAME_PLACEHOLDER')"
-                    />
-                </template>
-            </p-field-group>
-
-            <p-field-group label="Secret Type" required>
-                <div class="flex">
-                    <span v-for="(type, idx) in secretTypes" :key="idx" class="secret-type-text">
-                        <p-radio v-model="selectedSecretType" :value="type" />
-                        {{ type }}
-                    </span>
-                </div>
-            </p-field-group>
-            <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" stretch>
-                <template #input>
-                    <p-json-schema-form :model.sync="credentialModel" :schema="credentialSchema" :is-valid.sync="isCredentialModelValid"
-                                        class="custom-schema-box"
-                    />
-                </template>
-                <template #json>
-                    <p-text-editor class="m-4" :code.sync="jsonForCredential" mode="edit" />
-                </template>
-            </p-tab>
-        </p-pane-layout>
-
         <project-tree-panel class="tree-panel"
                             :target-name="accountName"
                             @select="selectedProject = $event"
         />
+
+        <p-pane-layout v-if="showCredentialInputs || !hasCredentialKey">
+            <div class="title">
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIALS_TITLE') }}
+            </div>
+            <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIAL_HELP_TEXT', { provider: providerObj.name })" required>
+                <div class="flex">
+                    <p-radio v-model="hasCredentialKey" :value="true" class="radio-text">
+                        {{ $t('APP.MAIN.YES') }}
+                    </p-radio>
+                    <p-radio v-model="hasCredentialKey" :value="false">
+                        {{ $t('APP.MAIN.NO') }}
+                    </p-radio>
+                </div>
+            </p-field-group>
+            <div v-if="hasCredentialKey">
+                <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SECRET_TYPE_LABEL')" required>
+                    <div class="flex">
+                        <span v-for="(type, idx) in secretTypes" :key="idx" class="radio-text">
+                            <p-radio v-model="selectedSecretType" :value="type" />
+                            {{ type }}
+                        </span>
+                    </div>
+                </p-field-group>
+                <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" stretch>
+                    <template #input>
+                        <p-json-schema-form :model.sync="credentialModel" :schema="credentialSchema" :is-valid.sync="isCredentialModelValid"
+                                            class="custom-schema-box"
+                        />
+                    </template>
+                    <template #json>
+                        <p-text-editor class="m-4" :code.sync="jsonForCredential" mode="edit" />
+                    </template>
+                </p-tab>
+            </div>
+        </p-pane-layout>
+
         <div class="button-group">
             <p-button class="text-button" style-type="primary-dark" size="lg"
                       :disabled="!isValid"
-                      @click="onClickSave"
+                      @click="handleSave"
             >
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.SAVE') }}
             </p-button>
             <p-button class="text-button" style-type="outline gray900" size="lg"
-                      @click="onClickGoBack"
+                      @click="handleGoBack"
             >
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CANCEL') }}
             </p-button>
@@ -138,11 +137,9 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { get } from 'lodash';
 
 import {
-    ComponentRenderProxy, getCurrentInstance,
     reactive, computed, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -162,6 +159,9 @@ import { ProjectGroup, ProviderModel } from '@/services/identity/service-account
 import { TranslateResult } from 'vue-i18n';
 import InfoButton from '@/common/modules/portals/InfoButton.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+import { i18n } from '@/translations';
 
 
 export default {
@@ -191,25 +191,25 @@ export default {
             default: null,
         },
     },
-    setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+    setup(props, { root }) {
         const state = reactive({
             providerLoading: true,
             providerObj: {} as ProviderModel,
             serviceAccountId: '',
-            providerIcon: computed(() => vm.$store.state.resource.provider.items[state.providerObj?.provider]?.icon),
+            providerIcon: computed(() => store.state.resource.provider.items[state.providerObj?.provider]?.icon),
             description: computed(() => get(state.providerObj, 'metadata.view.layouts.help:service_account:create', undefined)),
             selectedSecretType: '',
+            hasCredentialKey: true,
             serviceAccountNames: [] as string[],
             credentialNames: [] as string[],
             secretTypes: computed<any[]>(() => get(state.providerObj, 'capability.supported_schema', [])),
-            showCredentialInputs: computed<boolean>(() => state.secretTypes.length > 0),
+            showCredentialInputs: computed<boolean>(() => state.secretTypes.length > 0 && state.hasCredentialKey),
         });
 
         const tabState = reactive({
             tabs: computed<TabItem[]>(() => [
-                { label: vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_INPUT'), name: 'input', keepAlive: true },
-                { label: vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_JSON'), name: 'json', keepAlive: true },
+                { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_INPUT'), name: 'input', keepAlive: true },
+                { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_JSON'), name: 'json', keepAlive: true },
             ]),
             activeTab: 'input',
         });
@@ -221,9 +221,9 @@ export default {
                 let invalidText: TranslateResult = '';
                 if (typeof formState.accountName === 'string') {
                     if (formState.accountName.length < 2) {
-                        invalidText = vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
+                        invalidText = i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
                     } else if (state.serviceAccountNames.includes(formState.accountName)) {
-                        invalidText = vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_DUPLICATED');
+                        invalidText = i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_DUPLICATED');
                     }
                 }
                 return invalidText;
@@ -238,24 +238,6 @@ export default {
             tags: {},
             isTagsValid: true,
             //
-            credentialName: undefined as undefined | string,
-            credentialNameInvalidText: computed(() => {
-                let invalidText: TranslateResult = '';
-                if (typeof formState.credentialName === 'string') {
-                    if (formState.credentialName.length < 2) {
-                        invalidText = vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
-                    } else if (state.credentialNames.includes(formState.credentialName)) {
-                        invalidText = vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_DUPLICATED');
-                    }
-                }
-                return invalidText;
-            }),
-            isCredentialNameValid: computed(() => {
-                if (formState.credentialName) {
-                    return !(formState.credentialName.length < 2 || state.credentialNames.includes(formState.credentialName));
-                }
-                return false;
-            }),
             /* schema input */
             accountModel: {},
             accountSchema: null as any|null,
@@ -273,20 +255,18 @@ export default {
                 const isAccountModelValid = formState.accountSchema ? formState.isAccountModelValid : true;
 
                 if (tabState.activeTab === 'json') {
-                    return formState.isAccountNameValid && isAccountModelValid && formState.isCredentialNameValid;
+                    return formState.isAccountNameValid && isAccountModelValid;
                 }
-
-                if (state.showCredentialInputs) return formState.isAccountNameValid && isAccountModelValid && formState.isCredentialNameValid && formState.isCredentialModelValid;
-
+                if (state.hasCredentialKey) return formState.isAccountNameValid && isAccountModelValid && formState.isCredentialModelValid;
                 return formState.isAccountNameValid && isAccountModelValid;
             }),
         });
 
         const routeState = reactive({
             routes: computed(() => ([
-                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), path: '/identity/service-account' },
-                { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT_ADD_ACCOUNT') },
+                { name: i18n.t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
+                { name: i18n.t('MENU.IDENTITY.SERVICE_ACCOUNT'), path: '/identity/service-account' },
+                { name: i18n.t('MENU.IDENTITY.SERVICE_ACCOUNT_ADD_ACCOUNT') },
             ])),
         });
 
@@ -295,7 +275,7 @@ export default {
             try {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const [_, res] = await Promise.all([
-                    vm.$store.dispatch('resource/provider/load'),
+                    store.dispatch('resource/provider/load'),
                     await SpaceConnector.client.identity.provider.get({
                         provider: props.provider,
                     }),
@@ -355,12 +335,12 @@ export default {
                 const res = await SpaceConnector.client.identity.serviceAccount.create(item);
                 state.serviceAccountId = res.service_account_id;
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
             }
         };
         const createSecretWithForm = async () => {
             await SpaceConnector.client.secret.secret.create({
-                name: formState.credentialName,
+                name: formState.accountName + state.serviceAccountId,
                 data: formState.credentialModel,
                 schema: state.selectedSecretType,
                 secret_type: 'CREDENTIALS',
@@ -370,8 +350,8 @@ export default {
         };
         const createSecretWithJson = async (jsonData) => {
             await SpaceConnector.client.secret.secret.create({
+                name: formState.accountName + state.serviceAccountId,
                 data: jsonData,
-                name: formState.credentialName,
                 schema: state.selectedSecretType,
                 secret_type: 'CREDENTIALS',
                 service_account_id: state.serviceAccountId,
@@ -386,41 +366,36 @@ export default {
                     await createSecretWithJson(json);
                 } else if (tabState.activeTab === 'input') await createSecretWithForm();
 
-                showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm.$root);
+                showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', root);
                 isSucceed = true;
             } catch (e) {
                 isSucceed = false;
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
                 await deleteServiceAccount();
             }
 
             return isSucceed;
         };
 
-        const onClickSave = async () => {
+        const handleSave = async () => {
             if (!formState.isValid) {
-                ErrorHandler.handleRequestError(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+                ErrorHandler.handleRequestError(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
                 return;
             }
             if (formState.isTagsValid) {
                 await createServiceAccount();
-                if (state.serviceAccountId) {
-                    if (formState.credentialModel.private_key) {
-                        formState.credentialModel.private_key = formState.credentialModel.private_key.replace(/\\n/g, '\n');
-                    }
-                    if (state.showCredentialInputs) {
-                        const isSucceed = await createSecret();
-                        if (isSucceed) vm.$router.back();
-                    } else {
-                        vm.$router.back();
-                    }
+                if (state.serviceAccountId && state.hasCredentialKey) {
+                    if (formState.credentialModel.private_key) formState.credentialModel.private_key = formState.credentialModel.private_key.replace(/\\n/g, '\n');
+                    const isSecretCreationSuccess = await createSecret();
+                    if (!isSecretCreationSuccess) return;
+                    SpaceRouter.router.back();
                 }
             }
         };
-        const onClickGoBack = () => {
-            const nextPath = vm?.$route.query.nextPath as string|undefined;
-            if (nextPath) vm.$router.push(nextPath);
-            else vm.$router.back();
+        const handleGoBack = () => {
+            const nextPath = SpaceRouter.router.currentRoute.query.nextPath as string|undefined;
+            if (nextPath) SpaceRouter.router.push(nextPath);
+            else SpaceRouter.router.back();
         };
 
 
@@ -436,6 +411,7 @@ export default {
             await getCredentialNames();
             //
             await getServiceAccountSchema();
+            formState.isCredentialModelValid = false;
         };
         init();
 
@@ -444,8 +420,8 @@ export default {
             ...toRefs(formState),
             routeState,
             tabState,
-            onClickSave,
-            onClickGoBack,
+            handleSave,
+            handleGoBack,
         };
     },
 };
@@ -491,8 +467,8 @@ export default {
                 }
             }
         }
-        .secret-type-text {
-            margin-right: 4.375rem;
+        .radio-text {
+            margin-right: 1.125rem;
         }
         .custom-schema-box {
             padding: 2rem 2rem 0 2rem;
