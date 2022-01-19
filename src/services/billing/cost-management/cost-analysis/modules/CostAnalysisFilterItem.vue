@@ -2,6 +2,13 @@
     <div>
         <project-select-dropdown v-if="type === FILTER.PROJECT"
                                  multi-selectable
+                                 project-selectable
+                                 :selected-project-ids="selected"
+                                 @update:selectedProjectIds="handleSelectedProjectIds"
+        />
+        <project-select-dropdown v-else-if="type === FILTER.PROJECT_GROUP"
+                                 multi-selectable
+                                 project-group-selectable
                                  :selected-project-ids="selected"
                                  @update:selectedProjectIds="handleSelectedProjectIds"
         />

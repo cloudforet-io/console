@@ -20,6 +20,7 @@
         </p>
         <div v-else class="content-wrapper">
             <project-select-dropdown :selected-project-ids="dataForUpdate ? [dataForUpdate] : []"
+                                     project-selectable
                                      class="dropdown"
                                      @select="onSelectProject"
             />

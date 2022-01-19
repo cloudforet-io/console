@@ -345,6 +345,7 @@ export default {
 
         .filter-wrapper {
             height: 8rem;
+            overflow-y: auto;
             padding: 0.75rem 1rem;
             .p-tag {
                 margin-bottom: 0.5rem;

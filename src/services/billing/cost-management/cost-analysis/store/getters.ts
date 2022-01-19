@@ -5,12 +5,14 @@ import {
 import { ResourceItem } from '@/store/modules/resource/type';
 import { GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { CostQueryFilterItemsMap } from '@/services/billing/cost-management/type';
+import { store } from '@/store';
 
 
 export const filterItemsMap: Getter<CostAnalysisStoreState, any> = ({ filters }, getters, rootState): CostQueryFilterItemsMap => {
     const itemsMap: CostQueryFilterItemsMap = {};
     const resourceItemsMap = {
         project_id: rootState.resource.project.items,
+        project_group_id: store.state.resource.projectGroup.items,
         service_account_id: rootState.resource.serviceAccount.items,
         provider: rootState.resource.provider.items,
         region_code: rootState.resource.region.items,

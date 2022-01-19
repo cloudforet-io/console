@@ -56,7 +56,7 @@
                           highlight
                 />
             </template>
-            <project-select-dropdown :invalid="!isProjectValid" @select="onSelectProject" />
+            <project-select-dropdown project-selectable :invalid="!isProjectValid" @select="onSelectProject" />
         </p-field-group>
         <p-field-group
             :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.FINISH_CONDITION_LABEL')"

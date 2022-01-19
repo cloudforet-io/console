@@ -35,6 +35,7 @@
                     </p-anchor>
                 </template>
                 <project-select-dropdown :invalid="projectInvalid"
+                                         project-selectable
                                          :selected-project-ids="projectId ? [projectId] : undefined"
                                          :readonly="!!projectId"
                                          @select="onSelectProject"

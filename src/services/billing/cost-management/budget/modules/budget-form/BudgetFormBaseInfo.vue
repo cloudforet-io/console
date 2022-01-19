@@ -19,6 +19,7 @@
             >
                 <project-select-dropdown :selected-project-ids="selectedTargets"
                                          :invalid="invalidState.selectedTargets"
+                                         project-selectable
                                          project-group-selectable
                                          @update:selectedProjectIds="setForm('selectedTargets', $event)"
                                          @close="validate('selectedTargets')"

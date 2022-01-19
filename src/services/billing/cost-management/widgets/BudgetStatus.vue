@@ -147,7 +147,7 @@ export default {
                     end: dayjs.utc(period.end).format('YYYY-MM'),
                     sort: {
                         key: 'usage',
-                        desc: true,
+                        desc: false,
                     },
                     page: {
                         limit: 200,

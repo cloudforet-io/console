@@ -25,13 +25,14 @@
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.PROJECT_ROUTING') }}
                 </p>
-                <project-select-dropdown :selected-project-ids.sync="routingProjects" />
+                <project-select-dropdown project-selectable :selected-project-ids.sync="routingProjects" />
             </div>
             <div class="form-box mobile-block">
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCY') }}
                 </p>
                 <project-select-dropdown multi-selectable
+                                         project-selectable
                                          :selected-project-ids.sync="dependentProjects"
                 />
             </div>

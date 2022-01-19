@@ -10,7 +10,7 @@
                            :invalid="invalid"
                            :disabled="readonly"
                            :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
-                           :selected.sync="selectedProjectItems"
+                           :selected.sync="selectedItems"
                            @update:visibleMenu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
         >
@@ -34,7 +34,7 @@
                     <template #toggle-right="{node, path}">
                         <span>
                             <component :is="selectComponent"
-                                       v-if="node.data.item_type === 'PROJECT' || (node.data.item_type === 'PROJECT_GROUP' && projectGroupSelectable)"
+                                       v-if="(node.data.item_type === 'PROJECT' && projectSelectable) || (node.data.item_type === 'PROJECT_GROUP' && projectGroupSelectable)"
                                        :selected="selectedProjects" :value="node.data"
                                        :predicate="predicate"
                                        class="mr-1"
@@ -97,6 +97,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        projectSelectable: {
+            type: Boolean,
+            default: false,
+        },
         projectGroupSelectable: {
             type: Boolean,
             default: false,
@@ -109,19 +113,18 @@ export default {
             isFocused: false,
             root: null as ProjectTreeRoot|null,
             // selected states
-            selectedItems: [] as ProjectTreeItem[],
-            selectedItem: computed<ProjectTreeItem>(() => state.selectedItems[0]),
-            selectedProjects: computed<ProjectItemResp[]>(() => state.selectedItems.map(d => d.node.data)),
+            selectedProjectItems: [] as ProjectTreeItem[],
+            selectedProjects: computed<ProjectItemResp[]>(() => state.selectedProjectItems.map(d => d.node.data)),
             _selectedProjectIds: [...props.selectedProjectIds] as string[],
-            selectedProjectItems: computed<MenuItem[]>({
+            selectedItems: computed<MenuItem[]>({
                 get() {
-                    const projects: ResourceMap = {
+                    const items: ResourceMap = {
                         ...store.state.resource.project.items,
                         ...store.state.resource.projectGroup.items,
                     };
                     return state._selectedProjectIds.map(id => ({
                         name: id,
-                        label: projects[id]?.label,
+                        label: items[id]?.label,
                     }));
                 },
                 set(val) {
@@ -150,7 +153,7 @@ export default {
         const findNodes = async () => {
             if (!state.root) return;
 
-            const pathList: string[][] = await Promise.all(props.selectedProjectIds.map(d => getSearchPath(d, 'PROJECT')));
+            const pathList: string[][] = await Promise.all(props.selectedProjectIds.map(d => getSearchPath(d, props.projectGroupSelectable ? 'PROJECT_GROUP' : 'PROJECT')));
             const predicateList = pathList.map(paths => paths.map(d => (data => data.id === d)));
             await state.root.fetchAndFindNodes(predicateList);
         };
@@ -178,6 +181,8 @@ export default {
                     item_type: 'ROOT',
                     check_child: true,
                 };
+
+                if (!props.projectSelectable) params.exclude_type = 'PROJECT';
 
                 if (node.data?.id && node.data?.item_type) {
                     params.item_id = node.data.id;
@@ -207,9 +212,9 @@ export default {
         };
 
         const handleTreeChangeSelect = (selected: ProjectTreeItem[]) => {
-            if (!props.multiSelectable && state.selectedItems === selected) return;
+            if (!props.multiSelectable && state.selectedProjectItems === selected) return;
 
-            state.selectedItems = selected;
+            state.selectedProjectItems = selected;
             state._selectedProjectIds = state.selectedProjects.map(d => d.id);
 
             if (!props.multiSelectable) {
@@ -226,7 +231,7 @@ export default {
         };
 
         const handleDeleteTag = (_, index: number) => {
-            const { node, path } = state.selectedItems[index];
+            const { node, path } = state.selectedProjectItems[index];
             if (state.root) state.root.changeSelectState(node, path, false);
         };
 
@@ -235,9 +240,16 @@ export default {
         };
 
         /* Watchers */
-        watch(() => props.selectedProjectIds, (selectedProjectIds) => {
-            if (selectedProjectIds !== state._selectedProjectIds) {
+        watch(() => props.selectedProjectIds, async (after, before) => {
+            if (after !== state._selectedProjectIds) {
                 findNodes();
+
+                /* when findNodes() has node delete function, this will be deprecated */
+                if (after.length < before.length) {
+                    const deletedId = before.filter(d => !after.includes(d))[0];
+                    const deletedIdx = state._selectedProjectIds.indexOf(deletedId);
+                    handleDeleteTag(deletedId, deletedIdx);
+                }
             }
         });
 
