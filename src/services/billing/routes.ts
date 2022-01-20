@@ -5,6 +5,7 @@ const CostDashboardPage = () => import(/* webpackChunkName: "CostDashboardPage" 
 const CostAnalysisPage = () => import(/* webpackChunkName: "CostAnalysisPage" */ '@/services/billing/cost-management/cost-analysis/CostAnalysisPage.vue');
 const BudgetPage = () => import(/* webpackChunkName: "BudgetPage" */ '@/services/billing/cost-management/budget/BudgetPage.vue');
 const BudgetCreatePage = () => import(/* webpackChunkName: "BudgetCreatePage" */ '@/services/billing/cost-management/budget/budget-create/BudgetCreatePage.vue');
+const BudgetBulkCreatePage = () => import(/* webpackChunkName: "BudgetBulkCreatePage" */ '@/services/billing/cost-management/budget/budget-bulk-create/BudgetBulkCreatePage.vue');
 const BudgetUpdatePage = () => import(/* webpackChunkName: "BudgetUpdatePage" */ '@/services/billing/cost-management/budget/budget-update/BudgetUpdatePage.vue');
 const BudgetDetailPage = () => import(/* webpackChunkName: "BudgetDetailPage" */ '@/services/billing/cost-management/budget/budget-detail/BudgetDetailPage.vue');
 
@@ -19,6 +20,7 @@ export const BILLING_ROUTE = Object.freeze({
             _NAME: 'budget',
             DETAIL: { _NAME: 'budgetDetail' },
             CREATE: { _NAME: 'budgetCreate' },
+            BULK_CREATE: { _NAME: 'budgetBulkCreate' },
             UPDATE: { _NAME: 'budgetUpdate' },
         },
     },
@@ -72,6 +74,12 @@ export default {
                                     name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.CREATE._NAME,
                                     props: true,
                                     component: BudgetCreatePage,
+                                },
+                                {
+                                    path: 'bulk-create',
+                                    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.BULK_CREATE._NAME,
+                                    props: true,
+                                    component: BudgetBulkCreatePage,
                                 },
                                 {
                                     path: 'update/:budgetId',

@@ -64,6 +64,10 @@ export default {
                     label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.SINGLE_BUDGET'),
                     name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.CREATE._NAME,
                 },
+                {
+                    label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BULK_BUDGET'),
+                    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.BULK_CREATE._NAME,
+                },
             ]),
             filters: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).filters,
         });
