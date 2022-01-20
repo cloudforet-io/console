@@ -8,6 +8,7 @@
           :ondragstart="onDragStart"
           :ondragend="onDragEnd"
           :unfold-when-dragover="true"
+          @drop="handleDrop"
     >
         <template #default="{node, path, tree, index}">
             <div class="node" :class="{
@@ -67,9 +68,6 @@
 <script lang="ts">
 /* eslint-disable no-await-in-loop */
 import {
-    Tree as OriginTree, Fold, Draggable, Store, walkTreeData, walkTreeDataCallback, cloneTreeDataOptions, cloneTreeData,
-} from 'he-tree-vue';
-import {
     computed, defineComponent, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { unionBy } from 'lodash';
@@ -90,8 +88,14 @@ import {
     GetClassNames, DataFetcher,
 } from '@/data-display/tree/type';
 import { getDefaultNode } from '@/data-display/tree/helper';
+import { CloneTreeDataOptions, Store, WalkTreeDataCallback } from '@/data-display/tree/he-tree-vue/types';
+import OriginTree from './he-tree-vue/components/Tree.vue';
+import Draggable from './he-tree-vue/plugins/draggable/Draggable.vue';
+import Fold from './he-tree-vue/plugins/fold';
+import { walkTreeData, cloneTreeData } from './he-tree-vue/utils';
 
-interface HeTree extends OriginTree, Fold, Draggable {}
+// interface HeTree extends OriginTree, Fold, Draggable {}
+type HeTree = any;
 
 interface Props {
     toggleOptions: ToggleOptions;
@@ -105,12 +109,14 @@ interface Props {
     getClassNames: GetClassNames;
 }
 
+const MixedTree = (OriginTree as any).mixPlugins([Fold, Draggable]);
+
 export default defineComponent<Props>({
     name: 'PTree',
     components: {
         PTextInput,
         PI,
-        Tree: ((OriginTree as any).mixPlugins([Fold, Draggable]) as any),
+        Tree: (MixedTree as any),
     },
     directives: { focus },
     props: {
@@ -284,13 +290,15 @@ export default defineComponent<Props>({
                 return false;
             }
 
-            if (getSelectState(e.startPath ?? [])) {
-                setSelectItem(e.dragNode as TreeNode, e.targetPath);
-            }
-
             emit('update-drag', e.dragNode, parent);
             emit('end-drag', e.dragNode, parent);
             return true;
+        };
+
+        const handleDrop = (e, targetPath) => {
+            if (getSelectState(e.startPath ?? [])) {
+                setSelectItem(e.dragNode as TreeNode, targetPath);
+            }
         };
 
         const eachDraggable = (path: number[], tree: HeTree, e: Store) => {
@@ -570,12 +578,12 @@ export default defineComponent<Props>({
             getNodeByPath(path: number[]) {
                 return state.treeRef?.getNodeByPath(path) || null;
             },
-            walkTreeData(treeData: TreeNode[]|null, handler: walkTreeDataCallback, options?: {reverse: boolean}) {
+            walkTreeData(treeData: TreeNode[]|null, handler: WalkTreeDataCallback, options?: {reverse: boolean}) {
                 if (!state.treeRef) return;
 
                 walkTreeData(treeData === null ? state.treeData : treeData, handler, options);
             },
-            cloneTreeData(treeData: TreeNode[]|null, options: cloneTreeDataOptions): TreeNode[] {
+            cloneTreeData(treeData: TreeNode[]|null, options: CloneTreeDataOptions): TreeNode[] {
                 if (!state.treeRef) return [];
 
                 return cloneTreeData(treeData === null ? state.treeData : treeData, options) as TreeNode[];
@@ -601,6 +609,7 @@ export default defineComponent<Props>({
             eachDroppable,
             onDragStart,
             onDragEnd,
+            handleDrop,
             finishEdit,
             onToggle,
         };

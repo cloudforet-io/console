@@ -25,5 +25,6 @@ module.exports = {
                 useESModules: false,
             },
         ],
+        '@vue/babel-plugin-jsx',
     ],
 };

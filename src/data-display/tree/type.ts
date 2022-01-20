@@ -1,4 +1,4 @@
-import { cloneTreeDataOptions, Node, walkTreeDataCallback } from 'he-tree-vue';
+import { CloneTreeDataOptions, WalkTreeDataCallback, Node } from '@/data-display/tree/he-tree-vue/types';
 
 export interface TreeNode<T=any> extends Node {
     data: T;
@@ -79,6 +79,6 @@ export interface Tree<T=any> {
     // he tree vue api
     getNodeParentByPath: (path: number[]) => TreeNode<T>|null;
     getNodeByPath: (path: number[]) => TreeNode<T>;
-    walkTreeData: (treeData: TreeNode<T>[]|null, handler: walkTreeDataCallback, options?: {reverse: boolean}) => void;
-    cloneTreeData(treeData: TreeNode<T>[]|null, options?: cloneTreeDataOptions): TreeNode[];
+    walkTreeData: (treeData: TreeNode<T>[]|null, handler: WalkTreeDataCallback, options?: {reverse: boolean}) => void;
+    cloneTreeData(treeData: TreeNode<T>[]|null, options?: CloneTreeDataOptions): TreeNode[];
 }
