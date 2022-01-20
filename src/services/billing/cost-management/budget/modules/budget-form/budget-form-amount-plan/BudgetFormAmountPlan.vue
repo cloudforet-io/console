@@ -4,7 +4,7 @@
             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AMOUNT_PLANNING') }}
         </p-panel-top>
         <div class="p-4">
-            <budget-form-amount-plan-period-select class="mb-2" @update="handleUpdatePeriod" />
+            <budget-period-select class="mb-2" @update="handleUpdatePeriod" />
             <budget-form-amount-plan-unit-select class="mb-6" :selected-unit.sync="timeUnit" />
             <budget-form-amount-plan-monthly v-if="timeUnit === 'MONTHLY'" class="mb-6"
                                              :period="period"
@@ -37,8 +37,8 @@ import {
 
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 
-import BudgetFormAmountPlanPeriodSelect
-    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanPeriodSelect.vue';
+import BudgetPeriodSelect
+    from '@/services/billing/cost-management/budget/modules/BudgetPeriodSelect.vue';
 import BudgetFormAmountPlanUnitSelect
     from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanUnitSelect.vue';
 import BudgetFormAmountPlanMonthly
@@ -73,7 +73,7 @@ export default {
         BudgetFormAmountPlanTotal,
         BudgetFormAmountPlanMonthly,
         BudgetFormAmountPlanUnitSelect,
-        BudgetFormAmountPlanPeriodSelect,
+        BudgetPeriodSelect,
         PPaneLayout,
         PPanelTop,
     },

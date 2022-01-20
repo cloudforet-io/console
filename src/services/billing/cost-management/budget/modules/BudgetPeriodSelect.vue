@@ -1,5 +1,5 @@
 <template>
-    <div class="budget-form-amount-plan-period-select">
+    <div class="budget-period-select">
         <p-field-group class="period-select"
                        :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_START_MONTH')"
                        :invalid-text="invalidTexts.startDates"
@@ -40,7 +40,7 @@ import { Period } from '@/services/billing/cost-management/type';
 import { i18n } from '@/translations';
 
 export default {
-    name: 'BudgetFormAmountPlanPeriodSelect',
+    name: 'BudgetPeriodSelect',
     components: {
         PFieldGroup,
         PDatetimePicker,
@@ -105,7 +105,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.budget-form-amount-plan-period-select {
+.budget-period-select {
     display: flex;
     flex-wrap: wrap;
     .period-select {
