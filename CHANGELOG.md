@@ -1,3 +1,10 @@
+# [1.1.0-beta.229](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.228...v1.1.0-beta.229) (2022-01-20)
+
+
+### Bug Fixes
+
+* add rollback cb function to drop event param in tree ([#824](https://github.com/spaceone-dev/spaceone-design-system/issues/824)) ([da69b34](https://github.com/spaceone-dev/spaceone-design-system/commit/da69b34987ad4676066f81f10123fb106be15cd7))
+
 # [1.1.0-beta.228](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.227...v1.1.0-beta.228) (2022-01-20)
 
 
