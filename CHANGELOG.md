@@ -1,3 +1,10 @@
+# [1.1.0-beta.228](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.227...v1.1.0-beta.228) (2022-01-20)
+
+
+### Bug Fixes
+
+* bug that wrong node is selected after drag & drop ([#823](https://github.com/spaceone-dev/spaceone-design-system/issues/823)) ([439786f](https://github.com/spaceone-dev/spaceone-design-system/commit/439786fa694f63565639264c9e6643cd90177b6a))
+
 # [1.1.0-beta.227](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.226...v1.1.0-beta.227) (2022-01-18)
 
 
