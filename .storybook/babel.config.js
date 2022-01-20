@@ -3,7 +3,4 @@ module.exports = {
     '@babel/preset-env',
     'babel-preset-vue'
   ],
-  plugins: [
-    '@vue/babel-plugin-jsx',
-  ]
 }
