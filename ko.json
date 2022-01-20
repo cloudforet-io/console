@@ -391,6 +391,7 @@
 					"BUDGET": "예산",
 					"BUDGETED": "책정된 예산",
 					"BUDGET_NAME": "예산명",
+					"BULK_BUDGET": "",
 					"COST_TYPE": "비용 발생 기준",
 					"CREATE_BUDGET": "예산 생성",
 					"DESC": "내림차순",

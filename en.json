@@ -391,6 +391,7 @@
 					"BUDGET": "Budget",
 					"BUDGETED": "Budgeted",
 					"BUDGET_NAME": "Budget Name",
+					"BULK_BUDGET": "Bulk Budget",
 					"COST_TYPE": "Cost Type",
 					"CREATE_BUDGET": "Create Budget",
 					"DESC": "Desc",
