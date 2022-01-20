@@ -52,9 +52,7 @@
                         :get-class-names="getClassNames"
                         @init="onTreeInit"
                         @finish-edit="onFinishEdit"
-                        @start-drag="onStartDrag"
-                        @end-drag="onEndDrag"
-                        @update-drag="onUpdateDrag"
+                        @drop="onDrop"
                         @change-select="onChangeSelect"
                 >
                     <template #data="{node}">
@@ -148,12 +146,12 @@ export default {
             })),
             dragOptions: computed(() => ({
                 disabled: !state.treeEditMode,
-                dragValidator(node, parent) {
-                    if (!parent) return store.getters['user/isAdmin'];
+                dragValidator(node, dragNodeParent) {
+                    if (!dragNodeParent) return store.getters['user/isAdmin'];
                     return !!(state.permissionInfo[node.data.id] || node.data.has_permission);
                 },
-                dropValidator(node, parent) {
-                    if (state.dragParent?.data.id === parent?.data.id) return true;
+                dropValidator(node, oldParent, parent) {
+                    if (oldParent?.data.id === parent?.data.id) return true;
 
                     if (!parent) {
                         if (node.data.item_type === 'PROJECT') return false;
@@ -164,7 +162,6 @@ export default {
                     return !!(state.permissionInfo[parent.data.id] || parent.data.has_permission);
                 },
             })),
-            dragParent: null as any,
             allProjectRoot: null as any,
             allProjectNode: computed(() => ([vm.$t('PROJECT.LANDING.ALL_PROJECT')])),
             hasRootProjectPermission: computed(() => store.getters['user/hasDomainRole']),
@@ -308,11 +305,7 @@ export default {
             }
         };
 
-        const onStartDrag = (node, parent) => {
-            state.dragParent = parent;
-        };
-
-        const updateProjectGroup = async (node, parent) => {
+        const updateProjectGroup = async (node, oldParent, parent) => {
             const params: any = {
                 project_group_id: node.data.id,
             };
@@ -326,10 +319,11 @@ export default {
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm.$root);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
+                throw (e);
             }
         };
 
-        const updateProject = async (node, parent) => {
+        const updateProject = async (node, oldParent, parent) => {
             const params: any = {
                 project_id: node.data.id,
             };
@@ -342,35 +336,36 @@ export default {
                 await SpaceConnector.client.identity.project.update(params);
 
                 // this is for refresh project list cards
-                if (store.getters['service/project/groupId'] === state.dragParent?.data.id || store.getters['service/project/groupId'] === parent.data.id) {
+                if (store.getters['service/project/groupId'] === oldParent?.data.id || store.getters['service/project/groupId'] === parent.data.id) {
                     store.commit('service/project/setSelectedItem', { ...store.state.service.project.selectedItem });
                 }
 
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '', vm.$root);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT'));
+                throw (e);
             }
         };
 
-        const onEndDrag = () => {
-            state.dragParent = null;
-        };
-
-        const onUpdateDrag = async (node, parent) => {
+        const onDrop = async (node, oldParent, parent, rollback) => {
             if (!state.rootNode) return;
-            if (state.dragParent?.data.id === parent?.data.id) return;
+            if (oldParent?.data.id === parent?.data.id) return;
 
-            if (state.dragParent?.data.has_child && state.dragParent?.children.length === 1) {
-                state.rootNode.updateNode(d => d.id === state.dragParent.data.id, {
-                    ...state.dragParent.data,
+            if (oldParent?.data.has_child && oldParent?.children.length === 1) {
+                state.rootNode.updateNode(d => d.id === state.oldParent.data.id, {
+                    ...state.oldParent.data,
                     has_child: false,
                 });
             }
 
-            if (node.data.item_type === 'PROJECT_GROUP') {
-                await updateProjectGroup(node, parent);
-            } else {
-                await updateProject(node, parent);
+            try {
+                if (node.data.item_type === 'PROJECT_GROUP') {
+                    await updateProjectGroup(node, oldParent, parent);
+                } else {
+                    await updateProject(node, oldParent, parent);
+                }
+            } catch (e) {
+                rollback();
             }
         };
 
@@ -436,9 +431,7 @@ export default {
             finishTreeEdit,
             dataFetcher,
             onFinishEdit,
-            onStartDrag,
-            onEndDrag,
-            onUpdateDrag,
+            onDrop,
             onChangeSelect,
             onTreeInit,
             onAllProjectTreeInit,

@@ -142,7 +142,6 @@ import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { store } from '@/store';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
@@ -349,22 +348,6 @@ export default {
             },
         });
 
-        const createProject = async (item) => {
-            try {
-                await SpaceConnector.client.identity.project.create({
-                    project_group_id: state.groupId,
-                    ...item,
-                });
-                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', vm.$root);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
-            } finally {
-                state.projectFormVisible = false;
-                await listProjects(state.groupId, state.searchText);
-            }
-        };
-
-
         /* Init */
         watch([() => store.state.service.project.isInitiated, () => state.groupId, () => state.searchText], async ([isInitiated, groupId, searchText]) => {
             if (isInitiated) await listProjects(groupId, searchText);
@@ -384,7 +367,6 @@ export default {
             skeletons: range(1),
             listProjects,
             getLocation,
-            createProject,
             byteFormatter,
             getItemSummaryCount,
             SUMMARY_TYPE,

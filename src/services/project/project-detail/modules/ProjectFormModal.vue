@@ -117,14 +117,8 @@ export default {
         };
 
         const createProject = async (params) => {
-            try {
-                await SpaceConnector.client.identity.project.create(params);
-                await store.dispatch('resource/project/load');
-                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', vm.$root);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
-                throw new Error(e);
-            }
+            store.dispatch('service/project/createProject', params);
+            await store.dispatch('resource/project/load');
         };
 
         const updateProject = async (params) => {

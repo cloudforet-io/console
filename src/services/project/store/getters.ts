@@ -25,9 +25,11 @@ export const parentGroups: Getter<ProjectPageState, any> = (state: ProjectPageSt
             if (i + 1 === path.length) return parents;
 
             const parentPath = path.slice(0, i + 1);
-            const parent = tree.getNodeByPath(parentPath);
+            try {
+                const parent = tree.getNodeByPath(parentPath);
 
-            if (parent) parents.push(parent.data);
+                if (parent) parents.push(parent.data);
+            } catch (e) {}
 
             return parents;
         }, []);

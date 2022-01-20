@@ -4,6 +4,8 @@ import { ProjectGroupTreeItem, ProjectItemResp } from '@/services/project/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { i18n } from '@/translations';
 
 export const initRoot: Action<ProjectPageState, any> = ({ commit }, root) => {
     commit('setRootNode', root);
@@ -145,6 +147,39 @@ const getPermissionInfo = async (ids: string[]): Promise<Record<string, boolean>
     });
 
     return permissionInfo;
+};
+
+interface ProjectInfo {
+    project_group_id: string;
+    name: string;
+}
+export const createProject: Action<ProjectPageState, any> = async ({ state, commit, getters },
+    projectInfo: ProjectInfo) => {
+    try {
+        const res = await SpaceConnector.client.identity.project.create({
+            ...projectInfo,
+        });
+        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
+
+        if (state.treeEditMode) {
+            const newData: ProjectItemResp = {
+                name: projectInfo.name,
+                id: res.project_id,
+                item_type: 'PROJECT',
+                has_child: false,
+            };
+            if (state.rootNode) {
+                if (getters.selectedNodeData) {
+                    state.rootNode.addChildNodeByPath(getters.selectedNodePath, newData);
+                }
+            }
+
+            commit('addPermissionInfo', { [res.project_id]: true });
+        }
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
+        throw new Error(e);
+    }
 };
 
 let refreshPermissionInfoLoading;

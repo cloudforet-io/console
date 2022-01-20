@@ -28,9 +28,10 @@ export const showErrorMessage = (errorTitle, error) => {
  *   @param root
  *   @returns
  */
-export const showSuccessMessage = (successTitle, successMessage, root) => {
-    if (root) {
-        root.$notify({
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const showSuccessMessage = (successTitle, successMessage, root?) => {
+    if (Vue) {
+        Vue.notify({
             group: 'toastTopCenter',
             type: 'success',
             title: successTitle,
@@ -41,9 +42,10 @@ export const showSuccessMessage = (successTitle, successMessage, root) => {
     }
 };
 
-export const showLoadingMessage = (loadingTitle, loadingMessage, root) => {
-    if (root) {
-        root.$notify({
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const showLoadingMessage = (loadingTitle, loadingMessage, root?) => {
+    if (Vue) {
+        Vue.notify({
             group: 'toastTopCenter',
             type: 'loading',
             title: loadingTitle,
@@ -54,9 +56,10 @@ export const showLoadingMessage = (loadingTitle, loadingMessage, root) => {
     }
 };
 
-export const hideLoadingMessage = (root) => {
-    if (root) {
-        root.$notify({
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const hideLoadingMessage = (root?) => {
+    if (Vue) {
+        Vue.notify({
             group: 'toastTopCenter',
             clean: true,
         });
