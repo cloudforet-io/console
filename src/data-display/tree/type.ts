@@ -37,10 +37,10 @@ export interface EditOptions<T=any> {
 
 export interface DragOptions {
     disabled?: boolean;
-    dragValidator?: (node?: TreeNode, parent?: null|TreeNode) => boolean;
-    dropValidator?: (node?: TreeNode, parent?: null|TreeNode) => boolean;
-    startValidator?: (node?: TreeNode, parent?: null|TreeNode) => boolean;
-    endValidator?: (node?: TreeNode, parent?: null|TreeNode) => boolean;
+    startValidator?: (node?: TreeNode, dragNodeParent?: null|TreeNode) => boolean;
+    dragValidator?: (node?: TreeNode, dragNodeParent?: null|TreeNode) => boolean;
+    dropValidator?: (node?: TreeNode, oldParent?: null|TreeNode, parent?: null|TreeNode) => boolean;
+    endValidator?: (node?: TreeNode, oldParent?: null|TreeNode, parent?: null|TreeNode) => boolean;
 }
 
 export interface DataGetter<T=any> {

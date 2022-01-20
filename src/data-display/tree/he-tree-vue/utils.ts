@@ -1,6 +1,6 @@
 import { TreeData } from 'helper-js';
 
-export function cloneTreeData(treeData, opt) {
+export function cloneTreeData(treeData, opt?) {
     return (new TreeData(treeData)).clone(opt);
 }
 

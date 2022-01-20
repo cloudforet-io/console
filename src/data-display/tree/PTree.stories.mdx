@@ -48,7 +48,7 @@ export const ExpertTemplate = (args, { argTypes }) => ({
                     @init="onInit"
                     @change-select="onChangeSelect"
                     @start-drag="onStartDrag"
-                    @update-drag="onUpdateDrag"
+                    @drop="onDrop"
                     @end-drag="onEndDrag"
                     @finish-edit="onFinishEdit"
             >
@@ -105,11 +105,11 @@ export const ExpertTemplate = (args, { argTypes }) => ({
             })),
             dragOptions: computed(() => ({
                 disabled: !state.editMode,
-                dragValidator(node, parent) {
+                dragValidator(node, dragNodeParent) {
                     return !!state.permissionInfo[node.data.id]
                 },
-                dropValidator(node, parent) {
-                    if (state.dragParentNode === parent) return true;
+                dropValidator(node, oldParent, parent) {
+                    if (oldParent === parent) return true;
                     return !!state.permissionInfo[parent?.data?.id]
                 }
             })),
@@ -122,7 +122,6 @@ export const ExpertTemplate = (args, { argTypes }) => ({
             editText: '',
             selectedItem: {},
             dragNode: null,
-            dragParentNode: null
         })
         const selectOptions = {
                 validator({data}) {
@@ -214,18 +213,20 @@ export const ExpertTemplate = (args, { argTypes }) => ({
             state.selectedItem = selected.length > 0 ? selected[0] : {};
             state.editText = selected.length ? selected[0].node.data.name : ''
         }
-        const onStartDrag = (node, parent) => {
-            console.debug('start drag', node, parent)
+        const onStartDrag = (node, dragNodeParent) => {
+            console.debug('start drag', node, dragNodeParent)
             state.dragNode = node
-            state.dragParentNode = parent
         }
-        const onUpdateDrag = (node, parent, rollback) => {
-            console.debug('update drag', node, parent, rollback)
+        const onDrop = (node, oldParent, parent, rollback) => {
+            console.debug('drop', node, oldParent, parent, rollback)
+            if (Math.random() > 0.5) {
+                alert('Drop Failed! Rollback.');
+                rollback();
+            }
         }
         const onEndDrag = (node, parent) => {
             console.debug('end drag', node, parent)
             state.dragNode = null
-            state.dragParentNode = null
         }
         const onFinishEdit = (node, editText) => {
             console.debug('finish edit', node, editText)
@@ -258,7 +259,7 @@ export const ExpertTemplate = (args, { argTypes }) => ({
             updateData,
             onChangeSelect,
             onStartDrag,
-            onUpdateDrag,
+            onDrop,
             onEndDrag,
             onFinishEdit,
             changeSelectState
@@ -407,15 +408,15 @@ Options for node drag & drop.
 |dragValidator|Whether to enable or disable dragging each node.|
 |dropValidator|Whether to enable or disable dropping each node.|
 |startValidator|Whether to allow dragging of each node and emit `start-drag` event or not.|
-|endValidator|Whether to allow dropping of each node and emit `update--drag` event or not.|
+|endValidator|Whether to allow dropping of each node and emit `drop` event or not.|
 
 ```typescript
 interface DragOptions {
     disabled?: boolean;
-    dragValidator?: (node?: TreeNode, parent?: null|TreeNode) => boolean;
-    dropValidator?: (node?: TreeNode, parent?: null|TreeNode) => boolean;
-    startValidator?: (node?: TreeNode, parent?: null|TreeNode) => boolean;
-    endValidator?: (node?: TreeNode, parent?: null|TreeNode) => boolean;
+    startValidator?: (node?: TreeNode, dragNodeParent?: null|TreeNode) => boolean;
+    dragValidator?: (node?: TreeNode, dragNodeParent?: null|TreeNode) => boolean;
+    dropValidator?: (node?: TreeNode, oldParent?: null|TreeNode, parent?: null|TreeNode) => boolean;
+    endValidator?: (node?: TreeNode, oldParent?: null|TreeNode, parent?: null|TreeNode) => boolean;
 }
 ```
 
@@ -459,8 +460,8 @@ interface DataFetcher<T=any> {
 |click-node| Emitted when click nodes. Pass node and path. |
 |change-select| Emitted when selection items changed. Pass selected items. `TreeItem<T>[]` |
 |start-drag| Emitted when dragging start. Pass dragging node and parent node. |
-|end-drag| Emitted when finished dragging. Pass dragging node and parent of target node. |
-|update-drag| Emitted when finished dragging and all validations are passed. Pass dragging node and parent of target node. |
+|end-drag| Emitted when finished dragging. Pass dragging node, old parent node, and the parent of target node. |
+|drop| Emitted when finished dragging and finally dropped. Pass dropped node, old parent node, and updated parent node, and rollback function. |
 |finish-edit| Emitted when finished inline editing. Pass the node and the input text. |
 
 ```typescript

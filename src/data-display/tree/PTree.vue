@@ -88,14 +88,14 @@ import {
     GetClassNames, DataFetcher,
 } from '@/data-display/tree/type';
 import { getDefaultNode } from '@/data-display/tree/helper';
-import { CloneTreeDataOptions, Store, WalkTreeDataCallback } from '@/data-display/tree/he-tree-vue/types';
+import {
+    CloneTreeDataOptions, HeTree, Store, WalkTreeDataCallback,
+} from '@/data-display/tree/he-tree-vue/types';
 import OriginTree from './he-tree-vue/components/Tree.vue';
-import Draggable from './he-tree-vue/plugins/draggable/Draggable.vue';
-import Fold from './he-tree-vue/plugins/fold';
+import DraggablePlugin from './he-tree-vue/plugins/draggable/Draggable.vue';
+import FoldPlugin from './he-tree-vue/plugins/fold';
 import { walkTreeData, cloneTreeData } from './he-tree-vue/utils';
 
-// interface HeTree extends OriginTree, Fold, Draggable {}
-type HeTree = any;
 
 interface Props {
     toggleOptions: ToggleOptions;
@@ -109,7 +109,7 @@ interface Props {
     getClassNames: GetClassNames;
 }
 
-const MixedTree = (OriginTree as any).mixPlugins([Fold, Draggable]);
+const MixedTree = (OriginTree as any).mixPlugins([FoldPlugin, DraggablePlugin]);
 
 export default defineComponent<Props>({
     name: 'PTree',
@@ -282,23 +282,34 @@ export default defineComponent<Props>({
         const onDragEnd = (tree: HeTree, e: Store) => {
             state.dragTargetParentPath = null;
             const parent = e.targetPath ? tree.getNodeParentByPath(e.targetPath) as TreeNode : null;
+            const oldParent = e.startPath ? tree.getNodeParentByPath(e.startPath) as TreeNode : null;
 
             const validator = props.dragOptions.endValidator;
 
-            if (validator && !validator(e.dragNode as TreeNode, parent)) {
-                emit('end-drag', e.dragNode, parent);
+            if (validator && !validator(e.dragNode as TreeNode, oldParent, parent)) {
+                emit('end-drag', e.dragNode, oldParent, parent);
                 return false;
             }
 
-            emit('update-drag', e.dragNode, parent);
-            emit('end-drag', e.dragNode, parent);
+            emit('end-drag', e.dragNode, oldParent, parent);
             return true;
         };
 
-        const handleDrop = (e, targetPath) => {
+        const handleDrop = (e: Store, targetPath, _rollback) => {
+            const rollback = () => {
+                _rollback();
+
+                if (getSelectState(targetPath ?? [])) {
+                    setSelectItem(e.dragNode as TreeNode, e.startPath);
+                }
+            };
+
             if (getSelectState(e.startPath ?? [])) {
                 setSelectItem(e.dragNode as TreeNode, targetPath);
             }
+            const oldParent = e.startPath ? e.startTree?.getNodeParentByPath(e.startPath) as TreeNode : null;
+            const parent = e.targetTree?.getNodeParentByPath(targetPath) as TreeNode;
+            emit('drop', e.dragNode, oldParent, parent, rollback);
         };
 
         const eachDraggable = (path: number[], tree: HeTree, e: Store) => {
@@ -317,9 +328,11 @@ export default defineComponent<Props>({
                 parent = tree.getNodeByPath(parentPath) as TreeNode;
             }
 
+            const oldParent = e.startPath ? tree.getNodeParentByPath(e.startPath) : null;
+
             state.dragTargetParentPath = parentPath;
 
-            if (dropValidator && !dropValidator(e.dragNode as TreeNode, parent)) return false;
+            if (dropValidator && !dropValidator(e.dragNode as TreeNode, oldParent as TreeNode, parent)) return false;
             return true;
         };
         const finishEdit = (node: TreeNode) => {

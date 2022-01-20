@@ -1,14 +1,15 @@
 import Vue from 'vue';
+import {
+    Fold, Node, Path, UnfoldOptions,
+} from '@/data-display/tree/he-tree-vue/types';
 import { walkTreeData } from '../utils';
 
 export function foldAll(treeData) {
-    // @ts-ignore
     walkTreeData(treeData, (childNode) => {
         Vue.set(childNode, '$folded', true);
     });
 }
 export function unfoldAll(treeData) {
-    // @ts-ignore
     walkTreeData(treeData, (childNode) => {
         Vue.set(childNode, '$folded', false);
     });
@@ -29,7 +30,7 @@ export default {
                 this.$emit('nodeFoldedChanged', node);
             }
         },
-        unfold(node, path, opt: any = {}) {
+        unfold(node, path, opt: UnfoldOptions = {}) {
             // eslint-disable-next-line no-param-reassign
             opt = {
                 foldOthers: false,
@@ -47,7 +48,7 @@ export default {
                 this.$emit('node-folded-changed', node);
             }
         },
-        toggleFold(node, path, opt) {
+        toggleFold(node: Node, path: Path, opt: UnfoldOptions) {
             if (node.$folded) {
                 this.unfold(node, path, opt);
             } else {
@@ -75,4 +76,4 @@ export default {
             this.foldAll();
         }
     },
-};
+} as unknown as Fold;
