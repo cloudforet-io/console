@@ -12,12 +12,7 @@
                 <p-text-input :value="name" :invalid="invalidState.name" @input="setForm('name', $event)" />
             </p-field-group>
 
-            <budget-target-select :is-invalid="invalidState.selectedTargets"
-                                  :invalid-text="invalidTexts.selectedTargets"
-                                  :selected-targets="selectedTargets"
-                                  @update="setForm('selectedTargets', $event)"
-                                  @close="validate('selectedTargets')"
-            />
+            <budget-target-select @update="handleUpdateTarget" />
 
             <budget-cost-type-select @update="handleUpdateCostTypes" />
         </div>
@@ -65,38 +60,42 @@ export default {
     setup(props, { emit }) {
         const {
             forms: {
-                name, selectedTargets,
+                name,
             },
             setForm,
             invalidState,
             invalidTexts,
-            isAllValid: isNameAndTargetValid,
+            isAllValid: isNameValid,
             validate,
         } = useFormValidator({
             name: '',
-            selectedTargets: [] as string[],
         }, {
             name(value: string) { return value.trim().length ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.REQUIRED_NAME'); },
-            selectedTargets(value: string[]) { return value.length ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.REQUIRED_TARGET'); },
         });
 
         const state = reactive({
+            target: undefined as string|undefined,
+            isTargetValid: false,
             costTypes: undefined as CostTypes|undefined,
             isCostTypesValid: false,
             budgetInfo: computed<BudgetBaseInfo>(() => {
-                const target = selectedTargets.value[0];
-                const isProjectGroup = target?.startsWith('pg-');
+                const isProjectGroup = state.target?.startsWith('pg-');
 
                 const budgetInfo: BudgetBaseInfo = {
                     name: name.value,
-                    [isProjectGroup ? 'project_group_id' : 'project_id']: target,
+                    [isProjectGroup ? 'project_group_id' : 'project_id']: state.target,
                     cost_types: state.costTypes,
                 };
 
                 return budgetInfo;
             }),
-            isAllValid: computed<boolean>(() => isNameAndTargetValid.value && state.isCostTypesValid),
+            isAllValid: computed<boolean>(() => isNameValid.value && state.isCostTypesValid && state.isTargetValid),
         });
+
+        const handleUpdateTarget = (target: string|undefined, isValid: boolean) => {
+            state.target = target;
+            state.isTargetValid = isValid;
+        };
 
         const handleUpdateCostTypes = (costTypes: CostTypes|undefined, isValid: boolean) => {
             state.costTypes = costTypes;
@@ -111,12 +110,12 @@ export default {
 
         return {
             name,
-            selectedTargets,
             invalidState,
             invalidTexts,
             ...toRefs(state),
             setForm,
             validate,
+            handleUpdateTarget,
             handleUpdateCostTypes,
         };
     },
