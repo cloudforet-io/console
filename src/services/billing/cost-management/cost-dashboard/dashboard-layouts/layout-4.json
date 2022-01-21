@@ -1,14 +1,38 @@
 [
   [{
     "widget_id": "TrafficCostTrend",
-    "options": {}
+    "name": "Traffic Cost Trend",
+    "options": {
+      "value_options": "",
+      "name_options": "",
+      "chart_type": "",
+      "limit": "",
+      "layout": 100
+    },
+    "query": {}
   }],
   [{
     "widget_id": "TrafficCostByRegion",
-    "options": {}
+    "name": "Traffic Cost By Region",
+    "options": {
+      "value_options": "",
+      "name_options": "",
+      "chart_type": "",
+      "limit": "",
+      "layout": 100
+    },
+    "query": {}
   }],
   [{
     "widget_id": "CostTrendByAmazonCloudFront",
-    "options": {}
+    "name": "Cost Trend By Amazon CloudFront",
+    "options": {
+      "value_options": "",
+      "name_options": "",
+      "chart_type": "",
+      "limit": "",
+      "layout": 100
+    },
+    "query": {}
   }]
 ]

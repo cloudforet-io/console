@@ -1,6 +1,9 @@
 import { RouteConfig } from 'vue-router';
 
 const CostManagementPage = () => import(/* webpackChunkName: "CostManagementPage" */ '@/services/billing/cost-management/CostManagementPage.vue');
+const CostDashboardCreatePage = () => import(/* webpackChunkName: "CostDashboardCreatePage" */ '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/CostDashboardCreatePage.vue');
+// eslint-disable-next-line max-len
+const CostDashboardCustomizePage = () => import(/* webpackChunkName: "CostDashboardCustomizePage" */'@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/CostDashboardCustomizePage.vue');
 const CostDashboardPage = () => import(/* webpackChunkName: "CostDashboardPage" */ '@/services/billing/cost-management/cost-dashboard/CostDashboardPage.vue');
 const CostAnalysisPage = () => import(/* webpackChunkName: "CostAnalysisPage" */ '@/services/billing/cost-management/cost-analysis/CostAnalysisPage.vue');
 const BudgetPage = () => import(/* webpackChunkName: "BudgetPage" */ '@/services/billing/cost-management/budget/BudgetPage.vue');
@@ -14,7 +17,11 @@ export const BILLING_ROUTE = Object.freeze({
     _NAME: 'billing',
     COST_MANAGEMENT: {
         _NAME: 'costManagement',
-        DASHBOARD: { _NAME: 'costDashboard' },
+        DASHBOARD: {
+            _NAME: 'costDashboard',
+            CREATE: { _NAME: 'create' },
+            CUSTOMIZE: { _NAME: 'customize' },
+        },
         COST_ANALYSIS: { _NAME: 'costAnalysis' },
         BUDGET: {
             _NAME: 'budget',
@@ -45,6 +52,18 @@ export default {
                     redirect: 'dashboard',
                     component: CostManagementPage,
                     children: [
+                        {
+                            path: 'dashboard/create',
+                            name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD.CREATE._NAME,
+                            props: true,
+                            component: CostDashboardCreatePage,
+                        },
+                        {
+                            path: 'dashboard/customize/:dashboardId',
+                            name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE._NAME,
+                            props: true,
+                            component: CostDashboardCustomizePage,
+                        },
                         {
                             path: 'dashboard/:dashboardId?',
                             name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,

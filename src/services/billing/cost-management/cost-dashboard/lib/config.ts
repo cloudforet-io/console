@@ -1,3 +1,17 @@
+import Layout1WidgetList from '@/services/billing/cost-management/cost-dashboard/dashboard-layouts/layout-1.json';
+import Layout4WidgetList from '@/services/billing/cost-management/cost-dashboard/dashboard-layouts/layout-4.json';
+
+export const defaultLayoutMap = {
+    'layout-1': {
+        name: 'Cost Overview',
+        widgetList: Layout1WidgetList,
+    },
+    'layout-4': {
+        name: 'CDN & Traffic Cost',
+        widgetList: Layout4WidgetList,
+    },
+};
+
 export const continentData = [{
     continent_code: 'africa',
     title: 'Africa',

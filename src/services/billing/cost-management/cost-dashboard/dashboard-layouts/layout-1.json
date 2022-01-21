@@ -1,35 +1,108 @@
 [
   [{
     "widget_id": "MonthToDateSpend",
-    "options": {}
+    "type": "card",
+    "name": "Month-To-Date Spend",
+    "options": {
+      "value_options": "",
+      "name_options": "",
+      "chart_type": "",
+      "limit": "",
+      "layout": 33
+    },
+    "query": {}
   }, {
     "widget_id": "LastMonthTotalSpend",
-    "options": {}
+    "name": "Last Month Total Spending",
+    "options": {
+      "value_options": "",
+      "name_options": "",
+      "chart_type": "",
+      "limit": "",
+      "layout": 33
+    },
+    "query": {}
   }, {
     "widget_id": "BudgetUsage",
-    "options": {}
+    "name": "Budget Usage",
+    "options": {
+      "value_options": "",
+      "name_options": "",
+      "chart_type": "",
+      "limit": "",
+      "layout": 33
+    },
+    "query": {}
   }],
   [{
     "widget_id": "CostByProject",
-    "options": {}
+    "name": "Cost by Project",
+    "options": {
+      "value_options": "",
+      "name_options": "",
+      "chart_type": "",
+      "limit": "",
+      "layout": 100
+    },
+    "query": {}
   }],
   [{
     "widget_id": "CostTrendByProject",
-    "options": {}
+    "name": "Cost Trend By Project",
+    "options": {
+      "value_options": "",
+      "name_options": "",
+      "chart_type": "",
+      "limit": "",
+      "layout": 100
+    },
+    "query": {}
   }],
   [{
     "widget_id": "CostTrendByProduct",
-    "options": {}
+    "name": "Cost Trend By Product",
+    "options": {
+      "value_options": "",
+      "name_options": "",
+      "chart_type": "",
+      "limit": "",
+      "layout": 100
+    },
+    "query": {}
   }],
   [{
     "widget_id": "CostByProvider",
-    "options": {}
+    "name": "Cost By Provider",
+    "options": {
+      "value_options": "",
+      "name_options": "",
+      "chart_type": "",
+      "limit": "",
+      "layout": 50
+    },
+    "query": {}
   }, {
     "widget_id": "BudgetStatus",
-    "options": {}
+    "name": "Budget Status",
+    "options": {
+      "value_options": "",
+      "name_options": "",
+      "chart_type": "",
+      "limit": "",
+      "layout": 50
+    },
+    "query": {}
   }],
   [{
     "widget_id": "CostByRegion",
-    "options": {}
+    "name": "Cost By Region",
+    "options": {
+      "value_options": "",
+      "name_options": "",
+      "chart_type": "",
+      "limit": "",
+      "layout": 100
+    },
+    "query": {}
   }]
 ]
