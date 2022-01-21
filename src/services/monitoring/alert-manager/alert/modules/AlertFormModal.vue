@@ -23,12 +23,13 @@
                     {{ $t('MONITORING.ALERT.ALERT_LIST.FORM.LOW') }}
                 </p-radio>
             </p-field-group>
-            <p-field-group class="project-field-group" :label="$t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_PROJECT')" required
+            <p-field-group v-if="!projectId" class="project-field-group" :label="$t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_PROJECT')"
+                           required
                            :invalid="projectInvalid"
                            :invalid-text="projectInvalidText"
             >
                 <template #label-extra>
-                    <p-anchor v-if="!projectId" class="go-project" highlight
+                    <p-anchor class="go-project" highlight
                               :to="{name: PROJECT_ROUTE._NAME }"
                     >
                         {{ $t('MONITORING.ALERT.ALERT_LIST.FORM.CREATE_PROJECT') }}
@@ -36,8 +37,6 @@
                 </template>
                 <project-select-dropdown :invalid="projectInvalid"
                                          project-selectable
-                                         :selected-project-ids="projectId ? [projectId] : undefined"
-                                         :readonly="!!projectId"
                                          @select="onSelectProject"
                 />
             </p-field-group>
