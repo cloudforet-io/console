@@ -143,7 +143,7 @@ export default {
                 range(6).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');
                     fields.push({
-                        name: `usd_cost.${date.format('YYYY-M')}`,
+                        name: `usd_cost.${date.format('YYYY-MM')}`,
                         label: thisMonth.isSame(date, 'month') ? `${date.format('MMM')} (MTD)` : date.format('MMM'),
                     });
                 });

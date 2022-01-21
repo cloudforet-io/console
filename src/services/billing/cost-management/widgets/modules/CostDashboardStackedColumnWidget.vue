@@ -130,7 +130,7 @@ export default defineComponent<Props>({
                 const thisMonth = dayjs.utc();
                 while (start.isSameOrBefore(end, 'month')) {
                     fields.push({
-                        name: `usd_cost.${start.format('YYYY-M')}`,
+                        name: `usd_cost.${start.format('YYYY-MM')}`,
                         label: thisMonth.isSame(start, 'month') ? `${start.format('MMM')} (MTD)` : start.format('MMM'),
                         textAlign: 'right',
                     });
