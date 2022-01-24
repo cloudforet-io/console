@@ -53,7 +53,6 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
-import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { getConvertedBudgetFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -159,7 +158,7 @@ export default {
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({
                     include_budget_count: false,
                     include_budget_info: false,
-                    group_by: [GROUP_BY.PROJECT, GROUP_BY.PROJECT_GROUP],
+                    group_by: ['project_id', 'project_group_id'],
                     start: dayjs.utc(period.start).endOf('month').format('YYYY-MM'),
                     end: dayjs.utc(period.end).endOf('month').format('YYYY-MM'),
                     sort: {
