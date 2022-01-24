@@ -433,6 +433,10 @@
 				"FILTER_MODAL_HELP_TEXT_2": "",
 				"GRANULARITY": "",
 				"GROUP_BY": "",
+				"HELP_TEXT": {
+					"UP_TO_31_DAYS": "",
+					"UP_TO_LAST_12_MONTHS": ""
+				},
 				"HIDE_ALL": "",
 				"KEEP_MY_SETTING": "",
 				"LABEL_ADDITIONAL_FIELD": "",

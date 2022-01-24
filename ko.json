@@ -433,6 +433,10 @@
 				"FILTER_MODAL_HELP_TEXT_2": "리스트에 있는 필터를 선택 하세요.",
 				"GRANULARITY": "세부 기준",
 				"GROUP_BY": "그룹별 통계",
+				"HELP_TEXT": {
+					"UP_TO_31_DAYS": "최대 31일 까지",
+					"UP_TO_LAST_12_MONTHS": "지난 12 개월부터"
+				},
 				"HIDE_ALL": "전체 숨김",
 				"KEEP_MY_SETTING": "위의 설정을 내 설정사항으로 유지",
 				"LABEL_ADDITIONAL_FIELD": "추가 필드",

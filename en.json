@@ -433,6 +433,10 @@
 				"FILTER_MODAL_HELP_TEXT_2": "Select filters from the list.",
 				"GRANULARITY": "Granularity",
 				"GROUP_BY": "Group By",
+				"HELP_TEXT": {
+					"UP_TO_31_DAYS": "Up to 31 days",
+					"UP_TO_LAST_12_MONTHS": "Up to last 12 months"
+				},
 				"HIDE_ALL": "Hide all",
 				"KEEP_MY_SETTING": "Keep the settings above as my settings",
 				"LABEL_ADDITIONAL_FIELD": "Additional Field",
