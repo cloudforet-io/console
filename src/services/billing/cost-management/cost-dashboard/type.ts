@@ -34,3 +34,14 @@ export interface DashboardItem extends DashboardInfo {
     label: string;
     routeName: string;
 }
+
+export interface WidgetInfo {
+    name: string;
+    options: object;
+    type: string;
+    widget_id: string;
+}
+export interface DefaultLayout {
+    name: string;
+    widgetList: any;
+}

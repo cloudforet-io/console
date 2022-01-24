@@ -1,5 +1,6 @@
 import Layout1WidgetList from '@/services/billing/cost-management/cost-dashboard/dashboard-layouts/layout-1.json';
 import Layout4WidgetList from '@/services/billing/cost-management/cost-dashboard/dashboard-layouts/layout-4.json';
+import { DefaultLayout } from '@/services/billing/cost-management/cost-dashboard/type';
 
 export const defaultLayoutMap = {
     'layout-1': {
@@ -11,6 +12,12 @@ export const defaultLayoutMap = {
         widgetList: Layout4WidgetList,
     },
 };
+export const defaultLayoutList: Record<string, DefaultLayout> = {
+    ...{ blank: { name: 'Blank', widgetList: [] } },
+    ...{ 'layout-1': { ...defaultLayoutMap['layout-1'] } },
+    ...{ 'layout-4': { ...defaultLayoutMap['layout-4'] } },
+};
+export const defaultLayoutData = Object.values(defaultLayoutList);
 
 export const continentData = [{
     continent_code: 'africa',
