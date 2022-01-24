@@ -112,6 +112,13 @@ export default {
                 if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
                 if (d.name === GROUP_BY.REGION) field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
                 if (d.name === GROUP_BY.PROVIDER) field.reference = { reference_key: 'provider', resource_type: 'identity.Provider' };
+                if (d.name.startsWith('usd_cost')) {
+                    field.type = 'currency';
+                    field.options = {
+                        currency: state.currency,
+                        currencyRates: state.currencyRates,
+                    };
+                }
                 return field;
             })),
             items: [] as CostAnalyzeModel[],
@@ -293,9 +300,10 @@ export default {
                     param: {
                         granularity: state.granularity,
                         group_by: state.groupBy,
-                        start: dayjs.utc(state.period.start),
-                        end: dayjs.utc(state.period.end).add(1, state.timeUnit),
+                        start: dayjs.utc(state.period.start).format('YYYY-MM-DD'),
+                        end: dayjs.utc(state.period.end).add(1, 'day').format('YYYY-MM-DD'),
                         pivot_type: 'TABLE',
+                        filter: costApiQueryHelper.data.filter,
                         query: costApiQueryHelper.data,
                     },
                     fields: tableState.excelFields,
