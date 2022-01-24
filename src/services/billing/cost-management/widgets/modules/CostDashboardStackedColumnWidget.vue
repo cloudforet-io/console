@@ -210,7 +210,7 @@ export default defineComponent<Props>({
                 series.dataFields.valueY = legend.name;
                 series.strokeWidth = 0;
                 series.columns.template.width = am4core.percent(60);
-                series.tooltipText = '{name}: [bold]{valueY}[/]';
+                series.columns.template.tooltipText = '{name}: [bold]{valueY}[/]';
                 series.columns.template.propertyFields.fill = legend.color;
                 series.tooltip.label.fontSize = 12;
                 series.stacked = true;
@@ -221,11 +221,6 @@ export default defineComponent<Props>({
             legends.forEach((legend) => {
                 createSeries(legend);
             });
-
-            chart.cursor = new am4charts.XYCursor();
-            chart.cursor.maxTooltipDistance = 20;
-            chart.cursor.lineX.disabled = true;
-            chart.cursor.lineY.disabled = true;
 
             return chart;
         };

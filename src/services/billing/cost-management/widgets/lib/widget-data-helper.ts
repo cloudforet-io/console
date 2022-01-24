@@ -99,7 +99,7 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY)
             let _color;
             if (!_category) {
                 if (d.is_etc) _category = 'aggregation';
-                else _category = `no_${groupBy}`;
+                else _category = 'Unknown';
             }
             if (groupBy === GROUP_BY.PROVIDER) {
                 const _providers = store.state.resource.provider.items;
