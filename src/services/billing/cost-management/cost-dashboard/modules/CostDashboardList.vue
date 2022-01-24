@@ -1,9 +1,14 @@
 <template>
     <ul class="dashboard-list">
-        <li v-for="(item) in dashboardList" :key="item.dashboard_id"
-            class="menu-item"
-            :class="{'selected': item.dashboard_id === dashboardIdFromRoute}"
-            @click="showPage(item.dashboard_id)"
+        <router-link v-for="(item) in dashboardList" :key="item.dashboard_id"
+                     class="menu-item"
+                     :class="{'selected': item.dashboard_id === dashboardIdFromRoute}"
+                     :to="{
+                         name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                         params: {
+                             dashboardId: item.dashboard_id
+                         }
+                     }"
         >
             <span class="title">
                 {{ item.name }}
@@ -25,7 +30,7 @@
                                button-icon="ic_more"
                                @select="handleSelectMoreMenu(item, ...arguments)"
             />
-        </li>
+        </router-link>
     </ul>
 </template>
 
@@ -70,15 +75,6 @@ export default {
         });
 
         /* util */
-        const showPage = (dashboardId) => {
-            if (state.dashboardIdFromRoute !== dashboardId) {
-                SpaceRouter.router.push({
-                    name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
-                    params: { dashboardId },
-                });
-            }
-        };
-
         const handleSelectMoreMenu = (item, selectedMoreMenuItem) => {
             state.selectedMoreMenuItem = selectedMoreMenuItem;
             if (state.selectedMoreMenuItem === 'setHome') {
@@ -133,8 +129,8 @@ export default {
 
         return {
             ...toRefs(state),
-            showPage,
             handleSelectMoreMenu,
+            BILLING_ROUTE,
         };
     },
 };
