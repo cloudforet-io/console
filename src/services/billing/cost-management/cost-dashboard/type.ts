@@ -9,10 +9,10 @@ const DASHBOARD_SCOPE = {
 export type DASHBOARD_SCOPE = typeof DASHBOARD_SCOPE[keyof typeof DASHBOARD_SCOPE];
 
 interface DefaultFilter {
-    projects: string[];
-    project_groups: string[];
-    service_accounts: string[];
-    provider: string[];
+    projects?: string[];
+    project_groups?: string[];
+    service_accounts?: string[];
+    provider?: string[];
 }
 export interface DashboardInfo {
     created_at: TimeStamp;
@@ -36,12 +36,29 @@ export interface DashboardItem extends DashboardInfo {
 }
 
 export interface WidgetInfo {
-    name: string;
-    options: object;
-    type: string;
+    name?: string;
+    options?: object;
+    type?: string;
     widget_id: string;
 }
+
 export interface DefaultLayout {
     name: string;
     widgetList: any;
+}
+
+export type CustomLayout = WidgetInfo[];
+
+const periodTypes = ['AUTO', 'FIXED'] as const;
+type PeriodType = typeof periodTypes[number];
+
+export interface DashboardCreateParam {
+    name: string;
+    default_layout_id?: string;
+    custom_layouts?: CustomLayout[];
+    default_filter?: DefaultFilter;
+    period_type: PeriodType;
+    period?: Period;
+    tags?: Tags;
+    domain_id?: string;
 }

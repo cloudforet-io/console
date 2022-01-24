@@ -4,10 +4,12 @@ import { DefaultLayout } from '@/services/billing/cost-management/cost-dashboard
 
 export const defaultLayoutMap = {
     'layout-1': {
+        default_layout_id: 'layout-1',
         name: 'Cost Overview',
         widgetList: Layout1WidgetList,
     },
     'layout-4': {
+        default_layout_id: 'layout-4',
         name: 'CDN & Traffic Cost',
         widgetList: Layout4WidgetList,
     },
