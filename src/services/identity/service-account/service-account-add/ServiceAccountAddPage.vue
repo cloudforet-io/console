@@ -388,8 +388,8 @@ export default {
                     if (formState.credentialModel.private_key) formState.credentialModel.private_key = formState.credentialModel.private_key.replace(/\\n/g, '\n');
                     const isSecretCreationSuccess = await createSecret();
                     if (!isSecretCreationSuccess) return;
-                    SpaceRouter.router.back();
                 }
+                SpaceRouter.router.back();
             }
         };
         const handleGoBack = () => {
