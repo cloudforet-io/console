@@ -17,7 +17,7 @@
         <cost-management-custom-range-modal v-if="customRangeModalVisible"
                                             :visible.sync="customRangeModalVisible"
                                             :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.CUSTOM_DATE_RANGE')"
-                                            :datetime-picker-data-type="DATA_TYPE.yearToDate"
+                                            :granularity="granularity"
                                             @confirm="handleCustomRangeModalConfirm"
         />
     </div>
@@ -39,6 +39,7 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import { store } from '@/store';
 import { SpaceRouter } from '@/router';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 
 const today = dayjs.utc();
 const basicFormat = (date: Dayjs) => date.format('YYYY-MM-DD');
@@ -67,21 +68,28 @@ export default {
     },
     setup(props, { emit }) {
         const { i18nDayjs } = useI18nDayjs();
+        const arraySelector = (selectedNums: number[], array) => selectedNums.map(num => array[num]);
         const state = reactive({
             period: computed({
                 get() { return props.fixedPeriod; },
                 set(period) { store.commit('service/costAnalysis/setPeriod', period); },
             }),
-            quickSelectPeriodMenuItems: computed(() => [
+            granularity: computed(() => store.state.service.costAnalysis.granularity),
+            quickSelectPeriodMenuItems: computed(() => ([
                 { label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_7_DAYS'), name: 'last7days' },
                 { label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_14_DAYS'), name: 'last14days' },
                 { label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_MONTH'), name: 'thisMonth' },
                 { label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_MONTH'), name: 'lastMonth' },
                 { label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_3_MONTHS'), name: 'last3months' },
                 { label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_6_MONTHS'), name: 'last6months' },
-            ]),
+            ])),
+            quickSelectPeriodListByGranularity: computed(() => {
+                if (state.granularity === GRANULARITY.DAILY) return arraySelector([0, 1, 2, 3], state.quickSelectPeriodMenuItems);
+                if (state.granularity === GRANULARITY.MONTHLY) return arraySelector([2, 3, 4, 5], state.quickSelectPeriodMenuItems);
+                return state.quickSelectPeriodMenuItems;
+            }),
             periodMenuItems: computed<MenuItem[]>(() => ([
-                ...state.quickSelectPeriodMenuItems,
+                ...state.quickSelectPeriodListByGranularity,
                 {
                     type: 'divider',
                 },
@@ -90,7 +98,6 @@ export default {
                     name: 'custom',
                     label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOM'),
                 },
-
             ])),
             selectedPeriodMenuItem: 'thisMonth',
             customRangeModalVisible: false,
