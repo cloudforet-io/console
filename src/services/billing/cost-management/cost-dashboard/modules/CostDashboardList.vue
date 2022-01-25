@@ -1,25 +1,29 @@
 <template>
     <ul class="dashboard-list">
-        <router-link v-for="(item) in dashboardList" :key="item.dashboard_id"
-                     class="menu-item"
-                     :class="{'selected': item.dashboard_id === dashboardIdFromRoute}"
-                     :to="{
-                         name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
-                         params: {
-                             dashboardId: item.dashboard_id
-                         }
-                     }"
+        <li v-for="(item) in dashboardList" :key="item.dashboard_id"
+            class="menu-item"
+            :class="{'selected': item.dashboard_id === dashboardIdFromRoute}"
         >
-            <span class="title">
-                {{ item.name }}
-            </span>
-            <p-i v-if="item.scope === 'PRIVATE'" name="ic_private" class="private-icon"
-                 width="1rem"
-                 height="1rem"
-            />
-            <p-i v-if="item.dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
-                 width="1rem" height="1rem"
-            />
+            <router-link
+                :to="{
+                    name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                    params: {
+                        dashboardId: item.dashboard_id
+                    }
+                }"
+                class="link"
+            >
+                <span class="title">
+                    {{ item.name }}
+                </span>
+                <p-i v-if="item.scope === 'PRIVATE'" name="ic_private" class="private-icon"
+                     width="1rem"
+                     height="1rem"
+                />
+                <p-i v-if="item.dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
+                     width="1rem" height="1rem"
+                />
+            </router-link>
             <p-select-dropdown :selected="selectedMoreMenuItem"
                                class="more-button"
                                :items="moreMenuItems"
@@ -30,7 +34,7 @@
                                button-icon="ic_more"
                                @select="handleSelectMoreMenu(item, ...arguments)"
             />
-        </router-link>
+        </li>
     </ul>
 </template>
 
@@ -126,7 +130,6 @@ export default {
             }
         })();
 
-
         return {
             ...toRefs(state),
             handleSelectMoreMenu,
@@ -137,22 +140,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.sidebar-title {
-    @apply text-gray-900 text-sm font-bold;
-    position: relative;
-    align-items: center;
-    padding: 2rem 0 0.75rem 1rem;
-    .count {
-        font-weight: normal;
-    }
-}
-.sidebar-divider {
-    @apply w-full;
-    padding-left: 0;
-    margin-bottom: 0.75rem;
-}
 .dashboard-list {
-    margin: 0 0.75rem 1.5rem;
+    padding: 0 0.75rem 1.25rem;
 }
 .menu-item {
     @apply rounded text-gray-900;
@@ -176,6 +165,9 @@ export default {
     .title {
         @apply truncate;
         margin-right: 0.25rem;
+    }
+    .link {
+        width: inherit;
     }
     .home-icon {
         flex-shrink: 0;

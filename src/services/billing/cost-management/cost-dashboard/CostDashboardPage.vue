@@ -8,24 +8,28 @@
                 <!--                                 favorite-type="project"-->
                 <!--                                 resource-type="identity.Project"-->
                 <!--                />-->
-                <!--                <p-icon-button name="ic_edit-text"-->
-                <!--                               class="edit-btn"-->
-                <!--                               :outline="false"-->
-                <!--                               @click.stop="handleClickEditDashboard"-->
-                <!--                />-->
+                <p-icon-button name="ic_edit-text"
+                               class="edit-btn"
+                               :outline="false"
+                               @click.stop="handleClickEditDashboard"
+                />
+                <p-icon-button name="ic_trashcan"
+                               :outline="false"
+                               @click.stop="handleClickDeleteDashboard"
+                />
                 <cost-dashboard-more-menu :dashboard-id="dashboardId" />
             </div>
             <div class="right-part">
                 <cost-dashboard-period-select-dropdown :fixed-period="fixedPeriod" @update="handleUpdatePeriod" />
                 <currency-select-dropdown />
-                <!--                <div class="left-divider download-pdf">-->
-                <!--                    <p-icon-button name="ic_download" style-type="gray-border" size="sm" />-->
-                <!--                </div>-->
-                <!--                <div class="left-divider">-->
-                <!--                    <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm">-->
-                <!--                        Customize-->
-                <!--                    </p-icon-text-button>-->
-                <!--                </div>-->
+                <div class="left-divider download-pdf">
+                    <p-icon-button name="ic_download" style-type="gray-border" size="sm" />
+                </div>
+                <div class="left-divider">
+                    <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm">
+                        Customize
+                    </p-icon-text-button>
+                </div>
             </div>
             <cost-dashboard-filter :dashboard-id="dashboardId" :filters.sync="filters" />
         </div>
@@ -36,6 +40,11 @@
                            :currency="currency"
                            :currency-rates="currencyRates"
         />
+        <delete-modal :header-title="checkDeleteState.headerTitle"
+                      :visible.sync="checkDeleteState.visible"
+                      :loading="checkDeleteState.loading"
+                      @confirm="handleDeleteDashboardConfirm"
+        />
     </div>
 </template>
 
@@ -45,7 +54,7 @@ import {
 } from '@vue/composition-api';
 import { i18n } from '@/translations';
 import {
-    PBreadcrumbs, PPageTitle,
+    PBreadcrumbs, PPageTitle, PIconButton, PIconTextButton,
 } from '@spaceone/design-system';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
@@ -62,6 +71,7 @@ import CostDashboardPeriodSelectDropdown
 import { DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 import { SpaceRouter } from '@/router';
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 export default {
     name: 'CostDashboardPage',
@@ -71,9 +81,11 @@ export default {
         DashboardLayouts,
         CurrencySelectDropdown,
         CostDashboardFilter,
-        // PIconButton,
+        PIconButton,
+        PIconTextButton,
         PBreadcrumbs,
         PPageTitle,
+        DeleteModal,
     },
     props: {
         dashboardId: {
@@ -102,9 +114,33 @@ export default {
             ]),
         });
 
+        const checkDeleteState = reactive({
+            visible: false,
+            headerTitle: 'Are you sure you want to delete dashboard?',
+            loading: true,
+        });
+
         /* event */
         const handleClickEditDashboard = () => {
             console.log('edit dashboard');
+        };
+
+        const handleClickDeleteDashboard = () => {
+            checkDeleteState.visible = true;
+        };
+        const handleDeleteDashboardConfirm = async () => {
+            try {
+                checkDeleteState.loading = true;
+                await SpaceConnector.client.costAnalysis.dashboard.delete({
+                    dashboard_id: props.dashboardId,
+                });
+                await SpaceRouter.router.replace({ name: BILLING_ROUTE.COST_MANAGEMENT._NAME });
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, 'Failed to delete dashboard');
+            } finally {
+                checkDeleteState.loading = false;
+                checkDeleteState.visible = false;
+            }
         };
 
         const handleUpdatePeriod = (period: Period) => {
@@ -171,7 +207,10 @@ export default {
         return {
             ...toRefs(state),
             routeState,
+            checkDeleteState,
             handleClickEditDashboard,
+            handleClickDeleteDashboard,
+            handleDeleteDashboardConfirm,
             handleUpdatePeriod,
         };
     },
@@ -198,9 +237,6 @@ export default {
         display: flex;
         align-items: center;
         margin-left: 0.5rem;
-        .edit-btn {
-            margin-left: 0.5rem;
-        }
         .more-button {
             @apply bg-transparent;
         }

@@ -1,7 +1,16 @@
 <template>
     <aside class="sidebar-menu">
         <!--        <sidebar-title :title="$t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES')" />-->
-        <sidebar-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
+        <sidebar-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" class="sidebar-title">
+            <template #extra>
+                <p-icon-text-button style-type="gray-border" size="sm"
+                                    name="ic_plus_bold"
+                                    @click="handleClickCreate"
+                >
+                    Create
+                </p-icon-text-button>
+            </template>
+        </sidebar-title>
         <cost-dashboard-list />
         <div v-for="(item) in menuList" :key="item.label"
              @click="showPage(item.routeName)"
@@ -25,6 +34,7 @@ import { i18n } from '@/translations';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { SpaceRouter } from '@/router';
 import CostDashboardList from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardList.vue';
+import { PIconTextButton } from '@spaceone/design-system';
 
 interface ListItem {
     routeName?: string;
@@ -34,6 +44,7 @@ interface ListItem {
 export default {
     name: 'CostManagementMenu',
     components: {
+        PIconTextButton,
         CostDashboardList,
         SidebarTitle,
     },
@@ -62,16 +73,24 @@ export default {
             }
         };
 
+        const handleClickCreate = () => {
+            SpaceRouter.router.push({
+                name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD.CREATE._NAME,
+            });
+        };
+
         return {
             ...toRefs(state),
             showPage,
+            handleClickCreate,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.dashboard-list {
-    margin: 0 0.75rem 1.5rem;
+.sidebar-title {
+    @apply flex justify-between;
+    padding-right: 1rem;
 }
 </style>
