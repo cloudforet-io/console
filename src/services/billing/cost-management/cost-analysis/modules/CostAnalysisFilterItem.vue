@@ -22,7 +22,7 @@
             @update:selected="handleSelectMenuItem"
         />
         <p-search-dropdown
-            v-else-if="type === FILTER.PRODUCT || type === FILTER.ACCOUNT || type === FILTER.TYPE"
+            v-else
             type="checkbox"
             :handler="menuHandler"
             :selected="selectedItems"
