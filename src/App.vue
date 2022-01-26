@@ -64,7 +64,6 @@ import { Location } from 'vue-router';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { hideLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { AUTH_ROUTE } from '@/services/auth/routes';
 
 export default defineComponent({
@@ -87,14 +86,12 @@ export default defineComponent({
         });
 
         const goToSignIn = async () => {
-            if (!SpaceConnector.isTokenAlive) {
-                const res: Location = {
-                    name: AUTH_ROUTE.SIGN_OUT._NAME,
-                };
-                await vm.$router.push(res);
-            } else {
-                vm.$store.dispatch('user/setIsSessionExpired', false);
-            }
+            const res: Location = {
+                name: AUTH_ROUTE.SIGN_OUT._NAME,
+                query: { nextPath: vm.$route.fullPath },
+            };
+            await vm.$router.push(res);
+            vm.$store.dispatch('user/setIsSessionExpired', false);
         };
 
         watch(() => vm.$store.state.display.isDownloaded, async (after) => {
