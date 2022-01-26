@@ -26,7 +26,9 @@
                     <p-icon-button name="ic_download" style-type="gray-border" size="sm" />
                 </div>
                 <div class="left-divider">
-                    <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm">
+                    <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm"
+                                        @click.stop="handleClickCustomize"
+                    >
                         Customize
                     </p-icon-text-button>
                 </div>
@@ -147,6 +149,10 @@ export default {
             state.period = period;
         };
 
+        const handleClickCustomize = () => {
+            SpaceRouter.router.push({ name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });
+        };
+
         const fetchLayoutData = async (layoutId: string): Promise<any[]> => {
             try {
                 // noinspection TypeScriptCheckImport
@@ -212,6 +218,7 @@ export default {
             handleClickDeleteDashboard,
             handleDeleteDashboardConfirm,
             handleUpdatePeriod,
+            handleClickCustomize,
         };
     },
 };
