@@ -13,18 +13,22 @@
                   @click.native.stop="handleClick"
                   v-on="searchListeners"
         >
-            <p-tag v-if="type === SEARCH_DROPDOWN_TYPE.radioButton &&
-                       proxySelected.length &&
-                       !proxyVisibleMenu &&
-                       !proxyIsFocused"
-                   ref="tagRef"
-                   @delete="onDeleteTag(proxySelected[0], 0)"
+            <div v-if="type === SEARCH_DROPDOWN_TYPE.radioButton &&
+                     proxySelected.length &&
+                     !proxyVisibleMenu &&
+                     !proxyIsFocused"
+                 ref="selectedRadioRef"
+                 class="selected-radio-label"
             >
-                {{ proxySelected[0].label || proxySelected[0].name }}
-            </p-tag>
+                <span><slot name="selected-radio-label" :selected="proxySelected[0]">{{ proxySelected[0].label || proxySelected[0].name }}</slot></span>
+                <p-i class="delete-icon" name="ic_delete"
+                     height="1rem" width="1rem"
+                     @click="onDeleteTag(proxySelected[0], 0)"
+                />
+            </div>
             <template v-if="type !== SEARCH_DROPDOWN_TYPE.default || !proxySelected.length || proxyVisibleMenu" #right>
                 <p-i :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                     color="inherit" class="dropdown-button"
+                     color="inherit" class="dropdown-button" :class="disabled"
                      @click.stop="handleClickDropdownButton"
                 />
             </template>
@@ -64,7 +68,9 @@
             </template>
         </p-context-menu>
         <div v-if="type === SEARCH_DROPDOWN_TYPE.checkbox && proxySelected.length && showTagBox" class="p-search-dropdown__tag-box">
-            <p-tag v-for="(selectedItem, index) in proxySelected" :key="`tag-box-${index}`" @delete="onDeleteTag(selectedItem, index)">
+            <p-tag v-for="(selectedItem, index) in proxySelected" :key="`tag-box-${index}`" :deletable="!disabled"
+                   @delete="onDeleteTag(selectedItem, index)"
+            >
                 {{ selectedItem.label || selectedItem.name }}
             </p-tag>
         </div>
@@ -203,7 +209,7 @@ export default defineComponent<SearchDropdownProps>({
 
         const state = reactive({
             menuRef: null,
-            tagRef: null as null|HTMLElement,
+            selectedRadioRef: null as null|HTMLElement,
             proxyValue: makeOptionalProxy('value', vm, ''),
             proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
             proxySelected: makeOptionalProxy('selected', vm, []),
@@ -223,8 +229,8 @@ export default defineComponent<SearchDropdownProps>({
                 return res;
             }, {})),
             searchHeight: computed<number>(() => {
-                if (!state.tagRef) return 32;
-                if (!contextMenuFixedStyleState.proxyVisibleMenu && state.proxySelected.length && props.type === SEARCH_DROPDOWN_TYPE.radioButton) return state.tagRef.$el.clientHeight + 12;
+                if (!state.selectedRadioRef) return 32;
+                if (!contextMenuFixedStyleState.proxyVisibleMenu && state.proxySelected.length && props.type === SEARCH_DROPDOWN_TYPE.radioButton) return state.selectedRadioRef.clientHeight + 12;
                 return 32;
             }),
         });
@@ -411,11 +417,13 @@ export default defineComponent<SearchDropdownProps>({
         };
 
         const handleClickDropdownButton = () => {
+            if (props.disabled) return;
             if (contextMenuFixedStyleState.proxyVisibleMenu) hideMenu();
             else showMenu();
         };
 
         const handleClick = (e) => {
+            if (props.disabled) return;
             state.proxyIsFocused = true;
             showMenu();
             emit('click', e);
@@ -479,7 +487,6 @@ export default defineComponent<SearchDropdownProps>({
                 state._placeholder = '';
             }
         }, { immediate: true });
-
         return {
             ...toRefs(state),
             ...toRefs(contextMenuFixedStyleState),
@@ -503,12 +510,24 @@ export default defineComponent<SearchDropdownProps>({
     @apply w-full relative;
     .p-search {
         @apply text-sm font-normal;
-
-        &.focused {
+        &.disabled {
+            @apply text-gray-300;
+            .dropdown-button {
+                cursor: default;
+            }
+        }
+        &.focused:not(.disabled) {
             .dropdown-button {
                 @apply text-secondary;
             }
         }
+    }
+    .selected-radio-label {
+        @apply w-full flex justify-between items-center;
+        line-height: 1.125rem;
+    }
+    .delete-icon {
+        @apply min-w-4;
     }
     .dropdown-button {
         cursor: pointer;

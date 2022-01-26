@@ -211,6 +211,22 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## Disabled
+
+<Canvas>
+    <Story name="Disabled" args={{menu: getSearchDropdownMenu()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PSearchDropdown },
+            template: `
+        <p-search-dropdown :menu="menu" disabled use-fixed-menu-style />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 ## Radio Button Type
 

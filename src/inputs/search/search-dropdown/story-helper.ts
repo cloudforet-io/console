@@ -187,6 +187,15 @@ const extraArgTypes: ArgTypes = {
             },
         },
     },
+    'selected-radio-label': {
+        name: 'selected-radio-label',
+        description: 'This is a slot that allows you to customize the label of the selected value when the selected value is a radio button type.',
+        defaultValue: { summary: null },
+        table: {
+            category: 'slots',
+            type: { summary: null },
+        },
+    },
 };
 
 const initSearchArgTypes = (): ArgTypes => {
