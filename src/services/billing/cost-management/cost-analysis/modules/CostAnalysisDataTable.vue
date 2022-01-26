@@ -5,6 +5,7 @@
                      :total-count="tableState.totalCount"
                      :searchable="false"
                      exportable
+                     class="cost-analysis-data-table"
                      @change="handleChange"
                      @refresh="handleChange()"
                      @export="handleExport"
@@ -30,11 +31,17 @@
                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
             </span>
             <span v-else-if="typeof value !== 'string'" class="text-center">
-                {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
-                <!--                <p-anchor :to="value ? getLink(item) : undefined" target="_self"-->
-                <!--                          :show-icon="false"-->
-                <!--                >-->
-                <!--                </p-anchor>-->
+                <p-anchor :to="value ? getLink(item) : undefined" target="_self"
+                          :show-icon="false"
+                >
+                    <template v-if="getIsRaised(item, field.name)">
+                        <span class="cell-text raised">{{ currencyMoneyFormatter(value, currency, currencyRates, true) }}</span>
+                        <p-i name="ic_bold-arrow-up" width="0.75rem" />
+                    </template>
+                    <template v-else>
+                        {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
+                    </template>
+                </p-anchor>
             </span>
         </template>
     </p-toolbox-table>
@@ -48,7 +55,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PToolboxTable } from '@spaceone/design-system';
+import { PAnchor, PI, PToolboxTable } from '@spaceone/design-system';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -56,10 +63,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 
 import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
-import {
-    getConvertedFilter,
-    getTimeUnitByPeriod,
-} from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { getConvertedFilter, getTimeUnitByPeriod } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
@@ -81,12 +85,18 @@ export default {
     name: 'CostAnalysisDataTable',
     components: {
         PToolboxTable,
-        // PAnchor,
+        PAnchor,
+        PI,
     },
     props: {},
     setup(props, { root }) {
         const state = reactive({
             timeUnit: computed(() => getTimeUnitByPeriod(state.granularity, dayjs.utc(state.period.start), dayjs.utc(state.period.end))),
+            dateFormat: computed(() => {
+                if (state.granularity === GRANULARITY.MONTHLY) return 'YYYY-MM';
+                if (state.granularity === GRANULARITY.YEARLY) return 'YYYY';
+                return 'YYYY-MM-DD';
+            }),
             //
             projects: computed(() => store.state.resource.project.items),
             providers: computed(() => store.state.resource.provider.items),
@@ -131,13 +141,11 @@ export default {
             const start = dayjs(period.start);
             const end = dayjs(period.end);
 
-            let nameDateFormat = 'YYYY-MM-DD';
+            const nameDateFormat = state.dateFormat;
             let labelDateFormat = 'M/D';
             if (state.timeUnit === 'month') {
-                nameDateFormat = 'YYYY-MM';
                 labelDateFormat = 'MMM YYYY';
             } else if (state.timeUnit === 'year') {
-                nameDateFormat = 'YYYY';
                 labelDateFormat = 'YYYY';
             }
 
@@ -161,7 +169,7 @@ export default {
             }));
 
             if (granularity === GRANULARITY.ACCUMULATED) {
-                const label = `${dayjs(period.start).format('M/D')}~${dayjs(period.end).format('M/D')}`;
+                const label = `${dayjs.utc(period.start).format('M/D')}~${dayjs.utc(period.end).format('M/D')}`;
                 if (!groupByItems.length) {
                     groupByFields.push({
                         name: 'totalCost', label: ' ', sortable: false,
@@ -182,7 +190,7 @@ export default {
             const dateFields = _getTableDateFields(period);
             return groupByFields.concat(dateFields);
         };
-        const getLink = (item) => {
+        const getLink = (item: CostAnalyzeModel) => {
             const queryHelper = new QueryHelper();
             const query: Location['query'] = {};
             if (item.region_code) {
@@ -219,19 +227,24 @@ export default {
                 },
             };
         };
+        const getIsRaised = (item: CostAnalyzeModel, fieldName: string) => {
+            const currDate = fieldName.split('.')[1]; // usd_cost.2022-01-04
+            const prevDate = dayjs.utc(currDate).subtract(1, state.timeUnit).format(state.dateFormat);
+            const currValue = item.usd_cost[currDate] ?? 0;
+            const prevValue = item.usd_cost[prevDate] ?? 0;
+            if (prevValue) return ((currValue - prevValue) / prevValue) * 100 > 50;
+            return false;
+        };
         const _getStackedTableData = (rawData: CostAnalyzeModel[], granularity, period): CostAnalyzeModel[] => {
-            let dateFormat = 'YYYY-MM-DD';
-            if (granularity === GRANULARITY.MONTHLY) dateFormat = 'YYYY-MM';
-            if (granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
             const results: CostAnalyzeModel[] = [];
             rawData.forEach((d) => {
                 const usdCost: UsdCost = {};
                 let now = dayjs.utc(period.start).clone();
                 let stackedData = 0;
                 while (now.isSameOrBefore(dayjs.utc(period.end), state.timeUnit)) {
-                    const currValue = d.usd_cost[now.format(dateFormat)] || 0;
+                    const currValue = d.usd_cost[now.format(state.dateFormat)] || 0;
                     stackedData += currValue;
-                    usdCost[now.format(dateFormat)] = stackedData;
+                    usdCost[now.format(state.dateFormat)] = stackedData;
                     now = now.add(1, state.timeUnit);
                 }
                 results.push({
@@ -328,8 +341,19 @@ export default {
             handleRefresh,
             handleExport,
             getLink,
+            getIsRaised,
             currencyMoneyFormatter,
         };
     },
 };
 </script>
+
+<style lang="postcss" scoped>
+.cost-analysis-data-table {
+    .cell-text {
+        &.raised {
+            @apply text-alert;
+        }
+    }
+}
+</style>
