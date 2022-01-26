@@ -1,3 +1,10 @@
+# [1.1.0-beta.231](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.230...v1.1.0-beta.231) (2022-01-26)
+
+
+### Features
+
+* update functions of disabled prop in PSearchDropdown ([#828](https://github.com/spaceone-dev/spaceone-design-system/issues/828)) ([8a6dbe3](https://github.com/spaceone-dev/spaceone-design-system/commit/8a6dbe3233c132bc39641c51d0dd0f4331e04390))
+
 # [1.1.0-beta.230](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.229...v1.1.0-beta.230) (2022-01-25)
 
 
