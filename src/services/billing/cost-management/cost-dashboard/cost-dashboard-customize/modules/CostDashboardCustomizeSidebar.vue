@@ -1,38 +1,96 @@
 <template>
-    <fragment>
+    <div>
         <portal to="info-title">
             <span class="sidebar-title">Customize Dashboard</span> <br>
         </portal>
         <portal to="info-contents">
-            <p class="sidebar-contents">
+            <div class="sidebar-contents">
                 <span class="sidebar-desc">You can add, move and <br> remove your widgets.</span>
                 <p-icon-text-button style-type="primary-dark" name="ic_plus_bold" :outline="true"
-                                    class="add-widget-button"
+                                    class="add-widget-button" @click="handleClickAddWidget"
                 >
                     Add Widget
                 </p-icon-text-button>
                 <span class="widget-count">Widget</span>
-            </p>
+                <draggable v-model="widgetList" tag="ul" class="widget-list"
+                           ghost-class="ghost"
+                >
+                    <li
+                        v-for="(widget, idx) in widgetList"
+                        :key="idx"
+                        class="widget-item"
+                    >
+                        <p-i name="ic_drag-handle" width="1rem" height="1rem"
+                             class="drag-icon"
+                        />
+                        <span v-for="{ name, widget_id } in widget" :key="widget_id">
+                            {{ name }} <br>
+                        </span>
+                        <p-divider class="w-full" />
+                    </li>
+                </draggable>
+            </div>
         </portal>
-    </fragment>
+        <cost-dashboard-customize-widget-modal v-model="customizeModalVisible" />
+    </div>
 </template>
 
 <script lang="ts">
-import { PIconTextButton } from '@spaceone/design-system';
-import { onUnmounted } from '@vue/composition-api';
+import draggable from 'vuedraggable';
+
+import { PIconTextButton, PI, PDivider } from '@spaceone/design-system';
+import {
+    onUnmounted, reactive, toRefs,
+} from '@vue/composition-api';
 import { store } from '@/store';
+import CostDashboardCustomizeWidgetModal
+    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetModal.vue';
 
 export default {
     name: 'CostDashboardCustomizeSidebar',
     components: {
+        CostDashboardCustomizeWidgetModal,
+        PI,
         PIconTextButton,
+        PDivider,
+        draggable,
     },
 
     setup() {
+        const state = reactive({
+            widgetList: [[{
+                widget_id: 'MonthToDateSpend',
+                name: 'Month-To-Date Spend',
+            }, {
+                widget_id: 'LastMonthTotalSpend',
+                name: 'Last Month Total Spending',
+            }, {
+                widget_id: 'BudgetUsage',
+                name: 'Budget Usage',
+            }],
+            [{
+                widget_id: 'CostByProject',
+                name: 'Cost by Project',
+            }],
+            [{
+                widget_id: 'CostTrendByProject',
+                name: 'Cost Trend By Project',
+            }],
+            ],
+            customizeModalVisible: false,
+        });
+
+        const handleClickAddWidget = () => {
+            state.customizeModalVisible = true;
+        };
+
         onUnmounted(() => {
             store.dispatch('display/hideSidebar');
         });
-        return {};
+        return {
+            ...toRefs(state),
+            handleClickAddWidget,
+        };
     },
 };
 </script>
