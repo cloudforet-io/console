@@ -8,10 +8,10 @@
                            :exact-mode="false"
                            use-fixed-menu-style
                            :invalid="invalid"
-                           :disabled="readonly"
+                           :disabled="disabled"
                            :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
                            :selected.sync="selectedItems"
-                           @update:visibleMenu="handleUpdateVisibleMenu"
+                           @update:visible-menu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
         >
             <template #menu-no-data-format>
@@ -93,7 +93,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        readonly: {
+        disabled: {
             type: Boolean,
             default: false,
         },
@@ -253,6 +253,13 @@ export default {
             }
         });
 
+        /* init */
+        (async () => {
+            await Promise.all([
+                store.dispatch('resource/project/load'),
+                store.dispatch('resource/projectGroup/load'),
+            ]);
+        })();
         return {
             ...toRefs(state),
             predicate,

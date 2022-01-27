@@ -81,7 +81,7 @@
 
         <project-tree-panel class="tree-panel"
                             :target-name="accountName"
-                            @select="selectedProject = $event"
+                            @select="handleSelectedProject"
         />
 
         <p-pane-layout v-if="showCredentialInputs || !hasCredentialKey">
@@ -397,7 +397,7 @@ export default {
             if (nextPath) SpaceRouter.router.push(nextPath);
             else SpaceRouter.router.back();
         };
-
+        const handleSelectedProject = (selectedProject) => { formState.selectedProject = selectedProject; };
 
         watch(() => state.selectedSecretType, async (after, before) => {
             if (after && after !== before) {
@@ -422,6 +422,7 @@ export default {
             tabState,
             handleSave,
             handleGoBack,
+            handleSelectedProject,
         };
     },
 };
