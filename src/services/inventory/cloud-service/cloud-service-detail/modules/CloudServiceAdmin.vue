@@ -25,10 +25,8 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -41,7 +39,6 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
@@ -56,7 +53,6 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             users: computed(() => store.state.resource.user.items),
             fields: [
@@ -117,25 +113,20 @@ export default {
         };
 
         const onExport = async () => {
-            try {
-                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
-                await store.dispatch('file/downloadExcel', {
-                    url: '/inventory/cloud-service/member/list',
-                    param: {
-                        cloud_services: props.cloudServiceProjectId,
-                        query: getQuery(),
-                    },
-                    fields: [
-                        { name: 'User ID', key: 'user_info.user_id' },
-                        { name: 'Name', key: 'user_info.name' },
-                        { name: 'Email', key: 'user_info.email' },
-                        { name: 'Labels', key: 'labels' },
-                    ],
-                    file_name_prefix: FILE_NAME_PREFIX.cloudService,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+            await store.dispatch('file/downloadExcel', {
+                url: '/inventory/cloud-service/member/list',
+                param: {
+                    cloud_services: props.cloudServiceProjectId,
+                    query: getQuery(),
+                },
+                fields: [
+                    { name: 'User ID', key: 'user_info.user_id' },
+                    { name: 'Name', key: 'user_info.name' },
+                    { name: 'Email', key: 'user_info.email' },
+                    { name: 'Labels', key: 'labels' },
+                ],
+                file_name_prefix: FILE_NAME_PREFIX.cloudService,
+            });
         };
 
         watch(() => props.cloudServiceProjectId, (after, before) => {

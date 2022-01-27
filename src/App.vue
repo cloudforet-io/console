@@ -51,7 +51,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy, computed,
-    defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -63,7 +63,6 @@ import { Location } from 'vue-router';
 
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
-import { hideLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { AUTH_ROUTE } from '@/services/auth/routes';
 
 export default defineComponent({
@@ -93,15 +92,6 @@ export default defineComponent({
             await vm.$router.push(res);
             vm.$store.dispatch('user/setIsSessionExpired', false);
         };
-
-        watch(() => vm.$store.state.display.isDownloaded, async (after) => {
-            if (after) {
-                hideLoadingMessage(vm.$root);
-                setTimeout(() => {
-                    showSuccessMessage(vm.$t('COMMON.EXCEL.ALT_S_DOWNLOAD_SUCCESS'), '', vm.$root);
-                }, 500);
-            }
-        });
 
         return {
             ...toRefs(state),

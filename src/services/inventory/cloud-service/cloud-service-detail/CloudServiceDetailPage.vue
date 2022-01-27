@@ -235,7 +235,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -534,17 +534,12 @@ export default {
         });
 
         const exportCloudServiceData = async () => {
-            try {
-                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
-                await store.dispatch('file/downloadExcel', {
-                    url: '/inventory/cloud-service/list',
-                    param: { query: getQuery() },
-                    fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
-                    file_name_prefix: FILE_NAME_PREFIX.cloudService,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+            await store.dispatch('file/downloadExcel', {
+                url: '/inventory/cloud-service/list',
+                param: { query: getQuery() },
+                fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
+                file_name_prefix: FILE_NAME_PREFIX.cloudService,
+            });
         };
 
         const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {

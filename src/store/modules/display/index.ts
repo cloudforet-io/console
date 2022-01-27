@@ -18,7 +18,7 @@ const state: DisplayState = {
     visibleSidebar: storedDisplayState.visibleSidebar ?? false,
     sidebarType: storedDisplayState.sidebarType ?? SIDEBAR_TYPE.info,
     isInitialized: storedDisplayState.isInitialized ?? false,
-    isDownloaded: storedDisplayState.isDownloaded ?? false,
+    isLoading: storedDisplayState.isLoading ?? false,
     uncheckedNotificationCount: storedDisplayState.uncheckedNotificationCount ?? 0,
     isSignInFailed: storedDisplayState.isSignInFailed ?? false,
     currency: storedDisplayState.currency ?? 'USD',

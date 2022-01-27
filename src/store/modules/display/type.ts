@@ -4,7 +4,7 @@ export interface DisplayState {
     visibleSidebar: boolean;
     sidebarType: SIDEBAR_TYPE;
     isInitialized: boolean;
-    isDownloaded: boolean;
+    isLoading: boolean;
     uncheckedNotificationCount: number;
     isSignInFailed: boolean;
     currency: CURRENCY;

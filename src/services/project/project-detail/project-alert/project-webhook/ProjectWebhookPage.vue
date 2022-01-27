@@ -152,7 +152,7 @@ import { store } from '@/store';
 import { userStateFormatter } from '@/services/identity/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import {
     makeDistinctValueHandler, makeEnumValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
@@ -383,23 +383,18 @@ export default {
             }
         };
         const onExport = async () => {
-            try {
-                showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', root);
-                await store.dispatch('file/downloadExcel', {
-                    url: '/monitoring/webhook/list',
-                    param: { query: webhookListApiQuery },
-                    fields: [
-                        { name: 'Name', key: 'name' },
-                        { name: 'State', key: 'state' },
-                        { name: 'Plugin', key: 'plugin_info.plugin_id' },
-                        { name: 'WebhookURL', key: 'webhook_url' },
-                        { name: 'Created', key: 'created_at', type: 'datetime' },
-                    ],
-                    file_name_prefix: FILE_NAME_PREFIX.projectWebhook,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+            await store.dispatch('file/downloadExcel', {
+                url: '/monitoring/webhook/list',
+                param: { query: webhookListApiQuery },
+                fields: [
+                    { name: 'Name', key: 'name' },
+                    { name: 'State', key: 'state' },
+                    { name: 'Plugin', key: 'plugin_info.plugin_id' },
+                    { name: 'WebhookURL', key: 'webhook_url' },
+                    { name: 'Created', key: 'created_at', type: 'datetime' },
+                ],
+                file_name_prefix: FILE_NAME_PREFIX.projectWebhook,
+            });
         };
         const onChange = async (options: any = {}) => {
             webhookListApiQuery = getApiQueryWithToolboxOptions(webhookListApiQueryHelper, options) ?? webhookListApiQuery;

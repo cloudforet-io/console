@@ -1,5 +1,5 @@
-import { CURRENCY, SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { Mutation } from 'vuex';
+import { CURRENCY, SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { CurrencyRates, DisplayState } from './type';
 
 export const setVisibleSidebar: Mutation<DisplayState> = (state, visible: boolean): void => {
@@ -14,8 +14,8 @@ export const setIsInitialized: Mutation<DisplayState> = (state, isInitialized: b
     state.isInitialized = isInitialized;
 };
 
-export const setIsDownloaded: Mutation<DisplayState> = (state, isDownloaded: boolean): void => {
-    state.isDownloaded = isDownloaded;
+export const setIsLoading: Mutation<DisplayState> = (state, isLoading: boolean): void => {
+    state.isLoading = isLoading;
 };
 
 export const setUncheckedNotificationCount: Mutation<DisplayState> = (state, count: number): void => {

@@ -30,18 +30,17 @@ import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/tool
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 
+import { i18n } from '@/translations';
+import { store } from '@/store';
+import { ExcelDataField } from '@/store/modules/file/type';
+import { ExcelPayload } from '@/store/modules/file/actions';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import {
     dynamicFieldsToExcelDataFields,
 } from '@/lib/component-util/dynamic-layout';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { ExcelDataField } from '@/store/modules/file/type';
-import { ExcelPayload } from '@/store/modules/file/actions';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
-import { i18n } from '@/translations';
-import { store } from '@/store';
-import { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 
 
 interface Props {
@@ -82,7 +81,7 @@ export default {
             default: () => ([]),
         },
     },
-    setup(props: Props, { emit, root }) {
+    setup(props: Props, { emit }) {
         const state = reactive({
             providers: computed(() => store.state.resource.provider.items),
             selectedProvider: computed(() => store.state.service.cloudService.selectedProvider),
@@ -215,7 +214,7 @@ export default {
         };
         const handleExport = async () => {
             try {
-                showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', root);
+                store.dispatch('display/startLoading', { loadingMessage: i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD') });
 
                 const cloudServiceResourcesPayload = getCloudServiceResourcesPayload();
                 const excelPayloadList = await getExcelPayloadList();
@@ -225,6 +224,8 @@ export default {
                 ]);
             } catch (e) {
                 ErrorHandler.handleError(e);
+            } finally {
+                store.dispatch('display/finishLoading');
             }
         };
 

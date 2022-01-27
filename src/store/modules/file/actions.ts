@@ -4,6 +4,8 @@ import { Action } from 'vuex';
 import config from '@/lib/config';
 import axios from 'axios';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { i18n } from '@/translations';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 interface HeaderMessage {
     title: string;
@@ -18,7 +20,15 @@ export interface ExcelPayload {
     file_name_prefix?: string;
 }
 
+const getFileName = (contentDisposition) => {
+    const fileName = contentDisposition
+        .split(';')
+        .filter(el => el.indexOf('filename') > -1)
+        .map(ele => ele.replace(/"/g, '').split('=')[1]);
+    return fileName[0];
+};
 export const downloadExcel: Action<FileState, any> = async ({ commit, rootState, dispatch }, payload: ExcelPayload[] | ExcelPayload): Promise<void> => {
+    dispatch('display/startLoading', { loadingMessage: i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD') }, { root: true });
     try {
         let params;
         if (Array.isArray(payload)) {
@@ -62,20 +72,19 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
 
         const res = await SpaceConnector.client.addOns.excel.export(params);
 
-        const getFileName = (contentDisposition) => {
-            const fileName = contentDisposition
-                .split(';')
-                .filter(el => el.indexOf('filename') > -1)
-                .map(ele => ele.replace(/"/g, '').split('=')[1]);
-            return fileName[0];
-        };
-
         if (typeof res === 'string') { // defensive code for case of unexpected response from the server. will be removed
             commit('setDownloadSource', config.get('CONSOLE_API.ENDPOINT') + res);
         } else {
-            dispatch('display/startDownloading', {}, { root: true });
-            const { headers, data } = await axios.get(config.get('CONSOLE_API.ENDPOINT') + res.file_link, { responseType: 'blob' });
-            dispatch('display/finishDownloading', {}, { root: true });
+            const { headers, data } = await axios.get(config.get('CONSOLE_API.ENDPOINT') + res.file_link, { responseType: 'blob' }).catch((e) => {
+                /*
+                Must manually call showErrorMessage().
+                Because this error is not from the SpaceConnector(it's from axios), so the ErrorHandler does not pop up the error message in the catch below.
+                */
+                setTimeout(() => {
+                    showErrorMessage(i18n.t('COMMON.EXCEL.ALT_E_DOWNLOAD'), e);
+                }, 500);
+                throw e;
+            });
             const blob = new Blob([data], {
                 type: headers['content-type'],
             });
@@ -86,10 +95,12 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
             link.target = '_self';
             link.download = fileName;
             link.click();
-
-            // commit('setDownloadSource', link);
+            link.remove();
         }
-    } catch (e) {
-        ErrorHandler.handleError(e);
+
+        dispatch('display/finishLoading', { successMessage: i18n.t('COMMON.EXCEL.ALT_S_DOWNLOAD_SUCCESS') }, { root: true });
+    } catch (error) {
+        ErrorHandler.handleRequestError(error, i18n.t('COMMON.EXCEL.ALT_E_DOWNLOAD'));
+        dispatch('display/finishLoading', {}, { root: true });
     }
 };

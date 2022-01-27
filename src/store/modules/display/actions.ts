@@ -6,6 +6,9 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { CurrencyRates, DisplayState } from '@/store/modules/display/type';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import {
+    hideLoadingMessage, showLoadingMessage, showSuccessMessage,
+} from '@/lib/helper/notice-alert-helper';
 
 
 export const showHandbook = ({ commit }): void => {
@@ -30,12 +33,23 @@ export const finishInitializing = ({ commit }): void => {
     commit('setIsInitialized', true);
 };
 
-export const startDownloading = ({ commit }): void => {
-    commit('setIsDownloaded', false);
+interface StartLoadingPayload {loadingMessage?: string}
+export const startLoading = ({ state, commit }, { loadingMessage }: StartLoadingPayload = {}): void => {
+    if (!state.isLoading) {
+        commit('setIsLoading', true);
+        showLoadingMessage(loadingMessage, '');
+    }
 };
 
-export const finishDownloading = ({ commit }): void => {
-    commit('setIsDownloaded', true);
+interface FinishLoadingPayload { successMessage?: string}
+export const finishLoading = ({ commit }, { successMessage }: FinishLoadingPayload = {}): void => {
+    commit('setIsLoading', false);
+    hideLoadingMessage();
+    if (successMessage) {
+        setTimeout(() => {
+            showSuccessMessage(successMessage, '');
+        }, 500);
+    }
 };
 
 export const showSignInErrorMessage = ({ commit }): void => {

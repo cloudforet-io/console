@@ -47,9 +47,9 @@ export default class ErrorHandler {
         }
     }
 
-    static handleRequestError(error, i18nKey: TranslateResult) {
+    static handleRequestError(error, errorMessage: TranslateResult) {
         if (!isInstanceOfAuthorizationError(error)) {
-            if (isInstanceOfBadRequestError(error) && i18nKey) showErrorMessage(i18nKey, error);
+            if (isInstanceOfBadRequestError(error) && errorMessage) showErrorMessage(errorMessage, error);
             else if (isInstanceOfAPIError(error)) showErrorMessage('Something is Wrong! Please contact the administrator.', error);
         }
         this.handleError(error);

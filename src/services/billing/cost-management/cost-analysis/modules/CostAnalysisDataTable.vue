@@ -68,9 +68,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { objectToQueryString, primitiveToQueryString, arrayToQueryString } from '@/lib/router-query-string';
-import { i18n } from '@/translations';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -89,7 +87,7 @@ export default {
         PI,
     },
     props: {},
-    setup(props, { root }) {
+    setup() {
         const state = reactive({
             timeUnit: computed(() => getTimeUnitByPeriod(state.granularity, dayjs.utc(state.period.start), dayjs.utc(state.period.end))),
             dateFormat: computed(() => {
@@ -330,8 +328,6 @@ export default {
         };
         const handleExport = async () => {
             try {
-                showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', root);
-
                 const _convertedFilters = getConvertedFilter(state.filters);
                 costApiQueryHelper.setFilters(_convertedFilters);
 

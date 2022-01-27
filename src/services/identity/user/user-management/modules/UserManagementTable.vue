@@ -95,7 +95,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { calculateTime, userStateFormatter } from '@/services/identity/user/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import {
     PIconTextButton,
@@ -263,20 +263,15 @@ export default {
         };
 
         const handleExport = async () => {
-            try {
-                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
-                await store.dispatch('file/downloadExcel', {
-                    url: '/identity/user/list',
-                    param: {
-                        query: userListApiQuery,
-                        include_role_binding: true,
-                    },
-                    fields: state.excelFields,
-                    file_name_prefix: FILE_NAME_PREFIX.user,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+            await store.dispatch('file/downloadExcel', {
+                url: '/identity/user/list',
+                param: {
+                    query: userListApiQuery,
+                    include_role_binding: true,
+                },
+                fields: state.excelFields,
+                file_name_prefix: FILE_NAME_PREFIX.user,
+            });
         };
 
         /* Modal */

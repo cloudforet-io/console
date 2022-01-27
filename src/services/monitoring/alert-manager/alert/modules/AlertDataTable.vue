@@ -131,7 +131,6 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { durationFormatter, iso8601Formatter, commaFormatter } from '@spaceone/console-core-lib';
-import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -196,7 +195,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { root, emit }) {
+    setup(props, { emit }) {
         const tagQueryHelper = new ApiQueryHelper().setFilters(props.filters);
 
         const valueHandlerFilters = new QueryHelper().setFilters([
@@ -378,19 +377,14 @@ export default {
         };
 
         const onExportToExcel = async () => {
-            try {
-                showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', root);
-                await store.dispatch('file/downloadExcel', {
-                    url: '/monitoring/alert/list',
-                    param: {
-                        query: alertApiQuery,
-                    },
-                    fields: state.excelFields,
-                    file_name_prefix: FILE_NAME_PREFIX.alert,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+            await store.dispatch('file/downloadExcel', {
+                url: '/monitoring/alert/list',
+                param: {
+                    query: alertApiQuery,
+                },
+                fields: state.excelFields,
+                file_name_prefix: FILE_NAME_PREFIX.alert,
+            });
         };
 
         const onUpdateBottomFilters = async (filters: AlertBottomFilters) => {

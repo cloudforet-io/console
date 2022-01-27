@@ -187,7 +187,7 @@ import { CollectorModel } from '@/services/plugin/collector/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-util/dynamic-layout';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { store } from '@/store';
@@ -481,17 +481,12 @@ export default {
 
 
         const exportCollectorDataToExcel = async () => {
-            try {
-                showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
-                await store.dispatch('file/downloadExcel', {
-                    url: '/inventory/collector/list',
-                    param: { query: getQuery() },
-                    fields: state.excelFields,
-                    file_name_prefix: FILE_NAME_PREFIX.collector,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+            await store.dispatch('file/downloadExcel', {
+                url: '/inventory/collector/list',
+                param: { query: getQuery() },
+                fields: state.excelFields,
+                file_name_prefix: FILE_NAME_PREFIX.collector,
+            });
         };
 
         const init = async () => {

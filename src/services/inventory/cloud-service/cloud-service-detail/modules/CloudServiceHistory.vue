@@ -27,10 +27,8 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -40,7 +38,6 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -58,7 +55,6 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             fields: [
@@ -115,22 +111,17 @@ export default {
         };
 
         const onExport = async () => {
-            try {
-                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
-                await store.dispatch('file/downloadExcel', {
-                    url: '/inventory/cloud-service/get-data',
-                    param: getParams(),
-                    fields: [
-                        { name: 'Key', key: 'key' },
-                        { name: 'Job ID', key: 'job_id' },
-                        { name: 'Updated By', key: 'updated_by' },
-                        { name: 'Updated', key: 'updated_at', type: 'datetime' },
-                    ],
-                    file_name_prefix: FILE_NAME_PREFIX.cloudService,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+            await store.dispatch('file/downloadExcel', {
+                url: '/inventory/cloud-service/get-data',
+                param: getParams(),
+                fields: [
+                    { name: 'Key', key: 'key' },
+                    { name: 'Job ID', key: 'job_id' },
+                    { name: 'Updated By', key: 'updated_by' },
+                    { name: 'Updated', key: 'updated_at', type: 'datetime' },
+                ],
+                file_name_prefix: FILE_NAME_PREFIX.cloudService,
+            });
         };
 
         watch(() => props.cloudServiceId, (after, before) => {

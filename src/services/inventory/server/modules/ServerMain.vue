@@ -167,7 +167,7 @@ import {
     makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-util/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
@@ -392,17 +392,12 @@ export default {
             }
         };
         const exportServerData = async () => {
-            try {
-                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
-                await store.dispatch('file/downloadExcel', {
-                    url: '/inventory/server/list',
-                    param: { query: getQuery() },
-                    fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
-                    file_name_prefix: FILE_NAME_PREFIX.server,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+            await store.dispatch('file/downloadExcel', {
+                url: '/inventory/server/list',
+                param: { query: getQuery() },
+                fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
+                file_name_prefix: FILE_NAME_PREFIX.server,
+            });
         };
         const getTableSchema = async () => {
             try {

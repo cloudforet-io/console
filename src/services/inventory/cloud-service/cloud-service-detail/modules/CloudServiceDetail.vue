@@ -27,7 +27,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
@@ -53,7 +52,6 @@ import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { find } from 'lodash';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
@@ -217,17 +215,12 @@ export default {
             async export() {
                 const fields = state.currentLayout?.options?.fields;
                 if (!fields) return;
-                try {
-                    showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
-                    await store.dispatch('file/downloadExcel', {
-                        url: '/inventory/cloud-service/get-data',
-                        param: getParams(),
-                        fields: dynamicFieldsToExcelDataFields(fields),
-                        file_name_prefix: FILE_NAME_PREFIX.cloudService,
-                    });
-                } catch (e) {
-                    ErrorHandler.handleError(e);
-                }
+                await store.dispatch('file/downloadExcel', {
+                    url: '/inventory/cloud-service/get-data',
+                    param: getParams(),
+                    fields: dynamicFieldsToExcelDataFields(fields),
+                    file_name_prefix: FILE_NAME_PREFIX.cloudService,
+                });
             },
         };
 

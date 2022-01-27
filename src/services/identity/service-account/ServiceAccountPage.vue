@@ -168,7 +168,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
-    showSuccessMessage, showLoadingMessage,
+    showSuccessMessage,
 } from '@/lib/helper/notice-alert-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
@@ -378,17 +378,12 @@ export default {
 
         /** API for Excel export * */
         const exportServiceAccountData = async () => {
-            try {
-                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
-                await store.dispatch('file/downloadExcel', {
-                    url: '/identity/service-account/list',
-                    param: { query: getQuery() },
-                    fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
-                    file_name_prefix: FILE_NAME_PREFIX.serviceAccount,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+            await store.dispatch('file/downloadExcel', {
+                url: '/identity/service-account/list',
+                param: { query: getQuery() },
+                fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
+                file_name_prefix: FILE_NAME_PREFIX.serviceAccount,
+            });
         };
 
         /** Field Handler for display formatting(project id -> project name)* */
