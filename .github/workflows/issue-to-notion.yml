@@ -10,4 +10,4 @@ jobs:
         uses: dodo4114/issue-to-notion@v1.1.1
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          DATABASE_URL: https://www.notion.so/5843c3c1ed3a494a86771db368a612ed?v=901af819caf84584b11abc0ef8f9aad7
+          DATABASE_URL: ${{ secrets.NOTION_DATABASE }}
