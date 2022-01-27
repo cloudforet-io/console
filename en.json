@@ -505,6 +505,7 @@
 					"TARGET": "Target",
 					"TOTAL_BUDGET": "Total Budget"
 				},
+				"FIX_DATE": "Fix Date",
 				"FORM": {
 					"CUSTOM_RANGE": "Custom Range",
 					"FROM": "From",

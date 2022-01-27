@@ -505,6 +505,7 @@
 					"TARGET": "타겟",
 					"TOTAL_BUDGET": "총 예산"
 				},
+				"FIX_DATE": "날짜 고정",
 				"FORM": {
 					"CUSTOM_RANGE": "",
 					"FROM": "",
