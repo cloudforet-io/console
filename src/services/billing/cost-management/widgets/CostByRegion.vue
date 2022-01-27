@@ -12,8 +12,10 @@
                                class="chart-wrapper"
                 >
                     <div ref="chartRef" class="chart" />
-                    <div v-for="(item) in chartLegends" :key="item" class="circle-wrapper">
-                        <p v-if="providers" class="circle" :style="{background: providers[item].color}" /><span>{{ providers[item].label || '' }}</span>
+                    <div class="legend-wrapper">
+                        <span v-for="(item) in chartLegends" :key="item" class="circle-wrapper">
+                            <span v-if="providers" class="circle" :style="{background: providers[item].color}" /><span>{{ providers[item].label || '' }}</span>
+                        </span>
                     </div>
                 </p-data-loader>
                 <cost-dashboard-data-table
@@ -69,6 +71,7 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
 const categoryKey = 'title';
@@ -206,12 +209,19 @@ export default defineComponent<WidgetProps>({
             pieChartTemplate.verticalCenter = 'middle';
 
             const pieSeriesTemplate = pieChartTemplate.series.push(new am4charts.PieSeries());
-            pieSeriesTemplate.tooltip.fontSize = 12;
+            pieSeriesTemplate.tooltip.fontSize = 14;
             pieSeriesTemplate.dataFields.category = categoryKey;
             pieSeriesTemplate.dataFields.value = valueName;
             pieSeriesTemplate.labels.template.disabled = true;
             pieSeriesTemplate.ticks.template.disabled = true;
             pieSeriesTemplate.slices.template.propertyFields.fill = 'color';
+            pieSeriesTemplate.slices.template.adapter.add('tooltipText', (tooltipText, target) => {
+                if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
+                    const currencyMoney = currencyMoneyFormatter(target.dataItem.value, props.currency, props.currencyRates, true);
+                    return `{category}: [bold]${currencyMoney}[/] ({value.percent.formatNumber('#.00')}%)`;
+                }
+                return tooltipText;
+            });
 
             pieSeries.data = state.chartData;
         };
@@ -223,7 +233,7 @@ export default defineComponent<WidgetProps>({
                 const target = _continentData.find(continent => continent.continent_code === (state.regions[d.region_code]?.continent?.continent_code));
                 if (target) {
                     target.pieData.push({
-                        category: `${d.provider}:${state.regions[d.region_code]?.name}`,
+                        category: `${state.providers[d.provider]?.label} ${state.regions[d.region_code]?.name}`,
                         color: state.providers[d.provider]?.color || '',
                         value: d.usd_cost,
                         provider: d.provider,

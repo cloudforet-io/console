@@ -207,3 +207,11 @@ export const getCurrencyAppliedChartData = (
     });
     return results;
 });
+
+
+export const getPercentageText = (totalValue: number, value: number): string => {
+    if (!totalValue) return '--';
+    let percentage: string | number = (100 * value) / totalValue;
+    percentage = percentage > 0 ? `${percentage.toFixed(2)}%` : '--';
+    return percentage;
+};

@@ -111,7 +111,7 @@ export default {
             rawData.forEach((d) => {
                 let color;
                 let usage = d.usage;
-                if (usage === undefined) usage = 0;
+                if (usage === undefined || usage < 0) usage = 0;
 
                 if (usage < 70) color = indigo[100];
                 else if (usage < 90) color = indigo[500];
@@ -147,7 +147,7 @@ export default {
                     end: dayjs.utc(period.end).format('YYYY-MM'),
                     sort: {
                         key: 'usage',
-                        desc: false,
+                        desc: true,
                     },
                     page: {
                         limit: 200,

@@ -19,7 +19,6 @@ const createCategoryAxis = (chart, categoryOptions) => {
     dateAxis.fontSize = 12;
     dateAxis.renderer.grid.template.location = 0;
     dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
-    dateAxis.tooltip.label.fontSize = 12;
     dateAxis.renderer.grid.template.strokeOpacity = 0;
 
     dateAxis.renderer.labels.template.adapter.add('text', (text, target) => dayjs.utc(target.dataItem.category).format(dateFormat));
@@ -34,7 +33,6 @@ const createValueAxis = (chart) => {
     valueAxis.renderer.grid.template.strokeOpacity = 1;
     valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
     valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
-    valueAxis.tooltip.label.fontSize = 12;
 
     valueAxis.renderer.labels.template.adapter.add('text', (text, target) => {
         if (target.dataItem) {
@@ -54,7 +52,7 @@ const createSeries = (chart, legend, timeUnit) => {
     series.strokeWidth = 0;
     series.columns.template.width = am4core.percent(60);
     series.columns.template.tooltipText = '{name}: [bold]{valueY}[/]';
-    series.tooltip.label.fontSize = 10;
+    series.tooltip.label.fontSize = 14;
     series.stacked = true;
     if (legend.color) series.columns.template.fill = legend.color;
 

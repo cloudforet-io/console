@@ -56,7 +56,10 @@ import { CURRENCY } from '@/store/modules/display/config';
 import { store } from '@/store';
 import { gray } from '@/styles/colors';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { getCurrencyAppliedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import {
+    getCurrencyAppliedChartData,
+} from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -162,14 +165,21 @@ export default defineComponent<WidgetProps>({
             series.dataFields.category = 'category';
             series.labels.template.disabled = true;
             series.tooltip.disabled = true;
-            series.tooltip.fontSize = 12;
+            series.tooltip.fontSize = 14;
 
             const sliceTemplate = series.slices.template;
             sliceTemplate.clickable = false;
             sliceTemplate.properties.hoverable = false;
             sliceTemplate.states.getKey('hover').properties.scale = 1;
             sliceTemplate.propertyFields.fill = 'color';
-            sliceTemplate.tooltipText = '{category}: {value}';
+            sliceTemplate.adapter.add('tooltipText', (tooltipText, target) => {
+                if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
+                    const currencyMoney = currencyMoneyFormatter(target.dataItem.value, props.currency, props.currencyRates, true);
+                    return `{category}: [bold]${currencyMoney}[/] ({value.percent.formatNumber('#.00')}%)`;
+                }
+                return tooltipText;
+            });
+            // sliceTemplate.tooltipText = '{category}: [bold]{currencyMoney}[/] ({value.percent.formatNumber(\'#.00\')}%)';
             // sliceTemplate.adapter.add('fill', (fill, target) => {
             //     if (target.dataItem.category === 'dummy') return am4core.color(gray[100]);
             //     return fill;
@@ -187,6 +197,7 @@ export default defineComponent<WidgetProps>({
                 chart.legend.itemContainers.template.focusable = false;
                 chart.legend.itemContainers.template.hoverable = false;
                 chart.legend.itemContainers.template.cursorOverStyle = am4core.MouseCursorStyle.default;
+                chart.legend.labels.template.fill = am4core.color(gray[600]);
 
                 const marker = chart.legend.markers.template;
                 marker.children.getIndex(0)

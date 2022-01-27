@@ -65,6 +65,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import { store } from '@/store';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 import { toggleSeries } from '@/lib/amcharts/helper';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
 interface TableItem {
@@ -198,7 +199,6 @@ export default {
             dateAxis.startLocation = 0.45;
             dateAxis.endLocation = 0.55;
             dateAxis.renderer.labels.template.fill = am4core.color(gray[600]);
-            dateAxis.tooltip.label.fontSize = 12;
             dateAxis.renderer.grid.template.strokeOpacity = 0;
 
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
@@ -209,7 +209,6 @@ export default {
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
             valueAxis.renderer.labels.template.fill = am4core.color(gray[600]);
-            valueAxis.tooltip.label.fontSize = 12;
             valueAxis.renderer.labels.template.adapter.add('text', (text, target) => {
                 if (target.dataItem) {
                     if (target.dataItem.value) return commaFormatter(numberFormatter(target.dataItem.value));
@@ -218,14 +217,27 @@ export default {
             });
 
             const createSeries = (legend, idx) => {
+                const projectId = legend.name;
                 const series = chart.series.push(new am4charts.LineSeries());
                 series.name = legend.label;
                 series.stroke = am4core.color(DEFAULT_CHART_COLORS[(state.thisPage * 5 - 5) + idx]);
+                series.strokeWidth = 2;
                 series.dataFields.dateX = 'date';
-                series.dataFields.valueY = legend.name;
-                series.tooltipText = '{name}: [bold]{valueY}[/]';
-                series.tooltip.label.fontSize = 12;
-                return series;
+                series.dataFields.valueY = projectId;
+                series.tooltip.label.fontSize = 14;
+
+                series.adapter.add('tooltipText', (tooltipText, target) => {
+                    if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
+                        const usdCost = target.tooltipDataItem.dataContext[projectId] ? Number(target.tooltipDataItem.dataContext[projectId]) : undefined;
+                        const currencyMoney = currencyMoneyFormatter(usdCost, props.currency, props.currencyRates, true);
+                        return `{name}: [bold]${currencyMoney}[/]`;
+                    }
+                    return tooltipText;
+                });
+
+                const bullet = series.bullets.push(new am4charts.CircleBullet());
+                bullet.fill = am4core.color(gray[600]);
+                bullet.circle.radius = 3.5;
             };
 
             legends.forEach((legend, idx) => {
@@ -233,9 +245,9 @@ export default {
             });
 
             chart.cursor = new am4charts.XYCursor();
-            chart.cursor.maxTooltipDistance = 20;
             chart.cursor.lineX.disabled = true;
             chart.cursor.lineY.disabled = true;
+            chart.cursor.behavior = 'none';
 
             return chart;
         };

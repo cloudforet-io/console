@@ -38,18 +38,18 @@ import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import config from '@/lib/config';
 import { store } from '@/store';
 import { PChartLoader, PSkeleton } from '@spaceone/design-system';
+import { getPercentageText } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
-const categoryKey = 'projectId';
-const valueName = 'cost';
+const categoryKey = 'category';
+const valueName = 'value';
 
-interface ChartData {
-    projectId: string;
-    usdCost: number;
-    cost: number | string;
+interface CostByProjectChartData {
+    category: string;
+    value: number;
 }
 
 export default {
@@ -86,7 +86,7 @@ export default {
             chart: null as TreeMap | null,
             chartRegistry: {},
             loading: false,
-            data: [] as ChartData[],
+            data: [] as CostByProjectChartData[],
             widgetLink: computed(() => ({
                 name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                 params: {},
@@ -122,18 +122,28 @@ export default {
             chart.dataFields.name = categoryKey;
             chart.zoomOutButton.disabled = true;
 
+            const totalCost = sum(state.data.map(d => d.value));
             const series = chart.seriesTemplates.create('0');
+            series.tooltip.fontSize = 14;
             series.columns.template.stroke = am4core.color('white');
             series.columns.template.strokeWidth = 3;
             series.columns.template.strokeOpacity = 1;
+            series.columns.template.adapter.add('tooltipText', (tooltipText, target) => {
+                if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
+                    const percentage = getPercentageText(totalCost, target.dataItem.value);
+                    const currencyMoney = currencyMoneyFormatter(target.dataItem.value, props.currency, props.currencyRates, true);
+                    return `{category}: [bold]${currencyMoney}[/] (${percentage})`;
+                }
+                return tooltipText;
+            });
             const seriesBullet = series.bullets.push(new am4charts.LabelBullet());
             seriesBullet.locationY = 0.5;
             seriesBullet.locationX = 0.5;
-            const totalCost = sum(state.data.map(d => d.usdCost));
             seriesBullet.label.adapter.add('text', (text, target) => {
                 if (target.dataItem?.value) {
-                    if (((100 * target.dataItem.value) / totalCost) >= 5) {
-                        return '[font-size: 1rem; bold]{projectId}[/]';
+                    const percentage = (100 * target.dataItem.value) / totalCost;
+                    if (percentage >= 5) {
+                        return '[font-size: 14px; bold]{category}[/]';
                     }
                 }
                 return '';
@@ -162,13 +172,12 @@ export default {
             try {
                 state.loading = true;
                 const rawData = await fetchData();
-                const chartData: ChartData[] = [];
+                const chartData: CostByProjectChartData[] = [];
                 rawData.forEach((d) => {
                     if (d.usd_cost > 0) {
                         chartData.push({
-                            projectId: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'Unknown',
-                            usdCost: d.usd_cost,
-                            cost: convertUSDToCurrency(d.usd_cost, props.currency, props.currencyRates).toFixed(2),
+                            category: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'Unknown',
+                            value: d.usd_cost,
                         });
                     }
                 });
@@ -204,7 +213,7 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-by-project {
-    height: 20rem;
+    height: 25rem;
 
     .chart-wrapper {
         @apply h-full;

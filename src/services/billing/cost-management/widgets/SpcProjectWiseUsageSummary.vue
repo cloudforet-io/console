@@ -74,6 +74,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { i18n } from '@/translations';
 import { toggleSeries } from '@/lib/amcharts/helper';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
 const categoryKey = 'category';
@@ -163,8 +164,14 @@ export default defineComponent<WidgetProps>({
             series.slices.template.togglable = false;
             series.slices.template.clickable = false;
             series.slices.template.states.getKey('hover').properties.scale = 1;
-            series.slices.template.tooltipText = '{category}: [bold]{value} ({value.percent.formatNumber(\'#.00\')}%)[/]';
-            series.tooltip.label.fontSize = 12;
+            series.slices.template.adapter.add('tooltipText', (tooltipText, target) => {
+                if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
+                    const currencyMoney = currencyMoneyFormatter(target.dataItem.value, props.currency, props.currencyRates, true);
+                    return `{category}: [bold]${currencyMoney}[/] ({value.percent.formatNumber('#.00')}%)`;
+                }
+                return tooltipText;
+            });
+            series.tooltip.label.fontSize = 14;
 
             if (state.chartData.length === 0) {
                 series.tooltip.disabled = true;

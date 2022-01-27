@@ -62,6 +62,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { toggleSeries } from '@/lib/amcharts/helper';
 import { store } from '@/store';
 import { Period } from '@/services/billing/cost-management/type';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
 const widgetTypes = ['SHORT', 'LONG'] as const;
@@ -184,7 +185,6 @@ export default defineComponent<Props>({
             dateAxis.renderer.grid.template.strokeOpacity = 1;
             dateAxis.renderer.grid.template.location = 0;
             dateAxis.renderer.labels.template.fill = am4core.color(gray[600]);
-            dateAxis.tooltip.label.fontSize = 12;
             dateAxis.renderer.grid.template.strokeOpacity = 0;
 
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
@@ -195,7 +195,6 @@ export default defineComponent<Props>({
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
             valueAxis.renderer.labels.template.fill = am4core.color(gray[600]);
-            valueAxis.tooltip.label.fontSize = 12;
             valueAxis.renderer.labels.template.adapter.add('text', (text, target) => {
                 if (target.dataItem) {
                     if (target.dataItem.value) return commaFormatter(numberFormatter(target.dataItem.value));
@@ -212,9 +211,18 @@ export default defineComponent<Props>({
                 series.columns.template.width = am4core.percent(60);
                 series.columns.template.tooltipText = '{name}: [bold]{valueY}[/]';
                 series.columns.template.propertyFields.fill = legend.color;
-                series.tooltip.label.fontSize = 12;
+                series.tooltip.label.fontSize = 14;
                 series.stacked = true;
                 if (legend.color) series.fill = am4core.color(legend.color);
+
+                series.columns.template.adapter.add('tooltipText', (tooltipText, target) => {
+                    if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
+                        const currencyMoney = currencyMoneyFormatter(target.dataItem.valueY, props.currency, props.currencyRates, true);
+                        return `{name}: [bold]${currencyMoney}[/]`;
+                    }
+                    return tooltipText;
+                });
+
                 return series;
             };
 
