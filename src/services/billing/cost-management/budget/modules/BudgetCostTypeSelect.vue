@@ -1,7 +1,7 @@
 <template>
     <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_COST_TYPE')"
                    required
-                   :invalid="invalidState.selectedResources"
+                   :invalid="!disableValidation && invalidState.selectedResources"
                    :invalid-text="invalidTexts.selectedResources"
                    class="cost-type"
     >
@@ -18,7 +18,7 @@
                            :loading="resourceMenuLoading"
                            type="checkbox"
                            show-selected-list
-                           :invalid="invalidState.selectedResources"
+                           :invalid="!disableValidation && invalidState.selectedResources"
                            :selected="selectedResources"
                            @update:selected="setForm('selectedResources', $event)"
         />
@@ -54,6 +54,7 @@ type CostTypes = BudgetData['cost_types']
 
 interface Props {
     costTypes?: CostTypes;
+    disableValidation?: boolean;
 }
 
 type BudgetCostTypes = Record<BudgetCostType, TranslateResult>
@@ -66,7 +67,7 @@ const getSearchDropdownItems = (resourceItems: ResourceMap): SearchDropdownMenuI
     name: k, label: resourceItems[k].label,
 }));
 
-export default defineComponent({
+export default defineComponent<Props>({
     name: 'BudgetCostTypeSelect',
     components: {
         PFieldGroup,
@@ -77,6 +78,10 @@ export default defineComponent({
         costTypes: {
             type: Object as PropType<CostTypes|undefined>,
             default: undefined,
+        },
+        disableValidation: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {

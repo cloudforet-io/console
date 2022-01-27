@@ -1,11 +1,11 @@
 <template>
     <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_TARGET')"
-                   :invalid="invalidState.selectedTargets"
+                   :invalid="!disableValidation && invalidState.selectedTargets"
                    :invalid-text="invalidTexts.selectedTargets"
                    required
     >
         <project-select-dropdown :selected-project-ids="selectedTargets"
-                                 :invalid="invalidState.selectedTargets"
+                                 :invalid="!disableValidation && invalidState.selectedTargets"
                                  project-selectable
                                  project-group-selectable
                                  :multi-selectable="multiSelectable"
@@ -26,6 +26,7 @@ import { debounce } from 'lodash';
 interface Props {
     targets: string[];
     multiSelectable?: boolean;
+    disableValidation?: boolean;
 }
 export default defineComponent<Props>({
     name: 'BudgetTargetSelect',
@@ -39,6 +40,10 @@ export default defineComponent<Props>({
             default: () => [],
         },
         multiSelectable: {
+            type: Boolean,
+            default: false,
+        },
+        disableValidation: {
             type: Boolean,
             default: false,
         },

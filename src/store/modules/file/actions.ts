@@ -34,11 +34,8 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
                     options: {
                         fileType: 'xlsx', // will be deprecated»
                         timezone: rootState.user.timezone,
-                        // eslint-disable-next-line camelcase
                         sheet_name,
-                        // eslint-disable-next-line camelcase
                         file_name_prefix,
-                        // eslint-disable-next-line camelcase
                         header_message,
                     },
                     fields,
@@ -54,9 +51,7 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
                     options: {
                         fileType: 'xlsx', // will be deprecated
                         timezone: rootState.user.timezone,
-                        // eslint-disable-next-line camelcase
                         sheet_name: payload.sheet_name,
-                        // eslint-disable-next-line camelcase
                         file_name_prefix: payload.file_name_prefix,
                         header_message: payload.header_message,
                     },

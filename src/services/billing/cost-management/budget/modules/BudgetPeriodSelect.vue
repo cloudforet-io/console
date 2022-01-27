@@ -3,11 +3,11 @@
         <p-field-group class="period-select"
                        :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_START_MONTH')"
                        :invalid-text="invalidTexts.startDates"
-                       :invalid="invalidState.startDates"
+                       :invalid="!disableValidation && invalidState.startDates"
                        required
         >
             <p-datetime-picker :selected-dates="startDates" data-type="yearToMonth"
-                               :invalid="invalidState.startDates"
+                               :invalid="!disableValidation && invalidState.startDates"
                                :max-date="endDates[0] || ''"
                                @update:selectedDates="handleUpdateSelectedDates('startDates', $event)"
             />
@@ -15,11 +15,11 @@
         <p-field-group class="period-select"
                        :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_END_MONTH')"
                        :invalid-text="invalidTexts.endDates"
-                       :invalid="invalidState.endDates"
+                       :invalid="!disableValidation && invalidState.endDates"
                        required
         >
             <p-datetime-picker :selected-dates="endDates" data-type="yearToMonth"
-                               :invalid="invalidState.endDates"
+                               :invalid="!disableValidation && invalidState.endDates"
                                :min-date="startDates[0] || ''"
                                @update:selectedDates="handleUpdateSelectedDates('endDates', $event)"
             />
@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import {
-    computed,
+    computed, defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -39,11 +39,20 @@ import dayjs from 'dayjs';
 import { Period } from '@/services/billing/cost-management/type';
 import { i18n } from '@/translations';
 
-export default {
+interface Props {
+    disableValidation?: boolean;
+}
+export default defineComponent<Props>({
     name: 'BudgetPeriodSelect',
     components: {
         PFieldGroup,
-        PDatetimePicker,
+        PDatetimePicker: PDatetimePicker as any,
+    },
+    props: {
+        disableValidation: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const {
@@ -101,7 +110,7 @@ export default {
             handleUpdateSelectedDates,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
