@@ -599,6 +599,7 @@
 			"NO_RESOURCE_TITLE": "리소스가 없습니다. "
 		},
 		"EXCEL": {
+			"ALT_E_DOWNLOAD": "엑셀 다운로드 실패",
 			"ALT_L_READY_FOR_FILE_DOWNLOAD": "파일 다운로드 준비 중...",
 			"ALT_S_DOWNLOAD_SUCCESS": "1개 엑셀 다운로드 완료"
 		},

@@ -599,6 +599,7 @@
 			"NO_RESOURCE_TITLE": "No Resources"
 		},
 		"EXCEL": {
+			"ALT_E_DOWNLOAD": "Failed to Downloaded Excel",
 			"ALT_L_READY_FOR_FILE_DOWNLOAD": "Waiting download...",
 			"ALT_S_DOWNLOAD_SUCCESS": "Successfully Downloaded 1 Excel"
 		},

@@ -599,6 +599,7 @@
 			"NO_RESOURCE_TITLE": "リソースがありません。"
 		},
 		"EXCEL": {
+			"ALT_E_DOWNLOAD": "",
 			"ALT_L_READY_FOR_FILE_DOWNLOAD": "ファイルのダウンロードを準備中",
 			"ALT_S_DOWNLOAD_SUCCESS": "１つのエクセルダウンロード完了"
 		},
