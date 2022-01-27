@@ -7,15 +7,17 @@
             </template>
         </p-panel-top>
 
-        <p-icon-text-button name="ic_download" style-type="secondary-dark">
+        <p-icon-text-button name="ic_download" style-type="secondary-dark" @click="handleClickTemplateDownload(true)">
             Template with the following values
         </p-icon-text-button>
         OR
-        <p-icon-text-button name="ic_download" style-type="gray-border" :outline="true">
+        <p-icon-text-button name="ic_download" style-type="gray-border" :outline="true"
+                            @click="handleClickTemplateDownload(false)"
+        >
             Template with headers only
         </p-icon-text-button>
 
-        <budget-period-select />
+        <budget-period-select disable-validation @update="handleUpdatePeriodSelect" />
 
         <p-field-group label="How to budget" required>
             <p-radio v-for="({type, name, description}) in budgetPlans" :key="type"
@@ -28,9 +30,9 @@
             </p-radio>
         </p-field-group>
 
-        <budget-target-select @update="handleUpdateTarget" />
+        <budget-target-select disable-validation multi-selectable @update="handleUpdateTarget" />
 
-        <budget-cost-type-select @update="handleUpdateCostTypes" />
+        <budget-cost-type-select disable-validation @update="handleUpdateCostTypes" />
     </p-pane-layout>
 </template>
 
@@ -43,10 +45,27 @@ import {
     PFieldGroup, PIconTextButton, PPaneLayout, PPanelTop, PRadio,
 } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { Period } from '@/services/billing/cost-management/type';
+import { BudgetData, BudgetTimeUnit } from '@/services/billing/cost-management/budget/type';
 import BudgetPeriodSelect from '@/services/billing/cost-management/budget/modules/BudgetPeriodSelect.vue';
 import BudgetTargetSelect from '@/services/billing/cost-management/budget/modules/BudgetTargetSelect.vue';
 import BudgetCostTypeSelect from '@/services/billing/cost-management/budget/modules/BudgetCostTypeSelect.vue';
 
+
+type CostTypes = BudgetData['cost_types']
+interface BudgetBulkCreateTemplateSource {
+    start?: string;
+    end?: string;
+    time_unit?: BudgetTimeUnit;
+    cost_types?: CostTypes;
+    projects?: string[];
+}
 export default {
     name: 'BudgetBulkCreateTemplateDownload',
     components: {
@@ -61,23 +80,73 @@ export default {
     },
     setup() {
         const state = reactive({
+            period: {} as Period,
             budgetPlans: [
-                { type: 'total', name: 'Total Amount', description: 'Create a budget that tracks against total amount' },
-                { type: 'monthly', name: 'Monthly Planning', description: 'Specific your budgeted amount for each budget period' },
+                { type: 'TOTAL', name: 'Total Amount', description: 'Create a budget that tracks against total amount' },
+                { type: 'MONTHLY', name: 'Monthly Planning', description: 'Specific your budgeted amount for each budget period' },
             ],
-            selectedPlan: 'total',
+            selectedPlan: 'TOTAL' as BudgetTimeUnit,
+            costTypes: undefined as CostTypes|undefined,
+            projects: [] as string[],
         });
 
-        const handleUpdateTarget = () => {
+        const handleUpdatePeriodSelect = (period: Period) => {
+            state.period = period;
         };
 
-        const handleUpdateCostTypes = () => {
+        const handleUpdateTarget = (projects: string[]) => {
+            state.projects = projects;
+        };
+
+        const handleUpdateCostTypes = (costTypes?: CostTypes) => {
+            state.costTypes = costTypes;
+        };
+
+        const downloadTemplate = async (param) => {
+            store.dispatch('display/startLoading', { loadingMessage: i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD') });
+            try {
+                const blob = await SpaceConnector.client.costAnalysis.budget.create.template(param, { responseType: 'blob' });
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.target = '_self';
+                link.download = 'budget_bulk_create_template';
+                link.click();
+                link.remove();
+                setTimeout(() => {
+                    store.dispatch('display/finishLoading', { successMessage: 'Successfully Downloaded 1 Template' });
+                }, 500);
+            } catch (e) {
+                setTimeout(() => {
+                    ErrorHandler.handleRequestError(e, i18n.t('COMMON.EXCEL.ALT_E_DOWNLOAD'));
+                });
+            } finally {
+                store.dispatch('display/finishLoading', { errorMessage: i18n.t('COMMON.EXCEL.ALT_E_DOWNLOAD') });
+            }
+        };
+
+        const handleClickTemplateDownload = async (includeValues: boolean) => {
+            let source: BudgetBulkCreateTemplateSource|undefined;
+            if (includeValues) {
+                source = {
+                    start: state.period.start,
+                    end: state.period.end,
+                    time_unit: state.selectedPlan,
+                    cost_types: state.costTypes,
+                    projects: state.projects,
+                };
+            }
+            await downloadTemplate({
+                include_values: includeValues,
+                source,
+            });
         };
 
         return {
             ...toRefs(state),
+            handleUpdatePeriodSelect,
             handleUpdateTarget,
             handleUpdateCostTypes,
+            handleClickTemplateDownload,
         };
     },
 };
