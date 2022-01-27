@@ -45,7 +45,10 @@ export default defineComponent<Props>({
         const state = reactive({
             periodText: computed<string>(() => {
                 if (props.period?.start) {
-                    return `${dayjs.utc(props.period.start).format('MMM, YYYY')} ~ ${dayjs.utc(props.period.end).format('MMM, YYYY')}`;
+                    const start = dayjs.utc(props.period.start);
+                    const end = dayjs.utc(props.period.end);
+                    if (start.isSame(end)) return dayjs.utc(props.period.start).format('MMM D, YYYY');
+                    return `${start.format('MMM D, YYYY')} ~ ${end.format('MMM D, YYYY')}`;
                 }
                 return '';
             }),

@@ -31,7 +31,7 @@
                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
             </span>
             <span v-else-if="typeof value !== 'string'" class="text-center">
-                <p-anchor :to="value ? getLink(item) : undefined" target="_self"
+                <p-anchor :to="value ? getLink(item, field.name) : undefined" target="_self"
                           :show-icon="false"
                 >
                     <template v-if="getIsRaised(item, field.name)">
@@ -69,7 +69,7 @@ import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/st
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
-import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { objectToQueryString, primitiveToQueryString, arrayToQueryString } from '@/lib/router-query-string';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
@@ -190,21 +190,31 @@ export default {
             const dateFields = _getTableDateFields(period);
             return groupByFields.concat(dateFields);
         };
-        const getLink = (item: CostAnalyzeModel) => {
+        const getLink = (item: CostAnalyzeModel, fieldName: string) => {
             const queryHelper = new QueryHelper();
             const query: Location['query'] = {};
             if (item.region_code) {
                 query.region = item.region_code;
             } else if (state.filters.region_code?.length) {
-                query.region = state.filters.region_code;
+                query.region = arrayToQueryString(state.filters.region_code);
             }
             if (item.provider) {
                 query.provider = primitiveToQueryString(item.provider);
             } else if (state.filters.provider?.length) {
-                query.provider = state.filters.provider;
+                query.provider = primitiveToQueryString(state.filters.provider[0]);
             }
 
-            query.period = objectToQueryString(state.period);
+            if (state.granularity === GRANULARITY.ACCUMULATED) {
+                query.period = objectToQueryString(state.period);
+            } else {
+                const date = fieldName.split('.')[1]; // usd_cost.2022-01-04
+                const _period = { start: date, end: date };
+                if (state.granularity === GRANULARITY.MONTHLY) {
+                    _period.start = dayjs.utc(date).format('YYYY-MM-01');
+                    _period.end = dayjs.utc(date).endOf('month').format('YYYY-MM-DD');
+                }
+                query.period = objectToQueryString(_period);
+            }
 
             const filters: QueryStoreFilter[] = [];
             if (item.project_id) {
@@ -212,10 +222,27 @@ export default {
             } else if (state.filters.project_id?.length) {
                 filters.push({ k: 'project_id', v: state.filters.project_id, o: '=' });
             }
+
+            if (state.filters.project_group_id?.length) {
+                filters.push({ k: 'project_group_id', v: state.filters.project_group_id, o: '=' });
+            }
+
             if (item.service_account_id) {
                 filters.push({ k: 'collection_info.service_accounts', v: item.service_account_id, o: '=' });
             } else if (state.filters.service_account_id?.length) {
                 filters.push({ k: 'collection_info.service_accounts', v: state.filters.service_account_id, o: '=' });
+            }
+
+            if (item.account) {
+                filters.push({ k: 'account', v: item.account, o: '=' });
+            } else if (state.filters.account?.length) {
+                filters.push({ k: 'account', v: state.filters.account, o: '=' });
+            }
+
+            if (item.product) {
+                filters.push({ k: 'service_code', v: item.product, o: '=' });
+            } else if (state.filters.product?.length) {
+                filters.push({ k: 'service_code', v: state.filters.product, o: '=' });
             }
 
             return {
@@ -232,7 +259,7 @@ export default {
             const prevDate = dayjs.utc(currDate).subtract(1, state.timeUnit).format(state.dateFormat);
             const currValue = item.usd_cost[currDate] ?? 0;
             const prevValue = item.usd_cost[prevDate] ?? 0;
-            if (prevValue) return ((currValue - prevValue) / prevValue) * 100 > 50;
+            if (prevValue && currValue - prevValue > 0) return ((currValue - prevValue) / prevValue) * 100 > 50;
             return false;
         };
         const _getStackedTableData = (rawData: CostAnalyzeModel[], granularity, period): CostAnalyzeModel[] => {

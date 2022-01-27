@@ -30,12 +30,12 @@ export const GROUP_BY_ITEM_MAP = Object.freeze({
 });
 
 export const FILTER = Object.freeze({
-    ...GROUP_BY,
     PROJECT_GROUP: 'project_group_id',
+    ...GROUP_BY,
 } as const);
 export type FILTER = typeof FILTER[keyof typeof FILTER];
 
 export const FILTER_ITEM_MAP = Object.freeze({
-    ...GROUP_BY_ITEM_MAP,
     [FILTER.PROJECT_GROUP]: { name: FILTER.PROJECT_GROUP, label: 'Project Group' },
+    ...GROUP_BY_ITEM_MAP,
 });
