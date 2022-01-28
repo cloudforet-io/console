@@ -1,18 +1,24 @@
 <template>
     <div class="cost-dashboard-period-select-dropdown">
+        <div class="fix-date-box">
+            <p-check-box :selected="isFixDateSelected" @change="handleSelectedFixDate">
+                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FIX_DATE') }}
+            </p-check-box>
+            <p-i name="ic_tooltip" width="1rem" height="1rem" />
+        </div>
         <p-badge style-type="gray200">
-            <p v-if="dateFormatter(period.start, 'M') !== dateFormatter(period.end, 'M')">
-                {{ dateFormatter(period.start, 'MMMM D') }}, {{ dateFormatter(period.start, 'YYYY') }}
-                ~ {{ dateFormatter(period.end, 'MMMM D') }}, {{ dateFormatter(period.end, 'YYYY') }}
+            <p v-if="dateFormatter(selectedPeriod.start, 'M') !== dateFormatter(selectedPeriod.end, 'M')">
+                {{ dateFormatter(selectedPeriod.start, 'MMMM D') }}, {{ dateFormatter(selectedPeriod.start, 'YYYY') }}
+                ~ {{ dateFormatter(selectedPeriod.end, 'MMMM D') }}, {{ dateFormatter(selectedPeriod.end, 'YYYY') }}
             </p>
             <p v-else>
-                {{ dateFormatter(period.start, 'MMMM D') }} ~ {{ dateFormatter(period.end, 'D') }}, {{ dateFormatter(period.end, 'YYYY') }}
+                {{ dateFormatter(selectedPeriod.start, 'MMMM D') }} ~ {{ dateFormatter(selectedPeriod.end, 'D') }}, {{ dateFormatter(period.end, 'YYYY') }}
             </p>
         </p-badge>
         <p-select-dropdown :items="MonthMenuItems"
                            :selected="selectedMonthMenuItem"
                            without-outline
-                           :disabled="Object.keys(fixedPeriod).length > 0"
+                           :disabled="isFixDateSelected"
                            @select="handleSelectMonthMenuItem"
         />
         <cost-management-custom-range-modal v-if="customRangeModalVisible"
@@ -28,16 +34,20 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { range } from 'lodash';
+import { range, isEqual } from 'lodash';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { Period } from '@/services/billing/cost-management/type';
-import { PBadge, PSelectDropdown } from '@spaceone/design-system';
+import {
+    PBadge, PSelectDropdown, PCheckBox, PI,
+} from '@spaceone/design-system';
 import CostManagementCustomRangeModal
     from '@/services/billing/cost-management/modules/CostManagementCustomRangeModal.vue';
 import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const yesterday = dayjs.utc().subtract(1, 'day');
 const initialPeriodStart = yesterday.startOf('month').format('YYYY-MM-DD');
@@ -50,11 +60,21 @@ export default {
         CostManagementCustomRangeModal,
         PSelectDropdown,
         PBadge,
+        PCheckBox,
+        PI,
     },
     props: {
-        fixedPeriod: {
+        periodType: {
+            type: String,
+            default: '',
+        },
+        period: {
             type: Object,
             default: () => ({}),
+        },
+        dashboardId: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props, { emit }) {
@@ -63,10 +83,10 @@ export default {
         const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
 
         const state = reactive({
-            period: {
-                start: props.fixedPeriod ? dayjs(props.fixedPeriod.start).format('YYYY-MM')
+            selectedPeriod: {
+                start: props.periodType === 'FIXED' ? dayjs(props.period.start).format('YYYY-MM')
                     : initialPeriodStart,
-                end: props.fixedPeriod ? dayjs(props.fixedPeriod.end).endOf('month').format('YYYY-MM-DD')
+                end: props.periodType === 'FIXED' ? dayjs(props.period.end).endOf('month').format('YYYY-MM-DD')
                     : initialPeriodEnd,
             },
             getMonthMenuItem: computed(() => {
@@ -90,16 +110,16 @@ export default {
                     name: 'custom',
                     label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOM'),
                 },
-
             ])),
+            isFixDateSelected: computed<boolean>(() => props.periodType === 'FIXED'),
             selectedMonthMenuItem: initialSelectedMonth,
             customRangeModalVisible: false,
         });
         const savePeriod = (start, end) => {
             const _start = dayjs(start).startOf('month').format('YYYY-MM-DD');
             const _end = dayjs(end).endOf('month').format('YYYY-MM-DD');
-            state.period = { start: _start, end: _end };
-            emit('update', state.period);
+            state.selectedPeriod = { start: _start, end: _end };
+            emit('update:period', state.selectedPeriod);
         };
         const handleSelectMonthMenuItem = (monthMenuItem) => {
             state.selectedMonthMenuItem = monthMenuItem;
@@ -112,27 +132,56 @@ export default {
             state.customRangeModalVisible = false;
         };
 
-        watch(() => props.fixedPeriod, () => {
-            if (props.fixedPeriod?.start) {
-                savePeriod(props.fixedPeriod.start, props.fixedPeriod.end);
+        const handleSelectedFixDate = async (isSelected: boolean) => {
+            try {
+                const periodType = isSelected ? 'FIXED' : 'AUTO';
+                const period = isSelected ? state.selectedPeriod : {};
+                await SpaceConnector.client.costAnalysis.dashboard.update({
+                    dashboard_id: props.dashboardId,
+                    period_type: periodType,
+                    period,
+                });
+                emit('update:periodType', periodType);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
+
+        const initStates = (period: Period) => {
+            if (period?.start) {
+                savePeriod(period.start, period.end);
                 state.selectedMonthMenuItem = 'custom';
             } else {
                 savePeriod(initialPeriodStart, initialPeriodEnd);
                 state.selectedMonthMenuItem = initialSelectedMonth;
             }
-        });
+        };
 
+        watch(() => props.period, (period) => {
+            if (isEqual(period, state.selectedPeriod)) return;
+            initStates(period);
+        });
+        watch(() => state.isFixDateSelected, (isFixDateSelected) => {
+            initStates(isFixDateSelected ? props.period : {});
+        });
         return {
             ...toRefs(state),
             handleSelectMonthMenuItem,
             handleCustomRangeModalConfirm,
             dateFormatter,
             DATA_TYPE,
+            handleSelectedFixDate,
         };
     },
 };
 </script>
 <style lang="postcss" scoped>
+.cost-dashboard-period-select-dropdown {
+    .fix-date-box {
+        @apply inline-flex flex-wrap gap-2 items-center;
+        margin-right: 0.5rem;
+    }
+}
 .p-badge {
     margin-right: 0.5rem;
 }

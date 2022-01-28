@@ -20,7 +20,11 @@
                 <cost-dashboard-more-menu :dashboard-id="dashboardId" />
             </div>
             <div class="right-part">
-                <cost-dashboard-period-select-dropdown :fixed-period="fixedPeriod" @update="handleUpdatePeriod" />
+                <cost-dashboard-period-select-dropdown
+                    :dashboard-id="dashboardId"
+                    :period-type.sync="periodType"
+                    :period.sync="period"
+                />
                 <currency-select-dropdown />
                 <div class="left-divider download-pdf">
                     <p-icon-button name="ic_download" style-type="gray-border" size="sm" />
@@ -101,7 +105,7 @@ export default {
             loading: true,
             layout: [] as any[],
             period: {} as Period,
-            fixedPeriod: {} as Period,
+            periodType: '',
             filters: {} as CostQueryFilters,
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
@@ -148,6 +152,9 @@ export default {
         const handleUpdatePeriod = (period: Period) => {
             state.period = period;
         };
+        const handleUpdateFixedPeriod = (periodType) => {
+            state.periodType = periodType;
+        };
 
         const handleClickCustomize = () => {
             SpaceRouter.router.push({ name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });
@@ -188,8 +195,9 @@ export default {
             state.dashboard = dashboard;
             state.layout = layout;
             state.filters = dashboard.default_filter;
-            if (dashboard.period_type === 'FIXED') state.fixedPeriod = dashboard.period ?? {};
-            else state.fixedPeriod = {};
+
+            if (dashboard.period) state.period = dashboard.period;
+            state.periodType = dashboard.period_type;
 
             state.loading = false;
         };
@@ -219,6 +227,7 @@ export default {
             handleDeleteDashboardConfirm,
             handleUpdatePeriod,
             handleClickCustomize,
+            handleUpdateFixedPeriod,
         };
     },
 };
