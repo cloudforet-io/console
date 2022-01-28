@@ -387,6 +387,11 @@ export default {
                 &.disabled {
                     @apply text-gray-300;
                 }
+                .p-status::v-deep {
+                    .text {
+                        white-space: nowrap;
+                    }
+                }
             }
         }
     }

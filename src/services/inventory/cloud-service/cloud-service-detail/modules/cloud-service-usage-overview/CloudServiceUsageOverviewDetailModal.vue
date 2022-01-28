@@ -10,8 +10,7 @@
     >
         <template #body>
             <cloud-service-period-filter read-only :period="period" />
-            <p-divider class="flex-shrink-0" />
-            <p-query-search-tags :tags="queryTags" read-only />
+            <p-query-search-tags :tags="queryTags" read-only class="pt-4 border-t border-gray-200" />
             <p-data-loader v-if="cloudServiceTypeId" :loading="layoutLoading"
                            :disable-empty-case="layoutLoading || dataLoading"
                            :data="widgetSchemaList" class="widget-wrapper"
@@ -261,12 +260,18 @@ export default defineComponent<Props>({
     .widget-wrapper {
         padding: 0.5rem 0;
         flex: 1;
-        > .data-loader-container > .data-wrapper {
-            height: 100%;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            grid-gap: 0.5rem;
+        > .data-loader-container {
+            height: auto;
+            > .data-wrapper {
+                height: 100%;
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                grid-gap: 0.5rem;
+            }
         }
+    }
+    .line-break + .p-dynamic-widget-chart {
+        grid-column-start: 1;
     }
 }
 
