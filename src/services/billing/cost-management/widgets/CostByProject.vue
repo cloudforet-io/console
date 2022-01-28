@@ -42,10 +42,10 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import config from '@/lib/config';
 import { store } from '@/store';
 import { PChartLoader, PSkeleton } from '@spaceone/design-system';
-import { getPercentageText } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
-const categoryKey = 'category';
-const valueName = 'value';
+
+const CATEGORY_KEY = 'category';
+const VALUE_KEY = 'value';
 
 interface CostByProjectChartData {
     category: string;
@@ -118,8 +118,8 @@ export default {
             chart.colors.step = 1;
 
             chart.data = state.data;
-            chart.dataFields.value = valueName;
-            chart.dataFields.name = categoryKey;
+            chart.dataFields.name = CATEGORY_KEY;
+            chart.dataFields.value = VALUE_KEY;
             chart.zoomOutButton.disabled = true;
 
             const totalCost = sum(state.data.map(d => d.value));
@@ -130,9 +130,13 @@ export default {
             series.columns.template.strokeOpacity = 1;
             series.columns.template.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                    const percentage = getPercentageText(totalCost, target.dataItem.value);
+                    let percentage: string | number = '--';
+                    if (totalCost) {
+                        percentage = (100 * target.dataItem.value) / totalCost;
+                        if (percentage > 0) percentage = `${percentage.toFixed(2)}%`;
+                    }
                     const currencyMoney = currencyMoneyFormatter(target.dataItem.value, props.currency, props.currencyRates, true);
-                    return `{category}: [bold]${currencyMoney}[/] (${percentage})`;
+                    return `{${CATEGORY_KEY}}: [bold]${currencyMoney}[/] (${percentage})`;
                 }
                 return tooltipText;
             });
@@ -143,7 +147,7 @@ export default {
                 if (target.dataItem?.value) {
                     const percentage = (100 * target.dataItem.value) / totalCost;
                     if (percentage >= 5) {
-                        return '[font-size: 14px; bold]{category}[/]';
+                        return `[font-size: 14px; bold]{${CATEGORY_KEY}}[/]`;
                     }
                 }
                 return '';

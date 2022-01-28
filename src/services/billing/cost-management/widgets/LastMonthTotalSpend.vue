@@ -42,8 +42,8 @@ import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 
 
-const categoryKey = 'date';
-const valueName = 'totalCost';
+const CATEGORY_KEY = 'date';
+const VALUE_KEY = 'totalCost';
 
 export default {
     name: 'LastMonthTotalSpend',
@@ -118,7 +118,7 @@ export default {
             chart.paddingBottom = 0;
 
             const categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-            categoryAxis.dataFields.category = categoryKey;
+            categoryAxis.dataFields.category = CATEGORY_KEY;
             categoryAxis.renderer.minGridDistance = 1;
             categoryAxis.renderer.grid.template.strokeOpacity = 0;
             categoryAxis.renderer.grid.template.disabled = true;
@@ -141,8 +141,8 @@ export default {
             valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
 
             const series = chart.series.push(new am4charts.ColumnSeries());
-            series.dataFields.valueY = valueName;
-            series.dataFields.categoryX = categoryKey;
+            series.dataFields.valueY = VALUE_KEY;
+            series.dataFields.categoryX = CATEGORY_KEY;
             series.columns.template.propertyFields.fill = 'color';
             series.columns.template.strokeOpacity = 0;
             series.columns.template.column.cornerRadiusTopLeft = 2;

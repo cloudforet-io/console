@@ -74,8 +74,8 @@ import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
-const categoryKey = 'title';
-const valueName = 'value';
+const CATEGORY_KEY = 'title';
+const VALUE_KEY = 'value';
 
 interface PieChartData {
     category?: string;
@@ -210,15 +210,15 @@ export default defineComponent<WidgetProps>({
 
             const pieSeriesTemplate = pieChartTemplate.series.push(new am4charts.PieSeries());
             pieSeriesTemplate.tooltip.fontSize = 14;
-            pieSeriesTemplate.dataFields.category = categoryKey;
-            pieSeriesTemplate.dataFields.value = valueName;
+            pieSeriesTemplate.dataFields.category = CATEGORY_KEY;
+            pieSeriesTemplate.dataFields.value = VALUE_KEY;
             pieSeriesTemplate.labels.template.disabled = true;
             pieSeriesTemplate.ticks.template.disabled = true;
             pieSeriesTemplate.slices.template.propertyFields.fill = 'color';
             pieSeriesTemplate.slices.template.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
                     const currencyMoney = currencyMoneyFormatter(target.dataItem.value, props.currency, props.currencyRates, true);
-                    return `{category}: [bold]${currencyMoney}[/] ({value.percent.formatNumber('#.00')}%)`;
+                    return `{${CATEGORY_KEY}}: [bold]${currencyMoney}[/] ({${VALUE_KEY}.percent.formatNumber('#.00')}%)`;
                 }
                 return tooltipText;
             });

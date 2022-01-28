@@ -79,6 +79,8 @@ interface Props extends WidgetProps {
 
 const PAGE_SIZE = 5;
 
+const CATEGORY_KEY = 'date';
+
 export default {
     name: 'CostTrendByProject',
     components: {
@@ -190,7 +192,7 @@ export default {
                 count: 1,
             };
             dateAxis.dateFormats.setKey('month', 'MMM');
-            dateAxis.dataFields.category = 'date';
+            dateAxis.dataFields.category = CATEGORY_KEY;
             dateAxis.renderer.minGridDistance = 30;
             dateAxis.fontSize = 12;
             dateAxis.tooltip.disabled = true;
@@ -220,16 +222,16 @@ export default {
                 const projectId = legend.name;
                 const series = chart.series.push(new am4charts.LineSeries());
                 series.name = legend.label;
+                series.dataFields.dateX = CATEGORY_KEY;
+                series.dataFields.valueY = projectId;
                 series.stroke = am4core.color(DEFAULT_CHART_COLORS[(state.thisPage * 5 - 5) + idx]);
                 series.strokeWidth = 2;
-                series.dataFields.dateX = 'date';
-                series.dataFields.valueY = projectId;
                 series.tooltip.label.fontSize = 14;
 
                 series.adapter.add('tooltipText', (tooltipText, target) => {
                     if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
                         const usdCost = target.tooltipDataItem.dataContext[projectId] ? Number(target.tooltipDataItem.dataContext[projectId]) : undefined;
-                        const currencyMoney = currencyMoneyFormatter(usdCost, props.currency, props.currencyRates, true);
+                        const currencyMoney = currencyMoneyFormatter(usdCost, props.currency, undefined, true);
                         return `{name}: [bold]${currencyMoney}[/]`;
                     }
                     return tooltipText;
@@ -291,11 +293,13 @@ export default {
             state.loading = true;
             state.items = await listCostAnalysisData(period, filters);
             const { slicedChartData, slicedLegends } = await getSlicedChartDataAndLegends();
+            state.chartData = slicedChartData;
             state.chart = drawChart(state.chartRef, slicedChartData, slicedLegends);
             state.loading = false;
         }, { immediate: true });
         watch(() => state.thisPage, async () => {
             const { slicedChartData, slicedLegends } = await getSlicedChartDataAndLegends();
+            state.chartData = slicedChartData;
             state.chart = drawChart(state.chartRef, slicedChartData, slicedLegends);
             state.legends.forEach((d, idx) => {
                 state.legends[idx].disabled = false;

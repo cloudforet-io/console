@@ -104,8 +104,11 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY)
             if (groupBy === GROUP_BY.PROVIDER) {
                 const _providers = store.state.resource.provider.items;
                 _color = _providers[_category]?.color;
-            }
-            if (groupBy === GROUP_BY.PROJECT) {
+                _category = _providers[_category]?.label || _category;
+            } else if (groupBy === GROUP_BY.REGION) {
+                const _regions = store.state.resource.region.items;
+                _category = _regions[_category]?.name || _category;
+            } else if (groupBy === GROUP_BY.PROJECT) {
                 const _projects = store.state.resource.project.items;
                 _category = _projects[_category]?.label || _category;
             }
@@ -207,11 +210,3 @@ export const getCurrencyAppliedChartData = (
     });
     return results;
 });
-
-
-export const getPercentageText = (totalValue: number, value: number): string => {
-    if (!totalValue) return '--';
-    let percentage: string | number = (100 * value) / totalValue;
-    percentage = percentage > 0 ? `${percentage.toFixed(2)}%` : '--';
-    return percentage;
-};

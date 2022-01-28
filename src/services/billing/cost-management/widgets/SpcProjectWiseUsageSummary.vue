@@ -59,7 +59,6 @@ import { Legend, PieChartData, WidgetProps } from '@/services/billing/cost-manag
 import { CURRENCY } from '@/store/modules/display/config';
 import CostDashboardDataTable from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
 import {
-    getCurrencyAppliedChartData,
     getLegends,
     getPieChartData,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
@@ -77,8 +76,8 @@ import { toggleSeries } from '@/lib/amcharts/helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
-const categoryKey = 'category';
-const valueName = 'value';
+const CATEGORY_KEY = 'category';
+const VALUE_KEY = 'value';
 
 const PAGE_SIZE = 10;
 
@@ -158,8 +157,8 @@ export default defineComponent<WidgetProps>({
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
             const series = chart.series.push(new am4charts.PieSeries());
-            series.dataFields.value = valueName;
-            series.dataFields.category = categoryKey;
+            series.dataFields.value = VALUE_KEY;
+            series.dataFields.category = CATEGORY_KEY;
             series.labels.template.disabled = true;
             series.slices.template.togglable = false;
             series.slices.template.clickable = false;
@@ -167,7 +166,7 @@ export default defineComponent<WidgetProps>({
             series.slices.template.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
                     const currencyMoney = currencyMoneyFormatter(target.dataItem.value, props.currency, props.currencyRates, true);
-                    return `{category}: [bold]${currencyMoney}[/] ({value.percent.formatNumber('#.00')}%)`;
+                    return `{${CATEGORY_KEY}}: [bold]${currencyMoney}[/] ({${VALUE_KEY}.percent.formatNumber('#.00')}%)`;
                 }
                 return tooltipText;
             });
@@ -181,11 +180,7 @@ export default defineComponent<WidgetProps>({
                     color: am4core.color(gray[100]),
                 }];
             } else {
-                chart.data = getCurrencyAppliedChartData(
-                    state.chartData,
-                    props.currency,
-                    props.currencyRates,
-                );
+                chart.data = state.chartData;
             }
             return chart;
         };
@@ -249,12 +244,6 @@ export default defineComponent<WidgetProps>({
         watch([() => props.period, () => props.filters], () => {
             getData();
         }, { immediate: true });
-
-        watch(() => props.currency, (currency) => {
-            if (state.chart) {
-                state.chart.data = getCurrencyAppliedChartData(state.chartData, currency, props.currencyRates);
-            }
-        });
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();

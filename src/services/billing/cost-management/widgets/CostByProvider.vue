@@ -57,9 +57,6 @@ import { store } from '@/store';
 import { gray } from '@/styles/colors';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import {
-    getCurrencyAppliedChartData,
-} from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -69,6 +66,9 @@ import config from '@/lib/config';
 interface CostByProviderChartData extends PieChartData {
     color: string;
 }
+
+const CATEGORY_KEY = 'category';
+const VALUE_KEY = 'value';
 
 export default defineComponent<WidgetProps>({
     name: 'CostByProvider',
@@ -148,11 +148,7 @@ export default defineComponent<WidgetProps>({
             };
             const chart = createChart();
             if (isChartItemExists) {
-                chart.data = getCurrencyAppliedChartData(
-                    state.chartData,
-                    props.currency,
-                    props.currencyRates,
-                );
+                chart.data = state.chartData;
             } else {
                 chart.data = noItemsChartData;
             }
@@ -161,8 +157,8 @@ export default defineComponent<WidgetProps>({
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
             const series = chart.series.push(new am4charts.PieSeries());
-            series.dataFields.value = 'value';
-            series.dataFields.category = 'category';
+            series.dataFields.category = CATEGORY_KEY;
+            series.dataFields.value = VALUE_KEY;
             series.labels.template.disabled = true;
             series.tooltip.disabled = true;
             series.tooltip.fontSize = 14;
@@ -175,7 +171,7 @@ export default defineComponent<WidgetProps>({
             sliceTemplate.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
                     const currencyMoney = currencyMoneyFormatter(target.dataItem.value, props.currency, props.currencyRates, true);
-                    return `{category}: [bold]${currencyMoney}[/] ({value.percent.formatNumber('#.00')}%)`;
+                    return `{${CATEGORY_KEY}}: [bold]${currencyMoney}[/] ({${VALUE_KEY}.percent.formatNumber('#.00')}%)`;
                 }
                 return tooltipText;
             });
@@ -254,12 +250,6 @@ export default defineComponent<WidgetProps>({
         watch([() => props.period, () => props.filters], () => {
             getData();
         }, { immediate: true });
-
-        watch(() => props.currency, (currency) => {
-            if (state.chart) {
-                state.chart.data = getCurrencyAppliedChartData(state.chartData, currency, props.currencyRates);
-            }
-        });
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();

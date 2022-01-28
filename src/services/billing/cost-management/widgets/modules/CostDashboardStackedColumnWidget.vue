@@ -71,6 +71,8 @@ type WidgetType = typeof widgetTypes[number];
 const PAGE_SIZE = 9;
 const SHORT_TYPE_RANGE = 4;
 
+const CATEGORY_KEY = 'date';
+
 interface Props extends WidgetProps {
     widgetType?: WidgetType;
     groupBy: string;
@@ -178,7 +180,7 @@ export default defineComponent<Props>({
                 count: 1,
             };
             dateAxis.dateFormats.setKey('month', 'MMM');
-            dateAxis.dataFields.category = 'date';
+            dateAxis.dataFields.category = CATEGORY_KEY;
             dateAxis.renderer.minGridDistance = 30;
             dateAxis.fontSize = 12;
             dateAxis.tooltip.disabled = true;
@@ -205,7 +207,7 @@ export default defineComponent<Props>({
             const createSeries = (legend) => {
                 const series = chart.series.push(new am4charts.ColumnSeries());
                 series.name = legend.label;
-                series.dataFields.dateX = 'date';
+                series.dataFields.dateX = CATEGORY_KEY;
                 series.dataFields.valueY = legend.name;
                 series.strokeWidth = 0;
                 series.columns.template.width = am4core.percent(60);
@@ -217,7 +219,7 @@ export default defineComponent<Props>({
 
                 series.columns.template.adapter.add('tooltipText', (tooltipText, target) => {
                     if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                        const currencyMoney = currencyMoneyFormatter(target.dataItem.valueY, props.currency, props.currencyRates, true);
+                        const currencyMoney = currencyMoneyFormatter(target.dataItem.valueY, props.currency, undefined, true);
                         return `{name}: [bold]${currencyMoney}[/]`;
                     }
                     return tooltipText;
