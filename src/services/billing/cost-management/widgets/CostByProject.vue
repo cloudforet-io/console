@@ -26,6 +26,8 @@ import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { PChartLoader, PSkeleton } from '@spaceone/design-system';
+
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
 
@@ -41,7 +43,9 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import config from '@/lib/config';
 import { store } from '@/store';
-import { PChartLoader, PSkeleton } from '@spaceone/design-system';
+import {
+    gray, violet, white,
+} from '@/styles/colors';
 
 
 const CATEGORY_KEY = 'category';
@@ -50,6 +54,8 @@ const VALUE_KEY = 'value';
 interface CostByProjectChartData {
     category: string;
     value: number;
+    backgroundColor?: string;
+    textColor?: string;
 }
 
 export default {
@@ -100,13 +106,13 @@ export default {
             projects: computed(() => store.state.resource.project.items),
         });
 
+        /* Util */
         const disposeChart = (chartContext) => {
             if (state.chartRegistry[chartContext]) {
                 state.chartRegistry[chartContext].dispose();
                 delete state.chartRegistry[chartContext];
             }
         };
-
         const drawChart = (chartContext) => {
             const createChart = () => {
                 disposeChart(chartContext);
@@ -121,6 +127,7 @@ export default {
             chart.dataFields.name = CATEGORY_KEY;
             chart.dataFields.value = VALUE_KEY;
             chart.zoomOutButton.disabled = true;
+            chart.dataFields.color = 'backgroundColor';
 
             const totalCost = sum(state.data.map(d => d.value));
             const series = chart.seriesTemplates.create('0');
@@ -130,13 +137,9 @@ export default {
             series.columns.template.strokeOpacity = 1;
             series.columns.template.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                    let percentage: string | number = '--';
-                    if (totalCost) {
-                        percentage = (100 * target.dataItem.value) / totalCost;
-                        if (percentage > 0) percentage = `${percentage.toFixed(2)}%`;
-                    }
+                    const percentage = (100 * target.dataItem.value) / totalCost;
                     const currencyMoney = currencyMoneyFormatter(target.dataItem.value, props.currency, props.currencyRates, true);
-                    return `{${CATEGORY_KEY}}: [bold]${currencyMoney}[/] (${percentage})`;
+                    return `{${CATEGORY_KEY}}: [bold]${currencyMoney}[/] (${percentage.toFixed(2)}%)`;
                 }
                 return tooltipText;
             });
@@ -147,13 +150,40 @@ export default {
                 if (target.dataItem?.value) {
                     const percentage = (100 * target.dataItem.value) / totalCost;
                     if (percentage >= 5) {
-                        return `[font-size: 14px; bold]{${CATEGORY_KEY}}[/]`;
+                        return `[font-size: 14px; {textColor};]{${CATEGORY_KEY}}[/]`;
                     }
                 }
                 return '';
             });
         };
+        const getConvertedChartData = (chartData: CostByProjectChartData[]): CostByProjectChartData[] => {
+            const results: CostByProjectChartData[] = [];
+            chartData.forEach((d, idx) => {
+                let backgroundColor = violet[200];
+                let textColor = gray[900];
+                if (idx < 3) {
+                    textColor = white;
+                    if (idx === 0) {
+                        backgroundColor = violet[700];
+                    } else if (idx === 1) {
+                        backgroundColor = violet[500];
+                    } else {
+                        backgroundColor = violet[400];
+                    }
+                } else if (idx < 8) {
+                    backgroundColor = violet[300];
+                }
 
+                results.push({
+                    ...d,
+                    backgroundColor,
+                    textColor,
+                });
+            });
+            return results;
+        };
+
+        /* Api */
         const costQueryHelper = new QueryHelper();
         const fetchData = async () => {
             costQueryHelper.setFilters(getConvertedFilter(props.filters));
@@ -171,7 +201,6 @@ export default {
                 throw e;
             }
         };
-
         const getChartData = async () => {
             try {
                 state.loading = true;
@@ -185,7 +214,7 @@ export default {
                         });
                     }
                 });
-                state.data = chartData;
+                state.data = getConvertedChartData(chartData);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.data = [];
@@ -194,6 +223,7 @@ export default {
             }
         };
 
+        /* Watcher */
         watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
             if (!loading && chartContext) {
                 drawChart(chartContext);

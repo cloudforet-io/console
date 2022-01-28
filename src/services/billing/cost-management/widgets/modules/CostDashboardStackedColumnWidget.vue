@@ -50,7 +50,7 @@ import { gray } from '@/styles/colors';
 import config from '@/lib/config';
 
 import {
-    getCurrencyAppliedChartData, getLegends, getXYChartData,
+    getCurrencyAppliedChartData, getLegends, getTooltipText, getXYChartData,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
@@ -220,7 +220,7 @@ export default defineComponent<Props>({
                 series.columns.template.adapter.add('tooltipText', (tooltipText, target) => {
                     if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
                         const currencyMoney = currencyMoneyFormatter(target.dataItem.valueY, props.currency, undefined, true);
-                        return `{name}: [bold]${currencyMoney}[/]`;
+                        return getTooltipText('name', undefined, currencyMoney);
                     }
                     return tooltipText;
                 });

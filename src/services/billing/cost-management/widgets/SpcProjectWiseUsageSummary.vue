@@ -60,7 +60,7 @@ import { CURRENCY } from '@/store/modules/display/config';
 import CostDashboardDataTable from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
 import {
     getLegends,
-    getPieChartData,
+    getPieChartData, getTooltipText,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { store } from '@/store';
 import { PChartLoader, PSkeleton } from '@spaceone/design-system';
@@ -166,7 +166,7 @@ export default defineComponent<WidgetProps>({
             series.slices.template.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
                     const currencyMoney = currencyMoneyFormatter(target.dataItem.value, props.currency, props.currencyRates, true);
-                    return `{${CATEGORY_KEY}}: [bold]${currencyMoney}[/] ({${VALUE_KEY}.percent.formatNumber('#.00')}%)`;
+                    return getTooltipText(CATEGORY_KEY, VALUE_KEY, currencyMoney, false);
                 }
                 return tooltipText;
             });

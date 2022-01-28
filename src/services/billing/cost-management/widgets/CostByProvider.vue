@@ -61,6 +61,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import config from '@/lib/config';
+import { getTooltipText } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
 
 interface CostByProviderChartData extends PieChartData {
@@ -171,7 +172,7 @@ export default defineComponent<WidgetProps>({
             sliceTemplate.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
                     const currencyMoney = currencyMoneyFormatter(target.dataItem.value, props.currency, props.currencyRates, true);
-                    return `{${CATEGORY_KEY}}: [bold]${currencyMoney}[/] ({${VALUE_KEY}.percent.formatNumber('#.00')}%)`;
+                    return getTooltipText(CATEGORY_KEY, VALUE_KEY, currencyMoney, false);
                 }
                 return tooltipText;
             });

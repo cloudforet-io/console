@@ -210,3 +210,11 @@ export const getCurrencyAppliedChartData = (
     });
     return results;
 });
+
+
+export const getTooltipText = (categoryKey, valueKey, money, disablePercentage = true) => {
+    if (disablePercentage) {
+        return `{${categoryKey}}: [bold]${money}[/]`;
+    }
+    return `{${categoryKey}}: [bold]${money}[/] ({${valueKey}.percent.formatNumber('#.00')}%)`;
+};

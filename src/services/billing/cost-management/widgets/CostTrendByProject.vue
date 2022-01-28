@@ -55,7 +55,7 @@ import {
 } from '@/services/billing/cost-management/widgets/type';
 import {
     getCurrencyAppliedChartData,
-    getLegends,
+    getLegends, getTooltipText,
     getXYChartData,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -232,7 +232,7 @@ export default {
                     if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
                         const usdCost = target.tooltipDataItem.dataContext[projectId] ? Number(target.tooltipDataItem.dataContext[projectId]) : undefined;
                         const currencyMoney = currencyMoneyFormatter(usdCost, props.currency, undefined, true);
-                        return `{name}: [bold]${currencyMoney}[/]`;
+                        return getTooltipText('name', undefined, currencyMoney);
                     }
                     return tooltipText;
                 });

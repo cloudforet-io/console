@@ -72,6 +72,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { getTooltipText } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
 
 const CATEGORY_KEY = 'title';
@@ -218,7 +219,7 @@ export default defineComponent<WidgetProps>({
             pieSeriesTemplate.slices.template.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
                     const currencyMoney = currencyMoneyFormatter(target.dataItem.value, props.currency, props.currencyRates, true);
-                    return `{${CATEGORY_KEY}}: [bold]${currencyMoney}[/] ({${VALUE_KEY}.percent.formatNumber('#.00')}%)`;
+                    return getTooltipText(CATEGORY_KEY, VALUE_KEY, currencyMoney, false);
                 }
                 return tooltipText;
             });
