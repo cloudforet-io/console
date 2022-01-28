@@ -1,0 +1,225 @@
+<template>
+    <p-chart-loader :loading="loading" class="cost-analysis-stacked-column-chart">
+        <template #loader>
+            <p-skeleton height="100%" />
+        </template>
+        <div ref="chartRef" class="chart" />
+    </p-chart-loader>
+</template>
+
+<script lang="ts">
+import { cloneDeep } from 'lodash';
+import dayjs from 'dayjs';
+import * as am4core from '@amcharts/amcharts4/core';
+import { XYChart } from '@amcharts/amcharts4/charts';
+
+import {
+    reactive, toRefs, watch,
+} from '@vue/composition-api';
+
+import {
+    PChartLoader, PSkeleton,
+} from '@spaceone/design-system';
+
+import { makeProxy } from '@/lib/helper/composition-helpers';
+import { CURRENCY } from '@/store/modules/display/config';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
+import { getTimeUnitByPeriod } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import {
+    getStackedChartData, getCurrencyAppliedChartData,
+} from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import {
+    Legend, XYChartData, WidgetProps,
+} from '@/services/billing/cost-management/widgets/type';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import config from '@/lib/config';
+import { gray } from '@/styles/colors';
+import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
+const CATEGORY_KEY = 'date';
+
+interface Props extends WidgetProps {
+    loading: boolean;
+    chart: XYChart;
+    chartData: XYChartData[];
+    legends: Legend[];
+    granularity: GRANULARITY;
+    stack: boolean;
+}
+
+export default {
+    name: 'CostAnalysisStackedColumnChart',
+    components: {
+        PChartLoader,
+        PSkeleton,
+    },
+    props: {
+        loading: {
+            type: Boolean,
+            default: true,
+        },
+        chart: {
+            type: Object,
+            default: () => ({}),
+        },
+        chartData: {
+            type: Array,
+            default: () => ([]),
+        },
+        legends: {
+            type: Array,
+            default: () => ([]),
+        },
+        granularity: {
+            type: String,
+            default: GRANULARITY.DAILY,
+            validator(value: any) {
+                return Object.values(GRANULARITY).includes(value);
+            },
+        },
+        stack: {
+            type: Boolean,
+            default: false,
+        },
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props: Props, { emit }) {
+        const state = reactive({
+            chartRef: null as HTMLElement | null,
+            proxyChart: makeProxy('chart', props, emit),
+            USDChartData: [] as XYChartData[],
+        });
+
+        /* util */
+        const _createCategoryAxis = (chart, timeUnit) => {
+            const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+            let dateFormat = 'M/D';
+            if (timeUnit === 'month') dateFormat = 'MMM YYYY';
+            else if (timeUnit === 'year') dateFormat = 'YYYY';
+
+            dateAxis.dataFields.category = CATEGORY_KEY;
+            dateAxis.renderer.minGridDistance = 35;
+            dateAxis.fontSize = 12;
+            dateAxis.renderer.grid.template.location = 0;
+            dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
+            dateAxis.renderer.grid.template.strokeOpacity = 0;
+            dateAxis.renderer.labels.template.adapter.add('text', (text, target) => dayjs.utc(target.dataItem.category).format(dateFormat));
+        };
+        const _createValueAxis = (chart) => {
+            const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            valueAxis.renderer.minWidth = 20;
+            valueAxis.fontSize = 12;
+            valueAxis.extraMax = 0.01;
+            valueAxis.renderer.grid.template.strokeOpacity = 1;
+            valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
+            valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
+            valueAxis.renderer.labels.template.adapter.add('text', (text, target) => {
+                if (target.dataItem) {
+                    if (target.dataItem.value) return commaFormatter(numberFormatter(target.dataItem.value));
+                }
+                return text;
+            });
+        };
+
+        const _createSeries = (chart, legend, timeUnit) => {
+            const series = chart.series.push(new am4charts.ColumnSeries());
+            series.name = legend.label;
+            series.dataFields.categoryX = CATEGORY_KEY;
+            series.dataFields.valueY = legend.name;
+            series.strokeWidth = 0;
+            series.columns.template.width = am4core.percent(60);
+            series.tooltip.label.fontSize = 14;
+            series.stacked = true;
+            if (legend.color) series.columns.template.fill = legend.color;
+            series.columns.template.tooltipText = '{name}: [bold]{valueY}[/]';
+            series.columns.template.adapter.add('tooltipText', (tooltipText, target) => {
+                if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
+                    const currencyMoney = currencyMoneyFormatter(target.dataItem.valueY, props.currency, undefined, true);
+                    return `{name}: [bold]${currencyMoney}[/]`;
+                }
+                return tooltipText;
+            });
+
+            const today = dayjs.utc();
+            series.columns.template.adapter.add('fillOpacity', (fillOpacity, target) => {
+                if (today.isSame(dayjs.utc(target.dataItem?.dataContext?.date), timeUnit)) {
+                    return 0.5;
+                }
+                return fillOpacity;
+            });
+        };
+        const drawChart = (chartContainer) => {
+            const timeUnit = getTimeUnitByPeriod(props.granularity, dayjs.utc(props.period.start), dayjs.utc(props.period.end));
+
+            let USDChartData = cloneDeep(props.chartData);
+            if (props.stack) {
+                USDChartData = getStackedChartData(props.chartData as XYChartData[], props.period, timeUnit);
+            }
+            state.USDChartData = USDChartData;
+
+            const chart = am4core.create(chartContainer, am4charts.XYChart);
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+            chart.paddingLeft = -5;
+            chart.paddingBottom = -10;
+            chart.data = USDChartData;
+
+            _createCategoryAxis(chart, timeUnit);
+            _createValueAxis(chart);
+            props.legends.forEach((legend) => {
+                _createSeries(chart, legend, timeUnit);
+            });
+
+            const start = dayjs.utc(props.period.start);
+            const end = dayjs.utc(props.period.end);
+            const diff = end.diff(start, timeUnit);
+            if (diff > 31) {
+                (chart as XYChart).scrollbarX = new am4core.Scrollbar();
+            }
+
+            return chart;
+        };
+
+        watch([() => state.chartRef, () => props.loading], async ([chartContext, loading]) => {
+            if (chartContext && !loading) {
+                const chart = drawChart(chartContext);
+                emit('update:chart', chart);
+            }
+        }, { immediate: false });
+
+        watch(() => props.currency, (currency) => {
+            if (state.proxyChart) {
+                state.proxyChart.data = getCurrencyAppliedChartData(state.USDChartData, currency, props.currencyRates);
+            }
+        });
+
+        watch(() => props.stack, () => {
+            const chart = drawChart(state.chartRef);
+            emit('update:chart', chart);
+        });
+
+        return {
+            ...toRefs(state),
+        };
+    },
+};
+</script>
+<style lang="postcss" scoped>
+.cost-analysis-stacked-column-chart {
+    height: 100%;
+    .chart {
+        height: 100%;
+    }
+}
+</style>

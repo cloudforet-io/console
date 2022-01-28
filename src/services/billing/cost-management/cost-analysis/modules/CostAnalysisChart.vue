@@ -1,15 +1,24 @@
 <template>
     <div class="cost-analysis-chart">
         <section class="chart-section">
-            <cost-analysis-dynamic-widget :loading="loading"
-                                          :chart.sync="chart"
-                                          :stack="stack"
-                                          :chart-data="chartData"
-                                          :granularity="granularity"
-                                          :legends="legends"
-                                          :period="period"
-                                          :currency="currency"
-                                          :currency-rates="currencyRates"
+            <cost-analysis-pie-chart v-if="granularity === GRANULARITY.ACCUMULATED"
+                                     :loading="loading"
+                                     :chart.sync="chart"
+                                     :chart-data="chartData"
+                                     :legends="legends"
+                                     :currency="currency"
+                                     :currency-rates="currencyRates"
+            />
+            <cost-analysis-stacked-column-chart v-else
+                                                :loading="loading"
+                                                :chart.sync="chart"
+                                                :chart-data="chartData"
+                                                :legends="legends"
+                                                :granularity="granularity"
+                                                :stack="stack"
+                                                :period="period"
+                                                :currency="currency"
+                                                :currency-rates="currencyRates"
             />
         </section>
         <section class="query-section">
@@ -109,8 +118,10 @@ import {
     PButton, PIconButton, PSelectDropdown, PStatus, PTag, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
 
-import CostAnalysisDynamicWidget
-    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisDynamicWidget.vue';
+import CostAnalysisStackedColumnChart
+    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
+import CostAnalysisPieChart
+    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisPieChart.vue';
 import SetFilterModal
     from '@/services/billing/cost-management/modules/SetFilterModal.vue';
 
@@ -141,7 +152,8 @@ import { store } from '@/store';
 export default {
     name: 'CostAnalysisChart',
     components: {
-        CostAnalysisDynamicWidget,
+        CostAnalysisStackedColumnChart,
+        CostAnalysisPieChart,
         SetFilterModal,
         PButton,
         PIconButton,
