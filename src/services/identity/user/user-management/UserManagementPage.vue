@@ -7,7 +7,7 @@
         />
         <p-horizontal-layout>
             <template #container="{ height }">
-                <user-management-table />
+                <user-management-table :table-height="height" />
             </template>
         </p-horizontal-layout>
         <user-management-tab :selected-index="selectedIndex" :selected-users="selectedUsers" />

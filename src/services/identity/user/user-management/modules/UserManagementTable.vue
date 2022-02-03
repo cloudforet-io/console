@@ -16,7 +16,7 @@
             :key-item-sets="keyItemSets"
             :value-handler-map="valueHandlerMap"
             :query-tags="tags"
-            :style="{height: `${height}px`}"
+            :style="{height: `${tableHeight}px`}"
             @select="handleSelect"
             @change="handleChange"
             @refresh="handleChange()"
@@ -109,7 +109,6 @@ import UserManagementModal
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { MODAL_TYPE } from '@/services/identity/user/store/type';
 
-const height = 400;
 export default {
     name: 'UserManagementTable',
     components: {
@@ -121,7 +120,12 @@ export default {
         PStatus,
         PSelectDropdown,
     },
-
+    props: {
+        tableHeight: {
+            type: Number,
+            default: 400,
+        },
+    },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const userListApiQueryHelper = new ApiQueryHelper()
@@ -419,7 +423,6 @@ export default {
             handleSelect,
             handleChange,
             handleExport,
-            height,
         };
     },
 
