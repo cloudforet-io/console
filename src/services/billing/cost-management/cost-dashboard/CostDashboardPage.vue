@@ -8,15 +8,15 @@
                 <!--                                 favorite-type="project"-->
                 <!--                                 resource-type="identity.Project"-->
                 <!--                />-->
-                <p-icon-button name="ic_edit-text"
-                               class="edit-btn"
-                               :outline="false"
-                               @click.stop="handleClickEditDashboard"
-                />
-                <p-icon-button name="ic_trashcan"
-                               :outline="false"
-                               @click.stop="handleClickDeleteDashboard"
-                />
+                <!--                <p-icon-button name="ic_edit-text"-->
+                <!--                               class="edit-btn"-->
+                <!--                               :outline="false"-->
+                <!--                               @click.stop="handleClickEditDashboard"-->
+                <!--                />-->
+                <!--                <p-icon-button name="ic_trashcan"-->
+                <!--                               :outline="false"-->
+                <!--                               @click.stop="handleClickDeleteDashboard"-->
+                <!--                />-->
                 <cost-dashboard-more-menu :dashboard-id="dashboardId" />
             </div>
             <div class="right-part">
@@ -26,16 +26,16 @@
                     :period.sync="period"
                 />
                 <currency-select-dropdown />
-                <div class="left-divider download-pdf">
-                    <p-icon-button name="ic_download" style-type="gray-border" size="sm" />
-                </div>
-                <div class="left-divider">
-                    <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm"
-                                        @click.stop="handleClickCustomize"
-                    >
-                        Customize
-                    </p-icon-text-button>
-                </div>
+                <!--                <div class="left-divider download-pdf">-->
+                <!--                    <p-icon-button name="ic_download" style-type="gray-border" size="sm" />-->
+                <!--                </div>-->
+                <!--                <div class="left-divider">-->
+                <!--                    <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm"-->
+                <!--                                        @click.stop="handleClickCustomize"-->
+                <!--                    >-->
+                <!--                        Customize-->
+                <!--                    </p-icon-text-button>-->
+                <!--                </div>-->
             </div>
             <cost-dashboard-filter :dashboard-id="dashboardId" :filters.sync="filters" />
         </div>
@@ -60,7 +60,7 @@ import {
 } from '@vue/composition-api';
 import { i18n } from '@/translations';
 import {
-    PBreadcrumbs, PPageTitle, PIconButton, PIconTextButton,
+    PBreadcrumbs, PPageTitle,
 } from '@spaceone/design-system';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
@@ -87,8 +87,6 @@ export default {
         DashboardLayouts,
         CurrencySelectDropdown,
         CostDashboardFilter,
-        PIconButton,
-        PIconTextButton,
         PBreadcrumbs,
         PPageTitle,
         DeleteModal,
