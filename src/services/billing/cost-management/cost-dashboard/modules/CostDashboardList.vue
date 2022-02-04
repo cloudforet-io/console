@@ -11,17 +11,17 @@
                         dashboardId: item.dashboard_id
                     }
                 }"
-                class="link"
+                class="link inline-block"
             >
                 <span class="title">
                     {{ item.name }}
                 </span>
-                <p-i v-if="item.scope === 'PRIVATE'" name="ic_private" class="private-icon"
-                     width="1rem"
-                     height="1rem"
+                <p-i v-if="item.scope === 'PUBLIC'" name="ic_public" class="public-icon"
+                     width="0.875rem"
+                     height="0.875rem"
                 />
                 <p-i v-if="item.dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
-                     width="1rem" height="1rem"
+                     width="0.875rem" height="0.875rem"
                 />
             </router-link>
             <p-select-dropdown :selected="selectedMoreMenuItem"
@@ -150,7 +150,6 @@ export default {
     align-items: center;
     width: 100%;
     height: 2rem;
-    padding: 0.375rem 0.125rem;
     font-size: 0.875rem;
     line-height: 140%;
     &:hover {
@@ -163,23 +162,32 @@ export default {
         @apply bg-blue-200 text-blue-500 cursor-pointer;
     }
     .title {
-        @apply truncate;
+        @apply truncate inline-block;
         margin-right: 0.25rem;
+        padding-bottom: 0.5rem;
+        padding-left: 0.75rem;
+        padding-top: 0.4rem;
+        max-width: calc(100% - 3rem);
     }
     .link {
-        width: inherit;
-    }
-    .home-icon {
-        flex-shrink: 0;
-        margin-left: 0.125rem;
-    }
-    .favorite-icon {
-        flex-shrink: 0;
-        margin-right: 0.125rem;
-    }
-    .private-icon {
-        flex-shrink: 0;
-        margin-right: 0.125rem;
+        display: inline-block;
+        width: 100%;
+        height: 2rem;
+        .home-icon {
+            display: inline-block;
+            flex-shrink: 0;
+            margin-left: 0.125rem;
+            margin-top: -1.5rem;
+        }
+        .favorite-icon {
+            flex-shrink: 0;
+            margin-right: 0.125rem;
+        }
+        .public-icon {
+            flex-shrink: 0;
+            margin-right: 0.125rem;
+            margin-top: -1.5rem;
+        }
     }
     .more-button::v-deep {
         display: none;
