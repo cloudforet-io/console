@@ -1,3 +1,10 @@
+# [1.1.0-beta.233](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.232...v1.1.0-beta.233) (2022-02-07)
+
+
+### Bug Fixes
+
+* add limits to dynamic chart ([#836](https://github.com/spaceone-dev/spaceone-design-system/issues/836)) ([f678b5e](https://github.com/spaceone-dev/spaceone-design-system/commit/f678b5e6e65ee80b0bb9b0fc98fb04d2627adffb))
+
 # [1.1.0-beta.232](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.231...v1.1.0-beta.232) (2022-02-07)
 
 
