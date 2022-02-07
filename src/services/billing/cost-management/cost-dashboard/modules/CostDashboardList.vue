@@ -1,14 +1,14 @@
 <template>
     <ul class="dashboard-list">
-        <li v-for="(item) in dashboardList" :key="item.dashboard_id"
+        <li v-for="(item) in dashboardList" :key="item.public_dashboard_id"
             class="menu-item"
-            :class="{'selected': item.dashboard_id === dashboardIdFromRoute}"
+            :class="{'selected': item.public_dashboard_id === dashboardIdFromRoute}"
         >
             <router-link
                 :to="{
                     name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
                     params: {
-                        dashboardId: item.dashboard_id
+                        dashboardId: item.public_dashboard_id
                     }
                 }"
                 class="link inline-block"
@@ -20,7 +20,7 @@
                      width="0.875rem"
                      height="0.875rem"
                 />
-                <p-i v-if="item.dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
+                <p-i v-if="item.public_dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
                      width="0.875rem" height="0.875rem"
                 />
             </router-link>
@@ -84,7 +84,7 @@ export default {
             if (state.selectedMoreMenuItem === 'setHome') {
                 store.dispatch('settings/setItem', {
                     key: 'homeDashboard',
-                    value: item.dashboard_id,
+                    value: item.public_dashboard_id,
                     path: '/costDashboard',
                 });
             }
@@ -111,7 +111,7 @@ export default {
             if (!state.homeDashboardId) {
                 store.dispatch('settings/setItem', {
                     key: 'homeDashboard',
-                    value: state.items[0]?.dashboard_id,
+                    value: state.items[0]?.public_dashboard_id,
                     path: '/costDashboard',
                 });
             }
@@ -122,7 +122,7 @@ export default {
 
             if (!state.homeDashboardId) initHomeDashboard();
 
-            const isDashboardIdFromRouteValid = !!state.items.find(d => d.dashboard_id === state.dashboardIdFromRoute);
+            const isDashboardIdFromRouteValid = !!state.items.find(d => d.public_dashboard_id === state.dashboardIdFromRoute);
 
             if (vm.$route.name === BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME
                 && (!state.dashboardIdFromRoute || !isDashboardIdFromRouteValid)) {

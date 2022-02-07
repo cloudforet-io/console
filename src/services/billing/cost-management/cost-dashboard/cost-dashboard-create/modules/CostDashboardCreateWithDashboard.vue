@@ -1,7 +1,7 @@
 <template>
     <div>
         <h3>Clone an Existing Dashboard</h3>
-        <div v-for="dashboardData in existingDashboardData" :key="dashboardData.dashboard_id">
+        <div v-for="dashboardData in existingDashboardData" :key="dashboardData.public_dashboard_id">
             <p-select-card
                 :selected="selectedTemplate"
                 :value="dashboardData"
@@ -12,7 +12,7 @@
             </p-select-card>
             <p-anchor
                 target="_blank"
-                :to=" { name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME, params: { dashboardId: dashboardData.dashboard_id } }"
+                :to=" { name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME, params: { dashboardId: dashboardData.public_dashboard_id } }"
             >
                 View
             </p-anchor>
@@ -55,7 +55,7 @@ export default {
                 const { results } = await SpaceConnector.client.costAnalysis.dashboard.list();
                 state.existingDashboardData = results.map(d => ({
                     custom_layouts: d.custom_layouts,
-                    dashboard_id: d.dashboard_id,
+                    public_dashboard_id: d.public_dashboard_id,
                     default_filter: d.default_filter,
                     default_layout_id: d.default_layout_id,
                     name: d.name,

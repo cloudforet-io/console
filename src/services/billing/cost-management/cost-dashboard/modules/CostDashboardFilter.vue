@@ -131,7 +131,7 @@ export default {
         const updateFilters = async (filters) => {
             try {
                 await SpaceConnector.client.costAnalysis.dashboard.update({
-                    dashboard_id: props.dashboardId,
+                    public_dashboard_id: props.dashboardId,
                     default_filter: filters,
                 });
                 state.proxyFilters = filters;
