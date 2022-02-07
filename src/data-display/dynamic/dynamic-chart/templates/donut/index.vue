@@ -44,7 +44,7 @@ import PStatus from '@/data-display/status/PStatus.vue';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import { commaFormatter, getContextKey } from '@/util/helpers';
+import { getContextKey } from '@/util/helpers';
 
 
 export default defineComponent<DynamicChartTemplateProps>({
@@ -76,11 +76,7 @@ export default defineComponent<DynamicChartTemplateProps>({
             contextKey: getContextKey(),
         });
 
-        const getValue = (item: any): string|number|undefined => {
-            const value = getValueByPath(item, props.valueOptions.key);
-            if (typeof value === 'number') return commaFormatter(value) ?? '';
-            return '';
-        };
+        const getValue = (item: any): string|number|undefined => getValueByPath(item, props.valueOptions.key) ?? '';
 
         const disposeChart = () => {
             if (state.chart) state.chart.dispose();

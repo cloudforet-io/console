@@ -3,6 +3,7 @@ import PAnchor from '@/inputs/anchors/PAnchor.vue';
 import { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { TextDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/text/type';
 import { TranslateResult } from 'vue-i18n';
+import { commaFormatter } from '@/util/helpers';
 
 export default {
     name: 'PDynamicFieldText',
@@ -31,9 +32,11 @@ export default {
         },
     },
     render(h, { props, data }: {props: TextDynamicFieldProps; data: any}) {
-        let text: TranslateResult;
+        let text: TranslateResult|number;
         if (props.data === null || props.data === undefined) {
             text = props.options.default === undefined ? '' : props.options.default;
+        } else if (typeof props.data === 'number') {
+            text = commaFormatter(props.data) ?? '';
         } else {
             text = typeof props.data === 'string' ? props.data : JSON.stringify(props.data);
         }

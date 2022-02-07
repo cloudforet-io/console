@@ -14,7 +14,7 @@
                 </span>
                 <span class="value">
                     <p-dynamic-field :type="valueOptions.type"
-                                     :data="commaFormatter(value)"
+                                     :data="value"
                                      :options="valueOptions.options"
                                      :extra-data="valueOptions"
                                      :handler="fieldHandler"
@@ -36,7 +36,7 @@ import {
 import { max } from 'lodash';
 
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
-import { commaFormatter, getContextKey } from '@/util/helpers';
+import { getContextKey } from '@/util/helpers';
 import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS,
@@ -105,7 +105,6 @@ export default defineComponent<DynamicChartTemplateProps>({
         return {
             ...toRefs(state),
             getValueByPath,
-            commaFormatter,
             getPercentage,
             DEFAULT_CHART_COLORS,
         };

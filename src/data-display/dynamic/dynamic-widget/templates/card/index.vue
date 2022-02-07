@@ -34,7 +34,6 @@ import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vu
 import { DEFAULT_VALUE_OPTIONS } from '@/data-display/dynamic/dynamic-widget/config';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
-import { commaFormatter } from '@/util/helpers';
 
 type DynamicWidgetCardProps = Exclude<DynamicWidgetProps, 'type'>
 
@@ -73,7 +72,6 @@ export default defineComponent<DynamicWidgetCardProps>({
             value: computed(() => {
                 let value = getValueByPath(props.data, state.valueOptions.key);
                 if (Array.isArray(value)) value = value[0];
-                if (typeof value === 'number') return commaFormatter(value);
                 return value ?? '';
             }),
         });

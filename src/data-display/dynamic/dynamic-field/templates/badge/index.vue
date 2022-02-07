@@ -3,7 +3,7 @@ import PBadge from '@/data-display/badges/PBadge.vue';
 import { BadgeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { BadgeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/badge/type';
 import { Badge, BADGE_SHAPE } from '@/data-display/badges/type';
-import { getColor } from '@/util/helpers';
+import { commaFormatter, getColor } from '@/util/helpers';
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
 
 export default {
@@ -48,9 +48,9 @@ export default {
             badgeProps.textColor = getColor(options.text_color);
         }
 
-        let badgeEl = props.data === undefined || props.data === null ? props.options.default : props.data;
-
+        let badgeEl = props.data ?? props.options.default;
         if (badgeEl === undefined || badgeEl === null) return undefined;
+        if (typeof badgeEl === 'number') badgeEl = commaFormatter(badgeEl);
 
         if (options.link) {
             badgeEl = [h(PAnchor, {
