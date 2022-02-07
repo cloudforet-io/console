@@ -13,7 +13,7 @@
                     <template v-for="rowIdx in rowRange">
                         <router-link v-if="!!chartData[colIdx * 10 + rowIdx]"
                                      :key="`status-box-${colIdx}-${rowIdx}`"
-                                     v-tooltip.bottom="`${chartData[colIdx * 10 + rowIdx].budgetName} (${chartData[colIdx * 10 + rowIdx].usage}%)`"
+                                     v-tooltip.bottom="getTooltipText(rowIdx, colIdx)"
                                      :to="chartData[colIdx * 10 + rowIdx].linkLocation"
                                      class="box status-box"
                                      :style="{ 'background-color': chartData[colIdx * 10 + rowIdx].color }"
@@ -62,7 +62,7 @@ interface ChartData {
     budgetId: string;
     budgetName: string;
     color: string;
-    usage: string;
+    usage: number;
     linkLocation: Location;
 }
 
@@ -121,7 +121,7 @@ export default {
                     budgetId: d.budget_id,
                     budgetName: d.name,
                     color,
-                    usage: usage?.toFixed(2) ?? 0,
+                    usage,
                     linkLocation: {
                         name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
                         params: {
@@ -131,6 +131,12 @@ export default {
                 });
             });
             return chartData;
+        };
+        const getTooltipText = (rowIdx, colIdx) => {
+            const index = colIdx * 10 + rowIdx;
+            const usage = state.chartData[index].usage;
+            const percentage = usage > 0 ? usage.toFixed(2) : '-';
+            return `${state.chartData[index].budgetName} (${percentage})`;
         };
 
         /* api */
@@ -170,7 +176,7 @@ export default {
         return {
             ...toRefs(state),
             BILLING_ROUTE,
-            range,
+            getTooltipText,
         };
     },
 };
