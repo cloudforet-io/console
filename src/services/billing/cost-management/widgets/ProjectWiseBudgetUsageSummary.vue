@@ -110,8 +110,12 @@ export default {
                 { name: 'project', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.TARGET') },
                 { name: 'amountSpent', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.AMOUNT_SPENT'), textAlign: 'right' },
                 { name: 'totalBudget', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.TOTAL_BUDGET'), textAlign: 'right' },
-                { name: 'usage', label: ' ', textAlign: 'right' },
-                { name: 'shortageForecast', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.SHORTAGE_FORECAST'), textAlign: 'center' },
+                {
+                    name: 'usage', label: ' ', textAlign: 'right', width: '14rem',
+                },
+                {
+                    name: 'shortageForecast', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.SHORTAGE_FORECAST'), textAlign: 'center', width: '9rem',
+                },
             ])),
             items: [] as BudgetItem[],
             projectGroups: computed(() => store.state.resource.projectGroup.items),
