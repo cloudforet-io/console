@@ -1,6 +1,7 @@
 <template>
     <div class="project-select-dropdown">
         <p-search-dropdown :loading="loading"
+                           :disable-icon="true"
                            :visible-menu.sync="visibleMenu"
                            :is-focused.sync="isFocused"
                            :type="multiSelectable ? 'checkbox' : 'radioButton'"
@@ -16,6 +17,10 @@
         >
             <template #menu-no-data-format>
                 <div />
+            </template>
+            <template #search-left />
+            <template #search-default>
+                <span class="text-gray-300">Select</span>
             </template>
             <template #menu-menu>
                 <p-tree :edit-options="{disabled: true}"

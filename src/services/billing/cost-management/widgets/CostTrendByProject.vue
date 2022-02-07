@@ -220,11 +220,12 @@ export default {
 
             const createSeries = (legend, idx) => {
                 const projectId = legend.name;
+                const seriesColor = DEFAULT_CHART_COLORS[(state.thisPage * 5 - 5) + idx];
                 const series = chart.series.push(new am4charts.LineSeries());
                 series.name = legend.label;
                 series.dataFields.dateX = CATEGORY_KEY;
                 series.dataFields.valueY = projectId;
-                series.stroke = am4core.color(DEFAULT_CHART_COLORS[(state.thisPage * 5 - 5) + idx]);
+                series.stroke = am4core.color(seriesColor);
                 series.strokeWidth = 2;
                 series.tooltip.label.fontSize = 14;
 
@@ -238,7 +239,7 @@ export default {
                 });
 
                 const bullet = series.bullets.push(new am4charts.CircleBullet());
-                bullet.fill = am4core.color(gray[600]);
+                bullet.fill = am4core.color(seriesColor);
                 bullet.circle.radius = 3.5;
             };
 

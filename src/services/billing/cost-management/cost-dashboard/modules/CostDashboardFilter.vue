@@ -76,6 +76,7 @@ export default {
             isAdmin: computed(() => store.getters['user/isAdmin']),
             proxyFilters: makeProxy('filters', props, emit),
             filterItems: [
+                { name: FILTER.PROJECT_GROUP, title: FILTER_ITEM_MAP[FILTER.PROJECT_GROUP].label },
                 { name: FILTER.PROJECT, title: FILTER_ITEM_MAP[FILTER.PROJECT].label },
                 { name: FILTER.SERVICE_ACCOUNT, title: FILTER_ITEM_MAP[FILTER.SERVICE_ACCOUNT].label },
                 { name: FILTER.PROVIDER, title: FILTER_ITEM_MAP[FILTER.PROVIDER].label },
@@ -104,12 +105,22 @@ export default {
             selectFilterModalVisible: false,
             appliedFilterDescription: computed<string>(() => {
                 const desc: string[] = [];
-                if (state.proxyFilters[FILTER.PROJECT]?.length) {
-                    desc.push(`${state.proxyFilters[FILTER.PROJECT].length} Projects`);
+                if (state.proxyFilters[FILTER.PROJECT_GROUP]?.length) {
+                    const filterLength = state.proxyFilters[FILTER.PROJECT_GROUP].length;
+                    const suffix = filterLength > 1 ? 'Project Groups' : 'Project Group';
+                    desc.push(`${filterLength} ${suffix}`);
+                } if (state.proxyFilters[FILTER.PROJECT]?.length) {
+                    const filterLength = state.proxyFilters[FILTER.PROJECT].length;
+                    const suffix = filterLength > 1 ? 'Projects' : 'Project';
+                    desc.push(`${filterLength} ${suffix}`);
                 } if (state.proxyFilters[FILTER.SERVICE_ACCOUNT]?.length) {
-                    desc.push(`${state.proxyFilters[FILTER.SERVICE_ACCOUNT].length} Service Accounts`);
+                    const filterLength = state.proxyFilters[FILTER.SERVICE_ACCOUNT].length;
+                    const suffix = filterLength > 1 ? 'Service Accounts' : 'Service Account';
+                    desc.push(`${filterLength} ${suffix}`);
                 } if (state.proxyFilters[FILTER.PROVIDER]?.length) {
-                    desc.push(`${state.proxyFilters[FILTER.PROVIDER].length} Providers`);
+                    const filterLength = state.proxyFilters[FILTER.PROVIDER].length;
+                    const suffix = filterLength > 1 ? 'Providers' : 'Provider';
+                    desc.push(`${filterLength} ${suffix}`);
                 }
                 if (desc.length) return desc.join(' & ');
                 return 'No Filter';
