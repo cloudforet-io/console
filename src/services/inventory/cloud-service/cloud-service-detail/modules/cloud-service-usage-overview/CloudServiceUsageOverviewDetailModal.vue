@@ -252,13 +252,14 @@ export default defineComponent<Props>({
 <style lang="postcss" scoped>
 .cloud-service-usage-overview-detail-modal::v-deep {
     .modal-body {
+        @apply bg-gray-100;
         display: flex;
         flex-direction: column;
         height: 744px;
         padding: 1rem 2.5rem;
     }
     .widget-wrapper {
-        padding: 0.5rem 0;
+        padding: 0.13rem 0 0.5rem;
         flex: 1;
         > .data-loader-container {
             height: auto;
