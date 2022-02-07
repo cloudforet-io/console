@@ -69,7 +69,7 @@ import CloudServicePeriodFilter from '@/services/inventory/cloud-service/modules
 
 interface Props {
     visible: boolean;
-    cloudServiceTypeInfo?: CloudServiceTypeInfo;
+    cloudServiceTypeInfo: CloudServiceTypeInfo;
     isServer: boolean;
     filters: QueryStoreFilter[];
     period?: Period;
@@ -100,8 +100,8 @@ export default defineComponent<Props>({
             required: true,
         },
         cloudServiceTypeInfo: {
-            type: Object as () => CloudServiceTypeInfo|undefined,
-            default: undefined,
+            type: Object as () => CloudServiceTypeInfo,
+            default: () => ({}),
         },
         isServer: {
             type: Boolean,
@@ -144,12 +144,11 @@ export default defineComponent<Props>({
         const fetchSchemaList = async (): Promise<DynamicWidgetSchema[]> => {
             try {
                 const { provider, group, name } = props.cloudServiceTypeInfo as CloudServiceTypeInfo;
-                const options: any = {};
-                if (!props.isServer) {
-                    options.provider = provider;
-                    options.cloud_service_group = group;
-                    options.cloud_service_type = name;
-                }
+                const options = {
+                    provider,
+                    cloud_service_group: group,
+                    cloud_service_type: name,
+                };
 
                 const { widget } = await SpaceConnector.client.addOns.pageSchema.get({
                     resource_type: props.isServer ? 'inventory.Server' : 'inventory.CloudService',
@@ -255,7 +254,6 @@ export default defineComponent<Props>({
         @apply bg-gray-100;
         display: flex;
         flex-direction: column;
-        height: 744px;
         padding: 1rem 2.5rem;
     }
     .widget-wrapper {
@@ -270,6 +268,9 @@ export default defineComponent<Props>({
                 grid-gap: 0.5rem;
             }
         }
+    }
+    .p-dynamic-widget {
+        max-height: 320px;
     }
     .line-break + .p-dynamic-widget-chart {
         grid-column-start: 1;
