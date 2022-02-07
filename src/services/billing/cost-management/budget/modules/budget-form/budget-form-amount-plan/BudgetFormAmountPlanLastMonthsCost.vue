@@ -95,8 +95,8 @@ export default {
 
                 const today = dayjs.utc();
                 const params: BudgetListParams = {
-                    start: today.subtract(3, 'month').startOf('month').toISOString(),
-                    end: today.subtract(1, 'month').endOf('month').toISOString(),
+                    start: today.subtract(3, 'month').startOf('month').format('YYYY-MM-DD'),
+                    end: today.subtract(1, 'month').endOf('month').format('YYYY-MM-DD'),
                     granularity: 'MONTHLY',
                     ...recentBudgetApiQueryHelper.data,
                 };

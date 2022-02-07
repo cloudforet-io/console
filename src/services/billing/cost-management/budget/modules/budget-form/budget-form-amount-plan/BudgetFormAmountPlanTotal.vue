@@ -43,7 +43,7 @@ export default {
         } = useFormValidator({
             amount: undefined as number|undefined,
         }, {
-            amount: val => (val !== undefined ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
+            amount: val => (val ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
         });
 
         const state = reactive({
