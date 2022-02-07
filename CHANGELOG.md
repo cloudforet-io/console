@@ -1,3 +1,10 @@
+# [1.1.0-beta.232](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.231...v1.1.0-beta.232) (2022-02-07)
+
+
+### Bug Fixes
+
+* use commaFormatter at the low level components ([#835](https://github.com/spaceone-dev/spaceone-design-system/issues/835)) ([4115219](https://github.com/spaceone-dev/spaceone-design-system/commit/41152199736c63efd6ba05ab591e343c26e358db))
+
 # [1.1.0-beta.231](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.230...v1.1.0-beta.231) (2022-01-26)
 
 
