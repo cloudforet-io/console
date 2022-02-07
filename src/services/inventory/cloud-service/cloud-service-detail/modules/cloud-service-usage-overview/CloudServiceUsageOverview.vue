@@ -68,7 +68,7 @@ import { Period } from '@/services/billing/cost-management/type';
 
 
 interface Props {
-    cloudServiceTypeInfo?: CloudServiceTypeInfo;
+    cloudServiceTypeInfo: CloudServiceTypeInfo;
     isServer?: boolean;
     filters?: QueryStoreFilter[];
     period?: Period;
@@ -90,8 +90,8 @@ export default defineComponent<Props>({
     },
     props: {
         cloudServiceTypeInfo: {
-            type: Object as () => CloudServiceTypeInfo|undefined,
-            default: undefined,
+            type: Object as () => CloudServiceTypeInfo,
+            default: () => ({}),
         },
         isServer: {
             type: Boolean,
@@ -119,7 +119,7 @@ export default defineComponent<Props>({
             layoutLoading: true,
             dataList: [] as Data[],
             dataLoading: false,
-            cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo?.cloud_service_type_id ?? ''),
+            cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo.cloud_service_type_id ?? ''),
             apiFilter: computed<Filter[]|undefined>(() => {
                 if (props.filters) {
                     const { filter } = queryHelper.setFilters(props.filters).apiQuery;
@@ -143,12 +143,10 @@ export default defineComponent<Props>({
                 const options: any = {
                     widget_type: 'card',
                     limit: 3,
+                    provider,
+                    cloud_service_group: group,
+                    cloud_service_type: name,
                 };
-                if (!props.isServer) {
-                    options.provider = provider;
-                    options.cloud_service_group = group;
-                    options.cloud_service_type = name;
-                }
 
                 const { widget } = await SpaceConnector.client.addOns.pageSchema.get({
                     resource_type: props.isServer ? 'inventory.Server' : 'inventory.CloudService',
