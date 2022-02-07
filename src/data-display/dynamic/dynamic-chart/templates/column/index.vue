@@ -2,6 +2,7 @@
     <div class="p-dynamic-chart-column">
         <div v-for="(value, idx) in values"
              :key="`${contextKey}-${idx}`"
+             class="row-wrapper"
         >
             <div class="label-wrapper">
                 <span class="name">
@@ -120,17 +121,21 @@ export default defineComponent<DynamicChartTemplateProps>({
 <style lang="postcss">
 .p-dynamic-chart-column {
     width: 100%;
+    .row-wrapper {
+        margin-bottom: 0.5rem;
+    }
     .label-wrapper {
         display: flex;
         justify-content: space-between;
         > .name {
             font-size: 0.875rem;
-            line-height: 1.5;
+            line-height: 1.25;
+            margin-bottom: 0.125rem;
         }
         > .value {
+            @apply text-gray-600;
             font-size: 0.875rem;
-            line-height: 1.5;
-            font-weight: bold;
+            line-height: 1.25;
         }
     }
 }

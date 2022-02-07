@@ -46,30 +46,32 @@ export default defineComponent<DynamicChartTemplateProps>({
         });
 
         const disposeChart = () => {
-            if (state.chart) state.chart.dispose();
+            if (state.chart) {
+                state.chart.dispose();
+                state.chart = null;
+            }
         };
 
-        const drawChart = () => {
+        const drawChart = (data: any[]) => {
             const ctx = state.chartRef;
             if (!ctx) return;
 
             const chart = am4core.create(ctx, TreeMap);
 
-            drawTreemapChart(chart, props.nameOptions, props.valueOptions);
-
-            chart.data = props.data;
+            drawTreemapChart(chart, data, props.nameOptions, props.valueOptions);
 
             state.chart = chart;
         };
 
         const updateChartData = (data: any[]) => {
             if (state.chart) {
-                state.chart.data = data;
+                disposeChart();
             }
+            drawChart(data);
         };
 
         onMounted(() => {
-            drawChart();
+            drawChart(props.data);
         });
 
         const stopDataWatch = watch(() => props.data, (data) => {

@@ -80,13 +80,14 @@ export default defineComponent<DynamicWidgetChartProps>({
     height: 346px;
     min-width: 392px;
     padding: 1rem;
-    .name {
-        @apply text-gray-700;
-        line-height: 1.6;
-        font-size: 1rem;
-        margin-bottom: 1rem;
+    > .name {
+        @apply text-gray-900;
+        line-height: 1.25;
+        font-size: 0.875rem;
+        margin-bottom: 0.75rem;
+        font-weight: bold;
     }
-    .p-dynamic-chart {
+    > .p-dynamic-chart {
         flex-grow: 1;
     }
 }

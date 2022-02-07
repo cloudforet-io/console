@@ -72,7 +72,7 @@ export default defineComponent<DynamicWidgetCardProps>({
             value: computed(() => {
                 let value = getValueByPath(props.data, state.valueOptions.key);
                 if (Array.isArray(value)) value = value[0];
-                return value ?? '';
+                return value ?? '-';
             }),
         });
 
@@ -91,20 +91,20 @@ export default defineComponent<DynamicWidgetCardProps>({
     align-items: center;
     min-width: 391px;
     height: 44px;
-    .name {
+    > .name {
         @apply text-gray-700;
-        line-height: 1.2;
+        line-height: 1.25;
         font-size: 1rem;
         display: inline-flex;
         align-items: center;
         flex-grow: 1;
     }
-    .value {
+    > .value {
         display: inline-flex;
         align-items: center;
         font-size: 1.125rem;
         font-weight: bold;
-        line-height: 1.55;
+        line-height: 1.25;
         .p-skeleton {
             min-width: 40px;
         }

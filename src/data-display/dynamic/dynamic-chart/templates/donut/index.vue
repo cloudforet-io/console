@@ -150,18 +150,19 @@ export default defineComponent<DynamicChartTemplateProps>({
             &:first-of-type {
                 margin-top: 0;
             }
-            .text {
+            > .text {
                 @apply flex items-center flex-grow text-gray-900;
                 font-size: 0.875rem;
                 line-height: 1.43;
-                .name {
+                > .name {
                     @apply mb-0;
                     font-size: inherit;
                     color: inherit;
                 }
-                .value {
-                    @apply ml-auto;
-                    color: inherit;
+                > .value {
+                    @apply ml-auto text-gray-600;
+                    font-size: 0.875rem;
+                    line-height: 1.5;
                 }
             }
         }

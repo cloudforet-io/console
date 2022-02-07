@@ -97,8 +97,11 @@ export default defineComponent<DynamicChartProps>({
 </script>
 <style lang="postcss">
 .p-dynamic-chart {
-    .p-data-loader {
+    > .p-data-loader {
         height: 100%;
+        > .data-loader-container .data-wrapper {
+            overflow: hidden;
+        }
         .chart {
             height: 100%;
         }

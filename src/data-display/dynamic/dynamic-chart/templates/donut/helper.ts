@@ -59,11 +59,11 @@ export const drawPieChart = (chart: PieChart, nameOptions: DynamicField, valueOp
     chart.innerRadius = am4core.percent(65);
     if (chart.hasLicense() && chart.logo) chart.logo.disabled = true;
 
-    const series = drawPieSeries(chart, nameOptions, valueOptions);
+    drawPieSeries(chart, nameOptions, valueOptions);
 
-    const label = series.createChild(am4core.Label);
-    label.text = '{values.value.sum}';
-    label.horizontalCenter = 'middle';
-    label.verticalCenter = 'middle';
-    label.fontSize = 18;
+    // const label = series.createChild(am4core.Label);
+    // label.text = '{values.value.sum}';
+    // label.horizontalCenter = 'middle';
+    // label.verticalCenter = 'middle';
+    // label.fontSize = 18;
 };

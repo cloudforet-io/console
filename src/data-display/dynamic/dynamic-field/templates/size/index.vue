@@ -51,7 +51,7 @@ export default {
         else value = null;
 
         let formattedValue: string;
-        if (value === null) formattedValue = '';
+        if (value === null) formattedValue = '-';
         else {
             const displayUnit: bytes.Unit|undefined = unitMap[props.options.display_unit as string] || undefined;
             const sourceUnit: bytes.Unit|undefined = unitMap[props.options.source_unit as string] || undefined;
@@ -62,7 +62,7 @@ export default {
             }
 
             const res = bytes(value, bytesOptions);
-            if (!res) formattedValue = '';
+            if (!res) formattedValue = '-';
             else if (res.split(UNIT_SEPARATOR)[1] === 'B') {
                 formattedValue = `${value} bytes`;
             } else {
