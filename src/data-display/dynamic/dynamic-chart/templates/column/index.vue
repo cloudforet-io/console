@@ -46,6 +46,7 @@ import PProgressBar from '@/data-display/progress-bar/PProgressBar.vue';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 
+const LIMIT = 8;
 
 export default defineComponent<DynamicChartTemplateProps>({
     name: 'PDynamicChartColumn',
@@ -70,13 +71,17 @@ export default defineComponent<DynamicChartTemplateProps>({
     },
     setup(props) {
         const state = reactive({
+            filteredData: computed<any[]>(() => {
+                if (props.data.length > LIMIT) return props.data.slice(0, LIMIT);
+                return props.data;
+            }),
             names: computed<number[]>(() => {
                 const nameKey = props.nameOptions.key;
-                return props.data.map(d => getValueByPath(d, nameKey));
+                return state.filteredData.map(d => getValueByPath(d, nameKey));
             }),
             values: computed<number[]>(() => {
                 const valueKey = props.valueOptions.key;
-                return props.data.map((d) => {
+                return state.filteredData.map((d) => {
                     let value = getValueByPath(d, valueKey);
                     if (typeof value !== 'number') value = 0;
                     return value;
@@ -94,7 +99,7 @@ export default defineComponent<DynamicChartTemplateProps>({
             return maxValue === 0 ? 0 : value / maxValue * 100;
         };
 
-        const stopDataWatch = watch(() => props.data, () => {
+        const stopDataWatch = watch(() => state.filteredData, () => {
             state.contextKey = getContextKey();
         });
 

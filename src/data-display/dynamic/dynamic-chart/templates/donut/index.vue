@@ -2,7 +2,7 @@
     <div class="p-dynamic-chart-donut">
         <div ref="chartRef" class="donut-chart" />
         <div class="legend-group">
-            <p-status v-for="(item, idx) in data" :key="`${contextKey}-${idx}`" :icon-color="colors[idx]">
+            <p-status v-for="(item, idx) in filteredData" :key="`${contextKey}-${idx}`" :icon-color="colors[idx]">
                 <span class="name">
                     <p-dynamic-field :type="nameOptions.type"
                                      :data="getValueByPath(item, nameOptions.key)"
@@ -26,6 +26,7 @@
 
 <script lang="ts">
 import {
+    computed,
     defineComponent, onMounted, onUnmounted, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -46,6 +47,7 @@ import { getValueByPath } from '@/data-display/dynamic/helper';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { getContextKey } from '@/util/helpers';
 
+const LIMIT = 5;
 
 export default defineComponent<DynamicChartTemplateProps>({
     name: 'PDynamicChartDonut',
@@ -70,6 +72,10 @@ export default defineComponent<DynamicChartTemplateProps>({
     },
     setup(props) {
         const state = reactive({
+            filteredData: computed<any[]>(() => {
+                if (props.data.length > LIMIT) return props.data.slice(0, LIMIT);
+                return props.data;
+            }),
             chart: null as null|PieChart,
             chartRef: null as null|HTMLElement,
             colors: DEFAULT_CHART_COLORS,
