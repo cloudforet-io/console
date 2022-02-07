@@ -25,6 +25,7 @@
                                             :visible.sync="customRangeModalVisible"
                                             :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
                                             :datetime-picker-data-type="DATA_TYPE.yearToMonth"
+                                            :granularity="GRANULARITY.MONTHLY"
                                             @confirm="handleCustomRangeModalConfirm"
         />
     </div>
@@ -46,6 +47,7 @@ import CostManagementCustomRangeModal
 import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -147,14 +149,23 @@ export default {
             }
         };
 
-        const initStates = (period: Period) => {
-            if (period?.start) {
-                savePeriod(period.start, period.end);
-                state.selectedMonthMenuItem = 'custom';
+        // handle dropdown menu item (custom or date(ex. August 2021))
+        const changeSelectedMonthItem = (periodStart: string|undefined = undefined, isCustomPeriod: boolean) => {
+            if (periodStart) { // fixed date
+                if (isCustomPeriod) state.selectedMonthMenuItem = 'custom';
+                else state.selectedMonthMenuItem = dayjs(periodStart).format('YYYY-MM');
             } else {
-                savePeriod(initialPeriodStart, initialPeriodEnd);
                 state.selectedMonthMenuItem = initialSelectedMonth;
             }
+        };
+
+        const initStates = (period: Period) => {
+            const isCustomPeriod = dayjs(period.start).format('YYYY-MM') !== dayjs(period.end).format('YYYY-MM');
+
+            if (period?.start) savePeriod(period.start, period.end); // fixed date
+            else savePeriod(initialPeriodStart, initialPeriodEnd);
+
+            changeSelectedMonthItem(period.start, isCustomPeriod);
         };
 
         watch(() => props.period, (period) => {
@@ -170,6 +181,7 @@ export default {
             handleCustomRangeModalConfirm,
             dateFormatter,
             DATA_TYPE,
+            GRANULARITY,
             handleSelectedFixDate,
         };
     },
