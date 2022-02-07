@@ -35,7 +35,7 @@ export default {
             includesFilter: false,
             defaultFilterModalVisible: false,
             defaultFilter: computed(() => store.state.service?.costDashboardCreate?.defaultFilter || {}),
-            isDashboardTemplate: computed(() => store.state.service?.costDashboardCreate?.selectedTemplate.hasOwnProperty('dashboard_id')),
+            isDashboardTemplate: computed(() => store.state.service?.costDashboardCreate?.selectedTemplate.hasOwnProperty('public_dashboard_id')),
         });
 
         const handleClickFilterButton = () => {

@@ -18,7 +18,8 @@ export interface DashboardInfo {
     created_at: TimeStamp;
     updated_at: TimeStamp;
     custom_layouts: string[];
-    dashboard_id: string;
+    dashboard_id?: string;
+    public_dashboard_id: string;
     default_filter: DefaultFilter;
     default_layout_id: string;
     domain_id?: string;

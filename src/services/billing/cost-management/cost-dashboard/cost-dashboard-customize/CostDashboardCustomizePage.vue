@@ -90,7 +90,7 @@ export default {
         const saveDashboardWithUpdatedData = async () => {
             try {
                 await SpaceConnector.client.costAnalysis.dashboard.update({
-                    dashboard_id: state.dashboardIdFromRoute,
+                    public_dashboard_id: state.dashboardIdFromRoute,
                     name: state.dashboardTitle,
                 });
                 goToMainDashboardPage();
@@ -106,7 +106,7 @@ export default {
         const getDashboardData = async () => {
             try {
                 state.dashboardData = await SpaceConnector.client.costAnalysis.dashboard.get({
-                    dashboard_id: state.dashboardIdFromRoute,
+                    public_dashboard_id: state.dashboardIdFromRoute,
                 });
                 state.dashboardTitle = state.dashboardData?.name || '';
             } catch (e) {

@@ -90,7 +90,7 @@ export default {
         };
         const handleClickCreate = async () => {
             const createdDashboard = await createDashboard();
-            if (createdDashboard?.dashboard_id) goToCustomizePage(createdDashboard.dashboard_id);
+            if (createdDashboard?.dashboard_id) goToCustomizePage(createdDashboard.public_dashboard_id);
         };
 
         return {

@@ -136,7 +136,7 @@ export default {
             try {
                 checkDeleteState.loading = true;
                 await SpaceConnector.client.costAnalysis.dashboard.delete({
-                    dashboard_id: props.dashboardId,
+                    public_dashboard_id: props.dashboardId,
                 });
                 await SpaceRouter.router.replace({ name: BILLING_ROUTE.COST_MANAGEMENT._NAME });
             } catch (e) {
@@ -172,7 +172,7 @@ export default {
         const fetchDashboard = async (dashboardId: string): Promise<DashboardInfo> => {
             try {
                 const dashboard = await SpaceConnector.client.costAnalysis.dashboard.get({
-                    dashboard_id: dashboardId,
+                    public_dashboard_id: dashboardId,
                 });
                 return dashboard;
             } catch (e) {
