@@ -228,6 +228,8 @@ export default {
                 series.stroke = am4core.color(seriesColor);
                 series.strokeWidth = 2;
                 series.tooltip.label.fontSize = 14;
+                series.tooltip.getFillFromObject = false;
+                series.tooltip.background.fill = am4core.color(seriesColor);
 
                 series.adapter.add('tooltipText', (tooltipText, target) => {
                     if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {

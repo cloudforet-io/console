@@ -16,7 +16,7 @@
         <template #default>
             <budget-usage-progress-bar :usage-rate="usageRate" class="budget-progress-bar" />
             <p class="progress-bar-label">
-                <span class="usage-cost">
+                <span class="usage-cost" :style="{ color: getUsageCostColor(usageCost, limitCost) }">
                     {{ currencyMoneyFormatter(usageCost, currency, currencyRates, false, 10000000) }} <span class="spent">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.SPENT') }}</span>
                 </span>
                 <span class="limit-cost">
@@ -46,6 +46,7 @@ import {
     getConvertedBudgetFilter,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { BILLING_ROUTE } from '@/services/billing/routes';
+import { indigo, red } from '@/styles/colors';
 
 export default {
     name: 'BudgetUsage',
@@ -89,6 +90,14 @@ export default {
             widgetLink: computed(() => ({ name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME })),
         });
 
+        /* Util */
+        const getUsageCostColor = (usageCost, limitCost) => {
+            if (usageCost >= limitCost) return red[400];
+            if (usageCost > 0) return indigo[500];
+            return undefined;
+        };
+
+        /* Api */
         const budgetQueryHelper = new QueryHelper();
         const fetchData = async () => {
             budgetQueryHelper.setFilters(getConvertedBudgetFilter(props.filters));
@@ -107,7 +116,6 @@ export default {
                 throw e;
             }
         };
-
         const getData = async () => {
             try {
                 state.loading = true;
@@ -127,6 +135,7 @@ export default {
             }
         };
 
+        /* Watcher */
         watch([() => props.period, () => props.filters], () => {
             getData();
         }, { immediate: true });
@@ -134,6 +143,7 @@ export default {
         return {
             ...toRefs(state),
             currencyMoneyFormatter,
+            getUsageCostColor,
         };
     },
 };
@@ -155,7 +165,7 @@ export default {
     justify-content: space-between;
 
     .usage-cost {
-        @apply text-indigo-500 font-bold;
+        @apply font-bold;
         font-size: 1.125rem;
         line-height: 155%;
     }
