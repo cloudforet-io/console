@@ -111,7 +111,7 @@ export default {
                 { name: 'amountSpent', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.AMOUNT_SPENT'), textAlign: 'right' },
                 { name: 'totalBudget', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.TOTAL_BUDGET'), textAlign: 'right' },
                 {
-                    name: 'usage', label: ' ', textAlign: 'right', width: '14rem',
+                    name: 'usage', label: ' ', textAlign: 'right', width: '16rem',
                 },
                 {
                     name: 'shortageForecast', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.SHORTAGE_FORECAST'), textAlign: 'center', width: '9rem',
@@ -230,6 +230,7 @@ export default {
                 width: 7.5rem;
             }
             .usage-text {
+                flex-shrink: 0;
                 min-width: 3.375rem;
                 margin-left: 1rem;
                 text-align: right;
