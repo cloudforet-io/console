@@ -2,7 +2,9 @@
     <section class="budget-detail-summary">
         <p-pane-layout class="summary-card">
             <span v-if="!loading" class="summary-title">
-                {{ budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL ? $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_BUDGETED_AMOUNT') : 'Start ~ End Months' }}
+                {{ budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL ?
+                    $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_BUDGETED_AMOUNT')
+                    : $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.LABEL_START_END_MONTH') }}
             </span>
             <div v-if="!loading">
                 <p v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL" class="summary-content">
@@ -32,7 +34,7 @@
             </span>
             <p v-if="!loading" class="summary-content cost-type">
                 <span class="cost-type-content">{{ processedCostTypeValue }}</span>
-                <span ref="buttonRef" class="view-all" @click="handleClickViewAll">View all</span>
+                <span ref="buttonRef" class="view-all" @click="handleClickViewAll">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.VIEW_ALL') }}</span>
                 <budget-cost-type-balloon v-if="balloonVisible"
                                           class="cost-type-balloon"
                                           :balloon-width="balloonWidth"
