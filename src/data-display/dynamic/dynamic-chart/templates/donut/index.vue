@@ -42,7 +42,7 @@ import {
 import { DynamicChartFieldHandler, DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
 import { drawPieChart } from '@/data-display/dynamic/dynamic-chart/templates/donut/helper';
 import PStatus from '@/data-display/status/PStatus.vue';
-import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
+import { BASIC_CHART_COLORS } from '@/styles/colorsets';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { getContextKey } from '@/util/helpers';
@@ -78,7 +78,7 @@ export default defineComponent<DynamicChartTemplateProps>({
             }),
             chart: null as null|PieChart,
             chartRef: null as null|HTMLElement,
-            colors: DEFAULT_CHART_COLORS,
+            colors: BASIC_CHART_COLORS,
             contextKey: getContextKey(),
         });
 

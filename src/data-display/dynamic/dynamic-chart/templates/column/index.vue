@@ -36,7 +36,7 @@ import {
 } from '@vue/composition-api';
 import { max } from 'lodash';
 
-import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
+import { BASIC_CHART_COLORS } from '@/styles/colorsets';
 import { getContextKey } from '@/util/helpers';
 import {
     DEFAULT_NAME_OPTIONS,
@@ -112,7 +112,7 @@ export default defineComponent<DynamicChartTemplateProps>({
             ...toRefs(state),
             getValueByPath,
             getPercentage,
-            DEFAULT_CHART_COLORS,
+            BASIC_CHART_COLORS,
         };
     },
 });
