@@ -1,3 +1,10 @@
+# [1.1.0-beta.237](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.236...v1.1.0-beta.237) (2022-02-08)
+
+
+### Features
+
+* add theme to dynamic chart ([#841](https://github.com/spaceone-dev/spaceone-design-system/issues/841)) ([6d445e2](https://github.com/spaceone-dev/spaceone-design-system/commit/6d445e2836924cc7d3ddd819bc12ec4917278209))
+
 # [1.1.0-beta.236](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.235...v1.1.0-beta.236) (2022-02-08)
 
 
