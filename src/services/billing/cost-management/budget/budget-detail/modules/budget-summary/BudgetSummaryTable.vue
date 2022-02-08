@@ -41,12 +41,16 @@ import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/co
 import dayjs from 'dayjs';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { CURRENCY } from '@/store/modules/display/config';
+import { i18n } from '@/translations';
 
 const defaultTableKey = [{ name: 'Actual Cost', path: 'usd_cost' }, { name: 'Current vs Budget.', path: 'ratio' }];
 const monthlyPlanningTableKey = { name: 'Budgeted', path: 'limit' };
 
 const firstColumnData = {
-    date: '', limit: 'Budgeted', usd_cost: 'Actual Cost', ratio: 'Current vs. Budgeted',
+    date: '',
+    limit: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGETED'),
+    usd_cost: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.ACTUAL_COST'),
+    ratio: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_SPENT'),
 };
 
 const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];

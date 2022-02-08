@@ -63,12 +63,12 @@
                     <template v-else>
                         <div class="noti-not-set">
                             <p class="desc">
-                                Set budget notifications if you want to send notifications when the cost exceeds the budget
+                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_DESC') }}
                             </p>
                             <p-icon-text-button name="ic_setting" style-type="gray900" outline
                                                 @click="handleSetNotifications"
                             >
-                                Set
+                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_SET') }}
                             </p-icon-text-button>
                         </div>
                     </template>
