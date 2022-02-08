@@ -12,15 +12,12 @@
                            :disabled="disabled"
                            :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
                            :selected.sync="selectedItems"
+                           :readonly="true"
                            @update:visible-menu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
         >
             <template #menu-no-data-format>
                 <div />
-            </template>
-            <template #search-left />
-            <template #search-default>
-                <span class="text-gray-300">Select</span>
             </template>
             <template #menu-menu>
                 <p-tree :edit-options="{disabled: true}"
