@@ -8,7 +8,7 @@
                       @goBack="$router.go(-1)"
         />
         <slot name="period-filter" />
-        <p-horizontal-layout>
+        <p-horizontal-layout :height="height">
             <template #container="{ height }">
                 <p-dynamic-layout v-if="tableState.schema"
                                   type="query-search-table"
@@ -234,6 +234,10 @@ export default {
         period: {
             type: Object as () => Period|undefined,
             default: undefined,
+        },
+        height: {
+            type: Number,
+            default: 400,
         },
     },
     setup(props, context) {
