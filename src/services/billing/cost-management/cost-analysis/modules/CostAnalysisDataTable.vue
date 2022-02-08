@@ -31,7 +31,7 @@
                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
             </span>
             <span v-else-if="typeof value !== 'string'" class="text-center">
-                <p-anchor :to="value ? getLink(item, field.name) : undefined" target="_self"
+                <p-anchor :to="value ? getLink(item, field.name) : undefined"
                           :show-icon="false"
                 >
                     <template v-if="getIsRaised(item, field.name)">
@@ -136,8 +136,8 @@ export default {
         /* util */
         const _getTableDateFields = (period: Period): DataTableField[] => {
             const dateFields: DataTableField[] = [];
-            const start = dayjs(period.start);
-            const end = dayjs(period.end);
+            const start = dayjs.utc(period.start);
+            const end = dayjs.utc(period.end);
 
             const nameDateFormat = state.dateFormat;
             let labelDateFormat = 'M/D';

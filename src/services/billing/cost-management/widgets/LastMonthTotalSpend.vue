@@ -91,7 +91,7 @@ export default {
             widgetLink: computed(() => ({
                 name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                 query: {
-                    granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+                    granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                     period: objectToQueryString({ start: state.lastMonth.startOf('month'), end: state.lastMonth.endOf('month') }),
                 },
             })),

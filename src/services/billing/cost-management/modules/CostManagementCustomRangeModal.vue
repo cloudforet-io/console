@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        :header-title="headerTitle"
+        :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
         centered
         size="sm"
         fade
@@ -18,8 +18,8 @@
             >
                 <p-datetime-picker class="datetime-picker" :data-type="granularity ? settingsByGranularity.dateType : datetimePickerDataType" :selected-dates.sync="startDate"
                                    :invalid="!!startDate.length && !!endDate.length && invalid"
-                                   :min-date="settingsByGranularity.autoDateLimitDay ? calculatedMinDateFrom : settingsByGranularity.minDate"
-                                   :max-date="settingsByGranularity.autoDateLimitDay ? calculatedMaxDateFrom : settingsByGranularity.maxDate"
+                                   :min-date="fromDate.minDate"
+                                   :max-date="fromDate.maxDate"
                 />
             </p-field-group>
             <p-field-group class="period-select"
@@ -29,8 +29,8 @@
             >
                 <p-datetime-picker class="datetime-picker" :data-type="granularity ? settingsByGranularity.dateType : datetimePickerDataType" :selected-dates.sync="endDate"
                                    :invalid="!!startDate.length && !!endDate.length && invalid"
-                                   :min-date="settingsByGranularity.autoDateLimitDay ? calculatedMinDateTo : settingsByGranularity.minDate"
-                                   :max-date="settingsByGranularity.autoDateLimitDay ? calculatedMaxDateTo : settingsByGranularity.maxDate"
+                                   :min-date="toDate.minDate"
+                                   :max-date="toDate.maxDate"
                 />
             </p-field-group>
         </template>
@@ -47,15 +47,16 @@ import { TranslateResult } from 'vue-i18n';
 import { i18n } from '@/translations';
 
 interface CustomRangeModalSettings {
-    autoDateLimitDay?: number | undefined;
     helpTextFrom?: TranslateResult | undefined;
     helpTextTo?: TranslateResult | undefined;
-    minDate?: string | undefined;
-    maxDate?: string | undefined;
     dateType?: DATA_TYPE;
 }
 
-const today = dayjs.utc();
+interface DateOption {
+    minDate?: string;
+    maxDate?: string;
+}
+
 export default {
     name: 'CostDashboardCustomRangeModal',
     components: {
@@ -67,10 +68,6 @@ export default {
         visible: {
             type: Boolean,
             default: false,
-        },
-        headerTitle: {
-            type: String,
-            default: '',
         },
         datetimePickerDataType: {
             type: String,
@@ -96,46 +93,53 @@ export default {
             }),
             startDate: [],
             endDate: [],
+            fromDate: computed<DateOption>(() => {
+                let minDate;
+                let maxDate;
+                if (!state.endDate.length) return { minDate, maxDate };
+
+                const endDate = dayjs.utc(state.endDate[0]);
+                if (props.granularity === GRANULARITY.DAILY) {
+                    minDate = endDate.subtract(1, 'month').format('YYYY-MM-DD');
+                    maxDate = endDate.format('YYYY-MM-DD');
+                } else if (props.granularity === GRANULARITY.MONTHLY || props.granularity === GRANULARITY.ACCUMULATED) {
+                    minDate = endDate.subtract(11, 'month').format('YYYY-MM-DD');
+                    maxDate = endDate.format('YYYY-MM-DD');
+                }
+                return { minDate, maxDate };
+            }),
+            toDate: computed<DateOption>(() => {
+                let minDate;
+                let maxDate;
+                if (!state.startDate.length) return { minDate, maxDate };
+
+                const startDate = dayjs.utc(state.startDate[0]);
+                if (props.granularity === GRANULARITY.DAILY) {
+                    minDate = startDate.format('YYYY-MM-DD');
+                    maxDate = startDate.add(1, 'month').format('YYYY-MM-DD');
+                } else if (props.granularity === GRANULARITY.MONTHLY || props.granularity === GRANULARITY.ACCUMULATED) {
+                    minDate = startDate.format('YYYY-MM-DD');
+                    maxDate = startDate.add(11, 'month').format('YYYY-MM-DD');
+                }
+                return { minDate, maxDate };
+            }),
             settingsByGranularity: computed<CustomRangeModalSettings>(() => {
                 if (!props.granularity) return {};
                 const customRangeModalSettingsByGranularity = {
                     [GRANULARITY.ACCUMULATED]: {
                         helpTextFrom: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_LAST_12_MONTHS'),
-                        minDate: today.subtract(1, 'year').add(1, 'day').format('YYYY-MM-DD'),
-                        maxDate: today.format('YYYY-MM-DD'),
                         dateType: DATA_TYPE.yearToDate,
                     },
                     [GRANULARITY.DAILY]: {
                         helpTextTo: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_31_DAYS'),
-                        autoDateLimitDay: 31,
-                        minDate: undefined,
-                        maxDate: undefined,
                         dateType: DATA_TYPE.yearToDate,
                     },
                     [GRANULARITY.MONTHLY]: {
                         helpTextFrom: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_LAST_12_MONTHS'),
-                        minDate: today.subtract(1, 'year').format('YYYY-MM-DD'),
-                        maxDate: today.format('YYYY-MM-DD'),
                         dateType: DATA_TYPE.yearToMonth,
                     },
                 };
                 return customRangeModalSettingsByGranularity[props.granularity];
-            }),
-            calculatedMinDateFrom: computed(() => {
-                if (state.endDate.length) return dayjs.utc(state.endDate[0]).subtract(state.settingsByGranularity.autoDateLimitDay - 1, 'day').format('YYYY-MM-DD');
-                return undefined;
-            }),
-            calculatedMaxDateFrom: computed(() => {
-                if (state.endDate.length) return dayjs.utc(state.endDate[0]).add(state.settingsByGranularity.autoDateLimitDay - 1, 'day').format('YYYY-MM-DD');
-                return undefined;
-            }),
-            calculatedMinDateTo: computed(() => {
-                if (state.startDate.length) return dayjs.utc(state.startDate[0]).subtract(state.settingsByGranularity.autoDateLimitDay - 1, 'day').format('YYYY-MM-DD');
-                return undefined;
-            }),
-            calculatedMaxDateTo: computed(() => {
-                if (state.startDate.length) return dayjs.utc(state.startDate[0]).add(state.settingsByGranularity.autoDateLimitDay - 1, 'day').format('YYYY-MM-DD');
-                return undefined;
             }),
         });
         const handleConfirm = () => {

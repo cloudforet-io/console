@@ -27,7 +27,6 @@
         />
         <cost-management-custom-range-modal v-if="customRangeModalVisible"
                                             :visible.sync="customRangeModalVisible"
-                                            :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
                                             :datetime-picker-data-type="DATA_TYPE.yearToMonth"
                                             :granularity="GRANULARITY.MONTHLY"
                                             @confirm="handleCustomRangeModalConfirm"
