@@ -4,7 +4,11 @@
             <p-check-box :selected="isFixDateSelected" @change="handleSelectedFixDate">
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FIX_DATE') }}
             </p-check-box>
-            <p-i name="ic_tooltip" width="1rem" height="1rem" />
+            <p-tooltip class="fix-date-tooltip" :contents="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FIXED_DATE_TOOLTIP')"
+                       :position="'bottom'"
+            >
+                <p-i name="ic_tooltip" width="1rem" height="1rem" />
+            </p-tooltip>
         </div>
         <p-badge style-type="gray200">
             <p v-if="dateFormatter(selectedPeriod.start, 'M') !== dateFormatter(selectedPeriod.end, 'M')">
@@ -40,7 +44,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import dayjs from 'dayjs';
 import { Period } from '@/services/billing/cost-management/type';
 import {
-    PBadge, PSelectDropdown, PCheckBox, PI,
+    PBadge, PSelectDropdown, PCheckBox, PI, PTooltip,
 } from '@spaceone/design-system';
 import CostManagementCustomRangeModal
     from '@/services/billing/cost-management/modules/CostManagementCustomRangeModal.vue';
@@ -64,6 +68,7 @@ export default {
         PBadge,
         PCheckBox,
         PI,
+        PTooltip,
     },
     props: {
         periodType: {
