@@ -1,3 +1,10 @@
+# [1.1.0-beta.236](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.235...v1.1.0-beta.236) (2022-02-08)
+
+
+### Bug Fixes
+
+* add readonly props to PSearch, PSearchDropdown ([#840](https://github.com/spaceone-dev/spaceone-design-system/issues/840)) ([84d39a1](https://github.com/spaceone-dev/spaceone-design-system/commit/84d39a1ea68d99904fc2e841d9f640e60ba60fe4))
+
 # [1.1.0-beta.235](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.234...v1.1.0-beta.235) (2022-02-08)
 
 
