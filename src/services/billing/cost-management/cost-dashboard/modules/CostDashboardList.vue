@@ -16,10 +16,6 @@
                 <span class="title">
                     {{ item.name }}
                 </span>
-                <p-i v-if="item.scope === 'PUBLIC'" name="ic_public" class="public-icon"
-                     width="0.875rem"
-                     height="0.875rem"
-                />
                 <p-i v-if="item.public_dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
                      width="0.875rem" height="0.875rem"
                 />
@@ -167,7 +163,7 @@ export default {
         padding-bottom: 0.5rem;
         padding-left: 0.75rem;
         padding-top: 0.4rem;
-        max-width: calc(100% - 3rem);
+        max-width: calc(100% - 0.75rem);
     }
     .link {
         display: inline-block;

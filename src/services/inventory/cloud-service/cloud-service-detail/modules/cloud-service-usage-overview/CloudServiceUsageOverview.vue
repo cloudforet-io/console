@@ -7,7 +7,7 @@
                           font-weight="bold" class="show-button"
                           @click="handleClickShowAll"
                 >
-                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_ALL') }}
+                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_CHARTS') }}
                 </p-button>
             </template>
             <p-data-loader :loading="layoutLoading" :data="widgetSchemaList" class="stat-wrapper">
