@@ -128,6 +128,10 @@ export default {
             chart.dataFields.value = VALUE_KEY;
             chart.zoomOutButton.disabled = true;
             chart.dataFields.color = 'backgroundColor';
+            chart.paddingRight = 0;
+            chart.paddingLeft = 0;
+            chart.paddingTop = 0;
+            chart.paddingBottom = 0;
 
             const totalCost = sum(state.data.map(d => d.value));
             const series = chart.seriesTemplates.create('0');

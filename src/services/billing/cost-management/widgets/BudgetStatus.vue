@@ -63,6 +63,8 @@ interface ChartData {
     budgetName: string;
     color: string;
     usage: number;
+    limit: number;
+    usdCost: number;
     linkLocation: Location;
 }
 
@@ -113,15 +115,21 @@ export default {
                 let usage = d.usage;
                 if (usage === undefined || usage < 0) usage = 0;
 
-                if (usage < 70) color = indigo[100];
-                else if (usage < 90) color = indigo[500];
-                else if (usage < 100) color = yellow[500];
-                else color = red[400];
+                if (d.limit !== 0) {
+                    if (usage < 70) color = indigo[100];
+                    else if (usage < 90) color = indigo[500];
+                    else if (usage < 100) color = yellow[500];
+                    else color = red[400];
+                } else if (d.usd_cost > 0) color = red[400];
+                else color = indigo[100];
+
                 chartData.push({
                     budgetId: d.budget_id,
                     budgetName: d.name,
                     color,
                     usage,
+                    limit: d.limit,
+                    usdCost: d.usd_cost,
                     linkLocation: {
                         name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
                         params: {
@@ -134,9 +142,18 @@ export default {
         };
         const getTooltipText = (rowIdx, colIdx) => {
             const index = colIdx * 10 + rowIdx;
+            const limit = state.chartData[index].limit;
+            const usdCost = state.chartData[index].usdCost;
             const usage = state.chartData[index].usage;
-            const percentage = usage > 0 ? usage.toFixed(2) : '-';
-            return `${state.chartData[index].budgetName} (${percentage})`;
+
+            let percentage;
+            if (limit === 0) {
+                if (usdCost === 0) percentage = 0;
+                else percentage = '-';
+            } else {
+                percentage = usage.toFixed(2);
+            }
+            return `${state.chartData[index].budgetName} (${percentage}%)`;
         };
 
         /* api */
