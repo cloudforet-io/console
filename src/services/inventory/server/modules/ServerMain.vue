@@ -237,7 +237,7 @@ export default {
         },
         height: {
             type: Number,
-            default: 400,
+            default: undefined,
         },
     },
     setup(props, context) {

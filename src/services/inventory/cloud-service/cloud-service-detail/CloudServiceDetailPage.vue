@@ -894,7 +894,7 @@ export default {
 }
 
 >>> .p-dynamic-layout-query-search-table .p-toolbox-table {
-    @apply border border-gray-200 rounded-lg;
+    @apply overflow-auto border border-gray-200 rounded-lg;
     .p-data-table {
         min-height: unset;
     }
@@ -904,6 +904,17 @@ export default {
     &.monitoring {
         .tab-pane {
             @apply bg-secondary2;
+        }
+    }
+}
+
+@screen mobile {
+    ::v-deep {
+        .horizontal-contents {
+            height: 650px !important;
+            .p-dynamic-layout-query-search-table {
+                height: 650px !important;
+            }
         }
     }
 }
