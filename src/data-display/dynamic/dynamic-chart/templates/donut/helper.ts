@@ -3,7 +3,7 @@ import { PieSeries, PieChart } from '@amcharts/amcharts4/charts';
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { drawSeriesTooltip } from '@/data-display/dynamic/dynamic-chart/helper';
 
-const drawPieSeries = (chart: PieChart, nameOptions: DynamicField, valueOptions: DynamicField): PieSeries => {
+const drawPieSeries = (chart: PieChart, nameOptions: DynamicField, valueOptions: DynamicField, colors: string[]): PieSeries => {
     const series = chart.series.push(new PieSeries());
     series.dataFields.value = valueOptions.key;
     series.dataFields.category = nameOptions.key;
@@ -24,12 +24,13 @@ const drawPieSeries = (chart: PieChart, nameOptions: DynamicField, valueOptions:
     series.hiddenState.properties.endAngle = -90;
     series.hiddenState.properties.startAngle = -90;
 
+    series.colors.list = colors.map(d => am4core.color(d));
     return series;
 };
 
-export const drawPieChart = (chart: PieChart, nameOptions: DynamicField, valueOptions: DynamicField) => {
+export const drawPieChart = (chart: PieChart, nameOptions: DynamicField, valueOptions: DynamicField, colors: string[]) => {
     chart.innerRadius = am4core.percent(65);
     if (chart.hasLicense() && chart.logo) chart.logo.disabled = true;
 
-    drawPieSeries(chart, nameOptions, valueOptions);
+    drawPieSeries(chart, nameOptions, valueOptions, colors);
 };

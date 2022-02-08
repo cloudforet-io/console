@@ -9,6 +9,7 @@
                        :value-options="valueOptions"
                        :name-options="nameOptions"
                        :field-handler="fieldHandler"
+                       :theme="theme"
                        class="chart"
             />
         </p-data-loader>
@@ -25,11 +26,12 @@ import {
 
 import {
     DynamicChartFieldHandler,
-    DynamicChartProps,
+    DynamicChartProps, DynamicChartTheme,
 } from '@/data-display/dynamic/dynamic-chart/type';
 import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_TYPE,
+    DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
 import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
@@ -60,6 +62,10 @@ export default defineComponent<DynamicChartProps>({
         fieldHandler: {
             type: Function as PropType<DynamicChartFieldHandler|undefined>,
             default: undefined,
+        },
+        theme: {
+            type: String as PropType<DynamicChartTheme>,
+            default: DYNAMIC_CHART_THEMES[0],
         },
     },
     setup(props) {

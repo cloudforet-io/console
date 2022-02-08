@@ -37,18 +37,45 @@ import { PieChart } from '@amcharts/amcharts4/charts';
 import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS,
+    DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
 
-import { DynamicChartFieldHandler, DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
+import {
+    DynamicChartFieldHandler,
+    DynamicChartTemplateProps,
+    DynamicChartTheme,
+} from '@/data-display/dynamic/dynamic-chart/type';
 import { drawPieChart } from '@/data-display/dynamic/dynamic-chart/templates/donut/helper';
 import PStatus from '@/data-display/status/PStatus.vue';
-import { BASIC_CHART_COLORS } from '@/styles/colorsets';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { getContextKey } from '@/util/helpers';
+import { BASIC_CHART_COLORS } from '@/styles/colorsets';
 
 const LIMIT = 5;
 
+const getColorSet = (start: number): string[] => {
+    const results: string[] = [];
+    let idx = start;
+    let count = 0;
+    while (count <= LIMIT) {
+        if (idx >= BASIC_CHART_COLORS.length) idx = 0;
+        results.push(BASIC_CHART_COLORS[idx]);
+        count++;
+        idx++;
+    }
+    return results;
+};
+const themeColorSetMap: Record<DynamicChartTheme, string[]> = {
+    VIOLET: getColorSet(0),
+    BLUE: getColorSet(1),
+    CORAL: getColorSet(2),
+    YELLOW: getColorSet(3),
+    GREEN: getColorSet(4),
+    PEACOCK: getColorSet(5),
+    RED: getColorSet(6),
+    INDIGO: getColorSet(7),
+};
 export default defineComponent<DynamicChartTemplateProps>({
     name: 'PDynamicChartDonut',
     components: { PDynamicField, PStatus },
@@ -69,6 +96,10 @@ export default defineComponent<DynamicChartTemplateProps>({
             type: Function as PropType<DynamicChartFieldHandler|undefined>,
             default: undefined,
         },
+        theme: {
+            type: String as PropType<DynamicChartTheme>,
+            default: DYNAMIC_CHART_THEMES[0],
+        },
     },
     setup(props) {
         const state = reactive({
@@ -78,7 +109,7 @@ export default defineComponent<DynamicChartTemplateProps>({
             }),
             chart: null as null|PieChart,
             chartRef: null as null|HTMLElement,
-            colors: BASIC_CHART_COLORS,
+            colors: computed<string[]>(() => themeColorSetMap[props.theme] ?? themeColorSetMap[DYNAMIC_CHART_THEMES[0]]),
             contextKey: getContextKey(),
         });
 
@@ -94,9 +125,9 @@ export default defineComponent<DynamicChartTemplateProps>({
 
             const chart = am4core.create(ctx, PieChart);
 
-            drawPieChart(chart, props.nameOptions, props.valueOptions);
+            drawPieChart(chart, props.nameOptions, props.valueOptions, state.colors);
 
-            chart.data = props.data;
+            chart.data = state.filteredData;
 
             state.chart = chart;
         };
@@ -111,7 +142,7 @@ export default defineComponent<DynamicChartTemplateProps>({
             drawChart();
         });
 
-        const stopDataWatch = watch(() => props.data, (data) => {
+        const stopDataWatch = watch(() => state.filteredData, (data) => {
             state.contextKey = getContextKey();
             updateChartData(data);
         });

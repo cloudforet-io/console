@@ -1,7 +1,7 @@
 import { Meta, Canvas, Story, ArgsTable, Description } from '@storybook/addon-docs/blocks';
 import PDynamicChart from './PDynamicChart.vue';
 import { getDynamicChartArgTypes } from '@/data-display/dynamic/dynamic-chart/story-helper';
-import { DYNAMIC_CHART_TYPE } from '@/data-display/dynamic/dynamic-chart/config';
+import { DYNAMIC_CHART_TYPE, DYNAMIC_CHART_THEMES } from '@/data-display/dynamic/dynamic-chart/config';
 import { getDynamicChartMockData } from '@/data-display/dynamic/dynamic-chart/mock';
 
 
@@ -20,6 +20,7 @@ export const Template = (args, { argTypes }) => ({
         :data="data"
         :value-options="valueOptions"
         :name-options="nameOptions"
+        :theme="theme"
         style="height: 500px;"
     >
     </p-dynamic-chart>
@@ -53,17 +54,25 @@ ${DYNAMIC_CHART_TYPE.map(d => `\`${d}\``).join(', ')} types are available.
 {{
     components: { PDynamicChart },
     template: `
-<div class="h-full w-full overflow p-8">
-    <p-dynamic-chart
-        type="COLUMN"
-        :data="data"
-        style="height: 500px;"
-    >
-    </p-dynamic-chart>
+<div class="h-full w-full overflow p-8 bg-gray-100">
+    <div class="grid gap-4 grid-cols-3">
+        <div v-for="theme in DYNAMIC_CHART_THEMES" :key="theme" class="rounded-md bg-white p-4">
+            <p class="font-bold my-3">{{theme}} Theme</p>
+            <p-dynamic-chart
+                type="COLUMN"
+                :data="data"
+                :theme="theme"
+            >
+            </p-dynamic-chart>
+        </div>
+    </div>
 </div>
     `,
     setup() {
-        return getDynamicChartMockData('COLUMN')
+        return {
+            ...getDynamicChartMockData('COLUMN'),
+            DYNAMIC_CHART_THEMES,
+        }
     }
 }}
     </Story>
@@ -77,25 +86,25 @@ ${DYNAMIC_CHART_TYPE.map(d => `\`${d}\``).join(', ')} types are available.
 {{
     components: { PDynamicChart },
     template: `
-<div class="h-full w-full overflow p-8">
-    <p class="font-bold text-lg my-4">General Case</p>
-    <p-dynamic-chart
-            type="DONUT"
-            :data="data"
-            style="height: 500px;"
-        >
-        </p-dynamic-chart>
-    <p class="font-bold text-lg my-4">Empty Case</p>
-    <p-dynamic-chart
-            type="DONUT"
-            :data="[]"
-            style="height: 500px;"
-        >
-        </p-dynamic-chart>
+<div class="h-full w-full overflow p-8 bg-gray-100">
+    <div class="grid gap-4 grid-cols-3">
+        <div v-for="theme in DYNAMIC_CHART_THEMES" :key="theme" class="rounded-md bg-white p-4">
+            <p class="font-bold my-3">{{theme}} Theme</p>
+            <p-dynamic-chart
+                type="DONUT"
+                :data="data"
+                :theme="theme"
+            >
+            </p-dynamic-chart>
+        </div>
     </div>
+</div>
     `,
     setup() {
-        return getDynamicChartMockData('DONUT')
+        return {
+            ...getDynamicChartMockData('DONUT'),
+            DYNAMIC_CHART_THEMES,
+        }
     }
 }}
     </Story>
@@ -109,25 +118,25 @@ ${DYNAMIC_CHART_TYPE.map(d => `\`${d}\``).join(', ')} types are available.
 {{
     components: { PDynamicChart },
     template: `
-<div class="h-full w-full overflow p-8">
-    <p class="font-bold text-lg my-4">General Case</p>
-    <p-dynamic-chart
-        type="TREEMAP"
-        :data="data"
-        style="height: 500px;"
-    >
-    </p-dynamic-chart>
-    <p class="font-bold text-lg my-4">Empty Case</p>
-    <p-dynamic-chart
-        type="TREEMAP"
-        :data="[]"
-        style="height: 500px;"
-    >
-    </p-dynamic-chart>
+<div class="h-full w-full overflow p-8 bg-gray-100">
+    <div class="grid gap-4 grid-cols-3">
+        <div v-for="theme in DYNAMIC_CHART_THEMES" :key="theme" class="rounded-md bg-white p-4">
+            <p class="font-bold my-3">{{theme}} Theme</p>
+            <p-dynamic-chart
+                type="TREEMAP"
+                :data="data"
+                :theme="theme"
+            >
+            </p-dynamic-chart>
+        </div>
+    </div>
 </div>
     `,
     setup() {
-        return getDynamicChartMockData('TREEMAP')
+        return {
+            ...getDynamicChartMockData('TREEMAP'),
+            DYNAMIC_CHART_THEMES
+        }
     }
 }}
     </Story>

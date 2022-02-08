@@ -22,7 +22,7 @@
                     />
                 </span>
             </div>
-            <p-progress-bar :percentage="getPercentage(value)" />
+            <p-progress-bar :color="progressBarColor" :percentage="getPercentage(value)" />
         </div>
     </div>
 </template>
@@ -36,18 +36,34 @@ import {
 } from '@vue/composition-api';
 import { max } from 'lodash';
 
-import { BASIC_CHART_COLORS } from '@/styles/colorsets';
 import { getContextKey } from '@/util/helpers';
 import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS,
+    DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
-import { DynamicChartFieldHandler, DynamicChartTemplateProps } from '@/data-display/dynamic/dynamic-chart/type';
+import {
+    DynamicChartFieldHandler,
+    DynamicChartTemplateProps,
+    DynamicChartTheme,
+} from '@/data-display/dynamic/dynamic-chart/type';
 import PProgressBar from '@/data-display/progress-bar/PProgressBar.vue';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
+import { palette } from '@/styles/colors';
 
 const LIMIT = 8;
+
+const themeColorMap: Record<DynamicChartTheme, string> = {
+    VIOLET: palette.violet[400],
+    BLUE: palette.blue[400],
+    CORAL: palette.coral[400],
+    YELLOW: palette.yellow[400],
+    GREEN: palette.green[400],
+    PEACOCK: palette.peacock[400],
+    RED: palette.red[400],
+    INDIGO: palette.indigo[400],
+};
 
 export default defineComponent<DynamicChartTemplateProps>({
     name: 'PDynamicChartColumn',
@@ -68,6 +84,10 @@ export default defineComponent<DynamicChartTemplateProps>({
         fieldHandler: {
             type: Function as PropType<DynamicChartFieldHandler|undefined>,
             default: undefined,
+        },
+        theme: {
+            type: String as PropType<DynamicChartTheme>,
+            default: DYNAMIC_CHART_THEMES[0],
         },
     },
     setup(props) {
@@ -93,6 +113,7 @@ export default defineComponent<DynamicChartTemplateProps>({
                 return max(state.values) ?? 0;
             }),
             contextKey: getContextKey(),
+            progressBarColor: computed<string>(() => themeColorMap[props.theme] ?? themeColorMap[DYNAMIC_CHART_THEMES[0]]),
         });
 
         const getPercentage = (value: number) => {
@@ -112,7 +133,6 @@ export default defineComponent<DynamicChartTemplateProps>({
             ...toRefs(state),
             getValueByPath,
             getPercentage,
-            BASIC_CHART_COLORS,
         };
     },
 });

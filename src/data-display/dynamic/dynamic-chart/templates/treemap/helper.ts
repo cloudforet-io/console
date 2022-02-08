@@ -23,41 +23,15 @@ const drawSeries = (chart: TreeMap, nameOptions: DynamicField): TreeMapSeries =>
     return drawSeriesTooltip(series, nameOptions) as TreeMapSeries;
 };
 
-const getColoredData = (chartData: any[]): any[] => {
-    const results: any[] = [];
-    chartData.forEach((d, idx) => {
-        let backgroundColor = palette.violet[200];
-        let textColor = palette.gray[900];
-        if (idx < 3) {
-            textColor = palette.white;
-            if (idx === 0) {
-                backgroundColor = palette.violet[700];
-            } else if (idx === 1) {
-                backgroundColor = palette.violet[500];
-            } else {
-                backgroundColor = palette.violet[400];
-            }
-        } else if (idx < 8) {
-            backgroundColor = palette.violet[300];
-        }
-
-        results.push({
-            ...d,
-            backgroundColor,
-            textColor,
-        });
-    });
-    return results;
-};
-
-export const drawTreemapChart = (chart: TreeMap, data: any[], nameOptions: DynamicField, valueOptions: DynamicField) => {
+export const drawTreemapChart = (chart: TreeMap, nameOptions: DynamicField, valueOptions: DynamicField) => {
     if (chart.hasLicense() && chart.logo) chart.logo.disabled = true;
 
-    // set color step
-    chart.colors.step = 1;
+    chart.paddingTop = 0;
+    chart.paddingBottom = 0;
+    chart.paddingLeft = 0;
+    chart.paddingRight = 0;
 
-    // set data
-    chart.data = getColoredData(data);
+    chart.colors.step = 1;
 
     chart.dataFields.value = valueOptions.key;
     chart.dataFields.name = nameOptions.key;

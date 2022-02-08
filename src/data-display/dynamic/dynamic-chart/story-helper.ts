@@ -1,5 +1,8 @@
 import { ArgTypes } from '@storybook/addons';
-import { DEFAULT_NAME_OPTIONS, DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_TYPE } from '@/data-display/dynamic/dynamic-chart/config';
+import {
+    DEFAULT_NAME_OPTIONS, DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_TYPE, DYNAMIC_CHART_THEMES,
+} from '@/data-display/dynamic/dynamic-chart/config';
+
 
 export const getDynamicChartArgTypes = (): ArgTypes => ({
     type: {
@@ -108,5 +111,24 @@ export const getDynamicChartArgTypes = (): ArgTypes => ({
             },
         },
         control: null,
+    },
+    theme: {
+        name: 'theme',
+        type: { name: 'string' },
+        description: `The theme of chart. ${DYNAMIC_CHART_THEMES.map(d => `'${d}'`)} are available.`,
+        defaultValue: DYNAMIC_CHART_THEMES[0],
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: DYNAMIC_CHART_THEMES[0],
+            },
+        },
+        control: {
+            type: 'select',
+            options: DYNAMIC_CHART_THEMES,
+        },
     },
 });
