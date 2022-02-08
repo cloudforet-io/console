@@ -309,9 +309,14 @@
 				"ALT_S_DELETE_BUDGET": "Successfully Deleted Budget",
 				"ALT_S_UPDATE_BUDGET": "Successfully Updated Budget",
 				"DETAIL": {
+					"ACTUAL_COST": "Actual Cost",
+					"BUDGETED": "Budgeted",
 					"BUDGET_NOTIFICATIONS": "Budget Notifications",
+					"BUDGET_NOTIFICATIONS_DESC": "Set budget notifications if you want to send notifications when the cost exceeds the budget",
+					"BUDGET_NOTIFICATIONS_SET": "Set",
 					"BUDGET_NOTI_HELP_TEXT_1": "When any of the following conditions are met, the notification will be sent.",
 					"BUDGET_NOTI_HELP_TEXT_2": "Budget Notifications Message will be sent to the notifications channels below.",
+					"BUDGET_SPENT": "Budget Spent",
 					"BUDGET_SUMMARY": "Budget Summary",
 					"CONDITION": "Condition",
 					"COST_TYPE": "Cost Type",
@@ -324,6 +329,7 @@
 						"NOTIFICATIONS_LEVEL": "Notifications Level",
 						"SCHEDULE": "Schedule"
 					},
+					"LABEL_START_END_MONTH": "Start ~ End Months",
 					"MODAL": {
 						"ACTUAL_COST": "Actual Cost",
 						"ADD_CONDITION": "Add Condition",
@@ -340,7 +346,8 @@
 					"SET": "Set",
 					"SET_NOTIFICATION_CHANNEL": "Set Notifications Channel",
 					"TARGET": "Target",
-					"TOTAL_BUDGETED_AMOUNT": "Total Budgeted Amount (Period)"
+					"TOTAL_BUDGETED_AMOUNT": "Total Budgeted Amount (Period)",
+					"VIEW_ALL": "View All"
 				},
 				"FORM": {
 					"AMOUNT_PLAN": {
@@ -505,6 +512,7 @@
 					"TARGET": "Target",
 					"TOTAL_BUDGET": "Total Budget"
 				},
+				"FIXED_DATE_TOOLTIP": "Save this date and prevent it to change on reload",
 				"FIX_DATE": "Fix Date",
 				"FORM": {
 					"CUSTOM_RANGE": "Custom Range",

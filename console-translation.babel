@@ -5456,7 +5456,91 @@
                                         <name>DETAIL</name>
                                         <children>
                                             <concept_node>
+                                                <name>ACTUAL_COST</name>
+                                                <definition_loaded>false</definition_loaded>
+                                                <description/>
+                                                <comment/>
+                                                <default_text/>
+                                                <translations>
+                                                    <translation>
+                                                        <language>en-US</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ja-JP</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ko-KR</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                </translations>
+                                            </concept_node>
+                                            <concept_node>
+                                                <name>BUDGETED</name>
+                                                <definition_loaded>false</definition_loaded>
+                                                <description/>
+                                                <comment/>
+                                                <default_text/>
+                                                <translations>
+                                                    <translation>
+                                                        <language>en-US</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ja-JP</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ko-KR</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                </translations>
+                                            </concept_node>
+                                            <concept_node>
                                                 <name>BUDGET_NOTIFICATIONS</name>
+                                                <definition_loaded>false</definition_loaded>
+                                                <description/>
+                                                <comment/>
+                                                <default_text/>
+                                                <translations>
+                                                    <translation>
+                                                        <language>en-US</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ja-JP</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ko-KR</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                </translations>
+                                            </concept_node>
+                                            <concept_node>
+                                                <name>BUDGET_NOTIFICATIONS_DESC</name>
+                                                <definition_loaded>false</definition_loaded>
+                                                <description/>
+                                                <comment/>
+                                                <default_text/>
+                                                <translations>
+                                                    <translation>
+                                                        <language>en-US</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ja-JP</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ko-KR</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                </translations>
+                                            </concept_node>
+                                            <concept_node>
+                                                <name>BUDGET_NOTIFICATIONS_SET</name>
                                                 <definition_loaded>false</definition_loaded>
                                                 <description/>
                                                 <comment/>
@@ -5499,6 +5583,27 @@
                                             </concept_node>
                                             <concept_node>
                                                 <name>BUDGET_NOTI_HELP_TEXT_2</name>
+                                                <definition_loaded>false</definition_loaded>
+                                                <description/>
+                                                <comment/>
+                                                <default_text/>
+                                                <translations>
+                                                    <translation>
+                                                        <language>en-US</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ja-JP</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ko-KR</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                </translations>
+                                            </concept_node>
+                                            <concept_node>
+                                                <name>BUDGET_SPENT</name>
                                                 <definition_loaded>false</definition_loaded>
                                                 <description/>
                                                 <comment/>
@@ -5733,6 +5838,27 @@
                                                     </concept_node>
                                                 </children>
                                             </folder_node>
+                                            <concept_node>
+                                                <name>LABEL_START_END_MONTH</name>
+                                                <definition_loaded>false</definition_loaded>
+                                                <description/>
+                                                <comment/>
+                                                <default_text/>
+                                                <translations>
+                                                    <translation>
+                                                        <language>en-US</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ja-JP</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ko-KR</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                </translations>
+                                            </concept_node>
                                             <folder_node>
                                                 <name>MODAL</name>
                                                 <children>
@@ -6034,6 +6160,27 @@
                                             </concept_node>
                                             <concept_node>
                                                 <name>TOTAL_BUDGETED_AMOUNT</name>
+                                                <definition_loaded>false</definition_loaded>
+                                                <description/>
+                                                <comment/>
+                                                <default_text/>
+                                                <translations>
+                                                    <translation>
+                                                        <language>en-US</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ja-JP</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ko-KR</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                </translations>
+                                            </concept_node>
+                                            <concept_node>
+                                                <name>VIEW_ALL</name>
                                                 <definition_loaded>false</definition_loaded>
                                                 <description/>
                                                 <comment/>
@@ -9108,6 +9255,27 @@
                                             </concept_node>
                                         </children>
                                     </folder_node>
+                                    <concept_node>
+                                        <name>FIXED_DATE_TOOLTIP</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
                                     <concept_node>
                                         <name>FIX_DATE</name>
                                         <definition_loaded>false</definition_loaded>

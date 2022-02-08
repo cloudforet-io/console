@@ -309,9 +309,14 @@
 				"ALT_S_DELETE_BUDGET": "예산 삭제 성공",
 				"ALT_S_UPDATE_BUDGET": "예산 수정 성공",
 				"DETAIL": {
+					"ACTUAL_COST": "실 사용액",
+					"BUDGETED": "예산",
 					"BUDGET_NOTIFICATIONS": "예산 사용 알림 설정",
+					"BUDGET_NOTIFICATIONS_DESC": "비용이 예산의 일정 금액을 초과할 경우, 자동 알림을 받을 수 있도록 알림 기준을 설정하세요.",
+					"BUDGET_NOTIFICATIONS_SET": "설정",
 					"BUDGET_NOTI_HELP_TEXT_1": "다음 경우에 알림을 발송 합니다.",
 					"BUDGET_NOTI_HELP_TEXT_2": "아래 알림 채널로 예산 알림 메세지가 발송 됩니다.",
+					"BUDGET_SPENT": "예산 사용률",
 					"BUDGET_SUMMARY": "예산 요약",
 					"CONDITION": "알림 기준",
 					"COST_TYPE": "비용 발생 기준",
@@ -324,6 +329,7 @@
 						"NOTIFICATIONS_LEVEL": "알림 레벨",
 						"SCHEDULE": "알림 예정일"
 					},
+					"LABEL_START_END_MONTH": "시작 ~ 종료 월",
 					"MODAL": {
 						"ACTUAL_COST": "실 사용액",
 						"ADD_CONDITION": "알림 기준 추가",
@@ -340,7 +346,8 @@
 					"SET": "설정",
 					"SET_NOTIFICATION_CHANNEL": "알림 채널 설정",
 					"TARGET": "타겟",
-					"TOTAL_BUDGETED_AMOUNT": "전체 예산 금액(기간)"
+					"TOTAL_BUDGETED_AMOUNT": "전체 예산 금액(기간)",
+					"VIEW_ALL": "전체보기"
 				},
 				"FORM": {
 					"AMOUNT_PLAN": {
@@ -435,7 +442,7 @@
 				"GROUP_BY": "그룹별 통계",
 				"HELP_TEXT": {
 					"UP_TO_31_DAYS": "최대 31일 까지",
-					"UP_TO_LAST_12_MONTHS": "지난 12 개월부터"
+					"UP_TO_LAST_12_MONTHS": "최대 12개월 기간내 설정 가능"
 				},
 				"HIDE_ALL": "전체 숨김",
 				"KEEP_MY_SETTING": "위의 설정을 내 설정사항으로 유지",
@@ -505,6 +512,7 @@
 					"TARGET": "타겟",
 					"TOTAL_BUDGET": "총 예산"
 				},
+				"FIXED_DATE_TOOLTIP": "설정한 날짜가 새로고침 시에도 유지될 수 있도록 저장할 수 있습니다.",
 				"FIX_DATE": "날짜 고정",
 				"FORM": {
 					"CUSTOM_RANGE": "",
@@ -1185,7 +1193,7 @@
 				"SHOW_CHARTS": "차트 보기",
 				"SHOW_MAJOR": "주요 서비스 보기 ",
 				"TITLE": "{provider} 클라우드 서비스 ",
-				"USAGE_OVERVIEW": "Usage Overview"
+				"USAGE_OVERVIEW": "이용 현황"
 			},
 			"PAGE": {
 				"ACTION": "작업",

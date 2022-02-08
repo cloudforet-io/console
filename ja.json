@@ -309,9 +309,14 @@
 				"ALT_S_DELETE_BUDGET": "",
 				"ALT_S_UPDATE_BUDGET": "",
 				"DETAIL": {
+					"ACTUAL_COST": "",
+					"BUDGETED": "",
 					"BUDGET_NOTIFICATIONS": "",
+					"BUDGET_NOTIFICATIONS_DESC": "",
+					"BUDGET_NOTIFICATIONS_SET": "",
 					"BUDGET_NOTI_HELP_TEXT_1": "",
 					"BUDGET_NOTI_HELP_TEXT_2": "",
+					"BUDGET_SPENT": "",
 					"BUDGET_SUMMARY": "",
 					"CONDITION": "",
 					"COST_TYPE": "",
@@ -324,6 +329,7 @@
 						"NOTIFICATIONS_LEVEL": "",
 						"SCHEDULE": ""
 					},
+					"LABEL_START_END_MONTH": "",
 					"MODAL": {
 						"ACTUAL_COST": "",
 						"ADD_CONDITION": "",
@@ -340,7 +346,8 @@
 					"SET": "",
 					"SET_NOTIFICATION_CHANNEL": "",
 					"TARGET": "",
-					"TOTAL_BUDGETED_AMOUNT": ""
+					"TOTAL_BUDGETED_AMOUNT": "",
+					"VIEW_ALL": ""
 				},
 				"FORM": {
 					"AMOUNT_PLAN": {
@@ -505,6 +512,7 @@
 					"TARGET": "",
 					"TOTAL_BUDGET": ""
 				},
+				"FIXED_DATE_TOOLTIP": "",
 				"FIX_DATE": "",
 				"FORM": {
 					"CUSTOM_RANGE": "",
