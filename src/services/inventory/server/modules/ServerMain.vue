@@ -8,7 +8,7 @@
                       @goBack="$router.go(-1)"
         />
         <slot name="period-filter" />
-        <p-horizontal-layout :height="height">
+        <p-horizontal-layout :height="tableState.tableHeight" @drag-end="onTableHeightChange">
             <template #container="{ height }">
                 <p-dynamic-layout v-if="tableState.schema"
                                   type="query-search-table"
@@ -235,10 +235,6 @@ export default {
             type: Object as () => Period|undefined,
             default: undefined,
         },
-        height: {
-            type: Number,
-            default: undefined,
-        },
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -261,6 +257,7 @@ export default {
             schema: null as null|DynamicLayout,
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d]).filter(d => d !== undefined)),
+            tableHeight: store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX),
             consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
             dropdown: computed<MenuItem[]>(() => [
                 // {
@@ -537,6 +534,14 @@ export default {
             default: break;
             }
         };
+        const onTableHeightChange = (height) => {
+            tableState.tableHeight = height;
+            store.dispatch('settings/setItem', {
+                key: 'tableHeight',
+                value: height,
+                path: STORAGE_PREFIX,
+            });
+        };
 
         const reloadTable = async () => {
             await getTableSchema();
@@ -575,6 +580,7 @@ export default {
             fetchTableData,
             fieldHandler,
             reloadTable,
+            onTableHeightChange,
 
             /* Change Project */
             changeProjectState,
