@@ -1,3 +1,10 @@
+# [1.1.0-beta.238](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.237...v1.1.0-beta.238) (2022-02-08)
+
+
+### Features
+
+* add index to dynamic widget for variate themes ([#842](https://github.com/spaceone-dev/spaceone-design-system/issues/842)) ([50d2922](https://github.com/spaceone-dev/spaceone-design-system/commit/50d2922c3b8a70d66db397dfed515a0afebc5c11))
+
 # [1.1.0-beta.237](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.236...v1.1.0-beta.237) (2022-02-08)
 
 
