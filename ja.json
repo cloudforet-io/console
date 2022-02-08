@@ -1618,6 +1618,7 @@
 		}
 	},
 	"PAGE_SCHEMA": {
+		"ACCOUNT_ID": "",
 		"BASE_INFO": "基本情報",
 		"BIOS_RELEASED_AT": "BIOS配布日時",
 		"BIOS_VERSION": "BIOSバージョン",

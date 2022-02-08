@@ -1618,6 +1618,7 @@
 		}
 	},
 	"PAGE_SCHEMA": {
+		"ACCOUNT_ID": "계정",
 		"BASE_INFO": "기본 정보",
 		"BIOS_RELEASED_AT": "바이오스 배포 일시",
 		"BIOS_VERSION": "바이오스 버전",

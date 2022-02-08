@@ -1618,6 +1618,7 @@
 		}
 	},
 	"PAGE_SCHEMA": {
+		"ACCOUNT_ID": "Account ID",
 		"BASE_INFO": "Base Information",
 		"BIOS_RELEASED_AT": "Bios Released",
 		"BIOS_VERSION": "Bios Version",
