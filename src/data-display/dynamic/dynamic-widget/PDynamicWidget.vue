@@ -1,5 +1,6 @@
 <template>
     <component :is="component"
+               :index="index"
                :name="name"
                :schema-options="schemaOptions"
                :data="data"
@@ -28,6 +29,10 @@ export default defineComponent<DynamicWidgetProps>({
     name: 'PDynamicWidget',
     components: { PPaneLayout, PSkeleton },
     props: {
+        index: {
+            type: Number,
+            default: 0,
+        },
         type: {
             type: String,
             required: true,

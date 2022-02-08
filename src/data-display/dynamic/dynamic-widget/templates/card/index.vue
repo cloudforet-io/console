@@ -35,7 +35,7 @@ import { DEFAULT_VALUE_OPTIONS } from '@/data-display/dynamic/dynamic-widget/con
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 
-type DynamicWidgetCardProps = Exclude<DynamicWidgetProps, 'type'>
+type DynamicWidgetCardProps = Exclude<DynamicWidgetProps, 'type'&'index'>
 
 export default defineComponent<DynamicWidgetCardProps>({
     name: 'PDynamicWidgetCard',

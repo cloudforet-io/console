@@ -10,7 +10,6 @@ export interface DynamicWidgetSchemaOptions {
     value_options?: DynamicField;
     name_options?: DynamicField;
     chart_type?: DynamicChartType;
-    limit?: number;
 }
 
 export interface DynamicWidgetSchema<Query=object> {
@@ -34,6 +33,7 @@ export type DynamicWidgetFieldHandler<T = undefined> = DynamicFieldHandler<
 
 
 export interface DynamicWidgetProps<T=any> {
+    index: number;
     // data from schema
     type: DynamicWidgetType;
     name: string;

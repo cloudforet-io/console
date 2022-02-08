@@ -11,14 +11,15 @@
                          :loading="loading"
                          :value-options="schemaOptions.value_options"
                          :name-options="schemaOptions.name_options"
-                         :limit="schemaOptions.limit || 10"
                          :field-handler="fieldHandler"
+                         :theme="theme"
         />
     </p-pane-layout>
 </template>
 
 <script lang="ts">
 import {
+    computed,
     defineComponent, PropType,
     reactive, toRefs,
 } from '@vue/composition-api';
@@ -31,6 +32,8 @@ import {
 import PDynamicChart from '@/data-display/dynamic/dynamic-chart/PDynamicChart.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
+import { DYNAMIC_CHART_THEMES } from '@/data-display/dynamic/dynamic-chart/config';
+import { DynamicChartTheme } from '@/data-display/dynamic/dynamic-chart/type';
 
 type DynamicWidgetChartProps = Exclude<DynamicWidgetProps, 'type'>
 
@@ -38,6 +41,10 @@ export default defineComponent<DynamicWidgetChartProps>({
     name: 'PDynamicWidgetChart',
     components: { PSkeleton, PPaneLayout, PDynamicChart },
     props: {
+        index: {
+            type: Number,
+            default: 0,
+        },
         name: {
             type: String,
             default: '',
@@ -63,8 +70,13 @@ export default defineComponent<DynamicWidgetChartProps>({
             default: undefined,
         },
     },
-    setup() {
-        const state = reactive({});
+    setup(props) {
+        const state = reactive({
+            theme: computed<DynamicChartTheme>(() => {
+                const themeIdx = props.index % DYNAMIC_CHART_THEMES.length;
+                return DYNAMIC_CHART_THEMES[themeIdx];
+            }),
+        });
 
         return {
             ...toRefs(state),

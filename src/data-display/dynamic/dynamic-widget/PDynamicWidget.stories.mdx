@@ -23,13 +23,13 @@ export const Template = (args, { argTypes }) => ({
     template: `
     <div class="h-full w-full overflow p-8">
         <p-dynamic-widget
+            :index="index"
             :type="type"
             :name="name"
             :schema-options="{
                 value_options,
                 name_options,
                 chart_type,
-                limit
             }"
             :data="data"
             :loading="loading"
@@ -63,7 +63,6 @@ Options required to display data by type of Dynamic Widget.
 | value_options | Display options for value. `DynamicField` type.|
 | name_options | Display options for name. `DynamicField` type.|
 | chart_type | The type of chart. One of DynamicChart's type.|
-| limit | Maximum size of data to display. |
 
 <br/>
 
@@ -72,7 +71,6 @@ interface DynamicWidgetSchemaOptions {
     value_options?: DynamicField;
     name_options?: DynamicField;
     chart_type?: DynamicChartType;
-    limit?: number;
 }
 ```
 <br/>
@@ -93,7 +91,6 @@ interface DynamicWidgetSchemaOptions {
 | value_options | O |
 | name_options | X |
 | chart_type | X |
-| limit | X |
 
 <br/>
 
@@ -135,7 +132,6 @@ interface DynamicWidgetSchemaOptions {
 | value_options | O |
 | name_options | O|
 | chart_type | O |
-| limit | O |
 
 <br/>
 
@@ -148,6 +144,7 @@ interface DynamicWidgetSchemaOptions {
         <p class="text-lg font-bold my-4">Chart Type: COLUMN</p>
         <p-dynamic-widget
             type="chart"
+            :index="0"
             :name="name"
             :schema-options="column.schemaOptions"
             :data="column.data"
@@ -157,6 +154,7 @@ interface DynamicWidgetSchemaOptions {
         <p class="text-lg font-bold my-4">Chart Type: DONUT</p>
         <p-dynamic-widget
             type="chart"
+            :index="1"
             :name="name"
             :schema-options="donut.schemaOptions"
             :data="donut.data"
@@ -167,6 +165,7 @@ interface DynamicWidgetSchemaOptions {
         <p class="text-lg font-bold my-4">Chart Type: TREEMAP</p>
         <p-dynamic-widget
             type="chart"
+            :index="2"
             :name="name"
             :schema-options="treemap.schemaOptions"
             :data="treemap.data"

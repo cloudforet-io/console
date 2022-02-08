@@ -4,6 +4,24 @@ import { getDynamicChartArgTypes } from '@/data-display/dynamic/dynamic-chart/st
 
 export const getDynamicWidgetArgTypes = (): ArgTypes => {
     const dynamicWidgetArgTypes: ArgTypes = {
+        index: {
+            name: 'index',
+            type: { name: 'number' },
+            description: 'The index of widget. Useful when you list widgets.',
+            defaultValue: 0,
+            table: {
+                type: {
+                    summary: 'number',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: '0',
+                },
+            },
+            control: {
+                type: 'number',
+            },
+        },
         type: {
             name: 'type',
             type: { name: 'string', required: true },
