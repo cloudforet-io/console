@@ -117,7 +117,7 @@ export default {
     filter: drop-shadow(0 2px 4px rgba(theme('colors.black'), 0.06));
 
     &:hover {
-        @apply border-l border-secondary bg-blue-100;
+        @apply border-l border-secondary border-gray-200 bg-blue-100;
         cursor: pointer;
 
         .favorite-btn:not(.active) {
