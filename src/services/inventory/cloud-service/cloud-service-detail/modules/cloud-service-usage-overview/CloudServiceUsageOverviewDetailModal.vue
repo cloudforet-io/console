@@ -17,6 +17,7 @@
             >
                 <template v-for="(schema, idx) in widgetSchemaList">
                     <p-dynamic-widget :key="`${cloudServiceTypeId}-${idx}`"
+                                      :index="widgetIndices[idx]"
                                       :type="schema.type"
                                       :name="schema.name"
                                       :data="dataList[idx]"
@@ -124,12 +125,19 @@ export default defineComponent<Props>({
             proxyVisible: props.visible,
             header: computed(() => `Usage Overview of ${props.cloudServiceTypeInfo?.name}`),
             widgetSchemaList: [] as DynamicWidgetSchema[],
+            widgetIndices: computed<number[]>(() => {
+                let chartTypeIdx = 0;
+                return state.widgetSchemaList.map((d) => {
+                    if (d.type === 'chart') return chartTypeIdx++;
+                    return 0;
+                });
+            }),
             layoutLoading: true,
             dataList: [] as Data[][],
             dataLoading: true,
             cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo?.cloud_service_type_id ?? ''),
             queryTags: [] as QueryTag[],
-            apiFilter: [] as Filter[],
+            apiQuery: { filter: [] as Filter[], keyword: '' },
             dateRange: computed<Period|undefined>(() => {
                 if (isEmpty(props.period)) return undefined;
                 const period = props.period as Period;
@@ -166,9 +174,8 @@ export default defineComponent<Props>({
         const fetchDataWithSchema = async (schema: DynamicWidgetSchema): Promise<Data[]> => {
             try {
                 const { results } = await SpaceConnector.client.inventory[props.isServer ? 'server' : 'cloudService'].analyze({
+                    ...state.apiQuery,
                     default_query: schema.query,
-                    filter: state.apiFilter,
-                    limit: schema.options?.limit,
                     date_range: state.dateRange,
                 });
                 return results;
@@ -193,7 +200,7 @@ export default defineComponent<Props>({
 
         const getDataListWithSchema = async () => {
             state.dataLoading = true;
-            const results = await Promise.allSettled(state.widgetSchemaList.map(schema => fetchDataWithSchema(schema)));
+            const results: any = await Promise.allSettled(state.widgetSchemaList.map(schema => fetchDataWithSchema(schema)));
             state.dataList = results.map((d) => {
                 if (d.status === 'fulfilled') return d.value;
                 return [];
@@ -218,15 +225,17 @@ export default defineComponent<Props>({
 
         /* Watchers */
         watch(() => props.filters, (filters) => {
-            const { filter } = queryHelper.setFilters(filters).apiQuery;
+            const { filter, keyword } = queryHelper.setFilters(filters).apiQuery;
 
-            state.apiFilter = filter;
+            state.apiQuery.filter = filter;
+            state.apiQuery.keyword = keyword;
             state.queryTags = queryHelper.queryTags;
         }, { immediate: true });
 
         watch(() => props.visible, (visible) => {
             if (visible !== state.proxyVisible) state.proxyVisible = visible;
         });
+
 
         watch(() => state.proxyVisible, async (visible) => {
             if (visible && state.cloudServiceTypeId) {

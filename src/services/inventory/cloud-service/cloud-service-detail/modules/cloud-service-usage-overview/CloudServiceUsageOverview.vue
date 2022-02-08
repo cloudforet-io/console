@@ -120,12 +120,12 @@ export default defineComponent<Props>({
             dataList: [] as Data[],
             dataLoading: false,
             cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo.cloud_service_type_id ?? ''),
-            apiFilter: computed<Filter[]|undefined>(() => {
+            apiQuery: computed<{filter?: Filter[]; keyword?: string}>(() => {
                 if (props.filters) {
-                    const { filter } = queryHelper.setFilters(props.filters).apiQuery;
-                    return filter;
+                    const { filter, keyword } = queryHelper.setFilters(props.filters).apiQuery;
+                    return { filter, keyword };
                 }
-                return undefined;
+                return {};
             }),
             dateRange: computed<Period|undefined>(() => {
                 if (isEmpty(props.period)) return undefined;
@@ -167,9 +167,8 @@ export default defineComponent<Props>({
 
             try {
                 const { results } = await SpaceConnector.client.inventory[props.isServer ? 'server' : 'cloudService'].analyze({
+                    ...state.apiQuery,
                     default_query: schema.query,
-                    filter: state.apiFilter,
-                    limit: schema.options?.limit,
                     date_range: state.dateRange,
                 });
                 fetchDataTokenList[idx] = undefined;
