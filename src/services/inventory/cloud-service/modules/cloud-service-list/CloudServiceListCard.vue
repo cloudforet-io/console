@@ -47,11 +47,14 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { store } from '@/store';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import { Period } from '@/services/billing/cost-management/type';
+import { objectToQueryString } from '@/lib/router-query-string';
 
 interface Props {
     item: any;
     queryFilters: QueryStoreFilter[];
     selectedRegions: string[];
+    period?: Period;
 }
 
 export default {
@@ -72,6 +75,10 @@ export default {
             type: Array,
             default: () => [],
         },
+        period: {
+            type: Object,
+            default: undefined,
+        },
     },
     setup(props: Props) {
         const state = reactive({
@@ -82,6 +89,7 @@ export default {
             cloudServiceDetailQueryHelper.setFilters(props.queryFilters.filter((f: any) => f.k && ![
                 'cloud_service_type',
                 'cloud_service_group',
+                'service_code',
             ].includes(f.k)));
 
             if (props.selectedRegions.length) {
@@ -97,6 +105,7 @@ export default {
                 },
                 query: {
                     filters: cloudServiceDetailQueryHelper.rawQueryStrings,
+                    period: objectToQueryString(props.period),
                 },
             };
             return res;

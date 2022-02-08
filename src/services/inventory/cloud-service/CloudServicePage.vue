@@ -32,6 +32,7 @@
                                                  :item="item"
                                                  :query-filters="queryFilters"
                                                  :selected-regions="selectedRegions"
+                                                 :period="period"
                         />
                     </div>
                     <template #no-data>
