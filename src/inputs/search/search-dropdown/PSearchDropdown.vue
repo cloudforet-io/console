@@ -8,6 +8,7 @@
                   :is-focused.sync="proxyIsFocused"
                   :invalid="invalid"
                   :disabled="disabled"
+                  :readonly="readonly"
                   :style="{height: `${searchHeight}px`}"
                   @delete="onDeleteSearchText"
                   @click.native.stop="handleClick"
@@ -135,6 +136,10 @@ export default defineComponent<SearchDropdownProps>({
             default: false,
         },
         disabled: {
+            type: Boolean,
+            default: false,
+        },
+        readonly: {
             type: Boolean,
             default: false,
         },

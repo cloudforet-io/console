@@ -1,6 +1,6 @@
 <template>
     <div class="p-search" :class="{ focused: proxyIsFocused, invalid, disabled }">
-        <p-i v-if="!disableIcon && !proxyIsFocused && !value" class="left-icon" name="ic_search"
+        <p-i v-if="!disableIcon && !proxyIsFocused && !value && !readonly" class="left-icon" name="ic_search"
              color="inherit"
         />
         <slot name="left" v-bind="{ value, placeholder: placeholderText }" />
@@ -10,6 +10,7 @@
                        :value="value"
                        :placeholder="placeholderText"
                        :disabled="disabled"
+                       :readonly="readonly"
                        v-on="inputListeners"
                 >
             </slot>
@@ -66,6 +67,10 @@ export default defineComponent<SearchProps>({
             default: false,
         },
         disabled: {
+            type: Boolean,
+            default: false,
+        },
+        readonly: {
             type: Boolean,
             default: false,
         },
@@ -156,6 +161,9 @@ export default defineComponent<SearchProps>({
         }
         &:focus {
             outline: none;
+        }
+        &:read-only {
+            pointer-events: none;
         }
     }
     .right {

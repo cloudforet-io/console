@@ -116,6 +116,30 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## Readonly
+
+<Canvas>
+    <Story name="Readonly" >
+        {{
+            components: { PSearch },
+            template: `
+        <p-search v-model="proxyValue" readonly />
+    `,
+            setup(props) {
+                const state = reactive({
+                    proxyValue: props.value
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Playground
 

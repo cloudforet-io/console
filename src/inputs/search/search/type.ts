@@ -4,6 +4,7 @@ export interface SearchProps {
     disableIcon?: boolean;
     invalid?: boolean;
     disabled?: boolean;
+    readonly?: boolean;
     isFocused?: boolean; // sync
 }
 

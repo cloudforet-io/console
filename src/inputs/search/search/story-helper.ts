@@ -109,6 +109,24 @@ export const getSearchArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    readonly: {
+        name: 'readonly',
+        type: { name: 'boolean' },
+        description: 'Whether to make input readonly.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     /* model */
     'v-model': {
         name: 'v-model',

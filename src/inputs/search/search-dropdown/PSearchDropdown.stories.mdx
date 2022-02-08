@@ -228,6 +228,29 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## Readonly
+
+<Canvas>
+    <Story name="Readonly" args={{menu: getSearchDropdownMenu()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PSearchDropdown },
+            template: `
+        <p-search-dropdown
+            :menu="menu"
+            :readonly="true"
+            type="radioButton"
+            use-fixed-menu-style
+        />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
 ## Radio Button Type
 
 <Canvas>
