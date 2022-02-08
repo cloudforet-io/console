@@ -1,3 +1,10 @@
+# [1.1.0-beta.235](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.234...v1.1.0-beta.235) (2022-02-08)
+
+
+### Bug Fixes
+
+* add chart tooltip draw helper ([#839](https://github.com/spaceone-dev/spaceone-design-system/issues/839)) ([5d31148](https://github.com/spaceone-dev/spaceone-design-system/commit/5d3114892f2bede19f95a79b342132b82afe0c8a))
+
 # [1.1.0-beta.234](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.233...v1.1.0-beta.234) (2022-02-07)
 
 
