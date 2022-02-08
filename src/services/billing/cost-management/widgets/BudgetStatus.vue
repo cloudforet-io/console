@@ -147,13 +147,10 @@ export default {
             const usage = state.chartData[index].usage;
 
             let percentage;
-            if (limit === 0) {
-                if (usdCost === 0) percentage = 0;
-                else percentage = '-';
-            } else {
-                percentage = usage.toFixed(2);
-            }
-            return `${state.chartData[index].budgetName} (${percentage}%)`;
+            if (usdCost === 0) percentage = '0%';
+            else if (limit === 0) percentage = '-';
+            else percentage = `${usage.toFixed(2)}%`;
+            return `${state.chartData[index].budgetName} (${percentage})`;
         };
 
         /* api */

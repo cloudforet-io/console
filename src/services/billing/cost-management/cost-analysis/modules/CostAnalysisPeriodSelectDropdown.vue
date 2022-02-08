@@ -16,7 +16,6 @@
         />
         <cost-management-custom-range-modal v-if="customRangeModalVisible"
                                             :visible.sync="customRangeModalVisible"
-                                            :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.CUSTOM_DATE_RANGE')"
                                             :granularity="granularity"
                                             @confirm="handleCustomRangeModalConfirm"
         />
