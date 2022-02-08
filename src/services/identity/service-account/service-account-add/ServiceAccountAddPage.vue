@@ -101,10 +101,11 @@
             <div v-if="hasCredentialKey">
                 <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SECRET_TYPE_LABEL')" required>
                     <div class="flex">
-                        <span v-for="(type, idx) in secretTypes" :key="idx" class="radio-text">
-                            <p-radio v-model="selectedSecretType" :value="type" />
+                        <p-radio v-for="(type, idx) in secretTypes" :key="idx" v-model="selectedSecretType"
+                                 class="radio-text" :value="type"
+                        >
                             {{ type }}
-                        </span>
+                        </p-radio>
                     </div>
                 </p-field-group>
                 <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" stretch>
@@ -243,7 +244,7 @@ export default {
             accountSchema: null as any|null,
             isAccountModelValid: false,
             //
-            credentialModel: {},
+            credentialModel: { dummyKey: 'dummyKey' },
             credentialSchema: {},
             isCredentialModelValid: false,
             //
@@ -255,7 +256,7 @@ export default {
                 const isAccountModelValid = formState.accountSchema ? formState.isAccountModelValid : true;
 
                 if (tabState.activeTab === 'json') {
-                    return formState.isAccountNameValid && isAccountModelValid;
+                    return formState.isAccountNameValid && isAccountModelValid && formState.jsonForCredential;
                 }
                 if (state.hasCredentialKey) return formState.isAccountNameValid && isAccountModelValid && formState.isCredentialModelValid;
                 return formState.isAccountNameValid && isAccountModelValid;
@@ -311,6 +312,7 @@ export default {
                 name: selectedSecretType,
                 only: ['schema'],
             });
+            formState.credentialModel = {};
             formState.credentialSchema = res.schema;
         };
 

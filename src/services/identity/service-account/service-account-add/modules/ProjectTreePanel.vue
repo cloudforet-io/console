@@ -32,6 +32,7 @@
                                                  project-selectable
                                                  :disabled="selectedToggle"
                                                  :selected-project-ids="selectedProject"
+                                                 :use-fixed-menu-style="false"
                                                  @select="handleSelectedProjectIds"
                         />
                     </div>
