@@ -7,7 +7,7 @@
                            :type="multiSelectable ? 'checkbox' : 'radioButton'"
                            show-tag-box
                            :exact-mode="false"
-                           use-fixed-menu-style
+                           :use-fixed-menu-style="useFixedMenuStyle"
                            :invalid="invalid"
                            :disabled="disabled"
                            :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
@@ -109,6 +109,10 @@ export default {
         projectGroupSelectable: {
             type: Boolean,
             default: false,
+        },
+        useFixedMenuStyle: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props, { emit }) {
