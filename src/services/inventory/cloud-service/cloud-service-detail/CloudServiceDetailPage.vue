@@ -36,7 +36,6 @@
                          :cloud-service-type="sidebarState.serverCloudServiceType"
                          :cloud-service-group="group"
                          :period="overviewState.period"
-                         :height="tableState.tableHeight"
             >
                 <template #period-filter>
                     <cloud-service-period-filter :period="overviewState.period"
