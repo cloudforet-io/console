@@ -8,7 +8,7 @@
                       @goBack="$router.go(-1)"
         />
         <slot name="period-filter" />
-        <p-horizontal-layout :height="tableState.tableHeight" @drag-end="onTableHeightChange">
+        <p-horizontal-layout :min-height="minHeight" :height="tableState.tableHeight" @drag-end="onTableHeightChange">
             <template #container="{ height }">
                 <p-dynamic-layout v-if="tableState.schema"
                                   type="query-search-table"
@@ -235,6 +235,10 @@ export default {
             type: Object as () => Period|undefined,
             default: undefined,
         },
+        minHeight: {
+            type: Number,
+            default: undefined,
+        },
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -253,11 +257,12 @@ export default {
             colCopy: false,
             settingsVisible: true,
         });
+        const tableHeight = store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX) ?? 0;
         const tableState = reactive({
             schema: null as null|DynamicLayout,
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d]).filter(d => d !== undefined)),
-            tableHeight: store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX),
+            tableHeight: tableHeight > props.minHeight ? tableHeight : props.minHeight,
             consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
             dropdown: computed<MenuItem[]>(() => [
                 // {
@@ -535,7 +540,7 @@ export default {
             }
         };
         const onTableHeightChange = (height) => {
-            tableState.tableHeight = height;
+            tableState.tableHeight = height > props.minHeight ? height : props.minHeight;
             store.dispatch('settings/setItem', {
                 key: 'tableHeight',
                 value: height,

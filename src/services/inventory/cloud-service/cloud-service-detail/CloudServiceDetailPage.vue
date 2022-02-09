@@ -36,6 +36,7 @@
                          :cloud-service-type="sidebarState.serverCloudServiceType"
                          :cloud-service-group="group"
                          :period="overviewState.period"
+                         :min-height="TABLE_MIN_HEIGHT"
             >
                 <template #period-filter>
                     <cloud-service-period-filter :period="overviewState.period"
@@ -63,7 +64,7 @@
                 <cloud-service-period-filter :period="overviewState.period"
                                              @update:period="handlePeriodUpdate"
                 />
-                <p-horizontal-layout :height="tableState.tableHeight" @drag-end="onTableHeightChange">
+                <p-horizontal-layout :min-height="TABLE_MIN_HEIGHT" :height="tableState.tableHeight" @drag-end="onTableHeightChange">
                     <template #container="{ height }">
                         <template v-if="tableState.schema">
                             <p-dynamic-layout type="query-search-table"
@@ -258,6 +259,7 @@ const DEFAULT_PAGE_SIZE = 15;
 
 // TODO: move this code to store
 const STORAGE_PREFIX = 'inventory/cloudService';
+const TABLE_MIN_HEIGHT = 400;
 
 type SidebarItemType = {
     id?: string;
@@ -352,6 +354,7 @@ export default {
             settingsVisible: true,
         });
 
+        const tableHeight = store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX) ?? 0;
         const tableState = reactive({
             schema: null as null|DynamicLayout,
             items: [],
@@ -396,7 +399,7 @@ export default {
                 return res;
             }),
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
-            tableHeight: store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX),
+            tableHeight: tableHeight > TABLE_MIN_HEIGHT ? tableHeight : TABLE_MIN_HEIGHT,
             visibleCustomFieldModal: false,
             searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
         });
@@ -796,6 +799,7 @@ export default {
             fieldHandler,
             reloadTable,
             onClickSettings,
+            TABLE_MIN_HEIGHT,
 
 
             /* Change Project */
@@ -893,7 +897,7 @@ export default {
 }
 
 >>> .p-dynamic-layout-query-search-table .p-toolbox-table {
-    @apply overflow-auto border border-gray-200 rounded-lg;
+    @apply border border-gray-200 rounded-lg;
     .p-data-table {
         min-height: unset;
     }
@@ -910,9 +914,9 @@ export default {
 @screen mobile {
     ::v-deep {
         .horizontal-contents {
-            height: 650px !important;
+            height: 50rem !important;
             .p-dynamic-layout-query-search-table {
-                height: 650px !important;
+                height: 50rem !important;
             }
         }
     }
