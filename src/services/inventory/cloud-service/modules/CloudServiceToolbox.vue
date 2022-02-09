@@ -89,6 +89,10 @@ export default {
             selectedRegions: computed(() => store.state.service.cloudService.selectedRegions),
             keyItemSets: props.handlers.keyItemSets,
             valueHandlerMap: props.handlers.valueHandlerMap,
+            cloudServiceFilters: computed(() => props.filters.filter((f: any) => f.k && ![
+                'labels',
+                'service_code',
+            ].includes(f.k))),
         });
 
         /* event */
@@ -102,7 +106,7 @@ export default {
             .setSort('count', true);
         const getCloudServiceResources = async () => {
             try {
-                cloudServiceResourcesApiQueryHelper.setFilters(props.filters);
+                cloudServiceResourcesApiQueryHelper.setFilters(state.cloudServiceFilters);
                 const { results } = await SpaceConnector.client.statistics.topic.cloudServiceResources(
                     {
                         labels: state.selectedCategories,
@@ -154,7 +158,7 @@ export default {
         const excelApiQueryHelper = new ApiQueryHelper();
         const getExcelQuery = (data, field) => {
             excelApiQueryHelper
-                .setFilters(props.filters)
+                .setFilters(state.cloudServiceFilters)
                 .addFilter({ k: 'provider', o: '=', v: data.provider })
                 .addFilter({ k: 'cloud_service_group', o: '=', v: data.cloud_service_group })
                 .addFilter({ k: 'cloud_service_type', o: '=', v: data.cloud_service_type });
@@ -165,7 +169,7 @@ export default {
             return excelApiQueryHelper.data;
         };
         const getCloudServiceResourcesPayload = (): ExcelPayload => {
-            excelApiQueryHelper.setFilters(props.filters);
+            excelApiQueryHelper.setFilters(state.cloudServiceFilters);
             return {
                 url: '/statistics/topic/cloud-service-resources',
                 param: {
