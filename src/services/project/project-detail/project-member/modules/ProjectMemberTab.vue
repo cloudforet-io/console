@@ -28,8 +28,8 @@
                     {{ $t('IDENTITY.USER.MAIN.ACTION') }}
                 </p-select-dropdown>
             </template>
-            <template #col-resource_id-format="{ value }">
-                {{ memberTableState.users[value].name }}
+            <template #col-resource_id-format="{ value, item }">
+                {{ memberTableState.users[value] ? memberTableState.users[value].name : value }}
             </template>
             <template #col-assigned-format="{ value }">
                 <p-anchor :to="projectLinkFormatter(value)"
