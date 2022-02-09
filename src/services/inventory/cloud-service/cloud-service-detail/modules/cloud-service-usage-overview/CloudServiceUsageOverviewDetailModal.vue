@@ -279,10 +279,17 @@ export default defineComponent<Props>({
         }
     }
     .p-dynamic-widget {
-        max-height: 320px;
+        @apply h-auto;
     }
     .line-break + .p-dynamic-widget-chart {
         grid-column-start: 1;
+    }
+
+    .p-dynamic-chart-column .label-wrapper {
+        @apply items-center;
+        > .value {
+            @apply flex-shrink-0;
+        }
     }
 }
 
