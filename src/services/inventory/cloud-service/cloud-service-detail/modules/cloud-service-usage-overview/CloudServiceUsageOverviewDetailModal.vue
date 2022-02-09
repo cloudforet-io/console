@@ -278,26 +278,47 @@ export default defineComponent<Props>({
             }
         }
     }
-    .p-dynamic-widget {
-        @apply h-auto;
-    }
     .line-break + .p-dynamic-widget-chart {
         grid-column-start: 1;
     }
 
-    .p-dynamic-chart-column .label-wrapper {
-        @apply items-center;
-        > .value {
-            @apply flex-shrink-0;
+    .p-dynamic-chart-column {
+        .label-wrapper {
+            @apply items-center;
+            > .name {
+                @apply truncate mr-4;
+            }
+            > .value {
+                @apply flex-shrink-0;
+            }
         }
+    }
+
+    .p-dynamic-widget-chart {
+        @apply overflow-visible h-auto;
+        min-height: 21.625rem;
+    }
+
+    .p-data-loader {
+        .data-loader-container {
+            @apply overflow-visible;
+            .data-wrapper {
+                @apply overflow-visible;
+            }
+        }
+    }
+    .amcharts-Polyspline {
+        @apply hidden;
     }
 }
 
 @screen laptop {
     .cloud-service-usage-overview-detail-modal::v-deep {
         .widget-wrapper {
-            > .data-loader-container > .data-wrapper {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+            > .data-loader-container {
+                > .data-wrapper {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
             }
         }
     }
@@ -309,8 +330,10 @@ export default defineComponent<Props>({
             height: 70vh;
         }
         .widget-wrapper {
-            > .data-loader-container > .data-wrapper {
-                grid-template-columns: 1fr;
+            > .data-loader-container > {
+                .data-wrapper {
+                    grid-template-columns: 1fr;
+                }
             }
         }
     }

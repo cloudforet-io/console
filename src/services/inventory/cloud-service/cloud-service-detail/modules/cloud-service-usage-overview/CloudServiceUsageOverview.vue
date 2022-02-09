@@ -276,7 +276,10 @@ export default defineComponent<Props>({
             padding: 0 1rem;
             border-width: 0 0 0 1px;
             &:nth-of-type(3n-2) {
-                @apply border-l-0;
+                @apply border-l-0 pl-0;
+            }
+            &:nth-of-type(3n) {
+                @apply pr-0;
             }
             .name {
                 @apply text-gray-700 mr-2;
@@ -290,41 +293,24 @@ export default defineComponent<Props>({
     }
 }
 
-@screen tablet {
+@screen mobile {
     .cloud-service-usage-overview::v-deep {
         .body {
             padding: 0 1rem;
         }
-
         .stat-wrapper {
             .data-wrapper {
                 @apply flex-col;
                 row-gap: 0;
-                padding: 0;
             }
+
             .stat-summary {
-                @apply flex items-center w-full border-l-0 border-t;
-                min-height: 4.25rem;
-                padding: 0;
+                @apply flex items-center flex-col items-start w-full border-l-0 border-t;
+                min-height: 5.0625rem;
+                padding: 1rem 0;
                 &:nth-of-type(1) {
                     @apply border-t-0;
                 }
-            }
-        }
-    }
-}
-
-@screen mobile {
-    .cloud-service-usage-overview::v-deep {
-        .stat-wrapper {
-            .data-wrapper {
-                row-gap: 0;
-            }
-
-            .stat-summary {
-                @apply flex-col items-start;
-                min-height: 5.0625rem;
-                padding: 1rem 0;
             }
         }
     }
