@@ -206,7 +206,7 @@ export default {
                     labels: state.selectedCategories,
                     ...cloudServiceApiQueryHelper.data,
                     ...(state.period && {
-                        data_range: {
+                        date_range: {
                             start: state.period?.start,
                             end: dayjs.utc(state.period?.end).add(1, 'day').format('YYYY-MM-DD'),
                         },
