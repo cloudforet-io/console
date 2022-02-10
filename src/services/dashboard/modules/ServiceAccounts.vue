@@ -297,7 +297,7 @@ export default {
     @apply rounded-xs;
     margin-top: 1rem;
     overflow-x: hidden;
-    .default th {
+    &.default th {
         @apply bg-gray-100 text-gray-400;
         height: 1.5rem;
         border: none;

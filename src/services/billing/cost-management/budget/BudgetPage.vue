@@ -3,14 +3,21 @@
         <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')">
             <template #extra>
-                <p-select-dropdown
-                    class="create-budget-box"
-                    use-fixed-menu-style
-                    :items="createButtonItemList"
-                    :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET')"
-                    type="outline-button"
-                    @select="handleCreateBudgetSelect"
-                />
+                <!--                <p-select-dropdown-->
+                <!--                    class="create-budget-box"-->
+                <!--                    use-fixed-menu-style-->
+                <!--                    :items="createButtonItemList"-->
+                <!--                    :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET')"-->
+                <!--                    type="outline-button"-->
+                <!--                    @select="handleCreateBudgetSelect"-->
+                <!--                />-->
+                <p-icon-text-button
+                    outline style-type="primary-dark"
+                    name="ic_plus_bold"
+                    @click="handleCreateBudgetSelect(createButtonItemList[0].name)"
+                >
+                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
+                </p-icon-text-button>
             </template>
         </p-page-title>
         <p-divider />
@@ -24,7 +31,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle, PSelectDropdown, PDivider,
+    PBreadcrumbs, PPageTitle, PDivider, PIconTextButton,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -42,8 +49,9 @@ export default {
         BudgetList,
         PBreadcrumbs,
         PPageTitle,
-        PSelectDropdown,
+        // PSelectDropdown,
         PDivider,
+        PIconTextButton,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
