@@ -400,6 +400,7 @@
 					"BUDGET_NAME": "예산명",
 					"BULK_BUDGET": "",
 					"COST_TYPE": "비용 발생 기준",
+					"CREATE": "예산 생성",
 					"CREATE_BUDGET": "예산 생성",
 					"DESC": "내림차순",
 					"OVERSPENT": "예산초과",
