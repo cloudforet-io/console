@@ -316,13 +316,11 @@ export default {
         const listEndpoints = async () => {
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.identity.endpoint.list();
-                const endpointItem: EndpointItem[] = [];
-                const filteredEndpointItem: EndpointItem = res.results.find(d => d.service === 'inventory');
-                if (filteredEndpointItem) endpointItem.push(filteredEndpointItem);
+                const { results } = await SpaceConnector.client.identity.endpoint.list();
+                const filteredEndpointItem: EndpointItem[] = results.filter(d => d.service === 'inventory' || d.service === 'statistics') || [];
 
                 const endpoints = {};
-                endpointItem.forEach((data) => {
+                filteredEndpointItem.forEach((data) => {
                     const service = data.service;
                     const link = data.endpoint;
                     endpoints[service] = link;

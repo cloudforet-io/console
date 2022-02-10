@@ -77,7 +77,6 @@ export default {
                 { name: 'name', label: 'Name' },
                 { name: 'version', label: 'Version' },
                 { name: 'endpoint', label: 'Endpoint' },
-                { name: 'status', label: 'Status' },
             ],
             items: [] as EndpointItem[],
             userId: computed(() => store.state.user.userId),
@@ -104,8 +103,8 @@ export default {
         const listEndpoints = async () => {
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.identity.endpoint.list();
-                state.items = [res.results.find(d => d.service === 'inventory')];
+                const { results } = await SpaceConnector.client.identity.endpoint.list();
+                state.items = results.filter(d => d.service === 'inventory' || d.service === 'statistics');
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.items = [];
