@@ -56,6 +56,10 @@ export default {
         PI,
     },
     props: {
+        options: {
+            type: Object,
+            default: () => ({}),
+        },
         filters: {
             type: Object,
             default: () => ({}),

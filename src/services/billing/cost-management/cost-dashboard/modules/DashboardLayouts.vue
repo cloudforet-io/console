@@ -11,6 +11,7 @@
             <div v-for="({widget_id, options}) in row" :key="`widget-${widget_id}`" :class="`col-${row.length}`">
                 <dynamic-widget v-if="!loading"
                                 :widget-id="widget_id"
+                                :widget-name="defaultWidgetMap[widget_id].widget_name"
                                 :options="options"
                                 :period="period"
                                 :filters="filters"
@@ -26,6 +27,7 @@
 import DynamicWidget from '@/services/billing/cost-management/cost-dashboard/modules/DynamicWidget.vue';
 import { CURRENCY } from '@/store/modules/display/config';
 import { PDataLoader } from '@spaceone/design-system';
+import { defaultWidgetMap } from '@/services/billing/cost-management/widgets/lib/config';
 
 type Row = string[]
 
@@ -67,6 +69,7 @@ export default {
     },
     setup() {
         return {
+            defaultWidgetMap,
         };
     },
 };

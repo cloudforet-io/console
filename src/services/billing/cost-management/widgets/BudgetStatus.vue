@@ -76,6 +76,14 @@ export default {
         PSkeleton,
     },
     props: {
+        widgetId: {
+            type: String,
+            default: '',
+        },
+        options: {
+            type: Object,
+            default: () => ({}),
+        },
         period: {
             type: Object,
             default: () => ({}),

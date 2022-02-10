@@ -82,7 +82,7 @@ const VALUE_KEY = 'value';
 const PAGE_SIZE = 10;
 
 export default defineComponent<WidgetProps>({
-    name: 'SpcProjectWiseUsageSummary',
+    name: 'CostPie',
     components: {
         CostDashboardCardWidgetLayout,
         CostDashboardDataTable,

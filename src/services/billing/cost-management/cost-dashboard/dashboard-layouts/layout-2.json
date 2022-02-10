@@ -1,10 +1,8 @@
 [
   [{
-    "widget_id": "BudgetUsageSummary",
-    "options": {}
+    "widget_id": "card-lg-01"
   }],
   [{
-    "widget_id": "SpcProjectWiseUsageSummary",
-    "options": {}
+    "widget_id": "pie-lg-01"
   }]
 ]

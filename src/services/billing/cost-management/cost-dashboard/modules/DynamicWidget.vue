@@ -1,5 +1,6 @@
 <template>
     <component :is="component"
+               :widget-id="widgetId"
                :options="options"
                :period="period"
                :filters="filters"
@@ -19,12 +20,17 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props extends WidgetProps {
     widgetId: string;
+    widgetName: string;
 }
 
 export default {
     name: 'DynamicWidget',
     props: {
         widgetId: {
+            type: String,
+            default: '',
+        },
+        widgetName: {
             type: String,
             default: '',
         },
@@ -53,7 +59,7 @@ export default {
         // noinspection TypeScriptCheckImport
         const state = reactive({
             component: null as any,
-            loader: computed<() => Promise<any>>(() => () => import(`@/services/billing/cost-management/widgets/${props.widgetId}.vue`)) as unknown as () => Promise<any>,
+            loader: computed<() => Promise<any>>(() => () => import(`@/services/billing/cost-management/widgets/${props.widgetName}.vue`)) as unknown as () => Promise<any>,
         });
 
         const getComponent = async () => {
@@ -67,7 +73,7 @@ export default {
             }
         };
 
-        watch([() => props.widgetId], (aft, bef) => {
+        watch(() => props.widgetName, (aft, bef) => {
             if (!isEqual(aft, bef)) {
                 getComponent();
             }

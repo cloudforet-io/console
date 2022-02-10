@@ -1,5 +1,6 @@
 import { Tags, TimeStamp } from '@/models';
-import { Period } from '@/services/billing/cost-management/type';
+import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 
 const DASHBOARD_SCOPE = {
     PRIVATE: 'PRIVATE',
@@ -17,7 +18,7 @@ interface DefaultFilter {
 export interface DashboardInfo {
     created_at: TimeStamp;
     updated_at: TimeStamp;
-    custom_layouts: string[];
+    custom_layouts: CustomLayout[];
     dashboard_id?: string;
     public_dashboard_id: string;
     default_filter: DefaultFilter;
@@ -36,9 +37,20 @@ export interface DashboardItem extends DashboardInfo {
     routeName: string;
 }
 
+export interface WidgetOptions {
+    name: string;
+    stack?: boolean;
+    granularity?: GRANULARITY;
+    filters?: CostQueryFilters;
+    period?: Period;
+    group_by?: string;
+    chart_type: string;
+    layout: number;
+}
+
 export interface WidgetInfo {
     name?: string;
-    options?: object;
+    options?: WidgetOptions;
     type?: string;
     widget_id: string;
 }

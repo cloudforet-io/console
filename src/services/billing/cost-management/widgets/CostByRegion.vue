@@ -58,7 +58,7 @@ import { gray } from '@/styles/colors';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { continentData } from '@/services/billing/cost-management/cost-dashboard/lib/config';
+import { continentData } from '@/services/billing/cost-management/widgets/lib/config';
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
@@ -104,6 +104,10 @@ export default defineComponent<WidgetProps>({
         PSkeleton,
     },
     props: {
+        options: {
+            type: Object,
+            default: () => ({}),
+        },
         period: {
             type: Object,
             default: () => ({}),

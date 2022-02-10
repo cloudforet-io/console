@@ -20,6 +20,9 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import {
+    getWidgetOption,
+} from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
 
 export default {
@@ -29,6 +32,14 @@ export default {
         BudgetStat,
     },
     props: {
+        widgetId: {
+            type: String,
+            default: '',
+        },
+        options: {
+            type: Object,
+            default: () => ({}),
+        },
         period: {
             type: Object,
             default: () => ({}),
@@ -49,6 +60,7 @@ export default {
     setup(props: WidgetProps) {
         const budgetQueryHelper = new QueryHelper();
         const state = reactive({
+            widgetOptions: getWidgetOption(props.options, props.widgetId),
             queryStoreFilters: computed<QueryStoreFilter[]>(() => getConvertedBudgetFilter(props.filters)),
             widgetLink: computed(() => ({
                 name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,

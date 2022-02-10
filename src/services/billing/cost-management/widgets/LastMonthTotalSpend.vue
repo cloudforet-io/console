@@ -49,6 +49,10 @@ export default {
     name: 'LastMonthTotalSpend',
     components: { CostDashboardSimpleCardWidget },
     props: {
+        options: {
+            type: Object,
+            default: () => ({}),
+        },
         chartData: {
             type: Array,
             default: () => ([]),

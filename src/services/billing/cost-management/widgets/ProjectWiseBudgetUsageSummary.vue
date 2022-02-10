@@ -84,6 +84,10 @@ export default {
         PProgressBar,
     },
     props: {
+        options: {
+            type: Object,
+            default: () => ({}),
+        },
         period: {
             type: Object,
             default: () => ({}),

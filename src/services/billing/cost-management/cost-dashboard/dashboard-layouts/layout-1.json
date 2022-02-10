@@ -1,108 +1,26 @@
 [
   [{
-    "widget_id": "MonthToDateSpend",
-    "type": "card",
-    "name": "Month-To-Date Spend",
-    "options": {
-      "value_options": "",
-      "name_options": "",
-      "chart_type": "",
-      "limit": "",
-      "layout": 33
-    },
-    "query": {}
+    "widget_id": "card-sm-01"
   }, {
-    "widget_id": "LastMonthTotalSpend",
-    "name": "Last Month Total Spending",
-    "options": {
-      "value_options": "",
-      "name_options": "",
-      "chart_type": "",
-      "limit": "",
-      "layout": 33
-    },
-    "query": {}
+    "widget_id": "card-sm-02"
   }, {
-    "widget_id": "BudgetUsage",
-    "name": "Budget Usage",
-    "options": {
-      "value_options": "",
-      "name_options": "",
-      "chart_type": "",
-      "limit": "",
-      "layout": 33
-    },
-    "query": {}
+    "widget_id": "card-sm-03"
   }],
   [{
-    "widget_id": "CostByProject",
-    "name": "Cost by Project",
-    "options": {
-      "value_options": "",
-      "name_options": "",
-      "chart_type": "",
-      "limit": "",
-      "layout": 100
-    },
-    "query": {}
+    "widget_id": "treemap-lg-01"
   }],
   [{
-    "widget_id": "CostTrendByProject",
-    "name": "Cost Trend By Project",
-    "options": {
-      "value_options": "",
-      "name_options": "",
-      "chart_type": "",
-      "limit": "",
-      "layout": 100
-    },
-    "query": {}
+    "widget_id": "linegraph-lg-01"
   }],
   [{
-    "widget_id": "CostTrendByProduct",
-    "name": "Cost Trend By Product",
-    "options": {
-      "value_options": "",
-      "name_options": "",
-      "chart_type": "",
-      "limit": "",
-      "layout": 100
-    },
-    "query": {}
+    "widget_id": "stackedcol-lg-01"
   }],
   [{
-    "widget_id": "CostByProvider",
-    "name": "Cost By Provider",
-    "options": {
-      "value_options": "",
-      "name_options": "",
-      "chart_type": "",
-      "limit": "",
-      "layout": 50
-    },
-    "query": {}
+    "widget_id": "donut-md-01"
   }, {
-    "widget_id": "BudgetStatus",
-    "name": "Budget Status",
-    "options": {
-      "value_options": "",
-      "name_options": "",
-      "chart_type": "",
-      "limit": "",
-      "layout": 50
-    },
-    "query": {}
+    "widget_id": "waffle-md-01"
   }],
   [{
-    "widget_id": "CostByRegion",
-    "name": "Cost By Region",
-    "options": {
-      "value_options": "",
-      "name_options": "",
-      "chart_type": "",
-      "limit": "",
-      "layout": 100
-    },
-    "query": {}
+    "widget_id": "map-lg-01"
   }]
 ]

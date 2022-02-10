@@ -10,10 +10,16 @@ import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { Period } from '@/services/billing/cost-management/type';
 import {
-    ChartData, CostAnalyzeModel, Legend, PieChartData, XYChartData,
+    ChartData,
+    CostAnalyzeModel,
+    Legend,
+    PieChartData,
+    XYChartData,
 } from '@/services/billing/cost-management/widgets/type';
 import { getTimeUnitByPeriod } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { DATE_FORMAT } from '@/services/billing/cost-management/widgets/lib/config';
+import { isEqual } from 'lodash';
+import { WidgetOptions } from '@/services/billing/cost-management/cost-dashboard/type';
 
 
 /**
@@ -217,4 +223,24 @@ export const getTooltipText = (categoryKey, valueKey, money, disablePercentage =
         return `{${categoryKey}}: [bold]${money}[/]`;
     }
     return `{${categoryKey}}: [bold]${money}[/] ({${valueKey}.percent.formatNumber('#.00')}%)`;
+};
+
+
+const getWidgetDefaultOptions = async (widgetId?: string): Promise<WidgetOptions|undefined> => {
+    try {
+        const defaultWidgetList = await import('./defaultWidgetList.json');
+        return defaultWidgetList.default.find(widget => widget.widget_id === widgetId)?.options;
+    } catch (e) {
+        throw new Error('Failed to fetch default widget list');
+    }
+};
+
+export const getWidgetOption = async (customOptions: WidgetOptions, widgetId?: string) => {
+    try {
+        const defaultOptions = await getWidgetDefaultOptions(widgetId);
+        if (isEqual(defaultOptions, customOptions)) return defaultOptions;
+        return customOptions;
+    } catch (e) {
+        throw new Error('Failed to get default options');
+    }
 };

@@ -58,6 +58,7 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { keyBy } from 'lodash';
 import { i18n } from '@/translations';
 import {
     PBreadcrumbs, PPageTitle,
@@ -74,7 +75,7 @@ import CostDashboardFilter from '@/services/billing/cost-management/cost-dashboa
 import CostDashboardMoreMenu from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardMoreMenu.vue';
 import CostDashboardPeriodSelectDropdown
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
-import { DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
+import { CustomLayout, DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 import { SpaceRouter } from '@/router';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -158,15 +159,31 @@ export default {
             SpaceRouter.router.push({ name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });
         };
 
-        const fetchLayoutData = async (layoutId: string): Promise<any[]> => {
+        const fetchDefaultLayoutData = async (layoutId: string): Promise<any[]> => {
             try {
                 // noinspection TypeScriptCheckImport
-                const res = await import(`./dashboard-layouts/${layoutId}.json`);
-                return res.default;
+                const layoutTemplates = await import(`./dashboard-layouts/${layoutId}.json`);
+                const widgets = await import('../widgets/lib/defaultWidgetList.json');
+
+                const optionsKeyByWidgetId = keyBy(widgets.default, option => option.widget_id);
+                const layoutData: CustomLayout[] = layoutTemplates.default.map(layout => layout.map((d) => {
+                    const widget = optionsKeyByWidgetId[d.widget_id];
+                    return widget ? { ...widget } : {};
+                }));
+
+                return layoutData;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
             }
+        };
+
+        const setDashboardLayout = async (dashboard: DashboardInfo): Promise<CustomLayout[]> => {
+            let layout: CustomLayout[];
+            if (dashboard?.default_layout_id && dashboard.custom_layouts.length === 0) {
+                layout = await fetchDefaultLayoutData(dashboard.default_layout_id);
+            } else layout = dashboard.custom_layouts;
+            return layout;
         };
 
         const fetchDashboard = async (dashboardId: string): Promise<DashboardInfo> => {
@@ -185,15 +202,9 @@ export default {
             state.loading = true;
 
             const dashboard = await fetchDashboard(dashboardId);
-            let layout;
-            if (dashboard?.default_layout_id) {
-                layout = await fetchLayoutData(dashboard.default_layout_id);
-            }
-
             state.dashboard = dashboard;
-            state.layout = layout;
+            state.layout = await setDashboardLayout(dashboard);
             state.filters = dashboard.default_filter;
-
             if (dashboard.period) state.period = dashboard.period;
             state.periodType = dashboard.period_type;
 

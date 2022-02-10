@@ -1,14 +1,11 @@
 [
   [{
-    "widget_id": "BudgetUsageSummary",
-    "options": {}
+    "widget_id": "card-lg-01"
   }],
   [{
-    "widget_id": "ProjectWiseBudgetUsageSummary",
-    "options": {}
+    "widget_id": "table-lg-01"
   }],
   [{
-    "widget_id": "CostTrendByProvider",
-    "options": {}
+    "widget_id": "stackedcol-lg-02"
   }]
 ]

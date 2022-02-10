@@ -71,6 +71,10 @@ export default {
         PI,
     },
     props: {
+        options: {
+            type: Object,
+            default: () => ({}),
+        },
         period: {
             type: Object,
             default: () => ({}),
