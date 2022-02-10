@@ -202,6 +202,7 @@ export default {
             granularity: queryStringToString(urlQuery.granularity),
             stack: queryStringToBoolean(urlQuery.stack),
             group_by: queryStringToArray(urlQuery.groupBy),
+            primary_group_by: queryStringToString(urlQuery.primaryGroupBy),
             period: queryStringToObject(urlQuery.period),
             filters: queryStringToObject(urlQuery.filters),
         });
@@ -272,8 +273,8 @@ export default {
         const handleSaveQueryOption = async () => {
             try {
                 const {
-                    granularity, stack,
-                    period, groupBy, filters,
+                    granularity, stack, period,
+                    groupBy, filters, primaryGroupBy,
                 } = store.state.service.costAnalysis;
                 await SpaceConnector.client.costAnalysis.costQuerySet.update({
                     cost_query_set_id: state.selectedQueryId,
@@ -282,6 +283,7 @@ export default {
                         stack,
                         period,
                         group_by: groupBy,
+                        primary_group_by: primaryGroupBy,
                         filters,
                     },
                 });
@@ -317,6 +319,7 @@ export default {
                     granularity: primitiveToQueryString(options.granularity),
                     stack: primitiveToQueryString(options.stack),
                     groupBy: arrayToQueryString(options.groupBy),
+                    primaryGroupBy: primitiveToQueryString(options.primaryGroupBy),
                     period: objectToQueryString(options.period),
                     filters: objectToQueryString(options.filters),
                 };

@@ -169,6 +169,9 @@ export default {
             stack: computed(() => store.state.service.costAnalysis.stack),
             period: computed(() => store.state.service.costAnalysis.period),
             filters: computed(() => store.state.service.costAnalysis.filters),
+            selectedQueryId: computed(() => store.state.service.costAnalysis.selectedQueryId),
+            groupBy: computed(() => store.state.service.costAnalysis.groupBy),
+            primaryGroupBy: computed(() => store.state.service.costAnalysis.primaryGroupBy),
             chartGroupBy: store.state.service.costAnalysis.groupBy[0],
             //
             noFilter: computed(() => isEmpty(state.filterItemsMap) || Object.values(state.filters).every(d => !d)),
@@ -266,6 +269,7 @@ export default {
         };
         const handleSelectChartGroupByItem = async (groupBy?: string) => {
             state.chartGroupBy = groupBy;
+            store.commit('service/costAnalysis/setPrimaryGroupBy', groupBy);
         };
         const handleClickSelectFilter = () => {
             state.filterModalVisible = true;
@@ -298,7 +302,9 @@ export default {
         watch([() => state.granularity, () => state.period, () => state.chartGroupBy, () => state.filters], ([granularity, period, groupBy]) => {
             setChartData(granularity, period, groupBy);
         }, { immediate: true, deep: true });
-
+        watch(() => state.selectedQueryId, () => {
+            state.chartGroupBy = state.primaryGroupBy ? state.primaryGroupBy : state.groupBy[0];
+        });
         return {
             ...toRefs(state),
             FILTER_ITEM_MAP,

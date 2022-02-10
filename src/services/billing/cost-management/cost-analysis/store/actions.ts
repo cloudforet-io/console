@@ -10,6 +10,7 @@ export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = (
     commit('setGranularity', GRANULARITY.ACCUMULATED);
     commit('setStack', false);
     commit('setGroupBy', []);
+    commit('setPrimaryGroupBy', undefined);
     commit('setPeriod', getInitialDates());
     commit('setFilters', {});
 };
@@ -18,7 +19,10 @@ export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = (
 export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit }, options: Partial<CostQuerySetOption>): void => {
     if (options.granularity) commit('setGranularity', options.granularity);
     if (typeof options.stack === 'boolean') commit('setStack', options.stack);
-    if (options.group_by?.length) commit('setGroupBy', options.group_by);
+    if (options.group_by?.length) {
+        commit('setGroupBy', options.group_by);
+        commit('setPrimaryGroupBy', options.primary_group_by);
+    } else commit('setPrimaryGroupBy', undefined);
     if (options.period) commit('setPeriod', { start: options.period.start, end: options.period.end });
     if (options.filters) commit('setFilters', options.filters);
 };
@@ -41,7 +45,7 @@ export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, co
     try {
         const {
             granularity, stack, period,
-            groupBy, filters,
+            groupBy, filters, primaryGroupBy,
         } = state;
         const updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
             user_id: rootState.user.userId,
@@ -51,6 +55,7 @@ export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, co
                 stack,
                 period,
                 group_by: groupBy,
+                primary_group_by: groupBy?.length ? (primaryGroupBy || groupBy[0]) : undefined,
                 filter: filters,
             },
         });

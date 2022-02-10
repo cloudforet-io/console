@@ -12,6 +12,7 @@ export interface GroupByItem {
 export interface CostQuerySetOption {
     chart_type: CHART_TYPE;
     group_by: GROUP_BY[]; // string[]
+    primary_group_by: string|undefined;
     granularity: GRANULARITY;
     stack: boolean;
     period: Period;
@@ -29,6 +30,7 @@ export interface CostAnalysisStoreState {
     granularity: GRANULARITY;
     stack: boolean;
     groupBy: GROUP_BY[];
+    primaryGroupBy: GROUP_BY|undefined;
     period: Period;
     filters: CostQueryFilters;
     selectedQueryId: string|undefined;

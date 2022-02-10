@@ -18,6 +18,10 @@ export const setGroupBy: Mutation<CostAnalysisStoreState> = (state, groupBy: GRO
     state.groupBy = groupBy;
 };
 
+export const setPrimaryGroupBy: Mutation<CostAnalysisStoreState> = (state, primaryGroupBy: GROUP_BY|undefined) => {
+    state.primaryGroupBy = primaryGroupBy;
+};
+
 export const setPeriod: Mutation<CostAnalysisStoreState> = (state, period: Period) => {
     state.period = period;
 };

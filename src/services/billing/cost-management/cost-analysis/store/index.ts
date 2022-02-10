@@ -10,6 +10,7 @@ const state: CostAnalysisStoreState = {
     granularity: GRANULARITY.ACCUMULATED,
     stack: false,
     groupBy: [],
+    primaryGroupBy: undefined,
     period: getInitialDates(),
     filters: {},
     selectedQueryId: undefined,
