@@ -5,6 +5,7 @@
         <p-divider class="w-full" />
         <cost-dashboard-create-with-dashboard />
         <cost-dashboard-create-default-filter />
+        <cost-dashboard-create-select-privacy />
     </p-pane-layout>
 </template>
 
@@ -16,6 +17,8 @@ import CostDashboardCreateWithDashboard
 import CostDashboardCreateDefaultFilter
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateDefaultFilter.vue';
 import { PDivider, PPaneLayout } from '@spaceone/design-system';
+import CostDashboardCreateSelectPrivacy
+    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateSelectPrivacy.vue';
 
 
 export default {
@@ -24,6 +27,7 @@ export default {
         CostDashboardCreateDefaultFilter,
         CostDashboardCreateWithDashboard,
         CostDashboardCreateWithLayout,
+        CostDashboardCreateSelectPrivacy,
         PPaneLayout,
         PDivider,
     },

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <fragment>
         <h3>Clone an Existing Dashboard</h3>
         <div v-for="dashboardData in existingDashboardData" :key="dashboardData.public_dashboard_id">
             <p-select-card
@@ -17,7 +17,7 @@
                 View
             </p-anchor>
         </div>
-    </div>
+    </fragment>
 </template>
 
 <script lang="ts">

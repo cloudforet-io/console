@@ -8,3 +8,7 @@ export const setDashboardTemplate: Mutation<CostDashboardCreateState> = (state, 
 export const setDefaultFilter: Mutation<CostDashboardCreateState> = (state, filter) => {
     state.defaultFilter = filter;
 };
+
+export const setDashboardPrivacy: Mutation<CostDashboardCreateState> = (state, privacy) => {
+    state.selectedDashboardPrivacy = privacy;
+};

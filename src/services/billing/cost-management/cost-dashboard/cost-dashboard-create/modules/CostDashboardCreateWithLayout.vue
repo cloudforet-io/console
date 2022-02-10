@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <fragment>
         <h3>Start a new template</h3>
         <div v-for="(layoutData, idx) in defaultLayoutData" :key="layoutData.name">
             <p-select-card
@@ -22,7 +22,7 @@
                 </template>
             </p>
         </div>
-    </div>
+    </fragment>
 </template>
 
 <script lang="ts">
@@ -30,14 +30,15 @@ import {
     PCollapsibleToggle, PSelectCard,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { flattenDeep } from 'lodash';
+import { flattenDeep, startCase } from 'lodash';
 import { defaultLayoutData } from '@/services/billing/cost-management/cost-dashboard/lib/config';
 import { DefaultLayout, WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { store } from '@/store';
+import { defaultWidgetMap } from '@/services/billing/cost-management/widgets/lib/config';
 
 const getNamesOfWidgetList = (widgetList) => {
     const flattenWidgetList: WidgetInfo[] = flattenDeep(widgetList);
-    if (flattenWidgetList) return flattenWidgetList.map<Pick<WidgetInfo, 'name'>>(d => ({ name: d.name }));
+    if (flattenWidgetList) return flattenWidgetList.map(d => ({ name: startCase(defaultWidgetMap[d.widget_id].widget_name) }));
     return [];
 };
 
