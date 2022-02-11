@@ -62,7 +62,7 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: Deploy to s3
-        run: aws s3 sync ${{ env.BUILD_PATH }}/.storybook/ s3://test-design-book --delete
+        run: aws s3 sync ${{ env.BUILD_PATH }}/.out/ s3://test-design-book --delete
 
       - name: Slack
         if: always()
