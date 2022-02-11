@@ -32,10 +32,6 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
 
-      - name: Install dependencies
-        if: steps.node-cache.outputs.cache-hit != 'true'
-        run: npm install
-
       - name: Prepare build
         run: |
           mkdir -p ${{ env.BUILD_PATH }}
@@ -44,6 +40,11 @@ jobs:
           cp -r .storybook ${{ env.BUILD_PATH }}/.storybook
           cp -r public ${{ env.BUILD_PATH }}/public
           cp -r tsconfig.json ${{ env.BUILD_PATH }}/
+
+      - name: Install dependencies
+        working-directory: ${{ env.BUILD_PATH }}
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: npm install
 
       - name: Build
         working-directory: ${{ env.BUILD_PATH }}
