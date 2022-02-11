@@ -41,6 +41,7 @@ jobs:
       - name: Prepare build
         run: |
           mkdir -p ${{ env.BUILD_PATH }}
+          cp package.json package-lock.json *.js ${{ env.BUILD_PATH }}/
           cp -r src ${{ env.BUILD_PATH }}/src
           cp -r .storybook ${{ env.BUILD_PATH }}/.storybook
           cp -r public ${{ env.BUILD_PATH }}/public
