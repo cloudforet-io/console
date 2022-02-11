@@ -1,0 +1,76 @@
+name: Deploy
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+env:
+  BUILD_PATH: "/tmp/spaceone/build"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Cache node modules
+        id: node-cache
+        uses: actions/cache@v2
+        with:
+            path: node_modules
+            key: $ {{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+            restore-keys: |
+              $ {{ runner.OS }}-build-
+              $ {{ runner.OS }}-
+
+      - name: Install dependencies
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: npm install
+
+      - name: Prepare build
+        run: |
+          cp -r src ${{ env.BUILD_PATH }}/src
+          cp -r .storybook ${{ env.BUILD_PATH }}/.storybook
+          cp -r public ${{ env.BUILD_PATH }}/public
+          cp -r tsconfig.json ${{ env.BUILD_PATH }}/
+
+      - name: Build
+        working-directory: ${{ env.BUILD_PATH }}
+        env:
+          NODE_ENV: "production"
+        run: |
+          npm run build:storybook
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Deploy to s3
+        uses: reggionick/s3-deploy@v3
+        with:
+            folder: .storybook
+            bucket: s3://test-design-book/
+            #bucket: ${{ secrets.S3_BUCKET }}
+            #dist-id: "E2CEFS46KV2Z2A"
+
+      - name: Slack
+        if: always()
+        uses: 8398a7/action-slack@v3.2.0
+        with:
+          status: ${{job.status}}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          author_name: Github Action Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
