@@ -40,6 +40,7 @@ jobs:
 
       - name: Prepare build
         run: |
+          mkdir ${{ env.BUILD_PATH }}
           cp -r src ${{ env.BUILD_PATH }}/src
           cp -r .storybook ${{ env.BUILD_PATH }}/.storybook
           cp -r public ${{ env.BUILD_PATH }}/public
@@ -62,7 +63,7 @@ jobs:
       - name: Deploy to s3
         uses: reggionick/s3-deploy@v3
         with:
-            folder: .storybook
+            folder: ${{ env.BUILD_PATH }}/.storybook
             bucket: s3://test-design-book/
             #bucket: ${{ secrets.S3_BUCKET }}
             #dist-id: "E2CEFS46KV2Z2A"
