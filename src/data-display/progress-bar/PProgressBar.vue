@@ -8,7 +8,9 @@
             </slot>
         </label>
         <div ref="backgroundBar" class="background-bar" />
-        <transition appear @before-appear="beforeEnter" @after-appear="enter">
+        <transition appear @before-appear="beforeEnter"
+                    @after-appear="enter"
+        >
             <div ref="progressBar" class="tracker-bar" :style="progressBarStyle" />
         </transition>
     </div>
@@ -48,6 +50,10 @@ export default defineComponent<ProgressBarProps>({
                 return Object.values(PROGRESS_BAR_SIZE).includes(size);
             },
         },
+        disableAnimation: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props) {
         const linearGradientProperty = `linear-gradient(90deg, ${props.gradient?.startColor} ${props.gradient?.gradientPoint}%, ${props.gradient?.endColor} 100%)`;
@@ -58,11 +64,12 @@ export default defineComponent<ProgressBarProps>({
             progressBarStyle: computed(() => ({
                 background: props.gradient ? linearGradientProperty
                     : (props.color ?? defaultTrackerBarColor),
+                transition: props.disableAnimation ? undefined : 'width 0.5s linear',
             })),
         });
 
         const beforeEnter = (element) => {
-            element.style.width = 0;
+            element.style.width = props.disableAnimation ? `${props.percentage}%` : 0;
         };
 
         const enter = (element) => {
@@ -109,7 +116,6 @@ export default defineComponent<ProgressBarProps>({
         width: 0;
         max-width: 100%;
         overflow: hidden;
-        transition: width 0.5s linear;
     }
 
     @define-mixin progress-bar-size $height, $border-radius {

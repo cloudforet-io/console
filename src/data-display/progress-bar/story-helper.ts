@@ -93,6 +93,24 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
             type: 'object',
         },
     },
+    disableAnimation: {
+        name: 'disableAnimation',
+        type: { name: 'boolean' },
+        description: 'Whether to disable animation or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     /* slots */
     labelSlot: {
         name: 'label',
