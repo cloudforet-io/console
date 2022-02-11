@@ -62,12 +62,7 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: Deploy to s3
-        uses: reggionick/s3-deploy@v3
-        with:
-            folder: ${{ env.BUILD_PATH }}/.storybook
-            bucket: s3://test-design-book/
-            #bucket: ${{ secrets.S3_BUCKET }}
-            #dist-id: "E2CEFS46KV2Z2A"
+        run: aws s3 sync ${{ env.BUILD_PATH }}/.storybook/ s3://test-design-book --delete
 
       - name: Slack
         if: always()
