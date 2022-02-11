@@ -17,6 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
+          submodules: true
           token: ${{ secrets.PAT_TOKEN }}
 
       - name: Setup Node.js
