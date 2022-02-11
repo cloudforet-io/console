@@ -1,3 +1,10 @@
+# [1.1.0-beta.239](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.238...v1.1.0-beta.239) (2022-02-11)
+
+
+### Bug Fixes
+
+* add disableAnimation prop to progress bar ([#849](https://github.com/spaceone-dev/spaceone-design-system/issues/849)) ([7d85047](https://github.com/spaceone-dev/spaceone-design-system/commit/7d8504780f3abb710aca81963eaf168756b0db40))
+
 # [1.1.0-beta.238](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.237...v1.1.0-beta.238) (2022-02-08)
 
 
