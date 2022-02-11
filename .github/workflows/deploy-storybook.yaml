@@ -1,9 +1,11 @@
-name: Deploy
+name: Deploy Storybook
 on:
   workflow_dispatch:
   push:
     branches:
       - master
+    paths-ignore:
+      - '.github/**'
 
 env:
   BUILD_PATH: "/tmp/spaceone/build"
