@@ -1,37 +1,72 @@
 <template>
-    <ul class="dashboard-list">
-        <li v-for="(item) in dashboardList" :key="item.public_dashboard_id"
-            class="menu-item"
-            :class="{'selected': item.public_dashboard_id === dashboardIdFromRoute}"
-        >
-            <router-link
-                :to="{
-                    name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
-                    params: {
-                        dashboardId: item.public_dashboard_id
-                    }
-                }"
-                class="link inline-block"
+    <fragment>
+        <ul class="dashboard-list">
+            <li v-for="(item) in publicDashboardList" :key="item.public_dashboard_id"
+                class="menu-item"
+                :class="{'selected': item.public_dashboard_id === dashboardIdFromRoute}"
             >
-                <span class="title">
-                    {{ item.name }}
-                </span>
-                <p-i v-if="item.public_dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
-                     width="0.875rem" height="0.875rem"
+                <router-link
+                    :to="{
+                        name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                        params: {
+                            dashboardId: item.public_dashboard_id
+                        }
+                    }"
+                    class="link inline-block"
+                >
+                    <span class="title">
+                        {{ item.name }}
+                    </span>
+                    <p-i v-if="item.public_dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
+                         width="0.875rem" height="0.875rem"
+                    />
+                </router-link>
+                <p-select-dropdown :selected="selectedMoreMenuItem"
+                                   class="more-button"
+                                   :items="moreMenuItems"
+                                   button-style-type="transparent"
+                                   use-fixed-menu-style
+                                   menu-position="right"
+                                   type="icon-button"
+                                   button-icon="ic_more"
+                                   @select="handleSelectMoreMenu(item, ...arguments)"
                 />
-            </router-link>
-            <p-select-dropdown :selected="selectedMoreMenuItem"
-                               class="more-button"
-                               :items="moreMenuItems"
-                               button-style-type="transparent"
-                               use-fixed-menu-style
-                               menu-position="right"
-                               type="icon-button"
-                               button-icon="ic_more"
-                               @select="handleSelectMoreMenu(item, ...arguments)"
-            />
-        </li>
-    </ul>
+            </li>
+        </ul>
+        <ul class="dashboard-list">
+            <li v-for="(item) in userDashboardList" :key="item.user_dashboard_id"
+                class="menu-item"
+                :class="{'selected': item.user_dashboard_id === dashboardIdFromRoute}"
+            >
+                <router-link
+                    :to="{
+                        name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                        params: {
+                            dashboardId: item.user_dashboard_id
+                        }
+                    }"
+                    class="link inline-block"
+                >
+                    <span class="title">
+                        {{ item.name }}
+                    </span>
+                    <p-i v-if="item.user_dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
+                         width="0.875rem" height="0.875rem"
+                    />
+                </router-link>
+                <p-select-dropdown :selected="selectedMoreMenuItem"
+                                   class="more-button"
+                                   :items="moreMenuItems"
+                                   button-style-type="transparent"
+                                   use-fixed-menu-style
+                                   menu-position="right"
+                                   type="icon-button"
+                                   button-icon="ic_more"
+                                   @select="handleSelectMoreMenu(item, ...arguments)"
+                />
+            </li>
+        </ul>
+    </fragment>
 </template>
 
 <script lang="ts">
@@ -45,7 +80,11 @@ import {
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { SpaceRouter } from '@/router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { DashboardItem } from '@/services/billing/cost-management/cost-dashboard/type';
+import {
+    DashboardMenuItem,
+    PublicDashboardInfo,
+    UserDashboardInfo,
+} from '@/services/billing/cost-management/cost-dashboard/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -60,8 +99,13 @@ export default {
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            items: [] as any,
-            dashboardList: computed<DashboardItem[]>(() => state.items.map(d => ({
+            publicDashboardItems: [] as PublicDashboardInfo[],
+            publicDashboardList: computed<DashboardMenuItem[]>(() => state.publicDashboardItems.map(d => ({
+                ...d,
+                label: d.name,
+            }))),
+            userDashboardItems: [] as UserDashboardInfo[],
+            userDashboardList: computed<DashboardMenuItem[]>(() => state.userDashboardItems.map(d => ({
                 ...d,
                 label: d.name,
             }))),
@@ -80,7 +124,7 @@ export default {
             if (state.selectedMoreMenuItem === 'setHome') {
                 store.dispatch('settings/setItem', {
                     key: 'homeDashboard',
-                    value: item.public_dashboard_id,
+                    value: item.public_dashboard_id ?? item.user_dashboard_id,
                     path: '/costDashboard',
                 });
             }
@@ -88,11 +132,14 @@ export default {
 
         const listDashboard = async () => {
             try {
-                const { results } = await SpaceConnector.client.costAnalysis.dashboard.list();
-                state.items = results;
+                const publicDashboardList = await SpaceConnector.client.costAnalysis.dashboard.list();
+                const userDashboardList = await SpaceConnector.client.costAnalysis.userDashboard.list();
+                state.publicDashboardItems = publicDashboardList.results;
+                state.userDashboardItems = userDashboardList.results;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.items = [];
+                state.publicDashboardItems = [];
+                state.userDashboardItems = [];
             }
         };
 
@@ -107,7 +154,7 @@ export default {
             if (!state.homeDashboardId) {
                 store.dispatch('settings/setItem', {
                     key: 'homeDashboard',
-                    value: state.items[0]?.public_dashboard_id,
+                    value: state.publicDashboardItems[0]?.public_dashboard_id,
                     path: '/costDashboard',
                 });
             }
@@ -118,7 +165,8 @@ export default {
 
             if (!state.homeDashboardId) initHomeDashboard();
 
-            const isDashboardIdFromRouteValid = !!state.items.find(d => d.public_dashboard_id === state.dashboardIdFromRoute);
+            const isDashboardIdFromRouteValid = !!state.publicDashboardItems.find(d => d.public_dashboard_id === state.dashboardIdFromRoute
+                || d.user_dashboard_id === state.dashboardIdFromRoute);
 
             if (vm.$route.name === BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME
                 && (!state.dashboardIdFromRoute || !isDashboardIdFromRouteValid)) {

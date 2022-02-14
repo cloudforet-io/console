@@ -28,9 +28,10 @@ import CostDashboardCreateStoreModule
 import { CostDashboardCreateState } from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/store/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
+    DASHBOARD_PRIVACY_TYPE,
     DashboardCreateParam,
-    DashboardInfo,
-    DefaultLayout,
+    DashboardPrivacyType,
+    DefaultLayout, PublicDashboardInfo,
 } from '@/services/billing/cost-management/cost-dashboard/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -57,25 +58,39 @@ export default {
         });
 
         const state = reactive({
-            selectedTemplate: computed<Record<string, DefaultLayout> | DashboardInfo>(() => store.state.service?.costDashboardCreate?.selectedTemplate),
+            selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => store.state.service?.costDashboardCreate?.selectedTemplate),
             defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboardCreate?.defaultFilter),
+            selectedPrivacy: computed<DashboardPrivacyType>(() => store.state.service?.costDashboardCreate?.selectedPrivacy),
         });
 
         const getDefaultLayoutId = () => {
             if (Object.prototype.hasOwnProperty.call(state.selectedTemplate, 'default_layout_id')) {
                 return state.selectedTemplate.default_layout_id;
-            } return '';
+            } return undefined;
         };
 
-        const createDashboard = async (): Promise<DashboardInfo|undefined> => {
+        const dashboardCreateParam: DashboardCreateParam = {
+            name: 'Untitled Dashboard',
+            default_layout_id: getDefaultLayoutId() as string,
+            custom_layouts: [],
+            period_type: 'AUTO',
+            default_filter: state.defaultFilter,
+        };
+
+        const createPublicDashboard = async (): Promise<string|undefined> => {
             try {
-                return await SpaceConnector.client.costAnalysis.dashboard.create({
-                    name: 'Untitled Dashboard',
-                    default_layout_id: getDefaultLayoutId(),
-                    custom_layouts: [],
-                    period_type: 'AUTO',
-                    default_filter: state.defaultFilter,
-                } as DashboardCreateParam);
+                const { public_dashboard_id } = await SpaceConnector.client.costAnalysis.dashboard.create(dashboardCreateParam as DashboardCreateParam);
+                return public_dashboard_id;
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, 'Failed to create dashboard');
+            }
+            return undefined;
+        };
+
+        const createUserDashboard = async (): Promise<string|undefined> => {
+            try {
+                const { user_dashboard_id } = await SpaceConnector.client.costAnalysis.userDashboard.create(dashboardCreateParam as DashboardCreateParam);
+                return user_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, 'Failed to create dashboard');
             }
@@ -89,8 +104,8 @@ export default {
             });
         };
         const handleClickCreate = async () => {
-            const createdDashboard = await createDashboard();
-            if (createdDashboard?.dashboard_id) goToCustomizePage(createdDashboard.public_dashboard_id);
+            const createdDashboardId = state.selectedPrivacy === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
+            if (createdDashboardId) goToCustomizePage(createdDashboardId);
         };
 
         return {

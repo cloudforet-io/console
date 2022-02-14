@@ -15,12 +15,10 @@ interface DefaultFilter {
     service_accounts?: string[];
     provider?: string[];
 }
-export interface DashboardInfo {
+export interface DashboardItem {
     created_at: TimeStamp;
     updated_at: TimeStamp;
     custom_layouts: CustomLayout[];
-    dashboard_id?: string;
-    public_dashboard_id: string;
     default_filter: DefaultFilter;
     default_layout_id: string;
     domain_id?: string;
@@ -32,10 +30,18 @@ export interface DashboardInfo {
     period?: Period;
 }
 
-export interface DashboardItem extends DashboardInfo {
-    label: string;
-    routeName: string;
+export interface PublicDashboardInfo extends DashboardItem {
+    public_dashboard_id: string;
 }
+
+export interface UserDashboardInfo extends DashboardItem {
+    user_dashboard_id: string;
+}
+
+export type DashboardInfo = PublicDashboardInfo | UserDashboardInfo;
+
+export type DashboardMenuItem = Partial<DashboardInfo> & { label: string; routeName: string};
+
 
 export interface WidgetOptions {
     name: string;

@@ -1,7 +1,7 @@
 <template>
     <fragment>
         <h3>Clone an Existing Dashboard</h3>
-        <div v-for="dashboardData in existingDashboardData" :key="dashboardData.public_dashboard_id">
+        <div v-for="(dashboardData, idx) in existingDashboardData" :key="`$dashboard-${idx}-${getUUID()}`">
             <p-select-card
                 :selected="selectedTemplate"
                 :value="dashboardData"
@@ -25,10 +25,15 @@ import {
     PAnchor, PSelectCard,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
+import { getUUID } from '@/lib/component-util/getUUID';
 import { defaultLayoutData } from '@/services/billing/cost-management/cost-dashboard/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
+import {
+    DashboardInfo,
+    PublicDashboardInfo,
+    UserDashboardInfo,
+} from '@/services/billing/cost-management/cost-dashboard/type';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { store } from '@/store';
 
@@ -52,13 +57,15 @@ export default {
 
         const listDashboard = async () => {
             try {
-                const { results } = await SpaceConnector.client.costAnalysis.dashboard.list();
-                state.existingDashboardData = results.map(d => ({
+                const publicDashboardList = await SpaceConnector.client.costAnalysis.dashboard.list();
+                const userDashboardList = await SpaceConnector.client.costAnalysis.userDashboard.list();
+                const dashboardList = [...publicDashboardList.results as PublicDashboardInfo[], ...userDashboardList.results as UserDashboardInfo[]];
+                state.existingDashboardData = dashboardList.map(d => ({
                     custom_layouts: d.custom_layouts,
-                    public_dashboard_id: d.public_dashboard_id,
                     default_filter: d.default_filter,
                     default_layout_id: d.default_layout_id,
                     name: d.name,
+                    ...d,
                 }) as Partial<DashboardInfo>);
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -72,6 +79,7 @@ export default {
             ...toRefs(state),
             defaultLayoutData,
             handleDashboardChange,
+            getUUID,
         };
     },
 };

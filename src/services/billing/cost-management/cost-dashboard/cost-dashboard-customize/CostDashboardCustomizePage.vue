@@ -36,7 +36,7 @@ import CostDashboardCreateStoreModule
 import { CostDashboardCreateState } from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/store/type';
 import {
     DashboardInfo,
-    DefaultLayout,
+    DefaultLayout, PublicDashboardInfo,
 } from '@/services/billing/cost-management/cost-dashboard/type';
 import { store } from '@/store';
 import CostDashboardCustomizeSidebar
@@ -75,7 +75,7 @@ export default {
             dashboardIdFromRoute: computed(() => props.dashboardId || SpaceRouter.router.currentRoute.params.dashboardId),
             dashboardData: {} as DashboardInfo,
             dashboardTitle: '',
-            selectedTemplate: computed<Record<string, DefaultLayout> | DashboardInfo>(() => store.state.service?.costDashboardCreate?.selectedTemplate),
+            selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => store.state.service?.costDashboardCreate?.selectedTemplate),
             defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboardCreate?.defaultFilter),
         });
 
@@ -89,10 +89,17 @@ export default {
 
         const saveDashboardWithUpdatedData = async () => {
             try {
-                await SpaceConnector.client.costAnalysis.dashboard.update({
-                    public_dashboard_id: state.dashboardIdFromRoute,
-                    name: state.dashboardTitle,
-                });
+                if (state.dashboardIdFromRoute.startsWith('user')) {
+                    await SpaceConnector.client.costAnalysis.userDashboard.update({
+                        user_dashboard_id: state.dashboardIdFromRoute,
+                        name: state.dashboardTitle,
+                    });
+                } else {
+                    await SpaceConnector.client.costAnalysis.dashboard.update({
+                        public_dashboard_id: state.dashboardIdFromRoute,
+                        name: state.dashboardTitle,
+                    });
+                }
                 goToMainDashboardPage();
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -105,9 +112,15 @@ export default {
 
         const getDashboardData = async () => {
             try {
-                state.dashboardData = await SpaceConnector.client.costAnalysis.dashboard.get({
-                    public_dashboard_id: state.dashboardIdFromRoute,
-                });
+                if (state.dashboardIdFromRoute.startsWith('user')) {
+                    state.dashboardData = await SpaceConnector.client.costAnalysis.userDashboard.get({
+                        user_dashboard_id: state.dashboardIdFromRoute,
+                    });
+                } else {
+                    state.dashboardData = await SpaceConnector.client.costAnalysis.dashboard.get({
+                        public_dashboard_id: state.dashboardIdFromRoute,
+                    });
+                }
                 state.dashboardTitle = state.dashboardData?.name || '';
             } catch (e) {
                 ErrorHandler.handleError(e);

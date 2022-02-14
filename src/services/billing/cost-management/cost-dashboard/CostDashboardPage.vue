@@ -75,7 +75,9 @@ import CostDashboardFilter from '@/services/billing/cost-management/cost-dashboa
 import CostDashboardMoreMenu from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardMoreMenu.vue';
 import CostDashboardPeriodSelectDropdown
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
-import { CustomLayout, DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
+import {
+    CustomLayout, DashboardInfo,
+} from '@/services/billing/cost-management/cost-dashboard/type';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 import { SpaceRouter } from '@/router';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -138,9 +140,15 @@ export default {
         const handleDeleteDashboardConfirm = async () => {
             try {
                 checkDeleteState.loading = true;
-                await SpaceConnector.client.costAnalysis.dashboard.delete({
-                    public_dashboard_id: props.dashboardId,
-                });
+                if (props.dashboardId?.startsWith('user')) {
+                    await SpaceConnector.client.costAnalysis.userDashboard.delete({
+                        user_dashboard_id: props.dashboardId,
+                    });
+                } else {
+                    await SpaceConnector.client.costAnalysis.dashboard.delete({
+                        public_dashboard_id: props.dashboardId,
+                    });
+                }
                 await SpaceRouter.router.replace({ name: BILLING_ROUTE.COST_MANAGEMENT._NAME });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, 'Failed to delete dashboard');
@@ -190,10 +198,14 @@ export default {
 
         const fetchDashboard = async (dashboardId: string): Promise<DashboardInfo> => {
             try {
-                const dashboard = await SpaceConnector.client.costAnalysis.dashboard.get({
+                if (dashboardId.startsWith('user')) {
+                    return await SpaceConnector.client.costAnalysis.userDashboard.get({
+                        user_dashboard_id: dashboardId,
+                    });
+                }
+                return await SpaceConnector.client.costAnalysis.dashboard.get({
                     public_dashboard_id: dashboardId,
                 });
-                return dashboard;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return {} as DashboardInfo;
@@ -222,9 +234,7 @@ export default {
                 }
                 return;
             }
-
             if (before && dashboardId === before[0]) return;
-
             getDashboardLayout(dashboardId);
         }, { immediate: true });
 
