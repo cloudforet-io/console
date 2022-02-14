@@ -1,5 +1,7 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROJECT')" :widget-link="widgetLink" class="cost-trend-by-project">
+    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROJECT')" :widget-link="widgetLink" class="cost-trend-by-project"
+                                       :print-mode="printMode"
+    >
         <p-chart-loader :loading="loading" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
@@ -16,6 +18,7 @@
                                        :legends="legends"
                                        :currency-rates="currencyRates"
                                        :currency="currency"
+                                       :pagination-visible="!printMode"
                                        show-legend
                                        @toggle-legend="handleToggleLegend"
             />
@@ -114,10 +117,15 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: Props) {
+    setup(props: Props, { emit }) {
         const state = reactive({
             widgetLink: computed(() => {
+                if (props.printMode) return undefined;
                 const _period = {
                     start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM'),
                     end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
@@ -185,6 +193,9 @@ export default {
             };
             const chart = createChart();
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+            chart.events.on('ready', () => {
+                emit('rendered');
+            });
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
             chart.data = getCurrencyAppliedChartData(chartData, props.currency, props.currencyRates);
@@ -226,6 +237,7 @@ export default {
                 const projectId = legend.name;
                 const seriesColor = DEFAULT_CHART_COLORS[(state.thisPage * 5 - 5) + idx];
                 const series = chart.series.push(new am4charts.LineSeries());
+                if (props.printMode) series.showOnInit = false;
                 series.name = legend.label;
                 series.dataFields.dateX = CATEGORY_KEY;
                 series.dataFields.valueY = projectId;

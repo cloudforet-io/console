@@ -76,8 +76,12 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: WidgetProps) {
+    setup(props: WidgetProps, { emit }) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as XYChart | null,
@@ -92,13 +96,16 @@ export default {
                 return currencyMoneyFormatter(cost, props.currency, props.currencyRates, true, 10000000000);
             }),
             currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
-            widgetLink: computed(() => ({
-                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
-                query: {
-                    granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
-                    period: objectToQueryString({ start: state.lastMonth.startOf('month'), end: state.lastMonth.endOf('month') }),
-                },
-            })),
+            widgetLink: computed(() => {
+                if (props.printMode) return undefined;
+                return {
+                    name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    query: {
+                        granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                        period: objectToQueryString({ start: state.lastMonth.startOf('month'), end: state.lastMonth.endOf('month') }),
+                    },
+                };
+            }),
             noData: computed(() => state.data.find(d => d.totalCost > 0) === undefined),
         });
 
@@ -118,6 +125,9 @@ export default {
             const chart = createChart();
             state.chart = chart;
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+            chart.events.on('ready', () => {
+                emit('rendered');
+            });
 
             chart.paddingBottom = 0;
 
@@ -145,6 +155,7 @@ export default {
             valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
 
             const series = chart.series.push(new am4charts.ColumnSeries());
+            if (props.printMode) series.showOnInit = false;
             series.dataFields.valueY = VALUE_KEY;
             series.dataFields.categoryX = CATEGORY_KEY;
             series.columns.template.propertyFields.fill = 'color';

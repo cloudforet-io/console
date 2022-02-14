@@ -25,7 +25,7 @@
             <span class="description">{{ description }}</span>
             <p-divider v-if="showDivider" class="divider" />
             <slot />
-            <router-link :to="widgetLink" />
+            <router-link v-if="widgetLink" :to="widgetLink" />
         </div>
     </p-pane-layout>
 </template>
@@ -55,7 +55,7 @@ interface Props {
     showDivider: boolean;
     description: string;
     noData: boolean;
-    widgetLink: Location|string;
+    widgetLink?: Location|string;
 
 }
 
@@ -107,7 +107,7 @@ export default defineComponent<Props>({
         },
         widgetLink: {
             type: [Object, String] as PropType<Location|string>,
-            default: () => ({}),
+            default: undefined,
         },
     },
     setup(props) {

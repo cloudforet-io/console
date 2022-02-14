@@ -2,6 +2,7 @@
     <p-card class="cost-dashboard-card-widget-layout"
             style-type="white"
             size="lg"
+            :class="{responsive: !printMode}"
     >
         <template #header>
             <div class="header">
@@ -12,7 +13,7 @@
                         <!--                             color="inherit transparent" class="tooltip-button"-->
                         <!--                        />-->
                     </span>
-                    <router-link :to="widgetLink" class="anchor-button">
+                    <router-link v-if="widgetLink && !printMode" :to="widgetLink" class="anchor-button">
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
                         <p-i name="ic_arrow_right" width="1rem" height="1rem"
                              color="inherit transparent"
@@ -48,7 +49,7 @@ export default {
         },
         widgetLink: {
             type: [Object, String],
-            default: () => ({}),
+            default: undefined,
         },
         noData: {
             type: Boolean,
@@ -57,6 +58,10 @@ export default {
         showTopText: {
             type: Boolean,
             default: true,
+        },
+        printMode: {
+            type: Boolean,
+            default: false,
         },
     },
     setup() {
@@ -107,10 +112,12 @@ export default {
         }
     }
 
-    @screen mobile {
-        .title-extra {
-            .show-top-text {
-                @apply hidden;
+    &.responsive {
+        @screen mobile {
+            .title-extra {
+                .show-top-text {
+                    @apply hidden;
+                }
             }
         }
     }

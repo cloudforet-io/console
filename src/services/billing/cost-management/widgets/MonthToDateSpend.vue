@@ -50,7 +50,8 @@ import CostDashboardSimpleCardWidget from '@/services/billing/cost-management/wi
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { PI } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -94,8 +95,13 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: WidgetProps) {
+    setup(props: WidgetProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const checkThisMonth = () => dayjs.utc(props.period?.end).format('MM') === thisMonth;
         const thisMonthFormatter = (targetDate: Dayjs) => {
             if (checkThisMonth()) {
@@ -112,16 +118,19 @@ export default {
             currentMonth: computed<Dayjs>(() => dayjs.utc(props.period?.end)),
             lastMonth: computed<Dayjs>(() => dayjs.utc(props.period?.end).subtract(1, 'month')),
             currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
-            widgetLink: computed(() => ({
-                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
-                query: {
-                    granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
-                    period: objectToQueryString({
-                        start: state.currentMonth.startOf('month').format('YYYY-MM-DD'),
-                        end: state.currentMonth.endOf('month').format('YYYY-MM-DD'),
-                    }),
-                },
-            })),
+            widgetLink: computed(() => {
+                if (props.printMode) return undefined;
+                return {
+                    name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    query: {
+                        granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                        period: objectToQueryString({
+                            start: state.currentMonth.startOf('month').format('YYYY-MM-DD'),
+                            end: state.currentMonth.endOf('month').format('YYYY-MM-DD'),
+                        }),
+                    },
+                };
+            }),
         });
 
         const costQueryHelper = new QueryHelper();
@@ -162,10 +171,13 @@ export default {
         };
 
         watch([() => props.period, () => props.filters], async (after) => {
-            if (after) await getChartData();
-        });
-
-        getChartData();
+            if (after) {
+                await getChartData();
+                await vm.$nextTick();
+                getChartData();
+                emit('rendered');
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

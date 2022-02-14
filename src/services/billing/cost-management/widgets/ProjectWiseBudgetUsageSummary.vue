@@ -4,6 +4,7 @@
                                        :widget-link="widgetLink"
                                        :no-data="!loading && !items.length"
                                        :data-range="20"
+                                       :print-mode="printMode"
     >
         <p-data-table v-if="items.length"
                       :items="items"
@@ -27,7 +28,7 @@
             </template>
             <template #col-usage-format="{ value }">
                 <div class="col-usage">
-                    <p-progress-bar :percentage="value" :color="getColor(value)" />
+                    <p-progress-bar :percentage="value" :disable-animation="printMode" :color="getColor(value)" />
                     <span class="usage-text" :style="{ color: getColor(value) }">{{ value.toFixed(1) }}%</span>
                 </div>
             </template>
@@ -39,7 +40,8 @@
 import dayjs from 'dayjs';
 
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -104,8 +106,13 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: WidgetProps) {
+    setup(props: WidgetProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const budgetQueryHelper = new QueryHelper();
 
         const state = reactive({
@@ -124,13 +131,16 @@ export default {
             items: [] as BudgetItem[],
             projectGroups: computed(() => store.state.resource.projectGroup.items),
             projects: computed(() => store.state.resource.project.items),
-            widgetLink: computed(() => ({
-                name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
-                params: {},
-                query: {
-                    filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(props.filters)).rawQueryStrings,
-                },
-            })),
+            widgetLink: computed(() => {
+                if (props.printMode) return undefined;
+                return {
+                    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
+                    params: {},
+                    query: {
+                        filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(props.filters)).rawQueryStrings,
+                    },
+                };
+            }),
         });
 
         /* util */
@@ -194,8 +204,10 @@ export default {
             }
         };
 
-        watch([() => props.period, () => props.filters], ([period, filters]) => {
-            getBudgetUsageData(period, filters);
+        watch([() => props.period, () => props.filters], async ([period, filters]) => {
+            await getBudgetUsageData(period, filters);
+            await vm.$nextTick();
+            emit('rendered');
         }, { immediate: true });
 
         return {

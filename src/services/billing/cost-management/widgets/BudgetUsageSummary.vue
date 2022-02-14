@@ -2,8 +2,11 @@
     <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.BUDGET_USAGE_SUMMARY')"
                                        :widget-link="widgetLink"
                                        :show-top-text="false"
+                                       :print-mode="printMode"
     >
-        <budget-stat :filters="queryStoreFilters" :period="period" />
+        <budget-stat :filters="queryStoreFilters" :period="period" :print-mode="printMode"
+                     @rendered="handleRendered"
+        />
     </cost-dashboard-card-widget-layout>
 </template>
 
@@ -56,23 +59,35 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: WidgetProps) {
+    setup(props: WidgetProps, { emit }) {
         const budgetQueryHelper = new QueryHelper();
         const state = reactive({
             widgetOptions: getWidgetOption(props.options, props.widgetId),
             queryStoreFilters: computed<QueryStoreFilter[]>(() => getConvertedBudgetFilter(props.filters)),
-            widgetLink: computed(() => ({
-                name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
-                params: {},
-                query: {
-                    filters: budgetQueryHelper.setFilters(state.queryStoreFilters).rawQueryStrings,
-                },
-            })),
+            widgetLink: computed(() => {
+                if (props.printMode) return undefined;
+                return {
+                    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
+                    params: {},
+                    query: {
+                        filters: budgetQueryHelper.setFilters(state.queryStoreFilters).rawQueryStrings,
+                    },
+                };
+            }),
         });
+
+        const handleRendered = (...args) => {
+            emit('rendered', ...args);
+        };
 
         return {
             ...toRefs(state),
+            handleRendered,
         };
     },
 };

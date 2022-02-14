@@ -28,7 +28,8 @@
 
 <script lang="ts">
 import {
-    computed,
+    ComponentRenderProxy,
+    computed, getCurrentInstance,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { TranslateResult } from 'vue-i18n';
@@ -58,6 +59,7 @@ interface Props {
     filters: QueryStoreFilter[];
     period: Period;
     usageRange: BudgetUsageRange;
+    printMode?: boolean;
 }
 
 interface Card {
@@ -87,8 +89,13 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: Props) {
+    setup(props: Props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const { i18nDayjs } = useI18nDayjs();
         const budgetUsageApiQueryHelper = new ApiQueryHelper();
         const state = reactive({
@@ -174,8 +181,10 @@ export default {
         };
 
         /* Watchers */
-        watch([() => props.filters, () => props.period, () => props.usageRange], () => {
-            fetchBudgetUsage();
+        watch([() => props.filters, () => props.period, () => props.usageRange], async () => {
+            await fetchBudgetUsage();
+            await vm.$nextTick();
+            emit('rendered');
         }, { immediate: true });
 
 

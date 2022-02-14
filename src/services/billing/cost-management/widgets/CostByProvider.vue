@@ -1,5 +1,7 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_PROVIDER')" class="cost-by-provider" :widget-link="widgetLink">
+    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_PROVIDER')" class="cost-by-provider" :widget-link="widgetLink"
+                                       :print-mode="printMode"
+    >
         <p-chart-loader :loading="loading" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
@@ -17,6 +19,7 @@
                 :show-legend="false"
                 :currency-rates="currencyRates"
                 :currency="currency"
+                :pagination-visible="!printMode"
                 class="table"
             >
                 <template #category-format="{value}">
@@ -102,8 +105,12 @@ export default defineComponent<WidgetProps>({
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: WidgetProps) {
+    setup(props: WidgetProps, { emit }) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chartRegistry: {},
@@ -113,16 +120,19 @@ export default defineComponent<WidgetProps>({
             pageSize: 5,
             thisPage: 1,
             providers: computed(() => store.state.resource.provider.items),
-            widgetLink: computed(() => ({
-                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
-                params: {},
-                query: {
-                    granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
-                    groupBy: arrayToQueryString([GROUP_BY.PROVIDER]),
-                    period: objectToQueryString(props.period),
-                    filters: objectToQueryString(props.filters),
-                },
-            })),
+            widgetLink: computed(() => {
+                if (props.printMode) return undefined;
+                return {
+                    name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    params: {},
+                    query: {
+                        granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                        groupBy: arrayToQueryString([GROUP_BY.PROVIDER]),
+                        period: objectToQueryString(props.period),
+                        filters: objectToQueryString(props.filters),
+                    },
+                };
+            }),
         });
 
         const dataTableState = reactive({
@@ -148,6 +158,10 @@ export default defineComponent<WidgetProps>({
                 return state.chartRegistry[chartContext];
             };
             const chart = createChart();
+            chart.events.on('ready', () => {
+                emit('rendered');
+            });
+
             if (isChartItemExists) {
                 chart.data = state.chartData;
             } else {
@@ -158,6 +172,7 @@ export default defineComponent<WidgetProps>({
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
             const series = chart.series.push(new am4charts.PieSeries());
+            if (props.printMode) series.showOnInit = false;
             series.dataFields.category = CATEGORY_KEY;
             series.dataFields.value = VALUE_KEY;
             series.labels.template.disabled = true;

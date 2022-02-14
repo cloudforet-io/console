@@ -3,9 +3,10 @@
         :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_REGION')"
         :data-range="15"
         :widget-link="widgetLink"
+        :print-mode="printMode"
     >
         <template #default>
-            <div class="widget-wrapper">
+            <div class="widget-wrapper" :class="{responsive: !printMode}">
                 <p-data-loader :loading="loading"
                                loader-type="skeleton"
                                disable-empty-case
@@ -28,6 +29,7 @@
                     :show-legend="false"
                     :currency-rates="currencyRates"
                     :currency="currency"
+                    :pagination-visible="!printMode"
                     class="table"
                 >
                     <template #provider-format="item">
@@ -124,8 +126,12 @@ export default defineComponent<WidgetProps>({
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: WidgetProps) {
+    setup(props: WidgetProps, { emit }) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
@@ -134,16 +140,19 @@ export default defineComponent<WidgetProps>({
             providers: computed(() => store.state.resource.provider.items),
             loading: true,
             chartData: [] as DefaultContinentData[],
-            widgetLink: computed(() => ({
-                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
-                params: {},
-                query: {
-                    granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
-                    groupBy: arrayToQueryString([GROUP_BY.REGION]),
-                    period: objectToQueryString(props.period),
-                    filters: objectToQueryString(props.filters),
-                },
-            })),
+            widgetLink: computed(() => {
+                if (props.printMode) return undefined;
+                return {
+                    name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    params: {},
+                    query: {
+                        granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                        groupBy: arrayToQueryString([GROUP_BY.REGION]),
+                        period: objectToQueryString(props.period),
+                        filters: objectToQueryString(props.filters),
+                    },
+                };
+            }),
             chartLegends: computed(() => {
                 const legends = new Set();
                 state.chartData.forEach((item) => {
@@ -185,6 +194,13 @@ export default defineComponent<WidgetProps>({
             const chart = createChart();
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
+            chart.events.on('ready', () => {
+                (async () => {
+                    const image = await chart.exporting.getImage('png');
+                    emit('rendered', image);
+                })();
+            });
+
             chart.geodata = am4geodataContinentsLow;
             chart.projection = new am4maps.projections.Miller();
             chart.minWidth = 300;
@@ -193,12 +209,14 @@ export default defineComponent<WidgetProps>({
             chart.chartContainer.wheelable = false;
 
             const polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+            if (props.printMode) polygonSeries.showOnInit = false;
             polygonSeries.useGeodata = true;
             polygonSeries.exclude = ['antarctica'];
             polygonSeries.mapPolygons.template.fill = am4core.color(gray[200]);
             polygonSeries.calculateVisualCenter = true;
 
             const pieSeries = chart.series.push(new am4maps.MapImageSeries());
+            if (props.printMode) pieSeries.showOnInit = false;
             const pieTemplate = pieSeries.mapImages.template;
             pieTemplate.propertyFields.latitude = 'latitude';
             pieTemplate.propertyFields.longitude = 'longitude';
@@ -300,7 +318,10 @@ export default defineComponent<WidgetProps>({
         });
 
         (async () => {
-            await store.dispatch('resource/region/load');
+            await Promise.allSettled([
+                store.dispatch('resource/region/load'),
+                store.dispatch('resource/provider/load'),
+            ]);
             await getChartData();
         })();
 
@@ -351,18 +372,19 @@ export default defineComponent<WidgetProps>({
             line-height: 1.5;
         }
     }
-}
 
-@screen tablet {
-    .widget-wrapper {
-        .chart-wrapper {
-            flex-basis: 100%;
-        }
-        .table {
-            flex-basis: 100%;
-            margin-top: 1rem;
-            margin-left: 0;
+    @screen tablet {
+        &.responsive {
+            .chart-wrapper {
+                flex-basis: 100%;
+            }
+            .table {
+                flex-basis: 100%;
+                margin-top: 1rem;
+                margin-left: 0;
+            }
         }
     }
 }
+
 </style>

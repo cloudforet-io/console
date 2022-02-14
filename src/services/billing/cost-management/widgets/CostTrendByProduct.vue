@@ -1,11 +1,13 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PRODUCT')" :widget-link="widgetLink">
+    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PRODUCT')" :widget-link="widgetLink" :print-mode="printMode">
         <cost-dashboard-stacked-column-widget
             :group-by="GROUP_BY.PRODUCT"
             :currency="currency"
             :currency-rates="currencyRates"
             :period="period"
             :filters="filters"
+            :print-mode="printMode"
+            @rendered="handleRendered"
         />
     </cost-dashboard-card-widget-layout>
 </template>
@@ -52,8 +54,12 @@ export default defineComponent<WidgetProps>({
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: WidgetProps) {
+    setup(props: WidgetProps, { emit }) {
         const state = reactive({
             widgetLink: computed(() => {
                 const _period = {
@@ -73,8 +79,13 @@ export default defineComponent<WidgetProps>({
             }),
         });
 
+        const handleRendered = (...args) => {
+            emit('rendered', ...args);
+        };
+
         return {
             ...toRefs(state),
+            handleRendered,
             GROUP_BY,
         };
     },

@@ -4,6 +4,7 @@
         :data-range="15"
         :widget-link="widgetLink"
         :no-data="!loading && data.length === 0"
+        :print-mode="printMode"
         class="cost-by-project"
     >
         <p-chart-loader :loading="loading" class="chart-wrapper">
@@ -89,24 +90,31 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: WidgetProps) {
+    setup(props: WidgetProps, { emit }) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as TreeMap | null,
             chartRegistry: {},
             loading: false,
             data: [] as CostByProjectChartData[],
-            widgetLink: computed(() => ({
-                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
-                params: {},
-                query: {
-                    granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
-                    groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
-                    period: objectToQueryString(props.period),
-                    filters: objectToQueryString(props.filters),
-                },
-            })),
+            widgetLink: computed(() => {
+                if (props.printMode) return undefined;
+                return {
+                    name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    params: {},
+                    query: {
+                        granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                        groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
+                        period: objectToQueryString(props.period),
+                        filters: objectToQueryString(props.filters),
+                    },
+                };
+            }),
             projects: computed(() => store.state.resource.project.items),
         });
 
@@ -125,6 +133,9 @@ export default {
             };
             const chart = createChart();
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+            chart.events.on('ready', () => {
+                emit('rendered');
+            });
             chart.colors.step = 1;
 
             chart.data = state.data;
@@ -135,7 +146,8 @@ export default {
 
             const totalCost = sum(state.data.map(d => d.value));
             const series = chart.seriesTemplates.create('0');
-            series.tooltip.fontSize = 14;
+            if (props.printMode) series.showOnInit = false;
+            if (series.tooltip) series.tooltip.fontSize = 14;
             series.columns.template.stroke = am4core.color('white');
             series.columns.template.strokeWidth = 3;
             series.columns.template.strokeOpacity = 1;

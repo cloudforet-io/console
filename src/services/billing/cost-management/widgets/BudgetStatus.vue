@@ -3,6 +3,7 @@
                                        :data-range="200"
                                        class="budget-status"
                                        :widget-link="widgetLink"
+                                       :print-mode="printMode"
     >
         <p-chart-loader :loading="loading" class="chart-wrapper">
             <template #loader>
@@ -38,7 +39,8 @@ import dayjs from 'dayjs';
 import { Location } from 'vue-router';
 
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -92,8 +94,13 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: WidgetProps) {
+    setup(props: WidgetProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const budgetQueryHelper = new QueryHelper();
         const state = reactive({
             loading: false,
@@ -106,13 +113,16 @@ export default {
                 { label: '70-90%', color: indigo[500] },
                 { label: '< 70%', color: indigo[100] },
             ])),
-            widgetLink: computed(() => ({
-                name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
-                params: {},
-                query: {
-                    filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(props.filters)).rawQueryStrings,
-                },
-            })),
+            widgetLink: computed(() => {
+                if (props.printMode) return undefined;
+                return {
+                    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
+                    params: {},
+                    query: {
+                        filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(props.filters)).rawQueryStrings,
+                    },
+                };
+            }),
         });
 
         /* util */
@@ -191,8 +201,10 @@ export default {
             }
         };
 
-        watch([() => props.period, () => props.filters], ([period, filters]) => {
-            getBudgetUsageData(period, filters);
+        watch([() => props.period, () => props.filters], async ([period, filters]) => {
+            await getBudgetUsageData(period, filters);
+            await vm.$nextTick();
+            emit('rendered');
         }, { immediate: true });
 
         return {

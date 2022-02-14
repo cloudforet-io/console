@@ -1,5 +1,5 @@
 <template>
-    <div class="cost-dashboard-stacked-column-widget">
+    <div class="cost-dashboard-stacked-column-widget" :class="{responsive: !printMode}">
         <p-chart-loader :loading="loading" class="chart-wrapper" :class="widgetType">
             <template #loader>
                 <p-skeleton height="100%" />
@@ -16,6 +16,7 @@
                                        :legends="legends"
                                        :currency-rates="currencyRates"
                                        :currency="currency"
+                                       :pagination-visible="!printMode"
                                        show-legend
                                        @toggle-legend="handleToggleLegend"
             />
@@ -113,8 +114,12 @@ export default defineComponent<Props>({
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: Props) {
+    setup(props: Props, { emit }) {
         const state = reactive({
             providers: computed(() => store.state.resource.provider.items),
             //
@@ -169,6 +174,11 @@ export default defineComponent<Props>({
             };
             const chart = createChart();
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+
+            chart.events.on('ready', () => {
+                emit('rendered');
+            });
+
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
             chart.data = getCurrencyAppliedChartData(chartData, props.currency, props.currencyRates);
@@ -206,6 +216,7 @@ export default defineComponent<Props>({
 
             const createSeries = (legend) => {
                 const series = chart.series.push(new am4charts.ColumnSeries());
+                series.showOnInit = false;
                 series.name = legend.label;
                 series.dataFields.dateX = CATEGORY_KEY;
                 series.dataFields.valueY = legend.name;
@@ -326,11 +337,13 @@ export default defineComponent<Props>({
         }
     }
 
-    @screen tablet {
-        @apply grid-rows-2;
-        .chart-wrapper,
-        .table-wrapper {
-            @apply col-span-12 row-span-1;
+    &.responsive {
+        @screen tablet {
+            @apply grid-rows-2;
+            .chart-wrapper,
+            .table-wrapper {
+                @apply col-span-12 row-span-1;
+            }
         }
     }
 }

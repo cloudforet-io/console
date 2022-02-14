@@ -6,7 +6,6 @@
 export default {
     name: 'CustomWidget',
     components: {},
-
     setup() {
         return {};
     },

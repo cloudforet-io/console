@@ -3,6 +3,7 @@
         :percentage="percentage"
         :gradient="gradient"
         :color="color"
+        :diasble-animation="disableAnimation"
     />
 </template>
 
@@ -30,6 +31,10 @@ export default {
         usageRate: {
             type: Number,
             default: 200,
+        },
+        disableAnimation: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props) {

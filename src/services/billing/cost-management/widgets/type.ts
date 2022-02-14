@@ -48,4 +48,5 @@ export interface WidgetProps<Options = any> {
     filters: Record<string, string[]>;
     currency: CURRENCY;
     currencyRates: CurrencyRates;
+    printMode?: boolean;
 }

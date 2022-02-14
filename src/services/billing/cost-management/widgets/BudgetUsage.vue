@@ -14,7 +14,7 @@
             {{ budgetCount }} Budgets
         </template>
         <template #default>
-            <budget-usage-progress-bar :usage-rate="usageRate" class="budget-progress-bar" />
+            <budget-usage-progress-bar :usage-rate="usageRate" :disable-animation="printMode" class="budget-progress-bar" />
             <p class="progress-bar-label">
                 <span class="usage-cost" :style="{ color: getUsageCostColor(usageCost, limitCost) }">
                     {{ currencyMoneyFormatter(usageCost, currency, currencyRates, false, 10000000) }} <span class="spent">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.SPENT') }}</span>
@@ -34,7 +34,8 @@ import CostDashboardSimpleCardWidget
     from '@/services/billing/cost-management/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import { PI } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -79,8 +80,13 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props) {
+    setup(props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
             budgetCount: 0,
@@ -91,7 +97,10 @@ export default {
                 if (state.limitCost - state.usageCost > 0) return state.limitCost - state.usageCost;
                 return 0;
             }),
-            widgetLink: computed(() => ({ name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME })),
+            widgetLink: computed(() => {
+                if (props.printMode) return undefined;
+                return { name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME };
+            }),
         });
 
         /* Util */
@@ -140,8 +149,10 @@ export default {
         };
 
         /* Watcher */
-        watch([() => props.period, () => props.filters], () => {
-            getData();
+        watch([() => props.period, () => props.filters], async () => {
+            await getData();
+            await vm.$nextTick();
+            emit('rendered');
         }, { immediate: true });
 
         return {

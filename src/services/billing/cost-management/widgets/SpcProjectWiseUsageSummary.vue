@@ -2,6 +2,7 @@
     <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.SPC_USAGE_SUMMARY')" class="spc-project-wise-usage-summary"
                                        :widget-link="widgetLink"
                                        :data-range="20"
+                                       :print-mode="printMode"
     >
         <p-chart-loader :loading="loading" class="chart-wrapper">
             <template #loader>
@@ -110,8 +111,12 @@ export default defineComponent<WidgetProps>({
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: WidgetProps) {
+    setup(props: WidgetProps, { emit }) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as PieChart | null,
@@ -120,17 +125,20 @@ export default defineComponent<WidgetProps>({
             chartData: [] as PieChartData[],
             legends: [] as Legend[],
             projects: computed(() => store.state.resource.project.items),
-            widgetLink: computed(() => ({
-                name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
-                params: {},
-                query: {
-                    chartType: primitiveToQueryString(CHART_TYPE.DONUT),
-                    granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
-                    groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
-                    period: objectToQueryString(props.period),
-                    filters: objectToQueryString(props.filters),
-                },
-            })),
+            widgetLink: computed(() => {
+                if (props.printMode) return undefined;
+                return {
+                    name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    params: {},
+                    query: {
+                        chartType: primitiveToQueryString(CHART_TYPE.DONUT),
+                        granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                        groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
+                        period: objectToQueryString(props.period),
+                        filters: objectToQueryString(props.filters),
+                    },
+                };
+            }),
         });
         const tableState = reactive({
             items: [],
@@ -159,8 +167,12 @@ export default defineComponent<WidgetProps>({
             chart.paddingBottom = 5;
             chart.radius = am4core.percent(100);
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+            chart.events.on('ready', () => {
+                emit('rendered');
+            });
 
             const series = chart.series.push(new am4charts.PieSeries());
+            if (props.printMode) series.showOnInit = false;
             series.dataFields.value = VALUE_KEY;
             series.dataFields.category = CATEGORY_KEY;
             series.labels.template.disabled = true;

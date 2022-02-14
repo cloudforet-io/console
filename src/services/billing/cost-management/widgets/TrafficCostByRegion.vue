@@ -47,7 +47,13 @@ const valueName = 'value';
 
 export default {
     name: 'TrafficCostByRegion',
-    setup() {
+    props: {
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props, { emit }) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
@@ -69,6 +75,9 @@ export default {
             };
             const chart = createChart();
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+            chart.events.on('ready', () => {
+                emit('rendered');
+            });
             chart.chartContainer.wheelable = true;
             chart.zoomControl = new am4maps.ZoomControl();
 
@@ -77,6 +86,7 @@ export default {
             chart.responsive.enabled = true;
 
             const polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+            if (props.printMode) polygonSeries.showOnInit = false;
             polygonSeries.useGeodata = true;
             polygonSeries.exclude = ['AQ'];
             polygonSeries.nonScalingStroke = true;
@@ -85,6 +95,7 @@ export default {
             polygonSeries.calculateVisualCenter = true;
 
             const imageSeries = chart.series.push(new am4maps.MapImageSeries());
+            if (props.printMode) imageSeries.showOnInit = false;
             imageSeries.data = tempMapData;
             imageSeries.dataFields.value = valueName;
             polygonSeries.events.on('validated', () => {
