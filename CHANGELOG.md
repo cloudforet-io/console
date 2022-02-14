@@ -1,3 +1,10 @@
+# [1.1.0-beta.240](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.239...v1.1.0-beta.240) (2022-02-14)
+
+
+### Features
+
+* add readOnly props to PSelectDropdown ([#850](https://github.com/spaceone-dev/spaceone-design-system/issues/850)) ([b6cbc0c](https://github.com/spaceone-dev/spaceone-design-system/commit/b6cbc0c62e3b4629a122af5bbda2d1e4e4cef85f))
+
 # [1.1.0-beta.239](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.238...v1.1.0-beta.239) (2022-02-11)
 
 
