@@ -492,6 +492,13 @@
 				"YEARLY": ""
 			},
 			"DASHBOARD": {
+				"ADD_WIDGET": {
+					"ADD_TO_CUSTOM_WIDGET": "",
+					"COST_ANALYSIS_QUERY": "",
+					"CREATE_QUERY": "",
+					"NO_SAVED_QUERY": "",
+					"NO_SAVED_QUERY_HELP_TEXT": ""
+				},
 				"AVAILABLE": "",
 				"BUDGET": "",
 				"BUDGET_STATUS": "",
