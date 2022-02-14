@@ -7,7 +7,9 @@
     >
         <template #body>
             <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" class="tab">
-                <template #default />
+                <template #default-widget>
+                    <cost-dashboard-customize-default-widget-list />
+                </template>
                 <template #custom />
             </p-tab>
         </template>
@@ -22,6 +24,8 @@ import {
 } from '@vue/composition-api';
 import { PButtonModal, PTab } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/type';
+import CostDashboardCustomizeDefaultWidgetList
+    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeDefaultWidgetList.vue';
 
 interface Props {
     visible: boolean;
@@ -29,6 +33,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'CostDashboardCreateCustomizeWidgetModal',
     components: {
+        CostDashboardCustomizeDefaultWidgetList,
         PButtonModal,
         PTab,
     },
@@ -52,10 +57,10 @@ export default defineComponent<Props>({
         });
         const tabState = reactive({
             tabs: computed(() => ([
-                { name: 'default', label: 'Default', keepAlive: true },
-                { name: 'custom', label: 'Custom', keepAlive: true },
+                { name: 'default-widget', label: 'Default', keepAlive: true },
+                { name: 'custom-widget', label: 'Custom' },
             ] as TabItem[])),
-            activeTab: 'default',
+            activeTab: 'default-widget',
         });
         const handleConfirm = () => {
             emit('update:visible', false);
