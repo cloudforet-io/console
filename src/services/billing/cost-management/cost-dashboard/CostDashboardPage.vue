@@ -20,10 +20,9 @@
                 <cost-dashboard-more-menu :dashboard-id="dashboardId" />
             </div>
             <div class="right-part">
-                <cost-dashboard-period-select-dropdown
-                    :dashboard-id="dashboardId"
-                    :period-type.sync="periodType"
-                    :period.sync="period"
+                <cost-dashboard-period-select-dropdown :dashboard-id="dashboardId"
+                                                       :period.sync="period"
+                                                       :period-type.sync="periodType"
                 />
                 <currency-select-dropdown />
                 <div class="left-divider download-pdf">
@@ -158,13 +157,6 @@ export default {
             }
         };
 
-        const handleUpdatePeriod = (period: Period) => {
-            state.period = period;
-        };
-        const handleUpdateFixedPeriod = (periodType) => {
-            state.periodType = periodType;
-        };
-
         const handleClickCustomize = () => {
             SpaceRouter.router.push({ name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });
         };
@@ -188,7 +180,7 @@ export default {
             }
         };
 
-        const setDashboardLayout = async (dashboard: DashboardInfo): Promise<CustomLayout[]> => {
+        const getDashboardLayout = async (dashboard: DashboardInfo): Promise<CustomLayout[]> => {
             let layout: CustomLayout[];
             if (dashboard?.default_layout_id && dashboard.custom_layouts.length === 0) {
                 layout = await fetchDefaultLayoutData(dashboard.default_layout_id);
@@ -212,20 +204,21 @@ export default {
             }
         };
 
-        const getDashboardLayout = async (dashboardId: string) => {
+        const loadDashboardAndSetStates = async (dashboardId: string) => {
             state.loading = true;
 
             const dashboard = await fetchDashboard(dashboardId);
             state.dashboard = dashboard;
-            state.layout = await setDashboardLayout(dashboard);
+            state.layout = await getDashboardLayout(dashboard);
             state.filters = dashboard.default_filter;
-            if (dashboard.period) state.period = dashboard.period;
+            state.period = dashboard.period ?? {};
             state.periodType = dashboard.period_type;
 
             state.loading = false;
         };
 
-        watch([() => props.dashboardId, () => state.homeDashboardId], ([dashboardId, homeDashboardId], before) => {
+
+        watch([() => props.dashboardId, () => state.homeDashboardId], async ([dashboardId, homeDashboardId], before) => {
             if (!dashboardId) {
                 if (homeDashboardId) {
                     SpaceRouter.router.replace({
@@ -235,7 +228,8 @@ export default {
                 return;
             }
             if (before && dashboardId === before[0]) return;
-            getDashboardLayout(dashboardId);
+
+            await loadDashboardAndSetStates(dashboardId);
         }, { immediate: true });
 
 
@@ -246,9 +240,7 @@ export default {
             handleClickEditDashboard,
             handleClickDeleteDashboard,
             handleDeleteDashboardConfirm,
-            handleUpdatePeriod,
             handleClickCustomize,
-            handleUpdateFixedPeriod,
         };
     },
 };

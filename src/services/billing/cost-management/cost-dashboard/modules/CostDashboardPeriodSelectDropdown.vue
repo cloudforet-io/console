@@ -1,7 +1,7 @@
 <template>
     <div class="cost-dashboard-period-select-dropdown">
         <div class="fix-date-box">
-            <p-check-box :selected="isFixDateSelected" @change="handleSelectedFixDate">
+            <p-check-box :selected="isFixedTypeSelected" @change="handleSelectedFixDate">
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FIX_DATE') }}
             </p-check-box>
             <p-tooltip class="fix-date-tooltip" :contents="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FIXED_DATE_TOOLTIP')"
@@ -22,7 +22,7 @@
         <p-select-dropdown :items="MonthMenuItems"
                            :selected="selectedMonthMenuItem"
                            without-outline
-                           :disabled="isFixDateSelected"
+                           :disabled="isFixedTypeSelected"
                            @select="handleSelectMonthMenuItem"
         />
         <cost-management-custom-range-modal v-if="customRangeModalVisible"
@@ -38,7 +38,7 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { range, isEqual } from 'lodash';
+import { range } from 'lodash';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { Period } from '@/services/billing/cost-management/type';
@@ -117,24 +117,31 @@ export default {
                     label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOM'),
                 },
             ])),
-            isFixDateSelected: computed<boolean>(() => props.periodType === 'FIXED'),
+            isFixedTypeSelected: props.periodType === 'FIXED',
             selectedMonthMenuItem: initialSelectedMonth,
             customRangeModalVisible: false,
+            isCustomPeriod: computed<boolean>(() => {
+                const period = state.selectedPeriod;
+                return dayjs(period.start).format('YYYY-MM') !== dayjs(period.end).format('YYYY-MM');
+            }),
         });
-        const savePeriod = (start, end) => {
+        const setSelectedPeriod = (start, end) => {
             const _start = dayjs(start).startOf('month').format('YYYY-MM-DD');
             const _end = dayjs(end).endOf('month').format('YYYY-MM-DD');
             state.selectedPeriod = { start: _start, end: _end };
-            emit('update:period', state.selectedPeriod);
         };
         const handleSelectMonthMenuItem = (monthMenuItem) => {
             state.selectedMonthMenuItem = monthMenuItem;
             if (monthMenuItem === 'custom') state.customRangeModalVisible = true;
-            else savePeriod(monthMenuItem, monthMenuItem);
+            else {
+                setSelectedPeriod(monthMenuItem, monthMenuItem);
+                emit('update:period', state.selectedPeriod);
+            }
         };
         const handleCustomRangeModalConfirm = (period: Period) => {
             const { start, end } = period;
-            savePeriod(start, end);
+            setSelectedPeriod(start, end);
+            emit('update:period', state.selectedPeriod);
             state.customRangeModalVisible = false;
         };
 
@@ -147,37 +154,44 @@ export default {
                     period_type: periodType,
                     period,
                 });
+                state.isFixedTypeSelected = isSelected;
                 emit('update:periodType', periodType);
+                emit('update:period', state.selectedPeriod);
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         };
 
         // handle dropdown menu item (custom or date(ex. August 2021))
-        const changeSelectedMonthItem = (periodStart: string|undefined = undefined, isCustomPeriod: boolean) => {
-            if (periodStart) { // fixed date
-                if (isCustomPeriod) state.selectedMonthMenuItem = 'custom';
+        const initSelectedMonthItem = () => {
+            const periodStart = state.selectedPeriod.start;
+            if (periodStart) {
+                if (state.isCustomPeriod) state.selectedMonthMenuItem = 'custom';
                 else state.selectedMonthMenuItem = dayjs(periodStart).format('YYYY-MM');
             } else {
                 state.selectedMonthMenuItem = initialSelectedMonth;
             }
         };
 
-        const initStates = (period: Period) => {
-            const isCustomPeriod = dayjs(period.start).format('YYYY-MM') !== dayjs(period.end).format('YYYY-MM');
+        const initStates = (isFixedType: boolean) => {
+            state.isFixedTypeSelected = isFixedType;
 
-            if (period?.start) savePeriod(period.start, period.end); // fixed date
-            else savePeriod(initialPeriodStart, initialPeriodEnd);
+            if (isFixedType && props.period?.start && props.period?.end) {
+                // don't emit update:period event because selectedPeriod is set by props.period in this case.
+                setSelectedPeriod(props.period.start, props.period.end);
+            } else {
+                setSelectedPeriod(initialPeriodStart, initialPeriodEnd);
+                emit('update:period', state.selectedPeriod);
+            }
 
-            changeSelectedMonthItem(period.start, isCustomPeriod);
+            initSelectedMonthItem();
         };
 
-        watch(() => props.period, (period) => {
-            if (isEqual(period, state.selectedPeriod)) return;
-            initStates(period);
-        });
-        watch(() => state.isFixDateSelected, (isFixDateSelected) => {
-            initStates(isFixDateSelected ? props.period : {});
+        watch([() => props.period, () => props.periodType], ([period, periodType]) => {
+            // check if this change is not caused by this component's update:period event.
+            if (period === state.selectedPeriod) return;
+
+            initStates(periodType === 'FIXED');
         });
         return {
             ...toRefs(state),
