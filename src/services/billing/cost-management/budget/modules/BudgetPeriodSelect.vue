@@ -72,7 +72,7 @@ export default defineComponent<Props>({
                 let start = value[0];
                 const end = endDates.value[0];
 
-                if (start && end && dayjs(end).isSameOrBefore(dayjs(start))) {
+                if (start && end && dayjs.utc(end).isSameOrBefore(dayjs.utc(start))) {
                     start = undefined;
                 }
 
@@ -81,7 +81,7 @@ export default defineComponent<Props>({
                 let end = value[0];
                 const start = startDates.value[0];
 
-                if (start && end && dayjs(start).isSameOrAfter(dayjs(end))) {
+                if (start && end && dayjs.utc(start).isSameOrAfter(dayjs.utc(end))) {
                     end = undefined;
                 }
 
@@ -91,8 +91,8 @@ export default defineComponent<Props>({
 
         const state = reactive({
             period: computed<Period>(() => ({
-                start: dayjs(startDates.value[0]).locale('en').format('YYYY-MM-DD'),
-                end: dayjs(endDates.value[0]).locale('en').format('YYYY-MM-DD'),
+                start: dayjs.utc(startDates.value[0]).locale('en').format('YYYY-MM-DD'),
+                end: dayjs.utc(endDates.value[0]).locale('en').format('YYYY-MM-DD'),
             })),
         });
 

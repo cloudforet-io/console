@@ -79,7 +79,7 @@ export default {
             items: computed(() => state.months.map((month, i) => {
                 const data = state.last3MonthsBudgets[i];
                 return {
-                    month: data ? i18nDayjs.value(data.date).format('MMMM YYYY') : month,
+                    month: data ? i18nDayjs.value.utc(data.date).format('MMMM YYYY') : month,
                     cost: data ? data.usd_cost : 0,
                 };
             })),

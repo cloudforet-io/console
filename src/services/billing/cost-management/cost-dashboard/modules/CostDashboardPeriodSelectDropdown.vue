@@ -90,9 +90,9 @@ export default {
 
         const state = reactive({
             selectedPeriod: {
-                start: props.periodType === 'FIXED' ? dayjs(props.period.start).format('YYYY-MM')
+                start: props.periodType === 'FIXED' ? dayjs.utc(props.period.start).format('YYYY-MM')
                     : initialPeriodStart,
-                end: props.periodType === 'FIXED' ? dayjs(props.period.end).endOf('month').format('YYYY-MM-DD')
+                end: props.periodType === 'FIXED' ? dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD')
                     : initialPeriodEnd,
             },
             getMonthMenuItem: computed(() => {
@@ -100,7 +100,7 @@ export default {
                 range(12).forEach((i) => {
                     monthData.push({
                         type: 'item',
-                        label: i18nDayjs.value(yesterday.format('YYYY-MM-DD')).subtract(i, 'month').format('MMMM YYYY'),
+                        label: i18nDayjs.value.utc(yesterday.format('YYYY-MM-DD')).subtract(i, 'month').format('MMMM YYYY'),
                         name: yesterday.subtract(i, 'month').format('YYYY-MM'),
                     });
                 });
@@ -122,12 +122,12 @@ export default {
             customRangeModalVisible: false,
             isCustomPeriod: computed<boolean>(() => {
                 const period = state.selectedPeriod;
-                return dayjs(period.start).format('YYYY-MM') !== dayjs(period.end).format('YYYY-MM');
+                return dayjs.utc(period.start).format('YYYY-MM') !== dayjs.utc(period.end).format('YYYY-MM');
             }),
         });
         const setSelectedPeriod = (start, end) => {
-            const _start = dayjs(start).startOf('month').format('YYYY-MM-DD');
-            const _end = dayjs(end).endOf('month').format('YYYY-MM-DD');
+            const _start = dayjs.utc(start).startOf('month').format('YYYY-MM-DD');
+            const _end = dayjs.utc(end).endOf('month').format('YYYY-MM-DD');
             state.selectedPeriod = { start: _start, end: _end };
         };
         const handleSelectMonthMenuItem = (monthMenuItem) => {
@@ -167,7 +167,7 @@ export default {
             const periodStart = state.selectedPeriod.start;
             if (periodStart) {
                 if (state.isCustomPeriod) state.selectedMonthMenuItem = 'custom';
-                else state.selectedMonthMenuItem = dayjs(periodStart).format('YYYY-MM');
+                else state.selectedMonthMenuItem = dayjs.utc(periodStart).format('YYYY-MM');
             } else {
                 state.selectedMonthMenuItem = initialSelectedMonth;
             }

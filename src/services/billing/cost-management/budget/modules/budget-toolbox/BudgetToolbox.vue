@@ -155,7 +155,7 @@ export default {
                 const period: Period = {};
 
                 if (state.selectedPeriod[0] === 'thisMonth') {
-                    period.start = dayjs().startOf('month').format('YYYY-MM');
+                    period.start = dayjs.utc().startOf('month').format('YYYY-MM');
                 }
 
                 return period;

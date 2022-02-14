@@ -133,9 +133,9 @@ export default {
             formattedPeriod: computed<string>(() => {
                 if (isEmpty(props.period)) return '';
 
-                const today = i18nDayjs.value();
-                const start = i18nDayjs.value(props.period.start);
-                const end = i18nDayjs.value(props.period.end);
+                const today = i18nDayjs.value.utc();
+                const start = i18nDayjs.value.utc(props.period.start);
+                const end = i18nDayjs.value.utc(props.period.end);
 
                 const isStartFirstDateOfThisMonth = start.isSame(today, 'month') && start.isSame(1, 'date');
                 const isEndToday = end.isSame(today, 'date');

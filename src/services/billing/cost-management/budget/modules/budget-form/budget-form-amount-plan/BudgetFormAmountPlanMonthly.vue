@@ -69,7 +69,7 @@ export default {
             const months: string[] = [];
             let _month = month;
             while (_month.isSameOrBefore(monthEnd, 'month')) {
-                months.push(dayjs(_month).locale('en').format('YYYY-MM'));
+                months.push(dayjs.utc(_month).locale('en').format('YYYY-MM'));
                 _month = _month.add(1, 'month');
             }
             return months;
@@ -80,8 +80,8 @@ export default {
                 const { start, end } = props.period;
                 if (!start || !end) return [];
 
-                const month = dayjs(start as string);
-                const monthEnd = dayjs(end as string);
+                const month = dayjs.utc(start as string);
+                const monthEnd = dayjs.utc(end as string);
 
                 return getAllMonths(month, monthEnd);
             }),
