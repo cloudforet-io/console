@@ -1,5 +1,4 @@
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
-import { QUERY_VISIBILITY_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 
@@ -22,7 +21,6 @@ export interface CostQuerySetOption {
 export interface CostQuerySetModel {
     cost_query_set_id: string;
     name: string;
-    scope: QUERY_VISIBILITY_TYPE;
     options?: CostQuerySetOption;
 }
 

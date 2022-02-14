@@ -21,24 +21,6 @@
                     />
                 </template>
             </p-field-group>
-            <!--            <p-field-group v-if="!(requestType === REQUEST_TYPE.SAVE)" :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_VISIBILITY')" required>-->
-            <!--                <div class="visibility-radio-list">-->
-            <!--                    <p-radio v-for="visibility in visibilityList" :key="visibility.value"-->
-            <!--                             v-model="formState.selectedVisibility"-->
-            <!--                             :value="visibility.value"-->
-            <!--                             @change="handleChangeVisibility(visibility.value)"-->
-            <!--                    >-->
-            <!--                        <div class="visibility-radio-content-wrapper">-->
-            <!--                            <template>-->
-            <!--                                <p-i v-if="visibility.value === QUERY_VISIBILITY_TYPE.PRIVATE" name="ic_private"-->
-            <!--                                     height="1.3rem"-->
-            <!--                                />-->
-            <!--                            </template>-->
-            <!--                            <span>{{ visibility.label }}</span>-->
-            <!--                        </div>-->
-            <!--                    </p-radio>-->
-            <!--                </div>-->
-            <!--            </p-field-group>-->
         </template>
     </p-button-modal>
 </template>
@@ -50,10 +32,9 @@ import {
 
 import {
     PButtonModal, PFieldGroup, PTextInput,
-    // PRadio, PI,
 } from '@spaceone/design-system';
 import {
-    QUERY_VISIBILITY_TYPE, REQUEST_TYPE,
+    REQUEST_TYPE,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { CostQuerySetModel } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { makeProxy } from '@/lib/helper/composition-helpers';
@@ -76,8 +57,6 @@ export default {
         PTextInput,
         PFieldGroup,
         PButtonModal,
-        // PRadio,
-        // PI,
     },
     props: {
         visible: {
@@ -103,14 +82,9 @@ export default {
     setup(props: Props, { emit, root }) {
         const formState = reactive({
             queryName: undefined as undefined | string,
-            selectedVisibility: QUERY_VISIBILITY_TYPE.PRIVATE,
         });
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
-            visibilityList: computed(() => ([
-                { value: QUERY_VISIBILITY_TYPE.PUBLIC, label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PUBLIC') },
-                { value: QUERY_VISIBILITY_TYPE.PRIVATE, label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PRIVATE') },
-            ])),
             queryNameInvalidText: computed(() => {
                 if (typeof formState.queryName === 'undefined') return undefined;
                 if (formState.queryName.length === 0) {
@@ -124,21 +98,6 @@ export default {
             isQueryNameValid: computed(() => !state.queryNameInvalidText),
             showValidation: false,
             isAllValid: computed(() => state.showValidation && state.isQueryNameValid),
-        });
-
-        watch(() => state.proxyVisible, (after) => {
-            if (!after) {
-                formState.queryName = undefined;
-                formState.selectedVisibility = QUERY_VISIBILITY_TYPE.PRIVATE;
-                state.showValidation = false;
-            } else if (props.requestType === REQUEST_TYPE.EDIT) formState.selectedVisibility = props.selectedQuery.scope;
-        });
-
-        watch(() => props.selectedQuery.name, (after) => {
-            if (after) {
-                formState.queryName = after;
-                state.showValidation = true;
-            }
         });
 
         const saveQuery = async () => {
@@ -164,6 +123,7 @@ export default {
             }
         };
 
+        /* Event */
         const handleFormConfirm = async () => {
             if (!state.isAllValid) return;
             if (props.requestType === REQUEST_TYPE.SAVE) await saveQuery();
@@ -171,22 +131,30 @@ export default {
             state.proxyVisible = false;
         };
 
-        // event
-
-        const handleChangeVisibility = (value) => {
-            formState.selectedVisibility = value;
-        };
-
         const handleFirstQueryNameInput = () => {
             state.showValidation = true;
         };
+
+        /* Watcher */
+        watch(() => state.proxyVisible, (after) => {
+            if (!after) {
+                formState.queryName = undefined;
+                state.showValidation = false;
+            }
+        });
+
+        watch(() => props.selectedQuery.name, (after) => {
+            if (after) {
+                formState.queryName = after;
+                state.showValidation = true;
+            }
+        });
+
         return {
             ...toRefs(state),
             formState,
             handleFormConfirm,
-            handleChangeVisibility,
             handleFirstQueryNameInput,
-            QUERY_VISIBILITY_TYPE,
             REQUEST_TYPE,
         };
     },

@@ -9,9 +9,6 @@
                 <template #menu-item--format="{item}">
                     <div class="query-item-wrapper">
                         <div class="dropdown-item-modal">
-                            <p-i v-if="getQueryWithKey(item.name).scope === QUERY_VISIBILITY_TYPE.PRIVATE" name="ic_security" width="1rem"
-                                 height="1rem"
-                            />
                             <span>{{ item.label }}</span><span v-if="!item.name" class="default-item-suffix">(default)</span>
                         </div>
                         <div v-if="item.name" class="button-wrapper">
@@ -26,10 +23,6 @@
             <p-page-title>
                 <template #title>
                     <div class="title-main-wrapper">
-                        <p-i v-if="getQueryWithKey(selectedQueryId).scope === QUERY_VISIBILITY_TYPE.PRIVATE" name="ic_security"
-                             width="1rem"
-                             height="1rem"
-                        />
                         <span>{{ selectedQueryId ? title : defaultTitle }}</span>
                         <div v-if="selectedQueryId" class="button-wrapper">
                             <p-icon-button name="ic_trashcan"
@@ -80,7 +73,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle, PIconButton, PSelectDropdown, PI, PButton,
+    PBreadcrumbs, PPageTitle, PIconButton, PSelectDropdown, PButton,
 } from '@spaceone/design-system';
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -94,7 +87,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import {
-    QUERY_VISIBILITY_TYPE, REQUEST_TYPE,
+    REQUEST_TYPE,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import {
@@ -136,7 +129,6 @@ export default {
         PPageTitle,
         PIconButton,
         PSelectDropdown,
-        PI,
         // PIconTextButton,
         PButton,
         SaveQueryFormModal,
@@ -372,7 +364,6 @@ export default {
             handleClickQueryItem,
             handleSaveQueryConfirm,
             handleSaveQueryOption,
-            QUERY_VISIBILITY_TYPE,
             getQueryWithKey,
         };
     },

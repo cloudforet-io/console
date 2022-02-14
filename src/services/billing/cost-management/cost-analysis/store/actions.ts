@@ -31,7 +31,7 @@ export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ c
     try {
         const { results } = await SpaceConnector.client.costAnalysis.costQuerySet.list({
             query: {
-                filter: [{ k: 'user_id', v: [rootState.user.userId, null], o: 'in' }],
+                filter: [{ k: 'user_id', v: rootState.user.userId, o: 'eq' }],
             },
         });
         commit('setCostQueryList', results);
@@ -41,14 +41,13 @@ export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ c
     }
 };
 
-export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, commit, rootState }, name): Promise<CostQuerySetModel|Error> => {
+export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, commit }, name): Promise<CostQuerySetModel|Error> => {
     try {
         const {
             granularity, stack, period,
             groupBy, filters, primaryGroupBy,
         } = state;
         const updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
-            user_id: rootState.user.userId,
             name,
             options: {
                 granularity,
@@ -68,19 +67,13 @@ export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, co
 
 export const editQuery: Action<CostAnalysisStoreState, any> = async (_, { selectedQuery, formState }): Promise<CostQuerySetModel|Error> => {
     try {
-        const { cost_query_set_id, name, scope } = selectedQuery;
-        const { selectedVisibility, queryName } = formState;
+        const { cost_query_set_id, name } = selectedQuery;
+        const { queryName } = formState;
         let updatedQueryData;
         if (name !== queryName) {
             updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
                 cost_query_set_id,
                 name: queryName,
-            });
-        }
-        if (scope !== selectedVisibility) {
-            updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.changeScope({
-                cost_query_set_id,
-                scope: selectedVisibility,
             });
         }
         return updatedQueryData;
