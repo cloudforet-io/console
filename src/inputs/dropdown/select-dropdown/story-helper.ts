@@ -165,6 +165,24 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
+        readOnly: {
+            name: 'readOnly',
+            type: { name: 'boolean' },
+            description: 'Whether to make readonly or not.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         type: {
             name: 'type',
             type: { name: 'string' },

@@ -29,6 +29,8 @@ export interface SelectDropdownProps {
     type?: SELECT_DROPDOWN_TYPE;
     buttonStyleType?: BUTTON_STYLE;
     buttonIcon?: string;
+    readOnly?: boolean;
+    withoutOutline?: boolean;
     // context menu fixed style props
     useFixedMenuStyle?: boolean;
     visibleMenu?: boolean;

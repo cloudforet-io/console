@@ -36,6 +36,7 @@ export const Template = (args, { argTypes }) => ({
             :index-mode="indexMode"
             :placeholder="placeholder"
             :without-outline="withoutOutline"
+            :read-only="readOnly"
             :type="type"
             :button-style-type="buttonStyleType"
             :button-icon="buttonIcon"
@@ -165,6 +166,54 @@ export const Template = (args, { argTypes }) => ({
             <td><p-select-dropdown :items="menuItems" without-outline /></td>
             <td><p-select-dropdown :items="menuItems" without-outline disabled /></td>
             <td><p-select-dropdown :items="menuItems" without-outline invalid /></td>
+        </tr>
+    </tbody>
+</table>
+    `,
+            setup() {
+                return {
+                    menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Read Only
+
+<Canvas>
+    <Story name="Read Only">
+        {{
+            i18n,
+            components: { PSelectDropdown },
+            template: `
+<table style="border-collapse: separate; border-spacing: 24px;">
+    <thead>
+        <tr>
+            <th>case / type</th>
+            <th>default</th>
+            <th>default</th>
+            <th>button/ outline-button</th>
+            <th>icon-button</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>without outline</th>
+            <td><p><code>false</code></p></td>
+            <td><p><code>true</code></p></td>
+            <td><p>any</p></td>
+            <td><p>any</p></td>
+        </tr>
+        <tr>
+            <th>read only</th>
+            <td><p-select-dropdown :items="menuItems" read-only /></td>
+            <td><p-select-dropdown :items="menuItems" read-only without-outline /></td>
+            <td><p-select-dropdown :items="menuItems" read-only type="button" /></td>
+            <td><p-select-dropdown :items="menuItems" read-only type="icon-button"/></td>
         </tr>
     </tbody>
 </table>
