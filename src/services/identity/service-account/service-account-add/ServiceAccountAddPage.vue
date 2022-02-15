@@ -84,7 +84,7 @@
                             @select="handleSelectedProject"
         />
 
-        <p-pane-layout v-if="showCredentialInputs || !hasCredentialKey">
+        <p-pane-layout v-if="enableCredentialInput">
             <div class="title">
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIALS_TITLE') }}
             </div>
@@ -204,7 +204,7 @@ export default {
             serviceAccountNames: [] as string[],
             credentialNames: [] as string[],
             secretTypes: computed<any[]>(() => get(state.providerObj, 'capability.supported_schema', [])),
-            showCredentialInputs: computed<boolean>(() => state.secretTypes.length > 0 && state.hasCredentialKey),
+            enableCredentialInput: computed<boolean>(() => state.secretTypes.length > 0),
         });
 
         const tabState = reactive({
@@ -244,7 +244,7 @@ export default {
             accountSchema: null as any|null,
             isAccountModelValid: false,
             //
-            credentialModel: { dummyKey: 'dummyKey' },
+            credentialModel: {},
             credentialSchema: {},
             isCredentialModelValid: false,
             //
@@ -258,7 +258,7 @@ export default {
                 if (tabState.activeTab === 'json') {
                     return formState.isAccountNameValid && isAccountModelValid && formState.jsonForCredential;
                 }
-                if (state.hasCredentialKey) return formState.isAccountNameValid && isAccountModelValid && formState.isCredentialModelValid;
+                if (state.hasCredentialKey && state.enableCredentialInput) return formState.isAccountNameValid && isAccountModelValid && formState.isCredentialModelValid;
                 return formState.isAccountNameValid && isAccountModelValid;
             }),
         });
@@ -312,8 +312,13 @@ export default {
                 name: selectedSecretType,
                 only: ['schema'],
             });
-            formState.credentialModel = {};
             formState.credentialSchema = res.schema;
+            const defaultCredentialModal = {};
+            // The p-json-schema-form failed to achieve accurate validation, so I entered 'undefined' for comparison.
+            Object.keys(res.schema.properties).forEach((key) => {
+                defaultCredentialModal[key] = undefined;
+            });
+            formState.credentialModel = defaultCredentialModal;
         };
 
         const deleteServiceAccount = async () => {
@@ -386,7 +391,7 @@ export default {
             }
             if (formState.isTagsValid) {
                 await createServiceAccount();
-                if (state.serviceAccountId && state.hasCredentialKey) {
+                if (state.serviceAccountId && state.hasCredentialKey && state.enableCredentialInput) {
                     if (formState.credentialModel.private_key) formState.credentialModel.private_key = formState.credentialModel.private_key.replace(/\\n/g, '\n');
                     const isSecretCreationSuccess = await createSecret();
                     if (!isSecretCreationSuccess) return;
@@ -413,7 +418,6 @@ export default {
             await getCredentialNames();
             //
             await getServiceAccountSchema();
-            formState.isCredentialModelValid = false;
         };
         init();
 
