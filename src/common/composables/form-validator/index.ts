@@ -129,7 +129,8 @@ type ImmediateMap<T> = {
  * invalidState: A set of ComputedRef invalid state.
  * invalidTexts: A set of ComputedRef invalid text.
  * isAllValid: ComputedRef<boolean>. Is all form values are valid or not.
- * setForm: Function. Change form's value by given property name.
+ * initForm: Function. Initiate form's value by given property name or given form object.
+ * setForm: Function. Change form's value by given property name or given form object.
  * resetAll: Function. Reset form values and validation states.
  * resetValidations: Function. Reset validation states.
  * validateAll: Function. Validate all form values. Returns result.
@@ -138,13 +139,14 @@ type ImmediateMap<T> = {
  * @example
  *
  <template>
- <p-field-group :invalid="invalidState.name" :invalid-text="invalidTexts.name">
- <p-text-input :value="name" @input="handleNameInput" />
- </p-field-group>
- <p-field-group :invalid="invalidState.address" :invalid-text="invalidTexts.address">
- <p-text-input :value="address" @input="handleAddressInput" />
- </p-field-group>
- <p-button :disabled="isAllValid">confirm</p-button>
+    <p-field-group :invalid="invalidState.name" :invalid-text="invalidTexts.name">
+        <p-text-input :value="name" @input="handleNameInput" />
+    </p-field-group>
+    <p-field-group :invalid="invalidState.address" :invalid-text="invalidTexts.address">
+        <p-text-input :value="address" @input="handleAddressInput" />
+    </p-field-group>
+    <p-button :disabled="isAllValid">confirm</p-button>
+    <p-button @click="handleReset">reset</p-button>
  </template>
 
  setup() {
@@ -154,7 +156,7 @@ type ImmediateMap<T> = {
         invalidTexts,
         setForm, isAllValid,
     } = useFormValidator({
-        name: '',
+        name: 'name',
         address: '',
     }, {
         name: (val: string) => {
@@ -175,6 +177,13 @@ type ImmediateMap<T> = {
         setForm('address', value);
     };
 
+    const handleReset = () => {
+        initForm({
+            name: 'name',
+            address: '',
+        })
+    };
+
     return {
         name,
         address,
@@ -183,6 +192,7 @@ type ImmediateMap<T> = {
         isAllValid,
         handleNameInput,
         handleAddressInput,
+        handleReset,
     };
  }
  */
@@ -221,9 +231,36 @@ export function useFormValidator<T extends Record<string, any> = any>(
 
     const isAllValid = computed<boolean>(() => Object.values(invalidState).every(isInvalid => isInvalid.value === false));
 
-    const setForm = (key: keyof T, value: T[keyof T]) => {
-        const setter = valueSetters[key];
-        if (setter) setter(value);
+    const setForm = (key: keyof T | T, value?: T[keyof T]) => {
+        if (typeof key === 'object') {
+            const newForm = key;
+            Object.keys(newForm).forEach((k) => {
+                const setter = valueSetters[k];
+                if (setter) setter(newForm[k]);
+            });
+        } else {
+            const setter = valueSetters[key];
+            if (setter) setter(value as unknown as T[keyof T]);
+        }
+    };
+
+    const initForm = (key?: keyof T | T, value?: T[keyof T]) => {
+        if (typeof key === 'object' || key === undefined) {
+            const newForm = key ?? _forms;
+            Object.keys(newForm).forEach((k) => {
+                const setter = valueSetters[k];
+                if (setter) {
+                    setter(newForm[k]);
+                    resetValidationMap[k]();
+                }
+            });
+        } else {
+            const setter = valueSetters[key];
+            if (setter) {
+                setter(value as unknown as T[keyof T]);
+                resetValidationMap[key]();
+            }
+        }
     };
 
     const resetAll = () => {
@@ -253,6 +290,7 @@ export function useFormValidator<T extends Record<string, any> = any>(
         invalidState,
         invalidTexts,
         isAllValid,
+        initForm,
         setForm,
         resetAll,
         resetValidations,

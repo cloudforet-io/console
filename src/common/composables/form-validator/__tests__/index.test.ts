@@ -16,6 +16,7 @@ describe('Form Validator Composable', () => {
                 <span id="address-invalid-text">{{invalidTexts.address}}</span>
                 
                 <button v-if="isAllValid" id="confirm-button">Confirm</button>
+                <button id="init-button" @click="initForm({name: 'hello', address: ''})">Initiate</button>
             </div>
         `,
         setup() {
@@ -24,6 +25,7 @@ describe('Form Validator Composable', () => {
                 invalidState,
                 invalidTexts,
                 setForm, isAllValid,
+                initForm,
             } = useFormValidator({
                 name: '',
                 address: '',
@@ -54,6 +56,7 @@ describe('Form Validator Composable', () => {
                 isAllValid,
                 handleNameInput,
                 handleAddressInput,
+                initForm,
             };
         },
 
@@ -113,5 +116,30 @@ describe('Form Validator Composable', () => {
 
         const button = wrapper.find('#confirm-button');
         expect(button.exists()).toBeFalsy();
+    });
+
+    it('Change values and reset validations by initiating form.', async () => {
+        const nameForm = wrapper.find('#name-input');
+        const addressForm = wrapper.find('#address-input');
+        await nameForm.setValue('내이름은');
+        await addressForm.setValue('서울시');
+
+        const initButton = wrapper.find('#init-button');
+        await initButton.trigger('click');
+
+        const nameEl = nameForm.element as HTMLInputElement;
+        const addressEl = addressForm.element as HTMLInputElement;
+
+        // initiated form values are set.
+        expect(nameEl.value).toBe('hello');
+        expect(addressEl.value).toBe('');
+
+        // no address invalid text is shown.
+        const invalidText = wrapper.find('#address-invalid-text');
+        expect(invalidText.text()).toBe('');
+
+        // but disappear confirm button because address is invalid internally.
+        const confirmButton = wrapper.find('#confirm-button');
+        expect(confirmButton.exists()).toBeFalsy();
     });
 });
