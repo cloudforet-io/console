@@ -254,10 +254,7 @@ export default {
             //
             isValid: computed(() => {
                 const isAccountModelValid = formState.accountSchema ? formState.isAccountModelValid : true;
-
-                if (tabState.activeTab === 'json') {
-                    return formState.isAccountNameValid && isAccountModelValid && formState.jsonForCredential;
-                }
+                if (tabState.activeTab === 'json' && state.hasCredentialKey) return formState.isAccountNameValid && isAccountModelValid && formState.jsonForCredential;
                 if (state.hasCredentialKey && state.enableCredentialInput) return formState.isAccountNameValid && isAccountModelValid && formState.isCredentialModelValid;
                 return formState.isAccountNameValid && isAccountModelValid;
             }),
