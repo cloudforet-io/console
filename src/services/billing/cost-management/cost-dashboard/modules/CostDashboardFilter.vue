@@ -130,7 +130,7 @@ export default {
         /* api */
         const updateFilters = async (filters) => {
             try {
-                await SpaceConnector.client.costAnalysis.dashboard.update({
+                await SpaceConnector.client.costAnalysis.publicDashboard.update({
                     public_dashboard_id: props.dashboardId,
                     default_filter: filters,
                 });

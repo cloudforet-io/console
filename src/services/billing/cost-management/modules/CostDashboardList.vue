@@ -132,7 +132,7 @@ export default {
 
         const listDashboard = async () => {
             try {
-                const publicDashboardList = await SpaceConnector.client.costAnalysis.dashboard.list();
+                const publicDashboardList = await SpaceConnector.client.costAnalysis.publicDashboard.list();
                 const userDashboardList = await SpaceConnector.client.costAnalysis.userDashboard.list();
                 state.publicDashboardItems = publicDashboardList.results;
                 state.userDashboardItems = userDashboardList.results;

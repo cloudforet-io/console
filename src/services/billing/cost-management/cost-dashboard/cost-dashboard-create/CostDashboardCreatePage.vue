@@ -79,7 +79,7 @@ export default {
 
         const createPublicDashboard = async (): Promise<string|undefined> => {
             try {
-                const { public_dashboard_id } = await SpaceConnector.client.costAnalysis.dashboard.create(dashboardCreateParam as DashboardCreateParam);
+                const { public_dashboard_id } = await SpaceConnector.client.costAnalysis.publicDashboard.create(dashboardCreateParam as DashboardCreateParam);
                 return public_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, 'Failed to create dashboard');

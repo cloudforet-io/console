@@ -144,7 +144,7 @@ export default {
                         user_dashboard_id: props.dashboardId,
                     });
                 } else {
-                    await SpaceConnector.client.costAnalysis.dashboard.delete({
+                    await SpaceConnector.client.costAnalysis.publicDashboard.delete({
                         public_dashboard_id: props.dashboardId,
                     });
                 }
@@ -195,7 +195,7 @@ export default {
                         user_dashboard_id: dashboardId,
                     });
                 }
-                return await SpaceConnector.client.costAnalysis.dashboard.get({
+                return await SpaceConnector.client.costAnalysis.publicDashboard.get({
                     public_dashboard_id: dashboardId,
                 });
             } catch (e) {

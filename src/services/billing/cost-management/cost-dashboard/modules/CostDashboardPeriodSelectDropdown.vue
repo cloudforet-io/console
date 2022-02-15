@@ -149,7 +149,7 @@ export default {
             try {
                 const periodType = isSelected ? 'FIXED' : 'AUTO';
                 const period = isSelected ? state.selectedPeriod : {};
-                await SpaceConnector.client.costAnalysis.dashboard.update({
+                await SpaceConnector.client.costAnalysis.publicDashboard.update({
                     public_dashboard_id: props.dashboardId,
                     period_type: periodType,
                     period,

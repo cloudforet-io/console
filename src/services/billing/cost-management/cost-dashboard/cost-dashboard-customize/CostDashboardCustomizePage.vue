@@ -95,7 +95,7 @@ export default {
                         name: state.dashboardTitle,
                     });
                 } else {
-                    await SpaceConnector.client.costAnalysis.dashboard.update({
+                    await SpaceConnector.client.costAnalysis.publicDashboard.update({
                         public_dashboard_id: state.dashboardIdFromRoute,
                         name: state.dashboardTitle,
                     });
@@ -117,7 +117,7 @@ export default {
                         user_dashboard_id: state.dashboardIdFromRoute,
                     });
                 } else {
-                    state.dashboardData = await SpaceConnector.client.costAnalysis.dashboard.get({
+                    state.dashboardData = await SpaceConnector.client.costAnalysis.publicDashboard.get({
                         public_dashboard_id: state.dashboardIdFromRoute,
                     });
                 }
