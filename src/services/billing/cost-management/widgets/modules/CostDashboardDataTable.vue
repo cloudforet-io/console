@@ -4,6 +4,7 @@
                       :items="slicedItems"
                       :total-count="totalCount"
                       :loading="loading"
+                      :row-height-fixed="!printMode"
                       table-style-type="simple"
                       disable-hover
         >
@@ -12,6 +13,7 @@
                     <template v-if="fields[0].name === name">
                         <p-status v-if="showLegend"
                                   class="toggle-button"
+                                  :class="{'print-mode': printMode}"
                                   :text="(getConvertedIndex(index) + 1).toString()"
                                   :icon-color="getLegendIconColor(index)"
                                   :text-color="getLegendTextColor(index)"
@@ -39,7 +41,7 @@
                 </div>
             </template>
         </p-data-table>
-        <div v-if="paginationVisible" class="table-pagination-wrapper">
+        <div v-if="paginationVisible && !printMode" class="table-pagination-wrapper">
             <p-text-pagination :all-page="allPage"
                                :this-page.sync="proxyThisPage"
             />
@@ -125,12 +127,17 @@ export default {
             type: Boolean,
             default: true,
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
             providers: computed(() => store.state.resource.provider.items),
             projects: computed(() => store.state.resource.project.items),
             slicedItems: computed(() => {
+                if (props.printMode) return props.items;
                 const startIndex = state.proxyThisPage * props.pageSize - props.pageSize;
                 const endIndex = state.proxyThisPage * props.pageSize;
                 return props.items.slice(startIndex, endIndex);
@@ -190,6 +197,7 @@ export default {
 
         /* event */
         const handleClickLegend = (index) => {
+            if (props.printMode) return;
             emit('toggle-legend', index);
         };
 
@@ -225,6 +233,9 @@ export default {
         .toggle-button {
             cursor: pointer;
             padding-right: 1rem;
+            &.print-mode {
+                cursor: default;
+            }
         }
         .raised {
             @apply text-alert;
