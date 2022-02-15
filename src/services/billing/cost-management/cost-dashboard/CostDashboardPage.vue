@@ -26,7 +26,9 @@
                 />
                 <currency-select-dropdown />
                 <div class="left-divider download-pdf">
-                    <p-icon-button name="ic_download" style-type="gray-border" size="sm" />
+                    <p-icon-button name="ic_download" style-type="gray-border" size="sm"
+                                   @click="handleClickPdfDownload"
+                    />
                 </div>
                 <div class="left-divider">
                     <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm"
@@ -50,6 +52,7 @@
                       :loading="checkDeleteState.loading"
                       @confirm="handleDeleteDashboardConfirm"
         />
+        <cost-dashboard-pdf-download-overlay v-if="visiblePdfDownload" :dashboard-id="dashboardId" />
     </div>
 </template>
 
@@ -80,10 +83,13 @@ import {
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 import { SpaceRouter } from '@/router';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import CostDashboardPdfDownloadOverlay
+    from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPdfDownloadOverlay.vue';
 
 export default {
     name: 'CostDashboardPage',
     components: {
+        CostDashboardPdfDownloadOverlay,
         CostDashboardPeriodSelectDropdown,
         CostDashboardMoreMenu,
         DashboardLayouts,
@@ -112,6 +118,7 @@ export default {
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             homeDashboardId: computed<string|undefined>(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
+            visiblePdfDownload: false,
         });
 
         const routeState = reactive({
@@ -155,6 +162,10 @@ export default {
                 checkDeleteState.loading = false;
                 checkDeleteState.visible = false;
             }
+        };
+
+        const handleClickPdfDownload = () => {
+            state.visiblePdfDownload = true;
         };
 
         const handleClickCustomize = () => {
@@ -240,6 +251,7 @@ export default {
             handleClickEditDashboard,
             handleClickDeleteDashboard,
             handleDeleteDashboardConfirm,
+            handleClickPdfDownload,
             handleClickCustomize,
         };
     },

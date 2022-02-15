@@ -6,6 +6,8 @@
                :filters="filters"
                :currency="currency"
                :currency-rates="currencyRates"
+               :print-mode="printMode"
+               v-on="$listeners"
     />
 </template>
 
@@ -53,6 +55,10 @@ export default {
         currencyRates: {
             type: Object,
             default: () => ({}),
+        },
+        printMode: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: Props) {

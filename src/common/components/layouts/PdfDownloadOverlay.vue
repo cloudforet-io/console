@@ -34,6 +34,15 @@ export default {
 
 <style lang="postcss" scoped>
 .pdf-download-overlay {
+    @apply bg-gray-900;
+    position: fixed;
+    width: 100vw;
     height: 100vh;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    .preview {
+        @apply bg-gray-100;
+    }
 }
 </style>

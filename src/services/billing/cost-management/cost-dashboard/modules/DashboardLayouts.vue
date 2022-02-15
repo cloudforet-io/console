@@ -3,6 +3,7 @@
                    :min-loading-time="1000"
                    :lazy-loading-time="1000"
                    class="dashboard-layouts"
+                   :class="{responsive: !printMode}"
     >
         <template #loader>
             <div />
@@ -17,6 +18,8 @@
                                 :filters="filters"
                                 :currency="currency"
                                 :currency-rates="currencyRates"
+                                :print-mode="printMode"
+                                @rendered="handleDynamicWidgetInit"
                 />
             </div>
         </div>
@@ -28,11 +31,15 @@ import DynamicWidget from '@/services/billing/cost-management/cost-dashboard/mod
 import { CURRENCY } from '@/store/modules/display/config';
 import { PDataLoader } from '@spaceone/design-system';
 import { defaultWidgetMap } from '@/services/billing/cost-management/widgets/lib/config';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 type Row = string[]
 
 interface Props {
     layout: Row[];
+    printMode?: boolean;
 }
 
 export default {
@@ -66,10 +73,34 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup() {
+    setup(props, { emit }) {
+        const state = reactive({
+            widgetCount: computed<number>(() => props.layout.flat().length),
+            renderedCount: 0,
+            charts: [] as any[][],
+            isAllRendered: computed<boolean>(() => {
+                if (!props.layout.length) return false;
+                return state.renderedCount >= state.widgetCount;
+            }),
+        });
+        const handleDynamicWidgetInit = () => {
+            state.renderedCount++;
+        };
+        watch(() => props.layout, () => {
+            state.renderedCount = 0;
+        });
+        watch(() => state.isAllRendered, (isAllRendered) => {
+            if (isAllRendered) emit('rendered');
+        });
         return {
+            ...toRefs(state),
             defaultWidgetMap,
+            handleDynamicWidgetInit,
         };
     },
 };
@@ -101,18 +132,21 @@ export default {
             min-width: 19.5625rem;
             width: 33.33%;
         }
-
-        @screen tablet {
-            row-gap: 1rem;
-            min-width: 100%;
-            max-width: 100%;
-            .row {
-                @apply flex-col;
+    }
+    &.responsive {
+        .data-loader-container .data-wrapper {
+            @screen tablet {
                 row-gap: 1rem;
-            }
-            [class^='col-'] {
-                width: 100%;
                 min-width: 100%;
+                max-width: 100%;
+                .row {
+                    @apply flex-col;
+                    row-gap: 1rem;
+                }
+                [class^='col-'] {
+                    width: 100%;
+                    min-width: 100%;
+                }
             }
         }
     }
