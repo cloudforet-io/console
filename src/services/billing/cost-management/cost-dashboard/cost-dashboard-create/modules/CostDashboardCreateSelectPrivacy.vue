@@ -1,10 +1,11 @@
 <template>
     <fragment>
-        <span>Dashboard Privacy</span>
-        <p-radio v-for="privacy in privacyList" :key="privacy" v-model="selectedPrivacy"
-                 :value="privacy" @change="handleRadio"
+        <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.VISIBILITY.SAVE_AS') }}</h3>
+        <p-radio v-for="privacy in privacyList" :key="privacy.name" v-model="selectedPrivacy"
+                 :value="privacy.name" class="mr-4"
+                 @change="handleRadio"
         >
-            <span class="radio-text">{{ privacy.toLowerCase() }}</span>
+            <span class="capitalize ml-1">{{ privacy.label.toLowerCase() }}</span>
         </p-radio>
     </fragment>
 </template>
@@ -14,7 +15,7 @@ import { reactive, toRefs } from '@vue/composition-api';
 import { DASHBOARD_PRIVACY_TYPE, DashboardPrivacyType } from '@/services/billing/cost-management/cost-dashboard/type';
 import { PRadio } from '@spaceone/design-system';
 import { store } from '@/store';
-
+import { i18n } from '@/translations';
 
 export default {
     name: 'CostDashboardCreateSelectPrivacy',
@@ -24,8 +25,17 @@ export default {
 
     setup() {
         const state = reactive({
-            selectedPrivacy: DASHBOARD_PRIVACY_TYPE.PUBLIC as DashboardPrivacyType,
-            privacyList: [DASHBOARD_PRIVACY_TYPE.PUBLIC, DASHBOARD_PRIVACY_TYPE.USER],
+            selectedPrivacy: DASHBOARD_PRIVACY_TYPE.USER as DashboardPrivacyType,
+            privacyList: [
+                {
+                    name: DASHBOARD_PRIVACY_TYPE.USER,
+                    label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.VISIBILITY.PRIVATE'),
+                },
+                {
+                    name: DASHBOARD_PRIVACY_TYPE.PUBLIC,
+                    label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.VISIBILITY.PUBLIC'),
+                },
+            ],
         });
 
         const handleRadio = (value: DashboardPrivacyType) => {
@@ -39,9 +49,3 @@ export default {
     },
 };
 </script>
-
-<style lang="postcss" scoped>
-.radio-text {
-    @apply capitalize;
-}
-</style>

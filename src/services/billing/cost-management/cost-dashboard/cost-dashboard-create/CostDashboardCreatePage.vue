@@ -2,15 +2,15 @@
     <div class="cost-dashboard-create-page">
         <nav>
             <p-breadcrumbs :routes="routeState.route" />
-            <p-page-title title="Create New Dashboard" child @goBack="$router.go(-1)" />
+            <p-page-title :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CREATE_DASHBOARD')" child @goBack="$router.go(-1)" />
         </nav>
         <cost-dashboard-create-form />
         <div class="button-group">
             <p-button style-type="gray900" :outline="true" @click="$router.go(-1)">
-                Cancel
+                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CANCEL') }}
             </p-button>
             <p-button style-type="primary-dark" @click="handleClickCreate">
-                Create
+                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CREATE') }}
             </p-button>
         </div>
     </div>
@@ -121,7 +121,7 @@ export default {
 .cost-dashboard-create-page {
     .button-group {
         @apply flex justify-end;
-        margin-top: 1.5rem;
+        margin-top: 1rem;
         gap: 1rem;
     }
 }

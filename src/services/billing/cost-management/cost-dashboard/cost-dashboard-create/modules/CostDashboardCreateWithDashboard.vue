@@ -1,28 +1,40 @@
 <template>
     <fragment>
-        <h3>Clone an Existing Dashboard</h3>
-        <div v-for="(dashboardData, idx) in existingDashboardData" :key="`$dashboard-${idx}-${getUUID()}`">
-            <p-select-card
-                :selected="selectedTemplate"
-                :value="dashboardData"
-                block
-                @change="handleDashboardChange"
-            >
-                {{ dashboardData.name }}
-            </p-select-card>
-            <p-anchor
-                target="_blank"
-                :to=" { name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME, params: { dashboardId: dashboardData.public_dashboard_id } }"
-            >
-                View
-            </p-anchor>
+        <p-divider class="w-full mb-6" />
+        <div class="flex flex-col">
+            <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TEMPLATE.EXISTING_DASHBOARD') }}</h3>
+            <div class="grid grid-cols-4 col-gap-2">
+                <div v-for="(dashboardData, idx) in existingDashboardData" :key="`$dashboard-${idx}-${getUUID()}`" class="flex flex-col justify-between mb-4">
+                    <p-select-card
+                        :selected="selectedTemplate"
+                        :value="dashboardData"
+                        block
+                        class="flex-grow"
+                        @change="handleDashboardChange"
+                    >
+                        {{ dashboardData.name }}
+                    </p-select-card>
+                    <p-anchor
+                        target="_blank"
+                        :to=" { name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME, params: { dashboardId: dashboardData.public_dashboard_id } }"
+                        class="block mt-2 text-center"
+                    >
+                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TEMPLATE.VIEW') }}
+                    </p-anchor>
+                </div>
+            </div>
+            <p-pagination :total-count="totalCount"
+                          :this-page.sync="thisPage"
+                          :page-size.sync="pageSize"
+                          class="ml-auto mr-auto"
+            />
         </div>
     </fragment>
 </template>
 
 <script lang="ts">
 import {
-    PAnchor, PSelectCard,
+    PAnchor, PSelectCard, PPagination, PDivider,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { getUUID } from '@/lib/component-util/getUUID';
@@ -42,12 +54,18 @@ export default {
     components: {
         PSelectCard,
         PAnchor,
+        PPagination,
+        PDivider,
     },
 
     setup() {
         const state = reactive({
             existingDashboardData: [] as Partial<DashboardInfo>[],
             selectedTemplate: computed(() => store.state.service?.costDashboardCreate?.selectedTemplate),
+            // pagination
+            totalCount: 0,
+            thisPage: 1,
+            pageSize: 15,
         });
 
         const handleDashboardChange = (value: Partial<DashboardInfo>) => {
@@ -84,3 +102,9 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.p-anchor {
+    @apply text-blue-600;
+    font-size: 0.875rem;
+}
+</style>

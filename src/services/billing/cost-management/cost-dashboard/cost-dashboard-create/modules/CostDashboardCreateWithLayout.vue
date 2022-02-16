@@ -1,26 +1,36 @@
 <template>
     <fragment>
-        <h3>Start a new template</h3>
-        <div v-for="(layoutData, idx) in defaultLayoutData" :key="layoutData.name">
-            <p-select-card
-                :selected="selectedTemplate"
-                :value="layoutData"
-                block
-                @change="handleLayoutChange"
-            >
-                {{ layoutData.name }}
-            </p-select-card>
-            <p v-if="layoutData.widgetList.length">
-                <span>List of widgets</span>
-                <p-collapsible-toggle :is-collapsed="!unfoldedIndices.includes(idx)"
-                                      @update:isCollapsed="handleUpdateCollapsed(idx, ...arguments)"
-                />
-                <template v-if="unfoldedIndices.includes(idx)">
-                    <span v-for="({name}) in getNamesOfWidgetList(layoutData.widgetList)" :key="name">
-                        {{ name }} <br>
-                    </span>
-                </template>
-            </p>
+        <h3 class="pt-0">
+            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TEMPLATE.NEW_TEMPLATE') }}
+        </h3>
+        <div class="grid grid-cols-4 col-gap-2 mb-2">
+            <div v-for="(layoutData, idx) in defaultLayoutData" :key="layoutData.name" class="mb-4">
+                <p-select-card
+                    :selected="selectedTemplate"
+                    :value="layoutData"
+                    block
+                    @change="handleLayoutChange"
+                >
+                    {{ layoutData.name }}
+                </p-select-card>
+                <div v-if="layoutData.widgetList.length">
+                    <div class="flex justify-between mt-2">
+                        <span class="widget-list-title">List of widgets</span>
+                        <p-collapsible-toggle :is-collapsed="!unfoldedIndices.includes(idx)"
+                                              toggle-position="contents"
+                                              @update:isCollapsed="handleUpdateCollapsed(idx, ...arguments)"
+                        />
+                    </div>
+                    <ul v-if="unfoldedIndices.includes(idx)" class="widgets-list">
+                        <li v-for="({name}) in getNamesOfWidgetList(layoutData.widgetList)" :key="name">
+                            {{ name }}
+                        </li>
+                        <li class="text-more">
+                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TEMPLATE.AND_MORE') }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </fragment>
 </template>
@@ -82,3 +92,21 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.widget-list-title {
+    font-size: 0.875rem;
+}
+.widgets-list {
+    @apply mt-2 pl-6;
+    li {
+        @apply text-gray-700;
+        list-style-type: disc;
+        font-size: 0.875rem;
+        line-height: 1.25;
+        &.text-more {
+            list-style-type: none;
+            margin-left: -1.5rem;
+        }
+    }
+}
+</style>
