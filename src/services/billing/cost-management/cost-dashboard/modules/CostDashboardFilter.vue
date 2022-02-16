@@ -11,7 +11,7 @@
         >
             {{ $t('BILLING.COST_MANAGEMENT.MAIN.VIEW_FILTER') }}
         </p-button>
-        <p-icon-button v-if="isAdmin"
+        <p-icon-button v-if="isAdmin && !printMode"
                        name="ic_setting" style-type="gray900" size="sm"
                        outline
                        @click="handleClickSelectFilter"
@@ -69,6 +69,10 @@ export default {
         filters: {
             type: Object,
             default: () => ({}),
+        },
+        printMode: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: Props, { emit, root }) {

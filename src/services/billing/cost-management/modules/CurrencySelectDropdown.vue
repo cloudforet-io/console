@@ -2,6 +2,7 @@
     <p-select-dropdown :items="currencyItems"
                        :selected="currency"
                        without-outline
+                       :read-only="printMode"
                        @select="handleSelectCurrency"
     />
 </template>
@@ -22,6 +23,12 @@ export default {
     name: 'CurrencySelectDropdown',
     components: {
         PSelectDropdown,
+    },
+    props: {
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({

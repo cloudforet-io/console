@@ -24,7 +24,6 @@
                                                        :period.sync="period"
                                                        :period-type.sync="periodType"
                 />
-                <currency-select-dropdown />
                 <div class="left-divider download-pdf">
                     <p-icon-button name="ic_download" style-type="gray-border" size="sm"
                                    @click="handleClickPdfDownload"
@@ -68,7 +67,6 @@ import {
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
 
-import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
 import DashboardLayouts from '@/services/billing/cost-management/cost-dashboard/modules/DashboardLayouts.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -93,7 +91,6 @@ export default {
         CostDashboardPeriodSelectDropdown,
         CostDashboardMoreMenu,
         DashboardLayouts,
-        CurrencySelectDropdown,
         CostDashboardFilter,
         PBreadcrumbs,
         PPageTitle,

@@ -6,11 +6,10 @@
                 <cost-dashboard-period-select-dropdown :dashboard-id="dashboardId"
                                                        :period.sync="period"
                                                        :period-type.sync="periodType"
-                                                       readonly
+                                                       print-mode
                 />
-                <currency-select-dropdown readonly />
             </div>
-            <cost-dashboard-filter :dashboard-id="dashboardId" :filters.sync="filters" readonly />
+            <cost-dashboard-filter :dashboard-id="dashboardId" :filters.sync="filters" print-mode />
         </div>
         <dashboard-layouts :loading="loading"
                            :layout="layout"
@@ -33,7 +32,6 @@ import {
     PPageTitle,
 } from '@spaceone/design-system';
 
-import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
 import DashboardLayouts from '@/services/billing/cost-management/cost-dashboard/modules/DashboardLayouts.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -49,7 +47,6 @@ export default {
     components: {
         CostDashboardPeriodSelectDropdown,
         DashboardLayouts,
-        CurrencySelectDropdown,
         CostDashboardFilter,
         PPageTitle,
     },

@@ -1,6 +1,6 @@
 <template>
     <div class="cost-dashboard-period-select-dropdown">
-        <div class="fix-date-box">
+        <div v-if="!printMode" class="fix-date-box">
             <p-check-box :selected="isFixedTypeSelected" @change="handleSelectedFixDate">
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FIX_DATE') }}
             </p-check-box>
@@ -23,6 +23,7 @@
                            :selected="selectedMonthMenuItem"
                            without-outline
                            :disabled="isFixedTypeSelected"
+                           :read-only="printMode"
                            @select="handleSelectMonthMenuItem"
         />
         <cost-management-custom-range-modal v-if="customRangeModalVisible"
@@ -31,6 +32,7 @@
                                             :granularity="GRANULARITY.MONTHLY"
                                             @confirm="handleCustomRangeModalConfirm"
         />
+        <currency-select-dropdown :class="{ 'left-divider': printMode }" :print-mode="printMode" />
     </div>
 </template>
 
@@ -53,6 +55,7 @@ import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/ty
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
 
 const yesterday = dayjs.utc().subtract(1, 'day');
 const initialPeriodStart = yesterday.startOf('month').format('YYYY-MM-DD');
@@ -63,6 +66,7 @@ export default {
     name: 'CostDashboardPeriodSelectDropdown',
     components: {
         CostManagementCustomRangeModal,
+        CurrencySelectDropdown,
         PSelectDropdown,
         PBadge,
         PCheckBox,
@@ -81,6 +85,10 @@ export default {
         dashboardId: {
             type: String,
             default: undefined,
+        },
+        printMode: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {
@@ -210,6 +218,22 @@ export default {
     .fix-date-box {
         @apply inline-flex flex-wrap gap-2 items-center;
         margin-right: 0.5rem;
+    }
+    .left-divider {
+        @apply relative;
+        padding-left: 0.5rem;
+        margin-left: 0.5rem;
+        &::before {
+            @apply bg-gray-300;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            display: inline-block;
+            width: 0.0625rem;
+            height: 1.25rem;
+            content: ' ';
+            margin-top: calc(-1.25rem / 2);
+        }
     }
 }
 .p-badge {
