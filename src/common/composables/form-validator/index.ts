@@ -5,9 +5,9 @@ import { TranslateResult } from 'vue-i18n';
 import { clone } from 'lodash';
 
 
-type ValidatorResult = boolean|undefined|TranslateResult
+type ValidatorResult = boolean|TranslateResult
 interface Validator { (value?: any): ValidatorResult }
-type ValidateResult = boolean|undefined
+type ValidationResult = boolean
 
 function useValueValidator<T = any>(
     value: T,
@@ -23,23 +23,26 @@ function useValueValidator<T = any>(
     };
 
     const validatorResult = computed<ValidatorResult>(() => {
-        if (!validationStarted.value) return undefined;
         if (validator) return validator(valueRef.value);
         return true;
     });
 
-    const isInvalid = computed<ValidateResult>(() => {
+    const validationResult = computed<ValidationResult>(() => {
         const result = validatorResult.value;
+        if (typeof result === 'boolean') return result;
+        return !result;
+    });
 
-        if (result === undefined) return undefined;
-        if (typeof result === 'boolean') return !result;
-        return !!result;
+    const isInvalid = computed<ValidationResult|undefined>(() => {
+        if (!validationStarted.value) return undefined;
+        return !validationResult.value;
     });
 
     const invalidText = computed<TranslateResult>(() => {
-        const result = validatorResult.value;
+        if (!validationStarted.value) return '';
 
-        if (result === undefined || typeof result === 'boolean') return '';
+        const result = validatorResult.value;
+        if (typeof result === 'boolean') return '';
         return result;
     });
 
@@ -60,6 +63,7 @@ function useValueValidator<T = any>(
 
     return {
         value: computed<UnwrapRef<T>>(() => valueRef.value),
+        validationResult,
         isInvalid,
         invalidText,
         setValue,
@@ -87,7 +91,11 @@ type InvalidTexts<T> = {
 }
 
 type InvalidState<T> = {
-    [K in keyof T]: ComputedRef<ValidateResult>
+    [K in keyof T]: ComputedRef<ValidationResult|undefined>
+}
+
+type ValidationResults<T> = {
+    [K in keyof T]: ComputedRef<ValidationResult>
 }
 
 type Resets<T> = {
@@ -207,6 +215,7 @@ export function useFormValidator<T extends Record<string, any> = any>(
     const valueSetters = {} as ValueSetters<T>;
     const invalidTexts = {} as InvalidTexts<T>;
     const invalidState = {} as InvalidState<T>;
+    const validationResults = {} as ValidationResults<T>;
     const resets = {} as Resets<T>;
     const resetValidationMap = {} as Resets<T>;
     const validateMap = {} as Validates<T>;
@@ -217,19 +226,20 @@ export function useFormValidator<T extends Record<string, any> = any>(
         const immediate = typeof _immediate === 'boolean' ? _immediate : _immediate[key];
 
         const {
-            value, setValue, isInvalid, invalidText, reset, resetValidation, validate,
+            value, setValue, validationResult, isInvalid, invalidText, reset, resetValidation, validate,
         } = useValueValidator(_forms[key], validator, immediate);
 
         forms[key] = value;
         valueSetters[key] = setValue;
-        invalidTexts[key] = invalidText;
+        validationResults[key] = validationResult;
         invalidState[key] = isInvalid;
+        invalidTexts[key] = invalidText;
         resets[key] = reset;
         resetValidationMap[key] = resetValidation;
         validateMap[key] = validate;
     });
 
-    const isAllValid = computed<boolean>(() => Object.values(invalidState).every(isInvalid => isInvalid.value === false));
+    const isAllValid = computed<boolean>(() => Object.values(validationResults).every(validationResult => validationResult.value));
 
     const setForm = (key: keyof T | T, value?: T[keyof T]) => {
         if (typeof key === 'object') {

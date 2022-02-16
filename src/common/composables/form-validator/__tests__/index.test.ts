@@ -1,5 +1,5 @@
 import { mount, createLocalVue } from '@vue/test-utils';
-import CompositionApi, { defineComponent } from '@vue/composition-api';
+import CompositionApi, { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 const localVue = createLocalVue();
@@ -16,7 +16,9 @@ describe('Form Validator Composable', () => {
                 <span id="address-invalid-text">{{invalidTexts.address}}</span>
                 
                 <button v-if="isAllValid" id="confirm-button">Confirm</button>
-                <button id="init-button" @click="initForm({name: 'hello', address: ''})">Initiate</button>
+                <button id="init-button" @click="handleClickInitiate">Initiate with 
+                    <p ref="initValueRef" id="init-value"></p>
+                </button>
             </div>
         `,
         setup() {
@@ -40,6 +42,10 @@ describe('Form Validator Composable', () => {
                 },
             });
 
+            const state = reactive({
+                initValueRef: null as null|HTMLElement,
+            });
+
             const handleNameInput = (e) => {
                 setForm('name', e.target.value);
             };
@@ -48,15 +54,22 @@ describe('Form Validator Composable', () => {
                 setForm('address', e.target.value);
             };
 
+            const handleClickInitiate = () => {
+                if (!state.initValueRef?.textContent) return;
+                console.debug('JSON.parse(state.initValueRef.textContent)', JSON.parse(state.initValueRef.textContent));
+                initForm(JSON.parse(state.initValueRef.textContent));
+            };
+
             return {
                 name,
                 address,
                 invalidState,
                 invalidTexts,
                 isAllValid,
+                ...toRefs(state),
                 handleNameInput,
                 handleAddressInput,
-                initForm,
+                handleClickInitiate,
             };
         },
 
@@ -118,28 +131,53 @@ describe('Form Validator Composable', () => {
         expect(button.exists()).toBeFalsy();
     });
 
-    it('Change values and reset validations by initiating form.', async () => {
+    it('Initiate form with invalid value.', async () => {
         const nameForm = wrapper.find('#name-input');
         const addressForm = wrapper.find('#address-input');
-        await nameForm.setValue('내이름은');
-        await addressForm.setValue('서울시');
-
         const initButton = wrapper.find('#init-button');
+
+        // initiate values.
+        const initFormValue = { name: 'hello', address: '' };
+        wrapper.find('#init-value').element.textContent = JSON.stringify(initFormValue);
         await initButton.trigger('click');
 
+        // initiated form values are set.
         const nameEl = nameForm.element as HTMLInputElement;
         const addressEl = addressForm.element as HTMLInputElement;
-
-        // initiated form values are set.
-        expect(nameEl.value).toBe('hello');
-        expect(addressEl.value).toBe('');
+        expect(nameEl.value).toBe(initFormValue.name);
+        expect(addressEl.value).toBe(initFormValue.address);
 
         // no address invalid text is shown.
         const invalidText = wrapper.find('#address-invalid-text');
         expect(invalidText.text()).toBe('');
 
-        // but disappear confirm button because address is invalid internally.
+        // but confirm button is hidden because address is invalid internally.
         const confirmButton = wrapper.find('#confirm-button');
         expect(confirmButton.exists()).toBeFalsy();
+    });
+
+    it('Initiate form with valid value.', async () => {
+        const nameForm = wrapper.find('#name-input');
+        const addressForm = wrapper.find('#address-input');
+        const initButton = wrapper.find('#init-button');
+
+        // initiate values.
+        const initFormValue = { name: 'hello', address: '성남시 분당구' };
+        wrapper.find('#init-value').element.textContent = JSON.stringify(initFormValue);
+        await initButton.trigger('click');
+
+        // initiated form values are set.
+        const nameEl = nameForm.element as HTMLInputElement;
+        const addressEl = addressForm.element as HTMLInputElement;
+        expect(nameEl.value).toBe(initFormValue.name);
+        expect(addressEl.value).toBe(initFormValue.address);
+
+        // no address invalid text is shown.
+        const invalidText = wrapper.find('#address-invalid-text');
+        expect(invalidText.text()).toBe('');
+
+        // confirm button is shown because address is valid.
+        const confirmButton = wrapper.find('#confirm-button');
+        expect(confirmButton.exists()).toBeTruthy();
     });
 });
