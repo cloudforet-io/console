@@ -31,6 +31,7 @@ import CostDashboardCustomizeWidgetConfig
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
 import DefaultWidgetPreview
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/DefaultWidgetPreview.vue';
+import { store } from '@/store';
 
 export default {
     name: 'CostDashboardCustomizeDefaultWidgetTab',
@@ -43,9 +44,9 @@ export default {
     setup() {
         const state = reactive({
             widgetList: [] as WidgetInfo[],
-            selectedWidget: {} as WidgetInfo,
+            selectedWidget: computed(() => store.state.service?.costDashboardCustomize?.originSelectedWidget),
             hasGroupBy: computed(() => state.selectedWidget.options?.group_by?.length > 0),
-            widgetLabel: computed(() => widgetId => defaultWidgetMap[widgetId].widget_label ?? ''),
+            widgetLabel: computed(() => widgetId => defaultWidgetMap[widgetId].widget_name ?? ''),
         });
         const getWidgets = async () => {
             try {
@@ -56,8 +57,9 @@ export default {
             }
         };
 
-        const selectWidget = (value) => {
-            state.selectedWidget = value;
+        const selectWidget = (value: WidgetInfo) => {
+            store.commit('service/costDashboardCustomize/setOriginSelectedWidget', value);
+            store.commit('service/costDashboardCustomize/setEditedSelectedWidget', value);
         };
 
         (() => {

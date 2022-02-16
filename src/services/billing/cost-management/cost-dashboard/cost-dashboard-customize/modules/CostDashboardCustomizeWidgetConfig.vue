@@ -5,7 +5,7 @@
                        :invalid-text="invalidTexts.name"
                        required
         >
-            <p-text-input :value="name" :invalid="invalidState.name" @input="setForm('name', $event)" />
+            <p-text-input :value="name" :invalid="invalidState.name" @input="handleName" />
         </p-field-group>
         <p-field-group
             v-if="showGroupBy"
@@ -19,7 +19,7 @@
                 :invalid="invalidState.groupBy"
                 :selected="selectedGroupByItem"
                 use-fixed-menu-style
-                @select="setForm('groupBy', $event)"
+                @select="handleSelectGroupBy"
             />
         </p-field-group>
     </div>
@@ -32,9 +32,10 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { PFieldGroup, PSelectDropdown, PTextInput } from '@spaceone/design-system';
-import { WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { defaultWidgetMap } from '@/services/billing/cost-management/widgets/lib/config';
 import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { store } from '@/store';
+import { cloneDeep } from 'lodash';
 
 export default {
     name: 'CostDashboardCustomizeWidgetConfig',
@@ -47,10 +48,6 @@ export default {
         showGroupBy: {
             type: Boolean,
             default: false,
-        },
-        selectedWidget: {
-            type: Object as () => WidgetInfo,
-            default: () => ({}),
         },
     },
 
@@ -78,6 +75,8 @@ export default {
         });
 
         const state = reactive({
+            selectedWidget: computed(() => store.state.service.costDashboardCustomize.originSelectedWidget),
+            editedSelectedWidget: computed(() => cloneDeep(state.selectedWidget)),
             groupByItems: computed(() => ([
                 { name: GROUP_BY.PROVIDER, label: 'Provider' },
                 { name: GROUP_BY.PRODUCT, label: 'Product' },
@@ -98,15 +97,27 @@ export default {
             }),
         });
 
-        const init = () => {
-            initForm('name', defaultWidgetMap[props.selectedWidget?.widget_id].widget_label);
+        const handleName = (value) => {
+            setForm('name', value);
+            state.editedSelectedWidget.options.name = value;
+            store.commit('service/costDashboardCustomize/setEditedSelectedWidget', state.editedSelectedWidget);
+        };
 
-            if (props.showGroupBy) initForm('groupBy', props.selectedWidget?.options.group_by);
+        const handleSelectGroupBy = (value) => {
+            setForm('groupBy', value);
+            state.editedSelectedWidget.options.group_by = value;
+            store.commit('service/costDashboardCustomize/setEditedSelectedWidget', state.editedSelectedWidget);
+        };
+
+        const init = () => {
+            initForm('name', defaultWidgetMap[state.selectedWidget?.widget_id].widget_name);
+
+            if (props.showGroupBy) initForm('groupBy', state.selectedWidget?.options.group_by);
             else state.selectedGroupByItem = '';
         };
 
 
-        watch(() => props.selectedWidget, (after) => {
+        watch(() => state.selectedWidget, (after) => {
             if (after && Object.keys(after).length) {
                 init();
             }
@@ -122,6 +133,8 @@ export default {
             ...toRefs(state),
             setForm,
             validate,
+            handleSelectGroupBy,
+            handleName,
         };
     },
 };

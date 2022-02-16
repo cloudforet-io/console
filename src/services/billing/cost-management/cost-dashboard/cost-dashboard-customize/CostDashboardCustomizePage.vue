@@ -33,7 +33,10 @@ import { i18n } from '@/translations';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import CostDashboardCreateStoreModule
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/store';
+import CostDashboardCustomizeStoreModule
+    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/store';
 import { CostDashboardCreateState } from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/store/type';
+import { CostDashboardCustomizeState } from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/store/type';
 import {
     DashboardInfo,
     DefaultLayout, PublicDashboardInfo,
@@ -45,6 +48,7 @@ import { SpaceRouter } from '@/router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BILLING_ROUTE } from '@/services/billing/routes';
+
 
 export default {
     name: 'CostDashboardCustomizePage',
@@ -63,6 +67,7 @@ export default {
     },
     setup(props) {
         registerServiceStore<CostDashboardCreateState>('costDashboardCreate', CostDashboardCreateStoreModule);
+        registerServiceStore<CostDashboardCustomizeState>('costDashboardCustomize', CostDashboardCustomizeStoreModule);
         const routeState = reactive({
             route: computed(() => [
                 { name: i18n.t('MENU.BILLING.BILLING'), path: '/billing' },

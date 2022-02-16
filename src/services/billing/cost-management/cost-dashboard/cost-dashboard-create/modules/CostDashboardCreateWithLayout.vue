@@ -48,7 +48,7 @@ import { defaultWidgetMap } from '@/services/billing/cost-management/widgets/lib
 
 const getNamesOfWidgetList = (widgetList) => {
     const flattenWidgetList: WidgetInfo[] = flattenDeep(widgetList);
-    if (flattenWidgetList) return flattenWidgetList.map(d => ({ name: startCase(defaultWidgetMap[d.widget_id].widget_name) }));
+    if (flattenWidgetList) return flattenWidgetList.map(d => ({ name: startCase(defaultWidgetMap[d.widget_id].widget_file_name) }));
     return [];
 };
 

@@ -12,7 +12,7 @@
             <div v-for="({widget_id, options}) in row" :key="`widget-${widget_id}`" :class="`col-${row.length}`">
                 <dynamic-widget v-if="!loading"
                                 :widget-id="widget_id"
-                                :widget-name="defaultWidgetMap[widget_id].widget_name"
+                                :widget-file-name="defaultWidgetMap[widget_id].widget_file_name"
                                 :options="options"
                                 :period="period"
                                 :filters="filters"
