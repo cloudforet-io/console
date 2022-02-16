@@ -18,7 +18,7 @@
             </li>
         </ul>
         <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length" :selected-widget="selectedWidget" :show-group-by="hasGroupBy" />
-        <cost-dashboard-customize-widget-preview />
+        <default-widget-preview v-if="Object.keys(selectedWidget).length" :selected-widget="selectedWidget" />
     </div>
 </template>
 
@@ -29,13 +29,13 @@ import { defaultWidgetMap } from '@/services/billing/cost-management/widgets/lib
 import { PRadio } from '@spaceone/design-system';
 import CostDashboardCustomizeWidgetConfig
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
-import CostDashboardCustomizeWidgetPreview
-    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetPreview.vue';
+import DefaultWidgetPreview
+    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/DefaultWidgetPreview.vue';
 
 export default {
     name: 'CostDashboardCustomizeDefaultWidgetTab',
     components: {
-        CostDashboardCustomizeWidgetPreview,
+        DefaultWidgetPreview,
         CostDashboardCustomizeWidgetConfig,
         PRadio,
     },

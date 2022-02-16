@@ -50,7 +50,7 @@ export default {
         },
         selectedWidget: {
             type: Object as () => WidgetInfo,
-            default: '',
+            default: () => ({}),
         },
     },
 
