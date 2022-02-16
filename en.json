@@ -523,9 +523,28 @@
 				"FIXED_DATE_TOOLTIP": "Save this date and prevent it to change on reload",
 				"FIX_DATE": "Fix Date",
 				"FORM": {
+					"CANCEL": "Cancel",
+					"CREATE": "Create",
+					"CREATE_DASHBOARD": "Create New Dashboard",
 					"CUSTOM_RANGE": "Custom Range",
 					"FROM": "From",
-					"TO": "To"
+					"TEMPLATE": {
+						"AND_MORE": "..and more",
+						"APPLIED_FILTER": "Include Applied Filter from selected dashboard",
+						"EXISTING_DASHBOARD": "Clone an Existing Dashboard",
+						"FILTER": "Filter",
+						"NEW_TEMPLATE": "New Template",
+						"TEMPLATE": "Template",
+						"VIEW": "View",
+						"VIEW_FILTER": "View Filter"
+					},
+					"TO": "To",
+					"VISIBILITY": {
+						"PRIVATE": "My Dashboard (Private)",
+						"PUBLIC": "Public (Public to all members who has ‘View‘ access.)",
+						"SAVE_AS": "Save As",
+						"VISIBILITY": "Visibility"
+					}
 				},
 				"FULL_DATA": "Full data",
 				"INCREASE": "Increased from {date}",

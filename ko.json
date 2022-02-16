@@ -523,9 +523,28 @@
 				"FIXED_DATE_TOOLTIP": "설정한 날짜가 새로고침 시에도 유지될 수 있도록 저장할 수 있습니다.",
 				"FIX_DATE": "날짜 고정",
 				"FORM": {
+					"CANCEL": "취소",
+					"CREATE": "생성",
+					"CREATE_DASHBOARD": "대쉬보드 생성",
 					"CUSTOM_RANGE": "",
 					"FROM": "",
-					"TO": ""
+					"TEMPLATE": {
+						"AND_MORE": "\u001d",
+						"APPLIED_FILTER": "Include Applied Filter from selected dashboard\u001d",
+						"EXISTING_DASHBOARD": "",
+						"FILTER": "\u001d필터",
+						"NEW_TEMPLATE": "",
+						"TEMPLATE": "템플릿",
+						"VIEW": "",
+						"VIEW_FILTER": "\u001d필터 보기"
+					},
+					"TO": "",
+					"VISIBILITY": {
+						"PRIVATE": "",
+						"PUBLIC": "",
+						"SAVE_AS": "",
+						"VISIBILITY": ""
+					}
 				},
 				"FULL_DATA": "전체 데이터",
 				"INCREASE": "{date} 기간 사용량 증가됨",

@@ -523,9 +523,28 @@
 				"FIXED_DATE_TOOLTIP": "",
 				"FIX_DATE": "",
 				"FORM": {
+					"CANCEL": "",
+					"CREATE": "",
+					"CREATE_DASHBOARD": "",
 					"CUSTOM_RANGE": "",
 					"FROM": "",
-					"TO": ""
+					"TEMPLATE": {
+						"AND_MORE": "",
+						"APPLIED_FILTER": "",
+						"EXISTING_DASHBOARD": "",
+						"FILTER": "",
+						"NEW_TEMPLATE": "",
+						"TEMPLATE": "",
+						"VIEW": "",
+						"VIEW_FILTER": ""
+					},
+					"TO": "",
+					"VISIBILITY": {
+						"PRIVATE": "",
+						"PUBLIC": "",
+						"SAVE_AS": "",
+						"VISIBILITY": ""
+					}
 				},
 				"FULL_DATA": "",
 				"INCREASE": "",
