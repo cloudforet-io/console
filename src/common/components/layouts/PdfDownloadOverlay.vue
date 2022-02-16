@@ -13,7 +13,9 @@
         </div>
         <div class="preview-wrapper">
             <div class="preview">
-                <slot />
+                <div class="blocker">
+                    <slot />
+                </div>
             </div>
         </div>
     </div>
@@ -92,6 +94,10 @@ export default {
     .preview {
         @apply bg-gray-100;
         padding: 1.5rem;
+        overflow-x: scroll;
+        .blocker {
+            pointer-events: none;
+        }
     }
 }
 </style>
