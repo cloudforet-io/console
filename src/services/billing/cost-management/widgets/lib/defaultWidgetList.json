@@ -37,7 +37,7 @@
       "name": "CostTreeMap",
       "chart_type": "treemap",
       "layout": 100,
-      "group_by": "project"
+      "group_by": "project_id"
     }
   },
   {
@@ -46,7 +46,7 @@
       "name": "CostTrendLine",
       "chart_type": "line",
       "layout": 100,
-      "group_by": "string"
+      "group_by": "project_id"
     }
   },
   {
@@ -106,7 +106,7 @@
       "name": "SpcProjectWiseUsageSummary",
       "chart_type": "pie",
       "layout": 100,
-      "group_by": "project"
+      "group_by": "project_id"
     }
   }
 ]

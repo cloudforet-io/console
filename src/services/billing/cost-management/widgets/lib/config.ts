@@ -2,54 +2,67 @@ export const defaultWidgetMap = {
     'card-sm-01': {
         widget_id: 'card-sm-01',
         widget_name: 'MonthToDateSpend',
+        widget_label: 'Month-To-Date Spend',
     },
     'card-sm-02': {
         widget_id: 'card-sm-02',
         widget_name: 'LastMonthTotalSpend',
+        widget_label: 'Last Month Total Spend',
     },
     'card-sm-03': {
         widget_id: 'card-sm-03',
         widget_name: 'BudgetUsage',
+        widget_label: 'Budget Usage',
     },
     'card-lg-01': {
         widget_id: 'card-lg-01',
         widget_name: 'BudgetUsageSummary',
+        widget_label: 'Budget Usage Summary',
     },
     'treemap-lg-01': {
         widget_id: 'treemap-lg-01',
         widget_name: 'CostTreeMap',
+        widget_label: 'Cost Map',
     },
     'linegraph-lg-01': {
         widget_id: 'linegraph-lg-01',
         widget_name: 'CostTrendLine',
+        widget_label: 'Cost Trend',
     },
     'stackedcol-lg-01': {
         widget_id: 'stackedcol-lg-01',
         widget_name: 'CostTrendStackedColumnA',
+        widget_label: 'Cost Trend(Stacked) A',
     },
     'stackedcol-lg-02': {
         widget_id: 'stackedcol-lg-02',
         widget_name: 'CostTrendStackedColumnB',
+        widget_label: 'Cost Trend(Stacked) B',
     },
     'donut-md-01': {
         widget_id: 'donut-md-01',
         widget_name: 'CostDonut',
+        widget_label: 'Cost Donut',
     },
     'map-lg-01': {
         widget_id: 'map-lg-01',
         widget_name: 'CostByRegion',
+        widget_label: 'Cost By Region',
     },
     'waffle-md-01': {
         widget_id: 'waffle-md-01',
         widget_name: 'BudgetStatus',
+        widget_label: 'Budget Status',
     },
     'table-lg-01': {
         widget_id: 'table-lg-01',
         widget_name: 'ProjectWiseBudgetUsageSummary',
+        widget_label: 'Budget Usage With Forecast',
     },
     'pie-lg-01': {
         widget_id: 'pie-lg-01',
         widget_name: 'SpcProjectWiseUsageSummary',
+        widget_label: 'Cost Pie',
     },
 };
 

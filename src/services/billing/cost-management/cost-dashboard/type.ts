@@ -55,10 +55,8 @@ export interface WidgetOptions {
 }
 
 export interface WidgetInfo {
-    name?: string;
-    options?: WidgetOptions;
-    type?: string;
     widget_id: string;
+    options?: WidgetOptions;
 }
 
 export interface DefaultLayout {

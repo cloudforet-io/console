@@ -1,5 +1,9 @@
 <template>
-    <div>preview</div>
+    <fragment>
+        <slot name="description" />
+        <slot name="chart" />
+        <slot name="extra" />
+    </fragment>
 </template>
 
 <script lang="ts">

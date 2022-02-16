@@ -8,7 +8,7 @@
         <template #body>
             <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" class="tab">
                 <template #default-widget>
-                    <cost-dashboard-customize-default-widget-list />
+                    <cost-dashboard-customize-default-widget-tab />
                 </template>
                 <template #custom />
             </p-tab>
@@ -24,8 +24,8 @@ import {
 } from '@vue/composition-api';
 import { PButtonModal, PTab } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/type';
-import CostDashboardCustomizeDefaultWidgetList
-    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeDefaultWidgetList.vue';
+import CostDashboardCustomizeDefaultWidgetTab
+    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeDefaultWidgetTab.vue';
 
 interface Props {
     visible: boolean;
@@ -33,7 +33,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'CostDashboardCreateCustomizeWidgetModal',
     components: {
-        CostDashboardCustomizeDefaultWidgetList,
+        CostDashboardCustomizeDefaultWidgetTab,
         PButtonModal,
         PTab,
     },
