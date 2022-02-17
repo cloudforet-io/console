@@ -1,40 +1,40 @@
 [
   {
     "widget_id": "card-sm-01",
+    "name": "Month-To-Date Spend",
     "options": {
-      "name": "Month-To-Date Spend",
       "chart_type": "card",
       "layout": 33
     }
   },
   {
     "widget_id": "card-sm-02",
+    "name": "Last Month Total Spend",
     "options": {
-      "name": "Last Month Total Spend",
       "chart_type": "card",
       "layout": 33
     }
   },
   {
     "widget_id": "card-sm-03",
+    "name": "Budget Usage",
     "options": {
-      "name": "Budget Usage",
       "chart_type": "card",
       "layout": 33
     }
   },
   {
     "widget_id": "card-lg-01",
+    "name": "Budget Usage Summary",
     "options": {
-      "name": "Budget Usage Summary",
       "chart_type": "card",
       "layout": 100
     }
   },
   {
     "widget_id": "treemap-lg-01",
+    "name": "Cost Map",
     "options": {
-      "name": "Cost Map",
       "chart_type": "treemap",
       "layout": 100,
       "group_by": "project_id"
@@ -42,8 +42,8 @@
   },
   {
     "widget_id": "linegraph-lg-01",
+    "name": "Cost Trend",
     "options": {
-      "name": "Cost Trend",
       "chart_type": "line",
       "layout": 100,
       "group_by": "project_id"
@@ -51,8 +51,8 @@
   },
   {
     "widget_id": "stackedcol-lg-01",
+    "name": "Cost Trend(Stacked) A",
     "options": {
-      "name": "Cost Trend(Stacked) A",
       "chart_type": "stacked_column",
       "layout": 100,
       "group_by": "product"
@@ -60,8 +60,8 @@
   },
   {
     "widget_id": "stackedcol-lg-02",
+    "name": "Cost Trend(Stacked) B",
     "options": {
-      "name": "Cost Trend(Stacked) B",
       "chart_type": "stacked_column",
       "layout": 100,
       "group_by": "provider"
@@ -69,8 +69,8 @@
   },
   {
     "widget_id": "donut-md-01",
+    "name": "Cost Donut",
     "options": {
-      "name": "Cost Donut",
       "chart_type": "donut",
       "layout": 50,
       "group_by": "provider"
@@ -78,32 +78,32 @@
   },
   {
     "widget_id": "map-lg-01",
+    "name": "Cost By Region",
     "options": {
-      "name": "Cost By Region",
       "chart_type": "map",
       "layout": 100
     }
   },
   {
     "widget_id": "waffle-md-01",
+    "name": "Budget Status",
     "options": {
-      "name": "Budget Status",
       "chart_type": "waffle",
       "layout": 50
     }
   },
   {
     "widget_id": "table-lg-01",
+    "name": "Budget Usage With Forecast",
     "options": {
-      "name": "Budget Usage With Forecast",
       "chart_type": "table",
       "layout": 100
     }
   },
   {
     "widget_id": "pie-lg-01",
+    "name": "Cost Pie",
     "options": {
-      "name": "Cost Pie",
       "chart_type": "pie",
       "layout": 100,
       "group_by": "project_id"

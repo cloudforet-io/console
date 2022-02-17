@@ -44,7 +44,6 @@ export type DashboardMenuItem = Partial<DashboardInfo> & { label: string; routeN
 
 
 export interface WidgetOptions {
-    name: string;
     stack?: boolean;
     granularity?: GRANULARITY;
     filters?: CostQueryFilters;
@@ -56,6 +55,7 @@ export interface WidgetOptions {
 
 export interface WidgetInfo {
     widget_id: string;
+    name?: string;
     options: WidgetOptions;
 }
 

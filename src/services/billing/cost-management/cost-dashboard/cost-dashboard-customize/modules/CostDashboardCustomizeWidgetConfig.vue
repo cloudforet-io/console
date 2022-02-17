@@ -99,7 +99,7 @@ export default {
 
         const handleName = (value) => {
             setForm('name', value);
-            state.editedSelectedWidget.options.name = value;
+            state.editedSelectedWidget.name = value;
             store.commit('service/costDashboardCustomize/setEditedSelectedWidget', state.editedSelectedWidget);
         };
 
