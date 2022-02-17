@@ -4,6 +4,9 @@
         <slot name="chart" />
         <section class="layout">
             <p-label>Layout</p-label>
+            <div class="layout-preview">
+                <span v-for="i in Math.round(100 / selectedWidget.options.layout)" :key="i" />
+            </div>
             In ratio {{ selectedWidget.options.layout }}%
         </section>
         <slot name="extra" />
@@ -36,5 +39,17 @@ export default {
     @apply flex flex-col bg-gray-100 p-4;
     width: 16.5rem;
     height: 17.25rem;
+
+    .layout-preview {
+        @apply flex col-gap-2;
+        width: 14.375rem;
+        height: 2.5rem;
+        > span {
+            @apply flex-grow bg-white rounded-md;
+            &:first-child {
+                @apply bg-gray-400;
+            }
+        }
+    }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <ul>
+    <div class="flex">
+        <ul class="flex flex-wrap col-gap-2">
             <li v-for="widget in widgetList" :key="widget.widget_id" class="widget-card"
                 @click="selectWidget(widget)"
             >
@@ -17,8 +17,10 @@
                 </div>
             </li>
         </ul>
-        <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length" :selected-widget="selectedWidget" :show-group-by="hasGroupBy" />
-        <default-widget-preview v-if="Object.keys(selectedWidget).length" :selected-widget="selectedWidget" />
+        <div class="right-area">
+            <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length" :selected-widget="selectedWidget" :show-group-by="hasGroupBy" />
+            <default-widget-preview v-if="Object.keys(selectedWidget).length" :selected-widget="selectedWidget" />
+        </div>
     </div>
 </template>
 
