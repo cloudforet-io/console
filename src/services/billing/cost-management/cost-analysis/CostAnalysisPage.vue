@@ -1,92 +1,27 @@
 <template>
     <div class="cost-analysis-page">
         <p-breadcrumbs :routes="routeState.route" />
-        <section class="title-section">
-            <p-select-dropdown :items="queryItemList" type="icon-button" button-icon="ic_list"
-                               class="list-button"
-                               @select="handleClickQueryItem"
-            >
-                <template #menu-item--format="{item}">
-                    <div class="query-item-wrapper">
-                        <div class="dropdown-item-modal">
-                            <span>{{ item.label }}</span><span v-if="!item.name" class="default-item-suffix">(default)</span>
-                        </div>
-                        <div v-if="item.name" class="button-wrapper">
-                            <p-icon-button name="ic_trashcan" size="sm"
-                                           @click.stop="handleClickDeleteQuery(item.name)"
-                            />
-                            <p-icon-button name="ic_edit-text" size="sm" @click.stop="handleClickEditQuery(item.name)" />
-                        </div>
-                    </div>
-                </template>
-            </p-select-dropdown>
-            <p-page-title>
-                <template #title>
-                    <div class="title-main-wrapper">
-                        <span>{{ selectedQueryId ? title : defaultTitle }}</span>
-                        <div v-if="selectedQueryId" class="button-wrapper">
-                            <p-icon-button name="ic_trashcan"
-                                           @click.stop="handleClickDeleteQuery(selectedQueryId)"
-                            />
-                            <p-icon-button name="ic_edit-text" @click.stop="handleClickEditQuery(selectedQueryId)" />
-                        </div>
-                    </div>
-                </template>
-                <template #extra>
-                    <div class="title-extra-wrapper">
-                        <span />
-                        <div class="button-wrapper">
-                            <p-icon-text-button name="ic_download" style-type="gray-border" @click="handleClickPdf">
-                                PDF
-                            </p-icon-text-button>
-                            <p-button v-if="selectedQueryId" style-type="gray-border" @click="handleSaveQueryOption">
-                                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
-                            </p-button>
-                            <p-button style-type="gray-border" @click="handleClickSaveQuery">
-                                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS') }}
-                            </p-button>
-                        </div>
-                    </div>
-                </template>
-            </p-page-title>
-        </section>
+        <cost-analysis-header />
         <cost-analysis-query-filter />
         <cost-analysis-group-by-filter />
         <cost-analysis-chart />
         <cost-analysis-data-table />
-        <save-query-form-modal :header-title="saveQueryFormState.title" :visible.sync="saveQueryFormState.visible"
-                               :selected-query="saveQueryFormState.selectedQuery" :request-type="saveQueryFormState.requestType"
-                               @confirm="handleSaveQueryConfirm"
-        />
-        <delete-modal :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHECK_DELETE_MODAL_DESC')"
-                      :visible.sync="checkDeleteState.visible"
-                      @confirm="handleDeleteQueryConfirm"
-        />
-        <pdf-download-overlay v-model="visiblePdfOverlay" mode="ELEMENT_EMBED">
-            <cost-analysis-preview />
-        </pdf-download-overlay>
     </div>
 </template>
 
 <script lang="ts">
-import { TranslateResult } from 'vue-i18n';
-
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle, PIconButton, PSelectDropdown, PButton, PIconTextButton,
+    PBreadcrumbs,
 } from '@spaceone/design-system';
-
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import CostAnalysisChart from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisChart.vue';
 import CostAnalysisQueryFilter from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisQueryFilter.vue';
 import CostAnalysisGroupByFilter from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisGroupByFilter.vue';
 import CostAnalysisDataTable from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisDataTable.vue';
-import SaveQueryFormModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue';
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import {
@@ -97,9 +32,6 @@ import {
     CostAnalysisStoreState,
 } from '@/services/billing/cost-management/cost-analysis/store/type';
 import costAnalysisStoreModule from '@/services/billing/cost-management/cost-analysis/store';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import { SpaceRouter } from '@/router';
@@ -114,8 +46,7 @@ import {
 import { CostAnalysisPageUrlQuery } from '@/services/billing/cost-management/cost-analysis/type';
 import { CostQuerySetModel, CostQuerySetOption } from '@/services/billing/cost-management/type';
 import { Location } from 'vue-router';
-import PdfDownloadOverlay from '@/common/components/layouts/PdfDownloadOverlay.vue';
-import CostAnalysisPreview from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisPreview.vue';
+import CostAnalysisHeader from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisHeader.vue';
 
 export interface SaveQueryEmitParam {
     updatedQuery: CostQuerySetModel;
@@ -125,20 +56,12 @@ export interface SaveQueryEmitParam {
 export default {
     name: 'CostAnalysisPage',
     components: {
-        CostAnalysisPreview,
-        PdfDownloadOverlay,
+        CostAnalysisHeader,
         CostAnalysisDataTable,
         CostAnalysisGroupByFilter,
         CostAnalysisChart,
         CostAnalysisQueryFilter,
         PBreadcrumbs,
-        PPageTitle,
-        PIconButton,
-        PSelectDropdown,
-        PIconTextButton,
-        PButton,
-        SaveQueryFormModal,
-        DeleteModal,
     },
     props: {
         querySetId: {
@@ -146,33 +69,12 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { root }) {
+    setup(props) {
         registerServiceStore<CostAnalysisStoreState>('costAnalysis', costAnalysisStoreModule);
 
         const state = reactive({
-            defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
             costQueryList: computed<CostQuerySetModel[]>(() => store.state.service.costAnalysis.costQueryList),
-            queryItemList: computed<MenuItem[]>(() => ([
-                { name: 'header', label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVED_QUERY'), type: 'header' },
-                { name: undefined, label: 'Cost Analysis', type: 'item' },
-                ...state.costQueryList.map((item: CostQuerySetModel): MenuItem => ({
-                    name: item.cost_query_set_id,
-                    label: item.name,
-                    type: 'item',
-                })),
-            ])),
             selectedQueryId: computed<string|undefined>(() => store.state.service.costAnalysis.selectedQueryId),
-            selectedQuerySet: computed<CostQuerySetModel|undefined>(() => store.getters['service/costAnalysis/selectedQuerySet']),
-            title: computed<string>(() => state.selectedQuerySet?.name ?? 'Cost Analysis'),
-            itemIdForDeleteQuery: '',
-            visiblePdfOverlay: false,
-        });
-
-        const saveQueryFormState = reactive({
-            visible: false,
-            title: '' as string | TranslateResult,
-            selectedQuery: {},
-            requestType: REQUEST_TYPE.SAVE as REQUEST_TYPE,
         });
 
         const routeState = reactive({
@@ -181,10 +83,6 @@ export default {
                 { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), to: { name: BILLING_ROUTE.COST_MANAGEMENT._NAME } },
                 { name: i18n.t('MENU.BILLING.COST_ANALYSIS') },
             ]),
-        });
-
-        const checkDeleteState = reactive({
-            visible: false,
         });
 
         /* util */
@@ -208,104 +106,12 @@ export default {
 
         const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (state.costQueryList.find(item => item.cost_query_set_id === queryItemKey)) || {};
 
-        /* event */
-        const handleClickDeleteQuery = (id) => {
-            state.itemIdForDeleteQuery = id;
-            checkDeleteState.visible = true;
-        };
-        const handleClickEditQuery = (queryItemId) => {
-            const queryItem = getQueryWithKey(queryItemId);
-            saveQueryFormState.title = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_QUERY');
-            saveQueryFormState.requestType = REQUEST_TYPE.EDIT;
-            saveQueryFormState.selectedQuery = queryItem;
-            saveQueryFormState.visible = true;
-        };
-        const handleClickSaveQuery = () => {
-            saveQueryFormState.title = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY');
-            saveQueryFormState.requestType = REQUEST_TYPE.SAVE;
-            saveQueryFormState.visible = true;
-        };
-
-        const handleDeleteQueryConfirm = async () => {
-            checkDeleteState.visible = false;
-            try {
-                await SpaceConnector.client.costAnalysis.costQuerySet.delete({ cost_query_set_id: state.itemIdForDeleteQuery });
-                await store.dispatch('service/costAnalysis/listCostQueryList');
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '', root);
-                if (state.selectedQueryId === state.itemIdForDeleteQuery) {
-                    await SpaceRouter.router.push({ name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME });
-                    setQueryOptions();
-                    setSelectedQueryId();
-                }
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
-            }
-        };
-
-        const handleClickQueryItem = async (queryId: string) => {
-            if (queryId === state.selectedQueryId) return;
-
-            if (queryId) {
-                const { options } = getQueryWithKey(queryId);
-                setQueryOptions(options);
-                setSelectedQueryId(queryId);
-            } else {
-                setQueryOptions();
-                setSelectedQueryId();
-            }
-        };
-
-        const handleSaveQueryConfirm = ({ updatedQuery, requestType }: SaveQueryEmitParam) => {
-            if (!updatedQuery) return;
-
-            store.dispatch('service/costAnalysis/listCostQueryList');
-
-            if (requestType === REQUEST_TYPE.EDIT && updatedQuery.cost_query_set_id !== state.selectedQueryId) {
-                return;
-            }
-
-            if (requestType === REQUEST_TYPE.SAVE) {
-                setSelectedQueryId(updatedQuery.cost_query_set_id);
-            }
-        };
-
-        const handleSaveQueryOption = async () => {
-            try {
-                const {
-                    granularity, stack, period,
-                    groupBy, filters, primaryGroupBy,
-                } = store.state.service.costAnalysis;
-                await SpaceConnector.client.costAnalysis.costQuerySet.update({
-                    cost_query_set_id: state.selectedQueryId,
-                    options: {
-                        granularity,
-                        stack,
-                        period,
-                        group_by: groupBy,
-                        primary_group_by: primaryGroupBy,
-                        filters,
-                    },
-                });
-                await store.dispatch('service/costAnalysis/listCostQueryList');
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', root);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
-            }
-        };
-
-        const handleClickPdf = () => {
-            state.visiblePdfOverlay = true;
-        };
 
         /* Watchers */
-        watch(() => saveQueryFormState.visible, () => {
-            if (saveQueryFormState.visible === false) saveQueryFormState.selectedQuery = {};
-        });
-
         watch(() => state.selectedQueryId, (selectedQueryId) => {
             if (props.querySetId !== selectedQueryId) {
                 const location: Location = {
-                    params: { querySetId: selectedQueryId },
+                    params: { querySetId: selectedQueryId as string },
                     query: {},
                 };
 
@@ -366,17 +172,6 @@ export default {
         return {
             ...toRefs(state),
             routeState,
-            checkDeleteState,
-            saveQueryFormState,
-            handleClickDeleteQuery,
-            handleClickEditQuery,
-            handleClickSaveQuery,
-            handleDeleteQueryConfirm,
-            handleClickQueryItem,
-            handleSaveQueryConfirm,
-            handleSaveQueryOption,
-            handleClickPdf,
-            getQueryWithKey,
         };
     },
 };
@@ -384,71 +179,9 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-analysis-page {
-    .title-section {
-        @apply relative;
-        display: flex;
-
-        .p-page-title {
-            flex-wrap: wrap;
-            row-gap: 2rem;
-        }
-
-        .title-main-wrapper {
-            @apply flex items-center flex-wrap gap-2;
-            margin-left: 2.5rem;
-            .button-wrapper {
-                @apply flex items-center;
-            }
-        }
-
-        .dropdown-item-modal {
-            @apply flex items-center flex-wrap gap-1;
-
-            .default-item-suffix {
-                @apply text-gray-400;
-            }
-        }
-
-        .list-button::v-deep {
-            @apply absolute bg-transparent;
-            top: 0;
-            left: 0;
-            .p-context-menu {
-                min-width: 22rem;
-
-                .menu-item-wrapper {
-                    display: flex;
-                    justify-content: space-between;
-                }
-            }
-        }
-
-        .query-item-wrapper {
-            @apply flex justify-between;
-            width: 100%;
-        }
-
-        .title-extra-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            .button-wrapper {
-                @apply flex items-center flex-wrap gap-4;
-            }
-        }
-    }
-
     .cost-analysis-chart {
         @apply relative z-10;
         margin-bottom: 1rem;
-    }
-
-    @screen mobile {
-        &::v-deep .extra {
-            width: 100%;
-        }
     }
 }
 </style>
