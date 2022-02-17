@@ -51,7 +51,12 @@
                       :loading="checkDeleteState.loading"
                       @confirm="handleDeleteDashboardConfirm"
         />
-        <cost-dashboard-pdf-download-overlay v-if="visiblePdfDownload" :dashboard-id="dashboardId" />
+        <pdf-download-overlay v-model="visiblePdfDownload" :elements="previewElements">
+            <cost-dashboard-preview v-if="dashboardId"
+                                    :dashboard-id="dashboardId"
+                                    @rendered="handlePreviewRendered"
+            />
+        </pdf-download-overlay>
     </div>
 </template>
 
@@ -81,13 +86,14 @@ import {
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 import { SpaceRouter } from '@/router';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import CostDashboardPdfDownloadOverlay
-    from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPdfDownloadOverlay.vue';
+import PdfDownloadOverlay from '@/common/components/layouts/PdfDownloadOverlay.vue';
+import CostDashboardPreview from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPreview.vue';
 
 export default {
     name: 'CostDashboardPage',
     components: {
-        CostDashboardPdfDownloadOverlay,
+        CostDashboardPreview,
+        PdfDownloadOverlay,
         CostDashboardPeriodSelectDropdown,
         CostDashboardMoreMenu,
         DashboardLayouts,
@@ -116,6 +122,7 @@ export default {
             currencyRates: computed(() => store.state.display.currencyRates),
             homeDashboardId: computed<string|undefined>(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
             visiblePdfDownload: false,
+            previewElements: [] as HTMLElement[],
         });
 
         const routeState = reactive({
@@ -167,6 +174,10 @@ export default {
 
         const handleClickCustomize = () => {
             SpaceRouter.router.push({ name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });
+        };
+
+        const handlePreviewRendered = (elements: HTMLElement[]) => {
+            state.previewElements = elements;
         };
 
         const fetchDefaultLayoutData = async (layoutId: string): Promise<any[]> => {
@@ -250,6 +261,7 @@ export default {
             handleDeleteDashboardConfirm,
             handleClickPdfDownload,
             handleClickCustomize,
+            handlePreviewRendered,
         };
     },
 };

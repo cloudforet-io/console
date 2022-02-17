@@ -98,7 +98,7 @@ export const checkNotification: Action<DisplayState, any> = async ({
     }
 };
 
-let checkNotificationInterval: number|undefined;
+let checkNotificationInterval: undefined|ReturnType<typeof setTimeout>;
 export const stopCheckNotification: Action<DisplayState, any> = ({ commit, dispatch }): void => {
     const lastCheckedTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     dispatch('settings/setItem', {

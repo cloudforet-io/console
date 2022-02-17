@@ -8,8 +8,12 @@
         <template #loader>
             <div />
         </template>
-        <div v-for="(row, rowIdx) in layout" :key="`row-${rowIdx}`" class="row">
-            <div v-for="({widget_id, options}) in row" :key="`widget-${widget_id}`" :class="`col-${row.length}`">
+        <div v-for="(row, rowIdx) in layout" :key="`row-${rowIdx}`" ref="dynamicWidgetRows"
+             class="row"
+        >
+            <div v-for="({widget_id, options}) in row" :key="`widget-${widget_id}`"
+                 :class="`col-${row.length}`"
+            >
                 <dynamic-widget v-if="!loading"
                                 :widget-id="widget_id"
                                 :widget-file-name="defaultWidgetMap[widget_id].widget_file_name"
@@ -32,7 +36,8 @@ import { CURRENCY } from '@/store/modules/display/config';
 import { PDataLoader } from '@spaceone/design-system';
 import { defaultWidgetMap } from '@/services/billing/cost-management/widgets/lib/config';
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 type Row = string[]
@@ -79,6 +84,7 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             widgetCount: computed<number>(() => props.layout.flat().length),
             renderedCount: 0,
@@ -95,7 +101,10 @@ export default {
             state.renderedCount = 0;
         });
         watch(() => state.isAllRendered, (isAllRendered) => {
-            if (isAllRendered) emit('rendered');
+            if (isAllRendered) {
+                const widgetRows: HTMLElement[] = vm.$refs.dynamicWidgetRows as HTMLElement[] ?? [];
+                emit('rendered', widgetRows);
+            }
         });
         return {
             ...toRefs(state),

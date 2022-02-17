@@ -70,7 +70,7 @@ module.exports = {
         ],
         // eslint-disable-next-line consistent-return
         externals(context, request, callback) {
-            if (/xlsx|canvg|pdfmake/.test(request)) {
+            if (/xlsx|canvg/.test(request)) {
                 return callback(null, `commonjs ${request}`);
             }
             callback();

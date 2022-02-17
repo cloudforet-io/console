@@ -71,9 +71,9 @@ export default {
 
 
         /* event */
-        const handleDashboardRendered = () => {
+        const handleDashboardRendered = (rowElements: HTMLElement[]) => {
             console.debug('dashboard rendered');
-            emit('rendered');
+            emit('rendered', rowElements);
         };
 
         const fetchDefaultLayoutData = async (layoutId: string): Promise<any[]> => {
