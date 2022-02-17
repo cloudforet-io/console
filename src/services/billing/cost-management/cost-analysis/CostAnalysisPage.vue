@@ -36,9 +36,9 @@
                     <div class="title-extra-wrapper">
                         <span />
                         <div class="button-wrapper">
-                            <!--                            <p-icon-text-button name="ic_download" style-type="gray-border">-->
-                            <!--                                PDF-->
-                            <!--                            </p-icon-text-button>-->
+                            <p-icon-text-button name="ic_download" style-type="gray-border" @click="handleClickPdf">
+                                PDF
+                            </p-icon-text-button>
                             <p-button v-if="selectedQueryId" style-type="gray-border" @click="handleSaveQueryOption">
                                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
                             </p-button>
@@ -62,6 +62,9 @@
                       :visible.sync="checkDeleteState.visible"
                       @confirm="handleDeleteQueryConfirm"
         />
+        <pdf-download-overlay v-model="visiblePdfOverlay" mode="ELEMENT_EMBED">
+            <cost-analysis-preview />
+        </pdf-download-overlay>
     </div>
 </template>
 
@@ -73,7 +76,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle, PIconButton, PSelectDropdown, PButton,
+    PBreadcrumbs, PPageTitle, PIconButton, PSelectDropdown, PButton, PIconTextButton,
 } from '@spaceone/design-system';
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -111,6 +114,8 @@ import {
 import { CostAnalysisPageUrlQuery } from '@/services/billing/cost-management/cost-analysis/type';
 import { CostQuerySetModel, CostQuerySetOption } from '@/services/billing/cost-management/type';
 import { Location } from 'vue-router';
+import PdfDownloadOverlay from '@/common/components/layouts/PdfDownloadOverlay.vue';
+import CostAnalysisPreview from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisPreview.vue';
 
 export interface SaveQueryEmitParam {
     updatedQuery: CostQuerySetModel;
@@ -120,6 +125,8 @@ export interface SaveQueryEmitParam {
 export default {
     name: 'CostAnalysisPage',
     components: {
+        CostAnalysisPreview,
+        PdfDownloadOverlay,
         CostAnalysisDataTable,
         CostAnalysisGroupByFilter,
         CostAnalysisChart,
@@ -128,7 +135,7 @@ export default {
         PPageTitle,
         PIconButton,
         PSelectDropdown,
-        // PIconTextButton,
+        PIconTextButton,
         PButton,
         SaveQueryFormModal,
         DeleteModal,
@@ -158,6 +165,7 @@ export default {
             selectedQuerySet: computed<CostQuerySetModel|undefined>(() => store.getters['service/costAnalysis/selectedQuerySet']),
             title: computed<string>(() => state.selectedQuerySet?.name ?? 'Cost Analysis'),
             itemIdForDeleteQuery: '',
+            visiblePdfOverlay: false,
         });
 
         const saveQueryFormState = reactive({
@@ -285,6 +293,10 @@ export default {
             }
         };
 
+        const handleClickPdf = () => {
+            state.visiblePdfOverlay = true;
+        };
+
         /* Watchers */
         watch(() => saveQueryFormState.visible, () => {
             if (saveQueryFormState.visible === false) saveQueryFormState.selectedQuery = {};
@@ -363,6 +375,7 @@ export default {
             handleClickQueryItem,
             handleSaveQueryConfirm,
             handleSaveQueryOption,
+            handleClickPdf,
             getQueryWithKey,
         };
     },
