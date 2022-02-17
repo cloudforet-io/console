@@ -1,10 +1,10 @@
 import { Getter } from 'vuex';
 import {
-    CostAnalysisStoreState, CostQuerySetModel, GroupByItem,
+    CostAnalysisStoreState, GroupByItem,
 } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { ResourceItem } from '@/store/modules/resource/type';
 import { GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
-import { CostQueryFilterItemsMap } from '@/services/billing/cost-management/type';
+import { CostQueryFilterItemsMap, CostQuerySetModel } from '@/services/billing/cost-management/type';
 import { store } from '@/store';
 
 

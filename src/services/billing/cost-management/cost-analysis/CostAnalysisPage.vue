@@ -92,8 +92,6 @@ import {
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import {
     CostAnalysisStoreState,
-    CostQuerySetModel,
-    CostQuerySetOption,
 } from '@/services/billing/cost-management/cost-analysis/store/type';
 import costAnalysisStoreModule from '@/services/billing/cost-management/cost-analysis/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -111,6 +109,7 @@ import {
     queryStringToString,
 } from '@/lib/router-query-string';
 import { CostAnalysisPageUrlQuery } from '@/services/billing/cost-management/cost-analysis/type';
+import { CostQuerySetModel, CostQuerySetOption } from '@/services/billing/cost-management/type';
 import { Location } from 'vue-router';
 
 export interface SaveQueryEmitParam {

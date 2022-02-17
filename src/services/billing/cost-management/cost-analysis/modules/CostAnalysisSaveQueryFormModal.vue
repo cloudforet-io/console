@@ -36,7 +36,7 @@ import {
 import {
     REQUEST_TYPE,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
-import { CostQuerySetModel } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { CostQuerySetModel } from '@/services/billing/cost-management/type';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';

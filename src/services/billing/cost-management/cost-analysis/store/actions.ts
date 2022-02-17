@@ -1,6 +1,7 @@
 import { Action } from 'vuex';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
-import { CostAnalysisStoreState, CostQuerySetModel, CostQuerySetOption } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { CostAnalysisStoreState } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { CostQuerySetModel, CostQuerySetOption } from '@/services/billing/cost-management/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { getInitialDates } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
