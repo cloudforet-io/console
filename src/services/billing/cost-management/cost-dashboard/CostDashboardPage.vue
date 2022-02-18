@@ -88,6 +88,9 @@ import { SpaceRouter } from '@/router';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import PdfDownloadOverlay from '@/common/components/layouts/PdfDownloadOverlay.vue';
 import CostDashboardPreview from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPreview.vue';
+import { registerServiceStore } from '@/common/composables/register-service-store';
+import { CostDashboardState } from '@/services/billing/cost-management/cost-dashboard/store/type';
+import CostDashboardStoreModule from '@/services/billing/cost-management/cost-dashboard/store';
 
 export default {
     name: 'CostDashboardPage',
@@ -111,6 +114,7 @@ export default {
         },
     },
     setup(props) {
+        registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
         const state = reactive({
             dashboard: {} as DashboardInfo,
             loading: true,

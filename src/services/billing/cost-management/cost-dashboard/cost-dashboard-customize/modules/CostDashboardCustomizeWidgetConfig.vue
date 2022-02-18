@@ -75,7 +75,7 @@ export default {
         });
 
         const state = reactive({
-            selectedWidget: computed(() => store.state.service.costDashboardCustomize.originSelectedWidget),
+            selectedWidget: computed(() => store.state.service.costDashboard?.originSelectedWidget),
             editedSelectedWidget: computed(() => cloneDeep(state.selectedWidget)),
             groupByItems: computed(() => ([
                 { name: GROUP_BY.PROVIDER, label: 'Provider' },
@@ -100,13 +100,13 @@ export default {
         const handleName = (value) => {
             setForm('name', value);
             state.editedSelectedWidget.name = value;
-            store.commit('service/costDashboardCustomize/setEditedSelectedWidget', state.editedSelectedWidget);
+            store.commit('service/costDashboard/setEditedSelectedWidget', state.editedSelectedWidget);
         };
 
         const handleSelectGroupBy = (value) => {
             setForm('groupBy', value);
             state.editedSelectedWidget.options.group_by = value;
-            store.commit('service/costDashboardCustomize/setEditedSelectedWidget', state.editedSelectedWidget);
+            store.commit('service/costDashboard/setEditedSelectedWidget', state.editedSelectedWidget);
         };
 
         const init = () => {

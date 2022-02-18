@@ -23,9 +23,9 @@ import { i18n } from '@/translations';
 import CostDashboardCreateForm
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateForm.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
-import CostDashboardCreateStoreModule
-    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/store';
-import { CostDashboardCreateState } from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/store/type';
+import CostDashboardStoreModule
+    from '@/services/billing/cost-management/cost-dashboard/store';
+import { CostDashboardState } from '@/services/billing/cost-management/cost-dashboard/store/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     DASHBOARD_PRIVACY_TYPE,
@@ -48,7 +48,7 @@ export default {
     },
 
     setup() {
-        registerServiceStore<CostDashboardCreateState>('costDashboardCreate', CostDashboardCreateStoreModule);
+        registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
         const routeState = reactive({
             route: computed(() => [
                 { name: i18n.t('MENU.BILLING.BILLING'), path: '/billing' },
@@ -58,28 +58,30 @@ export default {
         });
 
         const state = reactive({
-            selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => store.state.service?.costDashboardCreate?.selectedTemplate),
-            defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboardCreate?.defaultFilter),
-            selectedPrivacy: computed<DashboardPrivacyType>(() => store.state.service?.costDashboardCreate?.selectedPrivacy),
+            selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => store.state.service?.costDashboard?.selectedTemplate),
+            defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboard?.defaultFilter),
+            selectedPrivacy: computed<DashboardPrivacyType>(() => store.state.service?.costDashboard?.selectedPrivacy),
         });
 
         const getDefaultLayoutId = () => {
             if (Object.prototype.hasOwnProperty.call(state.selectedTemplate, 'default_layout_id')) {
+                console.log(state.selectedTemplate.default_layout_id);
                 return state.selectedTemplate.default_layout_id;
-            } return undefined;
+            }
+            return undefined;
         };
 
-        const dashboardCreateParam: DashboardCreateParam = {
+        const makeDashboardCreateParam = (): DashboardCreateParam => ({
             name: 'Untitled Dashboard',
             default_layout_id: getDefaultLayoutId() as string,
             custom_layouts: [],
             period_type: 'AUTO',
             default_filter: state.defaultFilter,
-        };
+        });
 
         const createPublicDashboard = async (): Promise<string|undefined> => {
             try {
-                const { public_dashboard_id } = await SpaceConnector.client.costAnalysis.publicDashboard.create(dashboardCreateParam as DashboardCreateParam);
+                const { public_dashboard_id } = await SpaceConnector.client.costAnalysis.publicDashboard.create(makeDashboardCreateParam() as DashboardCreateParam);
                 return public_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, 'Failed to create dashboard');
@@ -89,7 +91,7 @@ export default {
 
         const createUserDashboard = async (): Promise<string|undefined> => {
             try {
-                const { user_dashboard_id } = await SpaceConnector.client.costAnalysis.userDashboard.create(dashboardCreateParam as DashboardCreateParam);
+                const { user_dashboard_id } = await SpaceConnector.client.costAnalysis.userDashboard.create(makeDashboardCreateParam() as DashboardCreateParam);
                 return user_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, 'Failed to create dashboard');

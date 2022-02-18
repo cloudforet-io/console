@@ -37,8 +37,8 @@ export default {
         const state = reactive({
             includesFilter: false,
             defaultFilterModalVisible: false,
-            defaultFilter: computed(() => store.state.service?.costDashboardCreate?.defaultFilter || {}),
-            isDashboardTemplate: computed(() => store.state.service?.costDashboardCreate?.selectedTemplate.hasOwnProperty('public_dashboard_id')),
+            defaultFilter: computed(() => store.state.service?.costDashboard?.defaultFilter || {}),
+            isDashboardTemplate: computed(() => store.state.service?.costDashboard?.selectedTemplate.hasOwnProperty('public_dashboard_id')),
         });
 
         const handleClickFilterButton = () => {

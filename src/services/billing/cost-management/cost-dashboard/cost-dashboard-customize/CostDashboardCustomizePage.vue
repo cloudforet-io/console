@@ -31,12 +31,9 @@ import {
 } from '@vue/composition-api';
 import { i18n } from '@/translations';
 import { registerServiceStore } from '@/common/composables/register-service-store';
-import CostDashboardCreateStoreModule
-    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/store';
-import CostDashboardCustomizeStoreModule
-    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/store';
-import { CostDashboardCreateState } from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/store/type';
-import { CostDashboardCustomizeState } from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/store/type';
+import CostDashboardStoreModule
+    from '@/services/billing/cost-management/cost-dashboard/store';
+import { CostDashboardState } from '@/services/billing/cost-management/cost-dashboard/store/type';
 import {
     DashboardInfo,
     DefaultLayout, PublicDashboardInfo,
@@ -66,8 +63,7 @@ export default {
         },
     },
     setup(props) {
-        registerServiceStore<CostDashboardCreateState>('costDashboardCreate', CostDashboardCreateStoreModule);
-        registerServiceStore<CostDashboardCustomizeState>('costDashboardCustomize', CostDashboardCustomizeStoreModule);
+        registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
         const routeState = reactive({
             route: computed(() => [
                 { name: i18n.t('MENU.BILLING.BILLING'), path: '/billing' },
@@ -80,8 +76,8 @@ export default {
             dashboardIdFromRoute: computed(() => props.dashboardId || SpaceRouter.router.currentRoute.params.dashboardId),
             dashboardData: {} as DashboardInfo,
             dashboardTitle: '',
-            selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => store.state.service?.costDashboardCreate?.selectedTemplate),
-            defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboardCreate?.defaultFilter),
+            selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => store.state.service?.costDashboard?.selectedTemplate),
+            defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboard?.defaultFilter),
         });
 
         const goToMainDashboardPage = () => {

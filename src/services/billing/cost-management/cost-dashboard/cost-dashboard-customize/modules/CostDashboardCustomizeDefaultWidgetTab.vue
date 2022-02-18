@@ -46,7 +46,7 @@ export default {
     setup() {
         const state = reactive({
             widgetList: [] as WidgetInfo[],
-            selectedWidget: computed(() => store.state.service?.costDashboardCustomize?.originSelectedWidget),
+            selectedWidget: computed(() => store.state.service?.costDashboard?.originSelectedWidget),
             hasGroupBy: computed(() => state.selectedWidget.options?.group_by?.length > 0),
             widgetLabel: computed(() => widgetId => defaultWidgetMap[widgetId].widget_name ?? ''),
         });
@@ -60,8 +60,8 @@ export default {
         };
 
         const selectWidget = (value: WidgetInfo) => {
-            store.commit('service/costDashboardCustomize/setOriginSelectedWidget', value);
-            store.commit('service/costDashboardCustomize/setEditedSelectedWidget', value);
+            store.commit('service/costDashboard/setOriginSelectedWidget', value);
+            store.commit('service/costDashboard/setEditedSelectedWidget', value);
         };
 
         (() => {

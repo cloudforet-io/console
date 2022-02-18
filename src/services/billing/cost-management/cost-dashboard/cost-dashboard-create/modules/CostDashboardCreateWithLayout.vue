@@ -62,7 +62,7 @@ export default {
     setup() {
         const state = reactive({
             selectedLayout: {} as Record<string, DefaultLayout>,
-            selectedTemplate: computed(() => store.state.service?.costDashboardCreate?.selectedTemplate),
+            selectedTemplate: computed(() => store.state.service?.costDashboard?.selectedTemplate),
             unfoldedIndices: [] as number[],
         });
 
@@ -78,8 +78,8 @@ export default {
         };
 
         const handleLayoutChange = (value: Record<string, DefaultLayout>) => {
-            store.commit('service/costDashboardCreate/setDashboardTemplate', value);
-            store.commit('service/costDashboardCreate/setDefaultFilter', {});
+            store.commit('service/costDashboard/setDashboardTemplate', value);
+            store.commit('service/costDashboard/setDefaultFilter', {});
         };
 
         return {

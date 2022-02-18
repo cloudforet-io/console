@@ -61,7 +61,7 @@ export default {
     setup() {
         const state = reactive({
             existingDashboardData: [] as Partial<DashboardInfo>[],
-            selectedTemplate: computed(() => store.state.service?.costDashboardCreate?.selectedTemplate),
+            selectedTemplate: computed(() => store.state.service?.costDashboard?.selectedTemplate),
             // pagination
             totalCount: 0,
             thisPage: 1,
@@ -69,8 +69,8 @@ export default {
         });
 
         const handleDashboardChange = (value: Partial<DashboardInfo>) => {
-            store.commit('service/costDashboardCreate/setDashboardTemplate', value);
-            store.commit('service/costDashboardCreate/setDefaultFilter', value.default_filter);
+            store.commit('service/costDashboard/setDashboardTemplate', value);
+            store.commit('service/costDashboard/setDefaultFilter', value.default_filter);
         };
 
         const listDashboard = async () => {
