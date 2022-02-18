@@ -131,7 +131,7 @@ export default {
         @mixin status-theme theme('colors.yellow.500'), theme('colors.black');
     }
     &.green {
-        @mixin status-theme theme('colors.green.500'), theme('colors.black');
+        @mixin status-theme theme('colors.green.600'), theme('colors.black');
     }
     &.red {
         @mixin status-theme theme('colors.red.500'), theme('colors.red.500');

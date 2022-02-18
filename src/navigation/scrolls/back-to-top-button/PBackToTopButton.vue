@@ -76,7 +76,7 @@ export default {
     &[type="button"] { appearance: none; }
     &:hover {
         background: theme('colors.blue.100');
-        color: theme('colors.blue.500');
+        color: theme('colors.blue.600');
     }
 }
 </style>

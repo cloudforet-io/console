@@ -109,7 +109,7 @@ export default defineComponent<Props>({
         }
     }
 
-    &.secondary { @mixin style-type transparent, theme('colors.gray.300'), theme('colors.gray.900'), theme('colors.blue.500'), theme('colors.white'), theme('colors.blue.200'); }
+    &.secondary { @mixin style-type transparent, theme('colors.gray.300'), theme('colors.gray.900'), theme('colors.blue.600'), theme('colors.white'), theme('colors.blue.200'); }
     &.gray { @mixin style-type transparent, theme('colors.gray.500'), theme('colors.gray.500'), theme('colors.gray.500'), theme('colors.white'), theme('colors.gray.100'); }
 
     @define-mixin size $font-size, $padding-x, $padding-y, $line-height {
