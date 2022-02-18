@@ -94,6 +94,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: Props, { emit }) {
         const state = reactive({
@@ -135,6 +139,7 @@ export default {
 
         const _createSeries = (chart, legend, timeUnit) => {
             const series = chart.series.push(new am4charts.ColumnSeries());
+            series.showOnInit = !props.printMode;
             series.name = legend.label;
             series.dataFields.categoryX = CATEGORY_KEY;
             series.dataFields.valueY = legend.name;
@@ -171,6 +176,9 @@ export default {
 
             const chart = am4core.create(chartContainer, am4charts.XYChart);
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+            chart.events.on('ready', () => {
+                emit('rendered');
+            });
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
             chart.data = USDChartData;

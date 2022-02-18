@@ -2,8 +2,8 @@
     <div class="cost-analysis-preview">
         <cost-analysis-header print-mode />
         <cost-analysis-query-filter print-mode />
-        <cost-analysis-group-by-filter />
-        <cost-analysis-chart />
+        <cost-analysis-group-by-filter print-mode />
+        <cost-analysis-chart print-mode />
         <cost-analysis-data-table />
     </div>
 </template>

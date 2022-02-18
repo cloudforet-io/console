@@ -70,6 +70,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: Props, { emit }) {
         const state = reactive({
@@ -79,6 +83,7 @@ export default {
         /* util */
         const _createDummySeries = (chart) => {
             const series = chart.series.push(new am4charts.PieSeries());
+            series.showOnInit = !props.printMode;
             series.dataFields.category = CATEGORY_KEY;
             series.dataFields.value = VALUE_KEY;
             series.slices.template.togglable = false;
@@ -92,6 +97,7 @@ export default {
         };
         const _createSeries = (chart) => {
             const series = chart.series.push(new am4charts.PieSeries());
+            series.showOnInit = !props.printMode;
             series.dataFields.category = CATEGORY_KEY;
             series.dataFields.value = VALUE_KEY;
             series.slices.template.stroke = am4core.color('white');
@@ -119,6 +125,9 @@ export default {
         const drawChart = (chartContainer) => {
             const chart = am4core.create(chartContainer, am4charts.PieChart);
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+            chart.events.on('ready', () => {
+                emit('rendered');
+            });
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
 

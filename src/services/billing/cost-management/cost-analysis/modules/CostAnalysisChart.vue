@@ -1,5 +1,5 @@
 <template>
-    <div class="cost-analysis-chart">
+    <div class="cost-analysis-chart" :class="{'print-mode': printMode}">
         <section class="chart-section">
             <cost-analysis-pie-chart v-if="granularity === GRANULARITY.ACCUMULATED"
                                      :loading="loading"
@@ -8,6 +8,7 @@
                                      :legends="legends"
                                      :currency="currency"
                                      :currency-rates="currencyRates"
+                                     :print-mode="printMode"
             />
             <cost-analysis-stacked-column-chart v-else
                                                 :loading="loading"
@@ -19,13 +20,14 @@
                                                 :period="period"
                                                 :currency="currency"
                                                 :currency-rates="currencyRates"
+                                                :print-mode="printMode"
             />
         </section>
         <section class="query-section">
             <!--filter-->
             <div class="title-wrapper">
                 <span class="title">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTER') }}</span>
-                <div class="button-wrapper">
+                <div v-if="!printMode" class="button-wrapper">
                     <p-button style-type="gray-border"
                               font-weight="normal" size="sm"
                               :disabled="!filtersLength"
@@ -50,6 +52,7 @@
                 <template v-else>
                     <template v-for="(selectedItems, filterName, idx) in filterItemsMap">
                         <p-tag v-for="(item, itemIdx) in selectedItems" :key="`selected-tag-${idx}-${item.name}`"
+                               :deletable="!printMode"
                                @delete="handleDeleteFilterTag(filterName, itemIdx)"
                         >
                             <b>{{ FILTER_ITEM_MAP[filterName].label }}: </b>{{ item.label }}
@@ -64,10 +67,11 @@
                                    :items="groupByItems"
                                    :selected="chartGroupBy"
                                    without-outline
+                                   :read-only="printMode"
                                    @select="handleSelectChartGroupByItem"
                 />
                 <span v-else class="title">Total Cost</span>
-                <div class="button-wrapper">
+                <div v-if="!printMode" class="button-wrapper">
                     <p-button style-type="gray-border"
                               size="sm" font-weight="normal"
                               @click="handleToggleAllLegends"
@@ -162,6 +166,12 @@ export default {
         PTag,
         PDataLoader,
         PEmpty,
+    },
+    props: {
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup() {
         const state = reactive({
@@ -335,6 +345,7 @@ export default {
     .chart-section {
         @apply col-span-9 bg-white rounded-md border border-gray-200;
         padding: 1rem 1rem 1.5rem 1rem;
+        min-height: 480px;
     }
     .query-section {
         @apply col-span-3 bg-white rounded-md border border-gray-200;
@@ -402,7 +413,7 @@ export default {
         }
     }
 
-    @screen tablet {
+    @define-mixin row-stack {
         height: auto;
         .chart-section {
             @apply col-span-12;
@@ -419,6 +430,15 @@ export default {
                     }
                 }
             }
+        }
+    }
+
+    &.print-mode {
+        @mixin row-stack;
+    }
+    &:not(.print-mode) {
+        @screen tablet {
+            @mixin row-stack;
         }
     }
 }

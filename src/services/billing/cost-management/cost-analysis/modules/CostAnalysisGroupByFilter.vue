@@ -1,10 +1,10 @@
 <template>
     <div class="cost-analysis-group-by-filter">
         <b class="mr-3">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
-        <p-select-button v-for="groupByItem in allGroupByItems"
+        <p-select-button v-for="groupByItem in (printMode ? selectedGroupByItems : allGroupByItems)"
                          :key="groupByItem.name"
                          :value="groupByItem"
-                         :selected="selectedGroupByItems"
+                         :selected="printMode ? '' : selectedGroupByItems"
                          multi-selectable
                          size="sm"
                          :predicate="predicate"
@@ -32,10 +32,16 @@ export default {
     components: {
         PSelectButton,
     },
+    props: {
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
+    },
     setup() {
         const state = reactive({
             selectedGroupByItems: computed<GroupByItem[]>(() => store.getters['service/costAnalysis/groupByItems']),
-            allGroupByItems: Object.values(GROUP_BY_ITEM_MAP),
+            allGroupByItems: Object.values(GROUP_BY_ITEM_MAP) as GroupByItem[],
         });
 
         /* util */
