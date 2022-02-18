@@ -17,6 +17,7 @@
                                        :currency-rates="currencyRates"
                                        :currency="currency"
                                        :pagination-visible="!printMode"
+                                       :print-mode="printMode"
                                        show-legend
                                        @toggle-legend="handleToggleLegend"
             />

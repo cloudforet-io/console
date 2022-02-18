@@ -41,7 +41,7 @@
                 </div>
             </template>
         </p-data-table>
-        <div v-if="paginationVisible && !printMode" class="table-pagination-wrapper">
+        <div v-if="paginationVisible" class="table-pagination-wrapper">
             <p-text-pagination :all-page="allPage"
                                :this-page.sync="proxyThisPage"
             />

@@ -13,6 +13,32 @@
             </template>
             <div ref="chartRef" class="chart" />
         </p-chart-loader>
+        <div v-if="printMode" class="table-wrapper">
+            <p-data-table v-for="(itemSet, itemSetIdx) in itemSetList" :key="itemSetIdx" class="table"
+                          :fields="fields"
+                          :items="itemSet"
+                          :loading="loading"
+                          :bordered="false"
+                          :row-height-fixed="!printMode"
+                          table-style-type="simple"
+                          disable-hover
+            >
+                <template #col-format="{field: { name }, item, index}">
+                    <div class="right">
+                        <template v-if="name === 'project'">
+                            <p-status class="project-index"
+                                      :text="getConvertedIndex(index, itemSetIdx).toString()"
+                                      :icon-color="item.backgroundColor"
+                            />
+                            <span>{{ item.category }}</span>
+                        </template>
+                        <template v-else>
+                            {{ currencyMoneyFormatter(item.value, currency, currencyRates, true) }}
+                        </template>
+                    </div>
+                </template>
+            </p-data-table>
+        </div>
     </cost-dashboard-card-widget-layout>
 </template>
 
@@ -27,7 +53,9 @@ import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PChartLoader, PSkeleton } from '@spaceone/design-system';
+import {
+    PChartLoader, PSkeleton, PDataTable, PStatus,
+} from '@spaceone/design-system';
 
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
@@ -47,10 +75,12 @@ import { store } from '@/store';
 import {
     gray, violet, white,
 } from '@/styles/colors';
+import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 
 const CATEGORY_KEY = 'category';
 const VALUE_KEY = 'value';
+const MAX_TABLE_COLUMN = 8;
 
 interface CostByProjectChartData {
     category: string;
@@ -63,8 +93,10 @@ export default {
     name: 'CostTreeMap',
     components: {
         CostDashboardCardWidgetLayout,
+        PDataTable,
         PChartLoader,
         PSkeleton,
+        PStatus,
     },
     props: {
         options: {
@@ -116,6 +148,14 @@ export default {
                 };
             }),
             projects: computed(() => store.state.resource.project.items),
+            fields: computed<DataTableField[]>(() => ([
+                { name: 'project', label: 'name' },
+                { name: 'value', label: 'Cost', textAlign: 'right' },
+            ])),
+            itemSetList: computed<CostByProjectChartData[][]>(() => {
+                if (state.data.length > MAX_TABLE_COLUMN) return [state.data.slice(0, MAX_TABLE_COLUMN), state.data.slice(MAX_TABLE_COLUMN)];
+                return [state.data];
+            }),
         });
 
         /* Util */
@@ -198,7 +238,7 @@ export default {
             });
             return results;
         };
-
+        const getConvertedIndex = (index, itemSetIdx) => index + 1 + ((itemSetIdx) * MAX_TABLE_COLUMN);
         /* Api */
         const costQueryHelper = new QueryHelper();
         const fetchData = async () => {
@@ -256,6 +296,8 @@ export default {
 
         return {
             ...toRefs(state),
+            getConvertedIndex,
+            currencyMoneyFormatter,
         };
     },
 };
@@ -263,13 +305,25 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-by-project {
-    height: 25rem;
-
     .chart-wrapper {
         @apply h-full;
+        height: 18.75rem;
     }
     .chart {
         @apply h-full w-full;
+    }
+    .table-wrapper {
+        @apply flex flex-wrap items-start;
+        .project-index {
+            margin-right: 1rem;
+        }
+        .table {
+            display: inline-block;
+            width: 50%;
+        }
+        .p-data-table::v-deep thead {
+            display: none;
+        }
     }
 }
 </style>

@@ -30,6 +30,7 @@
                     :currency-rates="currencyRates"
                     :currency="currency"
                     :pagination-visible="!printMode"
+                    :print-mode="printMode"
                     class="table"
                 >
                     <template #provider-format="item">
