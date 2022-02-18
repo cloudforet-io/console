@@ -32,14 +32,14 @@
 
         <!--right side-->
         <!--        <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length" :selected-widget="selectedWidget" />-->
-        <!--        <custom-widget-preview v-if="showPreview"-->
-        <!--                               :selected-item="selectedItem"-->
-        <!--        />-->
-        <!--        <p-button v-if="Object.keys(selectedWidget).length" style-type="alert" outline-->
-        <!--                  @click="handleClickRemoveWidget"-->
-        <!--        >-->
-        <!--            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.REMOVE_WIDGET') }}-->
-        <!--        </p-button>-->
+        <custom-widget-preview v-if="showPreview"
+                               :selected-item="selectedItem"
+        />
+        <p-button v-if="Object.keys(selectedWidget).length" style-type="alert" outline
+                  @click="handleClickRemoveWidget"
+        >
+            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.REMOVE_WIDGET') }}
+        </p-button>
     </div>
 </template>
 
@@ -48,14 +48,14 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PRadio, PTextPagination } from '@spaceone/design-system';
+import { PRadio, PTextPagination, PButton } from '@spaceone/design-system';
 
 import CostDashboardCustomizeCostQuery
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeCostQuery.vue';
 // import CostDashboardCustomizeWidgetConfig
 //     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
-// import CustomWidgetPreview
-//     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CustomWidgetPreview.vue';
+import CustomWidgetPreview
+    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CustomWidgetPreview.vue';
 
 import { store } from '@/store';
 import { WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
@@ -74,10 +74,10 @@ export default {
     components: {
         CostDashboardCustomizeCostQuery,
         // CostDashboardCustomizeWidgetConfig,
-        // CustomWidgetPreview,
+        CustomWidgetPreview,
         PTextPagination,
         PRadio,
-        // PButton,
+        PButton,
     },
     setup() {
         const state = reactive({

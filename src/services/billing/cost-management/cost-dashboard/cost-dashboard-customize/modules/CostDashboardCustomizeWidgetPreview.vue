@@ -5,16 +5,15 @@
         <section class="layout">
             <p-label>Layout</p-label>
             <div class="layout-preview">
-                <span v-for="i in Math.round(100 / selectedWidget.options.layout)" :key="i" />
+                <span v-for="i in Math.round(100 / layout)" :key="i" />
             </div>
-            In ratio {{ selectedWidget.options.layout }}%
+            In ratio {{ layout }}%
         </section>
         <slot name="extra" />
     </div>
 </template>
 
 <script lang="ts">
-import { WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { PLabel } from '@spaceone/design-system';
 
 export default {
@@ -23,9 +22,9 @@ export default {
         PLabel,
     },
     props: {
-        selectedWidget: {
-            type: Object as () => WidgetInfo,
-            default: () => ({}),
+        layout: {
+            type: Number,
+            default: 100,
         },
     },
 

@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-customize-widget-preview :selected-widget="selectedWidget">
+    <cost-dashboard-customize-widget-preview :layout="layout">
         <template #chart>
             <p-label>Type</p-label>
             {{ chartType }}
@@ -30,6 +30,7 @@ export default {
     setup(props) {
         const state = reactive({
             chartType: computed(() => props.selectedWidget?.options?.chart_type ?? ''),
+            layout: computed(() => props.selectedWidget?.options?.layout),
         });
         return {
             ...toRefs(state),
