@@ -1,7 +1,8 @@
 <template>
-    <fragment>
-        <section class="cost-analysis-header">
-            <p-select-dropdown :items="queryItemList" type="icon-button" button-icon="ic_list"
+    <div class="cost-analysis-header" :class="{'interactive-mode': !printMode}">
+        <section class="title-section">
+            <p-select-dropdown v-if="!printMode"
+                               :items="queryItemList" type="icon-button" button-icon="ic_list"
                                class="list-button"
                                @select="handleClickQueryItem"
             >
@@ -23,7 +24,7 @@
                 <template #title>
                     <div class="title-main-wrapper">
                         <span>{{ selectedQueryId ? title : defaultTitle }}</span>
-                        <div v-if="selectedQueryId" class="button-wrapper">
+                        <div v-if="!printMode && selectedQueryId" class="button-wrapper">
                             <p-icon-button name="ic_trashcan"
                                            @click.stop="handleClickDeleteQuery(selectedQueryId)"
                             />
@@ -31,7 +32,7 @@
                         </div>
                     </div>
                 </template>
-                <template #extra>
+                <template v-if="!printMode" #extra>
                     <div class="title-extra-wrapper">
                         <span />
                         <div class="button-wrapper">
@@ -49,18 +50,22 @@
                 </template>
             </p-page-title>
         </section>
-        <save-query-form-modal :header-title="saveQueryFormState.title" :visible.sync="saveQueryFormState.visible"
+        <save-query-form-modal v-if="!printMode"
+                               :header-title="saveQueryFormState.title" :visible.sync="saveQueryFormState.visible"
                                :selected-query="saveQueryFormState.selectedQuery" :request-type="saveQueryFormState.requestType"
                                @confirm="handleSaveQueryConfirm"
         />
-        <delete-modal :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHECK_DELETE_MODAL_DESC')"
+        <delete-modal v-if="!printMode"
+                      :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHECK_DELETE_MODAL_DESC')"
                       :visible.sync="checkDeleteState.visible"
                       @confirm="handleDeleteQueryConfirm"
         />
-        <pdf-download-overlay v-model="visiblePdfOverlay" mode="ELEMENT_EMBED">
+        <pdf-download-overlay v-if="!printMode"
+                              v-model="visiblePdfOverlay" mode="ELEMENT_EMBED"
+        >
             <cost-analysis-preview />
         </pdf-download-overlay>
-    </fragment>
+    </div>
 </template>
 
 <script lang="ts">
@@ -81,13 +86,13 @@ import { SaveQueryEmitParam } from '@/services/billing/cost-management/cost-anal
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import SaveQueryFormModal
-    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue';
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import PdfDownloadOverlay from '@/common/components/layouts/PdfDownloadOverlay.vue';
-import CostAnalysisPreview from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisPreview.vue';
 import { SpaceRouter } from '@/router';
 import { BILLING_ROUTE } from '@/services/billing/routes';
+
+const SaveQueryFormModal = () => import('@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue');
+const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
+const PdfDownloadOverlay = () => import('@/common/components/layouts/PdfDownloadOverlay.vue');
+const CostAnalysisPreview = () => import('@/services/billing/cost-management/cost-analysis/modules/CostAnalysisPreview.vue');
 
 export default {
     name: 'CostAnalysisHeader',
@@ -265,8 +270,10 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-analysis-header {
-    @apply relative;
-    display: flex;
+    .title-section {
+        @apply relative;
+        display: flex;
+    }
 
     .p-page-title {
         flex-wrap: wrap;
@@ -275,7 +282,6 @@ export default {
 
     .title-main-wrapper {
         @apply flex items-center flex-wrap gap-2;
-        margin-left: 2.5rem;
         .button-wrapper {
             @apply flex items-center;
         }
@@ -319,9 +325,15 @@ export default {
         }
     }
 
-    @screen mobile {
-        &::v-deep .extra {
-            width: 100%;
+    &.interactive-mode {
+        > .title-section .title-main-wrapper {
+            margin-left: 2.5rem;
+        }
+
+        @screen mobile {
+            &::v-deep .extra {
+                width: 100%;
+            }
         }
     }
 }

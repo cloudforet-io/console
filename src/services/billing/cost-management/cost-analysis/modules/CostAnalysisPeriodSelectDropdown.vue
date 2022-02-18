@@ -12,6 +12,7 @@
         <p-select-dropdown :items="periodMenuItems"
                            :selected="selectedPeriodMenuItem"
                            without-outline
+                           :read-only="printMode"
                            @select="handleSelectPeriodMenuItem"
         />
         <cost-management-custom-range-modal v-if="customRangeModalVisible"
@@ -31,14 +32,14 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import dayjs, { Dayjs } from 'dayjs';
 import { Period } from '@/services/billing/cost-management/type';
 import { PBadge, PSelectDropdown } from '@spaceone/design-system';
-import CostManagementCustomRangeModal
-    from '@/services/billing/cost-management/modules/CostManagementCustomRangeModal.vue';
 import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import { store } from '@/store';
 import { SpaceRouter } from '@/router';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
+
+const CostManagementCustomRangeModal = () => import('@/services/billing/cost-management/modules/CostManagementCustomRangeModal.vue');
 
 const today = dayjs.utc();
 const basicFormat = (date: Dayjs) => date.format('YYYY-MM-DD');
@@ -63,6 +64,10 @@ export default {
         fixedPeriod: {
             type: Object,
             default: () => (PERIOD_MENU_LIST.thisMonth),
+        },
+        printMode: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {

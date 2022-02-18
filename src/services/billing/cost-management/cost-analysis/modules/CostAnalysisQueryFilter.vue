@@ -7,6 +7,7 @@
                     <p-select-dropdown :items="granularityItems"
                                        :selected="granularity"
                                        without-outline
+                                       :read-only="printMode"
                                        @select="handleSelectGranularity"
                     />
                 </div>
@@ -21,14 +22,14 @@
             </div>
             <div class="right-part">
                 <span class="timezone-text">UTC</span>
-                <cost-analysis-period-select-dropdown :fixed-period="period" @update="handleSelectedDates" />
+                <cost-analysis-period-select-dropdown :fixed-period="period" :print-mode="printMode" @update="handleSelectedDates" />
                 <span class="v-divider" />
-                <currency-select-dropdown />
+                <currency-select-dropdown :print-mode="printMode" />
             </div>
         </div>
         <div class="filter-wrapper tablet-on">
             <div class="right-part">
-                <cost-analysis-period-select-dropdown :fixed-period="period" @update="handleSelectedDates" />
+                <cost-analysis-period-select-dropdown :fixed-period="period" :print-mode="printMode" @update="handleSelectedDates" />
                 <span class="v-divider" />
                 <p-icon-button class="filter-item" name="ic_setting" @click="handleClickSetFilter" />
             </div>
@@ -48,7 +49,6 @@ import {
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
-import CostAnalysisSetQueryModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetQueryModal.vue';
 import CostAnalysisPeriodSelectDropdown
     from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
 
@@ -57,6 +57,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 import { Period } from '@/services/billing/cost-management/type';
 
+const CostAnalysisSetQueryModal = () => import('@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetQueryModal.vue');
 
 export default {
     name: 'CostAnalysisQueryFilter',
@@ -67,6 +68,12 @@ export default {
         PSelectDropdown,
         PIconButton,
         PToggleButton,
+    },
+    props: {
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup() {
         const state = reactive({
