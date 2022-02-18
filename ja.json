@@ -494,10 +494,13 @@
 			"DASHBOARD": {
 				"ADD_WIDGET": {
 					"ADD_TO_CUSTOM_WIDGET": "",
+					"ALL": "",
 					"COST_ANALYSIS_QUERY": "",
 					"CREATE_QUERY": "",
 					"NO_SAVED_QUERY": "",
-					"NO_SAVED_QUERY_HELP_TEXT": ""
+					"NO_SAVED_QUERY_HELP_TEXT": "",
+					"REMOVE_WIDGET": "",
+					"VIEW_QUERY": ""
 				},
 				"AVAILABLE": "",
 				"BUDGET": "",

@@ -494,10 +494,13 @@
 			"DASHBOARD": {
 				"ADD_WIDGET": {
 					"ADD_TO_CUSTOM_WIDGET": "Add to Custom Widget",
+					"ALL": "All",
 					"COST_ANALYSIS_QUERY": "Cost Analysis Query",
 					"CREATE_QUERY": "Create Query",
 					"NO_SAVED_QUERY": "No Saved Query",
-					"NO_SAVED_QUERY_HELP_TEXT": "Set a new query from 'Cost Analysis' page in order to use it as a widget."
+					"NO_SAVED_QUERY_HELP_TEXT": "Set a new query from 'Cost Analysis' page in order to use it as a widget.",
+					"REMOVE_WIDGET": "Remove Widget",
+					"VIEW_QUERY": "View Query"
 				},
 				"AVAILABLE": "Available",
 				"BUDGET": "budgets",
