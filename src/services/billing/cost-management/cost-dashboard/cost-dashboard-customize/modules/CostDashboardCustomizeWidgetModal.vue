@@ -10,7 +10,9 @@
                 <template #default-widget>
                     <cost-dashboard-customize-default-widget-tab />
                 </template>
-                <template #custom />
+                <template #custom-widget>
+                    <cost-dashboard-customize-custom-widget-tab />
+                </template>
             </p-tab>
         </template>
     </p-button-modal>
@@ -18,22 +20,24 @@
 
 <script lang="ts">
 import {
-    computed,
-    defineComponent,
-    reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { PButtonModal, PTab } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/type';
+
 import CostDashboardCustomizeDefaultWidgetTab
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeDefaultWidgetTab.vue';
+import CostDashboardCustomizeCustomWidgetTab
+    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeCustomWidgetTab.vue';
 
 interface Props {
     visible: boolean;
 }
-export default defineComponent<Props>({
+export default {
     name: 'CostDashboardCreateCustomizeWidgetModal',
     components: {
         CostDashboardCustomizeDefaultWidgetTab,
+        CostDashboardCustomizeCustomWidgetTab,
         PButtonModal,
         PTab,
     },
@@ -51,13 +55,13 @@ export default defineComponent<Props>({
             default: () => ({}),
         },
     },
-    setup(props, { emit }) {
+    setup(props: Props, { emit }) {
         const state = reactive({
             proxyVisible: props.visible,
         });
         const tabState = reactive({
             tabs: computed(() => ([
-                { name: 'default-widget', label: 'Default', keepAlive: true },
+                { name: 'default-widget', label: 'Default' },
                 { name: 'custom-widget', label: 'Custom' },
             ] as TabItem[])),
             activeTab: 'default-widget',
@@ -80,5 +84,5 @@ export default defineComponent<Props>({
             handleUpdateVisible,
         };
     },
-});
+};
 </script>
