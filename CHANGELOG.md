@@ -1,3 +1,10 @@
+# [1.1.0-beta.242](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.241...v1.1.0-beta.242) (2022-02-18)
+
+
+### Features
+
+* change color palette ([#863](https://github.com/spaceone-dev/spaceone-design-system/issues/863)) ([d68cbfd](https://github.com/spaceone-dev/spaceone-design-system/commit/d68cbfd99ab57bf8c98bd15858c340114b1f72d8)), closes [#851](https://github.com/spaceone-dev/spaceone-design-system/issues/851)
+
 # [1.1.0-beta.241](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.240...v1.1.0-beta.241) (2022-02-14)
 
 
