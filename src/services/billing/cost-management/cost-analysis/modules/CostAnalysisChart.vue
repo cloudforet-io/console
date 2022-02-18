@@ -224,7 +224,7 @@ export default {
                     granularity: state.granularity,
                     group_by: state.chartGroupBy ? [state.chartGroupBy] : [],
                     start: dayjs.utc(state.period.start).format('YYYY-MM-DD'),
-                    end: dayjs.utc(state.period.end).add(1, 'day').format('YYYY-MM-DD'),
+                    end: dayjs.utc(state.period.end).format('YYYY-MM-DD'),
                     limit: 15,
                     pivot_type: 'TABLE',
                     ...costQueryHelper.apiQuery,

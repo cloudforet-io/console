@@ -124,7 +124,7 @@ export default {
                 if (props.printMode) return undefined;
                 const _period = {
                     start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM'),
-                    end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
+                    end: dayjs.utc(props.period.end).format('YYYY-MM'),
                 };
                 return {
                     name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
@@ -168,8 +168,8 @@ export default {
         const getSlicedChartDataAndLegends = () => {
             const slicedItems = state.items.slice((state.thisPage * 5) - 5, state.thisPage * 5);
             const _period = {
-                start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM-01'),
-                end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
+                start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM'),
+                end: dayjs.utc(props.period.end).format('YYYY-MM'),
             };
             const slicedChartData = getXYChartData(slicedItems, GRANULARITY.MONTHLY, _period, GROUP_BY.PROJECT);
             const slicedLegends = state.legends.slice((state.thisPage * 5) - 5, state.thisPage * 5);
@@ -277,8 +277,8 @@ export default {
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
                     group_by: [GROUP_BY.PROJECT],
-                    start: dayjs.utc(period.end).subtract(5, 'month').format('YYYY-MM-01'),
-                    end: dayjs.utc(period.end).add(1, 'month').format('YYYY-MM-01'),
+                    start: dayjs.utc(period.end).subtract(5, 'month').format('YYYY-MM'),
+                    end: dayjs.utc(period.end).format('YYYY-MM'),
                     pivot_type: 'TABLE',
                     limit: 15,
                     ...costQueryHelper.apiQuery,

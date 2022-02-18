@@ -209,8 +209,8 @@ export default defineComponent<WidgetProps>({
                     include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
                     group_by: [GROUP_BY.PROJECT],
-                    start: dayjs.utc(props.period?.start).format('YYYY-MM-01'),
-                    end: dayjs.utc(props.period?.end).add(1, 'month').format('YYYY-MM-01'),
+                    start: dayjs.utc(props.period?.start).format('YYYY-MM'),
+                    end: dayjs.utc(props.period?.end).format('YYYY-MM'),
                     limit: 20,
                     ...costQueryHelper.apiQuery,
                 });

@@ -125,8 +125,8 @@ export default {
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         period: objectToQueryString({
-                            start: state.currentMonth.startOf('month').format('YYYY-MM-DD'),
-                            end: state.currentMonth.endOf('month').format('YYYY-MM-DD'),
+                            start: state.currentMonth.format('YYYY-MM'),
+                            end: state.currentMonth.format('YYYY-MM'),
                         }),
                     },
                 };
@@ -152,15 +152,15 @@ export default {
         };
 
         const getCurrentMonthChartData = async () => {
-            const start = state.currentMonth.startOf('month').format('YYYY-MM-DD');
-            const end = state.currentMonth.add(1, 'month').format('YYYY-MM-01');
+            const start = state.currentMonth.format('YYYY-MM');
+            const end = state.currentMonth.format('YYYY-MM');
             state.currentMonthCost = await getData(start, end) || 0;
         };
 
         const getLastMonthChartData = async () => {
-            const start = state.lastMonth.startOf('month').format('YYYY-MM-DD');
-            const end = checkThisMonth() ? `${state.lastMonth.endOf('month').format('YYYY-MM')}-${thisDay}`
-                : state.lastMonth.add(1, 'month').format('YYYY-MM-01');
+            const start = state.lastMonth.format('YYYY-MM');
+            const end = checkThisMonth() ? `${state.lastMonth.format('YYYY-MM')}-${thisDay}`
+                : state.lastMonth.format('YYYY-MM');
             state.lastMonthCost = await getData(start, end) || 0;
         };
 
@@ -174,7 +174,7 @@ export default {
             if (after) {
                 await getChartData();
                 await vm.$nextTick();
-                getChartData();
+                await getChartData();
                 emit('rendered');
             }
         }, { immediate: true });

@@ -182,8 +182,8 @@ export default {
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
-                    start: state.firstMonth.format('YYYY-MM-01'),
-                    end: state.thisMonth.add(1, 'month').format('YYYY-MM-01'),
+                    start: state.firstMonth.format('YYYY-MM'),
+                    end: state.thisMonth.format('YYYY-MM'),
                     pivot_type: 'TABLE',
                     ...costQueryHelper.apiQuery,
                 });
@@ -199,7 +199,7 @@ export default {
                 const results = await fetchData();
                 const _period = {
                     start: state.firstMonth.format('YYYY-MM'),
-                    end: state.thisMonth.endOf('month').format('YYYY-MM-DD'),
+                    end: state.thisMonth.format('YYYY-MM'),
                 };
                 state.data = getXYChartData(results, GRANULARITY.MONTHLY, _period);
             } catch (e) {

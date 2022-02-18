@@ -63,8 +63,8 @@ export default defineComponent<WidgetProps>({
         const state = reactive({
             widgetLink: computed(() => {
                 const _period = {
-                    start: dayjs(props.period.end).subtract(3, 'month').format('YYYY-MM-01'),
-                    end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
+                    start: dayjs(props.period.end).subtract(3, 'month').format('YYYY-MM'),
+                    end: dayjs.utc(props.period.end).format('YYYY-MM'),
                 };
                 return {
                     name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
