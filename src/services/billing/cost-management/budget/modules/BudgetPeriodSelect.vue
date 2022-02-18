@@ -91,8 +91,8 @@ export default defineComponent<Props>({
 
         const state = reactive({
             period: computed<Period>(() => ({
-                start: dayjs.utc(startDates.value[0]).locale('en').format('YYYY-MM-DD'),
-                end: dayjs.utc(endDates.value[0]).locale('en').format('YYYY-MM-DD'),
+                start: dayjs.utc(startDates.value[0]).locale('en').format('YYYY-MM'),
+                end: dayjs.utc(endDates.value[0]).locale('en').format('YYYY-MM'),
             })),
         });
 
