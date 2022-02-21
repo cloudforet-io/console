@@ -39,15 +39,12 @@
         </p-search>
         <p-context-menu v-show="proxyVisibleMenu"
                         ref="menuRef"
-                        theme="secondary"
                         :menu="bindingMenu"
                         :loading="loading"
                         :strict-select-mode="strictSelectMode"
                         :selected.sync="proxySelected"
                         :multi-selectable="type === SEARCH_DROPDOWN_TYPE.checkbox"
                         :show-radio-icon="type === SEARCH_DROPDOWN_TYPE.radioButton"
-                        :show-selected-list="showSelectedList"
-                        :show-select-all="showSelectAll"
                         :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
                         @select="handleSelectMenuItem"
                         @keyup:up:end="focusSearch"
@@ -155,14 +152,6 @@ export default defineComponent<SearchDropdownProps>({
         selected: {
             type: Array,
             default: () => [],
-        },
-        showSelectedList: {
-            type: Boolean,
-            default: false,
-        },
-        showSelectAll: {
-            type: Boolean,
-            default: false,
         },
         /* context menu fixed style props */
         visibleMenu: {

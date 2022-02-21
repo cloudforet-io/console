@@ -34,8 +34,6 @@ export const Template = (args, { argTypes }) => ({
             :use-fixed-menu-style="useFixedMenuStyle"
             :visible-menu.sync="proxyVisibleMenu"
             :selected.sync="proxySelected"
-            :show-selected-list="showSelectedList"
-            :show-select-all="showSelectAll"
             :show-tag-box="showTagBox"
             :strict-select-mode="strictSelectMode"
             :invalid="invalid"
@@ -277,40 +275,6 @@ export const Template = (args, { argTypes }) => ({
             components: { PSearchDropdown },
             template: `
         <p-search-dropdown :menu="menu" type="checkbox" use-fixed-menu-style />
-`,
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Checkbox With Selected List
-
-<Canvas>
-    <Story name="Checkbox With Selected List" args={{menu: getSearchDropdownMenu()}}>
-        {{
-            props: Object.keys(getSearchDropdownArgTypes()),
-            components: { PSearchDropdown },
-            template: `
-        <p-search-dropdown :menu="menu" type="checkbox" :show-selected-list="true" use-fixed-menu-style />
-`,
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Checkbox With 'Select All'
-
-<Canvas>
-    <Story name="Checkbox With Select All" args={{menu: getSearchDropdownMenu()}}>
-        {{
-            props: Object.keys(getSearchDropdownArgTypes()),
-            components: { PSearchDropdown },
-            template: `
-        <p-search-dropdown :menu="menu" type="checkbox" :show-select-all="true" use-fixed-menu-style />
 `,
         }}
     </Story>

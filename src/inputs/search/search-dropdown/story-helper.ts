@@ -221,8 +221,6 @@ const initContextMenuArgTypes = (): ArgTypes => {
         menu: contextMenuArgTypes.menu,
         loading: contextMenuArgTypes.loading,
         selected: contextMenuArgTypes.selected,
-        showSelectedList: contextMenuArgTypes.showSelectedList,
-        showSelectAll: contextMenuArgTypes.showSelectAll,
         strictSelectMode: contextMenuArgTypes.strictSelectMode,
     };
     Object.keys(contextMenuArgTypes).forEach((k) => {

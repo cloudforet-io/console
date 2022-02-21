@@ -7,8 +7,6 @@ import PI from '@/foundation/icons/PI.vue';
 import PRawData from '@/data-display/raw-data/PRawData';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 
-import {CONTEXT_MENU_THEME} from '@/inputs/context-menu/type';
-
 import {getContextMenuArgTypes} from '@/inputs/context-menu/story-helper';
 import {menuItems} from '@/inputs/context-menu/mock';
 
@@ -28,14 +26,10 @@ export const Template = (args, { argTypes }) => ({
     <div class="h-full overflow p-8">
         <p-context-menu
             :menu="menu"
-            :theme="theme"
             :loading="loading"
             :selected="selected"
-            :invalid="invalid"
             :multi-selectable="multiSelectable"
             :show-radio-icon="showRadioIcon"
-            :show-selected-list="showSelectedList"
-            :show-select-all="showSelectAll"
             :strict-select-mode="strictSelectMode"
             @select="onSelect"
             @focus="onFocus"
@@ -139,50 +133,6 @@ Each `MenuItem` has the following type to represent it:
 <br/>
 <br/>
 
-## Invalid
-
-<Canvas>
-    <Story name="Invalid" args={{menu: menuItems}} height={'18rem'}>
-        {{
-            props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu },
-            template: `
-        <p-context-menu :menu="menu" invalid />
-`,
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Themes
-
-<Canvas>
-    <Story name="Themes" args={{menu: menuItems}} height={'18rem'}>
-        {{
-            props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu },
-            template: `
-        <div class="h-full overflow p-8">
-            <p class="mb-4 font-bold text-xl">{{CONTEXT_MENU_THEME.secondary}}</p>
-            <p-context-menu :menu="menu" :theme="CONTEXT_MENU_THEME.secondary" />
-            <p class="mt-8 mb-4 font-bold text-xl">{{CONTEXT_MENU_THEME.gray900}}</p>
-            <p-context-menu :menu="menu" :theme="CONTEXT_MENU_THEME.gray900" />
-        </div>
-`,
-            setup() {
-                return {
-                    CONTEXT_MENU_THEME
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
 ## Show Radio Icon
 
 <Canvas>
@@ -212,44 +162,6 @@ Each `MenuItem` has the following type to represent it:
             <p-context-menu :menu="menu" :multi-selectable="true" :selected="selected" />
             <br/>
             <p>Selected: {{ selected }}</p>
-        </div>
-`,
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Multi Selectable With 'Select All'
-
-<Canvas>
-    <Story name="Multi Selectable With Select All" args={{menu: menuItems}} height={'20rem'}>
-        {{
-            props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu },
-            template: `
-        <div>
-            <p-context-menu :menu="menu" :multi-selectable="true" :selected="selected" :show-select-all="true" />
-        </div>
-`,
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Multi Selectable With Selected List
-
-<Canvas>
-    <Story name="Multi Selectable With Selected List" args={{menu: menuItems}} height={'20rem'}>
-        {{
-            props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu },
-            template: `
-        <div>
-            <p-context-menu :menu="menu" :multi-selectable="true" :selected="selected" :show-selected-list="true" />
         </div>
 `,
         }}

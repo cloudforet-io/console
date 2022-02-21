@@ -15,7 +15,6 @@
         </p-search>
         <p-context-menu v-if="proxyVisibleMenu"
                         ref="menuRef"
-                        theme="secondary"
                         :menu="bindingMenu"
                         :loading="loading"
                         :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"

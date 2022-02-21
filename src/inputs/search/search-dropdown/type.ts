@@ -30,7 +30,6 @@ export interface SearchDropdownProps extends ContextMenuFixedStyleProps {
     menu: MenuItem[];
     loading?: boolean;
     selected?: SearchDropdownMenuItem[];
-    showSelectedList?: boolean;
     /* extra props */
     type?: SEARCH_DROPDOWN_TYPE;
     handler?: AutocompleteHandler;

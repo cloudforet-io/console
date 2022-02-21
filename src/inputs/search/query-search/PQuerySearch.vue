@@ -45,7 +45,6 @@
         </p-search>
         <div v-show="visibleMenu" class="menu-container">
             <p-context-menu ref="menuRef"
-                            theme="secondary"
                             :loading="lazyLoading"
                             :menu="menu"
                             @select="onMenuSelect"

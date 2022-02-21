@@ -1,24 +1,23 @@
 <template>
     <div class="p-context-menu"
-         :class="{[theme]: true, invalid}"
          @keyup.esc="onClickEsc"
     >
         <slot v-show="menu.length > 0" name="menu" v-bind="{...$props, uuid}">
-            <div v-if="multiSelectable && showSelectedList" class="selected-list-wrapper">
+            <div v-if="multiSelectable" class="selected-list-wrapper">
                 <div>
                     <b>{{ $t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
-                    <span class="pl-2">({{ selectedCountInFilteredMenu }} / {{ menu.length }})</span>
+                    <span class="pl-2">({{ selectedCountInFilteredMenu }} / {{ menuItemLength }})</span>
                 </div>
                 <p-button size="sm" style-type="primary-dark" :disabled="!proxySelected.length">
                     {{ $t('COMPONENT.CONTEXT_MENU.DONE') }}
                 </p-button>
             </div>
             <slot name="help-text" />
-            <a v-if="multiSelectable && showSelectAll" class="context-item" @click.stop="onClickSelectAll">
+            <a v-if="multiSelectable" class="context-item" @click.stop="onClickSelectAll">
                 <p-i :name="isAllSelected ? 'ic_checkbox--checked' : 'ic_checkbox'"
                      class="select-marker"
                 />
-                <span class="text italic">{{ $t('COMPONENT.CONTEXT_MENU.SELECT_ALL') }}</span>
+                <b class="text">{{ $t('COMPONENT.CONTEXT_MENU.SELECT_ALL') }}</b>
             </a>
             <template v-for="(item, index) in menu">
                 <a v-if="item.type === undefined || item.type === 'item'"
@@ -26,7 +25,7 @@
                    :key="`${item.name}-${index}-${uuid}`"
                    :tabindex="index"
                    class="context-item"
-                   :class="{ disabled: item.disabled, [theme]: true }"
+                   :class="{ disabled: item.disabled }"
                    :href="item.disabled ? undefined : item.link"
                    :target="item.target"
                    @click.stop="onClickMenu(item, index, $event)"
@@ -53,13 +52,13 @@
                 </a>
                 <div v-else-if="item.type==='divider'" :key="index" class="context-divider" />
                 <slot v-else-if="item.type==='header'" :name="`header-${item.name}`" v-bind="{...$props, uuid, item, key: index}">
-                    <div :key="index" class="context-header" :class="theme">
+                    <div :key="index" class="context-header">
                         {{ item.label }}
                     </div>
                 </slot>
             </template>
         </slot>
-        <div v-show="menu.length === 0" class="context-item empty" :class="theme">
+        <div v-show="menu.length === 0" class="context-item empty">
             <slot name="no-data-format" v-bind="{...$props, uuid}">
                 {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
             </slot>
@@ -79,7 +78,7 @@ import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
-import { ContextMenuProps, CONTEXT_MENU_THEME, MenuItem } from '@/inputs/context-menu/type';
+import { ContextMenuProps, MenuItem } from '@/inputs/context-menu/type';
 import { i18n } from '@/translations';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
@@ -102,18 +101,7 @@ export default defineComponent<ContextMenuProps>({
             type: Array,
             default: () => [],
         },
-        theme: {
-            type: String,
-            default: 'secondary',
-            validator(theme: any) {
-                return Object.values(CONTEXT_MENU_THEME).includes(theme);
-            },
-        },
         loading: {
-            type: Boolean,
-            default: false,
-        },
-        invalid: {
             type: Boolean,
             default: false,
         },
@@ -129,14 +117,6 @@ export default defineComponent<ContextMenuProps>({
             type: Boolean,
             default: false,
         },
-        showSelectedList: {
-            type: Boolean,
-            default: false,
-        },
-        showSelectAll: {
-            type: Boolean,
-            default: false,
-        },
         strictSelectMode: {
             type: Boolean,
             default: false,
@@ -147,11 +127,12 @@ export default defineComponent<ContextMenuProps>({
         const state = reactive({
             proxySelected: makeOptionalProxy('selected', vm, props.selected),
             selectedNames: computed(() => state.proxySelected.map(item => item.name)),
-            selectableMenuItems: computed(() => props.menu.filter(d => !d.disabled)),
+            selectableMenuItems: computed(() => props.menu.filter(d => !d.disabled && (d.type === undefined || d.type === 'item'))),
             isAllSelected: computed(() => state.selectableMenuItems.length
                     && state.selectableMenuItems.length === state.proxySelected.length
                 && state.proxySelected.every(item => state.selectableMenuItems.find(selected => selected.name === item.name))),
             selectedCountInFilteredMenu: computed(() => props.menu.filter(d => state.selectedNames.includes(d.name)).length),
+            menuItemLength: computed(() => props.menu.filter(d => d.type === undefined || d.type === 'item').length),
             uuid: computed(() => {
                 // CAUTION: Do not delete code belows. This is for detecting menu changes.
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -234,7 +215,7 @@ export default defineComponent<ContextMenuProps>({
             if (state.isAllSelected) {
                 state.proxySelected = [];
             } else {
-                state.proxySelected = state.selectableMenuItems;
+                state.proxySelected = state.selectableMenuItems.filter(d => d.type === undefined || d.type === 'item');
             }
         };
 
@@ -261,7 +242,7 @@ export default defineComponent<ContextMenuProps>({
 
 <style lang="postcss">
 .p-context-menu {
-    @apply rounded;
+    @apply rounded bg-white border border-gray-300;
     position: relative;
     min-width: 100%;
     text-align: left;
@@ -271,10 +252,6 @@ export default defineComponent<ContextMenuProps>({
     border-width: 1px;
     border-style: solid;
     user-select: none;
-
-    &.invalid {
-        @apply border-alert;
-    }
 
     .selected-list-wrapper {
         @apply border-b border-gray-200;
@@ -286,6 +263,7 @@ export default defineComponent<ContextMenuProps>({
         padding-bottom: 0.5rem;
     }
     .context-header {
+        @apply text-gray-500;
         margin-top: 0.875rem;
         margin-bottom: 0.25rem;
         padding-left: 0.5rem;
@@ -295,10 +273,12 @@ export default defineComponent<ContextMenuProps>({
         line-height: 1.5;
     }
     .context-divider {
+        @apply border-t border-gray-200;
         border-top-width: 1px;
         border-top-style: solid;
     }
     .context-item {
+        @apply text-gray-900;
         display: flex;
         padding: 0.25rem 0.5rem;
         line-height: 1.6;
@@ -306,6 +286,23 @@ export default defineComponent<ContextMenuProps>({
         cursor: pointer;
         justify-content: space-between;
         align-items: center;
+
+        &:not(.disabled):not(.empty) {
+            &:hover {
+                @apply bg-blue-100;
+            }
+            &:focus {
+                @apply bg-blue-200;
+            }
+        }
+        &.disabled {
+            @apply text-gray-300;
+            cursor: not-allowed;
+        }
+        &.empty {
+            @apply text-gray-300;
+            cursor: default;
+        }
 
         .text {
             @apply truncate;
@@ -331,58 +328,6 @@ export default defineComponent<ContextMenuProps>({
         left: 0;
         top: 0;
         background-color: rgba(theme('colors.white'), 0.5);
-    }
-
-    /* themes */
-    @define-mixin context-menu-theme $bg-color, $border-color, $header-color,
-        $color, $hover-bg-color, $hover-color,
-        $active-bg-color, $active-color, $disabled-color {
-        background-color: $bg-color;
-
-        &:not(.invalid) {
-            border-color: $border-color;
-        }
-
-        .context-divider {
-            border-top-color: $border-color;
-        }
-
-        .context-header {
-            color: $header-color;
-        }
-
-        .context-item {
-            color: $color;
-            &:not(.disabled):not(.empty) {
-                &:hover, &:focus {
-                    background-color: $hover-bg-color;
-                    color: $hover-color;
-                }
-            }
-            &:not(.disabled):not(.empty):not(:hover):not(:focus):active {
-                background-color: $active-bg-color;
-                color: $active-color;
-            }
-            &.disabled {
-                color: $disabled-color;
-                cursor: not-allowed;
-            }
-            &.empty {
-                color: $disabled-color;
-                cursor: default;
-            }
-        }
-    }
-
-    &.secondary {
-        @mixin context-menu-theme theme('colors.white'), theme('colors.secondary'), theme('colors.gray.900'),
-            theme('colors.gray.900'), theme('colors.blue.200'), theme('colors.gray.900'),
-            theme('colors.secondary2'), theme('colors.secondary'), theme('colors.gray.300');
-    }
-    &.gray900 {
-        @mixin context-menu-theme theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.900'),
-            theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.900'),
-            theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.300');
     }
 }
 </style>

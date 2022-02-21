@@ -1,5 +1,4 @@
 import { ArgTypes } from '@storybook/addons';
-import { CONTEXT_MENU_THEME } from '@/inputs/context-menu/type';
 
 const slots: [string, string][] = [
     ['no-data-format', '`no-data` slot with default style applied'],
@@ -63,47 +62,10 @@ export const getContextMenuArgTypes = (): ArgTypes => ({
             type: 'object',
         },
     },
-    theme: {
-        name: 'theme',
-        type: { name: 'string' },
-        description: `Theme for context menu. ${Object.values(CONTEXT_MENU_THEME)} are available.`,
-        defaultValue: CONTEXT_MENU_THEME.secondary,
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: CONTEXT_MENU_THEME.secondary,
-            },
-        },
-        control: {
-            type: 'select',
-            options: Object.values(CONTEXT_MENU_THEME),
-        },
-    },
     loading: {
         name: 'loading',
         type: { name: 'boolean' },
         description: 'Loading state.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
-    invalid: {
-        name: 'invalid',
-        type: { name: 'boolean' },
-        description: 'Whether to apply invalid style or not.',
         defaultValue: false,
         table: {
             type: {
@@ -158,42 +120,6 @@ export const getContextMenuArgTypes = (): ArgTypes => ({
         name: 'showRadioIcon',
         type: { name: 'boolean' },
         description: 'Whether to show radio button icon or not.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
-    showSelectedList: {
-        name: 'showSelectedList',
-        type: { name: 'boolean' },
-        description: 'Whether to show selected list or not.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
-    showSelectAll: {
-        name: 'showSelectAll',
-        type: { name: 'boolean' },
-        description: 'Whether to show \'Select All\' item at the top of the menu.',
         defaultValue: false,
         table: {
             type: {

@@ -17,22 +17,11 @@ export interface MenuItem {
     target?: string;
 }
 
-export const CONTEXT_MENU_THEME = {
-    secondary: 'secondary',
-    gray900: 'gray900',
-} as const;
-export type CONTEXT_MENU_THEME = typeof CONTEXT_MENU_THEME[keyof typeof CONTEXT_MENU_THEME];
-
-
 export interface ContextMenuProps {
     menu: MenuItem[];
-    theme?: keyof typeof CONTEXT_MENU_THEME;
     loading?: boolean;
-    invalid?: boolean;
     selected?: string[];
     multiSelectable?: boolean;
     showRadioIcon?: boolean;
-    showSelectedList?: boolean;
-    showSelectAll?: boolean;
     strictSelectMode?: boolean;
 }
