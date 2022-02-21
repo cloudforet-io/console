@@ -1,3 +1,10 @@
+# [1.1.0-beta.243](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.242...v1.1.0-beta.243) (2022-02-21)
+
+
+### Bug Fixes
+
+* delete some props and change default theme design ([#866](https://github.com/spaceone-dev/spaceone-design-system/issues/866)) ([2de5de5](https://github.com/spaceone-dev/spaceone-design-system/commit/2de5de577fd38440ddff773f8692000f319e48c3))
+
 # [1.1.0-beta.242](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.241...v1.1.0-beta.242) (2022-02-18)
 
 
