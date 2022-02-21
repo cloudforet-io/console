@@ -71,7 +71,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
+import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/type';
 import { i18n } from '@/translations';
 import { toggleSeries } from '@/lib/amcharts/helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';

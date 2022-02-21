@@ -14,3 +14,9 @@ export interface CostAnalysisPageQueryValue {
     stack?: boolean;
     granularity?: GRANULARITY;
 }
+
+export const CHART_TYPE = Object.freeze({
+    STACKED_COLUMN: 'STACKED_COLUMN',
+    DONUT: 'DONUT',
+});
+export type CHART_TYPE = typeof CHART_TYPE[keyof typeof CHART_TYPE];

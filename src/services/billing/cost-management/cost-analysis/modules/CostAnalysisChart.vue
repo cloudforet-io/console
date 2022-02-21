@@ -136,7 +136,6 @@ import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helpe
 import {
     getConvertedFilter,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import {
     Legend, PieChartData, XYChartData,
 } from '@/services/billing/cost-management/widgets/type';
@@ -320,7 +319,6 @@ export default {
             FILTER_ITEM_MAP,
             DISABLED_LEGEND_COLOR,
             DEFAULT_CHART_COLORS,
-            CHART_TYPE,
             GRANULARITY,
             getLegendIconColor,
             getLegendTextColor,

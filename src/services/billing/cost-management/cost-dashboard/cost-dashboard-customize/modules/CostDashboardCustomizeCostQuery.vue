@@ -62,7 +62,7 @@ import { CostQuerySetModel } from '@/services/billing/cost-management/type';
 import { store } from '@/store';
 import { WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
+import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/type';
 import { getUUID } from '@/lib/component-util/getUUID';
 
 
