@@ -32,10 +32,12 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { PFieldGroup, PSelectDropdown, PTextInput } from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { defaultWidgetMap } from '@/services/billing/cost-management/widgets/lib/config';
-import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { store } from '@/store';
 import { cloneDeep } from 'lodash';
+
 
 export default {
     name: 'CostDashboardCustomizeWidgetConfig',
@@ -46,6 +48,10 @@ export default {
     },
     props: {
         showGroupBy: {
+            type: Boolean,
+            default: false,
+        },
+        isCustom: {
             type: Boolean,
             default: false,
         },
@@ -77,16 +83,7 @@ export default {
         const state = reactive({
             selectedWidget: computed(() => store.state.service.costDashboard?.originSelectedWidget),
             editedSelectedWidget: computed(() => cloneDeep(state.selectedWidget)),
-            groupByItems: computed(() => ([
-                { name: GROUP_BY.PROVIDER, label: 'Provider' },
-                { name: GROUP_BY.PRODUCT, label: 'Product' },
-                { name: GROUP_BY.PROJECT, label: 'Project' },
-                { name: GROUP_BY.SERVICE_ACCOUNT, label: 'Service Account' },
-                { name: GROUP_BY.CATEGORY, label: 'Category' },
-                { name: GROUP_BY.REGION, label: 'Region' },
-                { name: GROUP_BY.TYPE, label: 'Type' },
-                { name: GROUP_BY.ACCOUNT, label: 'Account ID' },
-            ])),
+            groupByItems: computed<MenuItem[]>(() => Object.values(GROUP_BY_ITEM_MAP)),
             selectedGroupByItem: computed<string>({
                 get() {
                     return groupBy.value;
@@ -110,7 +107,11 @@ export default {
         };
 
         const init = () => {
-            initForm('name', defaultWidgetMap[state.selectedWidget?.widget_id].widget_name);
+            if (props.isCustom) {
+                initForm('name', state.selectedWidget?.name);
+            } else {
+                initForm('name', defaultWidgetMap[state.selectedWidget?.widget_id].widget_name);
+            }
 
             if (props.showGroupBy) initForm('groupBy', state.selectedWidget?.options.group_by);
             else state.selectedGroupByItem = '';

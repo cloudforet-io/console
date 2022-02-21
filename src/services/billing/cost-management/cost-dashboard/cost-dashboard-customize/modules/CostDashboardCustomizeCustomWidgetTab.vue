@@ -31,7 +31,10 @@
         />
 
         <!--right side-->
-        <!--        <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length" :selected-widget="selectedWidget" />-->
+        <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length"
+                                                :selected-widget="selectedWidget"
+                                                :is-custom="true"
+        />
         <custom-widget-preview v-if="showPreview"
                                :selected-item="selectedItem"
         />
@@ -52,8 +55,8 @@ import { PRadio, PTextPagination, PButton } from '@spaceone/design-system';
 
 import CostDashboardCustomizeCostQuery
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeCostQuery.vue';
-// import CostDashboardCustomizeWidgetConfig
-//     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
+import CostDashboardCustomizeWidgetConfig
+    from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
 import CustomWidgetPreview
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CustomWidgetPreview.vue';
 
@@ -73,7 +76,7 @@ export default {
     name: 'CostDashboardCustomizeCustomWidgetTab',
     components: {
         CostDashboardCustomizeCostQuery,
-        // CostDashboardCustomizeWidgetConfig,
+        CostDashboardCustomizeWidgetConfig,
         CustomWidgetPreview,
         PTextPagination,
         PRadio,
@@ -182,9 +185,10 @@ export default {
             font-weight: bold;
         }
         .custom-widget-list {
+            @apply grid grid-cols-12;
+            gap: 0.5rem;
             .widget-card {
-                @apply border border-gray-300 rounded-md;
-                width: 20rem;
+                @apply border border-gray-300 rounded-md col-span-4;
                 height: 7.1875rem;
                 .card-header {
                     height: 3.125rem;

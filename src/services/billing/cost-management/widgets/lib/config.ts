@@ -67,9 +67,6 @@ export const defaultWidgetMap = {
 };
 
 export const CHART_TYPE = Object.freeze({
-    LINE: 'LINE',
-    STACKED_LINE: 'STACKED_LINE',
-    COLUMN: 'COLUMN',
     STACKED_COLUMN: 'STACKED_COLUMN',
     DONUT: 'DONUT',
 });
