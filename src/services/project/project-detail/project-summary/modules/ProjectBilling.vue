@@ -131,6 +131,8 @@ import {
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { CURRENCY } from '@/store/modules/display/config';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
 interface ChartData {
@@ -489,9 +491,9 @@ export default {
                         const pastDate = dayjs.utc(d.date).subtract(1, dateUnit).format(dateFormat);
                         const pastCost = result.billing_data.find(bd => bd.date === pastDate)?.cost || 0;
                         billingData[d.date] = {
-                            cost: d.cost < 0.1 ? '-' : `$${commaFormatter(numberFormatter(d.cost))}`,
+                            cost: currencyMoneyFormatter(d.cost, CURRENCY.USD),
                         };
-                        if (d.cost > 0.1 && pastCost && pastCost * 1.5 < d.cost) {
+                        if (pastCost && pastCost < d.cost && (d.cost - pastCost) / Math.abs(pastCost) > 0.5) {
                             billingData[d.date].color = 'red';
                         }
                     });
