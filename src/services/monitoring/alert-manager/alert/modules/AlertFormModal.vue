@@ -100,7 +100,10 @@ export default {
             // inputs
             title: undefined as undefined|string,
             urgency: ALERT_URGENCY.HIGH,
-            selectedProjectId: makeProxy('projectId', props, emit),
+            selectedProjectId: computed({
+                get() { return props.projectId; },
+                set(val) { emit('update:selectedProjectId', val); },
+            }),
             description: '',
             // validation
             titleInvalidText: computed(() => {
