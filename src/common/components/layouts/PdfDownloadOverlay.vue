@@ -150,20 +150,19 @@ export default defineComponent<Props>({
                 if (props.orientation === 'landscape') return { width: paperSizeInfo.height, height: paperSizeInfo.width };
                 return paperSizeInfo;
             }),
-            isElementRendered: computed(() => !!props.items.length),
             isImageConvertingStarted: false,
             isPdfConvertingStarted: false,
             progressRate: 0,
         });
-
+        let fakeRate;
         const addRate = () => {
-            const fakeRate = setInterval(() => {
+            fakeRate = setInterval(() => {
                 let limit = COMPLETED_ELEMENT_RATE;
                 if (state.isImageConvertingStarted) limit = COMPLETED_IMAGE_RATE;
                 else if (state.isPdfConvertingStarted) limit = COMPLETED_PDF_RATE;
                 if (state.progressRate < limit) state.progressRate++;
                 if (state.progressRate >= COMPLETED_PDF_RATE) clearInterval(fakeRate);
-            }, 1);
+            }, 10);
         };
         const setVisible = (value: boolean) => {
             state.proxyVisible = value;
@@ -305,6 +304,10 @@ export default defineComponent<Props>({
                 state.isPdfConvertingStarted = false;
             }
             if (visible) addRate();
+            else if (fakeRate) {
+                clearInterval(fakeRate);
+                fakeRate = undefined;
+            }
         });
 
         return {
