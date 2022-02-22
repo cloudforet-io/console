@@ -82,6 +82,8 @@ export default {
 
         const handleClickAddWidget = () => {
             state.customizeModalVisible = true;
+            store.commit('service/costDashboard/setWidgetPosition', undefined);
+            store.commit('service/costDashboard/setLayoutOfSpace', undefined);
         };
 
         onUnmounted(() => {

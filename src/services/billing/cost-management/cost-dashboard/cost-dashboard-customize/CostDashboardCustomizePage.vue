@@ -32,7 +32,7 @@ import {
     PBreadcrumbs, PButton, PTextInput, PIconButton,
 } from '@spaceone/design-system';
 import {
-    computed, onBeforeUnmount, onMounted, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { i18n } from '@/translations';
 import { registerServiceStore } from '@/common/composables/register-service-store';
@@ -71,14 +71,15 @@ export default {
             default: '',
         },
     },
-    beforeRouteLeave(to, from, next) {
-        // eslint-disable-next-line no-alert
-        const answer = window.confirm(
-            'Are you sure you want to discard changes? Changes will not be saved.',
-        );
-        if (!answer) return false;
-        return next();
-    },
+    // beforeRouteLeave(to, from, next) {
+    //     console.log(this)
+    //     // eslint-disable-next-line no-alert
+    //     const answer = window.confirm(
+    //         'Are you sure you want to discard changes? Changes will not be saved.',
+    //     );
+    //     if (!answer) return false;
+    //     return next();
+    // },
     setup(props) {
         registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
         const routeState = reactive({
@@ -106,6 +107,7 @@ export default {
             defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboard?.defaultFilter),
             widgetPosition: computed(() => store.state.service.costDashboard?.widgetPosition),
             layoutOfSpace: computed(() => store.state.service.costDashboard?.layoutOfSpace),
+            canLeaveSite: false,
         });
 
         const goToMainDashboardPage = () => {
@@ -143,7 +145,7 @@ export default {
                     state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget];
                     store.commit('service/costDashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
                 }
-            } else if (state.layout?.length === 0) {
+            } else if (state.editingCustomLayout?.length === 0) {
                 state.editingCustomLayout = [[state.selectedWidget]];
             } else {
                 state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget];
@@ -230,18 +232,18 @@ export default {
             store.dispatch('display/showInfo');
         })();
 
-        const handleUnload = (event) => {
-            event.preventDefault(); event.returnValue = '';
-        };
-
-        onMounted(() => {
-            window.addEventListener('beforeunload', handleUnload);
-        });
-
-        onBeforeUnmount(() => {
-            window.removeEventListener('beforeunload', handleUnload);
-        });
-
+        // for preventing refresh
+        // const handleUnload = (event) => {
+        //     event.preventDefault(); event.returnValue = '';
+        // };
+        //
+        // onMounted(() => {
+        //     window.addEventListener('beforeunload', handleUnload);
+        // });
+        //
+        // onBeforeUnmount(() => {
+        //     window.removeEventListener('beforeunload', handleUnload);
+        // });
 
         return {
             routeState,
