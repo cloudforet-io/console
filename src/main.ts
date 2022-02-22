@@ -27,8 +27,6 @@ directive(Vue);
 
 Vue.use(SpaceDesignSystem);
 
-Vue.config.errorHandler = error => ErrorHandler.handleError(error);
-
 (async () => {
     ErrorHandler.init({
         authenticationErrorHandler: () => {

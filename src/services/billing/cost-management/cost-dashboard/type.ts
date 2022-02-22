@@ -49,7 +49,7 @@ export interface WidgetOptions {
     filters?: CostQueryFilters;
     period?: Period;
     group_by?: string;
-    chart_type: string;
+    chart_type?: string;
     layout: number;
 }
 

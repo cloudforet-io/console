@@ -6,11 +6,11 @@
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.ALL') }} ({{ widgetList.length }})
             </p>
             <div class="custom-widget-list">
-                <div v-for="(widget, idx) in widgetList" :key="`widget-${idx}-${widget.widget_id}`" class="widget-card"
+                <div v-for="(widget, idx) in widgetList" :key="`widget-${idx}-${widget.name}`" class="widget-card"
                      @click="handleSelectWidget(widget)"
                 >
                     <div class="card-header">
-                        <p-radio :selected="selectedWidget.widget_id" :value="widget.widget_id" @click="handleSelectWidget(widget)">
+                        <p-radio :selected="selectedWidget.name" :value="widget.name" @click="handleSelectWidget(widget)">
                             <span @click="handleSelectWidget(widget)">{{ widget.name }}</span>
                         </p-radio>
                     </div>
@@ -68,6 +68,7 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 import { CostQuerySetModel } from '@/services/billing/cost-management/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
+import { cloneDeep } from 'lodash';
 
 
 const PAGE_SIZE = 6;
@@ -131,8 +132,10 @@ export default {
 
         /* Event */
         const handleSelectWidget = async (value: WidgetInfo) => {
-            store.commit('service/costDashboard/setOriginSelectedWidget', value);
-            store.commit('service/costDashboard/setEditedSelectedWidget', value);
+            const convertedWidgetInfo = cloneDeep(value);
+            convertedWidgetInfo.widget_id = 'custom_widget';
+            store.commit('service/costDashboard/setOriginSelectedWidget', convertedWidgetInfo);
+            store.commit('service/costDashboard/setEditedSelectedWidget', convertedWidgetInfo);
             state.selectedQuery = {};
             state.selectedItem = value;
         };
@@ -146,10 +149,13 @@ export default {
         };
         const handleCreateCustomWidget = async (createdCustomWidget: WidgetInfo) => {
             await listCustomWidget();
-            store.commit('service/costDashboard/setOriginSelectedWidget', createdCustomWidget);
-            store.commit('service/costDashboard/setEditedSelectedWidget', createdCustomWidget);
+
+            const convertedWidgetInfo = cloneDeep(createdCustomWidget);
+            convertedWidgetInfo.widget_id = 'custom_widget';
+            store.commit('service/costDashboard/setOriginSelectedWidget', convertedWidgetInfo);
+            store.commit('service/costDashboard/setEditedSelectedWidget', convertedWidgetInfo);
             state.selectedQuery = {};
-            state.selectedItem = createdCustomWidget;
+            state.selectedItem = convertedWidgetInfo;
             state.thisPage = 1;
         };
 

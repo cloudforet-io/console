@@ -3,10 +3,13 @@
                     :disabled="false"
                     size="lg"
                     @confirm="handleConfirm"
+                    @cancel="handleCancel"
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" class="tab">
+            <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" class="tab"
+                   @change="handleChangeTab"
+            >
                 <template #default-widget>
                     <cost-dashboard-customize-default-widget-tab />
                 </template>
@@ -29,6 +32,7 @@ import CostDashboardCustomizeDefaultWidgetTab
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeDefaultWidgetTab.vue';
 import CostDashboardCustomizeCustomWidgetTab
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeCustomWidgetTab.vue';
+import { store } from '@/store';
 
 interface Props {
     visible: boolean;
@@ -58,6 +62,7 @@ export default {
     setup(props: Props, { emit }) {
         const state = reactive({
             proxyVisible: props.visible,
+            widgetPosition: computed(() => store.state.service.costDashboard.widgetPosition),
         });
         const tabState = reactive({
             tabs: computed(() => ([
@@ -74,6 +79,18 @@ export default {
             state.proxyVisible = visible;
             emit('update:visible', visible);
         };
+        const handleCancel = () => {
+            store.commit('service/costDashboard/setWidgetPosition', undefined);
+            store.commit('service/costDashboard/setLayoutOfSpace', undefined);
+            store.commit('service/costDashboard/setOriginSelectedWidget', {});
+            store.commit('service/costDashboard/setEditedSelectedWidget', {});
+        };
+
+        const handleChangeTab = () => {
+            store.commit('service/costDashboard/setOriginSelectedWidget', {});
+            store.commit('service/costDashboard/setEditedSelectedWidget', {});
+        };
+
         watch(() => props.visible, (visible) => {
             if (visible !== state.proxyVisible) state.proxyVisible = visible;
         });
@@ -82,6 +99,8 @@ export default {
             tabState,
             handleConfirm,
             handleUpdateVisible,
+            handleCancel,
+            handleChangeTab,
         };
     },
 };

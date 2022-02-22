@@ -31,7 +31,7 @@ import {
     DASHBOARD_PRIVACY_TYPE,
     DashboardCreateParam,
     DashboardPrivacyType,
-    DefaultLayout, PublicDashboardInfo,
+    DefaultLayout, DashboardInfo, CustomLayout,
 } from '@/services/billing/cost-management/cost-dashboard/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -58,7 +58,7 @@ export default {
         });
 
         const state = reactive({
-            selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => store.state.service?.costDashboard?.selectedTemplate),
+            selectedTemplate: computed<Record<string, DefaultLayout> | DashboardInfo>(() => store.state.service?.costDashboard?.selectedTemplate),
             defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboard?.defaultFilter),
             selectedPrivacy: computed<DashboardPrivacyType>(() => store.state.service?.costDashboard?.selectedPrivacy),
         });
@@ -74,7 +74,7 @@ export default {
         const makeDashboardCreateParam = (): DashboardCreateParam => ({
             name: 'Untitled Dashboard',
             default_layout_id: getDefaultLayoutId() as string,
-            custom_layouts: [],
+            custom_layouts: state.selectedTemplate?.custom_layouts ? (state.selectedTemplate?.custom_layouts as CustomLayout[]) : [],
             period_type: 'AUTO',
             default_filter: state.defaultFilter,
         });
@@ -103,6 +103,9 @@ export default {
             SpaceRouter.router.push({
                 name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE._NAME,
                 params: { dashboardId },
+                query: {
+                    from: 'create',
+                },
             });
         };
         const handleClickCreate = async () => {

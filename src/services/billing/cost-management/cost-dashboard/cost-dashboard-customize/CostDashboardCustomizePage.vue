@@ -3,7 +3,7 @@
         <nav>
             <p-breadcrumbs :routes="routeState.route" />
         </nav>
-        <h2 class="header">
+        <section class="header">
             <p-icon-button
                 name="ic_back"
                 @click="$router.go(-1)"
@@ -17,8 +17,13 @@
                     Save
                 </p-button>
             </div>
-        </h2>
-        <cost-dashboard-customize-sidebar />
+        </section>
+        <dashboard-layouts :loading="loading"
+                           :layout="editingCustomLayout"
+                           :customize-mode="true"
+                           @confirm="handleConfirmWidgetModal"
+        />
+        <cost-dashboard-customize-sidebar @confirm="handleConfirmWidgetModal" />
     </div>
 </template>
 
@@ -35,6 +40,7 @@ import CostDashboardStoreModule
     from '@/services/billing/cost-management/cost-dashboard/store';
 import { CostDashboardState } from '@/services/billing/cost-management/cost-dashboard/store/type';
 import {
+    CustomLayout,
     DashboardInfo,
     DefaultLayout, PublicDashboardInfo,
 } from '@/services/billing/cost-management/cost-dashboard/type';
@@ -45,12 +51,15 @@ import { SpaceRouter } from '@/router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BILLING_ROUTE } from '@/services/billing/routes';
+import DashboardLayouts from '@/services/billing/cost-management/cost-dashboard/modules/DashboardLayouts.vue';
+import { keyBy } from 'lodash';
 
 
 export default {
     name: 'CostDashboardCustomizePage',
     components: {
         CostDashboardCustomizeSidebar,
+        DashboardLayouts,
         PBreadcrumbs,
         PButton,
         PIconButton,
@@ -73,19 +82,114 @@ export default {
         });
 
         const state = reactive({
+            loading: true,
+            layout: [] as CustomLayout[],
+            editingCustomLayout: computed<CustomLayout[]>({
+                get() { return store.state.service.costDashboard.editedCustomLayout; },
+                set(val) {
+                    store.commit('service/costDashboard/setEditedCustomLayout', [...val]);
+                },
+            }),
             dashboardIdFromRoute: computed(() => props.dashboardId || SpaceRouter.router.currentRoute.params.dashboardId),
             dashboardData: {} as DashboardInfo,
             dashboardTitle: '',
+            selectedWidget: computed(() => store.state.service.costDashboard?.editedSelectedWidget),
             selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => store.state.service?.costDashboard?.selectedTemplate),
             defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboard?.defaultFilter),
+            widgetPosition: computed(() => store.state.service.costDashboard?.widgetPosition),
+            layoutOfSpace: computed(() => store.state.service.costDashboard?.layoutOfSpace),
         });
 
         const goToMainDashboardPage = () => {
             SpaceRouter.router.replace({ name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME, params: { dashboardId: state.dashboardIdFromRoute } });
         };
 
+        const rollbackDashboard = async () => {
+            try {
+                if (state.dashboardIdFromRoute?.startsWith('user')) {
+                    await SpaceConnector.client.costAnalysis.userDashboard.delete({
+                        user_dashboard_id: state.dashboardIdFromRoute,
+                    });
+                } else {
+                    await SpaceConnector.client.costAnalysis.publicDashboard.delete({
+                        public_dashboard_id: state.dashboardIdFromRoute,
+                    });
+                }
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
+
         const handleClickCancel = () => {
+            if (SpaceRouter.router.currentRoute.query.from === 'create') {
+                rollbackDashboard();
+            }
             goToMainDashboardPage();
+        };
+
+        const handleConfirmWidgetModal = () => {
+            if (state.widgetPosition && state.layoutOfSpace) {
+                if (state.layoutOfSpace === state.selectedWidget.options.layout) {
+                    state.editingCustomLayout[state.widgetPosition.row].splice(state.widgetPosition.col + 1, 0, state.selectedWidget);
+                } else {
+                    state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget];
+                    store.commit('service/costDashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
+                }
+            } else if (state.layout?.length === 0) {
+                state.editingCustomLayout = [[state.selectedWidget]];
+            } else {
+                state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget];
+                store.commit('service/costDashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
+            }
+        };
+
+
+        const fetchDefaultLayoutData = async (layoutId: string): Promise<any[]> => {
+            try {
+                // noinspection TypeScriptCheckImport
+                const layoutTemplates = await import(`../dashboard-layouts/${layoutId}.json`);
+                const widgets = await import('../../widgets/lib/defaultWidgetList.json');
+
+                const optionsKeyByWidgetId = keyBy(widgets.default, option => option.widget_id);
+                const layoutData: CustomLayout[] = layoutTemplates.default.map(layout => layout.map((d) => {
+                    const widget = optionsKeyByWidgetId[d.widget_id];
+                    return widget ? { ...widget } : {};
+                }));
+                return layoutData;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return [];
+            }
+        };
+
+        const getDashboardLayout = async (dashboard: DashboardInfo): Promise<CustomLayout[]> => {
+            let layout: CustomLayout[];
+            if (dashboard?.default_layout_id && dashboard.custom_layouts.length === 0) {
+                layout = await fetchDefaultLayoutData(dashboard.default_layout_id);
+            } else layout = dashboard.custom_layouts;
+            store.commit('service/costDashboard/setEditedCustomLayout', layout);
+            return layout;
+        };
+
+        const getDashboardData = async () => {
+            try {
+                state.loading = true;
+                if (state.dashboardIdFromRoute.startsWith('user')) {
+                    state.dashboardData = await SpaceConnector.client.costAnalysis.userDashboard.get({
+                        user_dashboard_id: state.dashboardIdFromRoute,
+                    });
+                } else {
+                    state.dashboardData = await SpaceConnector.client.costAnalysis.publicDashboard.get({
+                        public_dashboard_id: state.dashboardIdFromRoute,
+                    });
+                }
+                state.dashboardTitle = state.dashboardData?.name || '';
+                state.layout = await getDashboardLayout(state.dashboardData);
+                state.loading = false;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.dashboardData = {} as DashboardInfo;
+            }
         };
 
         const saveDashboardWithUpdatedData = async () => {
@@ -94,11 +198,13 @@ export default {
                     await SpaceConnector.client.costAnalysis.userDashboard.update({
                         user_dashboard_id: state.dashboardIdFromRoute,
                         name: state.dashboardTitle,
+                        custom_layouts: state.editingCustomLayout,
                     });
                 } else {
                     await SpaceConnector.client.costAnalysis.publicDashboard.update({
                         public_dashboard_id: state.dashboardIdFromRoute,
                         name: state.dashboardTitle,
+                        custom_layouts: state.editingCustomLayout,
                     });
                 }
                 goToMainDashboardPage();
@@ -111,24 +217,6 @@ export default {
             saveDashboardWithUpdatedData();
         };
 
-        const getDashboardData = async () => {
-            try {
-                if (state.dashboardIdFromRoute.startsWith('user')) {
-                    state.dashboardData = await SpaceConnector.client.costAnalysis.userDashboard.get({
-                        user_dashboard_id: state.dashboardIdFromRoute,
-                    });
-                } else {
-                    state.dashboardData = await SpaceConnector.client.costAnalysis.publicDashboard.get({
-                        public_dashboard_id: state.dashboardIdFromRoute,
-                    });
-                }
-                state.dashboardTitle = state.dashboardData?.name || '';
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.dashboardData = {} as DashboardInfo;
-            }
-        };
-
         (() => {
             getDashboardData();
             store.dispatch('display/showInfo');
@@ -139,6 +227,7 @@ export default {
             ...toRefs(state),
             handleClickCancel,
             handleClickSave,
+            handleConfirmWidgetModal,
         };
     },
 };

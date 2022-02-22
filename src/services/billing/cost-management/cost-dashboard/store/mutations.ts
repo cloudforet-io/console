@@ -20,3 +20,15 @@ export const setOriginSelectedWidget: Mutation<CostDashboardState> = (state, wid
 export const setEditedSelectedWidget: Mutation<CostDashboardState> = (state, widget) => {
     state.editedSelectedWidget = widget;
 };
+
+export const setEditedCustomLayout: Mutation<CostDashboardState> = (state, layout) => {
+    state.editedCustomLayout = layout;
+};
+
+export const setWidgetPosition: Mutation<CostDashboardState> = (state, position) => {
+    state.widgetPosition = position;
+};
+
+export const setLayoutOfSpace: Mutation<CostDashboardState> = (state, layout) => {
+    state.layoutOfSpace = layout;
+};

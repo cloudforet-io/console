@@ -31,7 +31,7 @@
                 </draggable>
             </div>
         </portal>
-        <cost-dashboard-customize-widget-modal v-model="customizeModalVisible" />
+        <cost-dashboard-customize-widget-modal v-model="customizeModalVisible" @confirm="$emit('confirm',$event)" />
     </div>
 </template>
 

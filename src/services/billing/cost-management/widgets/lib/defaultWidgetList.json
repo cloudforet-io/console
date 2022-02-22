@@ -108,5 +108,12 @@
       "layout": 100,
       "group_by": "project_id"
     }
+  },
+  {
+    "widget_id": "custom_widget",
+    "name": "Custom Widget",
+    "options": {
+      "layout": 100
+    }
   }
 ]

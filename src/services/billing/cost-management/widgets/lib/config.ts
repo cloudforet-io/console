@@ -64,6 +64,11 @@ export const defaultWidgetMap = {
         widget_file_name: 'SpcProjectWiseUsageSummary',
         widget_name: 'Cost Pie',
     },
+    custom_widget: {
+        widget_id: 'custom_widget',
+        widget_file_name: 'CustomWidget',
+        widget_name: 'Custom Widget',
+    },
 };
 
 export const DATE_FORMAT = Object.freeze({
