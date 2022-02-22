@@ -1,3 +1,10 @@
+# [1.1.0-beta.244](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.243...v1.1.0-beta.244) (2022-02-22)
+
+
+### Bug Fixes
+
+* update design and props of PSearchDropdown ([#867](https://github.com/spaceone-dev/spaceone-design-system/issues/867)) ([f6ac715](https://github.com/spaceone-dev/spaceone-design-system/commit/f6ac715f81ad87237269e7b7329c360a392bab9f))
+
 # [1.1.0-beta.243](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.242...v1.1.0-beta.243) (2022-02-21)
 
 
