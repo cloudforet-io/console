@@ -100,10 +100,7 @@ export default {
             // inputs
             title: undefined as undefined|string,
             urgency: ALERT_URGENCY.HIGH,
-            selectedProjectId: computed({
-                get() { return props.projectId; },
-                set(val) { emit('update:selectedProjectId', val); },
-            }),
+            selectedProjectId: computed(() => props.projectId),
             description: '',
             // validation
             titleInvalidText: computed(() => {
