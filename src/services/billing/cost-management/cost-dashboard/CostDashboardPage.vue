@@ -51,7 +51,7 @@
                       :loading="checkDeleteState.loading"
                       @confirm="handleDeleteDashboardConfirm"
         />
-        <pdf-download-overlay v-model="visiblePdfDownload" :elements="previewElements">
+        <pdf-download-overlay v-model="visiblePdfDownload" :items="previewItems">
             <cost-dashboard-preview v-if="dashboardId"
                                     :dashboard-id="dashboardId"
                                     @rendered="handlePreviewRendered"
@@ -86,7 +86,7 @@ import {
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 import { SpaceRouter } from '@/router';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import PdfDownloadOverlay from '@/common/components/layouts/PdfDownloadOverlay.vue';
+import PdfDownloadOverlay, { Item } from '@/common/components/layouts/PdfDownloadOverlay.vue';
 import CostDashboardPreview from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPreview.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import { CostDashboardState } from '@/services/billing/cost-management/cost-dashboard/store/type';
@@ -126,7 +126,7 @@ export default {
             currencyRates: computed(() => store.state.display.currencyRates),
             homeDashboardId: computed<string|undefined>(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
             visiblePdfDownload: false,
-            previewElements: [] as HTMLElement[],
+            previewItems: [] as Item[],
         });
 
         const routeState = reactive({
@@ -181,7 +181,7 @@ export default {
         };
 
         const handlePreviewRendered = (elements: HTMLElement[]) => {
-            state.previewElements = elements;
+            state.previewItems = elements.map(element => ({ element, type: 'image' }));
         };
 
         const fetchDefaultLayoutData = async (layoutId: string): Promise<any[]> => {

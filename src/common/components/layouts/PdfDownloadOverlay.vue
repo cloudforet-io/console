@@ -36,35 +36,51 @@
 
 <script lang="ts">
 import {
+    computed,
     defineComponent, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { PButton, PIconTextButton, PLottie } from '@spaceone/design-system';
 
 import { toPng } from 'html-to-image';
-import { createPdf, TCreatedPdf } from 'pdfmake/build/pdfmake';
-
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import { TCreatedPdf } from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+// eslint-disable-next-line import/extensions,import/no-unresolved
+import { Content, TableCell } from 'pdfmake/interfaces';
 import { gray } from '@/styles/colors';
 
+(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 const paperSizes = ['A4'] as const;
 const modes = ['ELEMENT_EMBED', 'PDF_EMBED', 'PDF_NEW_TAB'] as const;
 const PAGE_PAD_X = 12;
 const PAGE_PAD_Y = 40;
 const IMAGE_ROW_MARGIN_Y = 4;
+const orientations = ['portrait', 'landscape'] as const;
 const paperSizeInfoMap: Record<PaperSize, PaperSizeInfo> = Object.freeze({
     A4: { width: 595.28, height: 841.89 },
 });
 
 type PaperSize = typeof paperSizes[number];
 type Mode = typeof modes[number]
+type Orientation = typeof orientations[number]
 type PaperSizeInfo = {width: number; height: number}
+
+type ItemType = 'data-table'|'image'
+
+export interface Item {
+    element: HTMLElement;
+    // default type is 'image'
+    type?: ItemType;
+}
 
 interface Props {
     visible: boolean;
     mode: Mode;
-    elements: HTMLElement[];
+    items: Array<Item>;
     paperSize: PaperSize;
+    orientation: Orientation;
     fileName: string;
 }
 
@@ -91,8 +107,8 @@ export default defineComponent<Props>({
                 return modes.includes(mode);
             },
         },
-        elements: {
-            type: Array as PropType<HTMLElement[]>,
+        items: {
+            type: Array as PropType<Array<HTMLElement|Item>>,
             default: () => [],
         },
         paperSize: {
@@ -100,6 +116,13 @@ export default defineComponent<Props>({
             default: 'A4',
             validator(paperSize: PaperSize) {
                 return paperSizes.includes(paperSize);
+            },
+        },
+        orientation: {
+            type: String as PropType<Orientation>,
+            default: 'portrait',
+            validator(orientation: Orientation) {
+                return orientations.includes(orientation);
             },
         },
         fileName: {
@@ -113,6 +136,11 @@ export default defineComponent<Props>({
             loading: true,
             createdPdf: null as null|TCreatedPdf,
             pdfDataUrl: '',
+            paperSizeInfo: computed<PaperSizeInfo>(() => {
+                const paperSizeInfo = paperSizeInfoMap[props.paperSize];
+                if (props.orientation === 'landscape') return { width: paperSizeInfo.height, height: paperSizeInfo.width };
+                return paperSizeInfo;
+            }),
         });
 
         const setVisible = (value: boolean) => {
@@ -120,49 +148,87 @@ export default defineComponent<Props>({
             emit('update:visible', value);
         };
 
-        const getPngDataUrlsFromElements = async (elements: HTMLElement[]): Promise<string[]> => {
-            const results = await Promise.all(elements.map(el => toPng(el)));
-            return results;
+        const getTableRowsFromElement = (element: HTMLElement) => {
+            const tableElement = element.querySelector('table');
+
+            const headRows: TableCell[][] = [];
+            const bodyRows: TableCell[][] = [];
+
+            if (tableElement) {
+                const theadElements = tableElement.querySelectorAll('thead');
+                theadElements.forEach((theadElement) => {
+                    const thElements = theadElement.querySelectorAll('th');
+                    headRows.push(Array.from(thElements)
+                        .map(th => th?.textContent?.trim() ?? ''));
+                });
+
+                const trElements = tableElement.querySelector('tbody')
+                        ?.querySelectorAll('tr');
+                if (trElements) {
+                    trElements.forEach((trElement) => {
+                        const tdElements = trElement.querySelectorAll('td');
+                        const tdCells = Array.from(tdElements)
+                            .map(td => td?.textContent?.trim() ?? '');
+                        bodyRows.push(tdCells);
+                    });
+                }
+            }
+
+            return { headRows, bodyRows };
         };
 
-        const createPdfWithImageUrls = (imageUrls: string[]): TCreatedPdf => {
-            const paperSize = props.paperSize;
-            const paperSizeInfo = paperSizeInfoMap[paperSize];
-
-            return createPdf({
-                pageSize: paperSize,
-                pageMargins: [PAGE_PAD_X, PAGE_PAD_Y],
-                content: [
-                    ...imageUrls.map(url => ({
-                        image: url,
-                        width: paperSizeInfo.width - (PAGE_PAD_X * 2),
-                        style: 'imageRowWrapper',
-                    })),
-                ],
-                background: () => ({
-                    canvas: [
-                        {
-                            type: 'rect',
-                            x: 0,
-                            y: 0,
-                            w: paperSizeInfo.width,
-                            h: paperSizeInfo.height,
-                            color: gray[100],
-                        },
-                    ],
-                }),
-                styles: {
-                    imageRowWrapper: {
-                        margin: [0, IMAGE_ROW_MARGIN_Y],
+        const createContentWithItem = async ({ element, type }: Item): Promise<Content> => {
+            if (type === 'data-table') {
+                const { headRows, bodyRows } = getTableRowsFromElement(element);
+                const body = [
+                    ...headRows,
+                    ...bodyRows,
+                ];
+                return body.length ? {
+                    table: {
+                        headerRows: headRows.length,
+                        body,
                     },
-                },
-            });
+                } : {} as Content;
+            }
+
+            // 'image' is default type
+            const imageUrl = await toPng(element);
+            return {
+                image: imageUrl,
+                width: state.paperSizeInfo.width - (PAGE_PAD_X * 2),
+                style: 'imageRowWrapper',
+            };
         };
 
-        const makePdfWithElements = async (elements: HTMLElement[]) => {
+        const createPdfWithContents = (contents: Content[]) => pdfMake.createPdf({
+            pageSize: props.paperSize,
+            pageOrientation: props.orientation,
+            pageMargins: [PAGE_PAD_X, PAGE_PAD_Y],
+            content: contents,
+            background: () => ({
+                canvas: [
+                    {
+                        type: 'rect',
+                        x: 0,
+                        y: 0,
+                        w: state.paperSizeInfo.width,
+                        h: state.paperSizeInfo.height,
+                        color: gray[100],
+                    },
+                ],
+            }),
+            styles: {
+                imageRowWrapper: {
+                    margin: [0, IMAGE_ROW_MARGIN_Y],
+                },
+            },
+        });
+
+        const makePdfWithItems = async (items: Item[]) => {
             state.loading = true;
-            const imageUrls = await getPngDataUrlsFromElements(elements);
-            state.createdPdf = createPdfWithImageUrls(imageUrls);
+            const contents: Content[] = await Promise.all(items.map(item => createContentWithItem(item)));
+            state.createdPdf = createPdfWithContents(contents);
 
             if (props.mode === 'PDF_EMBED') {
                 state.createdPdf.getDataUrl((pdfDataUrl) => {
@@ -193,9 +259,11 @@ export default defineComponent<Props>({
         };
 
         /* Watchers */
-        watch(() => props.elements, async (elements) => {
-            if (!elements.length) return;
-            await makePdfWithElements(elements);
+        watch(() => props.items, async (items) => {
+            if (!items.length) return;
+            state.createdPdf = null;
+            state.pdfDataUrl = '';
+            await makePdfWithItems(items);
         });
         watch(() => props.visible, (visible) => {
             if (visible !== state.proxyVisible) {
@@ -259,6 +327,7 @@ export default defineComponent<Props>({
             @apply bg-gray-100;
             padding: 1.5rem;
             overflow-x: scroll;
+            width: 1366px;
             .blocker {
                 pointer-events: none;
             }
