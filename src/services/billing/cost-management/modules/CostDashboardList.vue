@@ -33,39 +33,42 @@
                 />
             </li>
         </ul>
-        <ul class="dashboard-list">
-            <li v-for="(item) in userDashboardList" :key="item.user_dashboard_id"
-                class="menu-item"
-                :class="{'selected': item.user_dashboard_id === dashboardIdFromRoute}"
-            >
-                <router-link
-                    :to="{
-                        name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
-                        params: {
-                            dashboardId: item.user_dashboard_id
-                        }
-                    }"
-                    class="link inline-block"
+        <details class="dashboard-list">
+            <summary>My</summary>
+            <ul>
+                <li v-for="(item) in userDashboardList" :key="item.user_dashboard_id"
+                    class="menu-item"
+                    :class="{'selected': item.user_dashboard_id === dashboardIdFromRoute}"
                 >
-                    <span class="title">
-                        {{ item.name }}
-                    </span>
-                    <p-i v-if="item.user_dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
-                         width="0.875rem" height="0.875rem"
+                    <router-link
+                        :to="{
+                            name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                            params: {
+                                dashboardId: item.user_dashboard_id
+                            }
+                        }"
+                        class="link inline-block"
+                    >
+                        <span class="title">
+                            {{ item.name }}
+                        </span>
+                        <p-i v-if="item.user_dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
+                             width="0.875rem" height="0.875rem"
+                        />
+                    </router-link>
+                    <p-select-dropdown :selected="selectedMoreMenuItem"
+                                       class="more-button"
+                                       :items="moreMenuItems"
+                                       button-style-type="transparent"
+                                       use-fixed-menu-style
+                                       menu-position="right"
+                                       type="icon-button"
+                                       button-icon="ic_more"
+                                       @select="handleSelectMoreMenu(item, ...arguments)"
                     />
-                </router-link>
-                <p-select-dropdown :selected="selectedMoreMenuItem"
-                                   class="more-button"
-                                   :items="moreMenuItems"
-                                   button-style-type="transparent"
-                                   use-fixed-menu-style
-                                   menu-position="right"
-                                   type="icon-button"
-                                   button-icon="ic_more"
-                                   @select="handleSelectMoreMenu(item, ...arguments)"
-                />
-            </li>
-        </ul>
+                </li>
+            </ul>
+        </details>
     </fragment>
 </template>
 

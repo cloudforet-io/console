@@ -32,7 +32,7 @@ import {
     PBreadcrumbs, PButton, PTextInput, PIconButton,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs,
+    computed, onBeforeUnmount, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
 import { i18n } from '@/translations';
 import { registerServiceStore } from '@/common/composables/register-service-store';
@@ -70,6 +70,14 @@ export default {
             type: String,
             default: '',
         },
+    },
+    beforeRouteLeave(to, from, next) {
+        // eslint-disable-next-line no-alert
+        const answer = window.confirm(
+            'Are you sure you want to discard changes? Changes will not be saved.',
+        );
+        if (!answer) return false;
+        return next();
     },
     setup(props) {
         registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
@@ -221,6 +229,19 @@ export default {
             getDashboardData();
             store.dispatch('display/showInfo');
         })();
+
+        const handleUnload = (event) => {
+            event.preventDefault(); event.returnValue = '';
+        };
+
+        onMounted(() => {
+            window.addEventListener('beforeunload', handleUnload);
+        });
+
+        onBeforeUnmount(() => {
+            window.removeEventListener('beforeunload', handleUnload);
+        });
+
 
         return {
             routeState,
