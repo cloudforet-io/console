@@ -497,9 +497,12 @@
 					"ALL": "",
 					"COST_ANALYSIS_QUERY": "",
 					"CREATE_QUERY": "",
+					"IN_RATIO": "",
 					"NO_SAVED_QUERY": "",
 					"NO_SAVED_QUERY_HELP_TEXT": "",
+					"RECOMMENDED_WIDGET": "",
 					"REMOVE_WIDGET": "",
+					"TITLE": "",
 					"VIEW_QUERY": ""
 				},
 				"AVAILABLE": "",

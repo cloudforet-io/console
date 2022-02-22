@@ -497,9 +497,12 @@
 					"ALL": "All",
 					"COST_ANALYSIS_QUERY": "Cost Analysis Query",
 					"CREATE_QUERY": "Create Query",
+					"IN_RATIO": "In ratio",
 					"NO_SAVED_QUERY": "No Saved Query",
 					"NO_SAVED_QUERY_HELP_TEXT": "Set a new query from 'Cost Analysis' page in order to use it as a widget.",
+					"RECOMMENDED_WIDGET": "Recommended Widget",
 					"REMOVE_WIDGET": "Remove Widget",
+					"TITLE": "Add New Widget",
 					"VIEW_QUERY": "View Query"
 				},
 				"AVAILABLE": "Available",

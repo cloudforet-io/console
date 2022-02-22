@@ -497,9 +497,12 @@
 					"ALL": "전체",
 					"COST_ANALYSIS_QUERY": "비용 분석 쿼리",
 					"CREATE_QUERY": "쿼리 생성",
+					"IN_RATIO": "",
 					"NO_SAVED_QUERY": "저장된 쿼리 없음",
 					"NO_SAVED_QUERY_HELP_TEXT": "",
+					"RECOMMENDED_WIDGET": "추천 위젯",
 					"REMOVE_WIDGET": "위젯 삭제",
+					"TITLE": "새로운 위젯 추가",
 					"VIEW_QUERY": ""
 				},
 				"AVAILABLE": "사용가능",
