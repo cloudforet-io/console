@@ -10,7 +10,6 @@ export type AutocompleteHandler = (inputText: string, list: MenuItem[]) => Promi
 export const SEARCH_DROPDOWN_TYPE = Object.freeze({
     default: 'default',
     radioButton: 'radioButton',
-    checkbox: 'checkbox',
 } as const);
 
 export type SEARCH_DROPDOWN_TYPE = typeof SEARCH_DROPDOWN_TYPE[keyof typeof SEARCH_DROPDOWN_TYPE];
@@ -30,6 +29,7 @@ export interface SearchDropdownProps extends ContextMenuFixedStyleProps {
     menu: MenuItem[];
     loading?: boolean;
     selected?: SearchDropdownMenuItem[];
+    multiSelectable?: boolean;
     /* extra props */
     type?: SEARCH_DROPDOWN_TYPE;
     handler?: AutocompleteHandler;

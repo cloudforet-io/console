@@ -7,11 +7,11 @@ import PSearchDropdown from './PSearchDropdown.vue';
 import PButton from '@/inputs/buttons/button/PButton';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 
-import { getSearchDropdownArgTypes } from '@/inputs/search/search-dropdown/story-helper';
-import { getSearchDropdownMenu, getSearchDropdownMenuWithMultiTypes } from '@/inputs/search/search-dropdown/mock';
+import { getSearchDropdownArgTypes } from '@/inputs/dropdown/search-dropdown/story-helper';
+import { getSearchDropdownMenu, getSearchDropdownMenuWithMultiTypes } from '@/inputs/dropdown/search-dropdown/mock';
 
 
-<Meta title='Inputs/Search/Search Dropdown' parameters={{
+<Meta title='Inputs/Dropdown/Search Dropdown' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A182254',
@@ -266,15 +266,15 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Checkbox Type
+## Multi Selectable
 
 <Canvas>
-    <Story name="Checkbox Type" args={{menu: getSearchDropdownMenu()}}>
+    <Story name="Multi Selectable" args={{menu: getSearchDropdownMenu()}}>
         {{
             props: Object.keys(getSearchDropdownArgTypes()),
             components: { PSearchDropdown },
             template: `
-        <p-search-dropdown :menu="menu" type="checkbox" use-fixed-menu-style />
+        <p-search-dropdown :menu="menu" :multi-selectable="true" use-fixed-menu-style />
 `,
         }}
     </Story>
@@ -316,11 +316,11 @@ export const Template = (args, { argTypes }) => ({
             />
         </div>
         <div class=m-4>
-            <p class="m-2">checkbox type</p>
+            <p class="m-2">multi selectable</p>
             <p-search-dropdown
                 :key="strictSelectMode ? 'strict-checkbox' : 'default-checkbox'"
                 :menu="menu"
-                type="checkbox"
+                :multi-selectable="true"
                 :selected="checkboxSelected"
                 :strict-select-mode="strictSelectMode"
                 use-fixed-menu-style

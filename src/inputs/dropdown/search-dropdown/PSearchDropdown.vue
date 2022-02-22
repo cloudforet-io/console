@@ -2,9 +2,8 @@
     <div class="p-search-dropdown">
         <p-search ref="targetRef"
                   v-model="proxyValue"
-                  :placeholder="_placeholder"
-                  :disable-icon="disableIcon || proxyVisibleMenu ||
-                      (type === SEARCH_DROPDOWN_TYPE.radioButton && !!proxySelected.length)"
+                  :placeholder="_placeholder ? _placeholder : $t('COMPONENT.SEARCH_DROPDOWN.PLACEHOLDER')"
+                  :disable-icon="true"
                   :is-focused.sync="proxyIsFocused"
                   :invalid="invalid"
                   :disabled="disabled"
@@ -14,7 +13,7 @@
                   @click.native.stop="handleClick"
                   v-on="searchListeners"
         >
-            <div v-if="type === SEARCH_DROPDOWN_TYPE.radioButton &&
+            <div v-if="searchDropdownType === SEARCH_DROPDOWN_TYPE.radioButton &&
                      proxySelected.length &&
                      !proxyVisibleMenu &&
                      !proxyIsFocused"
@@ -27,7 +26,7 @@
                      @click="onDeleteTag(proxySelected[0], 0)"
                 />
             </div>
-            <template v-if="type !== SEARCH_DROPDOWN_TYPE.default || !proxySelected.length || proxyVisibleMenu" #right>
+            <template v-if="searchDropdownType !== SEARCH_DROPDOWN_TYPE.default || !proxySelected.length || proxyVisibleMenu" #right>
                 <p-i :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                      color="inherit" class="dropdown-button" :class="disabled"
                      @click.stop="handleClickDropdownButton"
@@ -43,9 +42,10 @@
                         :loading="loading"
                         :strict-select-mode="strictSelectMode"
                         :selected.sync="proxySelected"
-                        :multi-selectable="type === SEARCH_DROPDOWN_TYPE.checkbox"
-                        :show-radio-icon="type === SEARCH_DROPDOWN_TYPE.radioButton"
+                        :multi-selectable="multiSelectable"
+                        :show-radio-icon="searchDropdownType === SEARCH_DROPDOWN_TYPE.radioButton"
                         :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
+                        :class="searchDropdownType"
                         @select="handleSelectMenuItem"
                         @keyup:up:end="focusSearch"
                         @keyup:esc="focusSearch"
@@ -55,7 +55,7 @@
                 <span class="p-search-dropdown__item-label">
                     <span v-for="(text, i) in item.label.split(searchRegex)"
                           :key="`item-label--${text}-${i}`"
-                          :class="{ 'selected': type === SEARCH_DROPDOWN_TYPE.default && item.name === selectedNames[0] }"
+                          :class="{ 'selected': searchDropdownType === SEARCH_DROPDOWN_TYPE.default && item.name === selectedNames[0] }"
                     >
                         <strong v-if="i !== 0">{{ getMatchText(item.label) }}</strong><span>{{ text }}</span>
                     </span>
@@ -65,7 +65,7 @@
                 <slot :name="`menu-${slot}`" v-bind="scope" />
             </template>
         </p-context-menu>
-        <div v-if="type === SEARCH_DROPDOWN_TYPE.checkbox && proxySelected.length && showTagBox" class="p-search-dropdown__tag-box">
+        <div v-if="multiSelectable && proxySelected.length" class="p-search-dropdown__tag-box">
             <p-tag v-for="(selectedItem, index) in proxySelected" :key="`tag-box-${index}`" :deletable="!disabled"
                    @delete="onDeleteTag(selectedItem, index)"
             >
@@ -94,7 +94,7 @@ import PButton from '@/inputs/buttons/button/PButton.vue';
 
 import {
     SEARCH_DROPDOWN_TYPE, SearchDropdownProps, SearchDropdownMenuItem,
-} from '@/inputs/search/search-dropdown/type';
+} from '@/inputs/dropdown/search-dropdown/type';
 
 export default defineComponent<SearchDropdownProps>({
     name: 'PSearchDropdown',
@@ -153,6 +153,10 @@ export default defineComponent<SearchDropdownProps>({
             type: Array,
             default: () => [],
         },
+        multiSelectable: {
+            type: Boolean,
+            default: false,
+        },
         /* context menu fixed style props */
         visibleMenu: {
             type: Boolean,
@@ -165,7 +169,7 @@ export default defineComponent<SearchDropdownProps>({
         /* extra props */
         type: {
             type: String,
-            default: SEARCH_DROPDOWN_TYPE.default,
+            default: undefined,
         },
         handler: {
             type: Function,
@@ -176,10 +180,6 @@ export default defineComponent<SearchDropdownProps>({
             default: false,
         },
         exactMode: {
-            type: Boolean,
-            default: true,
-        },
-        showTagBox: {
             type: Boolean,
             default: true,
         },
@@ -204,6 +204,11 @@ export default defineComponent<SearchDropdownProps>({
         const state = reactive({
             menuRef: null,
             selectedRadioRef: null as null|HTMLElement,
+            searchDropdownType: computed<SEARCH_DROPDOWN_TYPE | undefined>(() => {
+                if (props.type) return props.type;
+                if (!props.multiSelectable) return SEARCH_DROPDOWN_TYPE.default;
+                return undefined;
+            }),
             proxyValue: makeOptionalProxy('value', vm, ''),
             proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
             proxySelected: makeOptionalProxy('selected', vm, []),
@@ -224,7 +229,9 @@ export default defineComponent<SearchDropdownProps>({
             }, {})),
             searchHeight: computed<number>(() => {
                 if (!state.selectedRadioRef) return 32;
-                if (!contextMenuFixedStyleState.proxyVisibleMenu && state.proxySelected.length && props.type === SEARCH_DROPDOWN_TYPE.radioButton) return state.selectedRadioRef.clientHeight + 12;
+                if (!contextMenuFixedStyleState.proxyVisibleMenu && state.proxySelected.length && state.searchDropdownType === SEARCH_DROPDOWN_TYPE.radioButton) {
+                    return state.selectedRadioRef.clientHeight + 12;
+                }
                 return 32;
             }),
         });
@@ -274,19 +281,21 @@ export default defineComponent<SearchDropdownProps>({
         const hideMenu = (mode?: string) => {
             if (!contextMenuFixedStyleState.proxyVisibleMenu) return;
             // placeholder
-            if (props.type === SEARCH_DROPDOWN_TYPE.radioButton && (mode === 'click' || state.proxySelected.length)) {
+            const isRadioItemSelected = state.searchDropdownType === SEARCH_DROPDOWN_TYPE.radioButton && (mode === 'click' || state.proxySelected.length);
+            if (isRadioItemSelected) {
                 state._placeholder = '';
             } else {
                 state._placeholder = props.placeholder;
             }
 
             // value
-            if (props.type === SEARCH_DROPDOWN_TYPE.default && mode !== 'click') {
+            const isDefaultItemSelected = state.searchDropdownType === SEARCH_DROPDOWN_TYPE.default && mode !== 'click';
+            if (isDefaultItemSelected) {
                 const item = state.proxySelected[0];
                 if (item) state.proxyValue = item.label ?? item.name ?? '';
                 else state.proxyValue = '';
             }
-            if (props.type !== SEARCH_DROPDOWN_TYPE.default) {
+            if (state.searchDropdownType !== SEARCH_DROPDOWN_TYPE.default) {
                 state.proxyValue = '';
             }
 
@@ -299,8 +308,8 @@ export default defineComponent<SearchDropdownProps>({
 
             if (
                 state.proxySelected.length && (
-                    props.type === SEARCH_DROPDOWN_TYPE.default
-                    || props.type === SEARCH_DROPDOWN_TYPE.radioButton
+                    state.searchDropdownType === SEARCH_DROPDOWN_TYPE.default
+                    || state.searchDropdownType === SEARCH_DROPDOWN_TYPE.radioButton
                 )
             ) {
                 // If there is an existing selected item, the value will be placeholder & filter will be initialized
@@ -350,7 +359,7 @@ export default defineComponent<SearchDropdownProps>({
 
             if (state.proxySelected.length === 0) return;
 
-            if (props.type !== SEARCH_DROPDOWN_TYPE.default) return;
+            if (state.searchDropdownType !== SEARCH_DROPDOWN_TYPE.default) return;
 
             const item = state.proxySelected[0];
             state.proxySelected.splice(0, 1);
@@ -367,10 +376,10 @@ export default defineComponent<SearchDropdownProps>({
         };
 
         const handleSelectMenuItem = (item: SearchDropdownMenuItem) => {
-            if (props.type === SEARCH_DROPDOWN_TYPE.default || props.type === SEARCH_DROPDOWN_TYPE.radioButton) {
+            if ([SEARCH_DROPDOWN_TYPE.default, SEARCH_DROPDOWN_TYPE.radioButton].includes(state.searchDropdownType)) {
                 hideMenu('click');
             }
-            if (props.type === SEARCH_DROPDOWN_TYPE.default) {
+            if (state.searchDropdownType === SEARCH_DROPDOWN_TYPE.default) {
                 state.proxyValue = item.label ?? item.name ?? '';
             }
 
@@ -383,12 +392,12 @@ export default defineComponent<SearchDropdownProps>({
             if (menuItem) {
                 emit('select-menu', menuItem);
                 state.proxyValue = menuItem.label ?? menuItem.name ?? '';
-                if (props.type === SEARCH_DROPDOWN_TYPE.default) {
+                if (state.searchDropdownType === SEARCH_DROPDOWN_TYPE.default) {
                     state.proxySelected = [menuItem];
                 } else if (!state.selectedNames.includes(menuItem.name)) {
                     state.proxySelected.push(menuItem);
                 }
-            } else if (props.type === SEARCH_DROPDOWN_TYPE.default) {
+            } else if (state.searchDropdownType === SEARCH_DROPDOWN_TYPE.default) {
                 state.proxySelected = [];
                 state.proxyValue = '';
             }
@@ -469,15 +478,15 @@ export default defineComponent<SearchDropdownProps>({
         watch(() => state.proxySelected, (proxySelected) => {
             if (!proxySelected.length) {
                 state._placeholder = props.placeholder;
-                if (props.type === SEARCH_DROPDOWN_TYPE.default) state.proxyValue = '';
+                if (state.searchDropdownType === SEARCH_DROPDOWN_TYPE.default) state.proxyValue = '';
                 return;
             }
 
-            if (props.type === SEARCH_DROPDOWN_TYPE.default) {
+            if (state.searchDropdownType === SEARCH_DROPDOWN_TYPE.default) {
                 const item = state.proxySelected[0];
                 if (item) state.proxyValue = item.label ?? item.name ?? '';
                 else state.proxyValue = '';
-            } else if (props.type === SEARCH_DROPDOWN_TYPE.radioButton && state._placeholder !== '') {
+            } else if (state.searchDropdownType === SEARCH_DROPDOWN_TYPE.radioButton && state._placeholder !== '') {
                 state._placeholder = '';
             }
         }, { immediate: true });
@@ -535,15 +544,21 @@ export default defineComponent<SearchDropdownProps>({
         min-width: 100%;
         width: 100%;
 
-        .context-header.secondary {
-            @apply text-secondary;
+        &.default {
+            .context-item {
+                &.selected {
+                    @apply bg-blue-200;
+                }
+                &:not(.disabled):not(.empty) {
+                    &:hover, &:focus {
+                        @apply bg-blue-100;
+                    }
+                }
+            }
         }
+
         .p-search-dropdown__item-label {
             flex-grow: 1;
-            .selected {
-                @apply text-secondary;
-                font-weight: bold;
-            }
         }
     }
     .p-search-dropdown__tag-box {

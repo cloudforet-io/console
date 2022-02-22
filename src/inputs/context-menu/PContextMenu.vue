@@ -25,7 +25,7 @@
                    :key="`${item.name}-${index}-${uuid}`"
                    :tabindex="index"
                    class="context-item"
-                   :class="{ disabled: item.disabled }"
+                   :class="{ disabled: item.disabled, selected: selectedNames.includes(item.name) }"
                    :href="item.disabled ? undefined : item.link"
                    :target="item.target"
                    @click.stop="onClickMenu(item, index, $event)"
@@ -288,11 +288,8 @@ export default defineComponent<ContextMenuProps>({
         align-items: center;
 
         &:not(.disabled):not(.empty) {
-            &:hover {
+            &:hover, &:focus {
                 @apply bg-blue-100;
-            }
-            &:focus {
-                @apply bg-blue-200;
             }
         }
         &.disabled {

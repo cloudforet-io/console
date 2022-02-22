@@ -1,7 +1,7 @@
 import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import { ArgTypes } from '@storybook/addons';
-import { SEARCH_DROPDOWN_TYPE } from '@/inputs/search/search-dropdown/type';
+import { SEARCH_DROPDOWN_TYPE } from '@/inputs/dropdown/search-dropdown/type';
 
 
 const extraArgTypes: ArgTypes = {
@@ -9,7 +9,7 @@ const extraArgTypes: ArgTypes = {
     type: {
         name: 'type',
         type: { name: 'string' },
-        description: 'Type of PSearchDropdown. There are 3 types: `default`, `radioButton`, and `checkbox`',
+        description: 'Type of PSearchDropdown. There are 3 types: `default` and `radioButton`.',
         defaultValue: SEARCH_DROPDOWN_TYPE.default,
         table: {
             type: {
@@ -82,7 +82,7 @@ const extraArgTypes: ArgTypes = {
     showTagBox: {
         name: 'showTagBox',
         type: { name: 'boolean' },
-        description: 'Whether to show tag box or not when the type is `checkbox`.',
+        description: 'Whether to show tag box or not when `multiSelectable` is true.',
         defaultValue: true,
         table: {
             type: {
@@ -221,6 +221,7 @@ const initContextMenuArgTypes = (): ArgTypes => {
         menu: contextMenuArgTypes.menu,
         loading: contextMenuArgTypes.loading,
         selected: contextMenuArgTypes.selected,
+        multiSelectable: contextMenuArgTypes.multiSelectable,
         strictSelectMode: contextMenuArgTypes.strictSelectMode,
     };
     Object.keys(contextMenuArgTypes).forEach((k) => {
