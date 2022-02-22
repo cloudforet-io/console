@@ -184,7 +184,6 @@ export default {
                     granularity: GRANULARITY.MONTHLY,
                     start: state.firstMonth.format('YYYY-MM'),
                     end: state.thisMonth.format('YYYY-MM'),
-                    pivot_type: 'TABLE',
                     ...costQueryHelper.apiQuery,
                 });
                 return results;

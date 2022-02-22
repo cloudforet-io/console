@@ -284,7 +284,6 @@ export default {
                     group_by: [GROUP_BY.PROJECT],
                     start: dayjs.utc(period.end).subtract(5, 'month').format('YYYY-MM'),
                     end: dayjs.utc(period.end).format('YYYY-MM'),
-                    pivot_type: 'TABLE',
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });

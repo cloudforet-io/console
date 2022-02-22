@@ -301,7 +301,6 @@ export default {
                     group_by: groupBy,
                     start: dayjs.utc(period.start).format('YYYY-MM-DD'),
                     end: dayjs.utc(period.end).format('YYYY-MM-DD'),
-                    pivot_type: 'TABLE',
                     ...costApiQueryHelper.data,
                 });
                 let items = results;
@@ -338,7 +337,6 @@ export default {
                         group_by: state.groupBy,
                         start: dayjs.utc(state.period.start).format('YYYY-MM-DD'),
                         end: dayjs.utc(state.period.end).format('YYYY-MM-DD'),
-                        pivot_type: 'TABLE',
                         filter: costApiQueryHelper.data.filter,
                         query: costApiQueryHelper.data,
                     },

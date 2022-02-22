@@ -65,10 +65,10 @@
             <div class="title-wrapper">
                 <p-select-dropdown v-if="groupByItems.length"
                                    :items="groupByItems"
-                                   :selected="chartGroupBy"
+                                   :selected="primaryGroupBy"
                                    without-outline
                                    :read-only="printMode"
-                                   @select="handleSelectChartGroupByItem"
+                                   @select="handlePrimaryGroupByItem"
                 />
                 <span v-else class="title">Total Cost</span>
                 <div v-if="!printMode" class="button-wrapper">
@@ -181,7 +181,6 @@ export default {
             selectedQueryId: computed(() => store.state.service.costAnalysis.selectedQueryId),
             groupBy: computed(() => store.state.service.costAnalysis.groupBy),
             primaryGroupBy: computed(() => store.state.service.costAnalysis.primaryGroupBy),
-            chartGroupBy: store.state.service.costAnalysis.groupBy[0],
             //
             noFilter: computed(() => isEmpty(state.filterItemsMap) || Object.values(state.filters).every(d => !d)),
             groupByItems: computed(() => store.getters['service/costAnalysis/groupByItems']),
@@ -229,13 +228,12 @@ export default {
             try {
                 costQueryHelper.setFilters(getConvertedFilter(state.filters));
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    include_etc: !!state.chartGroupBy,
+                    include_others: !!state.primaryGroupBy,
                     granularity: state.granularity,
-                    group_by: state.chartGroupBy ? [state.chartGroupBy] : [],
+                    group_by: state.primaryGroupBy ? [state.primaryGroupBy] : [],
                     start: dayjs.utc(state.period.start).format('YYYY-MM-DD'),
                     end: dayjs.utc(state.period.end).format('YYYY-MM-DD'),
                     limit: 15,
-                    pivot_type: 'TABLE',
                     ...costQueryHelper.apiQuery,
                 });
                 listCostAnalysisRequest = undefined;
@@ -276,8 +274,7 @@ export default {
                 });
             }
         };
-        const handleSelectChartGroupByItem = async (groupBy?: string) => {
-            state.chartGroupBy = groupBy;
+        const handlePrimaryGroupByItem = async (groupBy?: string) => {
             store.commit('service/costAnalysis/setPrimaryGroupBy', groupBy);
         };
         const handleClickSelectFilter = () => {
@@ -303,17 +300,15 @@ export default {
 
         watch(() => state.groupByItems, (after, before) => {
             if (!after.length) {
-                state.chartGroupBy = undefined;
-            } else if ((!before.length && after.length) || !after.filter(d => d.name === state.chartGroupBy).length) {
-                state.chartGroupBy = after[0].name;
+                store.commit('service/costAnalysis/setPrimaryGroupBy', undefined);
+            } else if ((!before.length && after.length) || !after.filter(d => d.name === state.primaryGroupBy).length) {
+                store.commit('service/costAnalysis/setPrimaryGroupBy', after[0].name);
             }
         });
-        watch([() => state.granularity, () => state.period, () => state.chartGroupBy, () => state.filters], ([granularity, period, groupBy]) => {
+        watch([() => state.granularity, () => state.period, () => state.primaryGroupBy, () => state.filters], ([granularity, period, groupBy]) => {
             setChartData(granularity, period, groupBy);
         }, { immediate: true, deep: true });
-        watch(() => state.selectedQueryId, () => {
-            state.chartGroupBy = state.primaryGroupBy ? state.primaryGroupBy : state.groupBy[0];
-        });
+
         return {
             ...toRefs(state),
             FILTER_ITEM_MAP,
@@ -324,7 +319,7 @@ export default {
             getLegendTextColor,
             handleClickLegend,
             handleToggleAllLegends,
-            handleSelectChartGroupByItem,
+            handlePrimaryGroupByItem,
             handleClickSelectFilter,
             handleDeleteFilterTag,
             handleClearAllFilters,

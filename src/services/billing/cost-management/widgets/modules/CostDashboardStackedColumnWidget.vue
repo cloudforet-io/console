@@ -258,7 +258,6 @@ export default defineComponent<Props>({
                     group_by: [props.groupBy],
                     start: start.format('YYYY-MM-01'),
                     end: dayjs.utc(period.end).add(1, 'month').format('YYYY-MM-01'),
-                    pivot_type: 'TABLE',
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
