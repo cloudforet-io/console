@@ -1,5 +1,6 @@
 <template>
-    <p-button-modal :visible.sync="proxyVisible" :header-title="$t('COMMON.CUSTOM_FIELD_MODAL.TITLE')"
+    <p-button-modal :visible.sync="proxyVisible"
+                    :header-title="$t('COMMON.CUSTOM_FIELD_MODAL.TITLE')"
                     :scrollable="false"
                     :loading="loading"
                     :disabled="!isValid"

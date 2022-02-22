@@ -165,7 +165,7 @@ export default {
         const formState = reactive({
             spotGroupDeleteModalVisible: false,
             spotGroupEditFormVisible: false,
-            themeColor: '',
+            themeColor: 'primary',
             modalContent: '' as TranslateResult,
         });
 

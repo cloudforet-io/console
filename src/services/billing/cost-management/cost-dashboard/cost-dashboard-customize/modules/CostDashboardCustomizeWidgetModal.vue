@@ -1,5 +1,6 @@
 <template>
-    <p-button-modal :visible="proxyVisible" header-title="Add New Widget"
+    <p-button-modal :visible="proxyVisible"
+                    header-title="Add New Widget"
                     :disabled="false"
                     size="lg"
                     @confirm="handleConfirm"

@@ -1,5 +1,6 @@
 <template>
-    <p-button-modal :visible.sync="visibleCheckModal" size="md"
+    <p-button-modal :visible.sync="visibleCheckModal"
+                    size="md"
                     :header-title="$t('AUTOMATION.SPOT_AUTOMATION.ADD.CHECK_MODAL.TITLE')"
                     theme-color="primary-dark"
                     @confirm="$emit('confirm')"

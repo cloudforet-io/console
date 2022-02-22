@@ -113,7 +113,8 @@
             </template>
         </p-button-modal>
 
-        <p-button-modal :header-title="nameEditState.headerTitle" size="md"
+        <p-button-modal :header-title="nameEditState.headerTitle"
+                        size="md"
                         :visible.sync="nameEditState.visible"
                         :disabled="nameEditState.loading ||
                             (nameEditState.showValidation && !nameEditState.isValid)"

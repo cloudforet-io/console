@@ -1,5 +1,6 @@
 <template>
-    <p-button-modal :visible="proxyVisible" header-title="Bulk Create Budget"
+    <p-button-modal :visible="proxyVisible"
+                    header-title="Bulk Create Budget"
                     :disabled="false"
                     size="lg"
                     @confirm="handleConfirm"
