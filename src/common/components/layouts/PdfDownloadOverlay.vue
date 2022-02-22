@@ -27,7 +27,12 @@
         <iframe v-if="mode === 'PDF_EMBED' && pdfDataUrl" :src="pdfDataUrl" />
         <div v-if="loading" class="loader-wrapper">
             <div class="loader">
-                <p-lottie name="thin-spinner" :size="2.5" auto />
+                <p-i name="ic_working" animation="spin"
+                     width="2.5rem" height="2.5rem"
+                />
+                <div class="progress-rate">
+                    {{ progressRate }}%
+                </div>
                 <span>Processing...</span>
             </div>
         </div>
@@ -40,7 +45,7 @@ import {
     defineComponent, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { PButton, PIconTextButton, PLottie } from '@spaceone/design-system';
+import { PButton, PIconTextButton, PI } from '@spaceone/design-system';
 
 import { toPng } from 'html-to-image';
 import * as pdfMake from 'pdfmake/build/pdfmake';
@@ -84,12 +89,16 @@ interface Props {
     fileName: string;
 }
 
+const COMPLETED_ELEMENT_RATE = 70;
+const COMPLETED_IMAGE_RATE = 90;
+const COMPLETED_PDF_RATE = 100;
+
 export default defineComponent<Props>({
     name: 'PdfDownloadOverlay',
     components: {
         PButton,
         PIconTextButton: PIconTextButton as any,
-        PLottie,
+        PI,
     },
     model: {
         prop: 'visible',
@@ -141,8 +150,21 @@ export default defineComponent<Props>({
                 if (props.orientation === 'landscape') return { width: paperSizeInfo.height, height: paperSizeInfo.width };
                 return paperSizeInfo;
             }),
+            isElementRendered: computed(() => !!props.items.length),
+            isImageConvertingStarted: false,
+            isPdfConvertingStarted: false,
+            progressRate: 0,
         });
 
+        const addRate = () => {
+            const fakeRate = setInterval(() => {
+                let limit = COMPLETED_ELEMENT_RATE;
+                if (state.isImageConvertingStarted) limit = COMPLETED_IMAGE_RATE;
+                else if (state.isPdfConvertingStarted) limit = COMPLETED_PDF_RATE;
+                if (state.progressRate < limit) state.progressRate++;
+                if (state.progressRate >= COMPLETED_PDF_RATE) clearInterval(fakeRate);
+            }, 1);
+        };
         const setVisible = (value: boolean) => {
             state.proxyVisible = value;
             emit('update:visible', value);
@@ -227,8 +249,13 @@ export default defineComponent<Props>({
 
         const makePdfWithItems = async (items: Item[]) => {
             state.loading = true;
+            state.isImageConvertingStarted = true;
             const contents: Content[] = await Promise.all(items.map(item => createContentWithItem(item)));
+            state.progressRate = COMPLETED_IMAGE_RATE;
+
+            state.isPdfConvertingStarted = true;
             state.createdPdf = createPdfWithContents(contents);
+            state.progressRate = COMPLETED_PDF_RATE;
 
             if (props.mode === 'PDF_EMBED') {
                 state.createdPdf.getDataUrl((pdfDataUrl) => {
@@ -263,6 +290,7 @@ export default defineComponent<Props>({
             if (!items.length) return;
             state.createdPdf = null;
             state.pdfDataUrl = '';
+            state.progressRate = COMPLETED_ELEMENT_RATE;
             await makePdfWithItems(items);
         });
         watch(() => props.visible, (visible) => {
@@ -272,7 +300,11 @@ export default defineComponent<Props>({
                 state.createdPdf = null;
                 state.pdfDataUrl = '';
                 state.proxyVisible = visible;
+                state.progressRate = 0;
+                state.isImageConvertingStarted = false;
+                state.isPdfConvertingStarted = false;
             }
+            if (visible) addRate();
         });
 
         return {
@@ -348,6 +380,10 @@ export default defineComponent<Props>({
             display: flex;
             flex-direction: column;
             align-items: center;
+            .progress-rate {
+                margin-top: 0.5rem;
+                margin-bottom: 1rem;
+            }
             .p-lottie {
                 margin-bottom: 1rem;
             }
