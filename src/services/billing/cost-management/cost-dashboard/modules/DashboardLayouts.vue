@@ -150,6 +150,7 @@ export default {
         watch(() => props.layout, () => {
             state.renderedCount = 0;
         });
+
         watch(() => state.isAllRendered, (isAllRendered) => {
             if (isAllRendered) {
                 const widgetRows: HTMLElement[] = vm.$refs.dynamicWidgetRows as HTMLElement[] ?? [];

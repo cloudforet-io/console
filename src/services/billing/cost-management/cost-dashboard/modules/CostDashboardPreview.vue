@@ -1,6 +1,6 @@
 <template>
     <div class="cost-dashboard-preview">
-        <div class="top-wrapper">
+        <div ref="headerRef" class="top-wrapper">
             <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
             <div class="right-part">
                 <cost-dashboard-period-select-dropdown :dashboard-id="dashboardId"
@@ -18,14 +18,14 @@
                            :currency="currency"
                            :currency-rates="currencyRates"
                            print-mode
-                           @rendered="handleDashboardRendered"
+                           @rendered="handleAllRenderedWidgets"
         />
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { keyBy } from 'lodash';
 import {
@@ -41,6 +41,9 @@ import CostDashboardPeriodSelectDropdown
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
 import { CustomLayout, DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
+
+const HEADER_ELEMENT = 1;
+const DASHBOARD_LAYOUT = 1;
 
 export default {
     name: 'CostDashboardPreview',
@@ -67,13 +70,24 @@ export default {
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             homeDashboardId: computed<string|undefined>(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
+            isPageMounted: false,
+            // dashboard layout widget
+            widgetList: undefined as HTMLElement[]|undefined,
+            //
+            totalElementCount: DASHBOARD_LAYOUT + HEADER_ELEMENT,
+            headerRef: undefined as Element|undefined,
+            renderedCount: computed(() => ((state.widgetList ? DASHBOARD_LAYOUT : 0) + (state.isPageMounted ? HEADER_ELEMENT : 0))),
+            isAllRendered: computed<boolean>(() => {
+                if (!state.isPageMounted) return false;
+                if (state.widgetList === undefined) return false;
+                return (state.renderedCount >= state.totalElementCount);
+            }),
         });
 
-
         /* event */
-        const handleDashboardRendered = (rowElements: HTMLElement[]) => {
-            console.debug('dashboard rendered');
-            emit('rendered', rowElements);
+        const handleAllRenderedWidgets = (rowElements: HTMLElement[]) => {
+            state.widgetList = rowElements;
+            state.isWidgetListRendered = true;
         };
 
         const fetchDefaultLayoutData = async (layoutId: string): Promise<any[]> => {
@@ -133,15 +147,26 @@ export default {
             state.loading = false;
         };
 
-
         watch(() => props.dashboardId, async (dashboardId) => {
             if (dashboardId) await loadDashboardAndSetStates(dashboardId);
         }, { immediate: true });
 
+        watch(() => state.isAllRendered, (isAllRendered) => {
+            if (isAllRendered) {
+                const widgetRows: HTMLElement[] = [
+                    state.headerRef,
+                    ...(state.widgetList ?? []),
+                ];
+                emit('rendered', widgetRows);
+            }
+        });
+        onMounted(() => {
+            state.isPageMounted = true;
+        });
 
         return {
             ...toRefs(state),
-            handleDashboardRendered,
+            handleAllRenderedWidgets,
         };
     },
 };

@@ -49,7 +49,9 @@ import { gray } from '@/styles/colors';
 
 const paperSizes = ['A4'] as const;
 const modes = ['ELEMENT_EMBED', 'PDF_EMBED', 'PDF_NEW_TAB'] as const;
-const PAGE_PAD = 24;
+const PAGE_PAD_X = 12;
+const PAGE_PAD_Y = 40;
+const IMAGE_ROW_MARGIN_Y = 4;
 const paperSizeInfoMap: Record<PaperSize, PaperSizeInfo> = Object.freeze({
     A4: { width: 595.28, height: 841.89 },
 });
@@ -128,11 +130,15 @@ export default defineComponent<Props>({
             const paperSizeInfo = paperSizeInfoMap[paperSize];
 
             return createPdf({
-                content: imageUrls.map(url => ({
-                    image: url,
-                    width: paperSizeInfo.width - (PAGE_PAD * 2),
-                })),
                 pageSize: paperSize,
+                pageMargins: [PAGE_PAD_X, PAGE_PAD_Y],
+                content: [
+                    ...imageUrls.map(url => ({
+                        image: url,
+                        width: paperSizeInfo.width - (PAGE_PAD_X * 2),
+                        style: 'imageRowWrapper',
+                    })),
+                ],
                 background: () => ({
                     canvas: [
                         {
@@ -145,6 +151,11 @@ export default defineComponent<Props>({
                         },
                     ],
                 }),
+                styles: {
+                    imageRowWrapper: {
+                        margin: [0, IMAGE_ROW_MARGIN_Y],
+                    },
+                },
             });
         };
 
