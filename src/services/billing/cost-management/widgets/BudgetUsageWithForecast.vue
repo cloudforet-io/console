@@ -78,7 +78,7 @@ type I18nDataTableField = DataTableField | {
     label: string | TranslateResult;
 }
 export default {
-    name: 'ProjectWiseBudgetUsageSummary',
+    name: 'BudgetUsageWithForecast',
     components: {
         CostDashboardCardWidgetLayout,
         PDataTable,

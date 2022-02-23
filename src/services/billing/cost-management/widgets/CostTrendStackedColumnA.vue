@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PRODUCT')" :widget-link="widgetLink" :print-mode="printMode">
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PRODUCT')" :widget-link="widgetLink" :print-mode="printMode">
         <cost-dashboard-stacked-column-widget
             :group-by="GROUP_BY.PRODUCT"
             :currency="currency"
@@ -29,6 +29,7 @@ import { CURRENCY } from '@/store/modules/display/config';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { WidgetOptions } from '@/services/billing/cost-management/cost-dashboard/type';
 
 
 export default defineComponent<WidgetProps>({
@@ -38,9 +39,13 @@ export default defineComponent<WidgetProps>({
         CostDashboardCardWidgetLayout,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         options: {
-            type: Object,
-            default: () => ({}),
+            type: Object as () => WidgetOptions,
+            default: undefined,
         },
         currency: {
             type: String,
@@ -75,7 +80,7 @@ export default defineComponent<WidgetProps>({
                     params: {},
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                        groupBy: arrayToQueryString([GROUP_BY.PRODUCT]),
+                        groupBy: arrayToQueryString(props.options?.group_by ?? [GROUP_BY.PRODUCT]),
                         period: objectToQueryString(_period),
                         filters: objectToQueryString(props.filters),
                     },

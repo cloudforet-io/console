@@ -1,6 +1,6 @@
 <template>
     <cost-dashboard-card-widget-layout
-        :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_REGION')"
+        :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_REGION')"
         :data-range="15"
         :widget-link="widgetLink"
         :print-mode="printMode"
@@ -107,6 +107,10 @@ export default defineComponent<WidgetProps>({
         PSkeleton,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         options: {
             type: Object,
             default: () => ({}),

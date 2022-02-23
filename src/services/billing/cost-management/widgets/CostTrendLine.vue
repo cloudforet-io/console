@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROJECT')" :widget-link="widgetLink" class="cost-trend-by-project"
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROJECT')" :widget-link="widgetLink" class="cost-trend-by-project"
                                        :print-mode="printMode"
     >
         <p-chart-loader :loading="loading" class="chart-wrapper">
@@ -94,6 +94,10 @@ export default {
         PSkeleton,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         options: {
             type: Object,
             default: () => ({}),

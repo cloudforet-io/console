@@ -1,6 +1,6 @@
 <template>
     <cost-dashboard-card-widget-layout
-        :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_PROJECT')"
+        :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_PROJECT')"
         :data-range="15"
         :widget-link="widgetLink"
         :no-data="!loading && data.length === 0"
@@ -50,7 +50,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import { TreeMap } from '@amcharts/amcharts4/charts';
 
 import {
-    computed, onUnmounted, reactive, toRefs, watch,
+    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -89,7 +89,7 @@ interface CostByProjectChartData {
     textColor?: string;
 }
 
-export default {
+export default defineComponent<WidgetProps>({
     name: 'CostTreeMap',
     components: {
         CostDashboardCardWidgetLayout,
@@ -99,6 +99,10 @@ export default {
         PStatus,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         options: {
             type: Object,
             default: () => ({}),
@@ -300,7 +304,7 @@ export default {
             currencyMoneyFormatter,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

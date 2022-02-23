@@ -43,6 +43,7 @@ export interface CostAnalyzeModel {
 /* component props */
 export interface WidgetProps<Options = any> {
     widgetId?: string;
+    name?: string;
     options: Options;
     period: Period;
     filters: Record<string, string[]>;

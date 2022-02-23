@@ -84,12 +84,12 @@ export default defineComponent({
             isExpired: computed(() => vm.$store.state.user.isSessionExpired === true && !vm.$route.meta.excludeAuth),
         });
 
-        const goToSignIn = async () => {
+        const goToSignIn = () => {
             const res: Location = {
                 name: AUTH_ROUTE.SIGN_OUT._NAME,
                 query: { nextPath: vm.$route.fullPath },
             };
-            await vm.$router.push(res);
+            vm.$router.push(res);
             vm.$store.dispatch('user/setIsSessionExpired', false);
         };
 

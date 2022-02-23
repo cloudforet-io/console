@@ -56,12 +56,12 @@ export const defaultWidgetMap = {
     },
     'table-lg-01': {
         widget_id: 'table-lg-01',
-        widget_file_name: 'ProjectWiseBudgetUsageSummary',
+        widget_file_name: 'BudgetUsageWithForecast',
         widget_name: 'Budget Usage With Forecast',
     },
     'pie-lg-01': {
         widget_id: 'pie-lg-01',
-        widget_file_name: 'SpcProjectWiseUsageSummary',
+        widget_file_name: 'CostPie',
         widget_name: 'Cost Pie',
     },
     custom_widget: {

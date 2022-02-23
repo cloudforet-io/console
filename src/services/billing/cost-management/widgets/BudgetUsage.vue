@@ -1,6 +1,6 @@
 <template>
     <cost-dashboard-simple-card-widget
-        :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.TOTAL_BUDGET_USAGE')"
+        :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.TOTAL_BUDGET_USAGE')"
         unit-type="PERCENT"
         :value="usageRate"
         :description="`${currencyMoneyFormatter(availableCost, currency, currencyRates, false, 10000000)} ${ $t('BILLING.COST_MANAGEMENT.DASHBOARD.AVAILABLE') }`"
@@ -57,6 +57,10 @@ export default {
         PI,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         options: {
             type: Object,
             default: () => ({}),

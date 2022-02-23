@@ -1,7 +1,7 @@
 <template>
     <cost-dashboard-simple-card-widget
         class="last-month-total-spend"
-        :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.LAST_MONTH_TOTAL_SPEND')"
+        :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.LAST_MONTH_TOTAL_SPEND')"
         unit-type="CURRENCY"
         :loading="loading"
         :value="lastMonthCost"
@@ -22,7 +22,7 @@ import dayjs from 'dayjs';
 import CostDashboardSimpleCardWidget
     from '@/services/billing/cost-management/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import {
-    onUnmounted, computed, reactive, toRefs, watch,
+    onUnmounted, computed, reactive, toRefs, watch, defineComponent,
 } from '@vue/composition-api';
 import { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -45,10 +45,14 @@ import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 const CATEGORY_KEY = 'date';
 const VALUE_KEY = 'totalCost';
 
-export default {
+export default defineComponent<WidgetProps>({
     name: 'LastMonthTotalSpend',
     components: { CostDashboardSimpleCardWidget },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         options: {
             type: Object,
             default: () => ({}),
@@ -229,7 +233,7 @@ export default {
             currencyMoneyFormatter,
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .last-month-total-spend {

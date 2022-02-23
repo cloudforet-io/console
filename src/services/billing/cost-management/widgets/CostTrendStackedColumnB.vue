@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROVIDER')" :widget-link="widgetLink" :print-mode="printMode">
+    <cost-dashboard-card-widget-layout :title="name ? name :$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROVIDER')" :widget-link="widgetLink" :print-mode="printMode">
         <cost-dashboard-stacked-column-widget
             :group-by="GROUP_BY.PROVIDER"
             :currency="currency"
@@ -39,6 +39,10 @@ export default defineComponent<WidgetProps>({
         CostDashboardCardWidgetLayout,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         options: {
             type: Object,
             default: () => ({}),

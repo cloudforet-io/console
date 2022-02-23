@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.SPC_USAGE_SUMMARY')" class="spc-project-wise-usage-summary"
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.SPC_USAGE_SUMMARY')" class="spc-project-wise-usage-summary"
                                        :widget-link="widgetLink"
                                        :data-range="20"
                                        :print-mode="printMode"
@@ -91,6 +91,10 @@ export default defineComponent<WidgetProps>({
         PSkeleton,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         options: {
             type: Object,
             default: () => ({}),

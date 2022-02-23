@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.BUDGET_USAGE_SUMMARY')"
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.BUDGET_USAGE_SUMMARY')"
                                        :widget-link="widgetLink"
                                        :show-top-text="false"
                                        :print-mode="printMode"
@@ -35,6 +35,10 @@ export default {
         BudgetStat,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         widgetId: {
             type: String,
             default: '',

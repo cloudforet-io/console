@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_PROVIDER')" class="cost-by-provider" :widget-link="widgetLink"
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_PROVIDER')" class="cost-by-provider" :widget-link="widgetLink"
                                        :print-mode="printMode"
     >
         <p-chart-loader :loading="loading" class="chart-wrapper">
@@ -86,6 +86,10 @@ export default defineComponent<WidgetProps>({
         CostDashboardDataTable,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         options: {
             type: Object,
             default: () => ({}),

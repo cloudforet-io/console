@@ -1,5 +1,5 @@
 import { keyBy } from 'lodash';
-import { CustomLayout, DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
+import { CustomLayout, DashboardInfo, WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
 
@@ -12,7 +12,7 @@ export const fetchDefaultLayoutData = async (layoutId: string): Promise<any[]> =
         const optionsKeyByWidgetId = keyBy(widgets.default, option => option.widget_id);
         const layoutData: CustomLayout[] = layoutTemplates.default.map(layout => layout.map((d) => {
             const widget = optionsKeyByWidgetId[d.widget_id];
-            return widget ? { ...widget } : {};
+            return widget ? { ...widget, isInitialDefaultWidget: true } : {};
         }));
         return layoutData;
     } catch (e) {
@@ -28,4 +28,9 @@ export const getDashboardLayout = async (dashboard: DashboardInfo): Promise<Cust
     } else layout = dashboard.custom_layouts;
     store.commit('service/costDashboard/setEditedCustomLayout', layout);
     return layout;
+};
+
+export const getWidgetName = ({ name, isInitialDefaultWidget }: Partial<WidgetInfo>) => {
+    if (isInitialDefaultWidget) return undefined;
+    return name;
 };

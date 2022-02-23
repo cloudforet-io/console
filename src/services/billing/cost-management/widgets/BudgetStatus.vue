@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.BUDGET_STATUS')"
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.BUDGET_STATUS')"
                                        :data-range="200"
                                        class="budget-status"
                                        :widget-link="widgetLink"
@@ -40,7 +40,7 @@ import { Location } from 'vue-router';
 
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -70,7 +70,7 @@ interface ChartData {
     linkLocation: Location;
 }
 
-export default {
+export default defineComponent<WidgetProps>({
     name: 'BudgetStatus',
     components: {
         CostDashboardCardWidgetLayout,
@@ -78,6 +78,10 @@ export default {
         PSkeleton,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         widgetId: {
             type: String,
             default: '',
@@ -213,7 +217,7 @@ export default {
             getTooltipText,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

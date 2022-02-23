@@ -30,6 +30,7 @@
                     </div>
                     <dynamic-widget v-if="!loading"
                                     :widget-id="widget.widget_id"
+                                    :name="getWidgetName(widget)"
                                     :widget-file-name="defaultWidgetMap[widget.widget_id].widget_file_name"
                                     :options="widget.options"
                                     :period="period"
@@ -81,6 +82,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import CostDashboardUpdateWidgetModal
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardUpdateWidgetModal.vue';
 import { WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
+import { getWidgetName } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
 import { i18n } from '@/translations';
 
 type Row = string[]
@@ -215,6 +217,7 @@ export default {
             handleUpdateConfirm,
             getAddWidgetColumnByLayout,
             getUUID,
+            getWidgetName,
         };
     },
 };

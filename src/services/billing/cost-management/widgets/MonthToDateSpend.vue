@@ -1,6 +1,6 @@
 <template>
     <cost-dashboard-simple-card-widget
-        :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.MONTH_TO_DATE_SPEND')"
+        :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.MONTH_TO_DATE_SPEND')"
         unit-type="CURRENCY"
         :loading="loading"
         :widget-link="widgetLink"
@@ -51,7 +51,7 @@ import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { PI } from '@spaceone/design-system';
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -65,13 +65,17 @@ import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-
 
 const thisDay = dayjs.utc().format('DD');
 const thisMonth = dayjs.utc().format('MM');
-export default {
+export default defineComponent<WidgetProps>({
     name: 'MonthToDateSpend',
     components: {
         CostDashboardSimpleCardWidget,
         PI,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         options: {
             type: Object,
             default: () => ({}),
@@ -187,7 +191,7 @@ export default {
             thisMonthFormatter,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

@@ -1,6 +1,7 @@
 <template>
     <component :is="component"
                :widget-id="widgetId"
+               :name="name"
                :options="options"
                :period="period"
                :filters="filters"
@@ -22,6 +23,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props extends WidgetProps {
     widgetId: string;
+    name: string;
     widgetFileName: string;
 }
 
@@ -29,6 +31,10 @@ export default {
     name: 'DynamicWidget',
     props: {
         widgetId: {
+            type: String,
+            default: '',
+        },
+        name: {
             type: String,
             default: '',
         },
