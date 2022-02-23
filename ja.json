@@ -492,19 +492,6 @@
 				"YEARLY": ""
 			},
 			"DASHBOARD": {
-				"ADD_WIDGET": {
-					"ADD_TO_CUSTOM_WIDGET": "",
-					"ALL": "",
-					"COST_ANALYSIS_QUERY": "",
-					"CREATE_QUERY": "",
-					"IN_RATIO": "",
-					"NO_SAVED_QUERY": "",
-					"NO_SAVED_QUERY_HELP_TEXT": "",
-					"RECOMMENDED_WIDGET": "",
-					"REMOVE_WIDGET": "",
-					"TITLE": "",
-					"VIEW_QUERY": ""
-				},
 				"AVAILABLE": "",
 				"BUDGET": "",
 				"BUDGET_STATUS": "",
@@ -516,7 +503,55 @@
 				"COST_TREND_BY_PRODUCT": "",
 				"COST_TREND_BY_PROJECT": "",
 				"COST_TREND_BY_PROVIDER": "",
+				"CREATE": {
+					"ALT_E_CREATE_ALERT": "",
+					"CREATE_DASHBOARD": "",
+					"NO_WIDGET": "",
+					"TEMPLATE": {
+						"APPLIED_FILTER": "",
+						"EXISTING_DASHBOARD": "",
+						"FILTER": "",
+						"NEW_TEMPLATE": "",
+						"TEMPLATE": "",
+						"VIEW": "",
+						"VIEW_FILTER": ""
+					},
+					"VISIBILITY": {
+						"PRIVATE": "",
+						"PUBLIC": "",
+						"SAVE_AS": "",
+						"VISIBILITY": ""
+					}
+				},
 				"CUSTOM": "",
+				"CUSTOMIZE": {
+					"ADD_WIDGET": "",
+					"ADD_WIDGET_MODAL": {
+						"ADD_TO_CUSTOM_WIDGET": "",
+						"ALL": "",
+						"COST_ANALYSIS_QUERY": "",
+						"CREATE_QUERY": "",
+						"IN_RATIO": "",
+						"NO_SAVED_QUERY": "",
+						"NO_SAVED_QUERY_HELP_TEXT": "",
+						"RECOMMENDED_WIDGET": "",
+						"REMOVE_WIDGET": "",
+						"TITLE": "",
+						"VIEW_QUERY": ""
+					},
+					"CANCEL": "",
+					"FORM": {
+						"DELETE_CONTENTS": "",
+						"DELETE_TITLE": "",
+						"LABEL_GROUP_BY": "",
+						"LABEL_NAME": "",
+						"UPDATE_TITLE": ""
+					},
+					"SAVE": "",
+					"SIDEBAR_DESC": "",
+					"SIDEBAR_TITLE": "",
+					"SIDEBAR_WIDGET": ""
+				},
 				"DECREASE": "",
 				"DUPLICATE": "",
 				"FIELD_LABEL": {
@@ -534,29 +569,15 @@
 					"CREATE_DASHBOARD": "",
 					"CUSTOM_RANGE": "",
 					"FROM": "",
-					"TEMPLATE": {
-						"AND_MORE": "",
-						"APPLIED_FILTER": "",
-						"EXISTING_DASHBOARD": "",
-						"FILTER": "",
-						"NEW_TEMPLATE": "",
-						"TEMPLATE": "",
-						"VIEW": "",
-						"VIEW_FILTER": ""
-					},
-					"TO": "",
-					"VISIBILITY": {
-						"PRIVATE": "",
-						"PUBLIC": "",
-						"SAVE_AS": "",
-						"VISIBILITY": ""
-					}
+					"TO": ""
 				},
 				"FULL_DATA": "",
 				"INCREASE": "",
 				"LAST_MONTH_TOTAL_SPEND": "",
 				"MONTH_TO_DATE_SPEND": "",
+				"MY_DASHBOARD": "",
 				"PROJECT_WISE_BUDGET_USAGE_SUMMARY": "",
+				"PUBLIC": "",
 				"SET_HOME": "",
 				"SHOWING_TOP_NUM": "",
 				"SPC_USAGE_SUMMARY": "",

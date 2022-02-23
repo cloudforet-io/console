@@ -492,19 +492,6 @@
 				"YEARLY": "Yearly"
 			},
 			"DASHBOARD": {
-				"ADD_WIDGET": {
-					"ADD_TO_CUSTOM_WIDGET": "Add to Custom Widget",
-					"ALL": "All",
-					"COST_ANALYSIS_QUERY": "Cost Analysis Query",
-					"CREATE_QUERY": "Create Query",
-					"IN_RATIO": "In ratio",
-					"NO_SAVED_QUERY": "No Saved Query",
-					"NO_SAVED_QUERY_HELP_TEXT": "Set a new query from 'Cost Analysis' page in order to use it as a widget.",
-					"RECOMMENDED_WIDGET": "Recommended Widget",
-					"REMOVE_WIDGET": "Remove Widget",
-					"TITLE": "Add New Widget",
-					"VIEW_QUERY": "View Query"
-				},
 				"AVAILABLE": "Available",
 				"BUDGET": "budgets",
 				"BUDGET_STATUS": "Budget Status",
@@ -516,7 +503,55 @@
 				"COST_TREND_BY_PRODUCT": "Cost Trend by Product",
 				"COST_TREND_BY_PROJECT": "Cost Trend by Project",
 				"COST_TREND_BY_PROVIDER": "Cost Trend By Provider",
+				"CREATE": {
+					"ALT_E_CREATE_ALERT": "Failed to create dashboard",
+					"CREATE_DASHBOARD": "Create New Dashboard",
+					"NO_WIDGET": "Now, you can fill up your dashboard with the available widgets.",
+					"TEMPLATE": {
+						"APPLIED_FILTER": "Include Applied Filter from selected dashboard",
+						"EXISTING_DASHBOARD": "Clone an Existing Dashboard",
+						"FILTER": "Filter",
+						"NEW_TEMPLATE": "New Template",
+						"TEMPLATE": "Template",
+						"VIEW": "View",
+						"VIEW_FILTER": "View Filter"
+					},
+					"VISIBILITY": {
+						"PRIVATE": "My Dashboard (Private)",
+						"PUBLIC": "Public (Public to all members who has ‘View‘ access.)",
+						"SAVE_AS": "Save As",
+						"VISIBILITY": "Visibility"
+					}
+				},
 				"CUSTOM": "Custom",
+				"CUSTOMIZE": {
+					"ADD_WIDGET": "Add Widget",
+					"ADD_WIDGET_MODAL": {
+						"ADD_TO_CUSTOM_WIDGET": "Add to Custom Widget",
+						"ALL": "All",
+						"COST_ANALYSIS_QUERY": "Cost Analysis Query",
+						"CREATE_QUERY": "Create Query",
+						"IN_RATIO": "In ratio",
+						"NO_SAVED_QUERY": "No Saved Query",
+						"NO_SAVED_QUERY_HELP_TEXT": "Set a new query from 'Cost Analysis' page in order to use it as a widget.",
+						"RECOMMENDED_WIDGET": "Recommended Widget",
+						"REMOVE_WIDGET": "Remove Widget",
+						"TITLE": "Add New Widget",
+						"VIEW_QUERY": "View Query"
+					},
+					"CANCEL": "Cancel",
+					"FORM": {
+						"DELETE_CONTENTS": "You will not be able to recover this widget.",
+						"DELETE_TITLE": "Are you sure you want to remove this widget?",
+						"LABEL_GROUP_BY": "Group By",
+						"LABEL_NAME": "Name",
+						"UPDATE_TITLE": "Update Widget"
+					},
+					"SAVE": "Save",
+					"SIDEBAR_DESC": "You can add, move and remove your widgets.",
+					"SIDEBAR_TITLE": "Customize Dashboard",
+					"SIDEBAR_WIDGET": "Widget"
+				},
 				"DECREASE": "Decreased from {date}",
 				"DUPLICATE": "Duplicate",
 				"FIELD_LABEL": {
@@ -534,29 +569,15 @@
 					"CREATE_DASHBOARD": "Create New Dashboard",
 					"CUSTOM_RANGE": "Custom Range",
 					"FROM": "From",
-					"TEMPLATE": {
-						"AND_MORE": "..and more",
-						"APPLIED_FILTER": "Include Applied Filter from selected dashboard",
-						"EXISTING_DASHBOARD": "Clone an Existing Dashboard",
-						"FILTER": "Filter",
-						"NEW_TEMPLATE": "New Template",
-						"TEMPLATE": "Template",
-						"VIEW": "View",
-						"VIEW_FILTER": "View Filter"
-					},
-					"TO": "To",
-					"VISIBILITY": {
-						"PRIVATE": "My Dashboard (Private)",
-						"PUBLIC": "Public (Public to all members who has ‘View‘ access.)",
-						"SAVE_AS": "Save As",
-						"VISIBILITY": "Visibility"
-					}
+					"TO": "To"
 				},
 				"FULL_DATA": "Full data",
 				"INCREASE": "Increased from {date}",
 				"LAST_MONTH_TOTAL_SPEND": "Last Month Total Spend",
 				"MONTH_TO_DATE_SPEND": "Month-to-Date Spend",
+				"MY_DASHBOARD": "My Dashboard",
 				"PROJECT_WISE_BUDGET_USAGE_SUMMARY": "Project-wise Budget Usage Summary",
+				"PUBLIC": "Public",
 				"SET_HOME": "Set as Home Dashboard",
 				"SHOWING_TOP_NUM": "Showing Top {num}",
 				"SPC_USAGE_SUMMARY": "SPC Project-Wise Usage Summary",
