@@ -120,10 +120,6 @@ export default defineComponent<SearchDropdownProps>({
             type: String,
             default: undefined,
         },
-        disableIcon: {
-            type: Boolean,
-            default: false,
-        },
         isFocused: {
             type: Boolean,
             default: undefined,

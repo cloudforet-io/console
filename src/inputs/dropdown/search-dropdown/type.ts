@@ -20,7 +20,6 @@ export interface SearchDropdownProps extends ContextMenuFixedStyleProps {
     /* search props */
     value: string;
     placeholder?: string;
-    disableIcon?: boolean;
     isFocused?: boolean;
     invalid?: boolean;
     disabled?: boolean;
