@@ -12,18 +12,18 @@
                     Add Widget
                 </p-icon-text-button>
                 <span class="widget-count">Widget</span>
-                <draggable v-model="widgetList" tag="ul" class="widget-list"
+                <draggable v-model="editingCustomLayout" tag="ul" class="widget-list"
                            ghost-class="ghost"
                 >
                     <li
-                        v-for="(widget, idx) in widgetList"
+                        v-for="(widget, idx) in editingCustomLayout"
                         :key="idx"
                         class="widget-item"
                     >
                         <p-i name="ic_drag-handle" width="1rem" height="1rem"
                              class="drag-icon"
                         />
-                        <span v-for="{ name, widget_id } in widget" :key="widget_id">
+                        <span v-for="{ name, widget_id } in widget" :key="`${widget_id}-${getUUID()}`">
                             {{ name }} <br>
                         </span>
                         <p-divider class="w-full" />
@@ -40,11 +40,14 @@ import draggable from 'vuedraggable';
 
 import { PIconTextButton, PI, PDivider } from '@spaceone/design-system';
 import {
+    computed,
     onUnmounted, reactive, toRefs,
 } from '@vue/composition-api';
 import { store } from '@/store';
 import CostDashboardCustomizeWidgetModal
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetModal.vue';
+import { CustomLayout } from '@/services/billing/cost-management/cost-dashboard/type';
+import { getUUID } from '@/lib/component-util/getUUID';
 
 export default {
     name: 'CostDashboardCustomizeSidebar',
@@ -58,26 +61,13 @@ export default {
 
     setup() {
         const state = reactive({
-            widgetList: [[{
-                widget_id: 'MonthToDateSpend',
-                name: 'Month-To-Date Spend',
-            }, {
-                widget_id: 'LastMonthTotalSpend',
-                name: 'Last Month Total Spending',
-            }, {
-                widget_id: 'BudgetUsage',
-                name: 'Budget Usage',
-            }],
-            [{
-                widget_id: 'CostByProject',
-                name: 'Cost by Project',
-            }],
-            [{
-                widget_id: 'CostTrendByProject',
-                name: 'Cost Trend By Project',
-            }],
-            ],
             customizeModalVisible: false,
+            editingCustomLayout: computed<CustomLayout[]>({
+                get() { return store.state.service.costDashboard.editedCustomLayout; },
+                set(val) {
+                    store.commit('service/costDashboard/setEditedCustomLayout', [...val]);
+                },
+            }),
         });
 
         const handleClickAddWidget = () => {
@@ -92,6 +82,7 @@ export default {
         return {
             ...toRefs(state),
             handleClickAddWidget,
+            getUUID,
         };
     },
 };
