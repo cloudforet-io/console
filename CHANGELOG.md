@@ -1,3 +1,10 @@
+# [1.1.0-beta.246](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.245...v1.1.0-beta.246) (2022-02-23)
+
+
+### Bug Fixes
+
+* delete disable-icon props ([#869](https://github.com/spaceone-dev/spaceone-design-system/issues/869)) ([e62f95b](https://github.com/spaceone-dev/spaceone-design-system/commit/e62f95b89a67cebe30933896ca41845cab1766aa))
+
 # [1.1.0-beta.245](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.244...v1.1.0-beta.245) (2022-02-23)
 
 
