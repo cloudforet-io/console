@@ -1,17 +1,21 @@
 <template>
     <div>
         <portal to="info-title">
-            <span class="sidebar-title">Customize Dashboard</span> <br>
+            <span class="sidebar-title">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SIDEBAR_TITLE') }}</span> <br>
         </portal>
         <portal to="info-contents">
             <div class="sidebar-contents">
-                <span class="sidebar-desc">You can add, move and <br> remove your widgets.</span>
+                <p class="sidebar-desc">
+                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SIDEBAR_DESC') }}
+                </p>
                 <p-icon-text-button style-type="primary-dark" name="ic_plus_bold" :outline="true"
                                     class="add-widget-button" @click="handleClickAddWidget"
                 >
-                    Add Widget
+                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}
                 </p-icon-text-button>
-                <span class="widget-count">Widget</span>
+                <p class="widget-count">
+                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SIDEBAR_WIDGET') }}
+                </p>
                 <draggable v-model="editingCustomLayout" tag="ul" class="widget-list"
                            ghost-class="ghost"
                 >
@@ -23,10 +27,11 @@
                         <p-i name="ic_drag-handle" width="1rem" height="1rem"
                              class="drag-icon"
                         />
-                        <span v-for="{ name, widget_id } in widget" :key="`${widget_id}-${getUUID()}`">
-                            {{ name }} <br>
-                        </span>
-                        <p-divider class="w-full" />
+                        <div class="widget-row">
+                            <span v-for="{ name, widget_id } in widget" :key="`${widget_id}-${getUUID()}`" class="widget-col">
+                                {{ name }}
+                            </span>
+                        </div>
                     </li>
                 </draggable>
             </div>
@@ -38,7 +43,7 @@
 <script lang="ts">
 import draggable from 'vuedraggable';
 
-import { PIconTextButton, PI, PDivider } from '@spaceone/design-system';
+import { PIconTextButton, PI } from '@spaceone/design-system';
 import {
     computed,
     onUnmounted, reactive, toRefs,
@@ -55,7 +60,6 @@ export default {
         CostDashboardCustomizeWidgetModal,
         PI,
         PIconTextButton,
-        PDivider,
         draggable,
     },
 
@@ -96,18 +100,31 @@ export default {
 }
 
 .sidebar-contents {
-    @apply flex flex-col;
     gap: 1.5625rem;
     font-size: 0.875rem;
     line-height: 125%;
     .sidebar-desc {
         @apply text-gray-600;
+        width: 12.75rem;
     }
     .add-widget-button {
-        display: block;
+        @apply block mt-6 mb-6;
     }
     .widget-count {
-        @apply font-bold;
+        @apply mb-2 font-bold;
+    }
+    .widget-item {
+        @apply flex items-center pt-2 pb-2 border-b border-gray-200;
+        .drag-icon {
+            @apply flex-shrink-0 mr-2;
+        }
+        .widget-row {
+            @apply flex flex-col truncate;
+            row-gap: 0.1875rem;
+            .widget-col {
+                @apply truncate;
+            }
+        }
     }
 }
 </style>

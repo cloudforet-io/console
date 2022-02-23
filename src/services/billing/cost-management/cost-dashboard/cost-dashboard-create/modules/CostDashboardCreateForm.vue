@@ -1,7 +1,7 @@
 <template>
     <div class="cost-dashboard-create-form">
         <p-pane-layout>
-            <h2>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TEMPLATE.TEMPLATE') }}</h2>
+            <h2>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.TEMPLATE') }}</h2>
             <p-pane-layout class="p-8 mb-4">
                 <cost-dashboard-create-with-layout />
                 <cost-dashboard-create-with-dashboard />
@@ -9,7 +9,7 @@
             <cost-dashboard-create-default-filter />
         </p-pane-layout>
         <p-pane-layout>
-            <h2>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.VISIBILITY.VISIBILITY') }}</h2>
+            <h2>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.VISIBILITY') }}</h2>
             <cost-dashboard-create-select-privacy />
         </p-pane-layout>
     </div>

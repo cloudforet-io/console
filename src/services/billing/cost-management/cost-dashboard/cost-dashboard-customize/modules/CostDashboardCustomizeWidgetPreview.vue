@@ -8,7 +8,7 @@
                 <span v-for="i in Math.round(100 / layout)" :key="i" />
             </div>
             <p class="text">
-                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.IN_RATIO') }} {{ layout }}%
+                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.IN_RATIO') }} {{ layout }}%
             </p>
         </div>
         <slot name="extra" />

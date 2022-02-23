@@ -11,10 +11,10 @@
             <p-text-input v-model="dashboardTitle" block class="dashboard-title" />
             <div class="button-group">
                 <p-button style-type="transparent" :outline="true" @click="handleClickCancel">
-                    Cancel
+                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CANCEL') }}
                 </p-button>
                 <p-button style-type="secondary" @click="handleClickSave">
-                    Save
+                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SAVE') }}
                 </p-button>
             </div>
         </section>

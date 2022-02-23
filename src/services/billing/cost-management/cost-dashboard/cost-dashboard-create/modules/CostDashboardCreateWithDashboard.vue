@@ -2,7 +2,7 @@
     <fragment>
         <p-divider class="w-full mb-6" />
         <div class="flex flex-col">
-            <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TEMPLATE.EXISTING_DASHBOARD') }}</h3>
+            <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.EXISTING_DASHBOARD') }}</h3>
             <div class="grid grid-cols-4 col-gap-2">
                 <div v-for="(dashboardData, idx) in existingDashboardData" :key="`$dashboard-${idx}-${getUUID()}`" class="flex flex-col justify-between mb-4">
                     <p-select-card
@@ -19,14 +19,16 @@
                         :to=" { name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME, params: { dashboardId: dashboardData.public_dashboard_id } }"
                         class="block mt-2 text-center"
                     >
-                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TEMPLATE.VIEW') }}
+                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.VIEW') }}
                     </p-anchor>
                 </div>
             </div>
-            <p-pagination :total-count="totalCount"
-                          :this-page.sync="thisPage"
-                          :page-size.sync="pageSize"
-                          class="ml-auto mr-auto"
+
+            <p-text-pagination
+                :this-page.sync="thisPage"
+                :all-page="allPage"
+                class="ml-auto mr-auto"
+                @pageChange="listDashboard"
             />
         </div>
     </fragment>
@@ -34,7 +36,7 @@
 
 <script lang="ts">
 import {
-    PAnchor, PSelectCard, PPagination, PDivider,
+    PAnchor, PSelectCard, PDivider, PTextPagination,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { getUUID } from '@/lib/component-util/getUUID';
@@ -48,13 +50,18 @@ import {
 } from '@/services/billing/cost-management/cost-dashboard/type';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { store } from '@/store';
+// import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+// import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
+
+
+const PAGE_SIZE = 1;
 
 export default {
     name: 'CostDashboardCreateWithDashboard',
     components: {
         PSelectCard,
         PAnchor,
-        PPagination,
+        PTextPagination,
         PDivider,
     },
 
@@ -64,8 +71,8 @@ export default {
             selectedTemplate: computed(() => store.state.service?.costDashboard?.selectedTemplate),
             // pagination
             totalCount: 0,
+            allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
             thisPage: 1,
-            pageSize: 15,
         });
 
         const handleDashboardChange = (value: Partial<DashboardInfo>) => {
@@ -73,6 +80,14 @@ export default {
             store.commit('service/costDashboard/setDefaultFilter', value.default_filter);
         };
 
+        // const apiQueryHelper = new ApiQueryHelper();
+        // const getParams = () => {
+        //     apiQueryHelper.setPageStart(getPageStart(state.thisPage, PAGE_SIZE))
+        //         .setPageLimit(PAGE_SIZE);
+        //     return {
+        //         query: apiQueryHelper.data,
+        //     };
+        // };
         const listDashboard = async () => {
             try {
                 const publicDashboardList = await SpaceConnector.client.costAnalysis.publicDashboard.list();
@@ -98,6 +113,7 @@ export default {
             defaultLayoutData,
             handleDashboardChange,
             getUUID,
+            listDashboard,
         };
     },
 };

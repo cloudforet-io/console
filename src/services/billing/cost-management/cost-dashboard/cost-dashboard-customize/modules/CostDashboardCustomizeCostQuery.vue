@@ -1,14 +1,14 @@
 <template>
     <div class="cost-dashboard-customize-cost-query">
         <div class="title-wrapper">
-            <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.COST_ANALYSIS_QUERY') }}</p-label>
+            <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.COST_ANALYSIS_QUERY') }}</p-label>
             <template v-if="!loading && costQuerySetList.length">
                 <p-icon-button name="ic_refresh" @click="handleRefresh" />
                 <p-anchor :to="{ name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME }"
                           :show-icon="false"
                 >
                     <p-icon-text-button style-type="primary1" name="ic_plus_bold">
-                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.CREATE_QUERY') }}
+                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}
                     </p-icon-text-button>
                 </p-anchor>
             </template>
@@ -27,24 +27,24 @@
                         <p-icon-text-button style-type="gray-border" name="ic_plus_bold" size="sm"
                                             @click="handleAddToCustomWidget(query)"
                         >
-                            <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.ADD_TO_CUSTOM_WIDGET') }}</span>
+                            <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ADD_TO_CUSTOM_WIDGET') }}</span>
                         </p-icon-text-button>
                     </div>
                 </div>
                 <template #no-data>
                     <div class="refresh-wrapper">
-                        <span class="text">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.NO_SAVED_QUERY') }}</span>
+                        <span class="text">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_SAVED_QUERY') }}</span>
                         <p-icon-button name="ic_refresh" @click="handleRefresh" />
                     </div>
                     <p class="help-text">
-                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.NO_SAVED_QUERY_HELP_TEXT') }}
+                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_SAVED_QUERY_HELP_TEXT') }}
                     </p>
                     <p-anchor :to="{ name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME }"
                               :show-icon="false"
                               class="btn-add-query"
                     >
                         <p-icon-text-button style-type="primary1" name="ic_plus_bold">
-                            <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.CREATE_QUERY') }}</span>
+                            <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}</span>
                         </p-icon-text-button>
                     </p-anchor>
                 </template>

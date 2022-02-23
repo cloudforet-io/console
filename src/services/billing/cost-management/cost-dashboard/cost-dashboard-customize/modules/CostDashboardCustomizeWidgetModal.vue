@@ -172,6 +172,9 @@ export default {
         @apply overflow-auto flex-shrink-0 ml-8;
         width: 16.5rem;
         height: inherit;
+        .widget-config {
+            @apply mt-6;
+        }
     }
 }
 </style>

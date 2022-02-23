@@ -2,14 +2,14 @@
     <fragment>
         <h3>Filter</h3>
         <p-check-box v-model="includesFilter" :disabled="!isDashboardTemplate">
-            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TEMPLATE.APPLIED_FILTER') }}
+            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.APPLIED_FILTER') }}
         </p-check-box>
         <p-button size="sm" style-type="gray-border"
                   :disabled="!isDashboardTemplate"
                   class="ml-2"
                   @click="handleClickFilterButton"
         >
-            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TEMPLATE.VIEW_FILTER') }}
+            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.VIEW_FILTER') }}
         </p-button>
         <view-filter-modal :visible.sync="defaultFilterModalVisible"
                            :selected-filters="defaultFilter"

@@ -1,6 +1,6 @@
 <template>
     <fragment>
-        <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.VISIBILITY.SAVE_AS') }}</h3>
+        <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.SAVE_AS') }}</h3>
         <p-radio v-for="privacy in privacyList" :key="privacy.name" v-model="selectedPrivacy"
                  :value="privacy.name" class="mr-4"
                  @change="handleRadio"
@@ -29,11 +29,11 @@ export default {
             privacyList: [
                 {
                     name: DASHBOARD_PRIVACY_TYPE.USER,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.VISIBILITY.PRIVATE'),
+                    label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.PRIVATE'),
                 },
                 {
                     name: DASHBOARD_PRIVACY_TYPE.PUBLIC,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.VISIBILITY.PUBLIC'),
+                    label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.PUBLIC'),
                 },
             ],
         });

@@ -1,23 +1,32 @@
 <template>
     <aside class="sidebar-menu">
         <!--        <sidebar-title :title="$t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES')" />-->
-        <sidebar-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" class="sidebar-title">
-            <template #extra>
-                <p-icon-text-button style-type="gray-border" size="sm"
-                                    name="ic_plus_bold"
-                                    @click="handleClickCreate"
-                >
-                    Create
-                </p-icon-text-button>
-            </template>
-        </sidebar-title>
-        <ul v-if="!loading" class="dashboard-list">
-            <cost-dashboard-list :dashboard-list="publicDashboardList" />
-        </ul>
-        <details v-if="!loading" class="dashboard-list">
-            <summary>My</summary>
-            <cost-dashboard-list :dashboard-list="userDashboardList" />
-        </details>
+        <div>
+            <sidebar-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" class="sidebar-title">
+                <template #extra>
+                    <p-icon-text-button style-type="gray-border" size="sm"
+                                        name="ic_plus_bold"
+                                        @click="handleClickCreate"
+                    >
+                        {{ $t('BILLING.COST_MANAGEMENT.MAIN.CREATE') }}
+                    </p-icon-text-button>
+                </template>
+            </sidebar-title>
+            <div v-if="!loading" class="dashboard-list">
+                <p class="dashboard-type">
+                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.PUBLIC') }}
+                </p>
+                <ul>
+                    <cost-dashboard-list :dashboard-list="publicDashboardList" />
+                </ul>
+            </div>
+            <details v-if="!loading" class="dashboard-list">
+                <summary class="dashboard-type">
+                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.MY_DASHBOARD') }}
+                </summary>
+                <cost-dashboard-list :dashboard-list="userDashboardList" />
+            </details>
+        </div>
         <div v-for="(item) in menuList" :key="item.label"
              @click="showPage(item.routeName)"
         >
@@ -134,9 +143,27 @@ export default {
 <style lang="postcss" scoped>
 .sidebar-title {
     @apply flex justify-between;
+    padding-top: 1.5rem;
     padding-right: 1rem;
 }
+header.link {
+    padding-top: 1.5rem;
+    margin-bottom: 0;
+}
 .dashboard-list {
-    padding: 0 0.75rem 1.25rem;
+    padding: 0 0.875rem;
+    font-size: 0.875rem;
+    & + .dashboard-list {
+        @apply mt-3;
+    }
+    .dashboard-type {
+        line-height: 2rem;
+    }
+}
+details {
+    summary {
+        @apply cursor-pointer;
+        display: list-item;
+    }
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
     <fragment>
         <h3 class="pt-0">
-            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TEMPLATE.NEW_TEMPLATE') }}
+            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.NEW_TEMPLATE') }}
         </h3>
         <div class="grid grid-cols-4 col-gap-2 mb-2">
             <div v-for="(layoutData, idx) in defaultLayoutData" :key="layoutData.name" class="mb-4">
@@ -26,7 +26,7 @@
                             {{ name }}
                         </li>
                         <li class="text-more">
-                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TEMPLATE.AND_MORE') }}
+                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.AND_MORE') }}
                         </li>
                     </ul>
                 </div>

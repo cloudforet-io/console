@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :visible="proxyVisible" header-title="Update Widget"
+    <p-button-modal :visible="proxyVisible" :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.UPDATE_TITLE')"
                     :disabled="false"
                     size="sm"
                     @confirm="handleConfirm"

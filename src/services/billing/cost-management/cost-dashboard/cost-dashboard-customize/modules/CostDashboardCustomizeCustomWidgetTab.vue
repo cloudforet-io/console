@@ -2,7 +2,7 @@
     <div class="cost-dashboard-customize-custom-widget-tab">
         <div class="left-area">
             <div class="widgets-area">
-                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.ALL') }} ({{ widgetList.length }})</p-label>
+                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ widgetList.length }})</p-label>
                 <ul class="widget-list">
                     <li v-for="(widget, idx) in widgetList" :key="`widget-${idx}-${widget.name}`" class="widget-card"
                         :class="{'selected' : selectedItem.widget_id == widget.widget_id}"
@@ -42,7 +42,7 @@
                       class="btn-remove"
                       @click="handleClickRemoveWidget"
             >
-                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.REMOVE_WIDGET') }}
+                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.REMOVE_WIDGET') }}
             </p-button>
         </div>
     </div>

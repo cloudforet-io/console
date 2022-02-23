@@ -1,6 +1,6 @@
 <template>
     <div class="widget-config">
-        <p-field-group label="Name"
+        <p-field-group :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.LABEL_NAME')"
                        :invalid="invalidState.name"
                        :invalid-text="invalidTexts.name"
                        required
@@ -9,7 +9,7 @@
         </p-field-group>
         <p-field-group
             v-if="showGroupBy"
-            label="Group By"
+            :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.LABEL_GROUP_BY')"
             :invalid="invalidState.groupBy"
             :invalid-text="invalidTexts.groupBy"
             required
@@ -144,8 +144,3 @@ export default {
     },
 };
 </script>
-<style lang="postcss" scoped>
-.widget-config {
-    @apply mt-6;
-}
-</style>

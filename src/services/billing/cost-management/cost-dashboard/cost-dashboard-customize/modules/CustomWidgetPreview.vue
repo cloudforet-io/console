@@ -26,7 +26,7 @@
                       class="btn-view-query"
             >
                 <p-icon-text-button style-type="primary1" name="ic_plus_bold">
-                    <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.VIEW_QUERY') }}</span>
+                    <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.VIEW_QUERY') }}</span>
                 </p-icon-text-button>
             </p-anchor>
         </template>

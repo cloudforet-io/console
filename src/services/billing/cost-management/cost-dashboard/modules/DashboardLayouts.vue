@@ -6,6 +6,9 @@
                        class="dashboard-layouts"
                        :class="{responsive: !printMode}"
         >
+            <template #no-data>
+                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.NO_WIDGET') }}
+            </template>
             <template #loader>
                 <div />
             </template>
@@ -13,13 +16,17 @@
                  class="row" :class="{'customize':customizeMode}"
             >
                 <div v-for="(widget, colIdx) in row" :key="`widget-${widget.widget_id}-${getUUID()}`"
-                     :class="[`col-${widget.options.layout}`, {'customize':customizeMode}]"
+                     :class="`col-${widget.options.layout}`"
                 >
-                    <div v-if="customizeMode" class="absolute bg-red-100 w-10 h-10 z-10" @click.stop="handleClickUpdate(rowIdx, colIdx, widget)">
-                        update
-                    </div>
-                    <div v-if="customizeMode" class="absolute bg-blue-100 w-10 h-10 z-10 ml-10" @click.stop="handleClickDelete(rowIdx, colIdx, widget)">
-                        delete
+                    <div class="btn-group">
+                        <p-icon-button v-if="customizeMode" name="ic_edit" size="sm"
+                                       style-type="gray-border" :outline="true"
+                                       @click.stop="handleClickUpdate(rowIdx, colIdx, widget)"
+                        />
+                        <p-icon-button v-if="customizeMode" name="ic_trashcan" size="sm"
+                                       style-type="alert" :outline="true"
+                                       @click.stop="handleClickDelete(rowIdx, colIdx, widget)"
+                        />
                     </div>
                     <dynamic-widget v-if="!loading"
                                     :widget-id="widget.widget_id"
@@ -35,11 +42,13 @@
                 </div>
                 <template v-if="customizeMode && row.length > 0">
                     <div v-for="n in getAddWidgetColumnByLayout(row[0].options.layout, row.length)"
-                         :key="`${n}-${getUUID()}`" :class="[`col-${row[0].options.layout}`, {'customize':customizeMode}]"
+                         :key="`${n}-${getUUID()}`" :class="`col-${row[0].options.layout} empty-widget`"
                     >
-                        <p-button style-type="primary" :outline="true" @click="handleClickAdd(rowIdx, n, row[0].options.layout)">
-                            Add Widget
-                        </p-button>
+                        <p-icon-text-button style-type="primary-dark" name="ic_plus_bold" :outline="true"
+                                            @click="handleClickAdd(rowIdx, n, row[0].options.layout)"
+                        >
+                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}
+                        </p-icon-text-button>
                     </div>
                 </template>
             </div>
@@ -48,6 +57,7 @@
         <delete-modal
             :header-title="checkDeleteState.headerTitle"
             :visible.sync="checkDeleteState.visible"
+            :contents="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.DELETE_CONTENTS')"
             @confirm="handleDeleteConfirm"
         />
         <cost-dashboard-update-widget-modal v-if="updateModalVisible && customizeMode" v-model="updateModalVisible" @confirm="handleUpdateConfirm" />
@@ -57,7 +67,7 @@
 <script lang="ts">
 import DynamicWidget from '@/services/billing/cost-management/cost-dashboard/modules/DynamicWidget.vue';
 import { CURRENCY } from '@/store/modules/display/config';
-import { PButton, PDataLoader } from '@spaceone/design-system';
+import { PDataLoader, PIconButton, PIconTextButton } from '@spaceone/design-system';
 import { defaultWidgetMap } from '@/services/billing/cost-management/widgets/lib/config';
 import {
     ComponentRenderProxy,
@@ -71,6 +81,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import CostDashboardUpdateWidgetModal
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardUpdateWidgetModal.vue';
 import { WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
+import { i18n } from '@/translations';
 
 type Row = string[]
 
@@ -86,8 +97,9 @@ export default {
         CostDashboardCustomizeWidgetModal,
         DynamicWidget,
         PDataLoader,
-        PButton,
         DeleteModal,
+        PIconButton,
+        PIconTextButton,
     },
     props: {
         loading: {
@@ -139,7 +151,7 @@ export default {
 
         const checkDeleteState = reactive({
             visible: false,
-            headerTitle: 'Are you sure you want to remove this widget?',
+            headerTitle: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.DELETE_TITLE'),
         });
 
         const getAddWidgetColumnByLayout = (widget, rowLength) => {
@@ -211,50 +223,70 @@ export default {
 <style lang="postcss" scoped>
 .dashboard-layouts::v-deep {
     margin-top: 1.5rem;
-    .data-loader-container .data-wrapper {
-        @apply flex flex-col;
-        row-gap: 1rem;
+    .data-loader-container {
+        .data-wrapper {
+            @apply flex flex-col;
+            row-gap: 1rem;
+            .row {
+                @apply flex;
+                column-gap: 1rem;
+                min-width: 60.75rem;
+                [class^='col-'] {
+                    @apply relative w-full;
+                }
+                .col-100 {
+                    min-width: 60.75rem;
+                    width: 100%;
+                }
+                .col-50 {
+                    min-width: 29.875rem;
+                    width: 50%;
+                }
+                .col-33 {
+                    min-width: 19.5625rem;
+                    width: 33.33%;
+                }
 
-        .row {
-            @apply flex;
-            column-gap: 1rem;
-            &.customize {
-                @apply border border-gray-300;
+                &.customize {
+                    @apply border border-gray-300 rounded-lg;
+                    $border-width: 0.1875rem;
+
+                    border-width: $border-width;
+                    min-width: calc(60.75rem + $border-width * 2);
+
+                    .btn-group {
+                        @apply absolute z-10 flex gap-2;
+                        top: 1rem;
+                        right: 1rem;
+                    }
+                    .empty-widget {
+                        @apply grid bg-white border border-dashed border-gray-300 rounded-lg;
+                        place-content: center;
+                    }
+                }
             }
         }
-        [class^='col-'] {
-            width: 100%;
-            &.customize {
-                height: 100%;
-                align-self: center;
-            }
-        }
-        .col-100 {
-            min-width: 60.75rem;
-            width: 100%;
-        }
-        .col-50 {
-            min-width: 29.875rem;
-            width: 50%;
-        }
-        .col-33 {
-            min-width: 19.5625rem;
-            width: 33.33%;
+        .no-data-wrapper {
+            @apply text-gray-900;
+            margin-top: 12.5rem;
         }
     }
     &.responsive {
-        .data-loader-container .data-wrapper {
-            @screen tablet {
-                row-gap: 1rem;
-                min-width: 100%;
-                max-width: 100%;
-                .row {
-                    @apply flex-col;
+        .data-loader-container {
+            .data-wrapper {
+                @screen tablet {
                     row-gap: 1rem;
-                }
-                [class^='col-'] {
-                    width: 100%;
                     min-width: 100%;
+                    max-width: 100%;
+                    .row {
+                        @apply flex-col;
+                        row-gap: 1rem;
+                        min-width: auto;
+                    }
+                    [class^='col-'] {
+                        width: 100%;
+                        min-width: 100%;
+                    }
                 }
             }
         }
