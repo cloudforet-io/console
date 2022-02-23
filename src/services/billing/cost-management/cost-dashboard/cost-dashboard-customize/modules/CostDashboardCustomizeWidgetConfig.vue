@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="widget-config">
         <p-field-group label="Name"
                        :invalid="invalidState.name"
                        :invalid-text="invalidTexts.name"
@@ -144,3 +144,8 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.widget-config {
+    @apply mt-6;
+}
+</style>

@@ -2,13 +2,15 @@
     <div class="cost-dashboard-customize-widget-preview">
         <slot name="description" />
         <slot name="chart" />
-        <section class="layout">
+        <div class="layout-preview-area">
             <p-label>Layout</p-label>
             <div class="layout-preview">
                 <span v-for="i in Math.round(100 / layout)" :key="i" />
             </div>
-            In ratio {{ layout }}%
-        </section>
+            <p class="text">
+                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.IN_RATIO') }} {{ layout }}%
+            </p>
+        </div>
         <slot name="extra" />
     </div>
 </template>
@@ -35,19 +37,23 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .cost-dashboard-customize-widget-preview {
-    @apply flex flex-col bg-gray-100 p-4;
-    width: 16.5rem;
-    height: 17.25rem;
+    @apply flex flex-col bg-gray-100 p-4 mt-8;
 
-    .layout-preview {
-        @apply flex col-gap-2;
-        width: 14.375rem;
-        height: 2.5rem;
-        > span {
-            @apply flex-grow bg-white rounded-md;
-            &:first-child {
-                @apply bg-gray-400;
+    .layout-preview-area {
+        .layout-preview {
+            @apply flex col-gap-2;
+            width: 14.375rem;
+            height: 2.5rem;
+            > span {
+                @apply flex-grow bg-white rounded-md;
+                &:first-child {
+                    @apply bg-gray-400;
+                }
             }
+        }
+        .text {
+            @apply mt-2 text-gray-900;
+            font-size: 0.875rem;
         }
     }
 }

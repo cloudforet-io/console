@@ -1,48 +1,50 @@
 <template>
     <div class="cost-dashboard-customize-custom-widget-tab">
-        <!--left side-->
-        <div class="custom-widget-wrapper">
-            <p class="title">
-                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.ALL') }} ({{ widgetList.length }})
-            </p>
-            <div class="custom-widget-list">
-                <div v-for="(widget, idx) in widgetList" :key="`widget-${idx}-${widget.name}`" class="widget-card"
-                     @click="handleSelectWidget(widget)"
-                >
-                    <div class="card-header">
-                        <p-radio :selected="selectedWidget.name" :value="widget.name" @click="handleSelectWidget(widget)">
-                            <span @click="handleSelectWidget(widget)">{{ widget.name }}</span>
-                        </p-radio>
-                    </div>
-                    <div class="card-content">
-                        {{ widget.options.chart_type }}
-                    </div>
-                </div>
+        <div class="left-area">
+            <div class="widgets-area">
+                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.ALL') }} ({{ widgetList.length }})</p-label>
+                <ul class="widget-list">
+                    <li v-for="(widget, idx) in widgetList" :key="`widget-${idx}-${widget.name}`" class="widget-card"
+                        :class="{'selected' : selectedItem.widget_id == widget.widget_id}"
+                        @click="handleSelectWidget(widget)"
+                    >
+                        <div class="card-header">
+                            <p-radio :selected="selectedWidget.name" :value="widget.name" @click="handleSelectWidget(widget)">
+                                <span @click="handleSelectWidget(widget)">{{ widget.name }}</span>
+                            </p-radio>
+                        </div>
+                        <div class="card-content">
+                            {{ widget.options.chart_type }}
+                        </div>
+                    </li>
+                </ul>
+                <p-text-pagination
+                    :this-page.sync="thisPage"
+                    :all-page="allPage"
+                    @pageChange="listCustomWidget"
+                />
             </div>
-            <p-text-pagination
-                :this-page.sync="thisPage"
-                :all-page="allPage"
-                @pageChange="listCustomWidget"
+            <cost-dashboard-customize-cost-query :selected-query.sync="selectedQuery"
+                                                 :widget-list="widgetList"
+                                                 class="cost-query-area"
+                                                 @create-custom-widget="handleCreateCustomWidget"
             />
         </div>
-        <cost-dashboard-customize-cost-query :selected-query.sync="selectedQuery"
-                                             :widget-list="widgetList"
-                                             @create-custom-widget="handleCreateCustomWidget"
-        />
-
-        <!--right side-->
-        <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length"
-                                                :selected-widget="selectedWidget"
-                                                :is-custom="true"
-        />
-        <custom-widget-preview v-if="showPreview"
-                               :selected-item="selectedItem"
-        />
-        <p-button v-if="Object.keys(selectedWidget).length" style-type="alert" outline
-                  @click="handleClickRemoveWidget"
-        >
-            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.REMOVE_WIDGET') }}
-        </p-button>
+        <div class="right-area">
+            <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length"
+                                                    :selected-widget="selectedWidget"
+                                                    :is-custom="true"
+            />
+            <custom-widget-preview v-if="showPreview"
+                                   :selected-item="selectedItem"
+            />
+            <p-button v-if="Object.keys(selectedWidget).length" style-type="alert" outline="true"
+                      class="btn-remove"
+                      @click="handleClickRemoveWidget"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.REMOVE_WIDGET') }}
+            </p-button>
+        </div>
     </div>
 </template>
 
@@ -51,7 +53,9 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PRadio, PTextPagination, PButton } from '@spaceone/design-system';
+import {
+    PRadio, PTextPagination, PButton, PLabel,
+} from '@spaceone/design-system';
 
 import CostDashboardCustomizeCostQuery
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeCostQuery.vue';
@@ -82,6 +86,7 @@ export default {
         PTextPagination,
         PRadio,
         PButton,
+        PLabel,
     },
     setup() {
         const state = reactive({
@@ -185,25 +190,17 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-dashboard-customize-custom-widget-tab {
-    .custom-widget-wrapper {
-        .title {
-            font-size: 0.875rem;
-            font-weight: bold;
+    .left-area {
+        .widgets-area {
+            @apply mb-4 border-b border-gray-200;
         }
-        .custom-widget-list {
-            @apply grid grid-cols-12;
-            gap: 0.5rem;
-            .widget-card {
-                @apply border border-gray-300 rounded-md col-span-4;
-                height: 7.1875rem;
-                .card-header {
-                    height: 3.125rem;
-                }
-                .card-content {
-                    @apply bg-gray-100;
-                    height: 4rem;
-                }
-            }
+        .cost-query-area {
+            @apply mr-8;
+        }
+    }
+    .right-area {
+        .btn-remove {
+            @apply block mt-6 ml-auto mr-auto;
         }
     }
 }

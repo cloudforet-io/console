@@ -1,14 +1,14 @@
 <template>
     <div class="cost-dashboard-customize-cost-query">
         <div class="title-wrapper">
-            <span class="title">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.COST_ANALYSIS_QUERY') }}</span>
+            <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.COST_ANALYSIS_QUERY') }}</p-label>
             <template v-if="!loading && costQuerySetList.length">
                 <p-icon-button name="ic_refresh" @click="handleRefresh" />
                 <p-anchor :to="{ name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME }"
                           :show-icon="false"
                 >
                     <p-icon-text-button style-type="primary1" name="ic_plus_bold">
-                        <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.CREATE_QUERY') }}</span>
+                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.CREATE_QUERY') }}
                     </p-icon-text-button>
                 </p-anchor>
             </template>
@@ -21,22 +21,27 @@
                          :class="{ selected: query.cost_query_set_id === selectedQuery.cost_query_set_id }"
                          @click="handleClickQueryItem(query)"
                     >
-                        <p>{{ query.name }}</p>
-                        <p-icon-text-button style-type="gray-border" name="ic_plus_bold" @click="handleAddToCustomWidget(query)">
+                        <p class="name">
+                            {{ query.name }}
+                        </p>
+                        <p-icon-text-button style-type="gray-border" name="ic_plus_bold" size="sm"
+                                            @click="handleAddToCustomWidget(query)"
+                        >
                             <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.ADD_TO_CUSTOM_WIDGET') }}</span>
                         </p-icon-text-button>
                     </div>
                 </div>
                 <template #no-data>
-                    <div>
-                        <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.NO_SAVED_QUERY') }}</span>
+                    <div class="refresh-wrapper">
+                        <span class="text">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.NO_SAVED_QUERY') }}</span>
                         <p-icon-button name="ic_refresh" @click="handleRefresh" />
                     </div>
-                    <div>
+                    <p class="help-text">
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.NO_SAVED_QUERY_HELP_TEXT') }}
-                    </div>
+                    </p>
                     <p-anchor :to="{ name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME }"
                               :show-icon="false"
+                              class="btn-add-query"
                     >
                         <p-icon-text-button style-type="primary1" name="ic_plus_bold">
                             <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.CREATE_QUERY') }}</span>
@@ -52,7 +57,7 @@
 import { reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PAnchor, PDataLoader, PIconButton, PIconTextButton,
+    PAnchor, PDataLoader, PIconButton, PIconTextButton, PLabel,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -75,6 +80,7 @@ export default {
         PIconTextButton,
         PAnchor,
         PDataLoader,
+        PLabel,
     },
     props: {
         selectedQuery: {
@@ -161,28 +167,59 @@ export default {
     padding: 1rem;
 
     .title-wrapper {
-        .title {
-            font-weight: bold;
-            font-size: 0.875rem;
+        @apply flex items-center;
+        .p-label {
+            @apply mr-auto;
+        }
+        .p-anchor {
+            @apply ml-4;
+            &:hover::v-deep .text {
+                text-decoration: none;
+            }
         }
     }
 
     .content-wrapper::v-deep {
         .p-data-loader {
             .no-data-wrapper {
-                display: block;
+                @apply block;
+                font-size: 0.875rem;
+                .refresh-wrapper {
+                    @apply align-top;
+                    .text {
+                        @apply inline-block text-primary-2 font-bold;
+                        line-height: 2rem;
+                    }
+                }
+                .help-text {
+                    @apply mt-4 mb-4;
+                }
+                .btn-add-query {
+                    &:hover .text {
+                        text-decoration: none;
+                    }
+                }
             }
         }
         .query-list-wrapper {
-            @apply grid grid-cols-12;
+            @apply grid grid-cols-12 grid-cols-3 gap-2 mt-4;
             .query-item {
-                @apply col-span-4 bg-white;
-                height: 7rem;
+                @apply flex flex-col bg-white border border-gray-300 rounded-lg cursor-pointer;
+                min-height: 7rem;
                 padding: 0.5rem 1rem;
-                margin: 0.5rem;
-
                 &.selected {
-                    @apply border border-secondary;
+                    @apply border border-blue-500;
+                }
+
+                .name {
+                    @apply flex-grow font-bold mb-6;
+                    min-height: 2.25rem;
+                    font-size: 0.875rem;
+                    line-height: 1.25;
+                }
+                .p-icon-text-button {
+                    @apply block ml-auto mr-auto;
+                    max-width: 100%;
                 }
             }
         }

@@ -1,28 +1,29 @@
 <template>
     <cost-dashboard-customize-widget-preview :layout="LAYOUT">
         <template #description>
-            <div>
-                <b>Query Name</b> <span>{{ queryName }}</span>
+            <div class="info-item">
+                <p-label>Query Name</p-label> <span>{{ queryName }}</span>
             </div>
-            <div>
-                <b>Granularity</b> <span>{{ getGranularityText(granularity) }}</span>
+            <div class="info-item">
+                <p-label>Granularity</p-label> <span>{{ getGranularityText(granularity) }}</span>
             </div>
-            <div>
-                <b>Stack</b> <span>{{ stack ? 'On' : 'Off' }}</span>
+            <div class="info-item">
+                <p-label>Stack</p-label> <span>{{ stack ? 'On' : 'Off' }}</span>
             </div>
-            <div>
-                <b>Group By</b> <span>{{ getGroupByText(groupBy) }}</span>
+            <div class="info-item">
+                <p-label>Group By</p-label> <span :class="{ 'text-gray-500': !groupBy }">{{ getGroupByText(groupBy) }}</span>
             </div>
-            <div>
-                <b>Filters</b> <span>{{ getFiltersText(filters) }}</span>
+            <div class="info-item">
+                <p-label>Filters</p-label> <span :class="{'text-gray-500': !(filters.length > 0)}">{{ getFiltersText(filters) }}</span>
             </div>
-            <div>
-                <b>Start Date ~ End Date (UTC)</b> <span>{{ getPeriodText(period) }}</span>
+            <div class="info-item">
+                <p-label>Start Date ~ End Date (UTC)</p-label> <span>{{ getPeriodText(period) }}</span>
             </div>
         </template>
         <template #extra>
             <p-anchor :to="getViewQueryLink()"
                       :show-icon="false"
+                      class="btn-view-query"
             >
                 <p-icon-text-button style-type="primary1" name="ic_plus_bold">
                     <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.ADD_WIDGET.VIEW_QUERY') }}</span>
@@ -38,7 +39,7 @@ import { capitalize } from 'lodash';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PIconTextButton, PAnchor,
+    PIconTextButton, PAnchor, PLabel,
 } from '@spaceone/design-system';
 
 import CostDashboardCustomizeWidgetPreview
@@ -60,6 +61,7 @@ export default {
         CostDashboardCustomizeWidgetPreview,
         PIconTextButton,
         PAnchor,
+        PLabel,
     },
     props: {
         selectedItem: {
@@ -150,3 +152,18 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.info-item {
+    @apply mb-2;
+    font-size: 0.875rem;
+    .p-label {
+        @apply mb-0 mr-2;
+    }
+}
+.btn-view-query {
+    @apply mt-2 ml-auto mr-auto;
+    &:hover::v-deep .text {
+        text-decoration: none;
+    }
+}
+</style>
