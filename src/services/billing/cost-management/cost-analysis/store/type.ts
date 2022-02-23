@@ -10,9 +10,9 @@ export interface CostAnalysisStoreState {
     granularity: GRANULARITY;
     stack: boolean;
     groupBy: GROUP_BY[];
-    primaryGroupBy: GROUP_BY|undefined;
+    primaryGroupBy?: GROUP_BY;
     period: Period;
     filters: CostQueryFilters;
-    selectedQueryId: string|undefined;
+    selectedQueryId?: string;
     costQueryList: CostQuerySetModel[];
 }

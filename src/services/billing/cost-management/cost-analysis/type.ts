@@ -9,7 +9,7 @@ export type CostAnalysisPageUrlQuery = Partial<Record<COST_ANALYSIS_PAGE_URL_QUE
 export interface CostAnalysisPageQueryValue {
     period?: Period;
     groupBy?: GROUP_BY[];
-    primaryGroupBy?: GROUP_BY|undefined;
+    primaryGroupBy?: GROUP_BY;
     filters?: CostQueryFilters;
     stack?: boolean;
     granularity?: GRANULARITY;

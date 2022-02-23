@@ -16,10 +16,10 @@ export type CostQueryFilterItemsMap = Partial<Record<FILTER, FilterItem[]>>
 
 export interface CostQuerySetOption {
     group_by?: GROUP_BY[];
-    primary_group_by?: string|undefined;
+    primary_group_by?: GROUP_BY;
     granularity: GRANULARITY;
     stack?: boolean;
-    period?: Period;
+    period: Period;
     filters?: CostQueryFilters;
 }
 

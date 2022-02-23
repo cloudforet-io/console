@@ -43,10 +43,11 @@ import {
     queryStringToObject,
     queryStringToString,
 } from '@/lib/router-query-string';
+import CostAnalysisHeader from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisHeader.vue';
 import { CostAnalysisPageUrlQuery } from '@/services/billing/cost-management/cost-analysis/type';
 import { CostQuerySetModel, CostQuerySetOption } from '@/services/billing/cost-management/type';
 import { Location } from 'vue-router';
-import CostAnalysisHeader from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisHeader.vue';
+import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
 
 export interface SaveQueryEmitParam {
     updatedQuery: CostQuerySetModel;
@@ -99,7 +100,7 @@ export default {
             granularity: queryStringToString(urlQuery.granularity),
             stack: queryStringToBoolean(urlQuery.stack),
             group_by: queryStringToArray(urlQuery.groupBy),
-            primary_group_by: queryStringToString(urlQuery.primaryGroupBy),
+            primary_group_by: queryStringToString(urlQuery.primaryGroupBy) as GROUP_BY,
             period: queryStringToObject(urlQuery.period),
             filters: queryStringToObject(urlQuery.filters),
         });
