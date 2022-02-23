@@ -1,3 +1,10 @@
+# [1.1.0-beta.247](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.246...v1.1.0-beta.247) (2022-02-23)
+
+
+### Bug Fixes
+
+* reset to previously selected item when entered incorrectly ([#870](https://github.com/spaceone-dev/spaceone-design-system/issues/870)) ([8431125](https://github.com/spaceone-dev/spaceone-design-system/commit/843112524c8e1f5184ed8221798466edb720e998))
+
 # [1.1.0-beta.246](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.245...v1.1.0-beta.246) (2022-02-23)
 
 
