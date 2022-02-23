@@ -1,10 +1,10 @@
 <template>
-    <p-chart-loader :loading="loading" class="cost-analysis-stacked-column-chart">
+    <p-data-loader :loading="loading" class="cost-analysis-stacked-column-chart">
         <template #loader>
             <p-skeleton height="100%" />
         </template>
         <div ref="chartRef" class="chart" />
-    </p-chart-loader>
+    </p-data-loader>
 </template>
 
 <script lang="ts">
@@ -20,7 +20,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PSkeleton,
+    PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
@@ -53,7 +53,7 @@ interface Props extends WidgetProps {
 export default {
     name: 'CostAnalysisStackedColumnChart',
     components: {
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
     },
     props: {
