@@ -17,14 +17,14 @@
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.PUBLIC') }}
                 </p>
                 <ul>
-                    <cost-dashboard-list :dashboard-list="publicDashboardList" />
+                    <cost-dashboard-list :public-dashboard-items="publicDashboardList" />
                 </ul>
             </div>
             <details v-if="!loading" class="dashboard-list">
                 <summary class="dashboard-type">
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.MY_DASHBOARD') }}
                 </summary>
-                <cost-dashboard-list :dashboard-list="userDashboardList" />
+                <cost-dashboard-list :user-dashboard-items="userDashboardList" :is-public="false" />
             </details>
         </div>
         <div v-for="(item) in menuList" :key="item.label"
@@ -86,16 +86,8 @@ export default {
                 },
             ]),
             currentRouteName: computed(() => vm.$route.name),
-            publicDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.publicDashboardList?.map(d => ({
-                ...d,
-                dashboard_id: d.public_dashboard_id,
-                label: d.name,
-            }))),
-            userDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.userDashboardList?.map(d => ({
-                ...d,
-                dashboard_id: d.user_dashboard_id,
-                label: d.name,
-            }))),
+            publicDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.publicDashboardList),
+            userDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.userDashboardList),
             loading: true,
         });
 

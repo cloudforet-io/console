@@ -1,5 +1,5 @@
 <template>
-    <fragment>
+    <div>
         <li v-for="(item) in dashboardList" :key="item.dashboard_id"
             class="menu-item"
             :class="{'selected': item.dashboard_id === dashboardIdFromRoute}"
@@ -31,13 +31,13 @@
                                @select="handleSelectMoreMenu(item, ...arguments)"
             />
         </li>
-    </fragment>
+    </div>
 </template>
 
 <script lang="ts">
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, PropType, reactive, toRefs,
 } from '@vue/composition-api';
 import {
     PI, PSelectDropdown,
@@ -46,6 +46,11 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import {
+    DashboardMenuItem,
+    PublicDashboardInfo,
+    UserDashboardInfo,
+} from '@/services/billing/cost-management/cost-dashboard/type';
 
 
 export default {
@@ -55,9 +60,17 @@ export default {
         PSelectDropdown,
     },
     props: {
-        dashboardList: {
-            type: Array,
+        publicDashboardItems: {
+            type: Array as PropType<Array<PublicDashboardInfo>>,
             default: () => [],
+        },
+        userDashboardItems: {
+            type: Array as PropType<Array<UserDashboardInfo>>,
+            default: () => [],
+        },
+        isPublic: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props) {
@@ -70,6 +83,17 @@ export default {
             selectedMoreMenuItem: '',
             dashboardIdFromRoute: computed<string|undefined>(() => vm.$route.params.dashboardId),
             homeDashboardId: computed(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
+            publicDashboardList: computed<DashboardMenuItem[]>(() => props.publicDashboardItems?.map(d => ({
+                ...d,
+                dashboard_id: d.public_dashboard_id,
+                label: d.name,
+            }))),
+            userDashboardList: computed<DashboardMenuItem[]>(() => props.userDashboardItems?.map(d => ({
+                ...d,
+                dashboard_id: d.user_dashboard_id,
+                label: d.name,
+            }))),
+            dashboardList: computed<DashboardMenuItem[]>(() => (props.isPublic ? state.publicDashboardList : state.userDashboardList)),
         });
 
         /* util */

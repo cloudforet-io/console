@@ -64,7 +64,6 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { keyBy } from 'lodash';
 import { i18n } from '@/translations';
 import {
     PBreadcrumbs, PIconButton, PIconTextButton, PPageTitle,
@@ -81,7 +80,7 @@ import CostDashboardMoreMenu from '@/services/billing/cost-management/cost-dashb
 import CostDashboardPeriodSelectDropdown
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
 import {
-    CustomLayout, DashboardInfo,
+    DashboardInfo,
 } from '@/services/billing/cost-management/cost-dashboard/type';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 import { SpaceRouter } from '@/router';
@@ -91,6 +90,7 @@ import CostDashboardPreview from '@/services/billing/cost-management/cost-dashbo
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import { CostDashboardState } from '@/services/billing/cost-management/cost-dashboard/store/type';
 import CostDashboardStoreModule from '@/services/billing/cost-management/cost-dashboard/store';
+import { getDashboardLayout } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
 
 export default {
     name: 'CostDashboardPage',
@@ -163,6 +163,7 @@ export default {
                         public_dashboard_id: props.dashboardId,
                     });
                 }
+                await store.dispatch('service/costDashboard/setDashboardList');
                 await SpaceRouter.router.replace({ name: BILLING_ROUTE.COST_MANAGEMENT._NAME });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, 'Failed to delete dashboard');
@@ -182,33 +183,6 @@ export default {
 
         const handlePreviewRendered = (elements: HTMLElement[]) => {
             state.previewItems = elements.map(element => ({ element, type: 'image' }));
-        };
-
-        const fetchDefaultLayoutData = async (layoutId: string): Promise<any[]> => {
-            try {
-                // noinspection TypeScriptCheckImport
-                const layoutTemplates = await import(`./dashboard-layouts/${layoutId}.json`);
-                const widgets = await import('../widgets/lib/defaultWidgetList.json');
-
-                const optionsKeyByWidgetId = keyBy(widgets.default, option => option.widget_id);
-                const layoutData: CustomLayout[] = layoutTemplates.default.map(layout => layout.map((d) => {
-                    const widget = optionsKeyByWidgetId[d.widget_id];
-                    return widget ? { ...widget } : {};
-                }));
-
-                return layoutData;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return [];
-            }
-        };
-
-        const getDashboardLayout = async (dashboard: DashboardInfo): Promise<CustomLayout[]> => {
-            let layout: CustomLayout[];
-            if (dashboard?.default_layout_id && dashboard.custom_layouts.length === 0) {
-                layout = await fetchDefaultLayoutData(dashboard.default_layout_id);
-            } else layout = dashboard.custom_layouts;
-            return layout;
         };
 
         const fetchDashboard = async (dashboardId: string): Promise<DashboardInfo> => {
