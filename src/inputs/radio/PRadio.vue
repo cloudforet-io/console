@@ -104,7 +104,7 @@ export default defineComponent<Props>({
     vertical-align: middle;
     &:hover {
         .text {
-            @apply text-blue-500;
+            @apply text-blue-600;
         }
         .radio-icon {
             @apply text-gray-900;

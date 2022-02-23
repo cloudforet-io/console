@@ -465,7 +465,7 @@ export default {
         font-size: 0.75rem;
         line-height: 2rem;
         &:hover:not(.selected):not(.today):not(.prevMonthDay):not(.nextMonthDay):not(.inRange):not(.startRange):not(.endRange):not(.flatpickr-disabled) {
-            @apply text-blue-500 bg-blue-100 border-blue-100;
+            @apply text-blue-600 bg-blue-100 border-blue-100;
         }
         &.today:not(.flatpickr-disabled):not(.today) {
             @apply border-gray-400;
@@ -479,9 +479,9 @@ export default {
             }
         }
         &.selected, &.startRange, &.endRange {
-            @apply bg-blue-500 border-blue-500 text-white;
+            @apply bg-blue-600 border-blue-600 text-white;
             &.inRange, &:focus, &:hover, &.prevMonthDay, &.nextMonthDay {
-                @apply bg-blue-500 border-blue-500 text-white;
+                @apply bg-blue-600 border-blue-600 text-white;
             }
         }
         &.startRange {

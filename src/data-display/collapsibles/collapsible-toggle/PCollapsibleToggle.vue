@@ -76,7 +76,7 @@ export default defineComponent<CollapsibleToggleProps>({
 
 <style lang="postcss">
 .p-collapsible-toggle {
-    @apply inline-flex text-blue-600 cursor-pointer;
+    @apply inline-flex text-blue-700 cursor-pointer;
     font-size: 0.75rem;
     font-weight: 400;
     align-items: center;

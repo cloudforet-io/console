@@ -109,7 +109,7 @@ export default defineComponent<CheckboxProps>({
 
     &:hover {
         .text {
-            @apply text-blue-500;
+            @apply text-blue-600;
         }
         .check-icon {
             @apply text-gray-900;

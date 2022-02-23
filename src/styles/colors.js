@@ -130,7 +130,7 @@ const colorSet = {
     },
     green: {
         ...palette.green,
-        default: palette.green[500],
+        default: palette.green[600],
     },
     blue: {
         ...palette.blue,
@@ -142,7 +142,7 @@ const colorSet = {
     },
     peacock: {
         ...palette.peacock,
-        default: palette.peacock[500],
+        default: palette.peacock[600],
     },
     indigo: {
         ...palette.indigo,
@@ -154,7 +154,7 @@ const colorSet = {
 const semanticColors = {
     primary: palette.violet[600],
     primaryDark: palette.violet[800],
-    primary1: palette.violet[500],
+    primary1: palette.violet[400],
     primary2: palette.violet[300],
     primary3: palette.violet[200],
     primary4: palette.violet[100],

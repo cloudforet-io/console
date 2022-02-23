@@ -88,7 +88,7 @@ export default {
         }
     }
     a {
-        @apply text-blue-600;
+        @apply text-blue-700;
         font-size: 0.75rem;
         line-height: 150%;
         margin-bottom: 1.5rem;

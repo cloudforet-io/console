@@ -443,9 +443,9 @@ export default defineComponent<SelectDropdownProps>({
             .dropdown-button {
                 @media (hover: hover) {
                     &:not(.active):not(.disabled):hover {
-                        @apply border-blue-500;
+                        @apply border-blue-600;
                         .dropdown-icon {
-                            @apply text-blue-500;
+                            @apply text-blue-600;
                         }
                     }
                 }
