@@ -68,9 +68,9 @@
                     {{ $t('PROJECT.EVENT_RULE.ADDITIONAL_RESPONDER') }}
                 </p>
                 <p-search-dropdown class="user-search-dropdown"
-                                   type="checkbox"
                                    :menu="userItems"
                                    :selected.sync="selectedResponder"
+                                   multi-selectable
                                    use-fixed-menu-style
                 />
             </div>

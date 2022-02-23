@@ -21,26 +21,20 @@
                     </p>
                     <p-search-dropdown
                         v-show="activeTab === FORM_MODE.INTERNAL_USER"
-                        type="checkbox"
                         :menu="internalItems"
                         :selected.sync="formState.userItems"
-                        :show-selected-list="true"
-                        :show-tag-box="false"
-                        :show-select-all="true"
+                        multi-selectable
                         use-fixed-menu-style
                     />
                     <p-search-dropdown
                         v-show="activeTab !== FORM_MODE.INTERNAL_USER"
                         v-model="searchText"
-                        type="checkbox"
                         :loading="loading"
                         :menu="externalItems"
                         :selected.sync="formState.userItems"
-                        :show-selected-list="true"
-                        :show-tag-box="false"
-                        :show-select-all="true"
                         disable-handler
                         :exact-mode="false"
+                        multi-selectable
                         use-fixed-menu-style
                         @search="onSearchExternalUser"
                         @focus="onFocusExternalUserSearch"

@@ -12,11 +12,10 @@
             </p>
             <p-search-dropdown
                 class="search-dropdown-box"
-                type="checkbox"
                 :menu="additionalFieldState.additionalList"
                 :selected="additionalFieldState.selectedAdditional"
                 use-fixed-menu-style
-                show-selected-list
+                multi-selectable
                 :placeholder="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SEARCH_PLACEHOLDER')"
             />
             <p class="title">

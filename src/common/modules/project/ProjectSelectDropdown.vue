@@ -1,11 +1,10 @@
 <template>
     <div class="project-select-dropdown">
         <p-search-dropdown :loading="loading"
-                           :disable-icon="true"
                            :visible-menu.sync="visibleMenu"
                            :is-focused.sync="isFocused"
-                           :type="multiSelectable ? 'checkbox' : 'radioButton'"
-                           show-tag-box
+                           :type="multiSelectable ? undefined : 'radioButton'"
+                           :multi-selectable="multiSelectable"
                            :exact-mode="false"
                            :use-fixed-menu-style="useFixedMenuStyle"
                            :invalid="invalid"

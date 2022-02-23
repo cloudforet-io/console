@@ -33,9 +33,9 @@
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
                 <span class="text-gray-500"> ({{ responderState.selectedMemberItems.length }})</span>
             </p>
-            <p-search-dropdown type="checkbox"
-                               :menu="responderState.allMemberItems"
+            <p-search-dropdown :menu="responderState.allMemberItems"
                                :selected.sync="responderState.selectedMemberItems"
+                               multi-selectable
                                @hide-menu="onHideMenu"
                                @delete-tag="onDeleteTag"
             />

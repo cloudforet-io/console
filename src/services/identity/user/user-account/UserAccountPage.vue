@@ -11,7 +11,7 @@
                 <p-text-input v-model="userId" disabled class="text-input" />
             </p-field-group>
             <p-field-group required :label="$t('COMMON.PROFILE.NAME')" class="input-form">
-                <p-text-input v-model="userName" class="text-input" />
+                <p-text-input v-model="formState.userName" class="text-input" />
             </p-field-group>
             <p-field-group required :label="$t('COMMON.PROFILE.ROLE')" class="input-form">
                 <p-text-input v-model="userRole" disabled class="text-input" />
@@ -22,7 +22,7 @@
                            class="input-form"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="email"
+                    <p-text-input v-model="formState.email"
                                   class="text-input"
                                   :invalid="invalid"
                     />
@@ -33,26 +33,25 @@
                            :invalid-text="validationState.timezoneInvalidText"
             >
                 <template #default="{invalid}">
-                    <p-search-dropdown v-model="timezone"
-                                       :class="{invalid}"
-                                       :menu="timezones"
+                    <p-search-dropdown :menu="timezones"
+                                       :selected.sync="formState.timezone"
+                                       :invalid="validationState.showValidation && !!validationState.timezoneInvalidText"
                                        :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
-                                       disable-icon
                     />
                 </template>
             </p-field-group>
             <p-field-group required :label="$t('COMMON.PROFILE.LANGUAGE')" class="input-form">
-                <p-select-dropdown v-model="language"
+                <p-select-dropdown v-model="formState.language"
                                    :items="languages"
                 />
             </p-field-group>
-            <div class="save-btn">
+            <div class="save-button">
                 <p-button style-type="primary-dark" @click="onClickProfileConfirm">
                     {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
                 </p-button>
             </div>
         </p-pane-layout>
-        <div v-if="userType == 'LOCAL'">
+        <div v-if="userType === 'LOCAL'">
             <p-pane-layout class="mt-6 form-wrapper">
                 <p class="form-title">
                     {{ $t('IDENTITY.USER.ACCOUNT.CHANGE_PASSWORD') }}
@@ -66,7 +65,7 @@
                         class="input-form"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="password" type="password"
+                            <p-text-input v-model="formState.password" type="password"
                                           class="text-input"
                                           :invalid="invalid"
                             />
@@ -80,14 +79,14 @@
                         class="input-form"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="passwordCheck" type="password"
+                            <p-text-input v-model="formState.passwordCheck" type="password"
                                           class="text-input"
                                           :invalid="invalid"
                             />
                         </template>
                     </p-field-group>
                 </form>
-                <div class="save-btn">
+                <div class="save-button">
                     <p-button style-type="primary-dark" @click="onClickPasswordConfirm">
                         {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
                     </p-button>
@@ -105,6 +104,7 @@ import {
 import {
     PPaneLayout, PButton, PBreadcrumbs, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle, PSearchDropdown,
 } from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { map } from 'lodash';
 import { languages, timezoneList } from '@/store/modules/user/config';
@@ -113,6 +113,8 @@ import { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
+
 
 export default {
     name: 'UserAccountPage',
@@ -136,24 +138,26 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            userId: computed(() => store.state.user.userId),
-            userName: '' as string | undefined,
             isAdmin: computed(() => store.getters['user/isAdmin']).value,
+            userId: computed(() => store.state.user.userId),
             userRole: computed(() => {
                 const roleArray = store.getters['user/roleNames'];
                 return roleArray.join(', ');
             }),
             userType: computed(() => store.state.user.backend) as unknown as string,
-            language: '' as LanguageCode | undefined,
-            timezone: '' as string | undefined,
-            formattedTimezone: computed(() => state.timezone.replace(' (default)', '')),
             languages: map(languages, (d, k) => ({
                 type: 'item', label: k === 'en' ? `${d} (default)` : d, name: k,
-            })),
+            })) as MenuItem[],
             timezones: map(timezoneList, d => ({
                 type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
-            })),
+            })) as SearchDropdownMenuItem[],
+        });
+
+        const formState = reactive({
+            userName: '' as string | undefined,
             email: '',
+            timezone: [] as SearchDropdownMenuItem[],
+            language: '' as LanguageCode | undefined,
             password: '',
             passwordCheck: '',
         });
@@ -167,7 +171,7 @@ export default {
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
             timezoneInvalidText: computed(() => {
-                if (!state.timezone || !timezoneList.includes(state.formattedTimezone)) return vm.$t('IDENTITY.USER.FORM.TIMEZONE_INVALID');
+                if (!formState.timezone.length) return vm.$t('IDENTITY.USER.FORM.TIMEZONE_INVALID');
                 return '';
             }),
             showValidation: false,
@@ -187,8 +191,8 @@ export default {
 
         const checkEmail = async () => {
             const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-            if (state.email) {
-                if (!regex.test(state.email)) {
+            if (formState.email) {
+                if (!regex.test(formState.email)) {
                     validationState.isEmailValid = false;
                     validationState.emailInvalidText = vm.$t('IDENTITY.USER.FORM.EMAIL_INVALID');
                 } else {
@@ -221,7 +225,7 @@ export default {
             }
 
             // password2
-            if (password !== state.passwordCheck) {
+            if (password !== formState.passwordCheck) {
                 validationState.isPasswordCheckValid = false;
                 validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
             } else {
@@ -250,37 +254,36 @@ export default {
             if (!validationState.isEmailValid || validationState.timezoneInvalidText) return;
 
             const userParam: UpdateUserRequest = {
-                name: state.userName,
-                email: state.email,
-                language: state.language,
-                timezone: state.formattedTimezone,
+                name: formState.userName,
+                email: formState.email,
+                language: formState.language,
+                timezone: formState.timezone[0].name,
             };
             await updateUser(userParam);
         };
 
         const onClickPasswordConfirm = async () => {
-            await checkPassword(state.password);
+            await checkPassword(formState.password);
             if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
             const userParam: UpdateUserRequest = {
-                password: state.password,
+                password: formState.password,
             };
             await updateUser(userParam);
         };
 
-        const getProfile = async (id) => {
+        const getProfile = async () => {
             try {
-                await store.dispatch('user/getUser', id);
-                state.userName = store.state.user.name;
-                state.email = store.state.user.email;
-                state.language = store.state.user.language;
-                state.timezone = store.state.user.timezone;
+                formState.userName = store.state.user.name;
+                formState.email = store.state.user.email;
+                formState.language = store.state.user.language;
+                formState.timezone = state.timezones.filter(d => d.name === store.state.user.timezone);
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         };
 
         const init = async () => {
-            await getProfile(state.userId);
+            await getProfile();
         };
         init();
 
@@ -288,6 +291,7 @@ export default {
             ...toRefs(state),
             routeState,
             validationState,
+            formState,
             onClickProfileConfirm,
             onClickPasswordConfirm,
         };
@@ -334,13 +338,8 @@ export default {
         width: 100%;
     }
 }
-.p-search-dropdown::v-deep {
-    &.invalid .p-search {
-        @apply border-alert;
-    }
-}
 
-.save-btn {
+.save-button {
     display: flex;
     justify-content: flex-end;
     margin-top: 2rem;

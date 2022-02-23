@@ -16,10 +16,9 @@
                            :menu="resourceMenuItems"
                            :handler="resourceMenuItems ? undefined : resourceMenuHandler"
                            :loading="resourceMenuLoading"
-                           type="checkbox"
-                           show-selected-list
                            :invalid="!disableValidation && invalidState.selectedResources"
                            :selected="selectedResources"
+                           multi-selectable
                            @update:selected="setForm('selectedResources', $event)"
         />
     </p-field-group>
@@ -39,7 +38,7 @@ import { PFieldGroup, PRadio, PSearchDropdown } from '@spaceone/design-system';
 import {
     AutocompleteHandler,
     SearchDropdownMenuItem,
-} from '@spaceone/design-system/dist/src/inputs/search/search-dropdown/type';
+} from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';

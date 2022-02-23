@@ -1,9 +1,9 @@
 <template>
     <p-search-dropdown class="add-notification-member-group"
-                       type="checkbox"
                        :loading="loading"
                        :menu="allMemberItems"
                        :selected.sync="selectedMemberItems"
+                       multi-selectable
                        use-fixed-menu-style
     />
 </template>

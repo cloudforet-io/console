@@ -15,19 +15,17 @@
         <p-search-dropdown
             v-else-if="type === FILTER.SERVICE_ACCOUNT || type === FILTER.REGION || type === FILTER.PROVIDER"
             :menu="menuItems"
-            type="checkbox"
             :selected="selectedItems"
-            :show-selected-list="true"
+            multi-selectable
             use-fixed-menu-style
             @update:selected="handleSelectMenuItem"
         />
         <p-search-dropdown
             v-else
-            type="checkbox"
             :handler="menuHandler"
             :selected="selectedItems"
-            :show-selected-list="true"
             :loading="menuLoading"
+            multi-selectable
             use-fixed-menu-style
             @update:selected="handleSelectMenuItem"
         />
@@ -49,7 +47,7 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import {
     AutocompleteHandler, SearchDropdownMenuItem,
-} from '@spaceone/design-system/dist/src/inputs/search/search-dropdown/type';
+} from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 import { FILTER } from '@/services/billing/cost-management/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
