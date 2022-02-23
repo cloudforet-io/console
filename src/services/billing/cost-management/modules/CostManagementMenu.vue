@@ -11,7 +11,13 @@
                 </p-icon-text-button>
             </template>
         </sidebar-title>
-        <cost-dashboard-list />
+        <ul v-if="!loading" class="dashboard-list">
+            <cost-dashboard-list :dashboard-list="publicDashboardList" />
+        </ul>
+        <details v-if="!loading" class="dashboard-list">
+            <summary>My</summary>
+            <cost-dashboard-list :dashboard-list="userDashboardList" />
+        </details>
         <div v-for="(item) in menuList" :key="item.label"
              @click="showPage(item.routeName)"
         >
@@ -35,6 +41,14 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 import { SpaceRouter } from '@/router';
 import CostDashboardList from '@/services/billing/cost-management/modules/CostDashboardList.vue';
 import { PIconTextButton } from '@spaceone/design-system';
+import {
+    DashboardMenuItem,
+} from '@/services/billing/cost-management/cost-dashboard/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
+import { registerServiceStore } from '@/common/composables/register-service-store';
+import { CostDashboardState } from '@/services/billing/cost-management/cost-dashboard/store/type';
+import CostDashboardStoreModule from '@/services/billing/cost-management/cost-dashboard/store';
 
 interface ListItem {
     routeName?: string;
@@ -49,6 +63,7 @@ export default {
         PIconTextButton,
     },
     setup() {
+        registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             menuList: computed<ListItem[]>(() => [
@@ -62,7 +77,30 @@ export default {
                 },
             ]),
             currentRouteName: computed(() => vm.$route.name),
+            publicDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.publicDashboardList?.map(d => ({
+                ...d,
+                dashboard_id: d.public_dashboard_id,
+                label: d.name,
+            }))),
+            userDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.userDashboardList?.map(d => ({
+                ...d,
+                dashboard_id: d.user_dashboard_id,
+                label: d.name,
+            }))),
+            loading: true,
         });
+
+        const listDashboard = async () => {
+            try {
+                state.loading = true;
+                await store.dispatch('service/costDashboard/setDashboardList');
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+
 
         /* util */
         const showPage = (routeName) => {
@@ -79,6 +117,11 @@ export default {
             });
         };
 
+        (async () => {
+            await listDashboard();
+        })();
+
+
         return {
             ...toRefs(state),
             showPage,
@@ -92,5 +135,8 @@ export default {
 .sidebar-title {
     @apply flex justify-between;
     padding-right: 1rem;
+}
+.dashboard-list {
+    padding: 0 0.75rem 1.25rem;
 }
 </style>

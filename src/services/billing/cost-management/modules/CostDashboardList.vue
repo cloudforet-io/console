@@ -1,74 +1,36 @@
 <template>
     <fragment>
-        <ul class="dashboard-list">
-            <li v-for="(item) in publicDashboardList" :key="item.public_dashboard_id"
-                class="menu-item"
-                :class="{'selected': item.public_dashboard_id === dashboardIdFromRoute}"
+        <li v-for="(item) in dashboardList" :key="item.dashboard_id"
+            class="menu-item"
+            :class="{'selected': item.dashboard_id === dashboardIdFromRoute}"
+        >
+            <router-link
+                :to="{
+                    name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                    params: {
+                        dashboardId: item.dashboard_id
+                    }
+                }"
+                class="link inline-block"
             >
-                <router-link
-                    :to="{
-                        name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
-                        params: {
-                            dashboardId: item.public_dashboard_id
-                        }
-                    }"
-                    class="link inline-block"
-                >
-                    <span class="title">
-                        {{ item.name }}
-                    </span>
-                    <p-i v-if="item.public_dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
-                         width="0.875rem" height="0.875rem"
-                    />
-                </router-link>
-                <p-select-dropdown :selected="selectedMoreMenuItem"
-                                   class="more-button"
-                                   :items="moreMenuItems"
-                                   button-style-type="transparent"
-                                   use-fixed-menu-style
-                                   menu-position="right"
-                                   type="icon-button"
-                                   button-icon="ic_more"
-                                   @select="handleSelectMoreMenu(item, ...arguments)"
+                <span class="title">
+                    {{ item.name }}
+                </span>
+                <p-i v-if="item.dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
+                     width="0.875rem" height="0.875rem"
                 />
-            </li>
-        </ul>
-        <details class="dashboard-list">
-            <summary>My</summary>
-            <ul>
-                <li v-for="(item) in userDashboardList" :key="item.user_dashboard_id"
-                    class="menu-item"
-                    :class="{'selected': item.user_dashboard_id === dashboardIdFromRoute}"
-                >
-                    <router-link
-                        :to="{
-                            name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
-                            params: {
-                                dashboardId: item.user_dashboard_id
-                            }
-                        }"
-                        class="link inline-block"
-                    >
-                        <span class="title">
-                            {{ item.name }}
-                        </span>
-                        <p-i v-if="item.user_dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
-                             width="0.875rem" height="0.875rem"
-                        />
-                    </router-link>
-                    <p-select-dropdown :selected="selectedMoreMenuItem"
-                                       class="more-button"
-                                       :items="moreMenuItems"
-                                       button-style-type="transparent"
-                                       use-fixed-menu-style
-                                       menu-position="right"
-                                       type="icon-button"
-                                       button-icon="ic_more"
-                                       @select="handleSelectMoreMenu(item, ...arguments)"
-                    />
-                </li>
-            </ul>
-        </details>
+            </router-link>
+            <p-select-dropdown :selected="selectedMoreMenuItem"
+                               class="more-button"
+                               :items="moreMenuItems"
+                               button-style-type="transparent"
+                               use-fixed-menu-style
+                               menu-position="right"
+                               type="icon-button"
+                               button-icon="ic_more"
+                               @select="handleSelectMoreMenu(item, ...arguments)"
+            />
+        </li>
     </fragment>
 </template>
 
@@ -82,15 +44,8 @@ import {
 } from '@spaceone/design-system';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { SpaceRouter } from '@/router';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    DashboardMenuItem,
-    PublicDashboardInfo,
-    UserDashboardInfo,
-} from '@/services/billing/cost-management/cost-dashboard/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -99,19 +54,15 @@ export default {
         PI,
         PSelectDropdown,
     },
-    setup() {
+    props: {
+        dashboardList: {
+            type: Array,
+            default: () => [],
+        },
+    },
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            publicDashboardItems: [] as PublicDashboardInfo[],
-            publicDashboardList: computed<DashboardMenuItem[]>(() => state.publicDashboardItems.map(d => ({
-                ...d,
-                label: d.name,
-            }))),
-            userDashboardItems: [] as UserDashboardInfo[],
-            userDashboardList: computed<DashboardMenuItem[]>(() => state.userDashboardItems.map(d => ({
-                ...d,
-                label: d.name,
-            }))),
             moreMenuItems: computed(() => [
                 { name: 'duplicate', label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.DUPLICATE'), disabled: true },
                 { name: 'setHome', label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.SET_HOME') },
@@ -127,22 +78,9 @@ export default {
             if (state.selectedMoreMenuItem === 'setHome') {
                 store.dispatch('settings/setItem', {
                     key: 'homeDashboard',
-                    value: item.public_dashboard_id ?? item.user_dashboard_id,
+                    value: item.dashboard_id,
                     path: '/costDashboard',
                 });
-            }
-        };
-
-        const listDashboard = async () => {
-            try {
-                const publicDashboardList = await SpaceConnector.client.costAnalysis.publicDashboard.list();
-                const userDashboardList = await SpaceConnector.client.costAnalysis.userDashboard.list();
-                state.publicDashboardItems = publicDashboardList.results;
-                state.userDashboardItems = userDashboardList.results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.publicDashboardItems = [];
-                state.userDashboardItems = [];
             }
         };
 
@@ -153,26 +91,20 @@ export default {
             });
         };
 
-        const initHomeDashboard = () => {
+        const setInitialHomeDashboard = () => {
             if (!state.homeDashboardId) {
                 store.dispatch('settings/setItem', {
                     key: 'homeDashboard',
-                    value: state.publicDashboardItems[0]?.public_dashboard_id,
+                    value: props.dashboardList[0]?.dashboard_id,
                     path: '/costDashboard',
                 });
             }
         };
 
         (async () => {
-            await listDashboard();
+            if (!state.homeDashboardId) setInitialHomeDashboard();
 
-            if (!state.homeDashboardId) initHomeDashboard();
-
-            const isDashboardIdFromRouteValid = !!state.publicDashboardItems.find(d => d.public_dashboard_id === state.dashboardIdFromRoute
-                || d.user_dashboard_id === state.dashboardIdFromRoute);
-
-            if (vm.$route.name === BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME
-                && (!state.dashboardIdFromRoute || !isDashboardIdFromRouteValid)) {
+            if (vm.$route.name === BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME && !state.dashboardIdFromRoute) { // with no params
                 showHomeDashboardPage();
             }
         })();
@@ -187,9 +119,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.dashboard-list {
-    padding: 0 0.75rem 1.25rem;
-}
 .menu-item {
     @apply rounded text-gray-900;
     display: flex;
