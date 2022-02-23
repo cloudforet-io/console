@@ -79,24 +79,6 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
-    showTagBox: {
-        name: 'showTagBox',
-        type: { name: 'boolean' },
-        description: 'Whether to show tag box or not when `multiSelectable` is true.',
-        defaultValue: true,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'true',
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
     // context menu fixed style props
     useFixedMenuStyle: {
         name: 'useFixedMenuStyle',

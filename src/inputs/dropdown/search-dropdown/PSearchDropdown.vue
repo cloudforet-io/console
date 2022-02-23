@@ -394,8 +394,7 @@ export default defineComponent<SearchDropdownProps>({
                     state.proxySelected.push(menuItem);
                 }
             } else if (state.searchDropdownType === SEARCH_DROPDOWN_TYPE.default) {
-                state.proxySelected = [];
-                state.proxyValue = '';
+                if (!state.proxySelected.length) state.proxyValue = '';
             }
 
             if (!menuItem && props.exactMode) {
