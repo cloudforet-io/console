@@ -52,7 +52,7 @@ import * as pdfMake from 'pdfmake/build/pdfmake';
 import { TCreatedPdf } from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 // eslint-disable-next-line import/extensions,import/no-unresolved
-import { Content, TableCell } from 'pdfmake/interfaces';
+import { Content } from 'pdfmake/interfaces';
 import { gray } from '@/styles/colors';
 
 (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
@@ -75,9 +75,9 @@ type PaperSizeInfo = {width: number; height: number}
 type ItemType = 'data-table'|'image'
 
 export interface Item {
-    element: HTMLElement;
-    // default type is 'image'
-    type?: ItemType;
+    type?: ItemType; // default: 'image'
+    element?: HTMLElement;
+    data?: string[][];
 }
 
 interface Props {
@@ -169,51 +169,19 @@ export default defineComponent<Props>({
             emit('update:visible', value);
         };
 
-        const getTableRowsFromElement = (element: HTMLElement) => {
-            const tableElement = element.querySelector('table');
-
-            const headRows: TableCell[][] = [];
-            const bodyRows: TableCell[][] = [];
-
-            if (tableElement) {
-                const theadElements = tableElement.querySelectorAll('thead');
-                theadElements.forEach((theadElement) => {
-                    const thElements = theadElement.querySelectorAll('th');
-                    headRows.push(Array.from(thElements)
-                        .map(th => th?.textContent?.trim() ?? ''));
-                });
-
-                const trElements = tableElement.querySelector('tbody')
-                        ?.querySelectorAll('tr');
-                if (trElements) {
-                    trElements.forEach((trElement) => {
-                        const tdElements = trElement.querySelectorAll('td');
-                        const tdCells = Array.from(tdElements)
-                            .map(td => td?.textContent?.trim() ?? '');
-                        bodyRows.push(tdCells);
-                    });
-                }
-            }
-
-            return { headRows, bodyRows };
-        };
-
-        const createContentWithItem = async ({ element, type }: Item): Promise<Content> => {
+        const createContentWithItem = async ({ element, type, data }: Item): Promise<Content> => {
             if (type === 'data-table') {
-                const { headRows, bodyRows } = getTableRowsFromElement(element);
-                const body = [
-                    ...headRows,
-                    ...bodyRows,
-                ];
-                return body.length ? {
+                if (!data) throw Error('[PdfDownloadOverlay] data-table type item must have data.');
+                return data.length ? {
                     table: {
-                        headerRows: headRows.length,
-                        body,
+                        headerRows: 1,
+                        body: data,
                     },
                 } : {} as Content;
             }
 
             // 'image' is default type
+            if (!element) throw Error('[PdfDownloadOverlay] image type item must have element.');
             const imageUrl = await toPng(element);
             return {
                 image: imageUrl,
@@ -248,29 +216,34 @@ export default defineComponent<Props>({
 
         const makePdfWithItems = async (items: Item[]) => {
             state.loading = true;
-            state.isImageConvertingStarted = true;
-            const contents: Content[] = await Promise.all(items.map(item => createContentWithItem(item)));
-            state.progressRate = COMPLETED_IMAGE_RATE;
+            try {
+                state.isImageConvertingStarted = true;
+                const contents: Content[] = await Promise.all(items.map(item => createContentWithItem(item)));
+                state.progressRate = COMPLETED_IMAGE_RATE;
 
-            state.isPdfConvertingStarted = true;
-            state.createdPdf = createPdfWithContents(contents);
-            state.progressRate = COMPLETED_PDF_RATE;
+                state.isPdfConvertingStarted = true;
+                state.createdPdf = createPdfWithContents(contents);
+                state.progressRate = COMPLETED_PDF_RATE;
 
-            if (props.mode === 'PDF_EMBED') {
-                state.createdPdf.getDataUrl((pdfDataUrl) => {
-                    state.pdfDataUrl = pdfDataUrl;
+                if (props.mode === 'PDF_EMBED') {
+                    state.createdPdf.getDataUrl((pdfDataUrl) => {
+                        state.pdfDataUrl = pdfDataUrl;
+                        state.loading = false;
+                    });
+                } else if (props.mode === 'PDF_NEW_TAB') {
+                    try {
+                        state.createdPdf.open();
+                        setVisible(false);
+                        state.loading = false;
+                    } catch (e) {
+                        // eslint-disable-next-line no-alert
+                        alert(e);
+                    }
+                } else {
                     state.loading = false;
-                });
-            } else if (props.mode === 'PDF_NEW_TAB') {
-                try {
-                    state.createdPdf.open();
-                    setVisible(false);
-                    state.loading = false;
-                } catch (e) {
-                    // eslint-disable-next-line no-alert
-                    alert(e);
                 }
-            } else {
+            } catch (e) {
+                console.error(e);
                 state.loading = false;
             }
         };

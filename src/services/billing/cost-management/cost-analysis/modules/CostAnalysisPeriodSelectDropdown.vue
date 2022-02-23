@@ -1,18 +1,17 @@
 <template>
-    <div class="cost-analysis-period-select-dropdown">
+    <div class="cost-analysis-period-select-dropdown" :class="{responsive: !printMode}">
         <p-badge style-type="gray200">
-            <p v-if="dateFormatter(period.start, 'M') !== dateFormatter(period.end, 'M')">
-                {{ dateFormatter(period.start, 'MMMM D') }}, {{ dateFormatter(period.start, 'YYYY') }}
-                ~ {{ dateFormatter(period.end, 'MMMM D') }}, {{ dateFormatter(period.end, 'YYYY') }}
+            <p v-if="dateFormatter(period.start, 'M') !== dateFormatter(period.end, 'M')" class="text">
+                {{ dateFormatter(period.start, 'MMMM D') }}, {{ dateFormatter(period.start, 'YYYY') }} ~ {{ dateFormatter(period.end, 'MMMM D') }}, {{ dateFormatter(period.end, 'YYYY') }}
             </p>
-            <p v-else>
+            <p v-else class="text">
                 {{ dateFormatter(period.start, 'MMMM D') }} ~ {{ dateFormatter(period.end, 'D') }}, {{ dateFormatter(period.end, 'YYYY') }}
             </p>
         </p-badge>
-        <p-select-dropdown :items="periodMenuItems"
+        <p-select-dropdown v-if="!printMode"
+                           :items="periodMenuItems"
                            :selected="selectedPeriodMenuItem"
                            without-outline
-                           :read-only="printMode"
                            @select="handleSelectPeriodMenuItem"
         />
         <cost-management-custom-range-modal v-if="customRangeModalVisible"
@@ -138,14 +137,19 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.p-badge {
-    margin-right: 0.5rem;
-}
-
-@screen mobile {
-    .cost-analysis-period-select-dropdown {
-        @apply flex flex-wrap justify-end items-center;
-        width: 100%;
+.cost-analysis-period-select-dropdown {
+    .p-badge {
+        margin-right: 0.5rem;
+        .text {
+            white-space: nowrap;
+        }
+    }
+    &.responsive {
+        @screen mobile {
+            @apply flex flex-wrap justify-end items-center;
+            width: 100%;
+        }
     }
 }
+
 </style>

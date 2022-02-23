@@ -1,11 +1,12 @@
 <template>
-    <p-toolbox-table :loading="tableState.loading"
+    <p-toolbox-table class="cost-analysis-data-table"
+                     :loading="tableState.loading"
                      :fields="tableState.fields"
                      :items="tableState.items"
                      :total-count="tableState.totalCount"
                      :searchable="false"
+                     :row-height-fixed="!printMode"
                      exportable
-                     class="cost-analysis-data-table"
                      @change="handleChange"
                      @refresh="handleChange()"
                      @export="handleExport"
@@ -50,13 +51,15 @@
 <script lang="ts">
 import dayjs from 'dayjs';
 import axios, { CancelTokenSource } from 'axios';
-
+import { get } from 'lodash';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PAnchor, PI, PToolboxTable } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import {
+    PAnchor, PI, PToolboxTable, PDataTable,
+} from '@spaceone/design-system';
+import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -77,18 +80,29 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { Period } from '@/services/billing/cost-management/type';
 import { CostAnalyzeModel, UsdCost } from '@/services/billing/cost-management/widgets/type';
 import { ExcelDataField } from '@/store/modules/file/type';
+import { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay.vue';
+import { i18n } from '@/translations';
+import { ResourceMap } from '@/store/modules/resource/type';
 
+// must be greater than selectable group by items' count
+const PRINT_MODE_MAX_COL = 10;
 
 export default {
     name: 'CostAnalysisDataTable',
     components: {
-        PToolboxTable,
         PAnchor,
         PI,
+        PToolboxTable,
     },
-    props: {},
-    setup() {
+    props: {
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props, { emit }) {
         const state = reactive({
+            component: computed(() => (props.printMode ? PDataTable : PToolboxTable)),
             timeUnit: computed(() => getTimeUnitByPeriod(state.granularity, dayjs.utc(state.period.start), dayjs.utc(state.period.end))),
             dateFormat: computed(() => {
                 if (state.granularity === GRANULARITY.MONTHLY) return 'YYYY-MM';
@@ -110,11 +124,16 @@ export default {
             groupByItems: computed<GroupByItem[]>(() => store.getters['service/costAnalysis/groupByItems']),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
+            groupByStoreMap: computed<Record<string, ResourceMap>>(() => ({
+                [GROUP_BY.PROJECT]: state.projects,
+                [GROUP_BY.PROVIDER]: state.providers,
+                [GROUP_BY.REGION]: state.regions,
+                [GROUP_BY.SERVICE_ACCOUNT]: state.serviceAccounts,
+            })),
         });
         const tableState = reactive({
             loading: true,
-            fields: [] as DataTableField[],
-            excelFields: computed<ExcelDataField[]>(() => tableState.fields.map((d) => {
+            excelFields: computed<ExcelDataField[]>(() => tableState.groupByFields.concat(tableState.costFields).map((d) => {
                 const field: ExcelDataField = { key: d.name, name: d.label };
                 if (d.name === GROUP_BY.PROJECT) field.reference = { reference_key: 'project_id', resource_type: 'identity.Project' };
                 if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
@@ -129,13 +148,20 @@ export default {
                 }
                 return field;
             })),
+            groupByFields: computed<DataTableFieldType[]>(() => state.groupByItems.map(d => ({
+                name: d.name,
+                label: d.label,
+                sortable: false,
+            }))),
+            costFields: [] as DataTableFieldType[],
+            fields: computed<DataTableFieldType[]>(() => tableState.groupByFields.concat(tableState.costFields)),
             items: [] as CostAnalyzeModel[],
             totalCount: 0,
         });
 
         /* util */
-        const _getTableDateFields = (period: Period): DataTableField[] => {
-            const dateFields: DataTableField[] = [];
+        const _getTableDateFields = (period: Period): DataTableFieldType[] => {
+            const dateFields: DataTableFieldType[] = [];
             const start = dayjs.utc(period.start);
             const end = dayjs.utc(period.end);
 
@@ -159,34 +185,30 @@ export default {
             }
             return dateFields;
         };
-        const _getTableFields = (granularity: GRANULARITY, groupByItems: GroupByItem[], period: Period) => {
-            const groupByFields: DataTableField[] = groupByItems.map(d => ({
-                name: d.name,
-                label: d.label,
-                sortable: false,
-            }));
+        const _getTableCostFields = (granularity: GRANULARITY, period: Period, hasGroupBy: boolean) => {
+            const costFields: DataTableFieldType[] = [];
 
             if (granularity === GRANULARITY.ACCUMULATED) {
                 const label = `${dayjs.utc(period.start).format('M/D')}~${dayjs.utc(period.end).format('M/D')}`;
-                if (!groupByItems.length) {
-                    groupByFields.push({
+                if (!hasGroupBy) {
+                    costFields.push({
                         name: 'totalCost', label: ' ', sortable: false,
                     });
                 }
-                groupByFields.push({
+                costFields.push({
                     name: 'usd_cost', label, textAlign: 'right', sortable: false,
                 });
-                return groupByFields;
+                return costFields;
             }
 
-            if (!groupByItems.length) {
-                groupByFields.push({
+            if (!hasGroupBy) {
+                costFields.push({
                     name: 'totalCost', label: ' ', textAlign: 'right', sortable: false,
                 });
             }
 
             const dateFields = _getTableDateFields(period);
-            return groupByFields.concat(dateFields);
+            return costFields.concat(dateFields);
         };
         const getLink = (item: CostAnalyzeModel, fieldName: string) => {
             const queryHelper = new QueryHelper();
@@ -296,12 +318,15 @@ export default {
                 const _convertedFilters = getConvertedFilter(filters);
                 costApiQueryHelper.setFilters(_convertedFilters);
 
+                const query = costApiQueryHelper.data;
+                if (props.printMode) query.page = undefined;
+
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity,
                     group_by: groupBy,
                     start: dayjs.utc(period.start).format('YYYY-MM-DD'),
                     end: dayjs.utc(period.end).format('YYYY-MM-DD'),
-                    ...costApiQueryHelper.data,
+                    ...query,
                 });
                 let items = results;
                 if (granularity !== GRANULARITY.ACCUMULATED && stack) items = _getStackedTableData(results, granularity, period);
@@ -348,9 +373,52 @@ export default {
             }
         };
 
+        const getPrintModeFieldSets = (): DataTableFieldType[][] => {
+            const groupByLength = state.groupByItems.length;
+            const costFieldLength = tableState.costFields.length;
+            const totalLength = costFieldLength + groupByLength;
+            const costColumnCount = PRINT_MODE_MAX_COL - groupByLength;
+
+            if (props.printMode && totalLength > PRINT_MODE_MAX_COL) {
+                const fieldSetCount = Math.ceil(costFieldLength / costColumnCount);
+                const results = [] as DataTableFieldType[][];
+                for (let idx = 0; idx < fieldSetCount; idx++) {
+                    const tableFields = tableState.costFields.slice(idx * costColumnCount, (idx + 1) * costColumnCount);
+                    results.push(tableState.groupByFields.concat(tableFields));
+                }
+                return results;
+            }
+            return [tableState.groupByFields.concat(tableState.costFields)];
+        };
+
+        const getPdfItems = (): PdfOverlayItem[] => {
+            const items = tableState.items;
+            const fieldSets = getPrintModeFieldSets();
+            return fieldSets.map((fields) => {
+                const headRows: string[][] = [fields.map(f => f.label as string)];
+                const bodyRows: string[][] = items.map(d => fields.map((f) => {
+                    let value = get(d, f.name, '-');
+                    if (f.name === 'totalCost') value = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST');
+                    else if (state.groupByStoreMap[f.name]) {
+                        const referenceStore = state.groupByStoreMap[f.name];
+                        value = referenceStore[value] ? referenceStore[value].label : value;
+                    } else if (typeof value === 'number') {
+                        value = currencyMoneyFormatter(value, state.currency, state.currencyRates, true);
+                    }
+
+                    return value;
+                }));
+                return {
+                    data: headRows.concat(bodyRows),
+                    type: 'data-table',
+                };
+            });
+        };
+
         watch([() => state.granularity, () => state.groupBy, () => state.period, () => state.filters, () => state.stack], async ([granularity, groupBy, period, filters, stack]) => {
             await listCostAnalysisTableData(granularity, groupBy, period, filters, stack);
-            tableState.fields = _getTableFields(granularity, state.groupByItems, period);
+            tableState.costFields = _getTableCostFields(granularity, period, !!tableState.groupByFields.length);
+            if (props.printMode) emit('rendered', getPdfItems());
         }, { immediate: true, deep: true });
 
         return {

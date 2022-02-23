@@ -14,6 +14,8 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { XYChart } from '@amcharts/amcharts4/charts';
 
 import {
+    ComponentRenderProxy,
+    getCurrentInstance,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -100,10 +102,13 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
             chartRef: null as HTMLElement | null,
             proxyChart: makeProxy('chart', props, emit),
             USDChartData: [] as XYChartData[],
+            isChartDrawn: false,
         });
 
         /* util */
@@ -166,6 +171,7 @@ export default {
             });
         };
         const drawChart = (chartContainer) => {
+            state.isChartDrawn = false;
             const timeUnit = getTimeUnitByPeriod(props.granularity, dayjs.utc(props.period.start), dayjs.utc(props.period.end));
 
             let USDChartData = cloneDeep(props.chartData);
@@ -177,7 +183,7 @@ export default {
             const chart = am4core.create(chartContainer, am4charts.XYChart);
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.events.on('ready', () => {
-                emit('rendered');
+                state.isChartDrawn = true;
             });
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
@@ -215,6 +221,15 @@ export default {
         watch(() => props.stack, () => {
             const chart = drawChart(state.chartRef);
             emit('update:chart', chart);
+        });
+
+        watch([() => state.isChartDrawn, () => props.loading], async ([isChartDrawn, loading]) => {
+            if (isChartDrawn && !loading) {
+                await vm.$nextTick();
+                setTimeout(() => {
+                    emit('rendered');
+                }, 500);
+            }
         });
 
         return {

@@ -61,9 +61,11 @@
                       @confirm="handleDeleteQueryConfirm"
         />
         <pdf-download-overlay v-if="!printMode"
-                              v-model="visiblePdfOverlay" mode="ELEMENT_EMBED"
+                              v-model="visiblePdfOverlay"
+                              :items="previewItems"
+                              orientation="landscape"
         >
-            <cost-analysis-preview />
+            <cost-analysis-preview @rendered="handlePreviewRendered" />
         </pdf-download-overlay>
     </div>
 </template>
@@ -88,6 +90,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceRouter } from '@/router';
 import { BILLING_ROUTE } from '@/services/billing/routes';
+import { Item } from '@/common/components/layouts/PdfDownloadOverlay.vue';
 
 const SaveQueryFormModal = () => import('@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue');
 const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
@@ -131,6 +134,7 @@ export default {
             title: computed<string>(() => state.selectedQuerySet?.name ?? 'Cost Analysis'),
             itemIdForDeleteQuery: '',
             visiblePdfOverlay: false,
+            previewItems: [] as Item[],
         });
 
         const saveQueryFormState = reactive({
@@ -246,6 +250,10 @@ export default {
             state.visiblePdfOverlay = true;
         };
 
+        const handlePreviewRendered = (items: Item[]) => {
+            state.previewItems = items;
+        };
+
         /* Watchers */
         watch(() => saveQueryFormState.visible, () => {
             if (saveQueryFormState.visible === false) saveQueryFormState.selectedQuery = {};
@@ -263,6 +271,7 @@ export default {
             handleSaveQueryOption,
             handleDeleteQueryConfirm,
             handleClickPdf,
+            handlePreviewRendered,
         };
     },
 };

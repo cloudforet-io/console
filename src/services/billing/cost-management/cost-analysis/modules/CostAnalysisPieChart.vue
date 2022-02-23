@@ -13,6 +13,8 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import { PieChart } from '@amcharts/amcharts4/charts';
 
 import {
+    ComponentRenderProxy,
+    getCurrentInstance,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -76,8 +78,11 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
             chartRef: null as HTMLElement | null,
+            isChartDrawn: false,
         });
 
         /* util */
@@ -123,10 +128,11 @@ export default {
             slice.states.getKey('hover').properties.scale = 1;
         };
         const drawChart = (chartContainer) => {
+            state.isChartDrawn = false;
             const chart = am4core.create(chartContainer, am4charts.PieChart);
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.events.on('ready', () => {
-                emit('rendered');
+                state.isChartDrawn = true;
             });
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
@@ -154,6 +160,15 @@ export default {
                 emit('update:chart', chart);
             }
         }, { immediate: false });
+
+        watch([() => state.isChartDrawn, () => props.loading], async ([isChartDrawn, loading]) => {
+            if (isChartDrawn && !loading) {
+                await vm.$nextTick();
+                setTimeout(() => {
+                    emit('rendered');
+                }, 500);
+            }
+        });
 
         return {
             ...toRefs(state),

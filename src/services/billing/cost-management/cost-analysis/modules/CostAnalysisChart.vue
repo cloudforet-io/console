@@ -1,6 +1,6 @@
 <template>
     <div class="cost-analysis-chart" :class="{'print-mode': printMode}">
-        <section class="chart-section">
+        <section ref="chartRef" class="chart-section">
             <cost-analysis-pie-chart v-if="granularity === GRANULARITY.ACCUMULATED"
                                      :loading="loading"
                                      :chart.sync="chart"
@@ -9,6 +9,7 @@
                                      :currency="currency"
                                      :currency-rates="currencyRates"
                                      :print-mode="printMode"
+                                     @rendered="handleChartRendered"
             />
             <cost-analysis-stacked-column-chart v-else
                                                 :loading="loading"
@@ -21,9 +22,10 @@
                                                 :currency="currency"
                                                 :currency-rates="currencyRates"
                                                 :print-mode="printMode"
+                                                @rendered="handleChartRendered"
             />
         </section>
-        <section class="query-section">
+        <section ref="queryRef" class="query-section">
             <!--filter-->
             <div class="title-wrapper">
                 <span class="title">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTER') }}</span>
@@ -98,7 +100,8 @@
                 </template>
             </p-data-loader>
         </section>
-        <set-filter-modal :visible.sync="filterModalVisible"
+        <set-filter-modal v-if="!printMode"
+                          :visible.sync="filterModalVisible"
                           :selected-filters="filters"
                           :filter-items="filterItems"
                           @confirm="handleConfirmFilterModal"
@@ -126,8 +129,6 @@ import CostAnalysisStackedColumnChart
     from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
 import CostAnalysisPieChart
     from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisPieChart.vue';
-import SetFilterModal
-    from '@/services/billing/cost-management/modules/SetFilterModal.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -151,6 +152,8 @@ import {
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 import { store } from '@/store';
 
+const SetFilterModal = () => import('@/services/billing/cost-management/modules/SetFilterModal.vue');
+
 
 export default {
     name: 'CostAnalysisChart',
@@ -172,7 +175,7 @@ export default {
             default: false,
         },
     },
-    setup() {
+    setup(props, { emit }) {
         const state = reactive({
             granularity: computed(() => store.state.service.costAnalysis.granularity),
             stack: computed(() => store.state.service.costAnalysis.stack),
@@ -201,6 +204,8 @@ export default {
             chartData: [] as Array<XYChartData|PieChartData>,
             chart: null as XYChart | PieChart | null,
             filterModalVisible: false,
+            queryRef: null as null|HTMLElement,
+            chartRef: null as null|HTMLElement,
         });
 
         /* util */
@@ -240,7 +245,7 @@ export default {
                 return results;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                return undefined;
+                return [];
             }
         };
         const setChartData = debounce(async (granularity: GRANULARITY, period: Period, groupBy?: GROUP_BY) => {
@@ -298,6 +303,10 @@ export default {
             store.commit('service/costAnalysis/setFilters', filters);
         };
 
+        const handleChartRendered = () => {
+            if (state.chartRef && state.queryRef) emit('rendered', [state.queryRef, state.chartRef]);
+        };
+
         watch(() => state.groupByItems, (after, before) => {
             if (!after.length) {
                 store.commit('service/costAnalysis/setPrimaryGroupBy', undefined);
@@ -324,6 +333,7 @@ export default {
             handleDeleteFilterTag,
             handleClearAllFilters,
             handleConfirmFilterModal,
+            handleChartRendered,
         };
     },
 };
