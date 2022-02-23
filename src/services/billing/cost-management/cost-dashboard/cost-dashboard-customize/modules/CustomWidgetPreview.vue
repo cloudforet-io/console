@@ -14,7 +14,7 @@
                 <p-label>Group By</p-label> <span :class="{ 'text-gray-500': !groupBy }">{{ getGroupByText(groupBy) }}</span>
             </div>
             <div class="info-item">
-                <p-label>Filters</p-label> <span :class="{'text-gray-500': !(filters.length > 0)}">{{ getFiltersText(filters) }}</span>
+                <p-label>Filters</p-label> <span :class="{'text-gray-500': !filters}">{{ getFiltersText(filters) }}</span>
             </div>
             <div class="info-item">
                 <p-label>Start Date ~ End Date (UTC)</p-label> <span>{{ getPeriodText(period) }}</span>
