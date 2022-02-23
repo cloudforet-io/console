@@ -21,9 +21,11 @@
         <dashboard-layouts :loading="loading"
                            :layout="editingCustomLayout"
                            :customize-mode="true"
-                           @confirm="handleConfirmWidgetModal"
+                           @add-widget="handleAddWidget"
+                           @delete-widget="handleDeleteWidget"
+                           @update-widget="handleUpdateWidget"
         />
-        <cost-dashboard-customize-sidebar @confirm="handleConfirmWidgetModal" />
+        <cost-dashboard-customize-sidebar @add-widget="handleAddWidget" />
     </div>
 </template>
 
@@ -52,7 +54,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import DashboardLayouts from '@/services/billing/cost-management/cost-dashboard/modules/DashboardLayouts.vue';
-import { keyBy } from 'lodash';
+import { getDashboardLayout } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
 
 
 export default {
@@ -72,7 +74,6 @@ export default {
         },
     },
     // beforeRouteLeave(to, from, next) {
-    //     console.log(this)
     //     // eslint-disable-next-line no-alert
     //     const answer = window.confirm(
     //         'Are you sure you want to discard changes? Changes will not be saved.',
@@ -107,7 +108,6 @@ export default {
             defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboard?.defaultFilter),
             widgetPosition: computed(() => store.state.service.costDashboard?.widgetPosition),
             layoutOfSpace: computed(() => store.state.service.costDashboard?.layoutOfSpace),
-            canLeaveSite: false,
         });
 
         const goToMainDashboardPage = () => {
@@ -137,7 +137,7 @@ export default {
             goToMainDashboardPage();
         };
 
-        const handleConfirmWidgetModal = () => {
+        const handleAddWidget = () => {
             if (state.widgetPosition && state.layoutOfSpace) {
                 if (state.layoutOfSpace === state.selectedWidget.options.layout) {
                     state.editingCustomLayout[state.widgetPosition.row].splice(state.widgetPosition.col + 1, 0, state.selectedWidget);
@@ -153,32 +153,21 @@ export default {
             }
         };
 
-
-        const fetchDefaultLayoutData = async (layoutId: string): Promise<any[]> => {
-            try {
-                // noinspection TypeScriptCheckImport
-                const layoutTemplates = await import(`../dashboard-layouts/${layoutId}.json`);
-                const widgets = await import('../../widgets/lib/defaultWidgetList.json');
-
-                const optionsKeyByWidgetId = keyBy(widgets.default, option => option.widget_id);
-                const layoutData: CustomLayout[] = layoutTemplates.default.map(layout => layout.map((d) => {
-                    const widget = optionsKeyByWidgetId[d.widget_id];
-                    return widget ? { ...widget } : {};
-                }));
-                return layoutData;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return [];
-            }
+        const handleDeleteWidget = () => {
+            if (!state.widgetPosition) return;
+            state.editingCustomLayout[state.widgetPosition.row].splice(state.widgetPosition.col, 1);
+            state.editingCustomLayout = state.editingCustomLayout.filter(row => row.length > 0);
+            store.commit('service/costDashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
+            store.commit('service/costDashboard/setWidgetPosition', undefined);
+            store.commit('service/costDashboard/setEditedSelectedWidget', {});
         };
 
-        const getDashboardLayout = async (dashboard: DashboardInfo): Promise<CustomLayout[]> => {
-            let layout: CustomLayout[];
-            if (dashboard?.default_layout_id && dashboard.custom_layouts.length === 0) {
-                layout = await fetchDefaultLayoutData(dashboard.default_layout_id);
-            } else layout = dashboard.custom_layouts;
-            store.commit('service/costDashboard/setEditedCustomLayout', layout);
-            return layout;
+        const handleUpdateWidget = () => {
+            if (!state.widgetPosition) return;
+            state.editingCustomLayout[state.widgetPosition.row][state.widgetPosition.col] = state.selectedWidget;
+            store.commit('service/costDashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
+            store.commit('service/costDashboard/setWidgetPosition', undefined);
+            store.commit('service/costDashboard/setEditedSelectedWidget', {});
         };
 
         const getDashboardData = async () => {
@@ -250,7 +239,9 @@ export default {
             ...toRefs(state),
             handleClickCancel,
             handleClickSave,
-            handleConfirmWidgetModal,
+            handleAddWidget,
+            handleDeleteWidget,
+            handleUpdateWidget,
         };
     },
 };

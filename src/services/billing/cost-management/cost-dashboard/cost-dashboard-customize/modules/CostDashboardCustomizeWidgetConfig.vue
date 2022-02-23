@@ -55,6 +55,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        selectedWidget: {
+            type: Object,
+            default: () => ({}),
+        },
     },
 
     setup(props) {
@@ -81,8 +85,8 @@ export default {
         });
 
         const state = reactive({
-            selectedWidget: computed(() => store.state.service.costDashboard?.originSelectedWidget),
-            editedSelectedWidget: computed(() => cloneDeep(state.selectedWidget)),
+            _selectedWidget: computed(() => props.selectedWidget),
+            editedSelectedWidget: computed(() => cloneDeep(state._selectedWidget)),
             groupByItems: computed<MenuItem[]>(() => Object.values(GROUP_BY_ITEM_MAP)),
             selectedGroupByItem: computed<string>({
                 get() {
@@ -108,17 +112,17 @@ export default {
 
         const init = () => {
             if (props.isCustom) {
-                initForm('name', state.selectedWidget?.name);
+                initForm('name', state._selectedWidget?.name);
             } else {
-                initForm('name', defaultWidgetMap[state.selectedWidget?.widget_id].widget_name);
+                initForm('name', defaultWidgetMap[state._selectedWidget?.widget_id].widget_name);
             }
 
-            if (props.showGroupBy) initForm('groupBy', state.selectedWidget?.options.group_by);
+            if (props.showGroupBy) initForm('groupBy', state._selectedWidget?.options.group_by);
             else state.selectedGroupByItem = '';
         };
 
 
-        watch(() => state.selectedWidget, (after) => {
+        watch(() => state._selectedWidget, (after) => {
             if (after && Object.keys(after).length) {
                 init();
             }
