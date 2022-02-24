@@ -1,3 +1,10 @@
+# [1.1.0-beta.249](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.248...v1.1.0-beta.249) (2022-02-24)
+
+
+### Bug Fixes
+
+* fix wrong css in dynamic widget summary ([#873](https://github.com/spaceone-dev/spaceone-design-system/issues/873)) ([bc2d399](https://github.com/spaceone-dev/spaceone-design-system/commit/bc2d39918c6577ace3912ea5bcbc226886b555a6))
+
 # [1.1.0-beta.248](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.247...v1.1.0-beta.248) (2022-02-24)
 
 
