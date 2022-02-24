@@ -508,10 +508,11 @@
 					"CREATE_DASHBOARD": "Create New Dashboard",
 					"NO_WIDGET": "Now, you can fill up your dashboard with the available widgets.",
 					"TEMPLATE": {
+						"AND_MORE": "...and more",
 						"APPLIED_FILTER": "Include Applied Filter from selected dashboard",
+						"BASIC_TEMPLATE": "Basic Template",
 						"EXISTING_DASHBOARD": "Clone an Existing Dashboard",
 						"FILTER": "Filter",
-						"NEW_TEMPLATE": "New Template",
 						"TEMPLATE": "Template",
 						"VIEW": "View",
 						"VIEW_FILTER": "View Filter"
@@ -540,6 +541,7 @@
 						"VIEW_QUERY": "View Query"
 					},
 					"CANCEL": "Cancel",
+					"CUSTOMIZE_TITLE": "Customize Dashboard",
 					"FORM": {
 						"DELETE_CONTENTS": "You will not be able to recover this widget.",
 						"DELETE_TITLE": "Are you sure you want to remove this widget?",
@@ -549,7 +551,6 @@
 					},
 					"SAVE": "Save",
 					"SIDEBAR_DESC": "You can add, move and remove your widgets.",
-					"SIDEBAR_TITLE": "Customize Dashboard",
 					"SIDEBAR_WIDGET": "Widget"
 				},
 				"DECREASE": "Decreased from {date}",
@@ -566,7 +567,6 @@
 				"FORM": {
 					"CANCEL": "Cancel",
 					"CREATE": "Create",
-					"CREATE_DASHBOARD": "Create New Dashboard",
 					"CUSTOM_RANGE": "Custom Range",
 					"FROM": "From",
 					"TO": "To"

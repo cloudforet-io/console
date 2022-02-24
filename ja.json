@@ -508,10 +508,11 @@
 					"CREATE_DASHBOARD": "",
 					"NO_WIDGET": "",
 					"TEMPLATE": {
+						"AND_MORE": "",
 						"APPLIED_FILTER": "",
+						"BASIC_TEMPLATE": "",
 						"EXISTING_DASHBOARD": "",
 						"FILTER": "",
-						"NEW_TEMPLATE": "",
 						"TEMPLATE": "",
 						"VIEW": "",
 						"VIEW_FILTER": ""
@@ -540,6 +541,7 @@
 						"VIEW_QUERY": ""
 					},
 					"CANCEL": "",
+					"CUSTOMIZE_TITLE": "",
 					"FORM": {
 						"DELETE_CONTENTS": "",
 						"DELETE_TITLE": "",
@@ -549,7 +551,6 @@
 					},
 					"SAVE": "",
 					"SIDEBAR_DESC": "",
-					"SIDEBAR_TITLE": "",
 					"SIDEBAR_WIDGET": ""
 				},
 				"DECREASE": "",
@@ -566,7 +567,6 @@
 				"FORM": {
 					"CANCEL": "",
 					"CREATE": "",
-					"CREATE_DASHBOARD": "",
 					"CUSTOM_RANGE": "",
 					"FROM": "",
 					"TO": ""

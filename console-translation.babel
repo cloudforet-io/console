@@ -9173,7 +9173,49 @@
                                                 <name>TEMPLATE</name>
                                                 <children>
                                                     <concept_node>
+                                                        <name>AND_MORE</name>
+                                                        <definition_loaded>false</definition_loaded>
+                                                        <description/>
+                                                        <comment/>
+                                                        <default_text/>
+                                                        <translations>
+                                                            <translation>
+                                                                <language>en-US</language>
+                                                                <approved>false</approved>
+                                                            </translation>
+                                                            <translation>
+                                                                <language>ja-JP</language>
+                                                                <approved>false</approved>
+                                                            </translation>
+                                                            <translation>
+                                                                <language>ko-KR</language>
+                                                                <approved>false</approved>
+                                                            </translation>
+                                                        </translations>
+                                                    </concept_node>
+                                                    <concept_node>
                                                         <name>APPLIED_FILTER</name>
+                                                        <definition_loaded>false</definition_loaded>
+                                                        <description/>
+                                                        <comment/>
+                                                        <default_text/>
+                                                        <translations>
+                                                            <translation>
+                                                                <language>en-US</language>
+                                                                <approved>false</approved>
+                                                            </translation>
+                                                            <translation>
+                                                                <language>ja-JP</language>
+                                                                <approved>false</approved>
+                                                            </translation>
+                                                            <translation>
+                                                                <language>ko-KR</language>
+                                                                <approved>false</approved>
+                                                            </translation>
+                                                        </translations>
+                                                    </concept_node>
+                                                    <concept_node>
+                                                        <name>BASIC_TEMPLATE</name>
                                                         <definition_loaded>false</definition_loaded>
                                                         <description/>
                                                         <comment/>
@@ -9216,27 +9258,6 @@
                                                     </concept_node>
                                                     <concept_node>
                                                         <name>FILTER</name>
-                                                        <definition_loaded>false</definition_loaded>
-                                                        <description/>
-                                                        <comment/>
-                                                        <default_text/>
-                                                        <translations>
-                                                            <translation>
-                                                                <language>en-US</language>
-                                                                <approved>false</approved>
-                                                            </translation>
-                                                            <translation>
-                                                                <language>ja-JP</language>
-                                                                <approved>false</approved>
-                                                            </translation>
-                                                            <translation>
-                                                                <language>ko-KR</language>
-                                                                <approved>false</approved>
-                                                            </translation>
-                                                        </translations>
-                                                    </concept_node>
-                                                    <concept_node>
-                                                        <name>NEW_TEMPLATE</name>
                                                         <definition_loaded>false</definition_loaded>
                                                         <description/>
                                                         <comment/>
@@ -9714,6 +9735,27 @@
                                                     </translation>
                                                 </translations>
                                             </concept_node>
+                                            <concept_node>
+                                                <name>CUSTOMIZE_TITLE</name>
+                                                <definition_loaded>false</definition_loaded>
+                                                <description/>
+                                                <comment/>
+                                                <default_text/>
+                                                <translations>
+                                                    <translation>
+                                                        <language>en-US</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ja-JP</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ko-KR</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                </translations>
+                                            </concept_node>
                                             <folder_node>
                                                 <name>FORM</name>
                                                 <children>
@@ -9847,27 +9889,6 @@
                                             </concept_node>
                                             <concept_node>
                                                 <name>SIDEBAR_DESC</name>
-                                                <definition_loaded>false</definition_loaded>
-                                                <description/>
-                                                <comment/>
-                                                <default_text/>
-                                                <translations>
-                                                    <translation>
-                                                        <language>en-US</language>
-                                                        <approved>false</approved>
-                                                    </translation>
-                                                    <translation>
-                                                        <language>ja-JP</language>
-                                                        <approved>false</approved>
-                                                    </translation>
-                                                    <translation>
-                                                        <language>ko-KR</language>
-                                                        <approved>false</approved>
-                                                    </translation>
-                                                </translations>
-                                            </concept_node>
-                                            <concept_node>
-                                                <name>SIDEBAR_TITLE</name>
                                                 <definition_loaded>false</definition_loaded>
                                                 <description/>
                                                 <comment/>
@@ -10130,27 +10151,6 @@
                                             </concept_node>
                                             <concept_node>
                                                 <name>CREATE</name>
-                                                <definition_loaded>false</definition_loaded>
-                                                <description/>
-                                                <comment/>
-                                                <default_text/>
-                                                <translations>
-                                                    <translation>
-                                                        <language>en-US</language>
-                                                        <approved>false</approved>
-                                                    </translation>
-                                                    <translation>
-                                                        <language>ja-JP</language>
-                                                        <approved>false</approved>
-                                                    </translation>
-                                                    <translation>
-                                                        <language>ko-KR</language>
-                                                        <approved>false</approved>
-                                                    </translation>
-                                                </translations>
-                                            </concept_node>
-                                            <concept_node>
-                                                <name>CREATE_DASHBOARD</name>
                                                 <definition_loaded>false</definition_loaded>
                                                 <description/>
                                                 <comment/>

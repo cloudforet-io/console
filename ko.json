@@ -505,13 +505,14 @@
 				"COST_TREND_BY_PROVIDER": "서비스 제공자별 발생 비용 추이 ",
 				"CREATE": {
 					"ALT_E_CREATE_ALERT": "",
-					"CREATE_DASHBOARD": "",
+					"CREATE_DASHBOARD": "대쉬보드 생성",
 					"NO_WIDGET": "",
 					"TEMPLATE": {
+						"AND_MORE": "",
 						"APPLIED_FILTER": "Include Applied Filter from selected dashboard\u001d",
+						"BASIC_TEMPLATE": "",
 						"EXISTING_DASHBOARD": "",
 						"FILTER": "\u001d필터",
-						"NEW_TEMPLATE": "",
 						"TEMPLATE": "템플릿",
 						"VIEW": "",
 						"VIEW_FILTER": "\u001d필터 보기"
@@ -540,6 +541,7 @@
 						"VIEW_QUERY": ""
 					},
 					"CANCEL": "취소",
+					"CUSTOMIZE_TITLE": "",
 					"FORM": {
 						"DELETE_CONTENTS": "",
 						"DELETE_TITLE": "이 위젯을 삭제하시겠습니까?",
@@ -549,7 +551,6 @@
 					},
 					"SAVE": "저장",
 					"SIDEBAR_DESC": "",
-					"SIDEBAR_TITLE": "",
 					"SIDEBAR_WIDGET": "위젯"
 				},
 				"DECREASE": "{date} 기간 사용량 감소됨",
@@ -566,7 +567,6 @@
 				"FORM": {
 					"CANCEL": "취소",
 					"CREATE": "생성",
-					"CREATE_DASHBOARD": "대쉬보드 생성",
 					"CUSTOM_RANGE": "",
 					"FROM": "",
 					"TO": ""
