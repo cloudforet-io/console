@@ -1,3 +1,10 @@
+# [1.1.0-beta.250](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.249...v1.1.0-beta.250) (2022-02-24)
+
+
+### Features
+
+* add loaderBackdropOpacity and loaderBackdropColor props to data loader ([#874](https://github.com/spaceone-dev/spaceone-design-system/issues/874)) ([008beeb](https://github.com/spaceone-dev/spaceone-design-system/commit/008beeb87dc654c1f85663856a8e7bab141bb3dc))
+
 # [1.1.0-beta.249](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.248...v1.1.0-beta.249) (2022-02-24)
 
 
