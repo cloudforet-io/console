@@ -166,7 +166,6 @@ export default {
 .cost-dashboard-customize-cost-query {
     @apply bg-gray-100 rounded-sm;
     height: 12.5rem;
-    overflow-y: auto;
     padding: 1rem;
 
     .title-wrapper {

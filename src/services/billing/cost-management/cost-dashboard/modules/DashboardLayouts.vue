@@ -18,12 +18,12 @@
                 <div v-for="(widget, colIdx) in row" :key="`widget-${widget.widget_id}-${getUUID()}`"
                      :class="`col-${widget.options.layout}`"
                 >
-                    <div class="btn-group">
-                        <p-icon-button v-if="customizeMode" name="ic_edit" size="sm"
+                    <div v-if="customizeMode" class="btn-group">
+                        <p-icon-button name="ic_edit" size="sm"
                                        style-type="gray-border" :outline="true"
                                        @click.stop="handleClickUpdate(rowIdx, colIdx, widget)"
                         />
-                        <p-icon-button v-if="customizeMode" name="ic_trashcan" size="sm"
+                        <p-icon-button name="ic_trashcan" size="sm"
                                        style-type="alert" :outline="true"
                                        @click.stop="handleClickDelete(rowIdx, colIdx, widget)"
                         />
@@ -236,6 +236,7 @@ export default {
                 @apply flex;
                 column-gap: 1rem;
                 min-width: 60.75rem;
+                min-height: 12.8125rem;
                 [class^='col-'] {
                     @apply relative w-full;
                 }

@@ -2,7 +2,7 @@
     <div class="cost-dashboard-create-page">
         <nav>
             <p-breadcrumbs :routes="routeState.route" />
-            <p-page-title :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CREATE_DASHBOARD')" child @goBack="$router.go(-1)" />
+            <p-page-title :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.CREATE_DASHBOARD')" child @goBack="$router.go(-1)" />
         </nav>
         <cost-dashboard-create-form />
         <div class="button-group">

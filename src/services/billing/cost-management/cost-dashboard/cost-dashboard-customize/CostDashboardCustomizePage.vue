@@ -87,7 +87,7 @@ export default {
             route: computed(() => [
                 { name: i18n.t('MENU.BILLING.BILLING'), path: '/billing' },
                 { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), path: '/billing/cost-management' },
-                { name: 'Create New Dashboard' },
+                { name: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE_TITLE') },
             ]),
         });
 

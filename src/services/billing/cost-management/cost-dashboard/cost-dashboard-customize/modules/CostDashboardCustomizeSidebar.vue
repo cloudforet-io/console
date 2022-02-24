@@ -1,7 +1,7 @@
 <template>
     <div>
         <portal to="info-title">
-            <span class="sidebar-title">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SIDEBAR_TITLE') }}</span> <br>
+            <span class="sidebar-title">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE_TITLE') }}</span> <br>
         </portal>
         <portal to="info-contents">
             <div class="sidebar-contents">
