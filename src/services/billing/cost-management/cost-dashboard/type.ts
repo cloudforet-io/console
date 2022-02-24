@@ -57,7 +57,6 @@ export interface WidgetInfo {
     widget_id: string;
     name?: string;
     options: WidgetOptions;
-    isInitialDefaultWidget?: boolean;
 }
 
 export interface DefaultLayout {

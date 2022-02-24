@@ -23,20 +23,20 @@ import { i18n } from '@/translations';
 import CostDashboardCreateForm
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateForm.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
-import CostDashboardStoreModule
-    from '@/services/billing/cost-management/cost-dashboard/store';
+import CostDashboardStoreModule from '@/services/billing/cost-management/cost-dashboard/store';
 import { CostDashboardState } from '@/services/billing/cost-management/cost-dashboard/store/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
+    CustomLayout,
     DASHBOARD_PRIVACY_TYPE,
     DashboardCreateParam,
     DashboardPrivacyType,
-    DefaultLayout, DashboardInfo, CustomLayout,
 } from '@/services/billing/cost-management/cost-dashboard/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceRouter } from '@/router';
 import { BILLING_ROUTE } from '@/services/billing/routes';
+import { fetchDefaultLayoutData } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
 
 export default {
     name: 'CostDashboardCreatePage',
@@ -58,30 +58,29 @@ export default {
         });
 
         const state = reactive({
-            selectedTemplate: computed<Record<string, DefaultLayout> | DashboardInfo>(() => store.state.service?.costDashboard?.selectedTemplate),
+            selectedTemplate: computed(() => store.state.service?.costDashboard?.selectedTemplate),
             defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboard?.defaultFilter),
             selectedPrivacy: computed<DashboardPrivacyType>(() => store.state.service?.costDashboard?.selectedPrivacy),
         });
 
-        const getDefaultLayoutId = () => {
-            if (Object.prototype.hasOwnProperty.call(state.selectedTemplate, 'default_layout_id')) {
-                console.log(state.selectedTemplate.default_layout_id);
-                return state.selectedTemplate.default_layout_id;
+        const getCustomLayouts = async () => {
+            const hasDefaultId = Object.prototype.hasOwnProperty.call(state.selectedTemplate, 'default_layout_id');
+            if (hasDefaultId && (!state.selectedTemplate.custom_layouts || state.selectedTemplate.custom_layouts?.length === 0)) {
+                return await fetchDefaultLayoutData(state.selectedTemplate.default_layout_id as string) as CustomLayout[];
             }
-            return undefined;
+            return state.selectedTemplate?.custom_layouts as CustomLayout[];
         };
 
-        const makeDashboardCreateParam = (): DashboardCreateParam => ({
+        const makeDashboardCreateParam = async (): Promise<DashboardCreateParam> => ({
             name: 'Untitled Dashboard',
-            default_layout_id: getDefaultLayoutId() as string,
-            custom_layouts: state.selectedTemplate?.custom_layouts ? (state.selectedTemplate?.custom_layouts as CustomLayout[]) : [],
+            custom_layouts: await getCustomLayouts(),
             period_type: 'AUTO',
             default_filter: state.defaultFilter,
         });
 
         const createPublicDashboard = async (): Promise<string|undefined> => {
             try {
-                const { public_dashboard_id } = await SpaceConnector.client.costAnalysis.publicDashboard.create(makeDashboardCreateParam() as DashboardCreateParam);
+                const { public_dashboard_id } = await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
                 return public_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
@@ -91,7 +90,7 @@ export default {
 
         const createUserDashboard = async (): Promise<string|undefined> => {
             try {
-                const { user_dashboard_id } = await SpaceConnector.client.costAnalysis.userDashboard.create(makeDashboardCreateParam() as DashboardCreateParam);
+                const { user_dashboard_id } = await SpaceConnector.client.costAnalysis.userDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
                 return user_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));

@@ -30,7 +30,7 @@
                     </div>
                     <dynamic-widget v-if="!loading"
                                     :widget-id="widget.widget_id"
-                                    :name="getWidgetName(widget)"
+                                    :name="widget.name"
                                     :widget-file-name="defaultWidgetMap[widget.widget_id].widget_file_name"
                                     :options="widget.options"
                                     :period="period"
@@ -41,7 +41,7 @@
                                     @rendered="handleDynamicWidgetInit"
                     />
                 </div>
-                <template v-if="customizeMode && row.length > 0">
+                <template v-if="customizeMode && getAddWidgetColumnByLayout(row[0].options.layout, row.length) > 0">
                     <div v-for="n in getAddWidgetColumnByLayout(row[0].options.layout, row.length)"
                          :key="`${n}-${getUUID()}`" :class="`col-${row[0].options.layout} empty-widget`"
                     >
@@ -82,7 +82,6 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import CostDashboardUpdateWidgetModal
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardUpdateWidgetModal.vue';
 import { WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
-import { getWidgetName } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
 import { i18n } from '@/translations';
 
 type Row = string[]
@@ -217,7 +216,6 @@ export default {
             handleUpdateConfirm,
             getAddWidgetColumnByLayout,
             getUUID,
-            getWidgetName,
         };
     },
 };
