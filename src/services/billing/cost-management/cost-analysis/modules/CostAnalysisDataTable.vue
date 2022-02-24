@@ -66,7 +66,9 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 
 import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
-import { getConvertedFilter, getTimeUnitByPeriod } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import {
+    getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod,
+} from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
@@ -77,7 +79,6 @@ import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Location } from 'vue-router';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { Period } from '@/services/billing/cost-management/type';
 import { CostAnalyzeModel, UsdCost } from '@/services/billing/cost-management/widgets/type';
 import { ExcelDataField } from '@/store/modules/file/type';
 import { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay.vue';
@@ -160,56 +161,6 @@ export default {
         });
 
         /* util */
-        const _getTableDateFields = (period: Period): DataTableFieldType[] => {
-            const dateFields: DataTableFieldType[] = [];
-            const start = dayjs.utc(period.start);
-            const end = dayjs.utc(period.end);
-
-            const nameDateFormat = state.dateFormat;
-            let labelDateFormat = 'M/D';
-            if (state.timeUnit === 'month') {
-                labelDateFormat = 'MMM YYYY';
-            } else if (state.timeUnit === 'year') {
-                labelDateFormat = 'YYYY';
-            }
-
-            let now = start;
-            while (now.isSameOrBefore(end, state.timeUnit)) {
-                dateFields.push({
-                    name: `usd_cost.${now.format(nameDateFormat)}`,
-                    label: now.format(labelDateFormat),
-                    textAlign: 'right',
-                    sortable: true,
-                });
-                now = now.add(1, state.timeUnit);
-            }
-            return dateFields;
-        };
-        const _getTableCostFields = (granularity: GRANULARITY, period: Period, hasGroupBy: boolean) => {
-            const costFields: DataTableFieldType[] = [];
-
-            if (granularity === GRANULARITY.ACCUMULATED) {
-                const label = `${dayjs.utc(period.start).format('M/D')}~${dayjs.utc(period.end).format('M/D')}`;
-                if (!hasGroupBy) {
-                    costFields.push({
-                        name: 'totalCost', label: ' ', sortable: false,
-                    });
-                }
-                costFields.push({
-                    name: 'usd_cost', label, textAlign: 'right', sortable: false,
-                });
-                return costFields;
-            }
-
-            if (!hasGroupBy) {
-                costFields.push({
-                    name: 'totalCost', label: ' ', textAlign: 'right', sortable: false,
-                });
-            }
-
-            const dateFields = _getTableDateFields(period);
-            return costFields.concat(dateFields);
-        };
         const getLink = (item: CostAnalyzeModel, fieldName: string) => {
             const queryHelper = new QueryHelper();
             const query: Location['query'] = {};
@@ -417,7 +368,7 @@ export default {
 
         watch([() => state.granularity, () => state.groupBy, () => state.period, () => state.filters, () => state.stack], async ([granularity, groupBy, period, filters, stack]) => {
             await listCostAnalysisTableData(granularity, groupBy, period, filters, stack);
-            tableState.costFields = _getTableCostFields(granularity, period, !!tableState.groupByFields.length);
+            tableState.costFields = getDataTableCostFields(granularity, period, !!tableState.groupByFields.length);
             if (props.printMode) emit('rendered', getPdfItems());
         }, { immediate: true, deep: true });
 

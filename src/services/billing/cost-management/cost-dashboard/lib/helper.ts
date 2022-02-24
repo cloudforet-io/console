@@ -1,5 +1,6 @@
 import { keyBy } from 'lodash';
 import { CustomLayout, DashboardInfo, WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
+import { FILTER } from '@/services/billing/cost-management/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
 
@@ -33,4 +34,28 @@ export const getDashboardLayout = async (dashboard: DashboardInfo): Promise<Cust
 export const getWidgetName = ({ name, isInitialDefaultWidget }: Partial<WidgetInfo>) => {
     if (isInitialDefaultWidget) return undefined;
     return name;
+};
+
+export const getFiltersText = (filters) => {
+    if (!filters) return 'None';
+    const desc: string[] = [];
+    if (filters[FILTER.PROJECT_GROUP]?.length) {
+        const filterLength = filters[FILTER.PROJECT_GROUP].length;
+        const suffix = filterLength > 1 ? 'Project Groups' : 'Project Group';
+        desc.push(`${filterLength} ${suffix}`);
+    } if (filters[FILTER.PROJECT]?.length) {
+        const filterLength = filters[FILTER.PROJECT].length;
+        const suffix = filterLength > 1 ? 'Projects' : 'Project';
+        desc.push(`${filterLength} ${suffix}`);
+    } if (filters[FILTER.SERVICE_ACCOUNT]?.length) {
+        const filterLength = filters[FILTER.SERVICE_ACCOUNT].length;
+        const suffix = filterLength > 1 ? 'Service Accounts' : 'Service Account';
+        desc.push(`${filterLength} ${suffix}`);
+    } if (filters[FILTER.PROVIDER]?.length) {
+        const filterLength = filters[FILTER.PROVIDER].length;
+        const suffix = filterLength > 1 ? 'Providers' : 'Provider';
+        desc.push(`${filterLength} ${suffix}`);
+    }
+    if (desc.length) return desc.join(' & ');
+    return 'None';
 };

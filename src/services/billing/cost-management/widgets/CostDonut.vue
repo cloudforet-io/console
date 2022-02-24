@@ -15,7 +15,6 @@
                 :loading="loading"
                 :this-page.sync="thisPage"
                 :page-size="pageSize"
-                :chart="chart"
                 :show-legend="false"
                 :currency-rates="currencyRates"
                 :currency="currency"

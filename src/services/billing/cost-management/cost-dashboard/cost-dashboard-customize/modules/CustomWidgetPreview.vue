@@ -34,6 +34,7 @@
 </template>
 
 <script lang="ts">
+import dayjs from 'dayjs';
 import { capitalize } from 'lodash';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
@@ -46,11 +47,11 @@ import CostDashboardCustomizeWidgetPreview
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetPreview.vue';
 
 import { CostQuerySetModel } from '@/services/billing/cost-management/type';
-import dayjs from 'dayjs';
-import { FILTER, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
+import { GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { BILLING_ROUTE } from '@/services/billing/routes';
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
+import { getFiltersText } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 
 const LAYOUT = 100;
@@ -96,29 +97,6 @@ export default {
             const endText = dayjs.utc(period?.end).format('YYYY/MM/DD');
             return `${startText} ~ ${endText}`;
         };
-        const getFiltersText = (filters) => {
-            if (!filters) return 'None';
-            const desc: string[] = [];
-            if (filters[FILTER.PROJECT_GROUP]?.length) {
-                const filterLength = filters[FILTER.PROJECT_GROUP].length;
-                const suffix = filterLength > 1 ? 'Project Groups' : 'Project Group';
-                desc.push(`${filterLength} ${suffix}`);
-            } if (filters[FILTER.PROJECT]?.length) {
-                const filterLength = filters[FILTER.PROJECT].length;
-                const suffix = filterLength > 1 ? 'Projects' : 'Project';
-                desc.push(`${filterLength} ${suffix}`);
-            } if (filters[FILTER.SERVICE_ACCOUNT]?.length) {
-                const filterLength = filters[FILTER.SERVICE_ACCOUNT].length;
-                const suffix = filterLength > 1 ? 'Service Accounts' : 'Service Account';
-                desc.push(`${filterLength} ${suffix}`);
-            } if (filters[FILTER.PROVIDER]?.length) {
-                const filterLength = filters[FILTER.PROVIDER].length;
-                const suffix = filterLength > 1 ? 'Providers' : 'Provider';
-                desc.push(`${filterLength} ${suffix}`);
-            }
-            if (desc.length) return desc.join(' & ');
-            return 'None';
-        };
         const getViewQueryLink = () => {
             const queryId = props.selectedItem?.cost_query_set_id;
             if (queryId) {
@@ -143,10 +121,10 @@ export default {
             ...toRefs(state),
             LAYOUT,
             BILLING_ROUTE,
+            getFiltersText,
             getGranularityText,
             getGroupByText,
             getPeriodText,
-            getFiltersText,
             getViewQueryLink,
         };
     },

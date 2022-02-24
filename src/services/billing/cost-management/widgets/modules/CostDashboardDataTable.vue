@@ -103,10 +103,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        chart: {
-            type: Object,
-            default: undefined,
-        },
         legends: {
             type: Array,
             default: undefined,

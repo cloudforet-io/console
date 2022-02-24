@@ -1,8 +1,8 @@
 <template>
     <div class="set-filter-part">
         <p class="applied-filter">
-            <span class="label">{{ $t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER') }}:</span>
-            {{ appliedFilterDescription }}
+            <span class="label">{{ $t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER') }}: </span>
+            <span class="text">{{ getFiltersText(proxyFilters) }}</span>
         </p>
         <p-button v-if="!isAdmin && !noFilter"
                   style-type="gray-border"
@@ -45,6 +45,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import { getFiltersText } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
 
 
 interface Props {
@@ -107,28 +108,6 @@ export default {
             noFilter: computed(() => isEmpty(state.filterItemsMap) || Object.values(state.proxyFilters).every(d => !d)),
             viewFilterModalVisible: false,
             selectFilterModalVisible: false,
-            appliedFilterDescription: computed<string>(() => {
-                const desc: string[] = [];
-                if (state.proxyFilters[FILTER.PROJECT_GROUP]?.length) {
-                    const filterLength = state.proxyFilters[FILTER.PROJECT_GROUP].length;
-                    const suffix = filterLength > 1 ? 'Project Groups' : 'Project Group';
-                    desc.push(`${filterLength} ${suffix}`);
-                } if (state.proxyFilters[FILTER.PROJECT]?.length) {
-                    const filterLength = state.proxyFilters[FILTER.PROJECT].length;
-                    const suffix = filterLength > 1 ? 'Projects' : 'Project';
-                    desc.push(`${filterLength} ${suffix}`);
-                } if (state.proxyFilters[FILTER.SERVICE_ACCOUNT]?.length) {
-                    const filterLength = state.proxyFilters[FILTER.SERVICE_ACCOUNT].length;
-                    const suffix = filterLength > 1 ? 'Service Accounts' : 'Service Account';
-                    desc.push(`${filterLength} ${suffix}`);
-                } if (state.proxyFilters[FILTER.PROVIDER]?.length) {
-                    const filterLength = state.proxyFilters[FILTER.PROVIDER].length;
-                    const suffix = filterLength > 1 ? 'Providers' : 'Provider';
-                    desc.push(`${filterLength} ${suffix}`);
-                }
-                if (desc.length) return desc.join(' & ');
-                return 'No Filter';
-            }),
         });
 
         /* api */
@@ -158,6 +137,7 @@ export default {
 
         return {
             ...toRefs(state),
+            getFiltersText,
             handleClickSelectFilter,
             handleClickViewFilter,
             handleConfirmSetFilter,
@@ -172,7 +152,7 @@ export default {
     width: 100%;
     .applied-filter {
         margin-right: 0.5rem;
-        .count {
+        .text {
             @apply text-gray-800;
         }
     }
