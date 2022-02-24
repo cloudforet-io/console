@@ -63,7 +63,7 @@ const palette = {
     },
     blue: {
         100: '#F3F7FC',
-        200: '#D5EFFF',
+        200: '#E0F2FF',
         300: '#B4DFFF',
         400: '#86C8FF',
         500: '#49A7F7',
@@ -74,7 +74,7 @@ const palette = {
     },
     violet: {
         100: '#F8F8FC',
-        200: '#D5D3F9',
+        200: '#D8D7F9',
         300: '#B7AFED',
         400: '#897CD6',
         500: '#7D5DD2',
