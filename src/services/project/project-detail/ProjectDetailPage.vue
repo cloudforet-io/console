@@ -223,7 +223,7 @@ export default {
             projectDeleteFormVisible: false,
             projectEditFormVisible: false,
             headerTitle: '' as TranslateResult,
-            themeColor: 'primary',
+            themeColor: undefined as string | undefined,
             modalContent: '' as TranslateResult,
             modalLoading: false,
         });

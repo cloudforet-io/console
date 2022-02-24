@@ -191,7 +191,7 @@ export default {
         const formState = reactive({
             updateMode: false,
             headerTitle: '' as TranslateResult,
-            themeColor: '',
+            themeColor: undefined as string | undefined,
             memberAddFormVisible: false,
             memberDeleteFormVisible: false,
             memberUpdateFormVisible: false,
@@ -288,7 +288,7 @@ export default {
             items: [] as MemberItem[],
             headerTitle: '' as TranslateResult,
             subTitle: '' as TranslateResult,
-            themeColor: '',
+            themeColor: undefined as string | undefined,
             visible: false,
         });
 

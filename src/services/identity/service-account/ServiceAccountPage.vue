@@ -409,7 +409,7 @@ export default {
             title: '' as TranslateResult,
             subTitle: '' as TranslateResult,
             verificationText: '',
-            themeColor: '',
+            themeColor: undefined as string | undefined,
             api: null as any,
             params: null as any,
         });

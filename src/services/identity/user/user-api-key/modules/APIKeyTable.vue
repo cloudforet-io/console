@@ -179,7 +179,7 @@ export default {
             items: {} as APIKeyItem,
             title: '' as TranslateResult,
             subTitle: '' as TranslateResult,
-            themeColor: '',
+            themeColor: undefined as string | undefined,
             visible: false,
             loading: false,
         });

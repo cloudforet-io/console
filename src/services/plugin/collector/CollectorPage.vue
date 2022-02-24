@@ -318,7 +318,7 @@ export default {
             mode: '',
             title: '' as TranslateResult,
             subTitle: '' as TranslateResult,
-            themeColor: '',
+            themeColor: undefined as string | undefined,
             tableCheckFields: [
                 { name: 'name', label: 'Name' },
                 { name: 'state', label: 'State' },

@@ -196,7 +196,7 @@ export default {
             mode: '',
             title: '',
             subTitle: '',
-            themeColor: '',
+            themeColor: undefined as string | undefined,
             isManagementModalVisible: computed(() => store.getters['service/user/isManagementModalVisible']),
             visible: computed(() => modalState.isManagementModalVisible),
         });

@@ -409,7 +409,7 @@ export default {
             item: null,
             title: '' as TranslateResult,
             subTitle: '' as TranslateResult,
-            themeColor: '',
+            themeColor: undefined as string | undefined,
             api: null as any,
             params: null as any,
         });
@@ -705,7 +705,7 @@ export default {
                 checkTableModalState.visible = false;
                 checkTableModalState.title = '';
                 checkTableModalState.subTitle = '';
-                checkTableModalState.themeColor = '';
+                checkTableModalState.themeColor = undefined;
                 checkTableModalState.api = null;
                 checkTableModalState.params = null;
             };
