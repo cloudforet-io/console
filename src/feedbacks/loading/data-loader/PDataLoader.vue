@@ -15,7 +15,12 @@
                 <div v-if="showLoader" key="loader" class="loader-wrapper"
                      :class="{'no-empty-case': disableEmptyCase && isEmpty}"
                 >
-                    <div class="loader-backdrop" />
+                    <div class="loader-backdrop"
+                         :style="{
+                             opacity: loaderBackdropOpacity,
+                             backgroundColor: loaderBackdropColor
+                         }"
+                    />
                     <div class="loader">
                         <slot name="loader">
                             <template v-if="loaderType === LOADER_TYPES.spinner">
@@ -52,6 +57,8 @@ interface Props {
     showDataFromScratch: boolean;
     minLoadingTime: number;
     lazyLoadingTime: number;
+    loaderBackdropOpacity: number;
+    loaderBackdropColor: string;
 }
 export default defineComponent<Props>({
     name: 'PDataLoader',
@@ -98,6 +105,14 @@ export default defineComponent<Props>({
             validator(lazyLoadingTime: number) {
                 return lazyLoadingTime >= 0;
             },
+        },
+        loaderBackdropOpacity: {
+            type: Number,
+            default: 0.5,
+        },
+        loaderBackdropColor: {
+            type: String,
+            default: 'white',
         },
     },
     setup(props) {
@@ -210,8 +225,6 @@ export default defineComponent<Props>({
         z-index: 1;
         .loader-backdrop {
             @apply w-full h-full;
-            background-color: white;
-            opacity: 0.5;
         }
         .loader {
             @apply absolute flex w-full h-full justify-center items-center;

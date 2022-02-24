@@ -263,6 +263,65 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## Loader Backdrop Opacity & Color
+
+You can adjust the opacity of the loader backdrop through the `loaderBackdropOpacity` prop.<br/>
+You can also change the backdrop color through the `loaderBackdropColor` prop.<br/>
+
+<Canvas>
+    <Story name="Loader Backdrop Opacity" >
+        {{
+            components: { PDataLoader },
+            template: `
+<div class="w-full">
+    <div class="grid grid-cols-2">
+        <div class="mx-2">
+            <p class="font-lg font-bold my-4">Opacity: 0.6, Color: indianred</p>
+            <p-data-loader :loading="loading" :data="data"
+                            show-data-from-scratch
+                            :loader-backdrop-opacity="0.6"
+                            loader-backdrop-color="indianred"
+                            class="p-3 bg-gray-100 border border-gray-200"
+                            style="width: 100%; height: 100px; background-color: indianred"
+            >
+                <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                    {{d}}
+                </div>
+            </p-data-loader>
+        </div>
+        <div class="mx-2">
+            <p class="font-lg font-bold my-4">Opacity: 0.9, Color: indianred</p>
+            <p-data-loader :loading="loading" :data="data"
+                            show-data-from-scratch
+                            :loader-backdrop-opacity="0.9"
+                            loader-backdrop-color="indianred"
+                            class="p-3 bg-gray-100 border border-gray-200"
+                            style="width: 100%; height: 100px; background-color: indianred"
+            >
+                <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                    {{d}}
+                </div>
+            </p-data-loader>
+        </div>
+    </div>
+</div>
+    `,
+            setup() {
+                const state = reactive({
+                    loading: true,
+                    data: range(15).map(() => faker.lorem.lines()),
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Playground
 
 <Canvas>

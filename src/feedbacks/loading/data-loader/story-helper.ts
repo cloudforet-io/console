@@ -145,6 +145,40 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
             type: 'number',
         },
     },
+    loaderBackdropOpacity: {
+        name: 'loaderBackdropOpacity',
+        type: { name: 'number' },
+        defaultValue: 0.5,
+        table: {
+            type: {
+                summary: 'number',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 0.5,
+            },
+        },
+        control: {
+            type: 'number',
+        },
+    },
+    loaderBackdropColor: {
+        name: 'loaderBackdropColor',
+        type: { name: 'string' },
+        defaultValue: 'white',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'white',
+            },
+        },
+        control: {
+            type: 'color',
+        },
+    },
     /* slots */
     loaderSlot: {
         name: 'loader',
