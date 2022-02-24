@@ -140,7 +140,7 @@ export default {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
     border-width: 1px;
     &:hover {
-        @apply bg-blue-100 border-blue-500;
+        @apply bg-blue-100 border-blue-600;
     }
     max-width: 58rem;
 }

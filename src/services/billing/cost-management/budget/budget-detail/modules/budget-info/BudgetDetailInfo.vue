@@ -153,7 +153,7 @@ export default {
                 line-height: 130%;
             }
             .view-all {
-                @apply text-blue-600 cursor-pointer;
+                @apply text-blue-700 cursor-pointer;
                 font-size: 0.875rem;
                 margin-left: 0.5rem;
                 flex-shrink: 0;

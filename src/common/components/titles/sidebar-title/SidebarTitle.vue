@@ -62,10 +62,10 @@ header {
                 text-decoration: underline;
             }
             &:active {
-                @apply text-blue-500 cursor-pointer;
+                @apply text-blue-600 cursor-pointer;
             }
             &.selected {
-                @apply text-blue-500 cursor-pointer;
+                @apply text-blue-600 cursor-pointer;
             }
         }
     }

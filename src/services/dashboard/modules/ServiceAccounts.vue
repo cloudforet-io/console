@@ -271,7 +271,7 @@ export default {
         font-weight: bold;
     }
     .add-btn {
-        @apply flex-shrink-0 flex justify-end items-center text-blue-500;
+        @apply flex-shrink-0 flex justify-end items-center text-blue-600;
         line-height: 1.2;
         font-size: 0.75rem;
         &:hover {

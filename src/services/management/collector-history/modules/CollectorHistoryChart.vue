@@ -54,7 +54,7 @@ const VALUE_TYPE = {
 
 const LEGEND_COLORS = {
     completed: green[400],
-    failed: coral[500],
+    failed: coral[400],
 };
 
 export default {
@@ -87,7 +87,7 @@ export default {
                 },
                 {
                     label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILED'),
-                    color: coral[500],
+                    color: coral[400],
                 },
             ])),
             //
@@ -201,7 +201,7 @@ export default {
                 });
 
                 // tooltip
-                const tooltipTextColor = type === VALUE_TYPE.completed ? green[500] : coral[600];
+                const tooltipTextColor = type === VALUE_TYPE.completed ? green[500] : coral[500];
                 if (type === VALUE_TYPE.completed) {
                     series.columns.template.tooltipText = `[font-size: 1rem; ${tooltipTextColor}; bold]{completed} [font-size: 0.875rem; ${tooltipTextColor};](Total Completed)
 [font-size: 0.75rem; ${gray[700]}]{tooltipDate}`;

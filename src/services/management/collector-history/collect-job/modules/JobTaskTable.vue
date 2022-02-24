@@ -81,7 +81,7 @@ import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-const COMPLETED_ICON_COLOR = green[400];
+const COMPLETED_ICON_COLOR = green[500];
 const FAILED_ICON_COLOR = red[400];
 const PENDING_ICON_COLOR = primaryDark;
 

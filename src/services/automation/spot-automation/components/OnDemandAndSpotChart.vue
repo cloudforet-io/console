@@ -117,7 +117,7 @@ export default defineComponent({
         const getData = async () => {
             state.loading = true;
             state.data = [];
-            const colors = [peacock[400], blue[500]];
+            const colors = [peacock[500], blue[600]];
             try {
                 const res = [{
                     name: '스팟',
@@ -210,7 +210,7 @@ export default defineComponent({
         }
 
         .on-demand-text {
-            @apply text-blue-500;
+            @apply text-blue-600;
             font-size: 0.625rem;
             line-height: 100%;
         }
@@ -226,7 +226,7 @@ export default defineComponent({
         }
 
         .on-demand-text {
-            @apply text-blue-500;
+            @apply text-blue-600;
             font-size: 0.75rem;
             line-height: 160%;
         }

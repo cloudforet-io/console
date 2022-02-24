@@ -246,7 +246,7 @@ export default {
             mapMarker.width = 24;
             mapMarker.height = 34;
             mapMarker.scale = 0.7;
-            mapMarker.fill = am4core.color(coral[600]);
+            mapMarker.fill = am4core.color(coral[500]);
             mapMarker.fillOpacity = 1;
             mapMarker.horizontalCenter = 'middle';
             mapMarker.verticalCenter = 'bottom';

@@ -333,7 +333,7 @@ export default {
                         &.MAINTENANCE {
                             @apply bg-yellow-300;
                             &:hover {
-                                @apply border-yellow-700;
+                                @apply border-yellow-600;
                                 border-width: 0.25rem;
                             }
                         }

@@ -85,7 +85,7 @@ export const ALERT_SEVERITY_COLORS: Record<keyof typeof ALERT_SEVERITY, string> 
     CRITICAL: red[600],
     ERROR: coral[600],
     WARNING: yellow[600],
-    INFO: blue[400],
+    INFO: blue[600],
     NOT_AVAILABLE: violet[800],
     NONE: gray[500],
 };

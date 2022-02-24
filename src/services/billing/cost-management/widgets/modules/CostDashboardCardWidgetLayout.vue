@@ -90,7 +90,7 @@ export default {
             }
         }
         .anchor-button {
-            @apply flex items-center flex-shrink-0 text-sm text-blue-600 font-normal cursor-pointer;
+            @apply flex items-center flex-shrink-0 text-sm text-blue-700 font-normal cursor-pointer;
             font-size: 0.75rem;
             line-height: 150%;
             margin-top: 0.1rem;

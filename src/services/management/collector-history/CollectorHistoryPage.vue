@@ -136,8 +136,8 @@ import { JOB_STATUS } from '@/services/management/collector-history/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-const PROGRESS_BAR_COLOR = peacock[400];
-const COMPLETED_ICON_COLOR = green[400];
+const PROGRESS_BAR_COLOR = peacock[500];
+const COMPLETED_ICON_COLOR = green[500];
 const FAILED_ICON_COLOR = red[400];
 
 const statusTextFormatter = (status) => {

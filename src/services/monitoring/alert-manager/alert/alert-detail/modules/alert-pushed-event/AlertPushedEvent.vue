@@ -196,9 +196,9 @@ export default {
 }
 .list-item {
     &:hover {
-        @apply text-blue-500 cursor-pointer underline;
+        @apply text-blue-600 cursor-pointer underline;
         .desc {
-            @apply text-blue-500;
+            @apply text-blue-600;
         }
     }
     .desc {

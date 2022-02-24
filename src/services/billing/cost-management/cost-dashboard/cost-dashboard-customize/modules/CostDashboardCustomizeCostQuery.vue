@@ -208,7 +208,7 @@ export default {
                 min-height: 7rem;
                 padding: 0.5rem 1rem;
                 &.selected {
-                    @apply border border-blue-500;
+                    @apply border border-blue-600;
                 }
 
                 .name {

@@ -478,7 +478,7 @@ export default {
                         margin-top: -1.15rem;
                     }
                     .kanban-guide-text {
-                        @apply text-center text-xs text-blue-500;
+                        @apply text-center text-xs text-blue-600;
                         padding-top: 1rem;
                     }
                 }
@@ -489,7 +489,7 @@ export default {
                         height: 3.25rem;
                         margin-bottom: 0.5rem;
                         &:hover {
-                            @apply border-blue-500 border border-solid bg-blue-100;
+                            @apply border-blue-600 border border-solid bg-blue-100;
                         }
                         &:active {
                             @apply cursor-default bg-blue-200;
@@ -503,7 +503,7 @@ export default {
                         position: relative;
                         cursor: pointer;
                         &:hover {
-                            @apply border-blue-500 border border-solid bg-blue-100;
+                            @apply border-blue-600 border border-solid bg-blue-100;
                             .add-btn {
                                 display: inline;
                                 position: absolute;
@@ -539,7 +539,7 @@ export default {
                             opacity: 0.5;
                         }
                         .recommended-text {
-                            @apply text-blue-500;
+                            @apply text-blue-600;
                             opacity: 0.5;
                             font-size: 0.75rem;
                             flex-shrink: 0;
@@ -560,7 +560,7 @@ export default {
             @apply bg-blue-100;
         }
         .kanban-container .resource-group-box .resource-group-header .header-decorator {
-            @apply bg-blue-200 text-blue-500;
+            @apply bg-blue-200 text-blue-600;
         }
         .kanban-container .resource-group-box .resource-item-wrapper {
             height: 17rem;

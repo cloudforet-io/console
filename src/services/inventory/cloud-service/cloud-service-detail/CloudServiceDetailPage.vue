@@ -885,10 +885,10 @@ export default {
         }
     }
     &:active {
-        @apply bg-blue-200 text-blue-500 cursor-pointer;
+        @apply bg-blue-200 text-blue-600 cursor-pointer;
     }
     &.selected {
-        @apply bg-blue-200 text-blue-500 cursor-pointer;
+        @apply bg-blue-200 text-blue-600 cursor-pointer;
     }
 }
 

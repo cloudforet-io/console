@@ -229,7 +229,7 @@ export default {
 ${vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.TOOLTIP_ON_DEMAND_ESTIMATED_COST')}: <strong>$${normalCost}</strong>
 </span>
 <br>
-<span style="color: ${peacock[400]}; line-height: 1.5">
+<span style="color: ${peacock[500]}; line-height: 1.5">
 ${vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.TOOLTIP_SAVING_COST')}: <strong>$${savingResult} (${savingPercentage}%)</strong>
 </span>
 `;

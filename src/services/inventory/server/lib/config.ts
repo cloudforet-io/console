@@ -25,7 +25,7 @@ export const COLLECTION_STATE: Enum<StatusProps> = {
 export const LIFE_CYCLE: Enum<StatusProps> = {
     INSERVICE: {
         text: 'In Service',
-        iconColor: 'green.500',
+        iconColor: 'green.600',
     },
     MAINTENANCE: {
         text: 'Maintenance',
@@ -49,7 +49,7 @@ export const SERVER_TYPE: Enum<Partial<Badge>> = {
         outline: true,
     },
     BAREMETAL: {
-        backgroundColor: 'coral.600',
+        backgroundColor: 'coral.500',
         outline: true,
     },
     HYPERVISOR: {

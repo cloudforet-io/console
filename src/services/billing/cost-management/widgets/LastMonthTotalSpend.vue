@@ -173,7 +173,7 @@ export default defineComponent<WidgetProps>({
                     return am4core.color(violet[200]);
                 }
                 if (target.dataItem?.dataContext?.date === state.lastMonth.format('YYYY-MM')) {
-                    return am4core.color(violet[500]);
+                    return am4core.color(violet[600]);
                 }
                 return fill;
             });

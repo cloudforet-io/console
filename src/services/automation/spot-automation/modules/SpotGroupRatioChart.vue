@@ -56,7 +56,7 @@ enum CHART_TYPE {
 
 const COLORS = {
     onDemand: secondary,
-    spot: peacock[400],
+    spot: peacock[500],
 };
 
 export default {

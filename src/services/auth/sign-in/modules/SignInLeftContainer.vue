@@ -17,7 +17,7 @@
                 <p-anchor :href="contactLink ? contactLink : 'mailto:support@spaceone.dev'" target="_blank"
                           :show-icon="false" highlight
                 >
-                    <span class="text-blue-600 ml-2">{{ $t('COMMON.SIGN_IN.CONTACT') }}</span>
+                    <span class="text-blue-700 ml-2">{{ $t('COMMON.SIGN_IN.CONTACT') }}</span>
                 </p-anchor>
             </span>
         </div>

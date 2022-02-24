@@ -105,7 +105,7 @@ const PERIOD = {
 };
 const COLORS = {
     onDemand: secondary,
-    spot: peacock[400],
+    spot: peacock[500],
     interrupt: alert,
 };
 
@@ -132,11 +132,11 @@ export default {
             legends: computed(() => ([
                 {
                     label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.ON_DEMAND'),
-                    color: blue[500],
+                    color: blue[600],
                 },
                 {
                     label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.SPOT'),
-                    color: peacock[400],
+                    color: peacock[500],
                 },
             ])),
             dateTypes: computed(() => ([

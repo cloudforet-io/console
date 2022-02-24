@@ -262,7 +262,7 @@ export default {
                 }
             }
             .toggle-button {
-                @apply text-blue-600;
+                @apply text-blue-700;
                 font-size: 0.75rem;
                 text-align: right;
                 cursor: pointer;

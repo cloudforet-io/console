@@ -273,7 +273,7 @@ export default {
         }
     }
     .more {
-        @apply flex-shrink-0 text-sm text-blue-600 font-normal inline-flex items-center cursor-pointer;
+        @apply flex-shrink-0 text-sm text-blue-700 font-normal inline-flex items-center cursor-pointer;
         justify-self: flex-end;
         font-size: 0.75rem;
         &:hover {
@@ -301,7 +301,7 @@ export default {
     }
 }
 .more {
-    @apply text-blue-500 font-normal float-right inline-flex items-center cursor-pointer;
+    @apply text-blue-600 font-normal float-right inline-flex items-center cursor-pointer;
     font-size: 0.75rem;
     &:hover {
         @apply text-secondary underline;

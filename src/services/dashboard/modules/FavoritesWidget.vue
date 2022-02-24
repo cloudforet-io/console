@@ -154,7 +154,7 @@ export default {
     }
 }
 .toggle-btn {
-    @apply ml-2 mt-3 text-blue-600;
+    @apply ml-2 mt-3 text-blue-700;
     margin-top: 0.625rem;
     text-align: center;
     cursor: pointer;

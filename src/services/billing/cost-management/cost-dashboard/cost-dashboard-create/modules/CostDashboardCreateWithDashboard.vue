@@ -120,7 +120,7 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .p-anchor {
-    @apply text-blue-600;
+    @apply text-blue-700;
     font-size: 0.875rem;
 }
 </style>

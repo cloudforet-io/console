@@ -48,7 +48,7 @@
                         </p>
                         <router-link v-if="item.created_count" :to="item.createdHref" class="daily-created-count">
                             {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
-                            <span class="text-blue-500 font-bold text-sm">{{ item.created_count || 0 }}
+                            <span class="text-blue-600 font-bold text-sm">{{ item.created_count || 0 }}
                                 <p-i v-if="item.create_warning" name="ic_state_duplicated" width="0.75rem"
                                      height="0.75rem"
                                 />
@@ -76,7 +76,7 @@
                     </p>
                     <router-link v-if="item.created_count" :to="item.createdHref" class="daily-created-count">
                         {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
-                        <span class="text-blue-500 font-bold text-sm">{{ item.created_count || 0 }}</span>
+                        <span class="text-blue-600 font-bold text-sm">{{ item.created_count || 0 }}</span>
                     </router-link>
                     <router-link v-if="item.deleted_count" :to="item.deletedHref" class="daily-deleted-count">
                         {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
@@ -513,7 +513,7 @@ export default {
             width: 24%;
             max-width: 6.5rem;
             &:hover {
-                @apply bg-blue-100 cursor-pointer underline text-blue-500 rounded-md;
+                @apply bg-blue-100 cursor-pointer underline text-blue-600 rounded-md;
                 opacity: 0.75;
             }
         }

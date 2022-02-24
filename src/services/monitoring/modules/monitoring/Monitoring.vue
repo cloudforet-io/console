@@ -155,8 +155,8 @@ interface StatItem {
 
 
 const colors = [
-    coral[500], blue[500], violet[500], yellow[600], green[400], coral[400], peacock[600], coral[700],
-    peacock[400], green[700], green[500], blue[400], indigo[700], violet[400], indigo[400], blue[700],
+    coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[500], coral[600],
+    peacock[400], green[600], green[500], blue[400], indigo[500], violet[400], indigo[400], blue[600],
 ];
 const TIME_RANGE = {
     '1h': 1,

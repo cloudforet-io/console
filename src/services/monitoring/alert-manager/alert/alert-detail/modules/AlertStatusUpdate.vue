@@ -127,7 +127,7 @@ export default {
     line-height: 140%;
 }
 .new-button {
-    @apply text-blue-600;
+    @apply text-blue-700;
     line-height: 160%;
     min-width: 2.875rem;
     flex-shrink: 0;

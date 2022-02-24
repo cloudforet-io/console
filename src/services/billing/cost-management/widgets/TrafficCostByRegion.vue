@@ -39,7 +39,7 @@ const tempMapData = [
         latitude: 39.563353,
         longitude: -99.316406,
         value: 40764561,
-        color: am4core.color(green[500]),
+        color: am4core.color(green[600]),
     },
 ];
 

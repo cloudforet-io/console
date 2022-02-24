@@ -224,7 +224,7 @@ export default {
     }
 
     .project-healthy {
-        @apply bg-green-100 text-green-500 text-center;
+        @apply bg-green-100 text-green-600 text-center;
         padding: 3rem 0;
         margin-top: 0.5rem;
         .p-i-icon {

@@ -408,7 +408,7 @@ export default {
             @apply bg-secondary2;
         }
         &.selected {
-            @apply border-blue-500;
+            @apply border-blue-600;
             &:hover {
                 @apply bg-white;
                 cursor: default;

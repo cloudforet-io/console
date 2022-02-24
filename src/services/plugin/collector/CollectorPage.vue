@@ -543,7 +543,7 @@ li {
 }
 
 .view-detail {
-    @apply text-blue-600;
+    @apply text-blue-700;
     font-size: 0.875rem;
     line-height: 1.5;
     margin-right: 0.3825rem;

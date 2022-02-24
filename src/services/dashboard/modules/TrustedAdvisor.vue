@@ -154,7 +154,7 @@ const CLOUD_SERVICE_GROUP = 'TrustedAdvisor';
 const CLOUD_SERVICE_NAME = 'Check';
 const ERROR_COLOR = red[500];
 const WARNING_COLOR = yellow[500];
-const OK_COLOR = green[500];
+const OK_COLOR = green[600];
 
 export default {
     name: 'TrustedAdvisor',
@@ -464,7 +464,7 @@ export default {
                         @apply text-yellow-500;
                     }
                     &.ok {
-                        @apply text-green-500;
+                        @apply text-green-600;
                     }
                 }
                 .right-part {
@@ -478,7 +478,7 @@ export default {
                 @apply text-yellow-500;
             }
             &.ok {
-                @apply text-green-500;
+                @apply text-green-600;
             }
             .left-part {
                 display: inline-flex;
@@ -580,7 +580,7 @@ export default {
                         @apply border border-yellow-500 text-yellow-500;
                     }
                     &.ok {
-                        @apply border border-green-500 text-green-500;
+                        @apply border border-green-600 text-green-600;
                     }
                     &.empty {
                         @apply border border-gray-200 text-gray-300;

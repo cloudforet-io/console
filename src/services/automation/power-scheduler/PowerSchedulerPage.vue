@@ -479,7 +479,7 @@ export default {
                     line-height: 1.5;
 
                     &.schedule-on {
-                        @apply text-green-500;
+                        @apply text-green-600;
                     }
                 }
             }

@@ -123,9 +123,9 @@ export default {
     margin-top: 0.5rem;
 }
 .link {
-    @apply text-blue-500;
+    @apply text-blue-600;
     &:hover {
-        @apply text-blue-500;
+        @apply text-blue-600;
     }
 }
 </style>

@@ -53,7 +53,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const SUCCEEDED_COLOR = green[400];
-const FAILED_COLOR = coral[500];
+const FAILED_COLOR = coral[400];
 
 export default {
     name: 'JobStatusChart',
@@ -206,7 +206,7 @@ export default {
                 height: 100%;
             }
             .failed-bar {
-                @apply bg-coral-500;
+                @apply bg-coral-400;
                 height: 100%;
             }
         }

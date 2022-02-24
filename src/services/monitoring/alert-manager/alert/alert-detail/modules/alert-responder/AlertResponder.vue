@@ -243,7 +243,7 @@ export default {
     font-size: 1rem;
     line-height: 125%;
     &.current {
-        @apply text-violet-500;
+        @apply text-violet-600;
     }
     .level {
         @apply font-bold mx-2;

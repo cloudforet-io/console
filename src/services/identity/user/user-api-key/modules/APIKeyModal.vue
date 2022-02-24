@@ -221,7 +221,7 @@ export default {
         margin: 3px 0.25rem auto 0;
     }
     .text {
-        @apply text-blue-500;
+        @apply text-blue-600;
         display: inline-flex;
     }
 }

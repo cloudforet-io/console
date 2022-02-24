@@ -182,11 +182,11 @@ export default {
                     @apply bg-blue-200;
 
                     .service-type-name {
-                        @apply text-blue-500 underline;
+                        @apply text-blue-600 underline;
                     }
 
                     .service-type-count {
-                        @apply text-blue-500;
+                        @apply text-blue-600;
                     }
                 }
             }

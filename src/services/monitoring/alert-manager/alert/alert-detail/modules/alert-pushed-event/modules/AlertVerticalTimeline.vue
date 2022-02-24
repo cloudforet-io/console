@@ -92,7 +92,7 @@ export default {
             &::before {
                 @mixin circle-style;
 
-                @apply border-4 border-green-300 bg-green-500;
+                @apply border-4 border-green-300 bg-green-600;
             }
         }
         &.no-border {

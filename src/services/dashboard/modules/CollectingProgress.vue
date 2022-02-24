@@ -203,7 +203,7 @@ export default {
         @apply flex-shrink-0 flex justify-end;
         font-size: 0.75rem;
         .more {
-            @apply text-sm text-blue-500 font-normal float-right inline-flex items-center cursor-pointer float-right;
+            @apply text-sm text-blue-600 font-normal float-right inline-flex items-center cursor-pointer float-right;
             &:hover {
                 @apply text-secondary underline;
             }

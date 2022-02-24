@@ -152,7 +152,7 @@ export default {
     }
 }
 .toggle-btn {
-    @apply mt-3 text-blue-600;
+    @apply mt-3 text-blue-700;
     cursor: pointer;
     right: 1rem;
     bottom: 1rem;

@@ -146,7 +146,7 @@ export default {
                 min-height: 7.1875rem;
 
                 &.selected {
-                    @apply border border-blue-500;
+                    @apply border border-blue-600;
                 }
                 .card-header {
                     @apply flex items-center pl-4 pr-4 flex-grow;

@@ -11,7 +11,7 @@
             <span v-if="field.name && value.path === 'limit'">
                 {{ currencyMoneyFormatter(value[value.path], currency, currencyRates) }}
             </span>
-            <span v-else-if="field.name && value.path === 'usd_cost'" class="text-blue-600">
+            <span v-else-if="field.name && value.path === 'usd_cost'" class="text-blue-700">
                 <router-link :to="value.link" class="link-text">
                     {{ currencyMoneyFormatter(value[value.path], currency, currencyRates) }}
                 </router-link>

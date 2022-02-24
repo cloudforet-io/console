@@ -156,10 +156,10 @@ export default {
         @apply bg-blue-100 cursor-pointer;
     }
     &:active {
-        @apply bg-blue-200 text-blue-500 cursor-pointer;
+        @apply bg-blue-200 text-blue-600 cursor-pointer;
     }
     &.selected {
-        @apply bg-blue-200 text-blue-500 cursor-pointer;
+        @apply bg-blue-200 text-blue-600 cursor-pointer;
     }
     .title {
         @apply truncate inline-block;
