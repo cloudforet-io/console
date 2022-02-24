@@ -36,12 +36,12 @@
                                 {{ d.label }}
                             </p-button>
                         </div>
-                        <p-chart-loader :loading="chartState.loading">
+                        <p-data-loader :loading="chartState.loading">
                             <template #loader>
                                 <p-skeleton width="100%" height="100%" />
                             </template>
                             <div ref="chartRef" class="chart" />
-                        </p-chart-loader>
+                        </p-data-loader>
                     </div>
                     <div class="summary-wrapper col-span-12 lg:col-span-3">
                         <div class="title col-span-3">
@@ -110,7 +110,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import { Location } from 'vue-router';
 
 import {
-    PChartLoader, PSkeleton, PButton, PBalloonTab,
+    PDataLoader, PSkeleton, PButton, PBalloonTab,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -169,7 +169,7 @@ export default {
     components: {
         PButton,
         PSkeleton,
-        PChartLoader,
+        PDataLoader,
         PBalloonTab,
     },
     props: {

@@ -13,7 +13,7 @@
             </div>
         </template>
         <div class="chart-container">
-            <p-chart-loader :loading="loading" class="chart">
+            <p-data-loader :loading="loading" class="chart">
                 <template #loader>
                     <div ref="loaderRef" class="w-full h-full" />
                 </template>
@@ -21,7 +21,7 @@
                     <img src="@/assets/images/illust_ghost.svg" class="no-data-img">
                 </div>
                 <div v-else ref="chartRef" class="w-full h-full" />
-            </p-chart-loader>
+            </p-data-loader>
         </div>
         <div class="legends">
             <template v-if="loading">
@@ -59,7 +59,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PDataTable, PChartLoader, PSkeleton, PI,
+    PDataTable, PDataLoader, PSkeleton, PI,
 } from '@spaceone/design-system';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
@@ -90,7 +90,7 @@ export default {
         PI,
         PDataTable,
         PSkeleton,
-        PChartLoader,
+        PDataLoader,
     },
     props: {
         providers: {

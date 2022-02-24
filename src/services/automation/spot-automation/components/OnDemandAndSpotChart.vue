@@ -2,6 +2,7 @@
     <section class="on-demand-chart-wrapper"
              :class="chartType"
     >
+        <!--        TODO:: Should change PChartLoader to PDataLoader-->
         <p-chart-loader :loading="loading" class="chart-wrapper">
             <template #loader>
                 <div ref="loaderRef" />

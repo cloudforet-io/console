@@ -8,6 +8,7 @@
                 <p>$<b>{{ onDemandCost }}</b></p>
             </div>
         </div>
+        <!--        TODO:: Should chart PChartLoader as PDataLoader -->
         <p-chart-loader class="chart-wrapper" :loading="loading">
             <div ref="chartRef" class="chart" />
         </p-chart-loader>

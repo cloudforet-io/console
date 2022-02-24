@@ -5,7 +5,7 @@
                                        :widget-link="widgetLink"
                                        :print-mode="printMode"
     >
-        <p-chart-loader :loading="loading" class="chart-wrapper">
+        <p-data-loader :loading="loading" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
@@ -23,7 +23,7 @@
                     </template>
                 </div>
             </div>
-        </p-chart-loader>
+        </p-data-loader>
         <div class="legend-wrapper">
             <div v-for="legend in legends" :key="`legend-${legend.label}`" class="legend">
                 <span class="legend-icon" :style="{ 'background-color': legend.color }" />
@@ -44,7 +44,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PSkeleton,
+    PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
@@ -74,7 +74,7 @@ export default defineComponent<WidgetProps>({
     name: 'BudgetStatus',
     components: {
         CostDashboardCardWidgetLayout,
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
     },
     props: {

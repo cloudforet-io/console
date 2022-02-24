@@ -14,12 +14,12 @@
             </div>
         </template>
         <div class="contents-container">
-            <p-chart-loader :loading="loading" class="chart">
+            <p-data-loader :loading="loading" class="chart">
                 <template #loader>
                     <p-skeleton width="100%" height="100%" />
                 </template>
                 <div ref="chartRef" class="chart" />
-            </p-chart-loader>
+            </p-data-loader>
             <div v-if="!loading && data.length === 0"
                  class="no-data-wrapper"
             >
@@ -88,7 +88,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PDataTable, PIconTextButton, PSkeleton, PI,
+    PDataLoader, PDataTable, PIconTextButton, PSkeleton, PI,
 } from '@spaceone/design-system';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
@@ -136,7 +136,7 @@ export default {
         WidgetLayout,
         PDataTable,
         PIconTextButton,
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
         PI,
     },

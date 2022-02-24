@@ -10,12 +10,9 @@
         </div>
         <div v-else class="grid grid-cols-12">
             <div class="col-span-3 chart-wrapper">
-                <p-chart-loader :loading="loading">
-                    <template #loader>
-                        <div ref="loaderRef" />
-                    </template>
+                <p-data-loader :loading="loading">
                     <div ref="chartRef" class="chart" />
-                </p-chart-loader>
+                </p-data-loader>
             </div>
             <div class="col-span-9 summary-content-wrapper">
                 <template v-if="loading">
@@ -48,7 +45,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 
 import {
-    PChartLoader, PSkeleton,
+    PSkeleton, PDataLoader,
 } from '@spaceone/design-system';
 
 import {
@@ -84,7 +81,7 @@ interface RegionData {
 export default {
     name: 'ProjectRegionService',
     components: {
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
     },
     props: {
@@ -339,6 +336,10 @@ export default {
             position: absolute;
             right: 0.5rem;
         }
+    }
+
+    .p-data-loader {
+        height: 100%;
     }
 
     @screen mobile {

@@ -19,12 +19,12 @@
             </div>
             <div class="col-span-12 md:col-span-9">
                 <div class="chart-wrapper">
-                    <p-chart-loader :loading="chartState.loading">
+                    <p-data-loader :loading="chartState.loading">
                         <template #loader>
                             <p-skeleton width="100%" height="100%" />
                         </template>
                         <div ref="chartRef" class="chart" />
-                    </p-chart-loader>
+                    </p-data-loader>
                 </div>
             </div>
             <div class="col-span-12 md:col-span-3 grid grid-cols-12 summary-group">
@@ -115,7 +115,7 @@ import {
 
 import {
     PButton,
-    PChartLoader,
+    PDataLoader,
     PCollapsibleToggle,
     PDataTable,
     PI,
@@ -155,7 +155,7 @@ const DATA_TABLE_COLUMN = 6;
 export default {
     name: 'ProjectBilling',
     components: {
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
         PButton,
         PDataTable,

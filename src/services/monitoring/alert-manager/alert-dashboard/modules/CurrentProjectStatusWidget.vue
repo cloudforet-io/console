@@ -4,12 +4,12 @@
             {{ $t('MONITORING.ALERT.DASHBOARD.CURRENT_PROJECT_STATUS') }}
         </p>
         <div class="chart-wrapper">
-            <p-chart-loader :loading="loading">
+            <p-data-loader :loading="loading">
                 <template #loader>
                     <div ref="loaderRef" />
                 </template>
                 <div ref="chartRef" class="chart" />
-            </p-chart-loader>
+            </p-data-loader>
             <div class="legend-wrapper">
                 <p class="legend">
                     <span>{{ $t('MONITORING.ALERT.DASHBOARD.TOTAL') }}</span>
@@ -43,7 +43,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PChartLoader } from '@spaceone/design-system';
+import { PDataLoader } from '@spaceone/design-system';
 
 import {
     violet, green, red, yellow, white, gray,
@@ -67,7 +67,7 @@ interface ChartData {
 export default {
     name: 'CurrentProjectStatusWidget',
     components: {
-        PChartLoader,
+        PDataLoader,
     },
     setup() {
         const state = reactive({
@@ -255,6 +255,10 @@ export default {
                 }
             }
         }
+    }
+
+    .p-data-loader {
+        height: 100%;
     }
 }
 </style>

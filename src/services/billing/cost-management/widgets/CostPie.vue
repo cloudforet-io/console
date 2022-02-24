@@ -4,12 +4,12 @@
                                        :data-range="20"
                                        :print-mode="printMode"
     >
-        <p-chart-loader :loading="loading" class="chart-wrapper">
+        <p-data-loader :loading="loading" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
             <div ref="chartRef" class="chart" />
-        </p-chart-loader>
+        </p-data-loader>
         <div class="table-wrapper">
             <cost-dashboard-data-table :fields="tableState.fields"
                                        :items="tableState.items"
@@ -62,7 +62,7 @@ import {
     getPieChartData, getTooltipText,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { store } from '@/store';
-import { PChartLoader, PSkeleton } from '@spaceone/design-system';
+import { PSkeleton, PDataLoader } from '@spaceone/design-system';
 import { gray } from '@/styles/colors';
 import dayjs from 'dayjs';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -85,8 +85,8 @@ export default defineComponent<WidgetProps>({
     components: {
         CostDashboardCardWidgetLayout,
         CostDashboardDataTable,
-        PChartLoader,
         PSkeleton,
+        PDataLoader,
     },
     props: {
         name: {

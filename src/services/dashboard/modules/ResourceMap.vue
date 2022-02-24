@@ -7,12 +7,12 @@
         </template>
         <div class="contents-wrapper">
             <div class="col-span-12 lg:col-span-9 chart-wrapper">
-                <p-chart-loader :loading="loading">
+                <p-data-loader :loading="loading">
                     <template #loader>
                         <p-skeleton width="100%" height="100%" />
                     </template>
                     <div id="chartRef" ref="chartRef" class="chart" />
-                </p-chart-loader>
+                </p-data-loader>
                 <div v-if="!loading" class="circle-wrapper">
                     <div v-for="(item) in chartState.providers" :key="item.name">
                         <p class="circle" :style="{background: item.color}" /><span>{{ item.name }}</span>
@@ -68,7 +68,7 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PChartLoader, PSkeleton, PProgressBar } from '@spaceone/design-system';
+import { PDataLoader, PSkeleton, PProgressBar } from '@spaceone/design-system';
 
 import { range } from 'lodash';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -93,7 +93,7 @@ export default {
     name: 'ResourceMap',
     components: {
         PSkeleton,
-        PChartLoader,
+        PDataLoader,
         WidgetLayout,
         PProgressBar,
     },

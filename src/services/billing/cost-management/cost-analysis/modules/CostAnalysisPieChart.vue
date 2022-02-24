@@ -1,10 +1,10 @@
 <template>
-    <p-chart-loader :loading="loading" class="cost-analysis-pie-chart">
+    <p-data-loader :loading="loading" class="cost-analysis-pie-chart">
         <template #loader>
             <p-skeleton height="100%" />
         </template>
         <div ref="chartRef" class="chart" />
-    </p-chart-loader>
+    </p-data-loader>
 </template>
 
 <script lang="ts">
@@ -19,7 +19,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PSkeleton,
+    PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 
 import { CURRENCY } from '@/store/modules/display/config';
@@ -44,7 +44,7 @@ const VALUE_KEY = 'value';
 export default {
     name: 'CostAnalysisPieChart',
     components: {
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
     },
     props: {

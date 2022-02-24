@@ -29,12 +29,12 @@
                                 {{ d.label }}
                             </p-button>
                         </div>
-                        <p-chart-loader :loading="chartState.loading">
+                        <p-data-loader :loading="chartState.loading">
                             <template #loader>
                                 <p-skeleton width="100%" height="100%" />
                             </template>
                             <div ref="chartRef" class="chart" />
-                        </p-chart-loader>
+                        </p-data-loader>
                     </div>
                     <div class="col-span-12 md:col-span-4 lg:col-span-2 summary-wrapper">
                         <div class="sub-title">
@@ -108,7 +108,7 @@ import {
 
 import ProjectRegionService from '@/services/project/project-detail/project-summary/modules/ProjectRegionService.vue';
 import {
-    PChartLoader, PSkeleton, PButton, PBalloonTab,
+    PDataLoader, PSkeleton, PButton, PBalloonTab,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -174,7 +174,7 @@ export default {
         ProjectRegionService,
         PButton,
         PSkeleton,
-        PChartLoader,
+        PDataLoader,
         PBalloonTab,
     },
     props: {
