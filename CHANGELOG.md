@@ -1,3 +1,11 @@
+# [1.1.0-beta.248](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.247...v1.1.0-beta.248) (2022-02-24)
+
+
+### Features
+
+* change some color more lighter ([#872](https://github.com/spaceone-dev/spaceone-design-system/issues/872)) ([3e00cb3](https://github.com/spaceone-dev/spaceone-design-system/commit/3e00cb3eaf164433534d3048b7513c7cf62f0e7e))
+* update dynamic widget summary type, add showing top label to dynamic chart and update icons ([#871](https://github.com/spaceone-dev/spaceone-design-system/issues/871)) ([6f7eda4](https://github.com/spaceone-dev/spaceone-design-system/commit/6f7eda45edd7959a8493024c2f1b3b442bed3332))
+
 # [1.1.0-beta.247](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.246...v1.1.0-beta.247) (2022-02-23)
 
 
