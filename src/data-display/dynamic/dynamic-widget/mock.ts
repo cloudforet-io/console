@@ -25,7 +25,7 @@ export const getDynamicWidgetChartTypeMockData = (_chartType?: DynamicChartType)
     };
 };
 
-export const getDynamicWidgetCardTypeMockData = (): DynamicWidgetMockData => ({
+export const getDynamicWidgetSummaryTypeMockData = (): DynamicWidgetMockData => ({
     schemaOptions: {
         value_options: DEFAULT_VALUE_OPTIONS,
     },
@@ -47,7 +47,7 @@ export const getDynamicWidgetMockData = (_type?: DynamicWidgetType): DynamicWidg
         viewOptions: {},
     };
 
-    if (type === 'card') props = { ...props, ...getDynamicWidgetCardTypeMockData() };
+    if (type === 'summary') props = { ...props, ...getDynamicWidgetSummaryTypeMockData() };
     else if (type === 'chart') props = { ...props, ...getDynamicWidgetChartTypeMockData() };
     return props;
 };

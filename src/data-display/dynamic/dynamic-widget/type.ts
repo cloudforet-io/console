@@ -2,7 +2,7 @@ import { DynamicField, DynamicFieldOptions } from '@/data-display/dynamic/dynami
 import { DynamicChartType } from '@/data-display/dynamic/dynamic-chart/type';
 import { DynamicFieldHandler, DynamicFieldTypeOptions } from '@/data-display/dynamic/dynamic-field/type';
 
-export const DYNAMIC_WIDGET_TYPE = ['card', 'chart'] as const;
+export const DYNAMIC_WIDGET_TYPE = ['summary', 'chart'] as const;
 export type DynamicWidgetType = typeof DYNAMIC_WIDGET_TYPE[number];
 
 /* SpaceONE Dynamic Widget Schema Spec */

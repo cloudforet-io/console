@@ -26,7 +26,7 @@
                           @click.stop="onToggle(node, path, tree)"
                     >
                         <slot name="toggle" v-bind="{node, path, selected: getSelectState(path)}">
-                            <p-i v-if="node.loading" name="ic_working"
+                            <p-i v-if="node.loading" name="ic_loading"
                                  width="1rem" height="1rem"
                                  animation="spin"
                             />

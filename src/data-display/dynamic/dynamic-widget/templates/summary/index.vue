@@ -1,8 +1,7 @@
 <template>
-    <p-pane-layout class="p-dynamic-widget-card">
+    <div class="p-dynamic-widget-summary">
         <span class="name">
-            <p-skeleton v-if="loading" width="50%" height="1rem" />
-            <template v-else>{{ name }}</template>
+            {{ name }}
         </span>
         <span class="value">
             <p-skeleton v-if="loading" height="1.5rem" />
@@ -14,7 +13,7 @@
                              :handler="fieldHandler"
             />
         </span>
-    </p-pane-layout>
+    </div>
 </template>
 
 <script lang="ts">
@@ -33,13 +32,12 @@ import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { DEFAULT_VALUE_OPTIONS } from '@/data-display/dynamic/dynamic-widget/config';
 import { getValueByPath } from '@/data-display/dynamic/helper';
-import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 
-type DynamicWidgetCardProps = Exclude<DynamicWidgetProps, 'type'&'index'>
+type DynamicWidgetSummaryProps = Exclude<DynamicWidgetProps, 'type'&'index'>
 
-export default defineComponent<DynamicWidgetCardProps>({
-    name: 'PDynamicWidgetCard',
-    components: { PPaneLayout, PDynamicField, PSkeleton },
+export default defineComponent<DynamicWidgetSummaryProps>({
+    name: 'PDynamicWidgetSummary',
+    components: { PDynamicField, PSkeleton },
     props: {
         name: {
             type: String,
@@ -84,25 +82,22 @@ export default defineComponent<DynamicWidgetCardProps>({
 </script>
 
 <style lang="postcss">
-.p-dynamic-widget-card {
+.p-dynamic-widget-summary {
     display: flex;
-    padding: 0.625rem 1rem;
+    flex-direction: column;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    padding: 0.625rem 1rem;
     min-width: 391px;
-    height: 44px;
+    min-height: 3rem;
     > .name {
-        @apply text-gray-700;
+        @apply text-gray-900;
         line-height: 1.25;
-        font-size: 1rem;
-        display: inline-flex;
-        align-items: center;
-        flex-grow: 1;
+        font-size: 0.875rem;
+        margin-bottom: 0.125rem;
     }
     > .value {
-        display: inline-flex;
-        align-items: center;
-        font-size: 1.125rem;
+        font-size: 1.375rem;
         font-weight: bold;
         line-height: 1.25;
         .p-skeleton {

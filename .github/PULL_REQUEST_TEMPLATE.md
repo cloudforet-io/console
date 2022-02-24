@@ -1,13 +1,14 @@
-### To Reviewers
-- [ ] Skip
+## To Reviewers
+- [ ] Skipping reviews is not a problem
 
-### 작업 분류
-- [ ] 신규 기능
-- [ ] 버그 수정
-- [ ] 기능 개선
-- [ ] 리팩토링 및 구조 변경
-- [ ] 기타
+## Type of Change
+- [ ] New feature
+- [ ] Bug fixes
+- [ ] Feature improvement
+  - [ ] These changes require a usage change
+- [ ] Others (performance improvement, refactoring, CI/CD, etc.)
 
-### 작업 상세 내용
 
-### 생각해볼 문제
+## Description
+
+## Things to Talk About

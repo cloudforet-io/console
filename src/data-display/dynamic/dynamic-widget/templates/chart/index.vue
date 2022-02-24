@@ -1,18 +1,20 @@
 <template>
     <p-pane-layout class="p-dynamic-widget-chart">
-        <p class="name">
+        <p class="name-wrapper">
             <p-skeleton v-if="loading" height="1rem" width="80%" />
             <template v-else>
-                {{ name }}
+                <span class="name">{{ name }}</span>
+                <span v-if="isDataGreaterThanLimit" class="showing-top">Showing Top {{ chartLimit }}</span>
             </template>
         </p>
-        <p-dynamic-chart :type="schemaOptions.chart_type || 'COLUMN'"
-                         :data="data"
+        <p-dynamic-chart :type="chartType"
+                         :data="chartData"
                          :loading="loading"
                          :value-options="schemaOptions.value_options"
                          :name-options="schemaOptions.name_options"
                          :field-handler="fieldHandler"
                          :theme="theme"
+                         :limit="chartLimit"
         />
     </p-pane-layout>
 </template>
@@ -32,8 +34,8 @@ import {
 import PDynamicChart from '@/data-display/dynamic/dynamic-chart/PDynamicChart.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
-import { DYNAMIC_CHART_THEMES } from '@/data-display/dynamic/dynamic-chart/config';
-import { DynamicChartTheme } from '@/data-display/dynamic/dynamic-chart/type';
+import { DYNAMIC_CHART_LIMIT_MAP, DYNAMIC_CHART_THEMES } from '@/data-display/dynamic/dynamic-chart/config';
+import { DynamicChartTheme, DynamicChartType } from '@/data-display/dynamic/dynamic-chart/type';
 
 type DynamicWidgetChartProps = Exclude<DynamicWidgetProps, 'type'>
 
@@ -76,6 +78,17 @@ export default defineComponent<DynamicWidgetChartProps>({
                 const themeIdx = props.index % DYNAMIC_CHART_THEMES.length;
                 return DYNAMIC_CHART_THEMES[themeIdx];
             }),
+            chartData: computed<any[]>(() => {
+                if (Array.isArray(props.data)) return props.data;
+                if (props.data === undefined || props.data === null) return [];
+                return [props.data];
+            }),
+            chartType: computed<DynamicChartType>(() => props.schemaOptions.chart_type || 'COLUMN'),
+            chartLimit: computed<number|undefined>(() => DYNAMIC_CHART_LIMIT_MAP[state.chartType]),
+            isDataGreaterThanLimit: computed<boolean>(() => {
+                if (state.chartLimit === undefined) return false;
+                return state.chartData.length > state.chartLimit;
+            }),
         });
 
         return {
@@ -92,12 +105,22 @@ export default defineComponent<DynamicWidgetChartProps>({
     height: 346px;
     min-width: 392px;
     padding: 1rem;
-    > .name {
-        @apply text-gray-900;
-        line-height: 1.25;
-        font-size: 0.875rem;
+    > .name-wrapper {
+        display: flex;
+        align-items: start;
         margin-bottom: 0.75rem;
-        font-weight: bold;
+        line-height: 1.25rem;
+        > .name {
+            @apply text-gray-900;
+            flex-grow: 1;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+        > .showing-top {
+            @apply text-gray-500;
+            flex-shrink: 0;
+            font-size: 0.75rem;
+        }
     }
     > .p-dynamic-chart {
         flex-grow: 1;

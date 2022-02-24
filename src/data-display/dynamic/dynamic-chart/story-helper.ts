@@ -131,4 +131,22 @@ export const getDynamicChartArgTypes = (): ArgTypes => ({
             options: DYNAMIC_CHART_THEMES,
         },
     },
+    limit: {
+        name: 'limit',
+        type: { name: 'number' },
+        description: 'A number that determines how many pieces of data to display.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'number',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'number',
+        },
+    },
 });

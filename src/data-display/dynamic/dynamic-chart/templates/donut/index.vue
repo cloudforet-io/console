@@ -36,7 +36,7 @@ import { PieChart } from '@amcharts/amcharts4/charts';
 
 import {
     DEFAULT_NAME_OPTIONS,
-    DEFAULT_VALUE_OPTIONS,
+    DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_LIMIT_MAP,
     DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
 
@@ -52,13 +52,13 @@ import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vu
 import { getContextKey } from '@/util/helpers';
 import { BASIC_CHART_COLORS } from '@/styles/colorsets';
 
-const LIMIT = 5;
 
-const getColorSet = (start: number): string[] => {
+const getColorSet = (start: number, limit?: number): string[] => {
+    if (typeof limit !== 'number') return BASIC_CHART_COLORS;
     const results: string[] = [];
     let idx = start;
     let count = 0;
-    while (count <= LIMIT) {
+    while (count <= limit) {
         if (idx >= BASIC_CHART_COLORS.length) idx = 0;
         results.push(BASIC_CHART_COLORS[idx]);
         count++;
@@ -66,17 +66,9 @@ const getColorSet = (start: number): string[] => {
     }
     return results;
 };
-const themeColorSetMap: Record<DynamicChartTheme, string[]> = {
-    VIOLET: getColorSet(0),
-    BLUE: getColorSet(1),
-    CORAL: getColorSet(2),
-    YELLOW: getColorSet(3),
-    GREEN: getColorSet(4),
-    PEACOCK: getColorSet(5),
-    RED: getColorSet(6),
-    INDIGO: getColorSet(7),
-};
-export default defineComponent<DynamicChartTemplateProps>({
+
+type DynamicChartDonutProps = DynamicChartTemplateProps & { limit: number }
+export default defineComponent<DynamicChartDonutProps>({
     name: 'PDynamicChartDonut',
     components: { PDynamicField, PStatus },
     props: {
@@ -100,16 +92,30 @@ export default defineComponent<DynamicChartTemplateProps>({
             type: String as PropType<DynamicChartTheme>,
             default: DYNAMIC_CHART_THEMES[0],
         },
+        limit: {
+            type: Number,
+            default: DYNAMIC_CHART_LIMIT_MAP.COLUMN,
+        },
     },
     setup(props) {
         const state = reactive({
             filteredData: computed<any[]>(() => {
-                if (props.data.length > LIMIT) return props.data.slice(0, LIMIT);
+                if (props.data.length > props.limit) return props.data.slice(0, props.limit);
                 return props.data;
             }),
             chart: null as null|PieChart,
             chartRef: null as null|HTMLElement,
-            colors: computed<string[]>(() => themeColorSetMap[props.theme] ?? themeColorSetMap[DYNAMIC_CHART_THEMES[0]]),
+            themeColorSetMap: computed<Record<DynamicChartTheme, string[]>>(() => ({
+                VIOLET: getColorSet(0, props.limit),
+                BLUE: getColorSet(1, props.limit),
+                CORAL: getColorSet(2, props.limit),
+                YELLOW: getColorSet(3, props.limit),
+                GREEN: getColorSet(4, props.limit),
+                PEACOCK: getColorSet(5, props.limit),
+                RED: getColorSet(6, props.limit),
+                INDIGO: getColorSet(7, props.limit),
+            })),
+            colors: computed<string[]>(() => state.themeColorSetMap[props.theme] ?? state.themeColorSetMap[DYNAMIC_CHART_THEMES[0]]),
             contextKey: getContextKey(),
         });
 

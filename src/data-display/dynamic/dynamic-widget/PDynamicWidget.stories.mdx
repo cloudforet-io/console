@@ -2,6 +2,7 @@ import { Meta, Canvas, Story, ArgsTable, Description } from '@storybook/addon-do
 import {
     reactive, toRefs,
 } from '@vue/composition-api';
+import { range } from 'lodash';
 import PDynamicWidget from './PDynamicWidget.vue';
 import { getDynamicWidgetArgTypes } from '@/data-display/dynamic/dynamic-widget/story-helper';
 import {
@@ -9,6 +10,7 @@ import {
     getDynamicWidgetMockData
 } from '@/data-display/dynamic/dynamic-widget/mock';
 import { DYNAMIC_WIDGET_TYPE } from '@/data-display/dynamic/dynamic-widget/type';
+import { DYNAMIC_CHART_LIMIT_MAP } from '@/data-display/dynamic/dynamic-chart/config';
 
 
 
@@ -80,7 +82,7 @@ interface DynamicWidgetSchemaOptions {
 <br/>
 <br/>
 
-### Card Type
+### Summary Type
 
 <br/>
 
@@ -95,13 +97,13 @@ interface DynamicWidgetSchemaOptions {
 <br/>
 
 <Canvas>
-    <Story name="Card Type">
+    <Story name="Summary Type">
         {{
     components: { PDynamicWidget },
     template: `
     <div class="h-full w-full overflow p-8">
         <p-dynamic-widget
-            type="card"
+            type="summary"
             :name="name"
             :schema-options="schemaOptions"
             :data="data"
@@ -111,7 +113,7 @@ interface DynamicWidgetSchemaOptions {
     </div>
     `,
     setup() {
-        const state = reactive(getDynamicWidgetMockData('card'))
+        const state = reactive(getDynamicWidgetMockData('summary'))
         return toRefs(state)
     }
         }}
@@ -141,28 +143,63 @@ interface DynamicWidgetSchemaOptions {
         components: { PDynamicWidget },
         template: `
 <div class="h-full w-full overflow p-8">
-        <p class="text-lg font-bold my-4">Chart Type: COLUMN</p>
-        <p-dynamic-widget
-            type="chart"
-            :index="0"
-            :name="name"
-            :schema-options="column.schemaOptions"
-            :data="column.data"
-            :loading="loading"
-            :view-options="viewOptions"
-        ></p-dynamic-widget>
-        <p class="text-lg font-bold my-4">Chart Type: DONUT</p>
-        <p-dynamic-widget
-            type="chart"
-            :index="1"
-            :name="name"
-            :schema-options="donut.schemaOptions"
-            :data="donut.data"
-            :loading="loading"
-            :view-options="viewOptions"
-            style="overflow: hidden;"
-        ></p-dynamic-widget>
-        <p class="text-lg font-bold my-4">Chart Type: TREEMAP</p>
+        <p class="text-lg font-bold leading-6 my-6 border-b border-gray-300">Chart Type: COLUMN</p>
+        <div class="flex flex-wrap gap-4">
+            <div>
+                <p class="text-md font-bold text-gray-600 mb-4">Basic</p>
+                <p-dynamic-widget
+                    type="chart"
+                    :index="0"
+                    :name="name"
+                    :schema-options="column.schemaOptions"
+                    :data="column.data.slice(0, DYNAMIC_CHART_LIMIT_MAP.COLUMN)"
+                    :loading="loading"
+                    :view-options="viewOptions"
+                ></p-dynamic-widget>
+            </div>
+            <div>
+                <p class="text-md font-bold text-gray-600 mb-4">Limit exceeded</p>
+                <p-dynamic-widget
+                    type="chart"
+                    :index="0"
+                    :name="name"
+                    :schema-options="column.schemaOptions"
+                    :data="column.data"
+                    :loading="loading"
+                    :view-options="viewOptions"
+                ></p-dynamic-widget>
+            </div>
+        </div>
+        <p class="text-lg font-bold leading-6 my-6 border-b border-gray-300">Chart Type: DONUT</p>
+        <div class="flex flex-wrap gap-4">
+            <div>
+                <p class="text-md font-bold text-gray-600 mb-4">Basic</p>
+                <p-dynamic-widget
+                    type="chart"
+                    :index="1"
+                    :name="name"
+                    :schema-options="donut.schemaOptions"
+                    :data="donut.data.slice(0, DYNAMIC_CHART_LIMIT_MAP.DONUT)"
+                    :loading="loading"
+                    :view-options="viewOptions"
+                    style="overflow: hidden;"
+                ></p-dynamic-widget>
+            </div>
+            <div>
+                <p class="text-md font-bold text-gray-600 mb-4">Limit exceeded</p>
+                <p-dynamic-widget
+                type="chart"
+                :index="1"
+                :name="name"
+                :schema-options="donut.schemaOptions"
+                :data="donut.data"
+                :loading="loading"
+                :view-options="viewOptions"
+                style="overflow: hidden;"
+            ></p-dynamic-widget>
+            </div>
+        </div>
+        <p class="text-lg font-bold leading-6 my-6 border-b border-gray-300">Chart Type: TREEMAP</p>
         <p-dynamic-widget
             type="chart"
             :index="2"
@@ -181,7 +218,10 @@ interface DynamicWidgetSchemaOptions {
                 donut: getDynamicWidgetChartTypeMockData('DONUT'),
                 treemap: getDynamicWidgetChartTypeMockData('TREEMAP')
             })
-            return toRefs(state)
+            return {
+                ...toRefs(state),
+                DYNAMIC_CHART_LIMIT_MAP
+            }
         }
     }}
     </Story>
@@ -190,11 +230,61 @@ interface DynamicWidgetSchemaOptions {
 <br/>
 <br/>
 
+## Using Widget List
+
+If multiple widgets are used as a list, the same theme will be displayed repeatedly.<br/>
+In this case, different themes can be reflected by giving the ```index``` prop.
+
+<Canvas>
+    <Story name="Using Widget List">
+        {{
+            components: { PDynamicWidget },
+            template: `
+<div class="h-full w-full overflow p-8">
+        <p class="text-lg font-bold leading-6 mb-8 border-b border-gray-300">Without Index: The same theme is displayed repeatedly.</p>
+        <div class="flex flex-wrap gap-4">
+            <p-dynamic-widget v-for="({type, name, schemaOptions, data, loading, viewOptions}, idx) in widgets"
+                :key="'without-idx' + idx"
+                :type="type"
+                :name="name"
+                :schema-options="schemaOptions"
+                :data="data"
+                :loading="loading"
+                :view-options="viewOptions"
+            ></p-dynamic-widget>
+        </div>
+        <p class="text-lg font-bold leading-6 my-8 border-b border-gray-300">With Index: Different themes are reflected.</p>
+        <div class="flex flex-wrap gap-4">
+            <p-dynamic-widget v-for="({type, name, schemaOptions, data, loading, viewOptions}, idx) in widgets"
+                :key="'without-idx' + idx"
+                :index="idx"
+                :type="type"
+                :name="name"
+                :schema-options="schemaOptions"
+                :data="data"
+                :loading="loading"
+                :view-options="viewOptions"
+            ></p-dynamic-widget>
+        </div>
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    widgets: range(6).map(() => getDynamicWidgetMockData('chart'))
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
 ## Playground
 
 <Canvas>
     <Story name="Playground" args={(() => {
-        const mockData = getDynamicWidgetMockData('card')
+        const mockData = getDynamicWidgetMockData('summary')
         return {
             name: mockData.name,
             type: mockData.type,

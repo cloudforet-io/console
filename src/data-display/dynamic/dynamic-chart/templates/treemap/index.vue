@@ -95,6 +95,10 @@ export default defineComponent<DynamicChartTemplateProps>({
             type: String as PropType<DynamicChartTheme>,
             default: DYNAMIC_CHART_THEMES[0],
         },
+        limit: {
+            type: Number,
+            default: undefined,
+        },
     },
     setup(props) {
         const state = reactive({

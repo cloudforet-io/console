@@ -39,7 +39,7 @@ import { max } from 'lodash';
 import { getContextKey } from '@/util/helpers';
 import {
     DEFAULT_NAME_OPTIONS,
-    DEFAULT_VALUE_OPTIONS,
+    DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_LIMIT_MAP,
     DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
 import {
@@ -52,8 +52,6 @@ import { getValueByPath } from '@/data-display/dynamic/helper';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { palette } from '@/styles/colors';
 
-const LIMIT = 8;
-
 const themeColorMap: Record<DynamicChartTheme, string> = {
     VIOLET: palette.violet[400],
     BLUE: palette.blue[400],
@@ -65,7 +63,8 @@ const themeColorMap: Record<DynamicChartTheme, string> = {
     INDIGO: palette.indigo[400],
 };
 
-export default defineComponent<DynamicChartTemplateProps>({
+type DynamicChartColumnProps = DynamicChartTemplateProps & { limit: number }
+export default defineComponent<DynamicChartColumnProps>({
     name: 'PDynamicChartColumn',
     components: { PDynamicField, PProgressBar },
     props: {
@@ -89,11 +88,15 @@ export default defineComponent<DynamicChartTemplateProps>({
             type: String as PropType<DynamicChartTheme>,
             default: DYNAMIC_CHART_THEMES[0],
         },
+        limit: {
+            type: Number,
+            default: DYNAMIC_CHART_LIMIT_MAP.COLUMN,
+        },
     },
     setup(props) {
         const state = reactive({
             filteredData: computed<any[]>(() => {
-                if (props.data.length > LIMIT) return props.data.slice(0, LIMIT);
+                if (props.data.length > props.limit) return props.data.slice(0, props.limit);
                 return props.data;
             }),
             names: computed<number[]>(() => {

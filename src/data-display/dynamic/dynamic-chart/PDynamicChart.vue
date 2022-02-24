@@ -10,6 +10,7 @@
                        :name-options="nameOptions"
                        :field-handler="fieldHandler"
                        :theme="theme"
+                       :limit="limit"
                        class="chart"
             />
         </p-data-loader>
@@ -66,6 +67,10 @@ export default defineComponent<DynamicChartProps>({
         theme: {
             type: String as PropType<DynamicChartTheme>,
             default: DYNAMIC_CHART_THEMES[0],
+        },
+        limit: {
+            type: Number,
+            default: undefined,
         },
     },
     setup(props) {

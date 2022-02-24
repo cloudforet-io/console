@@ -18,10 +18,10 @@ export interface DynamicChartTemplateProps<Data=any> {
     nameOptions: DynamicField;
     fieldHandler?: DynamicChartFieldHandler;
     theme: DynamicChartTheme;
+    limit?: number;
 }
 
 export interface DynamicChartProps<T=any> extends DynamicChartTemplateProps<T> {
     type: DynamicChartType;
     loading: boolean;
-    limit: number;
 }
