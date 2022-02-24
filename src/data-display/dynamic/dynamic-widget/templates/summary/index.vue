@@ -4,7 +4,7 @@
             {{ name }}
         </span>
         <span class="value">
-            <p-skeleton v-if="loading" height="1.5rem" />
+            <p-skeleton v-if="loading" height="1.75rem" />
             <p-dynamic-field v-else
                              :type="valueOptions.type"
                              :data="value"
@@ -87,19 +87,19 @@ export default defineComponent<DynamicWidgetSummaryProps>({
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 0.625rem 1rem;
-    min-width: 391px;
+    min-width: inherit;
     min-height: 3rem;
     > .name {
         @apply text-gray-900;
-        line-height: 1.25;
+        line-height: 1.125rem;
         font-size: 0.875rem;
         margin-bottom: 0.125rem;
     }
     > .value {
+        display: inline-flex;
         font-size: 1.375rem;
         font-weight: bold;
-        line-height: 1.25;
+        line-height: 1.75rem;
         .p-skeleton {
             min-width: 40px;
         }

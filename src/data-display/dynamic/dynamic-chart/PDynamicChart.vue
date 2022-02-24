@@ -19,22 +19,35 @@
 
 <script lang="ts">
 import {
-    computed,
     defineComponent, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { AsyncComponent } from 'vue';
+import { AsyncComponentPromise } from 'vue/types/options';
 
-
+import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 import {
     DynamicChartFieldHandler,
-    DynamicChartProps, DynamicChartTheme,
+    DynamicChartProps, DynamicChartTheme, DynamicChartType,
 } from '@/data-display/dynamic/dynamic-chart/type';
 import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_TYPE,
     DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
-import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
+
+
+const componentMap: Record<DynamicChartType, AsyncComponent> = {
+    COLUMN: () => ({
+        component: import('./templates/column/index.vue') as unknown as AsyncComponentPromise,
+    }),
+    DONUT: () => ({
+        component: import('./templates/donut/index.vue') as unknown as AsyncComponentPromise,
+    }),
+    TREEMAP: () => ({
+        component: import('./templates/treemap/index.vue') as unknown as AsyncComponentPromise,
+    }),
+};
 
 export default defineComponent<DynamicChartProps>({
     name: 'PDynamicChart',
@@ -74,23 +87,20 @@ export default defineComponent<DynamicChartProps>({
         },
     },
     setup(props) {
-        // noinspection TypeScriptCheckImport
         const state = reactive({
-            component: null as any,
-            loader: computed<() => Promise<any>>(() => () => import(/* webpackMode: "eager" */ `./templates/${props.type.toLowerCase()}/index.vue`)) as unknown as () => Promise<any>,
+            component: null as null|AsyncComponent,
         });
 
         const getComponent = async () => {
             try {
-                await state.loader();
-
                 if (!DYNAMIC_CHART_TYPE.includes(props.type)) {
                     throw new Error(`[Dynamic Chart] Unacceptable chart type: chart type must be one of ${DYNAMIC_CHART_TYPE}. ${props.type} is not acceptable.`);
                 }
 
-                state.component = async () => state.loader();
+                state.component = componentMap[props.type];
             } catch (e) {
                 console.error(e);
+                state.component = null;
             }
         };
 

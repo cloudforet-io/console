@@ -107,7 +107,7 @@ export default defineComponent<DynamicWidgetChartProps>({
     padding: 1rem;
     > .name-wrapper {
         display: flex;
-        align-items: start;
+        align-items: flex-start;
         margin-bottom: 0.75rem;
         line-height: 1.25rem;
         > .name {

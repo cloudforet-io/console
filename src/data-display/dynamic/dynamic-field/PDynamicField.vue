@@ -34,8 +34,10 @@ import {
     computed, defineComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
-import { dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import { DynamicFieldType, dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PTextList from '@/others/console/text-list/PTextList.vue';
+import { AsyncComponent } from 'vue';
+import { AsyncComponentPromise } from 'vue/types/options';
 
 
 interface State {
@@ -44,6 +46,32 @@ interface State {
 }
 const RECURSIVE_TYPE = ['list', 'enum'];
 
+const componentMap: Record<DynamicFieldType, AsyncComponent> = {
+    text: () => ({
+        component: import('./templates/text/index.vue') as unknown as AsyncComponentPromise,
+    }),
+    badge: () => ({
+        component: import('./templates/badge/index.vue') as unknown as AsyncComponentPromise,
+    }),
+    datetime: () => ({
+        component: import('./templates/datetime/index.vue') as unknown as AsyncComponentPromise,
+    }),
+    state: () => ({
+        component: import('./templates/state/index.vue') as unknown as AsyncComponentPromise,
+    }),
+    enum: () => ({
+        component: import('./templates/enum/index.vue') as unknown as AsyncComponentPromise,
+    }),
+    size: () => ({
+        component: import('./templates/size/index.vue') as unknown as AsyncComponentPromise,
+    }),
+    dict: () => ({
+        component: import('./templates/dict/index.vue') as unknown as AsyncComponentPromise,
+    }),
+    list: () => ({
+        component: import('./templates/list/index.vue') as unknown as AsyncComponentPromise,
+    }),
+};
 
 export default defineComponent<DynamicFieldProps>({
     name: 'PDynamicField',
@@ -76,7 +104,7 @@ export default defineComponent<DynamicFieldProps>({
     },
     setup(props: DynamicFieldProps) {
         const state = reactive<any>({
-            component: null,
+            component: null as null|AsyncComponent,
             nextHandler: props.handler,
         });
 
@@ -89,9 +117,10 @@ export default defineComponent<DynamicFieldProps>({
                                     ${fieldProps.type} is not acceptable.`);
                 }
 
-                // noinspection TypeScriptCheckImport
-                state.component = () => import(/* webpackMode: "eager" */ `./templates/${fieldProps.type}/index.vue`);
+                state.component = componentMap[fieldProps.type];
             } catch (e) {
+                console.error(e);
+                state.component = componentMap.text;
             }
         };
 

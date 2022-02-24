@@ -13,17 +13,27 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, PropType,
+    defineComponent, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
     DYNAMIC_WIDGET_TYPE,
     DynamicWidgetFieldHandler,
-    DynamicWidgetProps,
+    DynamicWidgetProps, DynamicWidgetType,
 } from '@/data-display/dynamic/dynamic-widget/type';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
+import { AsyncComponent } from 'vue';
+import { AsyncComponentPromise } from 'vue/types/options';
 
+const componentMap: Record<DynamicWidgetType, AsyncComponent> = {
+    summary: () => ({
+        component: import('./templates/summary/index.vue') as unknown as AsyncComponentPromise,
+    }),
+    chart: () => ({
+        component: import('./templates/chart/index.vue') as unknown as AsyncComponentPromise,
+    }),
+};
 
 export default defineComponent<DynamicWidgetProps>({
     name: 'PDynamicWidget',
@@ -63,22 +73,20 @@ export default defineComponent<DynamicWidgetProps>({
         },
     },
     setup(props) {
-        // noinspection TypeScriptCheckImport
         const state = reactive({
-            component: null as any,
-            loader: computed<() => Promise<any>>(() => () => import(/* webpackMode: "eager" */ `./templates/${props.type}/index.vue`)) as unknown as () => Promise<any>,
+            component: null as null|AsyncComponent,
         });
 
         const getComponent = async () => {
             try {
-                await state.loader();
-
                 if (!DYNAMIC_WIDGET_TYPE.includes(props.type)) {
                     throw new Error(`[Dynamic Widget] Unacceptable widget type: widget type must be one of ${DYNAMIC_WIDGET_TYPE}. ${props.type} is not acceptable.`);
                 }
-                state.component = async () => state.loader();
+
+                state.component = componentMap[props.type];
             } catch (e) {
                 console.error(e);
+                state.component = null;
             }
         };
 

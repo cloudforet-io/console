@@ -22,6 +22,14 @@ module.exports = {
   ],
   webpackFinal: async (config) => {
 
+    // HACK do not allow Storybook to transform ES6 modules to ES5, to avoid a Babel bug that
+    // breaks dynamic source code display
+    // https://github.com/storybookjs/storybook/issues/13721#issuecomment-827919425
+    config.module.rules = config.module.rules.filter( ( rule ) =>
+        typeof rule.include !== 'function' ||
+        !rule.include.toString().includes('nodeModulesThatNeedToBeParsedBecauseTheyExposeES6')
+    );
+
     /* alis settings */
     config.resolve.alias = {
       'vue': 'vue/dist/vue.common.js',
