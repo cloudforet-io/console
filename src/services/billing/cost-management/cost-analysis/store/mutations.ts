@@ -18,7 +18,7 @@ export const setGroupBy: Mutation<CostAnalysisStoreState> = (state, groupBy: GRO
     state.groupBy = groupBy;
 };
 
-export const setPrimaryGroupBy: Mutation<CostAnalysisStoreState> = (state, primaryGroupBy: GROUP_BY|undefined) => {
+export const setPrimaryGroupBy: Mutation<CostAnalysisStoreState> = (state, primaryGroupBy?: GROUP_BY) => {
     state.primaryGroupBy = primaryGroupBy;
 };
 

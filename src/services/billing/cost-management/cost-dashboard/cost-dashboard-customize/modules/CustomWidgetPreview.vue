@@ -16,9 +16,6 @@
             <div class="info-item">
                 <p-label>Filters</p-label> <span :class="{'text-gray-500': !filters}">{{ getFiltersText(filters) }}</span>
             </div>
-            <div class="info-item">
-                <p-label>Start Date ~ End Date (UTC)</p-label> <span>{{ getPeriodText(period) }}</span>
-            </div>
         </template>
         <template #extra>
             <p-anchor :to="getViewQueryLink()"
@@ -34,7 +31,6 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs';
 import { capitalize } from 'lodash';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
@@ -75,7 +71,6 @@ export default {
             queryName: computed(() => props.selectedItem?.name),
             granularity: computed(() => props.selectedItem?.options.granularity),
             stack: computed(() => props.selectedItem?.options.stack),
-            period: computed(() => props.selectedItem?.options.period),
             groupBy: computed(() => {
                 const options = props.selectedItem?.options;
                 if (!options) return '';
@@ -92,11 +87,6 @@ export default {
             if (groupBy) return GROUP_BY_ITEM_MAP[groupBy].label;
             return 'None';
         };
-        const getPeriodText = (period) => {
-            const startText = dayjs.utc(period?.start).format('YYYY/MM/DD');
-            const endText = dayjs.utc(period?.end).format('YYYY/MM/DD');
-            return `${startText} ~ ${endText}`;
-        };
         const getViewQueryLink = () => {
             const queryId = props.selectedItem?.cost_query_set_id;
             if (queryId) {
@@ -111,8 +101,8 @@ export default {
                 query: {
                     granularity: primitiveToQueryString(state.granularity),
                     groupBy: arrayToQueryString([state.groupBy]),
-                    period: objectToQueryString(state.period),
                     filters: objectToQueryString(state.filters),
+                    stack: primitiveToQueryString(state.stack),
                 },
             };
         };
@@ -124,7 +114,6 @@ export default {
             getFiltersText,
             getGranularityText,
             getGroupByText,
-            getPeriodText,
             getViewQueryLink,
         };
     },

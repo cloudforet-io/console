@@ -1,6 +1,6 @@
 import { Tags, TimeStamp } from '@/models';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
-import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 
 const DASHBOARD_SCOPE = {
     PRIVATE: 'PRIVATE',
@@ -48,7 +48,7 @@ export interface WidgetOptions {
     granularity?: GRANULARITY;
     filters?: CostQueryFilters;
     period?: Period;
-    group_by?: string;
+    group_by?: string | GROUP_BY;
     chart_type?: string;
     layout: number;
 }

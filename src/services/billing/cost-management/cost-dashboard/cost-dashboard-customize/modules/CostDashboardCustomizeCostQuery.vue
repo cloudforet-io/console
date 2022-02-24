@@ -120,7 +120,10 @@ export default {
                 return await SpaceConnector.client.costAnalysis.customWidget.create({
                     name: `${query.name}-${getUUID().slice(0, 23)}`,
                     options: {
-                        ...query.options,
+                        granularity: query.options?.granularity,
+                        group_by: query.options?.primary_group_by,
+                        stack: query.options?.stack,
+                        filters: query.options?.filters,
                         chart_type: query.options?.granularity === GRANULARITY.ACCUMULATED ? CHART_TYPE.DONUT : CHART_TYPE.STACKED_COLUMN,
                         layout: LAYOUT,
                     },

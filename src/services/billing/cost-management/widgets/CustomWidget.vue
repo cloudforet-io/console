@@ -4,7 +4,7 @@
                                        :print-mode="printMode"
                                        class="custom-widget"
     >
-        <div class="filter-wrapper">
+        <div class="applied-filter-wrapper">
             <div>
                 <span class="label">{{ $t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER') }}: </span>
                 <span class="text">{{ getFiltersText(filters) }}</span>
@@ -31,7 +31,7 @@
                                                 :legends="legends"
                                                 :granularity="options.granularity"
                                                 :stack="options.stack"
-                                                :period="options.period"
+                                                :period="convertedPeriod"
                                                 :currency="currency"
                                                 :currency-rates="currencyRates"
                                                 :print-mode="printMode"
@@ -57,7 +57,7 @@
 import dayjs from 'dayjs';
 
 import {
-    computed, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PButton } from '@spaceone/design-system';
@@ -90,6 +90,7 @@ import {
 import {
     DataTableFieldType,
 } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { WidgetOptions } from '@/services/billing/cost-management/cost-dashboard/type';
 import { getFiltersText } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
 
 const CostAnalysisStackedColumnChart = () => import('@/services/billing/cost-management/cost-analysis/modules/CostAnalysisStackedColumnChart.vue');
@@ -116,6 +117,10 @@ export default {
             type: Object,
             default: () => ({}) as CostQuerySetOption,
         },
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
         currency: {
             type: String,
             default: CURRENCY.USD,
@@ -129,19 +134,23 @@ export default {
             default: false,
         },
     },
-    setup(props: WidgetProps<CostQuerySetOption>) {
+    setup(props: WidgetProps<WidgetOptions>) {
         const state = reactive({
             loading: false,
             chartData: [] as Array<XYChartData | PieChartData>,
             legends: [] as Legend[],
             title: '',
+            convertedPeriod: computed<Period>(() => ({
+                start: dayjs.utc(props.period.end).subtract(5, 'month').format('YYYY-MM'),
+                end: dayjs.utc(props.period.end).format('YYYY-MM-DD'), // '-DD' format added because of accumulated chart
+            })),
             filters: computed(() => props.options?.filters),
             widgetLink: computed(() => ({
                 name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                 params: {},
                 query: {
                     granularity: primitiveToQueryString(props.options?.granularity),
-                    groupBy: arrayToQueryString(props.options?.group_by),
+                    groupBy: arrayToQueryString([props.options?.group_by]),
                     period: objectToQueryString(props.options?.period),
                     filters: objectToQueryString(props.options?.filters),
                 },
@@ -157,14 +166,10 @@ export default {
         });
 
         /* Util */
-        const getFields = (granularity: GRANULARITY, period: Period, groupBy?: GROUP_BY[]) => {
+        const getFields = (granularity: GRANULARITY, period: Period, groupBy?: GROUP_BY) => {
             let groupByFields: DataTableFieldType[] = [];
-            if (groupBy?.length) {
-                groupByFields = groupBy.map(d => ({
-                    ...GROUP_BY_ITEM_MAP[d],
-                }));
-            }
-            const costFields: DataTableFieldType[] = getDataTableCostFields(granularity, period, !!groupBy?.length);
+            if (groupBy) groupByFields = [GROUP_BY_ITEM_MAP[groupBy]];
+            const costFields: DataTableFieldType[] = getDataTableCostFields(granularity, period, !!groupBy);
             return groupByFields.concat(costFields);
         };
 
@@ -176,9 +181,9 @@ export default {
                 costQueryHelper.setFilters(getConvertedFilter(props.options?.filters ?? {}));
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: props.options?.granularity,
-                    group_by: props.options?.group_by ?? [],
-                    start: dayjs.utc(props.options?.period?.start).format('YYYY-MM-DD'),
-                    end: dayjs.utc(props.options?.period?.end).format('YYYY-MM-DD'),
+                    group_by: [props.options?.group_by],
+                    start: state.convertedPeriod.start,
+                    end: state.convertedPeriod.end,
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
@@ -209,10 +214,15 @@ export default {
             state.viewFilterModalVisible = true;
         };
 
-        (() => {
-            setChartData(props.options?.granularity, props.options?.period, props.options?.primary_group_by);
-            tableState.fields = getFields(props.options?.granularity, props.options?.period, props.options?.group_by);
-        })();
+        /* Init */
+        const refreshAll = (options, period) => {
+            if (!options || !options?.granularity) return;
+            setChartData(options.granularity, period, options?.group_by as GROUP_BY);
+            tableState.fields = getFields(options.granularity, period, options?.group_by as GROUP_BY);
+        };
+        watch([() => props.options, () => state.convertedPeriod], ([options, convertedPeriod]) => {
+            refreshAll(options, convertedPeriod);
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
@@ -228,7 +238,7 @@ export default {
 
 <style lang="postcss">
 .custom-widget {
-    .filter-wrapper {
+    .applied-filter-wrapper {
         display: flex;
         justify-content: space-between;
         align-items: center;
