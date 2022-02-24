@@ -89,7 +89,7 @@ export default {
             }),
             selectedWidget: computed(() => store.state.service?.costDashboard?.originSelectedWidget),
             hasGroupBy: computed(() => state.selectedWidget.options?.group_by?.length > 0),
-            widgetLabel: computed(() => widgetId => defaultWidgetMap[widgetId].widget_name ?? ''),
+            widgetLabel: computed(() => widgetId => defaultWidgetMap[widgetId]?.widget_name ?? ''),
             // pagination
             totalCount: 0,
             thisPage: 1,

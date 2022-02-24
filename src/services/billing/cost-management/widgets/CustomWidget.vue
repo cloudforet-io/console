@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="title"
+    <cost-dashboard-card-widget-layout :title="name"
                                        :widget-link="widgetLink"
                                        :print-mode="printMode"
                                        class="custom-widget"
@@ -108,6 +108,10 @@ export default {
         PButton,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         options: {
             type: Object,
             default: () => ({}) as CostQuerySetOption,

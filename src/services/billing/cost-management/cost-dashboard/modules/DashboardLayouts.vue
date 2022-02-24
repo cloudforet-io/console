@@ -31,7 +31,7 @@
                     <dynamic-widget v-if="!loading"
                                     :widget-id="widget.widget_id"
                                     :name="widget.name"
-                                    :widget-file-name="defaultWidgetMap[widget.widget_id].widget_file_name"
+                                    :widget-file-name="getWidgetFileName(widget)"
                                     :options="widget.options"
                                     :period="period"
                                     :filters="filters"
@@ -162,6 +162,9 @@ export default {
             return undefined;
         };
 
+        const CUSTOM_WIDGET_FILE_NAME = 'CustomWidget';
+        const getWidgetFileName = widget => defaultWidgetMap[widget.widget_id]?.widget_file_name ?? CUSTOM_WIDGET_FILE_NAME;
+
         const handleDynamicWidgetInit = () => {
             state.renderedCount++;
         };
@@ -216,6 +219,7 @@ export default {
             handleUpdateConfirm,
             getAddWidgetColumnByLayout,
             getUUID,
+            getWidgetFileName,
         };
     },
 };

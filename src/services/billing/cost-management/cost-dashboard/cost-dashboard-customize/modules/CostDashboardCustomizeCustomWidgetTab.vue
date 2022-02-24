@@ -72,7 +72,6 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 import { CostQuerySetModel } from '@/services/billing/cost-management/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
-import { cloneDeep } from 'lodash';
 
 
 const PAGE_SIZE = 6;
@@ -137,10 +136,8 @@ export default {
 
         /* Event */
         const handleSelectWidget = async (value: WidgetInfo) => {
-            const convertedWidgetInfo = cloneDeep(value);
-            convertedWidgetInfo.widget_id = 'custom_widget';
-            store.commit('service/costDashboard/setOriginSelectedWidget', convertedWidgetInfo);
-            store.commit('service/costDashboard/setEditedSelectedWidget', convertedWidgetInfo);
+            store.commit('service/costDashboard/setOriginSelectedWidget', value);
+            store.commit('service/costDashboard/setEditedSelectedWidget', value);
             state.selectedQuery = {};
             state.selectedItem = value;
         };
@@ -154,13 +151,10 @@ export default {
         };
         const handleCreateCustomWidget = async (createdCustomWidget: WidgetInfo) => {
             await listCustomWidget();
-
-            const convertedWidgetInfo = cloneDeep(createdCustomWidget);
-            convertedWidgetInfo.widget_id = 'custom_widget';
-            store.commit('service/costDashboard/setOriginSelectedWidget', convertedWidgetInfo);
-            store.commit('service/costDashboard/setEditedSelectedWidget', convertedWidgetInfo);
+            store.commit('service/costDashboard/setOriginSelectedWidget', createdCustomWidget);
+            store.commit('service/costDashboard/setEditedSelectedWidget', createdCustomWidget);
             state.selectedQuery = {};
-            state.selectedItem = convertedWidgetInfo;
+            state.selectedItem = createdCustomWidget;
             state.thisPage = 1;
         };
 
