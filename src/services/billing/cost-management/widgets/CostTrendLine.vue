@@ -2,12 +2,12 @@
     <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROJECT')" :widget-link="widgetLink" class="cost-trend-by-project"
                                        :print-mode="printMode"
     >
-        <p-chart-loader :loading="loading" class="chart-wrapper">
+        <p-data-loader :loading="loading" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
             <div ref="chartRef" class="chart" />
-        </p-chart-loader>
+        </p-data-loader>
         <div class="table-wrapper">
             <cost-dashboard-data-table :fields="fields"
                                        :items="items"
@@ -37,7 +37,7 @@ import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PChartLoader, PSkeleton } from '@spaceone/design-system';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
@@ -89,7 +89,7 @@ export default {
     components: {
         CostDashboardCardWidgetLayout,
         CostDashboardDataTable,
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
     },
     props: {

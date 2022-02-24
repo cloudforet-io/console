@@ -42,6 +42,7 @@
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.USING_INSTANCE_TYPE') }}
             </p>
             <div class="chart-wrapper">
+                <!--            TODO:: Should change PChartLoader to PDataLoader-->
                 <p-chart-loader :loading="loading">
                     <template #loader>
                         <div ref="loaderRef" />

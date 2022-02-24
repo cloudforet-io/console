@@ -1,10 +1,10 @@
 <template>
-    <p-chart-loader :loading="loading" class="alert-history-chart">
+    <p-data-loader :loading="loading" class="alert-history-chart">
         <template #loader>
             <p-skeleton width="100%" height="100%" />
         </template>
         <div ref="chartRef" class="chart" />
-    </p-chart-loader>
+    </p-data-loader>
 </template>
 
 <script lang="ts">
@@ -17,7 +17,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PChartLoader, PSkeleton } from '@spaceone/design-system';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import { gray, red } from '@/styles/colors';
 import config from '@/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -42,7 +42,7 @@ const RESOLVED_COLOR = gray[400];
 export default {
     name: 'AlertHistoryChart',
     components: {
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
     },
     props: {

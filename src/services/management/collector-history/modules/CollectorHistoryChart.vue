@@ -11,12 +11,12 @@
             </div>
             <p-date-pagination :date.sync="currentDate" :timezone="timezone" />
         </div>
-        <p-chart-loader :loading="loading">
+        <p-data-loader :loading="loading">
             <template #loader>
                 <p-skeleton width="100%" />
             </template>
             <div ref="chartRef" class="chart" />
-        </p-chart-loader>
+        </p-data-loader>
     </div>
 </template>
 
@@ -29,7 +29,9 @@ import {
     reactive, watch, toRefs, computed, onUnmounted, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import { PChartLoader, PDatePagination, PSkeleton } from '@spaceone/design-system';
+import {
+    PDataLoader, PDatePagination, PSkeleton,
+} from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
@@ -62,7 +64,7 @@ export default {
     components: {
         PDatePagination,
         PSkeleton,
-        PChartLoader,
+        PDataLoader,
     },
     props: {
         selectedDate: {
@@ -311,7 +313,7 @@ export default {
         }
     }
 
-    .p-chart-loader {
+    .p-data-loader {
         height: 10rem;
 
         .p-skeleton {

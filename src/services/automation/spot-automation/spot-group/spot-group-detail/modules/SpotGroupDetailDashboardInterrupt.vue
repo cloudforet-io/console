@@ -28,6 +28,7 @@
                 </div>
             </div>
             <div class="chart-wrapper">
+                <!--            TODO:: Should change PChartLoader to PDataLoader-->
                 <p-chart-loader :loading="chartState.loading">
                     <template #loader>
                         <p-skeleton height="100%" />

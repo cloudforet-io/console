@@ -7,12 +7,12 @@
         :print-mode="printMode"
         class="cost-by-project"
     >
-        <p-chart-loader :loading="loading" class="chart-wrapper">
+        <p-data-loader :loading="loading" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
             <div ref="chartRef" class="chart" />
-        </p-chart-loader>
+        </p-data-loader>
         <div v-if="printMode" class="table-wrapper">
             <p-data-table v-for="(itemSet, itemSetIdx) in itemSetList" :key="itemSetIdx" class="table"
                           :fields="fields"
@@ -54,7 +54,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PSkeleton, PDataTable, PStatus,
+    PDataLoader, PSkeleton, PDataTable, PStatus,
 } from '@spaceone/design-system';
 
 import CostDashboardCardWidgetLayout
@@ -94,7 +94,7 @@ export default defineComponent<WidgetProps>({
     components: {
         CostDashboardCardWidgetLayout,
         PDataTable,
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
         PStatus,
     },

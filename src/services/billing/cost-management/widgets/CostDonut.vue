@@ -2,12 +2,12 @@
     <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_PROVIDER')" class="cost-by-provider" :widget-link="widgetLink"
                                        :print-mode="printMode"
     >
-        <p-chart-loader :loading="loading" class="chart-wrapper">
+        <p-data-loader :loading="loading" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
             <div ref="chartRef" class="chart" />
-        </p-chart-loader>
+        </p-data-loader>
         <div class="table-wrapper">
             <cost-dashboard-data-table
                 :fields="dataTableState.fields"
@@ -40,7 +40,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PSkeleton, PDataTable, PTextPagination,
+    PDataLoader, PSkeleton, PDataTable, PTextPagination,
 } from '@spaceone/design-system';
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
@@ -79,7 +79,7 @@ export default defineComponent<WidgetProps>({
     components: {
         CostDashboardCardWidgetLayout,
         PDataTable,
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
         PTextPagination,
         CostDashboardDataTable,

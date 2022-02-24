@@ -1,11 +1,11 @@
 <template>
     <div class="cost-dashboard-stacked-column-widget" :class="{responsive: !printMode}">
-        <p-chart-loader :loading="loading" class="chart-wrapper" :class="widgetType">
+        <p-data-loader :loading="loading" class="chart-wrapper" :class="widgetType">
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
             <div ref="chartRef" class="chart" />
-        </p-chart-loader>
+        </p-data-loader>
         <div class="table-wrapper" :class="widgetType">
             <cost-dashboard-data-table :fields="fields"
                                        :items="items"
@@ -35,7 +35,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PSkeleton,
+    PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
@@ -83,7 +83,7 @@ export default defineComponent<Props>({
     name: 'CostDashboardStackedColumnWidget',
     components: {
         CostDashboardDataTable,
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
     },
     props: {

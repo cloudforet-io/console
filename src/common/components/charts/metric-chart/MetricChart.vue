@@ -5,7 +5,7 @@
             <span class="text-sm text-gray flex-grow">&nbsp; {{ unit.y ? `(${unit.y})` : '' }}</span>
             <p-lottie v-if="loading && chart" name="thin-spinner" auto />
         </div>
-        <p-chart-loader :loading="loading && !chart" class="chart">
+        <p-data-loader :loading="loading && !chart" class="chart">
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
@@ -20,7 +20,7 @@
                     {{ $t('COMMON.COMPONENTS.METRIC_CHART.NO_DATA') }}
                 </div>
             </transition>
-        </p-chart-loader>
+        </p-data-loader>
         <transition name="fade">
             <div class="tooltip-wrapper" :class="{ 'tooltip-visible': visibleTooltip }">
                 <p class="date">
@@ -55,7 +55,7 @@ import { get } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import { PChartLoader, PLottie, PSkeleton } from '@spaceone/design-system';
+import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
 
 import { reactive, toRefs, watch } from '@vue/composition-api';
 
@@ -84,7 +84,7 @@ interface Tooltip {
 
 export default {
     name: 'PMetricChart',
-    components: { PLottie, PSkeleton, PChartLoader },
+    components: { PLottie, PSkeleton, PDataLoader },
     props: {
         loading: {
             type: Boolean,

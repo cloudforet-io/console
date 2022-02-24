@@ -1,10 +1,10 @@
 <template>
-    <p-chart-loader :loading="loading">
+    <p-data-loader :loading="loading">
         <template #loader>
             <p-skeleton height="100%" />
         </template>
         <div ref="chartRef" class="chart" />
-    </p-chart-loader>
+    </p-data-loader>
 </template>
 
 <script lang="ts">
@@ -25,7 +25,7 @@ import { getStackedChartData } from '@/services/billing/cost-management/widgets/
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import dayjs from 'dayjs';
 import { BUDGET_TIME_UNIT } from '@/services/billing/cost-management/budget/type';
-import { PChartLoader, PSkeleton } from '@spaceone/design-system';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 
 const categoryKey = 'date';
 const columnChartValueName = 'usd_cost';
@@ -33,7 +33,7 @@ const columnChartValueName = 'usd_cost';
 export default {
     name: 'BudgetSummaryChart',
     components: {
-        PChartLoader,
+        PDataLoader,
         PSkeleton,
     },
     setup() {

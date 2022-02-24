@@ -1,5 +1,6 @@
 <template>
     <section class="spot-interrupt-chart">
+        <!--            TODO:: Should change PChartLoader to PDataLoader-->
         <p-chart-loader :loading="loading" class="chart-wrapper">
             <div ref="chartRef" class="chart" />
         </p-chart-loader>
