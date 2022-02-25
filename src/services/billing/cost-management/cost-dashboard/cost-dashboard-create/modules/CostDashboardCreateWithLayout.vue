@@ -20,12 +20,19 @@
                         />
                     </div>
                     <ul v-if="unfoldedIndices.includes(idx)" class="widgets-list">
-                        <li v-for="({name}) in getNamesOfWidgetList(layoutData.widgetList)" :key="name">
-                            {{ name }}
-                        </li>
-                        <li class="text-more">
-                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.AND_MORE') }}
-                        </li>
+                        <template v-if="layoutData.widgetList.length > 10">
+                            <li v-for="({name}) in getNamesOfWidgetList(layoutData.widgetList).slice(0, 10)" :key="name">
+                                {{ name }}
+                            </li>
+                            <li class="text-more">
+                                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.AND_MORE') }}
+                            </li>
+                        </template>
+                        <template v-else>
+                            <li v-for="({name}) in getNamesOfWidgetList(layoutData.widgetList)" :key="name">
+                                {{ name }}
+                            </li>
+                        </template>
                     </ul>
                 </div>
             </div>

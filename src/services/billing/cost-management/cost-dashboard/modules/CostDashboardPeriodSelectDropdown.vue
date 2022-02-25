@@ -153,15 +153,41 @@ export default {
             state.customRangeModalVisible = false;
         };
 
-        const handleSelectedFixDate = async (isSelected: boolean) => {
+        const updatePublicDashboardPeriod = async (periodType, period) => {
             try {
-                const periodType = isSelected ? 'FIXED' : 'AUTO';
-                const period = isSelected ? state.selectedPeriod : {};
                 await SpaceConnector.client.costAnalysis.publicDashboard.update({
                     public_dashboard_id: props.dashboardId,
                     period_type: periodType,
                     period,
                 });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
+
+        const updateUserDashboardPeriod = async (periodType, period) => {
+            try {
+                await SpaceConnector.client.costAnalysis.userDashboard.update({
+                    user_dashboard_id: props.dashboardId,
+                    period_type: periodType,
+                    period,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
+
+        const handleSelectedFixDate = async (isSelected: boolean) => {
+            try {
+                const periodType = isSelected ? 'FIXED' : 'AUTO';
+                const period = isSelected ? state.selectedPeriod : {};
+
+                if (props.dashboardId?.startsWith('user')) {
+                    await updateUserDashboardPeriod(periodType, period);
+                } else {
+                    await updatePublicDashboardPeriod(periodType, period);
+                }
+
                 state.isFixedTypeSelected = isSelected;
                 emit('update:periodType', periodType);
                 emit('update:period', state.selectedPeriod);

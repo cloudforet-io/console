@@ -1,9 +1,10 @@
 <template>
     <p-button-modal :visible="proxyVisible"
                     header-title="Add New Widget"
-                    :disabled="false"
                     size="lg"
+                    :disabled="!isSelectedWidgetExist"
                     @confirm="handleConfirm"
+                    @close="handleCancel"
                     @cancel="handleCancel"
                     @update:visible="handleUpdateVisible"
     >
@@ -63,7 +64,8 @@ export default {
     setup(props: Props, { emit }) {
         const state = reactive({
             proxyVisible: props.visible,
-            widgetPosition: computed(() => store.state.service.costDashboard.widgetPosition),
+            widgetPosition: computed(() => store.state.service?.costDashboard?.widgetPosition),
+            isSelectedWidgetExist: computed(() => Object.keys(store.state.service?.costDashboard?.originSelectedWidget).length),
         });
         const tabState = reactive({
             tabs: computed(() => ([

@@ -3,7 +3,7 @@
         <p-divider />
         <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.EXISTING_DASHBOARD') }}</h3>
         <div class="dashboard-list">
-            <div v-for="(dashboardData, idx) in existingDashboardData" :key="`$dashboard-${idx}-${getUUID()}`"
+            <div v-for="(dashboardData, idx) in slicedDashboardData" :key="`$dashboard-${idx}-${getUUID()}`"
                  class="dashboard-item"
             >
                 <p-select-card
@@ -46,11 +46,8 @@ import {
 } from '@/services/billing/cost-management/cost-dashboard/type';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { store } from '@/store';
-// import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-// import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
 
-
-const PAGE_SIZE = 1;
+const PAGE_SIZE = 8;
 
 export default {
     name: 'CostDashboardCreateWithDashboard',
@@ -64,6 +61,11 @@ export default {
     setup() {
         const state = reactive({
             existingDashboardData: [] as Partial<DashboardInfo>[],
+            slicedDashboardData: computed(() => {
+                const startIndex = (state.thisPage * PAGE_SIZE) - PAGE_SIZE;
+                const endIndex = state.thisPage * PAGE_SIZE;
+                return state.existingDashboardData.slice(startIndex, endIndex);
+            }),
             selectedTemplate: computed(() => store.state.service?.costDashboard?.selectedTemplate),
             // pagination
             totalCount: 0,
@@ -76,14 +78,6 @@ export default {
             store.commit('service/costDashboard/setDefaultFilter', value.default_filter);
         };
 
-        // const apiQueryHelper = new ApiQueryHelper();
-        // const getParams = () => {
-        //     apiQueryHelper.setPageStart(getPageStart(state.thisPage, PAGE_SIZE))
-        //         .setPageLimit(PAGE_SIZE);
-        //     return {
-        //         query: apiQueryHelper.data,
-        //     };
-        // };
         const listDashboard = async () => {
             try {
                 const publicDashboardList = await SpaceConnector.client.costAnalysis.publicDashboard.list();
@@ -96,6 +90,7 @@ export default {
                     name: d.name,
                     ...d,
                 }) as Partial<DashboardInfo>);
+                state.totalCount = state.existingDashboardData.length ?? 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.existingDashboardData = [];

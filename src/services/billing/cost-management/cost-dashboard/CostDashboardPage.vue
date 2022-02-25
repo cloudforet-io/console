@@ -13,10 +13,6 @@
                                :outline="false"
                                @click.stop="handleClickEditDashboard"
                 />
-                <p-icon-button name="ic_trashcan"
-                               :outline="false"
-                               @click.stop="handleClickDeleteDashboard"
-                />
                 <cost-dashboard-more-menu :dashboard-id="dashboardId" :dashboard="dashboard" />
             </div>
             <div class="right-part">
@@ -45,11 +41,6 @@
                            :filters="filters"
                            :currency="currency"
                            :currency-rates="currencyRates"
-        />
-        <delete-modal :header-title="checkDeleteState.headerTitle"
-                      :visible.sync="checkDeleteState.visible"
-                      :loading="checkDeleteState.loading"
-                      @confirm="handleDeleteDashboardConfirm"
         />
         <cost-dashboard-update-modal :visible.sync="updateModalVisible"
                                      :dashboard-id="dashboardId"
@@ -89,7 +80,6 @@ import {
 } from '@/services/billing/cost-management/cost-dashboard/type';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 import { SpaceRouter } from '@/router';
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import PdfDownloadOverlay, { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import CostDashboardPreview from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPreview.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
@@ -113,7 +103,6 @@ export default {
         PPageTitle,
         PIconButton,
         PIconTextButton,
-        DeleteModal,
     },
     props: {
         dashboardId: {
@@ -147,40 +136,9 @@ export default {
             ]),
         });
 
-        const checkDeleteState = reactive({
-            visible: false,
-            headerTitle: 'Are you sure you want to delete dashboard?',
-            loading: true,
-        });
-
         /* event */
         const handleClickEditDashboard = () => {
             state.updateModalVisible = true;
-        };
-
-        const handleClickDeleteDashboard = () => {
-            checkDeleteState.visible = true;
-        };
-        const handleDeleteDashboardConfirm = async () => {
-            try {
-                checkDeleteState.loading = true;
-                if (props.dashboardId?.startsWith('user')) {
-                    await SpaceConnector.client.costAnalysis.userDashboard.delete({
-                        user_dashboard_id: props.dashboardId,
-                    });
-                } else {
-                    await SpaceConnector.client.costAnalysis.publicDashboard.delete({
-                        public_dashboard_id: props.dashboardId,
-                    });
-                }
-                await store.dispatch('service/costDashboard/setDashboardList');
-                await SpaceRouter.router.replace({ name: BILLING_ROUTE.COST_MANAGEMENT._NAME });
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, 'Failed to delete dashboard');
-            } finally {
-                checkDeleteState.loading = false;
-                checkDeleteState.visible = false;
-            }
         };
 
         const handleUpdateConfirm = (name) => {
@@ -247,11 +205,8 @@ export default {
         return {
             ...toRefs(state),
             routeState,
-            checkDeleteState,
             handleClickEditDashboard,
-            handleClickDeleteDashboard,
             handleUpdateConfirm,
-            handleDeleteDashboardConfirm,
             handleClickPdfDownload,
             handleClickCustomize,
             handlePreviewRendered,

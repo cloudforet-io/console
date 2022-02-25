@@ -22,6 +22,7 @@ import {
     PButton, PCheckBox,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
+import { has } from 'lodash';
 import { store } from '@/store';
 import ViewFilterModal from '@/services/billing/cost-management/cost-dashboard/modules/ViewFilterModal.vue';
 
@@ -38,7 +39,8 @@ export default {
             includesFilter: false,
             defaultFilterModalVisible: false,
             defaultFilter: computed(() => store.state.service?.costDashboard?.defaultFilter || {}),
-            isDashboardTemplate: computed(() => store.state.service?.costDashboard?.selectedTemplate.hasOwnProperty('public_dashboard_id')),
+            isDashboardTemplate: computed(() => has(store.state.service?.costDashboard?.selectedTemplate, 'public_dashboard_id')
+                || has(store.state.service?.costDashboard?.selectedTemplate, 'user_dashboard_id')),
         });
 
         const handleClickFilterButton = () => {

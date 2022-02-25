@@ -111,10 +111,23 @@ export default {
         });
 
         /* api */
-        const updateFilters = async (filters) => {
+        const updatePublicDashboardFilters = async (filters) => {
             try {
                 await SpaceConnector.client.costAnalysis.publicDashboard.update({
                     public_dashboard_id: props.dashboardId,
+                    default_filter: filters,
+                });
+                state.proxyFilters = filters;
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_S_EDIT_FILTER'), '', root);
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_E_EDIT_FILTER'));
+            }
+        };
+
+        const updateUserDashboardFilters = async (filters) => {
+            try {
+                await SpaceConnector.client.costAnalysis.userDashboard.update({
+                    user_dashboard_id: props.dashboardId,
                     default_filter: filters,
                 });
                 state.proxyFilters = filters;
@@ -132,7 +145,11 @@ export default {
             state.viewFilterModalVisible = true;
         };
         const handleConfirmSetFilter = (filters) => {
-            updateFilters(filters);
+            if (props.dashboardId?.startsWith('user')) {
+                updateUserDashboardFilters(filters);
+            } else {
+                updatePublicDashboardFilters(filters);
+            }
         };
 
         return {

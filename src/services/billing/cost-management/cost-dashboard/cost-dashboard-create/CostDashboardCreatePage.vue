@@ -9,7 +9,7 @@
             <p-button style-type="gray900" :outline="true" @click="$router.go(-1)">
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CANCEL') }}
             </p-button>
-            <p-button style-type="primary-dark" @click="handleClickCreate">
+            <p-button style-type="primary-dark" :disabled="!Object.keys(selectedTemplate).length" @click="handleClickCreate">
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CREATE') }}
             </p-button>
         </div>
