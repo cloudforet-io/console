@@ -133,6 +133,8 @@ export default {
         const handleClickCancel = () => {
             if (SpaceRouter.router.currentRoute.query.from === 'create') {
                 rollbackDashboard();
+                SpaceRouter.router.replace({ name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME });
+                return;
             }
             goToMainDashboardPage();
         };

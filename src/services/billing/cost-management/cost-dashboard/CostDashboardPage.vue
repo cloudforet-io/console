@@ -2,6 +2,9 @@
     <div class="cost-dashboard-page">
         <p-breadcrumbs :routes="routeState.route" />
         <div class="top-wrapper">
+            <p-i name="ic_public" width="1rem" height="1rem"
+                 class="mr-2"
+            />
             <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
             <div class="left-part">
                 <!--                <favorite-button :item-id="'item-id1'"-->
@@ -62,7 +65,7 @@ import {
 } from '@vue/composition-api';
 import { i18n } from '@/translations';
 import {
-    PBreadcrumbs, PIconButton, PIconTextButton, PPageTitle,
+    PBreadcrumbs, PI, PIconButton, PIconTextButton, PPageTitle,
 } from '@spaceone/design-system';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
@@ -75,9 +78,7 @@ import CostDashboardFilter from '@/services/billing/cost-management/cost-dashboa
 import CostDashboardMoreMenu from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardMoreMenu.vue';
 import CostDashboardPeriodSelectDropdown
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
-import {
-    DashboardInfo,
-} from '@/services/billing/cost-management/cost-dashboard/type';
+import { DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 import { SpaceRouter } from '@/router';
 import PdfDownloadOverlay, { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
@@ -88,6 +89,12 @@ import CostDashboardStoreModule from '@/services/billing/cost-management/cost-da
 import { getDashboardLayout } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
 import CostDashboardUpdateModal
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardUpdateModal.vue';
+
+const validateDashboardId = async (dashboardId): Promise<boolean> => {
+    await store.dispatch('service/costDashboard/setDashboardList');
+    const dashboardList = store.getters['service/costDashboard/dashboardList'];
+    return dashboardList.find(item => item.dashboard_id === dashboardId);
+};
 
 export default {
     name: 'CostDashboardPage',
@@ -103,12 +110,25 @@ export default {
         PPageTitle,
         PIconButton,
         PIconTextButton,
+        PI,
     },
     props: {
         dashboardId: {
             type: String,
             default: undefined,
         },
+    },
+    beforeRouteEnter(to, from, next) {
+        next(async () => {
+            if (!await validateDashboardId(to.params.dashboardId)) {
+                next({
+                    name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                    params: {},
+                });
+                return;
+            }
+            next();
+        })();
     },
     setup(props) {
         registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
@@ -222,7 +242,7 @@ export default {
     height: 100%;
 }
 .top-wrapper {
-    @apply flex flex-wrap;
+    @apply flex flex-wrap items-center;
     row-gap: 1rem;
     min-width: 62.25rem;
     max-width: 117rem;

@@ -20,10 +20,11 @@
                            :invalid="invalidState.visibility"
                            :invalida-text="invalidTexts.visibility"
                            required
+                           class="mt-6"
             >
                 <p-radio v-for="{ name, label } in visibilityList" :key="name" :value="name"
                          :selected="visibility"
-                         class="mr-4"
+                         class="radio-group"
                          @change="setForm('visibility', $event)"
                 >
                     <span class="capitalize ml-1">{{ label.toLowerCase() }}</span>
@@ -187,3 +188,9 @@ export default defineComponent<Props>({
     },
 });
 </script>
+<style lang="postcss" scoped>
+.radio-group {
+    @apply inline-block;
+    margin-bottom: 0.625rem;
+}
+</style>

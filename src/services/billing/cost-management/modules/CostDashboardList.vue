@@ -20,16 +20,16 @@
                      width="0.875rem" height="0.875rem"
                 />
             </router-link>
-            <p-select-dropdown :selected="selectedMoreMenuItem"
-                               class="more-button"
-                               :items="moreMenuItems"
-                               button-style-type="transparent"
-                               use-fixed-menu-style
-                               menu-position="right"
-                               type="icon-button"
-                               button-icon="ic_more"
-                               @select="handleSelectMoreMenu(item, ...arguments)"
-            />
+            <!--            <p-select-dropdown :selected="selectedMoreMenuItem"-->
+            <!--                               class="more-button"-->
+            <!--                               :items="moreMenuItems"-->
+            <!--                               button-style-type="transparent"-->
+            <!--                               use-fixed-menu-style-->
+            <!--                               menu-position="right"-->
+            <!--                               type="icon-button"-->
+            <!--                               button-icon="ic_more"-->
+            <!--                               @select="handleSelectMoreMenu(item, ...arguments)"-->
+            <!--            />-->
         </li>
     </div>
 </template>
@@ -40,7 +40,7 @@ import {
     computed, getCurrentInstance, PropType, reactive, toRefs,
 } from '@vue/composition-api';
 import {
-    PI, PSelectDropdown,
+    PI,
 } from '@spaceone/design-system';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { SpaceRouter } from '@/router';
@@ -57,7 +57,6 @@ export default {
     name: 'CostDashboardList',
     components: {
         PI,
-        PSelectDropdown,
     },
     props: {
         publicDashboardItems: {
