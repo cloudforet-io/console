@@ -14,7 +14,7 @@
                             </p-radio>
                         </div>
                         <div class="card-content">
-                            {{ widget.options.chart_type }}
+                            <img class="card-image" :src="require(`@/assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`)">
                         </div>
                     </li>
                 </ul>
@@ -65,13 +65,14 @@ import CustomWidgetPreview
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CustomWidgetPreview.vue';
 
 import { store } from '@/store';
-import { WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
+import { CHART_TYPE, WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { CostQuerySetModel } from '@/services/billing/cost-management/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
+import { chartTypeItemMap } from '@/services/billing/cost-management/cost-dashboard/lib/config';
 
 
 const PAGE_SIZE = 6;
@@ -157,6 +158,7 @@ export default {
             state.selectedItem = createdCustomWidget;
             state.thisPage = 1;
         };
+        const getChartTypeImageFileName = (chartType: CHART_TYPE) => chartTypeItemMap[chartType].imageFileName;
 
         (() => {
             listCustomWidget();
@@ -177,6 +179,7 @@ export default {
             handleSelectWidget,
             handleClickRemoveWidget,
             handleCreateCustomWidget,
+            getChartTypeImageFileName,
         };
     },
 };
@@ -196,6 +199,10 @@ export default {
         .btn-remove {
             @apply block mt-6 ml-auto mr-auto;
         }
+    }
+
+    .card-image {
+        height: 3rem;
     }
 }
 </style>

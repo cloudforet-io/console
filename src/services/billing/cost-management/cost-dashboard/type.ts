@@ -43,13 +43,26 @@ export type DashboardInfo = PublicDashboardInfo | UserDashboardInfo;
 export type DashboardMenuItem = Partial<DashboardInfo> & { label: string; routeName: string};
 
 
+export const CHART_TYPE = Object.freeze({
+    CARD: 'CARD',
+    TREEMAP: 'TREEMAP',
+    MAP: 'MAP',
+    LINE: 'LINE',
+    STACKED_COLUMN: 'STACKED_COLUMN',
+    DONUT: 'DONUT',
+    PIE: 'PIE',
+    WAFFLE: 'WAFFLE',
+    TABLE: 'TABLE',
+} as const);
+export type CHART_TYPE = typeof CHART_TYPE[keyof typeof CHART_TYPE];
+
 export interface WidgetOptions {
     stack?: boolean;
     granularity?: GRANULARITY;
     filters?: CostQueryFilters;
     period?: Period;
     group_by?: string | GROUP_BY;
-    chart_type?: string;
+    chart_type?: CHART_TYPE;
     layout: number;
 }
 

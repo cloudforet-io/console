@@ -3,7 +3,7 @@
     "widget_id": "card-lg-01",
     "name": "Budget Usage Summary",
     "options": {
-      "chart_type": "card",
+      "chart_type": "CARD",
       "layout": 100
     }
   }],
@@ -11,7 +11,7 @@
     "widget_id": "pie-lg-01",
     "name": "SPC Project-Wise Usage Summary",
     "options": {
-      "chart_type": "pie",
+      "chart_type": "PIE",
       "layout": 100,
       "group_by": "project_id"
     }

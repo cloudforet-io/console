@@ -3,21 +3,21 @@
     "widget_id": "card-sm-01",
     "name": "Month-to-Date Spend",
     "options": {
-      "chart_type": "card",
+      "chart_type": "CARD",
       "layout": 33
     }
   }, {
     "widget_id": "card-sm-02",
     "name": "Last Month Total Spend",
     "options": {
-      "chart_type": "card",
+      "chart_type": "CARD",
       "layout": 33
     }
   }, {
     "widget_id": "card-sm-03",
     "name": "Budget Usage",
     "options": {
-      "chart_type": "card",
+      "chart_type": "CARD",
       "layout": 33
     }
   }],
@@ -25,7 +25,7 @@
     "widget_id": "treemap-lg-01",
     "name": "Cost By Project",
     "options": {
-      "chart_type": "treemap",
+      "chart_type": "TREEMAP",
       "layout": 100,
       "group_by": "project_id"
     }
@@ -34,7 +34,7 @@
     "widget_id": "linegraph-lg-01",
     "name": "Cost Trend By Project",
     "options": {
-      "chart_type": "line",
+      "chart_type": "LINE",
       "layout": 100,
       "group_by": "project_id"
     }
@@ -43,7 +43,7 @@
     "widget_id": "stackedcol-lg-01",
     "name": "Cost Trend By Product",
     "options": {
-      "chart_type": "stacked_column",
+      "chart_type": "STACKED_COLUMN",
       "layout": 100,
       "group_by": "product"
     }
@@ -52,7 +52,7 @@
     "widget_id": "donut-md-01",
     "name": "Cost By Provider",
     "options": {
-      "chart_type": "stacked_column",
+      "chart_type": "STACKED_COLUMN",
       "layout": 50,
       "group_by": "provider"
     }
@@ -60,7 +60,7 @@
     "widget_id": "waffle-md-01",
     "name": "Budget Status",
     "options": {
-      "chart_type": "waffle",
+      "chart_type": "WAFFLE",
       "layout": 50
     }
   }],
@@ -68,7 +68,7 @@
     "widget_id": "map-lg-01",
     "name": "Cost By Region",
     "options": {
-      "chart_type": "map",
+      "chart_type": "MAP",
       "layout": 100
     }
   }]

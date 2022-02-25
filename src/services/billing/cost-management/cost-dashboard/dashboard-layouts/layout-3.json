@@ -3,7 +3,7 @@
     "widget_id": "card-lg-01",
     "name": "Budget Usage Summary",
     "options": {
-      "chart_type": "card",
+      "chart_type": "CARD",
       "layout": 100
     }
   }],
@@ -11,7 +11,7 @@
     "widget_id": "table-lg-01",
     "name": "Project-wise Budget Usage Summary",
     "options": {
-      "chart_type": "table",
+      "chart_type": "TABLE",
       "layout": 100
     }
   }],
@@ -19,7 +19,7 @@
     "widget_id": "stackedcol-lg-02",
     "name": "Cost Trend By Product",
     "options": {
-      "chart_type": "stacked_column",
+      "chart_type": "STACKED_COLUMN",
       "layout": 100,
       "group_by": "product"
     }

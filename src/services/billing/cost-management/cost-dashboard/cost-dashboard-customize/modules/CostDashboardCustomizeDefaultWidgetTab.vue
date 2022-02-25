@@ -18,7 +18,7 @@
                             </p-radio>
                         </div>
                         <div class="card-content">
-                            {{ widget.options.chart_type }}
+                            <img class="card-image" :src="require(`@/assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`)">
                         </div>
                     </li>
                 </ul>
@@ -40,7 +40,7 @@
                             </p-radio>
                         </div>
                         <div class="card-content">
-                            {{ widget.options.chart_type }}
+                            <img class="card-image" :src="require(`@/assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`)">
                         </div>
                     </li>
                 </ul>
@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
+import { CHART_TYPE, WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { defaultWidgetMap } from '@/services/billing/cost-management/widgets/lib/config';
 import { PRadio, PLabel, PTextPagination } from '@spaceone/design-system';
 import CostDashboardCustomizeWidgetConfig
@@ -67,6 +67,7 @@ import CostDashboardCustomizeWidgetConfig
 import DefaultWidgetPreview
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/DefaultWidgetPreview.vue';
 import { store } from '@/store';
+import { chartTypeItemMap } from '@/services/billing/cost-management/cost-dashboard/lib/config';
 
 const PAGE_SIZE = 6;
 
@@ -105,6 +106,7 @@ export default {
                 throw new Error('Failed to fetch widget list');
             }
         };
+        const getChartTypeImageFileName = (chartType: CHART_TYPE) => chartTypeItemMap[chartType].imageFileName;
 
         const selectWidget = (value: WidgetInfo) => {
             store.commit('service/costDashboard/setOriginSelectedWidget', value);
@@ -120,6 +122,7 @@ export default {
             defaultWidgetMap,
             selectWidget,
             getWidgets,
+            getChartTypeImageFileName,
         };
     },
 };
@@ -130,6 +133,10 @@ export default {
     @apply flex flex-col flex-grow;
     .text-pagination {
         @apply mt-auto;
+    }
+    .card-image {
+        height: 3rem;
+        margin: auto;
     }
 }
 </style>

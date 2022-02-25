@@ -229,7 +229,7 @@ export const getTooltipText = (categoryKey, valueKey, money, disablePercentage =
 const getWidgetDefaultOptions = async (widgetId?: string): Promise<WidgetOptions|undefined> => {
     try {
         const defaultWidgetList = await import('./defaultWidgetList.json');
-        return defaultWidgetList.default.find(widget => widget.widget_id === widgetId)?.options;
+        return defaultWidgetList.default.find(widget => widget.widget_id === widgetId)?.options as WidgetOptions;
     } catch (e) {
         throw new Error('Failed to fetch default widget list');
     }

@@ -3,8 +3,10 @@
         <template #chart>
             <div class="info-item">
                 <p-label>Type</p-label>
-                <div style="width: 100px; height: 100px; background-color: lightgreen;" />
-                <span>{{ chartType }}</span>
+                <div class="image-wrapper">
+                    <img :src="require(`@/assets/images/${chartTypeImageFileName}.svg`)">
+                </div>
+                <span>{{ chartTypeName }}</span>
             </div>
         </template>
     </cost-dashboard-customize-widget-preview>
@@ -16,6 +18,7 @@ import CostDashboardCustomizeWidgetPreview
 import { WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { PLabel } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
+import { chartTypeItemMap } from '@/services/billing/cost-management/cost-dashboard/lib/config';
 
 export default {
     name: 'DefaultWidgetPreview',
@@ -33,6 +36,8 @@ export default {
     setup(props) {
         const state = reactive({
             chartType: computed(() => props.selectedWidget?.options?.chart_type ?? ''),
+            chartTypeName: computed(() => chartTypeItemMap[state.chartType].label),
+            chartTypeImageFileName: computed(() => chartTypeItemMap[state.chartType].imageFileName),
             layout: computed(() => props.selectedWidget?.options?.layout),
         });
         return {
@@ -50,5 +55,9 @@ export default {
     .p-label {
         @apply mr-auto;
     }
+}
+.image-wrapper {
+    width: 6.25rem;
+    height: 6.25rem;
 }
 </style>
