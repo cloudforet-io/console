@@ -1,8 +1,11 @@
 <template>
     <cost-dashboard-customize-widget-preview :layout="layout">
         <template #chart>
-            <p-label>Type</p-label>
-            {{ chartType }}
+            <div class="info-item">
+                <p-label>Type</p-label>
+                <div style="width: 100px; height: 100px; background-color: lightgreen;" />
+                <span>{{ chartType }}</span>
+            </div>
         </template>
     </cost-dashboard-customize-widget-preview>
 </template>
@@ -38,3 +41,14 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 0.5rem;
+    .p-label {
+        @apply mr-auto;
+    }
+}
+</style>

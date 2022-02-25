@@ -59,11 +59,13 @@ export default {
             @apply font-bold mb-3;
             font-size: 0.875rem;
         }
-
-        .p-select-card {
-            font-size: 0.875rem;
-            .contents {
-                @apply font-bold;
+        .dashboard-list {
+            @apply grid grid-cols-4 col-gap-2;
+            .p-select-card {
+                font-size: 0.875rem;
+                .contents {
+                    @apply font-bold;
+                }
             }
         }
     }

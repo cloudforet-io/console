@@ -1,10 +1,8 @@
 <template>
-    <fragment>
-        <h3 class="pt-0">
-            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.BASIC_TEMPLATE') }}
-        </h3>
-        <div class="grid grid-cols-4 col-gap-2 mb-2">
-            <div v-for="(layoutData, idx) in defaultLayoutData" :key="layoutData.name" class="mb-4">
+    <div class="basic-dashboard">
+        <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.BASIC_TEMPLATE') }}</h3>
+        <div class="dashboard-list">
+            <div v-for="(layoutData, idx) in defaultLayoutData" :key="layoutData.name" class="dashboard-item">
                 <p-select-card
                     :selected="selectedTemplate"
                     :value="layoutData"
@@ -13,8 +11,8 @@
                 >
                     {{ layoutData.name }}
                 </p-select-card>
-                <div v-if="layoutData.widgetList.length">
-                    <div class="flex justify-between mt-2">
+                <div v-if="layoutData.widgetList.length" class="widget-list-wrapper">
+                    <div class="widget-title-wrapper">
                         <span class="widget-list-title">List of widgets</span>
                         <p-collapsible-toggle :is-collapsed="!unfoldedIndices.includes(idx)"
                                               toggle-position="contents"
@@ -32,7 +30,7 @@
                 </div>
             </div>
         </div>
-    </fragment>
+    </div>
 </template>
 
 <script lang="ts">
@@ -93,20 +91,37 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.widget-list-title {
-    font-size: 0.875rem;
-}
-.widgets-list {
-    @apply mt-2 pl-6;
-    li {
-        @apply text-gray-700;
-        list-style-type: disc;
-        font-size: 0.875rem;
-        line-height: 1.25;
-        &.text-more {
-            list-style-type: none;
-            margin-left: -1.5rem;
+.basic-dashboard {
+    h3 {
+        @apply pt-0;
+    }
+    .dashboard-list {
+        @apply mb-2;
+        .dashboard-item {
+            @apply mb-4;
+        }
+    }
+    .widget-list-wrapper {
+        .widget-title-wrapper {
+            @apply flex justify-between mt-2;
+            .widget-list-title {
+                font-size: 0.875rem;
+            }
+        }
+        .widgets-list {
+            @apply mt-2 pl-6;
+            li {
+                @apply text-gray-700;
+                list-style-type: disc;
+                font-size: 0.875rem;
+                line-height: 1.25;
+                &.text-more {
+                    list-style-type: none;
+                    margin-left: -1.5rem;
+                }
+            }
         }
     }
 }
+
 </style>

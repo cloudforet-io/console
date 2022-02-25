@@ -1,37 +1,33 @@
 <template>
-    <fragment>
-        <p-divider class="w-full mb-6" />
-        <div class="flex flex-col">
-            <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.EXISTING_DASHBOARD') }}</h3>
-            <div class="grid grid-cols-4 col-gap-2">
-                <div v-for="(dashboardData, idx) in existingDashboardData" :key="`$dashboard-${idx}-${getUUID()}`" class="flex flex-col justify-between mb-4">
-                    <p-select-card
-                        :selected="selectedTemplate"
-                        :value="dashboardData"
-                        block
-                        class="flex-grow"
-                        @change="handleDashboardChange"
-                    >
-                        {{ dashboardData.name }}
-                    </p-select-card>
-                    <p-anchor
-                        target="_blank"
-                        :to=" { name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME, params: { dashboardId: dashboardData.public_dashboard_id } }"
-                        class="block mt-2 text-center"
-                    >
-                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.VIEW') }}
-                    </p-anchor>
-                </div>
+    <div class="existing-dashboard">
+        <p-divider />
+        <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.EXISTING_DASHBOARD') }}</h3>
+        <div class="dashboard-list">
+            <div v-for="(dashboardData, idx) in existingDashboardData" :key="`$dashboard-${idx}-${getUUID()}`"
+                 class="dashboard-item"
+            >
+                <p-select-card
+                    :selected="selectedTemplate"
+                    :value="dashboardData"
+                    block
+                    @change="handleDashboardChange"
+                >
+                    {{ dashboardData.name }}
+                </p-select-card>
+                <p-anchor
+                    target="_blank"
+                    :to=" { name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME, params: { dashboardId: dashboardData.public_dashboard_id } }"
+                >
+                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.VIEW') }}
+                </p-anchor>
             </div>
-
-            <p-text-pagination
-                :this-page.sync="thisPage"
-                :all-page="allPage"
-                class="ml-auto mr-auto"
-                @pageChange="listDashboard"
-            />
         </div>
-    </fragment>
+        <p-text-pagination
+            :this-page.sync="thisPage"
+            :all-page="allPage"
+            @pageChange="listDashboard"
+        />
+    </div>
 </template>
 
 <script lang="ts">
@@ -119,8 +115,25 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.p-anchor {
-    @apply text-blue-700;
-    font-size: 0.875rem;
+.existing-dashboard {
+    @apply flex flex-col;
+    .p-divider {
+        @apply w-full mb-6;
+    }
+    .dashboard-list {
+        .dashboard-item {
+            @apply flex flex-col justify-between row-gap-2 mb-4;
+            .p-select-card {
+                @apply flex-grow;
+            }
+            .p-anchor {
+                @apply text-center text-blue-700;
+                font-size: 0.875rem;
+            }
+        }
+    }
+    .text-pagination {
+        @apply ml-auto mr-auto;
+    }
 }
 </style>

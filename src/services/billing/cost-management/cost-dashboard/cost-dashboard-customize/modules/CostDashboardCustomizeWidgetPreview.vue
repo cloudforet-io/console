@@ -37,7 +37,8 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .cost-dashboard-customize-widget-preview {
-    @apply flex flex-col bg-gray-100 p-4 mt-8;
+    @apply flex flex-col row-gap-2 bg-gray-100 p-4 mt-8;
+    font-size: 0.875rem;
 
     .layout-preview-area {
         .layout-preview {

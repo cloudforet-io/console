@@ -1,21 +1,11 @@
 <template>
     <cost-dashboard-customize-widget-preview :layout="LAYOUT">
         <template #description>
-            <div class="info-item">
-                <p-label>Query Name</p-label> <span>{{ queryName }}</span>
-            </div>
-            <div class="info-item">
-                <p-label>Granularity</p-label> <span>{{ getGranularityText(granularity) }}</span>
-            </div>
-            <div class="info-item">
-                <p-label>Stack</p-label> <span>{{ stack ? 'On' : 'Off' }}</span>
-            </div>
-            <div class="info-item">
-                <p-label>Group By</p-label> <span :class="{ 'text-gray-500': !groupBy }">{{ getGroupByText(groupBy) }}</span>
-            </div>
-            <div class="info-item">
-                <p-label>Filters</p-label> <span :class="{'text-gray-500': !filters}">{{ getFiltersText(filters) }}</span>
-            </div>
+            <div><p-label>Query Name</p-label> <span>{{ queryName }}</span></div>
+            <div><p-label>Granularity</p-label> <span>{{ getGranularityText(granularity) }}</span></div>
+            <div><p-label>Stack</p-label> <span>{{ stack ? 'On' : 'Off' }}</span></div>
+            <div><p-label>Group By</p-label> <span :class="{ 'text-gray-500': !groupBy }">{{ getGroupByText(groupBy) }}</span></div>
+            <div><p-label>Filters</p-label> <span :class="{'text-gray-500': !filters}">{{ getFiltersText(filters) }}</span></div>
         </template>
         <template #extra>
             <p-anchor :to="getViewQueryLink()"
@@ -120,12 +110,8 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.info-item {
-    @apply mb-2;
-    font-size: 0.875rem;
-    .p-label {
-        @apply mb-0 mr-2;
-    }
+.p-label {
+    @apply mb-0 mr-2;
 }
 .btn-view-query {
     @apply mt-2 ml-auto mr-auto;

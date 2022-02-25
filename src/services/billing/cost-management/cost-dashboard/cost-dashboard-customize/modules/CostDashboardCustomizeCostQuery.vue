@@ -165,7 +165,6 @@ export default {
 <style lang="postcss" scoped>
 .cost-dashboard-customize-cost-query {
     @apply bg-gray-100 rounded-sm;
-    height: 12.5rem;
     padding: 1rem;
 
     .title-wrapper {
@@ -208,7 +207,7 @@ export default {
             .query-item {
                 @apply flex flex-col bg-white border border-gray-300 rounded-lg cursor-pointer;
                 min-height: 7rem;
-                padding: 0.5rem 1rem;
+                padding: 0.5rem 1rem 1.5rem;
                 &.selected {
                     @apply border border-blue-600;
                 }

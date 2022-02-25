@@ -1,6 +1,6 @@
 <template>
     <fragment>
-        <h3>Filter</h3>
+        <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.FILTER') }}</h3>
         <p-check-box v-model="includesFilter" :disabled="!isDashboardTemplate">
             {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.APPLIED_FILTER') }}
         </p-check-box>
