@@ -48,16 +48,17 @@ export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, co
             granularity, stack, period,
             groupBy, filters, primaryGroupBy,
         } = state;
+        const options: CostQuerySetOption = {
+            granularity,
+            stack,
+            period,
+            group_by: groupBy,
+            primary_group_by: groupBy?.length ? (primaryGroupBy || groupBy[0]) : undefined,
+            filters,
+        };
         const updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
             name,
-            options: {
-                granularity,
-                stack,
-                period,
-                group_by: groupBy,
-                primary_group_by: groupBy?.length ? (primaryGroupBy || groupBy[0]) : undefined,
-                filter: filters,
-            },
+            options,
         });
         commit('setSelectedQueryId', updatedQueryData.cost_query_set_id);
         return updatedQueryData;

@@ -5,7 +5,7 @@
                 <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ widgetList.length }})</p-label>
                 <ul class="widget-list">
                     <li v-for="(widget, idx) in widgetList" :key="`widget-${idx}-${widget.name}`" class="widget-card"
-                        :class="{'selected' : selectedItem.widget_id == widget.widget_id}"
+                        :class="{'selected' : selectedItem.widget_id === widget.widget_id}"
                         @click="handleSelectWidget(widget)"
                     >
                         <div class="card-header">

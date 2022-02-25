@@ -175,9 +175,9 @@ export const getXYChartData = (rawData: CostAnalyzeModel[], granularity: GRANULA
  */
 export const getStackedChartData = (chartData: XYChartData[], period: Period, timeUnit: TimeUnit): XYChartData[] => {
     const accumulatedChartData = [] as XYChartData[];
-    let now = dayjs(period.start).clone();
+    let now = dayjs.utc(period.start).clone();
     let accumulatedData: Record<string, number> = {};
-    while (now.isSameOrBefore(dayjs(period.end), timeUnit)) {
+    while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
         let eachChartData: XYChartData = { date: now.format('YYYY-MM-DD') };
         // eslint-disable-next-line no-loop-func
         const existData = chartData.find(d => now.isSame(d.date, timeUnit));
