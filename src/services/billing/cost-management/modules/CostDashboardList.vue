@@ -119,7 +119,7 @@ export default {
             if (!state.homeDashboardId) {
                 store.dispatch('settings/setItem', {
                     key: 'homeDashboard',
-                    value: props.dashboardList[0]?.dashboard_id,
+                    value: state.dashboardList[0]?.dashboard_id,
                     path: '/costDashboard',
                 });
             }

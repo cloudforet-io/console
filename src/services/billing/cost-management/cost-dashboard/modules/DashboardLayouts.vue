@@ -15,7 +15,7 @@
             <div v-for="(row, rowIdx) in layout" :key="`row-${rowIdx}`" ref="dynamicWidgetRows"
                  class="row" :class="{'customize':customizeMode}"
             >
-                <div v-for="(widget, colIdx) in row" :key="`widget-${widget.widget_id}-${getUUID()}`"
+                <div v-for="(widget, colIdx) in row" :key="`widget-${widget.widget_id}-${rowIdx}-${colIdx}-${contextId}`"
                      :class="`col-${widget.options.layout}`"
                 >
                     <div v-if="customizeMode" class="btn-group">
@@ -148,6 +148,7 @@ export default {
             }),
             customizeModalVisible: false,
             updateModalVisible: false,
+            contextId: getUUID(),
         });
 
         const checkDeleteState = reactive({
