@@ -64,6 +64,7 @@
                               v-model="visiblePdfOverlay"
                               :items="previewItems"
                               orientation="landscape"
+                              :font-language="pdfFontLanguage"
         >
             <cost-analysis-preview @rendered="handlePreviewRendered" />
         </pdf-download-overlay>
@@ -90,11 +91,12 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceRouter } from '@/router';
 import { BILLING_ROUTE } from '@/services/billing/routes';
-import { Item } from '@/common/components/layouts/PdfDownloadOverlay.vue';
+import { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
+import { CURRENCY } from '@/store/modules/display/config';
 
 const SaveQueryFormModal = () => import('@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue');
 const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
-const PdfDownloadOverlay = () => import('@/common/components/layouts/PdfDownloadOverlay.vue');
+const PdfDownloadOverlay = () => import('@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue');
 const CostAnalysisPreview = () => import('@/services/billing/cost-management/cost-analysis/modules/CostAnalysisPreview.vue');
 
 export default {
@@ -135,6 +137,13 @@ export default {
             itemIdForDeleteQuery: '',
             visiblePdfOverlay: false,
             previewItems: [] as Item[],
+            currency: computed(() => store.state.display.currency),
+            pdfFontLanguage: computed<string>(() => {
+                // https://pdfmake.github.io/docs/0.1/fonts/custom-fonts-client-side/url/
+                if (state.currency === CURRENCY.USD) return 'en';
+                if (state.currency === CURRENCY.KRW) return 'ko';
+                return 'jp';
+            }),
         });
 
         const saveQueryFormState = reactive({

@@ -26,7 +26,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 import { CostQuerySetModel } from '@/services/billing/cost-management/type';
 import CostAnalysisHeader from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisHeader.vue';
-import { Item } from '@/common/components/layouts/PdfDownloadOverlay.vue';
+import { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 
 export default {
     name: 'CostAnalysisPreview',

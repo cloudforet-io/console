@@ -81,7 +81,7 @@ import { Location } from 'vue-router';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { CostAnalyzeModel, UsdCost } from '@/services/billing/cost-management/widgets/type';
 import { ExcelDataField } from '@/store/modules/file/type';
-import { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay.vue';
+import { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import { i18n } from '@/translations';
 import { ResourceMap } from '@/store/modules/resource/type';
 

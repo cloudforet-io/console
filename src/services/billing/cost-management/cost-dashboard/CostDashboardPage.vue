@@ -90,7 +90,7 @@ import {
 import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 import { SpaceRouter } from '@/router';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import PdfDownloadOverlay, { Item } from '@/common/components/layouts/PdfDownloadOverlay.vue';
+import PdfDownloadOverlay, { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import CostDashboardPreview from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPreview.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import { CostDashboardState } from '@/services/billing/cost-management/cost-dashboard/store/type';

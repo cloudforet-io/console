@@ -50,12 +50,12 @@ import { PButton, PIconTextButton, PI } from '@spaceone/design-system';
 import { toPng } from 'html-to-image';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import { TCreatedPdf } from 'pdfmake/build/pdfmake';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 // eslint-disable-next-line import/extensions,import/no-unresolved
-import { Content } from 'pdfmake/interfaces';
-import { gray } from '@/styles/colors';
-
-(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
+import { Content, ContentText, TableCell } from 'pdfmake/interfaces';
+import { gray, black, white } from '@/styles/colors';
+import {
+    pdfFontInfoMap, PdfFontFamily, Language, fontLanguages, pdfFontFamily,
+} from '@/common/components/layouts/PdfDownloadOverlay/fonts';
 
 const paperSizes = ['A4'] as const;
 const modes = ['ELEMENT_EMBED', 'PDF_EMBED', 'PDF_NEW_TAB'] as const;
@@ -77,7 +77,7 @@ type ItemType = 'data-table'|'image'
 export interface Item {
     type?: ItemType; // default: 'image'
     element?: HTMLElement;
-    data?: string[][];
+    data?: (string | ContentText)[][];
 }
 
 interface Props {
@@ -87,6 +87,7 @@ interface Props {
     paperSize: PaperSize;
     orientation: Orientation;
     fileName: string;
+    fontLanguage?: Language;
 }
 
 const COMPLETED_ELEMENT_RATE = 70;
@@ -138,6 +139,13 @@ export default defineComponent<Props>({
             type: String,
             default: 'report',
         },
+        fontLanguage: {
+            type: String,
+            default: fontLanguages.en,
+            validator(value: Language) {
+                return Object.values(fontLanguages).includes(value);
+            },
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -153,6 +161,11 @@ export default defineComponent<Props>({
             isImageConvertingStarted: false,
             isPdfConvertingStarted: false,
             progressRate: 0,
+            font: computed<PdfFontFamily>(() => {
+                if (fontLanguages.en === props.fontLanguage) return pdfFontFamily.NotoSans;
+                if (fontLanguages.ko === props.fontLanguage) return pdfFontFamily.NotoSansKo;
+                return pdfFontFamily.NotoSansJp;
+            }),
         });
         let fakeRate;
         const addRate = () => {
@@ -169,14 +182,29 @@ export default defineComponent<Props>({
             emit('update:visible', value);
         };
 
+        const applyTableHeaderStyle = (data: (string | ContentText)[][]): TableCell[][] => {
+            const tableData = data;
+            if (tableData[0]) {
+                tableData[0] = tableData[0].map(item => ({
+                    text: item,
+                    style: 'tableHeader',
+                }));
+            }
+            return tableData;
+        };
+
         const createContentWithItem = async ({ element, type, data }: Item): Promise<Content> => {
             if (type === 'data-table') {
                 if (!data) throw Error('[PdfDownloadOverlay] data-table type item must have data.');
+                const tableBody = applyTableHeaderStyle(data);
                 return data.length ? {
                     table: {
                         headerRows: 1,
-                        body: data,
+                        body: tableBody,
                     },
+                    fillColor: white,
+                    margin: [0, 4],
+                    layout: 'DataTable',
                 } : {} as Content;
             }
 
@@ -190,29 +218,59 @@ export default defineComponent<Props>({
             };
         };
 
-        const createPdfWithContents = (contents: Content[]) => pdfMake.createPdf({
-            pageSize: props.paperSize,
-            pageOrientation: props.orientation,
-            pageMargins: [PAGE_PAD_X, PAGE_PAD_Y],
-            content: contents,
-            background: () => ({
-                canvas: [
-                    {
-                        type: 'rect',
-                        x: 0,
-                        y: 0,
-                        w: state.paperSizeInfo.width,
-                        h: state.paperSizeInfo.height,
-                        color: gray[100],
-                    },
-                ],
-            }),
-            styles: {
-                imageRowWrapper: {
-                    margin: [0, IMAGE_ROW_MARGIN_Y],
+        const makeTableLayouts = () => ({
+            DataTable: {
+                hLineWidth: (i, node) => {
+                    if (i === node.table.body.length) return 0;
+                    return 1;
+                },
+                vLineWidth: () => 0,
+                hLineColor: i => (i === 0 || i === 1 ? black : gray[300]),
+                paddingLeft: i => (i === 0 ? 8 : 2),
+                paddingTop: (i) => {
+                    if (i === 0) return 3;
+                    return 9;
+                },
+                paddingRight: (i, node) => (node?.table.widths.length - 1 === i ? 6 : 8),
+                paddingBottom: (i) => {
+                    if (i === 0) return 3;
+                    return 9;
                 },
             },
         });
+        const createPdfWithContents = (contents: Content[]) => {
+            const tableLayouts = makeTableLayouts();
+            return pdfMake.createPdf({
+                pageSize: props.paperSize,
+                pageOrientation: props.orientation,
+                pageMargins: [PAGE_PAD_X, PAGE_PAD_Y],
+                content: contents,
+                background: () => ({
+                    canvas: [
+                        {
+                            type: 'rect',
+                            x: 0,
+                            y: 0,
+                            w: state.paperSizeInfo.width,
+                            h: state.paperSizeInfo.height,
+                            color: gray[100],
+                        },
+                    ],
+                }),
+                styles: {
+                    imageRowWrapper: {
+                        margin: [0, IMAGE_ROW_MARGIN_Y],
+                    },
+                    tableHeader: {
+                        bold: true,
+                        color: black,
+                    },
+                },
+                defaultStyle: {
+                    font: state.font,
+                },
+            }, tableLayouts, pdfFontInfoMap);
+        };
 
         const makePdfWithItems = async (items: Item[]) => {
             state.loading = true;

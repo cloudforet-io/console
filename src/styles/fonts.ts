@@ -13,7 +13,7 @@ const robotoConfig: FontConfig = {
     formats: ['woff2', 'woff'],
 };
 
-const notoSansConfigMap: Record<string, FontConfig> = {
+export const notoSansConfigMap: Record<string, FontConfig> = {
     en: {
         family: 'Noto Sans',
         urlPrefix: 'fonts/noto-sans/en/noto-sans-v12-latin-',
@@ -135,7 +135,6 @@ export const fontInfoMap: Record<string, FontInfo[]> = {
         },
     ],
 };
-
 
 export const loadFont = async (fontsInfo: FontInfo[]) => {
     const fonts = fontsInfo.map(({ family, source, descriptors }) => {
