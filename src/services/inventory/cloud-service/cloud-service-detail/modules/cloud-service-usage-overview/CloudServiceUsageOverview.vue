@@ -1,28 +1,26 @@
 <template>
     <fragment>
-        <p-card class="cloud-service-usage-overview">
-            <template #header>
+        <div class="cloud-service-usage-overview">
+            <header>
                 {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.USAGE_OVERVIEW') }}
-                <p-button size="sm" style-type="primary-dark" :outline="true"
-                          font-weight="bold" class="show-button"
+                <p-button size="sm" style-type="gray-border" :outline="true"
+                          font-weight="bold"
+                          :disabled="schemaLoading || !chartWidgetSchemaList.length"
                           @click="handleClickShowAll"
                 >
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_CHARTS') }}
                 </p-button>
-            </template>
-            <p-data-loader :loading="layoutLoading" :data="widgetSchemaList" class="stat-wrapper">
-                <p-dynamic-widget v-for="(schema, idx) in widgetSchemaList" :key="`${cloudServiceTypeId}-${idx}`"
-                                  class="stat-summary"
-                                  :type="schema.type"
-                                  :name="schema.name"
-                                  :data="dataList[idx]"
-                                  :loading="dataLoading"
-                                  :schema-options="schema.options"
-                                  :field-handler="fieldHandler"
-                />
-            </p-data-loader>
-        </p-card>
+            </header>
+            <cloud-service-usage-overview-summary :schema-loading="schemaLoading"
+                                                  :data-loading="dataLoading"
+                                                  :data-list="summaryDataList"
+                                                  :widget-schema-list="summaryWidgetSchemaList"
+                                                  :cloud-service-type-id="cloudServiceTypeId"
+            />
+        </div>
         <cloud-service-usage-overview-detail-modal v-model="usageOverviewDetailModalVisible"
+                                                   :schema-list="widgetSchemaList"
+                                                   :summary-data-list="summaryDataList"
                                                    :cloud-service-type-info="cloudServiceTypeInfo"
                                                    :filters="filters"
                                                    :period="period"
@@ -43,10 +41,9 @@ import axios, { CancelTokenSource } from 'axios';
 import dayjs from 'dayjs';
 
 import {
-    PButton, PCard, PDataLoader, PDynamicWidget,
+    PButton,
 } from '@spaceone/design-system';
 import {
-    DynamicWidgetFieldHandler,
     DynamicWidgetSchema,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
 
@@ -56,8 +53,6 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { Filter } from '@spaceone/console-core-lib/space-connector/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { Reference } from '@/lib/reference/type';
-import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
 import CloudServiceUsageOverviewDetailModal
     from '@/services/inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewDetailModal.vue';
@@ -65,6 +60,8 @@ import {
     CloudServiceTypeInfo,
 } from '@/services/inventory/cloud-service/cloud-service-detail/type';
 import { Period } from '@/services/billing/cost-management/type';
+import CloudServiceUsageOverviewSummary
+    from '@/services/inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewSummary.vue';
 
 
 interface Props {
@@ -82,11 +79,10 @@ interface Data {
 export default defineComponent<Props>({
     name: 'CloudServiceUsageOverview',
     components: {
+        CloudServiceUsageOverviewSummary,
         CloudServiceUsageOverviewDetailModal,
-        PDataLoader,
-        PCard,
         PButton,
-        PDynamicWidget,
+
     },
     props: {
         cloudServiceTypeInfo: {
@@ -116,8 +112,10 @@ export default defineComponent<Props>({
         const state = reactive({
             usageOverviewDetailModalVisible: false,
             widgetSchemaList: [] as DynamicWidgetSchema[],
-            layoutLoading: true,
-            dataList: [] as Data[],
+            summaryWidgetSchemaList: computed<DynamicWidgetSchema[]>(() => state.widgetSchemaList.filter(({ type }) => type === 'summary')),
+            chartWidgetSchemaList: computed<DynamicWidgetSchema[]>(() => state.widgetSchemaList.filter(({ type }) => type === 'chart')),
+            schemaLoading: true,
+            summaryDataList: [] as Data[],
             dataLoading: false,
             cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo.cloud_service_type_id ?? ''),
             apiQuery: computed<{filter?: Filter[]; keyword?: string}>(() => {
@@ -141,8 +139,6 @@ export default defineComponent<Props>({
             try {
                 const { provider, group, name } = props.cloudServiceTypeInfo as CloudServiceTypeInfo;
                 const options: any = {
-                    widget_type: 'card',
-                    limit: 3,
                     provider,
                     cloud_service_group: group,
                     cloud_service_type: name,
@@ -198,23 +194,16 @@ export default defineComponent<Props>({
         };
 
         const getDataListWithSchema = debounce(async () => {
-            state.dataLoading = true;
+            if (!state.dataLoading) state.dataLoading = true;
             cancelPreviousDataFetchRequests();
-            const results = await Promise.allSettled(state.widgetSchemaList.map((schema, i) => fetchDataWithSchema(schema, i)));
-            state.dataList = results.map((d) => {
+            const results: any = await Promise.allSettled(state.summaryWidgetSchemaList.map((schema, i) => fetchDataWithSchema(schema, i)));
+            state.summaryDataList = results.map((d) => {
                 if (d.status === 'fulfilled') return d.value;
                 return {};
             });
             state.dataLoading = false;
         }, 300);
 
-        /* Component Props */
-        const fieldHandler: DynamicWidgetFieldHandler<Record<'reference', Reference>> = (field) => {
-            if (field.extraData?.reference) {
-                return referenceFieldFormatter(field.extraData.reference, field.data);
-            }
-            return {};
-        };
 
         /* Event Handlers */
         const handleClickShowAll = () => {
@@ -230,89 +219,34 @@ export default defineComponent<Props>({
 
         watch(() => state.cloudServiceTypeId, async (cloudServiceTypeId) => {
             if (!props.disabled && cloudServiceTypeId) {
+                state.schemaLoading = true;
+                state.dataLoading = true;
                 await getWidgetSchemaList();
                 await getDataListWithSchema();
-                if (state.layoutLoading) state.layoutLoading = false;
+                state.schemaLoading = false;
             }
         }, { immediate: true });
 
         return {
             ...toRefs(state),
             handleClickShowAll,
-            fieldHandler,
         };
     },
 });
 </script>
 
 <style lang="postcss" scoped>
-.cloud-service-usage-overview::v-deep {
+.cloud-service-usage-overview {
     padding: 0 1rem 1.5rem;
 
     header {
-        @apply flex items-center;
-        .show-button {
-            @apply ml-auto;
-        }
-    }
-
-    .body {
-        padding: 1rem;
-    }
-
-    .stat-wrapper {
-        height: 100%;
-        .data-wrapper {
-            @apply flex;
-            flex-wrap: wrap;
-            row-gap: 1.25rem;
-        }
-        .stat-summary {
-            @apply border-gray-200 rounded-none;
-            width: 33.3%;
-            min-width: auto;
-            height: auto;
-            min-height: 1.75rem;
-            padding: 0 1rem;
-            border-width: 0 0 0 1px;
-            &:nth-of-type(3n-2) {
-                @apply border-l-0 pl-0;
-            }
-            &:nth-of-type(3n) {
-                @apply pr-0;
-            }
-            .name {
-                @apply text-gray-700 mr-2;
-                font-size: 1rem;
-                line-height: 1.2;
-            }
-            .value {
-                @apply flex-shrink-0;
-            }
-        }
-    }
-}
-
-@screen mobile {
-    .cloud-service-usage-overview::v-deep {
-        .body {
-            padding: 0 1rem;
-        }
-        .stat-wrapper {
-            .data-wrapper {
-                @apply flex-col;
-                row-gap: 0;
-            }
-
-            .stat-summary {
-                @apply flex items-center flex-col items-start w-full border-l-0 border-t;
-                min-height: 5.0625rem;
-                padding: 1rem 0;
-                &:nth-of-type(1) {
-                    @apply border-t-0;
-                }
-            }
-        }
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: bold;
+        font-size: 1rem;
+        line-height: 1.25rem;
+        margin-bottom: 0.625rem;
     }
 }
 </style>

@@ -11,23 +11,25 @@
         <template #body>
             <cloud-service-period-filter read-only :period="period" />
             <p-query-search-tags :tags="queryTags" read-only class="pt-4 border-t border-gray-200" />
-            <p-data-loader v-if="cloudServiceTypeId" :loading="layoutLoading"
-                           :disable-empty-case="layoutLoading || dataLoading"
-                           :data="widgetSchemaList" class="widget-wrapper"
-            >
-                <template v-for="(schema, idx) in widgetSchemaList">
+            <cloud-service-usage-overview-summary v-if="summaryDataList.length"
+                                                  :data-loading="dataLoading"
+                                                  :data-list="summaryDataList"
+                                                  :widget-schema-list="summaryWidgetSchemaList"
+                                                  :cloud-service-type-id="cloudServiceTypeId"
+            />
+            <div class="chart-widget-wrapper">
+                <template v-for="(schema, idx) in chartWidgetSchemaList">
                     <p-dynamic-widget :key="`${cloudServiceTypeId}-${idx}`"
-                                      :index="widgetIndices[idx]"
+                                      :index="idx"
                                       :type="schema.type"
                                       :name="schema.name"
-                                      :data="dataList[idx]"
+                                      :data="chartDataList[idx]"
                                       :loading="dataLoading"
                                       :schema-options="schema.options"
                                       :field-handler="fieldHandler"
-                                      :class="{'line-break': widgetSchemaList[idx + 1] && widgetSchemaList[idx + 1].type !== schema.type}"
                     />
                 </template>
-            </p-data-loader>
+            </div>
         </template>
         <template #confirm-button>
             Close
@@ -45,7 +47,7 @@ import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
 import {
-    PButtonModal, PDataLoader, PDivider, PDynamicWidget, PQuerySearchTags,
+    PButtonModal, PDivider, PDynamicWidget, PQuerySearchTags,
 } from '@spaceone/design-system';
 import {
     DynamicWidgetFieldHandler,
@@ -66,10 +68,14 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import { CloudServiceTypeInfo } from '@/services/inventory/cloud-service/cloud-service-detail/type';
 import { Period } from '@/services/billing/cost-management/type';
 import CloudServicePeriodFilter from '@/services/inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
+import CloudServiceUsageOverviewSummary
+    from '@/services/inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewSummary.vue';
 
 
 interface Props {
     visible: boolean;
+    schemaList: DynamicWidgetSchema[];
+    summaryDataList: Data[][];
     cloudServiceTypeInfo: CloudServiceTypeInfo;
     isServer: boolean;
     filters: QueryStoreFilter[];
@@ -84,9 +90,9 @@ interface Data {
 export default defineComponent<Props>({
     name: 'CloudServiceUsageOverviewDetailModal',
     components: {
+        CloudServiceUsageOverviewSummary,
         CloudServicePeriodFilter,
         PButtonModal: PButtonModal as any,
-        PDataLoader,
         PDynamicWidget,
         PDivider,
         PQuerySearchTags,
@@ -99,6 +105,14 @@ export default defineComponent<Props>({
         visible: {
             type: Boolean,
             required: true,
+        },
+        schemaList: {
+            type: Array,
+            default: () => [],
+        },
+        summaryDataList: {
+            type: Array,
+            default: () => [],
         },
         cloudServiceTypeInfo: {
             type: Object as () => CloudServiceTypeInfo,
@@ -119,21 +133,13 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }) {
         const queryHelper = new QueryHelper();
-
-
         const state = reactive({
             proxyVisible: props.visible,
             header: computed(() => `Usage Overview of ${props.cloudServiceTypeInfo?.name}`),
             widgetSchemaList: [] as DynamicWidgetSchema[],
-            widgetIndices: computed<number[]>(() => {
-                let chartTypeIdx = 0;
-                return state.widgetSchemaList.map((d) => {
-                    if (d.type === 'chart') return chartTypeIdx++;
-                    return 0;
-                });
-            }),
-            layoutLoading: true,
-            dataList: [] as Data[][],
+            summaryWidgetSchemaList: computed<DynamicWidgetSchema[]>(() => props.schemaList.filter(({ type }) => type === 'summary')),
+            chartWidgetSchemaList: computed<DynamicWidgetSchema[]>(() => props.schemaList.filter(({ type }) => type === 'chart')),
+            chartDataList: [] as Data[][],
             dataLoading: true,
             cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo?.cloud_service_type_id ?? ''),
             queryTags: [] as QueryTag[],
@@ -149,28 +155,6 @@ export default defineComponent<Props>({
         });
 
 
-        const fetchSchemaList = async (): Promise<DynamicWidgetSchema[]> => {
-            try {
-                const { provider, group, name } = props.cloudServiceTypeInfo as CloudServiceTypeInfo;
-                const options = {
-                    provider,
-                    cloud_service_group: group,
-                    cloud_service_type: name,
-                };
-
-                const { widget } = await SpaceConnector.client.addOns.pageSchema.get({
-                    resource_type: props.isServer ? 'inventory.Server' : 'inventory.CloudService',
-                    schema: 'widget',
-                    options,
-                });
-
-                return widget ?? [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return [];
-            }
-        };
-
         const fetchDataWithSchema = async (schema: DynamicWidgetSchema): Promise<Data[]> => {
             try {
                 const { results } = await SpaceConnector.client.inventory[props.isServer ? 'server' : 'cloudService'].analyze({
@@ -185,26 +169,17 @@ export default defineComponent<Props>({
             }
         };
 
-        const cachedSchemaList = {};
-        const getWidgetSchemaList = async () => {
-            state.layoutLoading = true;
-            const schemaList = cachedSchemaList[state.cloudServiceTypeId];
-            if (schemaList) state.widgetSchemaList = schemaList;
-            else {
-                state.widgetSchemaList = await fetchSchemaList();
-                cachedSchemaList[state.cloudServiceTypeId] = state.widgetSchemaList;
-            }
-            state.layoutLoading = false;
-        };
-
 
         const getDataListWithSchema = async () => {
             state.dataLoading = true;
-            const results: any = await Promise.allSettled(state.widgetSchemaList.map(schema => fetchDataWithSchema(schema)));
-            state.dataList = results.map((d) => {
+
+            const results: any[] = await Promise.allSettled(state.chartWidgetSchemaList.map(schema => fetchDataWithSchema(schema)));
+
+            state.chartDataList = results.map((d) => {
                 if (d.status === 'fulfilled') return d.value;
                 return [];
             });
+
             state.dataLoading = false;
         };
 
@@ -224,29 +199,22 @@ export default defineComponent<Props>({
 
 
         /* Watchers */
-        watch(() => props.filters, (filters) => {
-            const { filter, keyword } = queryHelper.setFilters(filters).apiQuery;
-
-            state.apiQuery.filter = filter;
-            state.apiQuery.keyword = keyword;
-            state.queryTags = queryHelper.queryTags;
-        }, { immediate: true });
-
         watch(() => props.visible, (visible) => {
             if (visible !== state.proxyVisible) state.proxyVisible = visible;
         });
 
+        watch([() => props.filters, () => state.proxyVisible], async ([filters, visible]) => {
+            if (visible) {
+                const { filter, keyword } = queryHelper.setFilters(filters as QueryStoreFilter[]).apiQuery;
 
-        watch(() => state.proxyVisible, async (visible) => {
-            if (visible && state.cloudServiceTypeId) {
-                await getWidgetSchemaList();
+                state.apiQuery.filter = filter;
+                state.apiQuery.keyword = keyword;
+                state.queryTags = queryHelper.queryTags;
                 await getDataListWithSchema();
             } else {
-                state.widgetSchemaList = [];
-                state.dataList = [];
+                state.chartDataList = [];
             }
         }, { immediate: true });
-
 
         return {
             ...toRefs(state),
@@ -265,21 +233,14 @@ export default defineComponent<Props>({
         flex-direction: column;
         padding: 1rem 2.5rem;
     }
-    .widget-wrapper {
-        padding: 0.13rem 0 0.5rem;
+    .chart-widget-wrapper {
+        @apply overflow-visible;
+        padding: 1.5rem 0 0.5rem;
         flex: 1;
-        > .data-loader-container {
-            height: auto;
-            > .data-wrapper {
-                height: 100%;
-                display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                grid-gap: 0.5rem;
-            }
-        }
-    }
-    .line-break + .p-dynamic-widget-chart {
-        grid-column-start: 1;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-gap: 0.5rem;
     }
 
     .p-dynamic-chart-column {
@@ -299,14 +260,6 @@ export default defineComponent<Props>({
         min-height: 21.625rem;
     }
 
-    .p-data-loader {
-        .data-loader-container {
-            @apply overflow-visible;
-            .data-wrapper {
-                @apply overflow-visible;
-            }
-        }
-    }
     .amcharts-Polyspline {
         @apply hidden;
     }
@@ -314,12 +267,8 @@ export default defineComponent<Props>({
 
 @screen laptop {
     .cloud-service-usage-overview-detail-modal::v-deep {
-        .widget-wrapper {
-            > .data-loader-container {
-                > .data-wrapper {
-                    grid-template-columns: repeat(2, minmax(0, 1fr));
-                }
-            }
+        .chart-widget-wrapper {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 }
@@ -329,12 +278,8 @@ export default defineComponent<Props>({
         .modal-body {
             height: 70vh;
         }
-        .widget-wrapper {
-            > .data-loader-container > {
-                .data-wrapper {
-                    grid-template-columns: 1fr;
-                }
-            }
+        .chart-widget-wrapper {
+            grid-template-columns: 1fr;
         }
     }
 }
