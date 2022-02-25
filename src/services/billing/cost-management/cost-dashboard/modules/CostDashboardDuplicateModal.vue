@@ -1,0 +1,189 @@
+<template>
+    <p-button-modal :visible="proxyVisible" header-title="Duplicate Dashboard"
+                    size="sm"
+                    :disabled="!isAllValid"
+                    @confirm="handleConfirm"
+                    @update:visible="handleUpdateVisible"
+    >
+        <template #body>
+            <p-field-group :label="'Dashboard Name'"
+                           :invalid="invalidState.name"
+                           :invalid-text="invalidTexts.name"
+                           required
+            >
+                <p-text-input :value="name" :invalid="invalidState.name" @input="setForm('name', $event)" />
+            </p-field-group>
+            <p-check-box v-model="includesFilter">
+                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.APPLIED_FILTER') }}
+            </p-check-box>
+            <p-field-group label="Dashboard Visibility"
+                           :invalid="invalidState.visibility"
+                           :invalida-text="invalidTexts.visibility"
+                           required
+            >
+                <p-radio v-for="{ name, label } in visibilityList" :key="name" :value="name"
+                         :selected="visibility"
+                         class="mr-4"
+                         @change="setForm('visibility', $event)"
+                >
+                    <span class="capitalize ml-1">{{ label.toLowerCase() }}</span>
+                </p-radio>
+            </p-field-group>
+        </template>
+    </p-button-modal>
+</template>
+
+<script lang="ts">
+import {
+    defineComponent,
+    reactive, toRefs, watch,
+} from '@vue/composition-api';
+import {
+    PButtonModal, PCheckBox, PFieldGroup, PRadio, PTextInput,
+} from '@spaceone/design-system';
+import { useFormValidator } from '@/common/composables/form-validator';
+import {
+    CustomLayout,
+    DASHBOARD_PRIVACY_TYPE, DashboardCreateParam,
+    DashboardInfo,
+    DashboardPrivacyType,
+} from '@/services/billing/cost-management/cost-dashboard/type';
+import { i18n } from '@/translations';
+import { fetchDefaultLayoutData } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
+
+interface Props {
+    visible: boolean;
+    dashboard: DashboardInfo;
+}
+export default defineComponent<Props>({
+    name: 'CostDashboardDashboardDuplicateModal',
+    components: {
+        PButtonModal,
+        PRadio,
+        PFieldGroup,
+        PTextInput,
+        PCheckBox,
+    },
+    model: {
+        prop: 'visible',
+        event: 'update:visible',
+    },
+    props: {
+        visible: {
+            type: Boolean,
+            required: true,
+        },
+        dashboard: {
+            type: Object as () => DashboardInfo,
+            default: {},
+        },
+    },
+    setup(props, { emit }) {
+        const {
+            forms: {
+                name,
+                visibility,
+            },
+            setForm,
+            initForm,
+            invalidState,
+            invalidTexts,
+            validate,
+            isAllValid,
+        } = useFormValidator({
+            name: '',
+            visibility: '',
+        }, {
+            name(value: string) { return value.trim().length ? '' : 'Required Field'; },
+            visibility(value: DashboardPrivacyType) { return value.length ? '' : 'Required Field'; },
+        });
+        const state = reactive({
+            proxyVisible: props.visible,
+            visibilityList: [
+                {
+                    name: DASHBOARD_PRIVACY_TYPE.USER,
+                    label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.PRIVATE'),
+                },
+                {
+                    name: DASHBOARD_PRIVACY_TYPE.PUBLIC,
+                    label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.PUBLIC'),
+                },
+            ],
+            includesFilter: false,
+        });
+
+        const handleUpdateVisible = (visible) => {
+            state.proxyVisible = visible;
+            emit('update:visible', visible);
+        };
+
+        const getCustomLayouts = async () => {
+            const hasDefaultId = Object.prototype.hasOwnProperty.call(props.dashboard, 'default_layout_id');
+            if (hasDefaultId && (!props.dashboard.custom_layouts || props.dashboard.custom_layouts?.length === 0)) {
+                return await fetchDefaultLayoutData(props.dashboard.default_layout_id as string) as CustomLayout[];
+            }
+            return props.dashboard.custom_layouts as CustomLayout[];
+        };
+
+        const makeDashboardCreateParam = async (): Promise<DashboardCreateParam> => ({
+            name: name.value,
+            custom_layouts: await getCustomLayouts(),
+            period_type: 'AUTO',
+            default_filter: state.includesFilter ? props.dashboard.default_filter : undefined,
+        });
+
+        const createPublicDashboard = async (): Promise<string|undefined> => {
+            try {
+                await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
+                await store.dispatch('service/costDashboard/setDashboardList');
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
+            }
+            return undefined;
+        };
+
+        const createUserDashboard = async (): Promise<string|undefined> => {
+            try {
+                await SpaceConnector.client.costAnalysis.userDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
+                await store.dispatch('service/costDashboard/setDashboardList');
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
+            }
+            return undefined;
+        };
+
+        const handleConfirm = () => {
+            if (!isAllValid) return;
+            if (visibility.value === DASHBOARD_PRIVACY_TYPE.PUBLIC) createPublicDashboard();
+            else createUserDashboard();
+            emit('update:visible', false);
+            emit('confirm');
+        };
+
+        const init = () => {
+            initForm('name', props.dashboard.name);
+            initForm('visibility', '');
+        };
+
+        watch(() => props.visible, (visible) => {
+            if (visible !== state.proxyVisible) state.proxyVisible = visible;
+            init();
+        });
+        return {
+            name,
+            visibility,
+            invalidState,
+            invalidTexts,
+            setForm,
+            validate,
+            isAllValid,
+            ...toRefs(state),
+            handleConfirm,
+            handleUpdateVisible,
+        };
+    },
+});
+</script>

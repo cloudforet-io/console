@@ -17,7 +17,7 @@
                                :outline="false"
                                @click.stop="handleClickDeleteDashboard"
                 />
-                <cost-dashboard-more-menu :dashboard-id="dashboardId" />
+                <cost-dashboard-more-menu :dashboard-id="dashboardId" :dashboard="dashboard" />
             </div>
             <div class="right-part">
                 <cost-dashboard-period-select-dropdown :dashboard-id="dashboardId"
@@ -50,6 +50,11 @@
                       :visible.sync="checkDeleteState.visible"
                       :loading="checkDeleteState.loading"
                       @confirm="handleDeleteDashboardConfirm"
+        />
+        <cost-dashboard-update-modal :visible.sync="updateModalVisible"
+                                     :dashboard-id="dashboardId"
+                                     :dashboard-name="dashboard.name"
+                                     @confirm="handleUpdateConfirm"
         />
         <pdf-download-overlay v-model="visiblePdfDownload" :items="previewItems">
             <cost-dashboard-preview v-if="dashboardId"
@@ -91,10 +96,13 @@ import { registerServiceStore } from '@/common/composables/register-service-stor
 import { CostDashboardState } from '@/services/billing/cost-management/cost-dashboard/store/type';
 import CostDashboardStoreModule from '@/services/billing/cost-management/cost-dashboard/store';
 import { getDashboardLayout } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
+import CostDashboardUpdateModal
+    from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardUpdateModal.vue';
 
 export default {
     name: 'CostDashboardPage',
     components: {
+        CostDashboardUpdateModal,
         CostDashboardPreview,
         PdfDownloadOverlay,
         CostDashboardPeriodSelectDropdown,
@@ -127,6 +135,8 @@ export default {
             homeDashboardId: computed<string|undefined>(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
             visiblePdfDownload: false,
             previewItems: [] as Item[],
+            dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(state.dashboard, 'public_dashboard_id') ? 'public' : 'user')),
+            updateModalVisible: false,
         });
 
         const routeState = reactive({
@@ -145,7 +155,7 @@ export default {
 
         /* event */
         const handleClickEditDashboard = () => {
-            console.log('edit dashboard');
+            state.updateModalVisible = true;
         };
 
         const handleClickDeleteDashboard = () => {
@@ -171,6 +181,10 @@ export default {
                 checkDeleteState.loading = false;
                 checkDeleteState.visible = false;
             }
+        };
+
+        const handleUpdateConfirm = (name) => {
+            state.dashboard.name = name;
         };
 
         const handleClickPdfDownload = () => {
@@ -236,6 +250,7 @@ export default {
             checkDeleteState,
             handleClickEditDashboard,
             handleClickDeleteDashboard,
+            handleUpdateConfirm,
             handleDeleteDashboardConfirm,
             handleClickPdfDownload,
             handleClickCustomize,

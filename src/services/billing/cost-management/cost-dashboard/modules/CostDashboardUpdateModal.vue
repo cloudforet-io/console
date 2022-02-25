@@ -1,0 +1,132 @@
+<template>
+    <p-button-modal :visible="proxyVisible" header-title="Update Dashboard"
+                    :disabled="!isAllValid"
+                    size="sm"
+                    @confirm="handleConfirm"
+                    @update:visible="handleUpdateVisible"
+    >
+        <template #body>
+            <p-field-group :label="'Dashboard Name'"
+                           :invalid="invalidState.name"
+                           :invalid-text="invalidTexts.name"
+                           required
+            >
+                <p-text-input :value="name" :invalid="invalidState.name" @input="setForm('name', $event)" />
+            </p-field-group>
+        </template>
+    </p-button-modal>
+</template>
+
+<script lang="ts">
+import {
+    defineComponent,
+    reactive, toRefs, watch,
+} from '@vue/composition-api';
+import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
+import { useFormValidator } from '@/common/composables/form-validator';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { store } from '@/store';
+
+interface Props {
+    visible: boolean;
+    dashboardId: string;
+    dashboardName: string;
+}
+export default defineComponent<Props>({
+    name: 'CostDashboardUpdateModal',
+    components: {
+        PButtonModal,
+        PFieldGroup,
+        PTextInput,
+    },
+    model: {
+        prop: 'visible',
+        event: 'update:visible',
+    },
+    props: {
+        visible: {
+            type: Boolean,
+            required: true,
+        },
+        dashboardId: {
+            type: String,
+            default: '',
+        },
+        dashboardName: {
+            type: String,
+            default: '',
+        },
+    },
+    setup(props, { emit }) {
+        const {
+            forms: {
+                name,
+            },
+            setForm,
+            initForm,
+            invalidState,
+            invalidTexts,
+            validate,
+            isAllValid,
+        } = useFormValidator({
+            name: '',
+        }, {
+            name(value: string) { return value.trim().length ? '' : 'Required Field'; },
+        });
+        const state = reactive({
+            proxyVisible: props.visible,
+        });
+
+        const updateDashboard = async () => {
+            try {
+                if (props.dashboardId.startsWith('user')) {
+                    await SpaceConnector.client.costAnalysis.userDashboard.update({
+                        user_dashboard_id: props.dashboardId,
+                        name: name.value,
+                    });
+                } else {
+                    await SpaceConnector.client.costAnalysis.publicDashboard.update({
+                        public_dashboard_id: props.dashboardId,
+                        name: name.value,
+                    });
+                }
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
+
+        const handleConfirm = () => {
+            updateDashboard();
+            store.dispatch('service/costDashboard/setDashboardList');
+            emit('update:visible', false);
+            emit('confirm', name.value);
+        };
+
+        const handleUpdateVisible = (visible) => {
+            state.proxyVisible = visible;
+            emit('update:visible', visible);
+        };
+
+        const init = () => {
+            initForm('name', props.dashboardName);
+        };
+
+        watch(() => props.visible, (visible) => {
+            if (visible !== state.proxyVisible) state.proxyVisible = visible;
+            init();
+        });
+        return {
+            name,
+            invalidState,
+            invalidTexts,
+            setForm,
+            validate,
+            isAllValid,
+            ...toRefs(state),
+            handleConfirm,
+            handleUpdateVisible,
+        };
+    },
+});
+</script>

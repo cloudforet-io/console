@@ -63,7 +63,7 @@ export class SpaceRouter {
                 }
             } else if (!to.meta?.excludeAuth) {
                 const res = await SpaceConnector.refreshAccessToken(false);
-                if ((!isTokenAlive && res) || !res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
+                if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
             }
             next(nextLocation);
         });
