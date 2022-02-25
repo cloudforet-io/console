@@ -60,7 +60,7 @@ export default {
         const state = reactive({
             selectedTemplate: computed(() => store.state.service?.costDashboard?.selectedTemplate),
             defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboard?.defaultFilter),
-            selectedPrivacy: computed<DashboardPrivacyType>(() => store.state.service?.costDashboard?.selectedPrivacy),
+            selectedPrivacy: computed<DashboardPrivacyType>(() => store.state.service?.costDashboard?.selectedDashboardPrivacy),
         });
 
         const getCustomLayouts = async () => {
@@ -80,6 +80,7 @@ export default {
 
         const createPublicDashboard = async (): Promise<string|undefined> => {
             try {
+                console.log('public');
                 const { public_dashboard_id } = await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
                 return public_dashboard_id;
             } catch (e) {
@@ -110,6 +111,7 @@ export default {
         const handleClickCreate = async () => {
             const createdDashboardId = state.selectedPrivacy === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
             if (createdDashboardId) goToCustomizePage(createdDashboardId);
+            store.commit('service/costDashboard/setDashboardPrivacy', DASHBOARD_PRIVACY_TYPE.USER);
         };
 
         return {

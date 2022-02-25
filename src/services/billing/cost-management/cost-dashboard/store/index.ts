@@ -14,7 +14,7 @@ const state: CostDashboardState = {
     // for creating dashboard
     selectedTemplate: {},
     defaultFilter: {},
-    selectedDashboardPrivacy: DASHBOARD_PRIVACY_TYPE.PUBLIC,
+    selectedDashboardPrivacy: DASHBOARD_PRIVACY_TYPE.USER,
 
     // for selecting widget
     originSelectedWidget: {} as WidgetInfo,
