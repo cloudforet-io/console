@@ -1,5 +1,6 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.SPC_USAGE_SUMMARY')" class="spc-project-wise-usage-summary"
+    <cost-dashboard-card-widget-layout class="spc-project-wise-usage-summary"
+                                       :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.SPC_USAGE_SUMMARY')"
                                        :widget-link="widgetLink"
                                        :data-range="20"
                                        :print-mode="printMode"
@@ -50,7 +51,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 import config from '@/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
@@ -123,10 +124,11 @@ export default defineComponent<WidgetProps>({
             chartRef: null as HTMLElement | null,
             chart: null as PieChart | null,
             chartRegistry: {},
-            loading: false,
+            loading: true,
             chartData: [] as PieChartData[],
             legends: [] as Legend[],
             projects: computed(() => store.state.resource.project.items),
+            groupBy: computed(() => props.options?.group_by),
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
                 return {
@@ -135,7 +137,7 @@ export default defineComponent<WidgetProps>({
                     query: {
                         chartType: primitiveToQueryString(CHART_TYPE.DONUT),
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
-                        groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
+                        groupBy: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(props.period),
                         filters: objectToQueryString(props.filters),
                     },
@@ -145,7 +147,7 @@ export default defineComponent<WidgetProps>({
         const tableState = reactive({
             items: [],
             fields: computed(() => [
-                { name: 'project_id', label: 'Project' },
+                GROUP_BY_ITEM_MAP[state.groupBy],
                 { name: 'usd_cost', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.FIELD_LABEL.ACCUMULATED_SPENT'), textAlign: 'right' },
             ]),
             totalCount: 20,
@@ -211,7 +213,7 @@ export default defineComponent<WidgetProps>({
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
-                    group_by: [GROUP_BY.PROJECT],
+                    group_by: [state.groupBy],
                     start: dayjs.utc(props.period?.start).format('YYYY-MM'),
                     end: dayjs.utc(props.period?.end).format('YYYY-MM'),
                     limit: 20,
@@ -229,13 +231,9 @@ export default defineComponent<WidgetProps>({
 
                 const results = await fetchData();
 
-                state.chartData = getPieChartData(results, GROUP_BY.PROJECT);
-                state.legends = getLegends(results, GROUP_BY.PROJECT);
-
-                tableState.items = results.map(d => ({
-                    ...d,
-                    project_id: d.project_id ? state.projects[d.project_id]?.label || d.project_id : 'Unknown',
-                }));
+                tableState.items = results;
+                state.chartData = getPieChartData(results, state.groupBy);
+                state.legends = getLegends(results, state.groupBy);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.chartData = [];

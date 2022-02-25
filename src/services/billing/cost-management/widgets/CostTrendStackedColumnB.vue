@@ -1,7 +1,10 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="name ? name :$t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROVIDER')" :widget-link="widgetLink" :print-mode="printMode">
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROVIDER')"
+                                       :widget-link="widgetLink"
+                                       :print-mode="printMode"
+    >
         <cost-dashboard-stacked-column-widget
-            :group-by="GROUP_BY.PROVIDER"
+            :group-by="groupBy"
             :currency="currency"
             :currency-rates="currencyRates"
             :period="period"
@@ -25,11 +28,12 @@ import CostDashboardCardWidgetLayout
 import CostDashboardStackedColumnWidget
     from '@/services/billing/cost-management/widgets/modules/CostDashboardStackedColumnWidget.vue';
 
-import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { CURRENCY } from '@/store/modules/display/config';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { WidgetOptions } from '@/services/billing/cost-management/cost-dashboard/type';
 
 
 export default defineComponent<WidgetProps>({
@@ -44,7 +48,7 @@ export default defineComponent<WidgetProps>({
             default: undefined,
         },
         options: {
-            type: Object,
+            type: Object as () => WidgetOptions,
             default: () => ({}),
         },
         currency: {
@@ -70,6 +74,7 @@ export default defineComponent<WidgetProps>({
     },
     setup(props: WidgetProps, { emit }) {
         const state = reactive({
+            groupBy: computed(() => props.options?.group_by),
             widgetLink: computed(() => {
                 const _period = {
                     start: dayjs(props.period.end).subtract(3, 'month').format('YYYY-MM'),
@@ -80,7 +85,7 @@ export default defineComponent<WidgetProps>({
                     params: {},
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                        groupBy: arrayToQueryString([GROUP_BY.PROVIDER]),
+                        groupBy: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(_period),
                         filters: objectToQueryString(props.filters),
                     },
@@ -94,7 +99,6 @@ export default defineComponent<WidgetProps>({
 
         return {
             ...toRefs(state),
-            GROUP_BY,
             handleRendered,
         };
     },

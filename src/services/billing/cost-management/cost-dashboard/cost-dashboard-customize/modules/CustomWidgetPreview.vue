@@ -52,8 +52,8 @@ export default {
     },
     props: {
         selectedItem: {
-            type: Object,
-            default: () => ({}) as WidgetInfo | CostQuerySetModel,
+            type: Object as () => WidgetInfo | CostQuerySetModel,
+            default: () => ({}),
         },
     },
     setup(props) {

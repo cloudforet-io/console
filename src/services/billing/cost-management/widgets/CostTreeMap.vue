@@ -5,7 +5,7 @@
         :widget-link="widgetLink"
         :no-data="!loading && data.length === 0"
         :print-mode="printMode"
-        class="cost-by-project"
+        class="cost-tree-map"
     >
         <p-data-loader :loading="loading" class="chart-wrapper">
             <template #loader>
@@ -25,8 +25,8 @@
             >
                 <template #col-format="{field: { name }, item, index}">
                     <div class="right">
-                        <template v-if="name === 'project'">
-                            <p-status class="project-index"
+                        <template v-if="name === groupBy">
+                            <p-status class="group-by-index"
                                       :text="getConvertedIndex(index, itemSetIdx).toString()"
                                       :icon-color="item.backgroundColor"
                             />
@@ -64,27 +64,26 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
-import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
+import { CostAnalyzeModel, PieChartData, WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import config from '@/lib/config';
-import { store } from '@/store';
 import {
     gray, violet, white,
 } from '@/styles/colors';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { WidgetOptions } from '@/services/billing/cost-management/cost-dashboard/type';
+import { getPieChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
 
 const CATEGORY_KEY = 'category';
 const VALUE_KEY = 'value';
 const MAX_TABLE_COLUMN = 8;
 
-interface CostByProjectChartData {
-    category: string;
-    value: number;
+interface CostTreeMapData extends PieChartData {
     backgroundColor?: string;
     textColor?: string;
 }
@@ -131,13 +130,14 @@ export default defineComponent<WidgetProps>({
             default: false,
         },
     },
-    setup(props: WidgetProps, { emit }) {
+    setup(props: WidgetProps<WidgetOptions>, { emit }) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as TreeMap | null,
             chartRegistry: {},
             loading: false,
-            data: [] as CostByProjectChartData[],
+            groupBy: computed(() => props.options?.group_by),
+            data: [] as CostTreeMapData[],
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
                 return {
@@ -145,18 +145,17 @@ export default defineComponent<WidgetProps>({
                     params: {},
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
-                        groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
+                        groupBy: arrayToQueryString([props.options.group_by]),
                         period: objectToQueryString(props.period),
                         filters: objectToQueryString(props.filters),
                     },
                 };
             }),
-            projects: computed(() => store.state.resource.project.items),
             fields: computed<DataTableField[]>(() => ([
-                { name: 'project', label: 'name' },
+                { name: state.groupBy, label: 'name' },
                 { name: 'value', label: 'Cost', textAlign: 'right' },
             ])),
-            itemSetList: computed<CostByProjectChartData[][]>(() => {
+            itemSetList: computed<CostTreeMapData[][]>(() => {
                 if (state.data.length > MAX_TABLE_COLUMN) return [state.data.slice(0, MAX_TABLE_COLUMN), state.data.slice(MAX_TABLE_COLUMN)];
                 return [state.data];
             }),
@@ -216,8 +215,8 @@ export default defineComponent<WidgetProps>({
                 return '';
             });
         };
-        const getConvertedChartData = (chartData: CostByProjectChartData[]): CostByProjectChartData[] => {
-            const results: CostByProjectChartData[] = [];
+        const getConvertedChartData = (chartData: CostTreeMapData[]): CostTreeMapData[] => {
+            const results: CostTreeMapData[] = [];
             chartData.forEach((d, idx) => {
                 let backgroundColor = violet[200];
                 let textColor = gray[900];
@@ -245,12 +244,12 @@ export default defineComponent<WidgetProps>({
         const getConvertedIndex = (index, itemSetIdx) => index + 1 + ((itemSetIdx) * MAX_TABLE_COLUMN);
         /* Api */
         const costQueryHelper = new QueryHelper();
-        const fetchData = async () => {
+        const fetchData = async (): Promise<CostAnalyzeModel[]> => {
             costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.ACCUMULATED,
-                    group_by: ['project_id'],
+                    group_by: [props.options.group_by],
                     start: dayjs.utc(props.period?.start).format('YYYY-MM'),
                     end: dayjs.utc(props.period?.end).format('YYYY-MM'),
                     limit: 15,
@@ -265,15 +264,7 @@ export default defineComponent<WidgetProps>({
             try {
                 state.loading = true;
                 const rawData = await fetchData();
-                const chartData: CostByProjectChartData[] = [];
-                rawData.forEach((d) => {
-                    if (d.usd_cost > 0) {
-                        chartData.push({
-                            category: d.project_id ? (state.projects[d.project_id]?.label || d.project_id) : 'Unknown',
-                            value: d.usd_cost,
-                        });
-                    }
-                });
+                const chartData: CostTreeMapData[] = getPieChartData(rawData, state.groupBy);
                 state.data = getConvertedChartData(chartData);
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -308,7 +299,7 @@ export default defineComponent<WidgetProps>({
 </script>
 
 <style lang="postcss" scoped>
-.cost-by-project {
+.cost-tree-map {
     .chart-wrapper {
         @apply h-full;
         height: 18.75rem;
@@ -318,7 +309,7 @@ export default defineComponent<WidgetProps>({
     }
     .table-wrapper {
         @apply flex flex-wrap items-start;
-        .project-index {
+        .group-by-index {
             margin-right: 1rem;
         }
         .table {

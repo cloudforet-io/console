@@ -1,5 +1,7 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROJECT')" :widget-link="widgetLink" class="cost-trend-by-project"
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROJECT')"
+                                       class="cost-trend-line"
+                                       :widget-link="widgetLink"
                                        :print-mode="printMode"
     >
         <p-data-loader :loading="loading" class="chart-wrapper">
@@ -45,7 +47,7 @@ import CostDashboardDataTable from '@/services/billing/cost-management/widgets/m
 
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
-import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -65,23 +67,13 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { Period } from '@/services/billing/cost-management/type';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { store } from '@/store';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 import { toggleSeries } from '@/lib/amcharts/helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { WidgetOptions } from '@/services/billing/cost-management/cost-dashboard/type';
 
-
-interface TableItem {
-    project_id: string;
-    [key: string]: string | number;
-}
-
-interface Props extends WidgetProps {
-    groupBy: string;
-}
 
 const PAGE_SIZE = 5;
-
 const CATEGORY_KEY = 'date';
 
 export default {
@@ -98,12 +90,8 @@ export default {
             default: undefined,
         },
         options: {
-            type: Object,
+            type: Object as () => WidgetOptions,
             default: () => ({}),
-        },
-        groupBy: {
-            type: String,
-            default: undefined,
         },
         currency: {
             type: String,
@@ -126,7 +114,7 @@ export default {
             default: false,
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props: WidgetProps, { emit }) {
         const state = reactive({
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
@@ -139,13 +127,12 @@ export default {
                     params: {},
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                        groupBy: arrayToQueryString([GROUP_BY.PROJECT]),
+                        groupBy: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(_period),
                         filters: objectToQueryString(props.filters),
                     },
                 };
             }),
-            projects: computed(() => store.state.resource.project.items),
             //
             chartRegistry: {},
             chart: null as XYChart | null,
@@ -154,9 +141,10 @@ export default {
             legends: [] as Legend[],
             //
             loading: true,
+            groupBy: computed(() => props.options?.group_by),
             items: [] as CostAnalyzeModel[],
             fields: computed<DataTableField[]>(() => {
-                const fields: DataTableField[] = [{ name: GROUP_BY.PROJECT, label: 'Project' }];
+                const fields: DataTableField[] = [GROUP_BY_ITEM_MAP[state.groupBy]];
                 const fiveMonthsAgo = dayjs.utc(props.period.end).subtract(5, 'month');
                 const thisMonth = dayjs.utc();
                 range(6).forEach((d) => {
@@ -179,7 +167,7 @@ export default {
                 start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM'),
                 end: dayjs.utc(props.period.end).format('YYYY-MM'),
             };
-            const slicedChartData = getXYChartData(slicedItems, GRANULARITY.MONTHLY, _period, GROUP_BY.PROJECT);
+            const slicedChartData = getXYChartData(slicedItems, GRANULARITY.MONTHLY, _period, state.groupBy);
             const slicedLegends = state.legends.slice((state.thisPage * 5) - 5, state.thisPage * 5);
             return { slicedChartData, slicedLegends };
         };
@@ -238,13 +226,12 @@ export default {
             });
 
             const createSeries = (legend, idx) => {
-                const projectId = legend.name;
                 const seriesColor = DEFAULT_CHART_COLORS[(state.thisPage * 5 - 5) + idx];
                 const series = chart.series.push(new am4charts.LineSeries());
                 if (props.printMode) series.showOnInit = false;
                 series.name = legend.label;
                 series.dataFields.dateX = CATEGORY_KEY;
-                series.dataFields.valueY = projectId;
+                series.dataFields.valueY = legend.name;
                 series.stroke = am4core.color(seriesColor);
                 series.strokeWidth = 2;
                 series.tooltip.label.fontSize = 14;
@@ -253,7 +240,7 @@ export default {
 
                 series.adapter.add('tooltipText', (tooltipText, target) => {
                     if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                        const usdCost = target.tooltipDataItem.dataContext[projectId] ? Number(target.tooltipDataItem.dataContext[projectId]) : undefined;
+                        const usdCost = target.tooltipDataItem.dataContext[legend.name] ? Number(target.tooltipDataItem.dataContext[legend.name]) : undefined;
                         const currencyMoney = currencyMoneyFormatter(usdCost, props.currency, undefined, true);
                         return getTooltipText('name', undefined, currencyMoney);
                     }
@@ -284,13 +271,13 @@ export default {
             try {
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
-                    group_by: [GROUP_BY.PROJECT],
+                    group_by: [state.groupBy],
                     start: dayjs.utc(period.end).subtract(5, 'month').format('YYYY-MM'),
                     end: dayjs.utc(period.end).format('YYYY-MM'),
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
-                state.legends = getLegends(results, GROUP_BY.PROJECT);
+                state.legends = getLegends(results, state.groupBy);
                 state.totalCount = total_count > 15 ? 15 : total_count;
                 return results;
             } catch (e) {
@@ -342,9 +329,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.cost-trend-by-project {
+.cost-trend-line {
     .chart-wrapper {
-        height: 10rem;
+        height: 13rem;
         .chart {
             height: 100%;
         }

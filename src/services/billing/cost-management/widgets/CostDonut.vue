@@ -1,5 +1,7 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_PROVIDER')" class="cost-by-provider" :widget-link="widgetLink"
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_PROVIDER')"
+                                       class="cost-donut"
+                                       :widget-link="widgetLink"
                                        :print-mode="printMode"
     >
         <p-data-loader :loading="loading" class="chart-wrapper">
@@ -48,15 +50,13 @@ import CostDashboardDataTable from '@/services/billing/cost-management/widgets/m
 
 import { PieChart } from '@amcharts/amcharts4/charts';
 import {
-    CostAnalyzeModel, PieChartData, WidgetProps,
+    PieChartData, WidgetProps,
 } from '@/services/billing/cost-management/widgets/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { forEach } from 'lodash';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { CURRENCY } from '@/store/modules/display/config';
-import { store } from '@/store';
 import { gray } from '@/styles/colors';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -64,12 +64,9 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import config from '@/lib/config';
-import { getTooltipText } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import { getPieChartData, getTooltipText } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import { WidgetOptions } from '@/services/billing/cost-management/cost-dashboard/type';
 
-
-interface CostByProviderChartData extends PieChartData {
-    color: string;
-}
 
 const CATEGORY_KEY = 'category';
 const VALUE_KEY = 'value';
@@ -78,11 +75,11 @@ export default defineComponent<WidgetProps>({
     name: 'CostDonut',
     components: {
         CostDashboardCardWidgetLayout,
+        CostDashboardDataTable,
         PDataTable,
         PDataLoader,
         PSkeleton,
         PTextPagination,
-        CostDashboardDataTable,
     },
     props: {
         name: {
@@ -90,7 +87,7 @@ export default defineComponent<WidgetProps>({
             default: undefined,
         },
         options: {
-            type: Object,
+            type: Object as () => WidgetOptions,
             default: () => ({}),
         },
         period: {
@@ -119,11 +116,11 @@ export default defineComponent<WidgetProps>({
             chartRef: null as HTMLElement | null,
             chartRegistry: {},
             loading: false,
-            chartData: [] as CostByProviderChartData[],
+            chartData: [] as PieChartData[],
             chart: null as PieChart | null,
             pageSize: 5,
             thisPage: 1,
-            providers: computed(() => store.state.resource.provider.items),
+            groupBy: computed(() => props.options?.group_by),
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
                 return {
@@ -131,7 +128,7 @@ export default defineComponent<WidgetProps>({
                     params: {},
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
-                        groupBy: arrayToQueryString([GROUP_BY.PROVIDER]),
+                        groupBy: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(props.period),
                         filters: objectToQueryString(props.filters),
                     },
@@ -141,8 +138,8 @@ export default defineComponent<WidgetProps>({
 
         const dataTableState = reactive({
             fields: [
-                { name: 'category', label: 'Provider' },
-                { name: 'value', label: 'Cost', textAlign: 'right' },
+                { name: CATEGORY_KEY, label: GROUP_BY_ITEM_MAP[state.groupBy].label },
+                { name: VALUE_KEY, label: 'Cost', textAlign: 'right' },
             ] as DataTableField[],
         });
 
@@ -155,7 +152,7 @@ export default defineComponent<WidgetProps>({
 
         const drawChart = (chartContext) => {
             const isChartItemExists = !!state.chartData.length;
-            const noItemsChartData: CostByProviderChartData[] = [{ category: 'dummy', value: 1, color: gray[100] }];
+            const noItemsChartData: PieChartData[] = [{ category: 'dummy', value: 1, color: gray[100] }];
             const createChart = () => {
                 disposeChart(chartContext);
                 state.chartRegistry[chartContext] = am4core.create(chartContext, am4charts.PieChart);
@@ -223,17 +220,6 @@ export default defineComponent<WidgetProps>({
             state.chart = chart;
         };
 
-        const convertToChartData = (rawData: CostAnalyzeModel[]) => {
-            state.chartData = [];
-            forEach(rawData, (d) => {
-                state.chartData.push({
-                    category: state.providers[d.provider]?.label || d.provider,
-                    color: state.providers[d.provider]?.color || '',
-                    value: d.usd_cost,
-                });
-            });
-        };
-
         const costQueryHelper = new QueryHelper();
         const getData = async () => {
             state.loading = true;
@@ -241,20 +227,16 @@ export default defineComponent<WidgetProps>({
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.ACCUMULATED,
-                    group_by: [GROUP_BY.PROVIDER],
+                    group_by: [state.groupBy],
                     start: dayjs.utc(props.period?.start).format('YYYY-MM'),
                     end: dayjs.utc(props.period?.end).format('YYYY-MM'),
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
-
-                if (results.length > 0) {
-                    convertToChartData(results);
-                } else {
-                    state.chartData = [];
-                }
+                state.chartData = getPieChartData(results, state.groupBy);
             } catch (e) {
                 ErrorHandler.handleError(e);
+                state.chartData = [];
             } finally {
                 state.loading = false;
             }
@@ -282,7 +264,7 @@ export default defineComponent<WidgetProps>({
 </script>
 
 <style lang="postcss" scoped>
-.cost-by-provider {
+.cost-donut {
     .chart-wrapper {
         .chart {
             height: 15.2rem;

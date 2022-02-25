@@ -114,8 +114,8 @@ export default {
             default: undefined,
         },
         options: {
-            type: Object,
-            default: () => ({}) as CostQuerySetOption,
+            type: Object as () => CostQuerySetOption,
+            default: () => ({}),
         },
         period: {
             type: Object,
