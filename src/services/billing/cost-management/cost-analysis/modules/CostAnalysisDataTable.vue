@@ -84,7 +84,13 @@ import { ExcelDataField } from '@/store/modules/file/type';
 import { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import { i18n } from '@/translations';
 import { ResourceMap } from '@/store/modules/resource/type';
+// eslint-disable-next-line import/extensions,import/no-unresolved
+import { Table } from 'pdfmake/interfaces';
 
+interface PrintModeFieldSet {
+    widths?: Table['widths'];
+    fields: DataTableFieldType[];
+}
 // must be greater than selectable group by items' count
 const PRINT_MODE_MAX_COL = 10;
 
@@ -324,28 +330,39 @@ export default {
             }
         };
 
-        const getPrintModeFieldSets = (): DataTableFieldType[][] => {
+        // Link for setting table widths: https://pdfmake.github.io/docs/0.1/document-definition-object/tables/
+        const getPrintModeFieldSets = (): PrintModeFieldSet[] => {
             const groupByLength = state.groupByItems.length;
             const costFieldLength = tableState.costFields.length;
             const totalLength = costFieldLength + groupByLength;
             const costColumnCount = PRINT_MODE_MAX_COL - groupByLength;
+            const groupByFieldWidthValues = Array(groupByLength).fill('auto');
+            let costFieldWidthValues = Array(tableState.costFields.length).fill('*');
 
             if (props.printMode && totalLength > PRINT_MODE_MAX_COL) {
                 const fieldSetCount = Math.ceil(costFieldLength / costColumnCount);
-                const results = [] as DataTableFieldType[][];
+                const results = [] as PrintModeFieldSet[];
                 for (let idx = 0; idx < fieldSetCount; idx++) {
                     const tableFields = tableState.costFields.slice(idx * costColumnCount, (idx + 1) * costColumnCount);
-                    results.push(tableState.groupByFields.concat(tableFields));
+                    costFieldWidthValues = Array(tableFields.length).fill('*');
+                    const widths = groupByFieldWidthValues.concat(costFieldWidthValues);
+                    results.push({
+                        widths,
+                        fields: tableState.groupByFields.concat(tableFields),
+                    });
                 }
                 return results;
             }
-            return [tableState.groupByFields.concat(tableState.costFields)];
+            return [{
+                widths: groupByFieldWidthValues.concat(costFieldWidthValues),
+                fields: tableState.groupByFields.concat(tableState.costFields),
+            }];
         };
 
         const getPdfItems = (): PdfOverlayItem[] => {
             const items = tableState.items;
             const fieldSets = getPrintModeFieldSets();
-            return fieldSets.map((fields) => {
+            return fieldSets.map(({ widths, fields }) => {
                 const headRows: string[][] = [fields.map(f => f.label as string)];
                 const bodyRows: string[][] = items.map(d => fields.map((f) => {
                     let value = get(d, f.name, '-');
@@ -360,7 +377,10 @@ export default {
                     return value;
                 }));
                 return {
-                    data: headRows.concat(bodyRows),
+                    tableData: {
+                        widths,
+                        body: headRows.concat(bodyRows),
+                    },
                     type: 'data-table',
                 };
             });

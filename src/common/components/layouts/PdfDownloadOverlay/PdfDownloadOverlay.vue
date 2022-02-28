@@ -51,7 +51,7 @@ import { toPng } from 'html-to-image';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import { TCreatedPdf } from 'pdfmake/build/pdfmake';
 // eslint-disable-next-line import/extensions,import/no-unresolved
-import { Content, ContentText, TableCell } from 'pdfmake/interfaces';
+import { Content, Table } from 'pdfmake/interfaces';
 import { gray, black, white } from '@/styles/colors';
 import {
     pdfFontInfoMap, PdfFontFamily, Language, fontLanguages, pdfFontFamily,
@@ -59,8 +59,7 @@ import {
 
 const paperSizes = ['A4'] as const;
 const modes = ['ELEMENT_EMBED', 'PDF_EMBED', 'PDF_NEW_TAB'] as const;
-const PAGE_PAD_X = 12;
-const PAGE_PAD_Y = 40;
+const PAGE_PADDING = 12;
 const IMAGE_ROW_MARGIN_Y = 4;
 const orientations = ['portrait', 'landscape'] as const;
 const paperSizeInfoMap: Record<PaperSize, PaperSizeInfo> = Object.freeze({
@@ -77,7 +76,7 @@ type ItemType = 'data-table'|'image'
 export interface Item {
     type?: ItemType; // default: 'image'
     element?: HTMLElement;
-    data?: (string | ContentText)[][];
+    tableData?: Pick<Table, 'body' | 'widths'>;
 }
 
 interface Props {
@@ -182,7 +181,7 @@ export default defineComponent<Props>({
             emit('update:visible', value);
         };
 
-        const applyTableHeaderStyle = (data: (string | ContentText)[][]): TableCell[][] => {
+        const applyTableHeaderStyle = (data: Table['body']): Table['body'] => {
             const tableData = data;
             if (tableData[0]) {
                 tableData[0] = tableData[0].map(item => ({
@@ -193,13 +192,14 @@ export default defineComponent<Props>({
             return tableData;
         };
 
-        const createContentWithItem = async ({ element, type, data }: Item): Promise<Content> => {
+        const createContentWithItem = async ({ element, type, tableData }: Item): Promise<Content> => {
             if (type === 'data-table') {
-                if (!data) throw Error('[PdfDownloadOverlay] data-table type item must have data.');
-                const tableBody = applyTableHeaderStyle(data);
-                return data.length ? {
+                if (!tableData?.body) throw Error('[PdfDownloadOverlay] data-table type item must have data.');
+                const tableBody = applyTableHeaderStyle(tableData?.body);
+                return tableData?.body.length ? {
                     table: {
                         headerRows: 1,
+                        widths: tableData?.widths,
                         body: tableBody,
                     },
                     fillColor: white,
@@ -213,7 +213,7 @@ export default defineComponent<Props>({
             const imageUrl = await toPng(element);
             return {
                 image: imageUrl,
-                width: state.paperSizeInfo.width - (PAGE_PAD_X * 2),
+                width: state.paperSizeInfo.width - (PAGE_PADDING * 2),
                 style: 'imageRowWrapper',
             };
         };
@@ -228,13 +228,13 @@ export default defineComponent<Props>({
                 hLineColor: i => (i === 0 || i === 1 ? black : gray[300]),
                 paddingLeft: i => (i === 0 ? 8 : 2),
                 paddingTop: (i) => {
-                    if (i === 0) return 3;
-                    return 9;
+                    if (i === 0) return 4;
+                    return 6;
                 },
                 paddingRight: (i, node) => (node?.table.widths.length - 1 === i ? 6 : 8),
                 paddingBottom: (i) => {
-                    if (i === 0) return 3;
-                    return 9;
+                    if (i === 0) return 4;
+                    return 6;
                 },
             },
         });
@@ -243,7 +243,7 @@ export default defineComponent<Props>({
             return pdfMake.createPdf({
                 pageSize: props.paperSize,
                 pageOrientation: props.orientation,
-                pageMargins: [PAGE_PAD_X, PAGE_PAD_Y],
+                pageMargins: PAGE_PADDING,
                 content: contents,
                 background: () => ({
                     canvas: [
@@ -268,6 +268,7 @@ export default defineComponent<Props>({
                 },
                 defaultStyle: {
                     font: state.font,
+                    fontSize: 9,
                 },
             }, tableLayouts, pdfFontInfoMap);
         };

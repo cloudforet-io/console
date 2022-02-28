@@ -438,6 +438,20 @@ export default {
 
     &.print-mode {
         @mixin row-stack;
+        .filter-wrapper {
+            height: auto;
+            padding: 0.75rem 1rem;
+            .p-tag {
+                margin-bottom: 0.5rem;
+            }
+            .p-empty {
+                @apply flex justify-start;
+            }
+        }
+        .legend-wrapper {
+            height: auto;
+            overflow-y: visible;
+        }
     }
     &:not(.print-mode) {
         @screen tablet {
