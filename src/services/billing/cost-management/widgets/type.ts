@@ -35,7 +35,7 @@ export interface UsdCost {
 export interface CostAnalyzeModel {
     total_usd_cost?: number;
     usd_cost: UsdCost | number;
-    is_etc?: boolean;
+    is_others?: boolean;
     [key: string]: any;
 }
 
