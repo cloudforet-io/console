@@ -211,6 +211,9 @@ export default defineComponent<Props>({
             // 'image' is default type
             if (!element) throw Error('[PdfDownloadOverlay] image type item must have element.');
             const imageUrl = await toPng(element);
+            if (!imageUrl.split(':')[1]?.split(',')[1]) {
+                return {} as Content;
+            }
             return {
                 image: imageUrl,
                 width: state.paperSizeInfo.width - (PAGE_PADDING * 2),

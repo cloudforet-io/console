@@ -1,7 +1,7 @@
 <template>
     <p-data-loader class="cloud-service-usage-overview-summary"
                    :loading="schemaLoading" :data="widgetSchemaList"
-                   :min-loading-time="1500"
+                   :min-loading-time="1000"
                    :loader-backdrop-opacity="1"
                    :loader-backdrop-color="loaderBackdropColor"
     >
@@ -11,7 +11,7 @@
                 <p-skeleton width="40px" height="1.5rem" />
             </div>
         </template>
-        <div v-for="(schema, idx) in widgetSchemaList" :key="`${cloudServiceTypeId}-${idx}`" class="summary-wrapper">
+        <div v-for="(schema, idx) in widgetSchemaList" :key="`${contextId}-${idx}`" class="summary-wrapper">
             <p-dynamic-widget :type="schema.type"
                               :name="schema.name"
                               :data="dataList[idx]"
@@ -33,6 +33,7 @@ import { DynamicWidgetFieldHandler } from '@spaceone/design-system/dist/src/data
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { gray } from '@/styles/colors';
+import { getUUID } from '@/lib/component-util/getUUID';
 
 export default {
     name: 'CloudServiceUsageOverviewSummary',
@@ -64,7 +65,9 @@ export default {
         },
     },
     setup() {
-        const state = reactive({});
+        const state = reactive({
+            contextId: getUUID(),
+        });
 
         const fieldHandler: DynamicWidgetFieldHandler<Record<'reference', Reference>> = (field) => {
             if (field.extraData?.reference) {

@@ -24,6 +24,7 @@
                                      :currency="currency"
                                      :currency-rates="currencyRates"
                                      :print-mode="printMode"
+                                     @rendered="$emit('rendered')"
             />
             <cost-analysis-stacked-column-chart v-else
                                                 :loading="loading"
@@ -35,6 +36,7 @@
                                                 :currency="currency"
                                                 :currency-rates="currencyRates"
                                                 :print-mode="printMode"
+                                                @rendered="$emit('rendered')"
             />
         </div>
         <cost-dashboard-data-table :fields="tableState.fields"
