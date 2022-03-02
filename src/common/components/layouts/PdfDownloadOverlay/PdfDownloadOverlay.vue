@@ -24,7 +24,6 @@
                 </div>
             </div>
         </div>
-        <iframe v-if="mode === 'PDF_EMBED' && pdfDataUrl" :src="pdfDataUrl" />
         <div v-if="loading" class="loader-wrapper">
             <div class="loader">
                 <p-i name="ic_working" animation="spin"
@@ -36,6 +35,7 @@
                 <span>Processing...</span>
             </div>
         </div>
+        <iframe v-if="mode === 'PDF_EMBED' && pdfDataUrl" :src="pdfDataUrl" />
     </div>
 </template>
 
@@ -157,8 +157,8 @@ export default defineComponent<Props>({
                 if (props.orientation === 'landscape') return { width: paperSizeInfo.height, height: paperSizeInfo.width };
                 return paperSizeInfo;
             }),
-            isImageConvertingStarted: false,
-            isPdfConvertingStarted: false,
+            isMakingContentsStarted: false,
+            isMakingPdfStarted: false,
             progressRate: 0,
             font: computed<PdfFontFamily>(() => {
                 if (fontLanguages.en === props.fontLanguage) return pdfFontFamily.NotoSans;
@@ -166,16 +166,25 @@ export default defineComponent<Props>({
                 return pdfFontFamily.NotoSansJp;
             }),
         });
-        let fakeRate;
+
+        let fakeRateInterval;
         const addRate = () => {
-            fakeRate = setInterval(() => {
+            fakeRateInterval = setInterval(() => {
                 let limit = COMPLETED_ELEMENT_RATE;
-                if (state.isImageConvertingStarted) limit = COMPLETED_IMAGE_RATE;
-                else if (state.isPdfConvertingStarted) limit = COMPLETED_PDF_RATE;
+                if (state.isMakingContentsStarted) limit = COMPLETED_IMAGE_RATE;
+                else if (state.isMakingPdfStarted) limit = COMPLETED_PDF_RATE;
                 if (state.progressRate < limit) state.progressRate++;
-                if (state.progressRate >= COMPLETED_PDF_RATE) clearInterval(fakeRate);
+                if (state.progressRate >= COMPLETED_PDF_RATE) clearInterval(fakeRateInterval);
             }, 10);
         };
+        const resetRate = () => {
+            if (fakeRateInterval) {
+                clearInterval(fakeRateInterval);
+                fakeRateInterval = undefined;
+                state.progressRate = 0;
+            }
+        };
+
         const setVisible = (value: boolean) => {
             state.proxyVisible = value;
             emit('update:visible', value);
@@ -279,11 +288,11 @@ export default defineComponent<Props>({
         const makePdfWithItems = async (items: Item[]) => {
             state.loading = true;
             try {
-                state.isImageConvertingStarted = true;
+                state.isMakingContentsStarted = true;
                 const contents: Content[] = await Promise.all(items.map(item => createContentWithItem(item)));
                 state.progressRate = COMPLETED_IMAGE_RATE;
 
-                state.isPdfConvertingStarted = true;
+                state.isMakingPdfStarted = true;
                 state.createdPdf = createPdfWithContents(contents);
                 state.progressRate = COMPLETED_PDF_RATE;
 
@@ -324,26 +333,25 @@ export default defineComponent<Props>({
             if (!items.length) return;
             state.createdPdf = null;
             state.pdfDataUrl = '';
-            state.progressRate = COMPLETED_ELEMENT_RATE;
             await makePdfWithItems(items);
+            state.progressRate = COMPLETED_ELEMENT_RATE;
         });
         watch(() => props.visible, (visible) => {
             if (visible !== state.proxyVisible) {
                 // reset states
+                state.proxyVisible = visible;
                 state.loading = true;
                 state.createdPdf = null;
                 state.pdfDataUrl = '';
-                state.proxyVisible = visible;
                 state.progressRate = 0;
-                state.isImageConvertingStarted = false;
-                state.isPdfConvertingStarted = false;
-            }
-            if (visible) addRate();
-            else if (fakeRate) {
-                clearInterval(fakeRate);
-                fakeRate = undefined;
+                state.isMakingContentsStarted = false;
+                state.isMakingPdfStarted = false;
             }
         });
+        watch(() => state.loading, (loading) => {
+            if (loading) addRate();
+            else resetRate();
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
@@ -358,12 +366,13 @@ export default defineComponent<Props>({
 .pdf-download-overlay {
     @apply bg-gray-800;
     $header-height: 3.5rem;
+    $z-index: 999;
     position: fixed;
     width: 100vw;
     height: 100vh;
     top: 0;
     left: 0;
-    z-index: 999;
+    z-index: $z-index;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -410,7 +419,7 @@ export default defineComponent<Props>({
         left: 0;
         height: calc(100vh - $header-height);
         width: 100%;
-        z-index: 999;
+        z-index: $z-index;
         padding-top: 4.5rem;
         .loader {
             @apply text-gray-400;
@@ -428,6 +437,10 @@ export default defineComponent<Props>({
         }
     }
     iframe {
+        @apply bg-gray-800;
+        position: absolute;
+        z-index: $z-index;
+        top: $header-height;
         flex-grow: 1;
         height: calc(100vh - $header-height);
         width: 100%;
