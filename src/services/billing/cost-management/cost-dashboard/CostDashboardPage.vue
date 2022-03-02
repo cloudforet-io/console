@@ -108,7 +108,8 @@ import CostDashboardUpdateModal
 const validateDashboardId = async (dashboardId): Promise<boolean> => {
     await store.dispatch('service/costDashboard/setDashboardList');
     const dashboardList = store.getters['service/costDashboard/dashboardList'];
-    return dashboardList.find(item => item.dashboard_id === dashboardId);
+    const targetDashboard = dashboardList.find(item => item.dashboard_id === dashboardId);
+    return !!targetDashboard;
 };
 
 export default {

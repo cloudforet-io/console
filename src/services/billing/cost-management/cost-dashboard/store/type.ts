@@ -12,6 +12,7 @@ export interface CostDashboardState {
     //
     selectedTemplate: Record<string, DefaultLayout> | PublicDashboardInfo;
     defaultFilter: Record<string, string[]>;
+    includesFilter: boolean;
     selectedDashboardPrivacy: DashboardPrivacyType;
     //
     editedCustomLayout?: CustomLayout[];

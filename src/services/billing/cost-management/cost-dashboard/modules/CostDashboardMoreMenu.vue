@@ -63,11 +63,13 @@ export default {
             moreMenuItems: computed(() => {
                 const menuItems = cloneDeep(defaultMenuItems.value);
                 if (state.homeDashboardId === props.dashboardId) {
+                    menuItems[1].disabled = true;
                     menuItems[2].disabled = true;
                     return menuItems;
                 }
                 if (state.dashboardType === 'public' && !state.isDomainOwner) {
                     if (state.homeDashboardId === props.dashboardId) {
+                        menuItems[1].disabled = true;
                         menuItems[2].disabled = true;
                     }
                     menuItems[1].disabled = true;

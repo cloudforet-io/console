@@ -45,7 +45,7 @@ import { store } from '@/store';
 import { ResourceItem } from '@/store/modules/resource/type';
 
 
-const DASHBOARD_FILTER_NAMES = [FILTER.PROJECT, FILTER.SERVICE_ACCOUNT, FILTER.PROVIDER];
+const DASHBOARD_FILTER_NAMES = [FILTER.PROJECT_GROUP, FILTER.PROJECT, FILTER.SERVICE_ACCOUNT, FILTER.PROVIDER];
 
 interface Props {
     visible: boolean;
@@ -73,6 +73,7 @@ export default {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             count: computed(() => ({
+                [FILTER.PROJECT_GROUP]: props.selectedFilters[FILTER.PROJECT_GROUP]?.length || 0,
                 [FILTER.PROJECT]: props.selectedFilters[FILTER.PROJECT]?.length || 0,
                 [FILTER.SERVICE_ACCOUNT]: props.selectedFilters[FILTER.SERVICE_ACCOUNT]?.length || 0,
                 [FILTER.PROVIDER]: props.selectedFilters[FILTER.PROVIDER]?.length || 0,

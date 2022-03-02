@@ -60,6 +60,7 @@ export default {
         const state = reactive({
             selectedTemplate: computed(() => store.state.service?.costDashboard?.selectedTemplate),
             defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboard?.defaultFilter),
+            includesFilter: computed<boolean>(() => store.state.service?.costDashboard?.includesFilter),
             selectedPrivacy: computed<DashboardPrivacyType>(() => store.state.service?.costDashboard?.selectedDashboardPrivacy),
         });
 
@@ -75,12 +76,11 @@ export default {
             name: 'Untitled Dashboard',
             custom_layouts: await getCustomLayouts(),
             period_type: 'AUTO',
-            default_filter: state.defaultFilter,
+            default_filter: state.includesFilter ? state.defaultFilter : {},
         });
 
         const createPublicDashboard = async (): Promise<string|undefined> => {
             try {
-                console.log('public');
                 const { public_dashboard_id } = await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
                 return public_dashboard_id;
             } catch (e) {

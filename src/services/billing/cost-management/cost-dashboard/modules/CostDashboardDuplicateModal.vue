@@ -54,6 +54,8 @@ import { fetchDefaultLayoutData } from '@/services/billing/cost-management/cost-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
+import { SpaceRouter } from '@/router';
+import { BILLING_ROUTE } from '@/services/billing/routes';
 
 interface Props {
     visible: boolean;
@@ -130,16 +132,16 @@ export default defineComponent<Props>({
         };
 
         const makeDashboardCreateParam = async (): Promise<DashboardCreateParam> => ({
-            name: name.value,
+            name: `CLONE - ${name.value}`,
             custom_layouts: await getCustomLayouts(),
             period_type: 'AUTO',
-            default_filter: state.includesFilter ? props.dashboard.default_filter : undefined,
+            default_filter: state.includesFilter ? props.dashboard.default_filter : {},
         });
 
         const createPublicDashboard = async (): Promise<string|undefined> => {
             try {
-                await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
-                await store.dispatch('service/costDashboard/setDashboardList');
+                const { public_dashboard_id } = await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
+                return public_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
             }
@@ -148,20 +150,25 @@ export default defineComponent<Props>({
 
         const createUserDashboard = async (): Promise<string|undefined> => {
             try {
-                await SpaceConnector.client.costAnalysis.userDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
-                await store.dispatch('service/costDashboard/setDashboardList');
+                const { user_dashboard_id } = await SpaceConnector.client.costAnalysis.userDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
+                return user_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
             }
             return undefined;
         };
 
-        const handleConfirm = () => {
+        const handleConfirm = async () => {
             if (!isAllValid) return;
-            if (visibility.value === DASHBOARD_PRIVACY_TYPE.PUBLIC) createPublicDashboard();
-            else createUserDashboard();
+            const duplicatedDashboardId = visibility.value === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
+            await store.dispatch('service/costDashboard/setDashboardList');
+            if (duplicatedDashboardId) {
+                await SpaceRouter.router.push({
+                    name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                    params: { dashboardId: duplicatedDashboardId },
+                });
+            }
             emit('update:visible', false);
-            emit('confirm');
         };
 
         const init = () => {
