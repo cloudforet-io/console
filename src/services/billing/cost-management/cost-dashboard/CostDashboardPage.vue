@@ -53,6 +53,8 @@
         <pdf-download-overlay v-model="visiblePdfDownload" :items="previewItems">
             <cost-dashboard-preview v-if="dashboardId"
                                     :dashboard-id="dashboardId"
+                                    :period="period"
+                                    :filters="filters"
                                     @rendered="handlePreviewRendered"
             />
         </pdf-download-overlay>

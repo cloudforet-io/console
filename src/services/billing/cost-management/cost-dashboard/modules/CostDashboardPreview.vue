@@ -4,12 +4,12 @@
             <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
             <div class="right-part">
                 <cost-dashboard-period-select-dropdown :dashboard-id="dashboardId"
-                                                       :period.sync="period"
-                                                       :period-type.sync="periodType"
+                                                       :period="period"
+                                                       :period-type="periodType"
                                                        print-mode
                 />
             </div>
-            <cost-dashboard-filter :dashboard-id="dashboardId" :filters.sync="filters" print-mode />
+            <cost-dashboard-filter :dashboard-id="dashboardId" :filters="filters" print-mode />
         </div>
         <dashboard-layouts :loading="loading"
                            :layout="layout"
@@ -27,7 +27,6 @@
 import {
     computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { keyBy } from 'lodash';
 import {
     PPageTitle,
 } from '@spaceone/design-system';
@@ -40,7 +39,7 @@ import CostDashboardFilter from '@/services/billing/cost-management/cost-dashboa
 import CostDashboardPeriodSelectDropdown
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
 import { CustomLayout, DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
-import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
+import { fetchDefaultLayoutData } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
 
 const HEADER_ELEMENT = 1;
 const DASHBOARD_LAYOUT = 1;
@@ -58,15 +57,21 @@ export default {
             type: String,
             required: true,
         },
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
+        filters: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
             dashboard: {} as DashboardInfo,
             loading: true,
             layout: [] as any[],
-            period: {} as Period,
             periodType: '',
-            filters: {} as CostQueryFilters,
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             homeDashboardId: computed<string|undefined>(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
@@ -88,26 +93,6 @@ export default {
         const handleAllRenderedWidgets = (rowElements: HTMLElement[]) => {
             state.widgetList = rowElements;
             state.isWidgetListRendered = true;
-        };
-
-        const fetchDefaultLayoutData = async (layoutId: string): Promise<any[]> => {
-            try {
-                // noinspection TypeScriptCheckImport
-                const layoutTemplates = await import(`../dashboard-layouts/${layoutId}.json`);
-                // noinspection TypeScriptCheckImport
-                const widgets = await import('../../widgets/lib/defaultWidgetList.json');
-
-                const optionsKeyByWidgetId = keyBy(widgets.default, option => option.widget_id);
-                const layoutData: CustomLayout[] = layoutTemplates.default.map(layout => layout.map((d) => {
-                    const widget = optionsKeyByWidgetId[d.widget_id];
-                    return widget ? { ...widget } : {};
-                }));
-
-                return layoutData;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return [];
-            }
         };
 
         const getDashboardLayout = async (dashboard: DashboardInfo): Promise<CustomLayout[]> => {
