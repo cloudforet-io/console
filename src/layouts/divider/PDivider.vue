@@ -1,30 +1,36 @@
-<script lang="ts">
-import { getBindClass } from '@/util/functional-helpers';
+<template functional>
+    <component
+        :is="props.vertical ? 'div' : 'hr'"
+        :class="[{'p-divider': true}, {'vertical': props.vertical}]"
+    />
+</template>
 
+<script lang="ts">
 export default {
     name: 'PDivider',
-    functional: true,
-    render(h, { data, children }) {
-        return h('hr', {
-            ...data,
-            class: {
-                'p-divider': true,
-                ...getBindClass(data.class),
-            },
+    props: {
+        vertical: {
+            type: Boolean,
+            default: false,
         },
-        children);
     },
 };
 </script>
 
 <style lang="postcss">
 .p-divider {
-    width: 100%;
-    border: none;
-    height: 1px;
-
     @apply text-gray-200 bg-gray-200;
+    width: 100%;
+    height: 1px;
+    border: none;
     margin-top: 0;
     margin-bottom: 0;
+
+    &.vertical {
+        height: initial;
+        width: 1px;
+        margin-left: 0;
+        margin-right: 0;
+    }
 }
 </style>

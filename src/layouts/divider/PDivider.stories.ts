@@ -31,3 +31,35 @@ export const divider = () => ({
             </div>
         </div>`,
 });
+
+export const verticalDivider = () => ({
+    components: { PDivider },
+    template: `
+        <div style="width: 50vw; height: 50vh; border: 1px dashed #415ee1">
+            <h1>The div tags defines a thematic horizontal break in an HTML page</h1>
+            <p-divider />
+            <div>
+                <div style="display: flex; justify-content: space-around">
+                    <span>split</span>
+                </div>
+            </div>
+            <p-divider />
+            <div>
+                <div style="display: flex; justify-content: space-around">
+                    <span>split</span>
+                    <p-divider vertical="true" />
+                    <span>split</span>
+                </div>
+            </div>
+            <p-divider />
+            <div>
+                <div style="display: flex; justify-content: space-around">
+                    <span>split</span>
+                    <p-divider vertical="true" />
+                    <span>split</span>
+                    <p-divider vertical="true" />
+                    <span>split</span>
+                </div>
+            </div>
+        </div>`,
+});
