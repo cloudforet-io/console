@@ -28,6 +28,7 @@ const state: CostDashboardState = {
     // for dashboard
     publicDashboardList: [] as PublicDashboardInfo[],
     userDashboardList: [] as UserDashboardInfo[],
+    dashboardListLoading: true,
 };
 
 export default {

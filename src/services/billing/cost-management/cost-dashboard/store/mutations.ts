@@ -40,3 +40,7 @@ export const setPublicDashboard: Mutation<CostDashboardState> = (state, dashboar
 export const setUserDashboard: Mutation<CostDashboardState> = (state, dashboardList) => {
     state.userDashboardList = dashboardList;
 };
+
+export const setDashboardListLoading: Mutation<CostDashboardState> = (state, dashboardListLoading) => {
+    state.dashboardListLoading = dashboardListLoading;
+};

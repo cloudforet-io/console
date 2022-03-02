@@ -1,7 +1,7 @@
 <template>
     <div class="cost-dashboard-page">
         <p-breadcrumbs :routes="routeState.route" />
-        <div class="top-wrapper">
+        <div v-if="dashboardList.length" class="top-wrapper">
             <p-i name="ic_public" width="1rem" height="1rem"
                  class="mr-2"
             />
@@ -38,13 +38,26 @@
             </div>
             <cost-dashboard-filter :dashboard-id="dashboardId" :filters.sync="filters" />
         </div>
-        <dashboard-layouts :loading="loading"
-                           :layout="layout"
-                           :period="period"
-                           :filters="filters"
-                           :currency="currency"
-                           :currency-rates="currencyRates"
-        />
+        <div v-if="!loading && !dashboardListLoading">
+            <dashboard-layouts
+                v-if="dashboardList.length > 0"
+                :loading="loading"
+                :layout="layout"
+                :period="period"
+                :filters="filters"
+                :currency="currency"
+                :currency-rates="currencyRates"
+            />
+            <div v-else class="empty-dashboard">
+                <img src="@/assets/images/illust_circle_boy.svg" class="empty-img">
+                <span class="empty-text">No saved Dashboard Found</span>
+                <p-icon-text-button v-if="isAdmin" name="ic_plus" style-type="primary1"
+                                    @click="handleClickCreate"
+                >
+                    <span>Create Dashboard</span>
+                </p-icon-text-button>
+            </div>
+        </div>
         <cost-dashboard-update-modal :visible.sync="updateModalVisible"
                                      :dashboard-id="dashboardId"
                                      :dashboard-name="dashboard.name"
@@ -148,6 +161,9 @@ export default {
             previewItems: [] as Item[],
             dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(state.dashboard, 'public_dashboard_id') ? 'public' : 'user')),
             updateModalVisible: false,
+            isAdmin: computed((() => store.getters['user/isAdmin'])),
+            dashboardList: computed(() => store.getters['service/costDashboard/dashboardList'] ?? []),
+            dashboardListLoading: computed(() => store.state.service.costDashboard.dashboardListLoading),
         });
 
         const routeState = reactive({
@@ -195,6 +211,12 @@ export default {
             }
         };
 
+        const handleClickCreate = () => {
+            SpaceRouter.router.push({
+                name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD.CREATE._NAME,
+            });
+        };
+
         const loadDashboardAndSetStates = async (dashboardId: string) => {
             state.loading = true;
 
@@ -232,6 +254,7 @@ export default {
             handleClickPdfDownload,
             handleClickCustomize,
             handlePreviewRendered,
+            handleClickCreate,
         };
     },
 };
@@ -287,6 +310,21 @@ export default {
             content: ' ';
             margin-top: calc(-1.25rem / 2);
         }
+    }
+}
+
+.empty-dashboard {
+    @apply text-center;
+    margin-top: 10.25rem;
+    .empty-img {
+        margin: 0 auto 1rem;
+    }
+    .empty-text {
+        @apply text-violet-300 font-bold block;
+        font-size: 0.875rem;
+        line-height: 160%;
+        margin-bottom: 0.5rem;
+        opacity: 0.7;
     }
 }
 
