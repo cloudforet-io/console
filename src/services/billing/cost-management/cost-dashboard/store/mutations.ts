@@ -9,6 +9,10 @@ export const setDefaultFilter: Mutation<CostDashboardState> = (state, filter) =>
     state.defaultFilter = filter;
 };
 
+export const setIncludesFilter: Mutation<CostDashboardState> = (state, includesFilter) => {
+    state.includesFilter = includesFilter;
+};
+
 export const setDashboardPrivacy: Mutation<CostDashboardState> = (state, privacy) => {
     state.selectedDashboardPrivacy = privacy;
 };

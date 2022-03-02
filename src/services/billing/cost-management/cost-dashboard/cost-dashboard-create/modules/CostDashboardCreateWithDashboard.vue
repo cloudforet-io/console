@@ -16,7 +16,8 @@
                 </p-select-card>
                 <p-anchor
                     target="_blank"
-                    :to=" { name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME, params: { dashboardId: dashboardData.public_dashboard_id } }"
+                    :to=" { name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                            params: { dashboardId: dashboardData.public_dashboard_id ? dashboardData.public_dashboard_id : dashboardData.user_dashboard_id } }"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.VIEW') }}
                 </p-anchor>
@@ -61,7 +62,7 @@ export default {
     setup() {
         const state = reactive({
             existingDashboardData: [] as Partial<DashboardInfo>[],
-            slicedDashboardData: computed(() => {
+            slicedDashboardData: computed<Partial<DashboardInfo>[]>(() => {
                 const startIndex = (state.thisPage * PAGE_SIZE) - PAGE_SIZE;
                 const endIndex = state.thisPage * PAGE_SIZE;
                 return state.existingDashboardData.slice(startIndex, endIndex);

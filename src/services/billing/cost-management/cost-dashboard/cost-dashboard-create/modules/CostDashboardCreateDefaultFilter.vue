@@ -36,9 +36,16 @@ export default {
 
     setup() {
         const state = reactive({
-            includesFilter: false,
+            includesFilter: computed({
+                get() {
+                    return store.state.service?.costDashboard?.includesFilter ?? false;
+                },
+                set(value) {
+                    store.commit('service/costDashboard/setIncludesFilter', value);
+                },
+            }),
             defaultFilterModalVisible: false,
-            defaultFilter: computed(() => store.state.service?.costDashboard?.defaultFilter || {}),
+            defaultFilter: computed(() => store.state.service?.costDashboard?.defaultFilter ?? {}),
             isDashboardTemplate: computed(() => has(store.state.service?.costDashboard?.selectedTemplate, 'public_dashboard_id')
                 || has(store.state.service?.costDashboard?.selectedTemplate, 'user_dashboard_id')),
         });
