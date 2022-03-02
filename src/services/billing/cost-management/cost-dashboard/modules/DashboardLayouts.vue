@@ -1,8 +1,8 @@
 <template>
     <div>
         <p-data-loader :loading="loading" :data="layout"
-                       :min-loading-time="1000"
-                       :lazy-loading-time="1000"
+                       :min-loading-time="printMode ? 0 : 1000"
+                       :lazy-loading-time="printMode ? 0 : 1000"
                        class="dashboard-layouts"
                        :class="{responsive: !printMode}"
         >
@@ -143,7 +143,7 @@ export default {
             renderedCount: 0,
             charts: [] as any[][],
             isAllRendered: computed<boolean>(() => {
-                if (!props.layout.length) return false;
+                if (props.loading) return false;
                 return state.renderedCount >= state.widgetCount;
             }),
             customizeModalVisible: false,
