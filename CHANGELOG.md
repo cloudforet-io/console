@@ -1,3 +1,10 @@
+# [1.1.0-beta.251](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.250...v1.1.0-beta.251) (2022-03-02)
+
+
+### Features
+
+* add vertical property at PDivider component ([#876](https://github.com/spaceone-dev/spaceone-design-system/issues/876)) ([0b017b3](https://github.com/spaceone-dev/spaceone-design-system/commit/0b017b3adfc549813c86fdf0c04401bf7d9b70c5))
+
 # [1.1.0-beta.250](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.249...v1.1.0-beta.250) (2022-02-24)
 
 
