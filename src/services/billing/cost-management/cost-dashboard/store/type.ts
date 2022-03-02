@@ -20,4 +20,5 @@ export interface CostDashboardState {
     //
     publicDashboardList: PublicDashboardInfo[];
     userDashboardList: UserDashboardInfo[];
+    dashboardListLoading: boolean;
 }

@@ -12,20 +12,24 @@
                     </p-icon-text-button>
                 </template>
             </sidebar-title>
-            <div v-if="!loading" class="dashboard-list">
-                <p class="dashboard-type">
-                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.PUBLIC') }}
-                </p>
-                <ul>
-                    <cost-dashboard-list :public-dashboard-items="publicDashboardList" />
-                </ul>
-            </div>
-            <details v-if="!loading" class="dashboard-list">
-                <summary class="dashboard-type">
-                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.MY_DASHBOARD') }}
-                </summary>
-                <cost-dashboard-list :user-dashboard-items="userDashboardList" :is-public="false" />
-            </details>
+            <template v-if="publicDashboardList.length > 0">
+                <div v-if="!loading" class="dashboard-list">
+                    <p class="dashboard-type">
+                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.PUBLIC') }}
+                    </p>
+                    <ul>
+                        <cost-dashboard-list :public-dashboard-items="publicDashboardList" />
+                    </ul>
+                </div>
+            </template>
+            <template v-if="userDashboardList.length > 0">
+                <details v-if="!loading" class="dashboard-list">
+                    <summary class="dashboard-type">
+                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.MY_DASHBOARD') }}
+                    </summary>
+                    <cost-dashboard-list :user-dashboard-items="userDashboardList" :is-public="false" />
+                </details>
+            </template>
         </div>
         <div v-for="(item) in menuList" :key="item.label"
              @click="showPage(item.routeName)"
@@ -86,8 +90,8 @@ export default {
                 },
             ]),
             currentRouteName: computed(() => vm.$route.name),
-            publicDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.publicDashboardList),
-            userDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.userDashboardList),
+            publicDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.publicDashboardList ?? []),
+            userDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.userDashboardList ?? []),
             loading: true,
         });
 

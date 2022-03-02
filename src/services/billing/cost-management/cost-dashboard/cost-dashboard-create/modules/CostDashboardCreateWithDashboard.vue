@@ -71,6 +71,7 @@ export default {
             totalCount: 0,
             allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
             thisPage: 1,
+            userId: computed(() => store.state.user.userId),
         });
 
         const handleDashboardChange = (value: Partial<DashboardInfo>) => {
@@ -81,7 +82,9 @@ export default {
         const listDashboard = async () => {
             try {
                 const publicDashboardList = await SpaceConnector.client.costAnalysis.publicDashboard.list();
-                const userDashboardList = await SpaceConnector.client.costAnalysis.userDashboard.list();
+                const userDashboardList = await SpaceConnector.client.costAnalysis.userDashboard.list({
+                    user_id: state.userId,
+                });
                 const dashboardList = [...publicDashboardList.results as PublicDashboardInfo[], ...userDashboardList.results as UserDashboardInfo[]];
                 state.existingDashboardData = dashboardList.map(d => ({
                     custom_layouts: d.custom_layouts,
