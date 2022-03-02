@@ -258,8 +258,9 @@ export default defineComponent<WidgetProps>({
             }
         }, { immediate: false });
 
-        watch([() => props.period, () => props.filters], () => {
-            getData();
+        watch([() => props.period, () => props.filters], async () => {
+            await getData();
+            if (state.chartData.length === 0) emit('rendered');
         }, { immediate: true });
 
         onUnmounted(() => {

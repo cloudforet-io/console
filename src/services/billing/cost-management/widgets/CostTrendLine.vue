@@ -161,15 +161,20 @@ export default {
         });
 
         /* util */
-        const getSlicedChartDataAndLegends = () => {
-            const slicedItems = state.items.slice((state.thisPage * 5) - 5, state.thisPage * 5);
-            const _period = {
-                start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM'),
-                end: dayjs.utc(props.period.end).format('YYYY-MM'),
-            };
-            const slicedChartData = getXYChartData(slicedItems, GRANULARITY.MONTHLY, _period, state.groupBy);
-            const slicedLegends = state.legends.slice((state.thisPage * 5) - 5, state.thisPage * 5);
-            return { slicedChartData, slicedLegends };
+        const getSlicedChartDataAndLegends = async () => {
+            try {
+                const slicedItems = state.items.slice((state.thisPage * 5) - 5, state.thisPage * 5);
+                const _period = {
+                    start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM'),
+                    end: dayjs.utc(props.period.end).format('YYYY-MM'),
+                };
+                const slicedChartData = getXYChartData(slicedItems, GRANULARITY.MONTHLY, _period, state.groupBy);
+                const slicedLegends = state.legends.slice((state.thisPage * 5) - 5, state.thisPage * 5);
+                return { slicedChartData, slicedLegends };
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return ({ slicedChartData: [], slicedLegends: [] });
+            }
         };
         const disposeChart = (chartContext) => {
             if (state.chartRegistry[chartContext]) {
@@ -301,6 +306,7 @@ export default {
         watch([() => props.period, () => props.filters], async ([period, filters]) => {
             state.loading = true;
             state.items = await listCostAnalysisData(period, filters);
+            if (state.items.length === 0) emit('rendered');
             const { slicedChartData, slicedLegends } = await getSlicedChartDataAndLegends();
             state.chartData = slicedChartData;
             state.chart = drawChart(state.chartRef, slicedChartData, slicedLegends);
@@ -341,7 +347,7 @@ export default {
 
         .cost-dashboard-data-table {
             .p-data-table {
-                height: 13.5rem;
+                min-height: 13.5rem;
             }
         }
     }

@@ -317,8 +317,9 @@ export default defineComponent<WidgetProps>({
             }
         }, { immediate: false });
 
-        watch([() => props.period, () => props.filters], () => {
-            getChartData();
+        watch([() => props.period, () => props.filters], async () => {
+            await getChartData();
+            if (state.chartData.length === 0) emit('rendered');
         });
 
         (async () => {

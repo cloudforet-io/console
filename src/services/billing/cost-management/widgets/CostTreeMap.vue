@@ -281,8 +281,9 @@ export default defineComponent<WidgetProps>({
             }
         }, { immediate: false });
 
-        watch([() => props.period, () => props.filters, () => props.currency], () => {
-            getChartData();
+        watch([() => props.period, () => props.filters, () => props.currency], async () => {
+            await getChartData();
+            if (state.data.length === 0) emit('rendered');
         }, { immediate: true });
 
         onUnmounted(() => {

@@ -283,6 +283,7 @@ export default defineComponent<Props>({
         watch([() => props.period, () => props.filters], async ([period, filters]) => {
             state.loading = true;
             state.items = await listCostAnalysisData(period, filters);
+            if (state.items.length === 0) emit('rendered');
             await setChartDataAndLegends();
             state.chart = drawChart(state.chartRef, state.chartData, state.legends);
             state.loading = false;
