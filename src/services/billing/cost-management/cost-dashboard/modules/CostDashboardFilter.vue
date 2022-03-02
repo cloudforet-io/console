@@ -4,7 +4,7 @@
             <span class="label">{{ $t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER') }}: </span>
             <span class="text">{{ getFiltersText(proxyFilters) }}</span>
         </p>
-        <p-button v-if="!isAdmin && !noFilter"
+        <p-button v-if="!isAdmin && !noFilter && !printMode"
                   style-type="gray-border"
                   size="sm"
                   @click.stop="handleClickViewFilter"
