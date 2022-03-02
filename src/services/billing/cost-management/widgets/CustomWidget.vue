@@ -9,7 +9,8 @@
                 <span class="label">{{ $t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER') }}: </span>
                 <span class="text">{{ getFiltersText(filters) }}</span>
             </div>
-            <p-button style-type="gray-border"
+            <p-button v-if="!printMode"
+                      style-type="gray-border"
                       size="sm"
                       @click.stop="handleClickViewFilter"
             >
