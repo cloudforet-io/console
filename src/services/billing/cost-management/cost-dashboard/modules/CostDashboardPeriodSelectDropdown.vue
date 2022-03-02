@@ -19,7 +19,8 @@
                 {{ dateFormatter(selectedPeriod.start, 'MMMM D') }} ~ {{ dateFormatter(selectedPeriod.end, 'D') }}, {{ dateFormatter(period.end, 'YYYY') }}
             </p>
         </p-badge>
-        <p-select-dropdown :items="MonthMenuItems"
+        <p-select-dropdown v-if="!printMode"
+                           :items="MonthMenuItems"
                            :selected="selectedMonthMenuItem"
                            without-outline
                            :disabled="isFixedTypeSelected"
@@ -97,9 +98,9 @@ export default {
 
         const state = reactive({
             selectedPeriod: {
-                start: props.periodType === 'FIXED' ? dayjs.utc(props.period.start).format('YYYY-MM')
+                start: props.printMode || props.periodType === 'FIXED' ? dayjs.utc(props.period.start).format('YYYY-MM')
                     : initialPeriodStart,
-                end: props.periodType === 'FIXED' ? dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD')
+                end: props.printMode || props.periodType === 'FIXED' ? dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD')
                     : initialPeriodEnd,
             },
             getMonthMenuItem: computed(() => {
@@ -217,14 +218,14 @@ export default {
                 emit('update:period', state.selectedPeriod);
             }
 
-            initSelectedMonthItem();
+            if (!props.printMode) initSelectedMonthItem();
         };
 
         watch([() => props.period, () => props.periodType], ([period, periodType]) => {
             // check if this change is not caused by this component's update:period event.
             if (period === state.selectedPeriod) return;
 
-            initStates(periodType === 'FIXED');
+            initStates(props.printMode || periodType === 'FIXED');
         });
         return {
             ...toRefs(state),
