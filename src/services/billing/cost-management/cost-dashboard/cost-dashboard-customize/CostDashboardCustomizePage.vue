@@ -34,7 +34,7 @@ import {
     PBreadcrumbs, PButton, PTextInput, PIconButton,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs,
+    computed, onBeforeUnmount, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
 import { i18n } from '@/translations';
 import { registerServiceStore } from '@/common/composables/register-service-store';
@@ -224,17 +224,17 @@ export default {
         })();
 
         // for preventing refresh
-        // const handleUnload = (event) => {
-        //     event.preventDefault(); event.returnValue = '';
-        // };
-        //
-        // onMounted(() => {
-        //     window.addEventListener('beforeunload', handleUnload);
-        // });
-        //
-        // onBeforeUnmount(() => {
-        //     window.removeEventListener('beforeunload', handleUnload);
-        // });
+        const handleUnload = (event) => {
+            event.preventDefault(); event.returnValue = '';
+        };
+
+        onMounted(() => {
+            window.addEventListener('beforeunload', handleUnload);
+        });
+
+        onBeforeUnmount(() => {
+            window.removeEventListener('beforeunload', handleUnload);
+        });
 
         return {
             routeState,
