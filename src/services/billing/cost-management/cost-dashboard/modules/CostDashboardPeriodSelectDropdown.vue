@@ -57,9 +57,8 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
 
-const yesterday = dayjs.utc().subtract(1, 'day');
-const initialPeriodStart = yesterday.startOf('month').format('YYYY-MM-DD');
-const initialPeriodEnd = yesterday.endOf('month').format('YYYY-MM-DD');
+const initialPeriodStart = dayjs.utc().startOf('month').format('YYYY-MM-DD');
+const initialPeriodEnd = dayjs.utc().endOf('month').format('YYYY-MM-DD');
 const initialSelectedMonth = initialPeriodStart.substr(0, 7);
 
 export default {
@@ -108,8 +107,8 @@ export default {
                 range(12).forEach((i) => {
                     monthData.push({
                         type: 'item',
-                        label: i18nDayjs.value.utc(yesterday.format('YYYY-MM-DD')).subtract(i, 'month').format('MMMM YYYY'),
-                        name: yesterday.subtract(i, 'month').format('YYYY-MM'),
+                        label: i18nDayjs.value.utc(dayjs.utc().format('YYYY-MM-DD')).subtract(i, 'month').format('MMMM YYYY'),
+                        name: dayjs.utc().subtract(i, 'month').format('YYYY-MM'),
                     });
                 });
                 return monthData.reverse();
