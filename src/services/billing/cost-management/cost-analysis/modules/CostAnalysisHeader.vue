@@ -64,6 +64,7 @@
                               v-model="visiblePdfOverlay"
                               :items="previewItems"
                               orientation="landscape"
+                              :file-name="pdfFileName"
                               :font-language="pdfFontLanguage"
         >
             <cost-analysis-preview @rendered="handlePreviewRendered" />
@@ -72,6 +73,7 @@
 </template>
 
 <script lang="ts">
+import dayjs from 'dayjs';
 import {
     computed,
     reactive, toRefs, watch,
@@ -136,6 +138,7 @@ export default {
             title: computed<string>(() => state.selectedQuerySet?.name ?? 'Cost Analysis'),
             itemIdForDeleteQuery: '',
             visiblePdfOverlay: false,
+            pdfFileName: computed<string>(() => `${state.selectedQuerySet?.name ?? 'Cost_Analysis'}_${dayjs().format('YYYYMMDD')}`),
             previewItems: [] as Item[],
             currency: computed(() => store.state.display.currency),
             pdfFontLanguage: computed<string>(() => {

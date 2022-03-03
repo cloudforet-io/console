@@ -205,7 +205,8 @@ export default defineComponent<Props>({
             if (type === 'data-table') {
                 if (!tableData?.body) throw Error('[PdfDownloadOverlay] data-table type item must have data.');
                 const tableBody = applyTableHeaderStyle(tableData?.body);
-                return tableData?.body.length ? {
+                return tableData?.body.length > 1 ? {
+                    pageBreak: 'before',
                     table: {
                         headerRows: 1,
                         widths: tableData?.widths,
@@ -253,6 +254,9 @@ export default defineComponent<Props>({
         const createPdfWithContents = (contents: Content[]) => {
             const tableLayouts = makeTableLayouts();
             return pdfMake.createPdf({
+                info: {
+                    title: props.fileName,
+                },
                 pageSize: props.paperSize,
                 pageOrientation: props.orientation,
                 pageMargins: PAGE_PADDING,

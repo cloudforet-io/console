@@ -12,12 +12,18 @@
                     />
                 </div>
                 <div v-if="granularity !== GRANULARITY.ACCUMULATED" class="filter-item">
-                    <span class="v-divider" />
-                    <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}</b>
-                    <p-toggle-button class="ml-2"
-                                     :value="stack"
-                                     @change="handleToggleStack"
-                    />
+                    <template v-if="!printMode">
+                        <span class="v-divider" />
+                        <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}</b>
+                        <p-toggle-button class="ml-2"
+                                         :value="stack"
+                                         @change="handleToggleStack"
+                        />
+                    </template>
+                    <template v-else-if="stack">
+                        <span class="v-divider" />
+                        <span>Stacked</span>
+                    </template>
                 </div>
             </div>
             <div class="right-part">
@@ -141,7 +147,7 @@ export default {
         display: flex;
         justify-content: space-between;
         font-size: 0.875rem;
-        padding-bottom: 1rem;
+        margin-bottom: 1rem;
         .timezone-text {
             @apply text-gray-400;
             font-size: 0.875rem;

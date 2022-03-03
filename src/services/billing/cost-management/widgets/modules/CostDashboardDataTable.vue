@@ -1,5 +1,5 @@
 <template>
-    <div class="cost-dashboard-data-table">
+    <div class="cost-dashboard-data-table" :class="{'print-mode': printMode}">
         <p-data-table :fields="fields"
                       :items="slicedItems"
                       :total-count="totalCount"
@@ -13,7 +13,6 @@
                     <template v-if="fields[0].name === name">
                         <p-status v-if="showLegend"
                                   class="toggle-button"
-                                  :class="{'print-mode': printMode}"
                                   :text="(getConvertedIndex(index) + 1).toString()"
                                   :icon-color="getLegendIconColor(index)"
                                   :text-color="getLegendTextColor(index)"
@@ -229,8 +228,9 @@ export default {
         .toggle-button {
             cursor: pointer;
             padding-right: 1rem;
-            &.print-mode {
-                cursor: default;
+            > .text {
+                flex-shrink: 0;
+                white-space: nowrap;
             }
         }
         .raised {
@@ -241,6 +241,17 @@ export default {
         }
         td {
             @apply border-none;
+        }
+    }
+
+    &.print-mode {
+        .p-data-table::v-deep {
+            table {
+                width: 100%;
+            }
+            .toggle-button {
+                cursor: default;
+            }
         }
     }
 }

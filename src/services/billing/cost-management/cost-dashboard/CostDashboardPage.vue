@@ -64,7 +64,7 @@
                                      :dashboard-name="dashboard.name"
                                      @confirm="handleUpdateConfirm"
         />
-        <pdf-download-overlay v-model="visiblePdfDownload" :items="previewItems">
+        <pdf-download-overlay v-model="visiblePdfDownload" :items="previewItems" :file-name="pdfFileName">
             <cost-dashboard-preview v-if="dashboardId"
                                     :dashboard-id="dashboardId"
                                     :period="period"
@@ -76,6 +76,7 @@
 </template>
 
 <script lang="ts">
+import dayjs from 'dayjs';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -161,6 +162,7 @@ export default {
             homeDashboardId: computed<string|undefined>(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
             visiblePdfDownload: false,
             previewItems: [] as Item[],
+            pdfFileName: computed<string>(() => `${state.dashboard.name ?? 'Cost_Dashboard'}_${dayjs().format('YYYYMMDD')}`),
             dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(state.dashboard, 'public_dashboard_id') ? 'public' : 'user')),
             updateModalVisible: false,
             isAdmin: computed((() => store.getters['user/isAdmin'])),
