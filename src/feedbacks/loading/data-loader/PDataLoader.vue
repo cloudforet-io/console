@@ -254,7 +254,7 @@ export default defineComponent<Props>({
 
     /* transitions */
     .fade-in-enter-active {
-        transition: opacity 0.2s;
+        transition: opacity 0s;
     }
     .fade-in-leave-active {
         transition: opacity 0.2s;
