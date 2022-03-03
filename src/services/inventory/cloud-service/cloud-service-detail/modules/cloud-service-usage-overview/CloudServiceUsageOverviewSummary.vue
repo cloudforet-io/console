@@ -12,7 +12,7 @@
             </div>
         </template>
         <div v-for="(schema, idx) in widgetSchemaList" :key="`${contextId}-${idx}`" class="summary-wrapper">
-            <p-dynamic-widget :type="schema.type"
+            <p-dynamic-widget type="summary"
                               :name="schema.name"
                               :data="dataList[idx]"
                               :loading="dataLoading"

@@ -11,8 +11,7 @@
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_CHARTS') }}
                 </p-button>
             </header>
-            <cloud-service-usage-overview-summary :key="`${cloudServiceResourceType}-summary`"
-                                                  :schema-loading="schemaLoading"
+            <cloud-service-usage-overview-summary :schema-loading="schemaLoading"
                                                   :data-loading="dataLoading"
                                                   :data-list="summaryDataList"
                                                   :widget-schema-list="summaryWidgetSchemaList"
@@ -113,13 +112,12 @@ export default defineComponent<Props>({
         const state = reactive({
             usageOverviewDetailModalVisible: false,
             widgetSchemaList: [] as DynamicWidgetSchema[],
-            summaryWidgetSchemaList: computed<DynamicWidgetSchema[]>(() => state.widgetSchemaList.filter(({ type }) => type === 'summary')),
+            summaryWidgetSchemaList: computed<DynamicWidgetSchema[]>(() => state.widgetSchemaList.filter(({ type }) => ['summary', 'card'].includes(type))),
             chartWidgetSchemaList: computed<DynamicWidgetSchema[]>(() => state.widgetSchemaList.filter(({ type }) => type === 'chart')),
             schemaLoading: true,
             summaryDataList: [] as Data[],
             dataLoading: false,
             cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo.cloud_service_type_id ?? ''),
-            cloudServiceResourceType: computed<string>(() => props.cloudServiceTypeInfo.resource_type), // resource_type is always unique for every cloud service types including servers.
             apiQuery: computed<{filter?: Filter[]; keyword?: string}>(() => {
                 if (props.filters) {
                     const { filter, keyword } = queryHelper.setFilters(props.filters).apiQuery;
