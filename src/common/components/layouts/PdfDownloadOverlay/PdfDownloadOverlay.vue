@@ -51,7 +51,7 @@ import { toPng } from 'html-to-image';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import { TCreatedPdf } from 'pdfmake/build/pdfmake';
 // eslint-disable-next-line import/extensions,import/no-unresolved
-import { Content, Table } from 'pdfmake/interfaces';
+import { Content, Table, TableCell } from 'pdfmake/interfaces';
 import { gray, black, white } from '@/styles/colors';
 import {
     pdfFontInfoMap, PdfFontFamily, Language, fontLanguages, pdfFontFamily,
@@ -65,6 +65,7 @@ const orientations = ['portrait', 'landscape'] as const;
 const paperSizeInfoMap: Record<PaperSize, PaperSizeInfo> = Object.freeze({
     A4: { width: 595.28, height: 841.89 },
 });
+const EMPTY_ROW_COUNT = 5;
 
 type PaperSize = typeof paperSizes[number];
 type Mode = typeof modes[number]
@@ -190,22 +191,39 @@ export default defineComponent<Props>({
             emit('update:visible', value);
         };
 
-        const applyTableHeaderStyle = (data: Table['body']): Table['body'] => {
-            const tableData = data;
+        const applyTableHeaderStyle = (data: TableCell[][]): TableCell[][] => {
+            let tableData = data;
             if (tableData[0]) {
                 tableData[0] = tableData[0].map(item => ({
                     text: item,
                     style: 'tableHeader',
                 }));
+                // check if no items
+                if (!tableData[1]) {
+                    const colsLength = tableData[0].length;
+                    const emptyCell = {
+                        text: 'No Items', rowSpan: EMPTY_ROW_COUNT, colSpan: colsLength, alignment: 'center', style: 'noDataRow',
+                    };
+                    // add first row
+                    tableData.push(tableData[0].map((_, i) => {
+                        if (i === 0) return emptyCell;
+                        return '';
+                    }));
+                    // add blank rows
+                    const fakeRows = new Array(EMPTY_ROW_COUNT - 1).fill(new Array(colsLength).fill(''));
+                    tableData = tableData.concat(fakeRows);
+                }
             }
             return tableData;
         };
+
 
         const createContentWithItem = async ({ element, type, tableData }: Item): Promise<Content> => {
             if (type === 'data-table') {
                 if (!tableData?.body) throw Error('[PdfDownloadOverlay] data-table type item must have data.');
                 const tableBody = applyTableHeaderStyle(tableData?.body);
-                return tableData?.body.length > 1 ? {
+
+                return tableData?.body.length ? {
                     pageBreak: 'before',
                     table: {
                         headerRows: 1,
@@ -280,6 +298,10 @@ export default defineComponent<Props>({
                     tableHeader: {
                         bold: true,
                         color: black,
+                    },
+                    noDataRow: {
+                        bold: true,
+                        color: gray[300],
                     },
                 },
                 defaultStyle: {

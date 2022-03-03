@@ -219,6 +219,7 @@ export default {
         }
         .stat {
             @apply text-2xl font-bold flex justify-center;
+            white-space: nowrap;
             padding: 0.25rem 0;
             line-height: 1.2;
         }
