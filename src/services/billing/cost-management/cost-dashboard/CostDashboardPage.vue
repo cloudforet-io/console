@@ -2,8 +2,9 @@
     <div class="cost-dashboard-page">
         <p-breadcrumbs :routes="routeState.route" />
         <div v-if="dashboardList.length" class="top-wrapper">
-            <p-i name="ic_public" width="1rem" height="1rem"
-                 class="mr-2"
+            <p-i v-if="dashboardType==='public'" name="ic_public" width="1rem"
+                 height="1rem" color="inherit"
+                 class="mr-2 text-gray-500"
             />
             <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
             <div class="left-part">

@@ -5,7 +5,9 @@
                        :invalid-text="invalidTexts.name"
                        required
         >
-            <p-text-input :value="name" :invalid="invalidState.name" @input="handleName" />
+            <p-text-input :value="name" :invalid="invalidState.name" class="w-full"
+                          @input="handleName"
+            />
         </p-field-group>
         <p-field-group
             v-if="showGroupBy"
@@ -19,6 +21,7 @@
                 :invalid="invalidState.groupBy"
                 :selected="selectedGroupByItem"
                 use-fixed-menu-style
+                class="w-full"
                 @select="handleSelectGroupBy"
             />
         </p-field-group>

@@ -11,7 +11,9 @@
                            :invalid-text="invalidTexts.name"
                            required
             >
-                <p-text-input :value="name" :invalid="invalidState.name" @input="setForm('name', $event)" />
+                <p-text-input :value="name" :invalid="invalidState.name" class="w-full"
+                              @input="setForm('name', $event)"
+                />
             </p-field-group>
             <p-check-box v-model="includesFilter">
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.APPLIED_FILTER') }}

@@ -12,9 +12,9 @@
                       :show-icon="false"
                       class="btn-view-query"
             >
-                <p-icon-text-button style-type="primary1" name="ic_plus_bold">
+                <p-button style-type="primary1">
                     <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.VIEW_QUERY') }}</span>
-                </p-icon-text-button>
+                </p-button>
             </p-anchor>
         </template>
     </cost-dashboard-customize-widget-preview>
@@ -26,7 +26,7 @@ import { capitalize } from 'lodash';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PIconTextButton, PAnchor, PLabel,
+    PButton, PAnchor, PLabel,
 } from '@spaceone/design-system';
 
 import CostDashboardCustomizeWidgetPreview
@@ -46,7 +46,7 @@ export default {
     name: 'CustomWidgetPreview',
     components: {
         CostDashboardCustomizeWidgetPreview,
-        PIconTextButton,
+        PButton,
         PAnchor,
         PLabel,
     },

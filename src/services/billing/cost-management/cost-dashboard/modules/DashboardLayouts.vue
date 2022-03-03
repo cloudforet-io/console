@@ -19,11 +19,11 @@
                      :class="`col-${widget.options.layout}`"
                 >
                     <div v-if="customizeMode" class="btn-group">
-                        <p-icon-button name="ic_edit" size="sm"
+                        <p-icon-button name="ic_edit"
                                        style-type="gray-border" :outline="true"
                                        @click.stop="handleClickUpdate(rowIdx, colIdx, widget)"
                         />
-                        <p-icon-button name="ic_trashcan" size="sm"
+                        <p-icon-button name="ic_trashcan"
                                        style-type="alert" :outline="true"
                                        @click.stop="handleClickDelete(rowIdx, colIdx, widget)"
                         />
