@@ -262,8 +262,11 @@ export default {
         }
     }
 }
-.p-badge {
+.p-badge::v-deep {
     margin-right: 0.5rem;
+    > p {
+        white-space: nowrap;
+    }
 }
 
 @screen mobile {
