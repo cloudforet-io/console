@@ -137,7 +137,7 @@ export default defineComponent<Props>({
             proxyVisible: props.visible,
             header: computed(() => `Usage Overview of ${props.cloudServiceTypeInfo?.name}`),
             widgetSchemaList: [] as DynamicWidgetSchema[],
-            summaryWidgetSchemaList: computed<DynamicWidgetSchema[]>(() => props.schemaList.filter(({ type }) => type === 'summary')),
+            summaryWidgetSchemaList: computed<DynamicWidgetSchema[]>(() => props.schemaList.filter(({ type }) => ['summary', 'card'].includes(type))),
             chartWidgetSchemaList: computed<DynamicWidgetSchema[]>(() => props.schemaList.filter(({ type }) => type === 'chart')),
             chartDataList: [] as Data[][],
             dataLoading: true,
