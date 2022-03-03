@@ -1,3 +1,10 @@
+# [1.1.0-beta.255](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.254...v1.1.0-beta.255) (2022-03-03)
+
+
+### Bug Fixes
+
+* update the code according to latest version of "marked" ([#879](https://github.com/spaceone-dev/spaceone-design-system/issues/879)) ([a237889](https://github.com/spaceone-dev/spaceone-design-system/commit/a237889f3f69c59dad8fe4b2c372422ac7abd1d1))
+
 # [1.1.0-beta.254](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.253...v1.1.0-beta.254) (2022-03-03)
 
 
