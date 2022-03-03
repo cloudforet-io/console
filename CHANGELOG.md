@@ -1,3 +1,10 @@
+# [1.1.0-beta.252](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.251...v1.1.0-beta.252) (2022-03-03)
+
+
+### Bug Fixes
+
+* change loader enter active transition time to 0 in data loader ([#875](https://github.com/spaceone-dev/spaceone-design-system/issues/875)) ([d22307d](https://github.com/spaceone-dev/spaceone-design-system/commit/d22307d1007f4614a5cfad22dea8664bbdd62998))
+
 # [1.1.0-beta.251](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.250...v1.1.0-beta.251) (2022-03-02)
 
 
