@@ -27,7 +27,7 @@ import { iframeStyle } from './style';
 
 DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     // set all elements owning target to target=_blank
-    if ('target' in node) {
+    if ('target' in node as never) {
         node.setAttribute('target', '_blank');
         node.setAttribute('rel', 'noopener');
     }
@@ -68,7 +68,7 @@ export default {
                 if (typeof props.data !== 'string') return '';
                 return props.data;
             }),
-            iframeData: computed(() => DOMPurify.sanitize(state.rootData, { allowAttributes: { a: ['target'] } })),
+            iframeData: computed(() => DOMPurify.sanitize(state.rootData, { ALLOWED_TAGS: ['a'], ALLOWED_ATTR: ['target'] })),
         });
 
 

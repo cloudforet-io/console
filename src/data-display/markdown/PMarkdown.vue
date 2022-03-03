@@ -11,8 +11,7 @@ import { render } from 'ejs';
 import { get } from 'lodash';
 import DOMPurify from 'dompurify';
 import { MarkdownProps } from '@/data-display/markdown/type';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const marked = require('marked');
+import { marked } from 'marked';
 
 marked.setOptions({
     gfm: true,
@@ -51,7 +50,7 @@ export default {
             if (props.data) {
                 doc = render(doc, props.data);
             }
-            doc = marked(doc).replace(/<pre>/g, '<pre class="hljs"');
+            doc = marked.parse(doc).replace(/<pre>/g, '<pre class="hljs"');
             return DOMPurify.sanitize(doc);
         });
         return {
