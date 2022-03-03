@@ -69,7 +69,7 @@ export default {
     height: 100%;
 
     &.admin {
-        @apply bg-primary3;
+        background-color: rgba(theme('colors.primary3'), 0.3);
     }
 
     .lottie-wrapper {

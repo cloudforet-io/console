@@ -50,7 +50,8 @@ export default {
             active: computed(() => !!state.itemMap[props.itemId]),
         });
 
-        const onClickProjectFavorite = async () => {
+        const onClickProjectFavorite = async (event: MouseEvent) => {
+            event.stopPropagation();
             if (props.readOnly) return;
             if (state.itemMap[props.itemId]) {
                 await vm.$store.dispatch(`favorite/${props.favoriteType}/removeItem`, { id: props.itemId });

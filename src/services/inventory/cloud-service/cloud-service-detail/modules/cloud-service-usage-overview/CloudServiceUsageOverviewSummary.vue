@@ -125,7 +125,7 @@ export default {
         box-sizing: content-box;
         .name {
             @apply text-gray-700 mr-2;
-            font-size: 1rem;
+            font-size: 0.875rem;
             line-height: 1.2;
         }
         .value {
