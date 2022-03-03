@@ -20,11 +20,11 @@
             </p-check-box>
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.DASHBOARD_VISIBILITY')"
                            :invalid="invalidState.visibility"
-                           :invalida-text="invalidTexts.visibility"
+                           :invalid-text="invalidTexts.visibility"
                            required
                            class="mt-6"
             >
-                <p-radio v-for="{ name, label } in visibilityList" :key="name" :value="name"
+                <p-radio v-for="{ name, label } in filteredVisibilityList" :key="name" :value="name"
                          :selected="visibility"
                          class="radio-group"
                          @change="setForm('visibility', $event)"
@@ -38,6 +38,7 @@
 
 <script lang="ts">
 import {
+    computed,
     defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -63,6 +64,17 @@ interface Props {
     visible: boolean;
     dashboard: DashboardInfo;
 }
+
+const visibilityList = [
+    {
+        name: DASHBOARD_PRIVACY_TYPE.USER,
+        label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.PRIVATE'),
+    },
+    {
+        name: DASHBOARD_PRIVACY_TYPE.PUBLIC,
+        label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.PUBLIC'),
+    },
+];
 export default defineComponent<Props>({
     name: 'CostDashboardDashboardDuplicateModal',
     components: {
@@ -107,16 +119,8 @@ export default defineComponent<Props>({
         });
         const state = reactive({
             proxyVisible: props.visible,
-            visibilityList: [
-                {
-                    name: DASHBOARD_PRIVACY_TYPE.USER,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.PRIVATE'),
-                },
-                {
-                    name: DASHBOARD_PRIVACY_TYPE.PUBLIC,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.PUBLIC'),
-                },
-            ],
+            isAdmin: computed((() => store.getters['user/isAdmin'])),
+            filteredVisibilityList: computed(() => (state.isAdmin ? visibilityList : visibilityList.filter(item => item.name === DASHBOARD_PRIVACY_TYPE.USER))),
             includesFilter: false,
         });
 

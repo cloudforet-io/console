@@ -4,14 +4,14 @@
             <span class="label">{{ $t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER') }}: </span>
             <span class="text">{{ getFiltersText(proxyFilters) }}</span>
         </p>
-        <p-button v-if="!isAdmin && !noFilter && !printMode"
+        <p-button v-if="!showSetting && !noFilter && !printMode"
                   style-type="gray-border"
                   size="sm"
                   @click.stop="handleClickViewFilter"
         >
             {{ $t('BILLING.COST_MANAGEMENT.MAIN.VIEW_FILTER') }}
         </p-button>
-        <p-icon-button v-if="isAdmin && !printMode"
+        <p-icon-button v-if="showSetting"
                        name="ic_setting" style-type="gray900" size="sm"
                        outline
                        @click="handleClickSelectFilter"
@@ -46,11 +46,13 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import { getFiltersText } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
+import { DASHBOARD_TYPE } from '@/services/billing/cost-management/cost-dashboard/lib/config';
 
 
 interface Props {
     dashboardId: string;
     filters: CostQueryFilters;
+    printMode: boolean;
 }
 
 export default {
@@ -108,6 +110,8 @@ export default {
             noFilter: computed(() => isEmpty(state.filterItemsMap) || Object.values(state.proxyFilters).every(d => !d)),
             viewFilterModalVisible: false,
             selectFilterModalVisible: false,
+            isUserDashboard: computed(() => (props.dashboardId?.startsWith(DASHBOARD_TYPE.USER))),
+            showSetting: computed(() => ((!state.isAdmin && state.isUserDashboard) || state.isAdmin) && !props.printMode),
         });
 
         /* api */
@@ -145,7 +149,7 @@ export default {
             state.viewFilterModalVisible = true;
         };
         const handleConfirmSetFilter = (filters) => {
-            if (props.dashboardId?.startsWith('user')) {
+            if (state.isUserDashboard) {
                 updateUserDashboardFilters(filters);
             } else {
                 updatePublicDashboardFilters(filters);

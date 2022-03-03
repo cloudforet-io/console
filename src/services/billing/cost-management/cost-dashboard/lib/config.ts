@@ -50,3 +50,8 @@ export const chartTypeItemMap = Object.freeze({
         name: CHART_TYPE.TABLE, label: 'Table', imageFileName: 'widget_table',
     },
 });
+
+export const DASHBOARD_TYPE = Object.freeze({
+    PUBLIC: 'public',
+    USER: 'user',
+} as const);

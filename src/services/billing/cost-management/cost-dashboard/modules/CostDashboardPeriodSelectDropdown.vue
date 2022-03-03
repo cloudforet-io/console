@@ -1,7 +1,7 @@
 <template>
     <div class="cost-dashboard-period-select-dropdown">
         <div v-if="!printMode" class="fix-date-box">
-            <p-check-box :selected="isFixedTypeSelected" @change="handleSelectedFixDate">
+            <p-check-box :selected="isFixedTypeSelected" :disabled="disableFixDate" @change="handleSelectedFixDate">
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FIX_DATE') }}
             </p-check-box>
             <p-tooltip class="fix-date-tooltip" :contents="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FIXED_DATE_TOOLTIP')"
@@ -57,6 +57,8 @@ import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
+import { DASHBOARD_TYPE } from '@/services/billing/cost-management/cost-dashboard/lib/config';
+import { store } from '@/store';
 
 const initialPeriodStart = dayjs.utc().startOf('month').format('YYYY-MM-DD');
 const initialPeriodEnd = dayjs.utc().endOf('month').format('YYYY-MM-DD');
@@ -126,6 +128,9 @@ export default {
                 },
             ])),
             isFixedTypeSelected: props.periodType === 'FIXED',
+            isAdmin: computed((() => store.getters['user/isAdmin'])),
+            isUserDashboard: computed(() => (props.dashboardId?.startsWith(DASHBOARD_TYPE.USER))),
+            disableFixDate: computed(() => !state.isUserDashboard && !state.isAdmin),
             selectedMonthMenuItem: initialSelectedMonth,
             customRangeModalVisible: false,
             isCustomPeriod: computed<boolean>(() => {
