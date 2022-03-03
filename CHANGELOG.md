@@ -1,3 +1,10 @@
+# [1.1.0-beta.253](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.252...v1.1.0-beta.253) (2022-03-03)
+
+
+### Features
+
+* add limit to dynamic widget & chart treemap type ([#878](https://github.com/spaceone-dev/spaceone-design-system/issues/878)) ([562cb06](https://github.com/spaceone-dev/spaceone-design-system/commit/562cb06a7cdd6e1d58f90e113b652de3fbe39dbf))
+
 # [1.1.0-beta.252](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.251...v1.1.0-beta.252) (2022-03-03)
 
 
