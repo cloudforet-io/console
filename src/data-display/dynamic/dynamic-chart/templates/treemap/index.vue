@@ -5,6 +5,7 @@
 <script lang="ts">
 import { maxBy, minBy } from 'lodash';
 import {
+    computed,
     defineComponent,
     onMounted, onUnmounted, PropType,
     reactive, toRefs, watch,
@@ -15,7 +16,7 @@ import { TreeMap } from '@amcharts/amcharts4/charts';
 
 import {
     DEFAULT_NAME_OPTIONS,
-    DEFAULT_VALUE_OPTIONS,
+    DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_LIMIT_MAP,
     DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
 import { drawTreemapChart } from '@/data-display/dynamic/dynamic-chart/templates/treemap/helper';
@@ -72,7 +73,8 @@ const getColoredData = (chartData: any[], theme: DynamicChartTheme, valueOptions
     return results;
 };
 
-export default defineComponent<DynamicChartTemplateProps>({
+type DynamicChartTreemapProps = DynamicChartTemplateProps & { limit: number }
+export default defineComponent<DynamicChartTreemapProps>({
     name: 'PDynamicChartTreemap',
     props: {
         data: {
@@ -97,13 +99,17 @@ export default defineComponent<DynamicChartTemplateProps>({
         },
         limit: {
             type: Number,
-            default: undefined,
+            default: DYNAMIC_CHART_LIMIT_MAP.TREEMAP,
         },
     },
     setup(props) {
         const state = reactive({
             chart: null as null|TreeMap,
             chartRef: null as null|HTMLElement,
+            filteredData: computed<any[]>(() => {
+                if (props.data.length > props.limit) return props.data.slice(0, props.limit);
+                return props.data;
+            }),
         });
 
         const disposeChart = () => {
@@ -122,7 +128,7 @@ export default defineComponent<DynamicChartTemplateProps>({
             drawTreemapChart(chart, props.nameOptions, props.valueOptions);
             state.chart = chart;
 
-            state.chart.data = getColoredData(props.data, props.theme, props.valueOptions);
+            state.chart.data = getColoredData(state.filteredData, props.theme, props.valueOptions);
         };
 
         const updateChartData = (data: any[]) => {
@@ -133,7 +139,7 @@ export default defineComponent<DynamicChartTemplateProps>({
             drawChart();
         });
 
-        const stopDataWatch = watch([() => props.data, () => props.theme], ([data, theme]) => {
+        const stopDataWatch = watch([() => state.filteredData, () => props.theme], ([data, theme]) => {
             updateChartData(getColoredData(data as any[], theme as DynamicChartTheme, props.valueOptions));
         });
 

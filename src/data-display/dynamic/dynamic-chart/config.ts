@@ -11,4 +11,5 @@ export const DYNAMIC_CHART_THEMES = ['VIOLET', 'BLUE', 'CORAL', 'YELLOW', 'GREEN
 export const DYNAMIC_CHART_LIMIT_MAP = {
     COLUMN: 8,
     DONUT: 5,
+    TREEMAP: 10,
 };
