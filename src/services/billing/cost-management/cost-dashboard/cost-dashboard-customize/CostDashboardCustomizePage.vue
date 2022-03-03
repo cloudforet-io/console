@@ -260,7 +260,7 @@ export default {
             .input-container {
                 @apply font-bold;
                 height: 3.125rem;
-                font-size: 1.875rem;
+                font-size: 1.5rem;
             }
         }
     }

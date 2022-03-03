@@ -9,6 +9,7 @@
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SIDEBAR_DESC') }}
                 </p>
                 <p-icon-text-button style-type="primary-dark" name="ic_plus_bold" :outline="true"
+                                    size="lg"
                                     class="add-widget-button" @click="handleClickAddWidget"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}

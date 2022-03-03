@@ -36,8 +36,8 @@ export default {
     setup(props) {
         const state = reactive({
             chartType: computed(() => props.selectedWidget?.options?.chart_type ?? ''),
-            chartTypeName: computed(() => chartTypeItemMap[state.chartType].label),
-            chartTypeImageFileName: computed(() => chartTypeItemMap[state.chartType].imageFileName),
+            chartTypeName: computed(() => chartTypeItemMap[state.chartType]?.label),
+            chartTypeImageFileName: computed(() => chartTypeItemMap[state.chartType]?.imageFileName),
             layout: computed(() => props.selectedWidget?.options?.layout),
         });
         return {
