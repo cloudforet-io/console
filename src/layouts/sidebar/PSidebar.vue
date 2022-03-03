@@ -8,6 +8,7 @@
         <transition name="slide-fade">
             <div v-if="proxyVisible"
                  class="sidebar-wrapper"
+                 :class="size"
             >
                 <div class="inner">
                     <p class="title" :class="{'mb-4': !!title || !!$scopedSlots.title}">
@@ -15,7 +16,8 @@
                             {{ title }}
                         </slot>
                     </p>
-                    <p-icon-button class="close-btn"
+                    <p-icon-button v-if="!hideCloseButton"
+                                   class="close-button"
                                    name="ic_delete"
                                    size="lg"
                                    @click.stop="onClickClose"
@@ -34,7 +36,11 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import { SIDEBAR_STYLE_TYPE } from '@/layouts/sidebar/type';
+import {
+    STYLE_TYPE as SIDEBAR_STYLE_TYPE,
+    SIZE as SIDEBAR_SIZE,
+    SidebarProps,
+} from '@/layouts/sidebar/type';
 
 export default defineComponent({
     name: 'PSidebar',
@@ -58,8 +64,17 @@ export default defineComponent({
             default: SIDEBAR_STYLE_TYPE.primary,
             validator: value => Object.keys(SIDEBAR_STYLE_TYPE).includes(value as string),
         },
+        size: {
+            type: String,
+            default: SIDEBAR_SIZE.md,
+            validator: value => Object.keys(SIDEBAR_SIZE).includes(value as string),
+        },
+        hideCloseButton: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props, { emit, listeners }) {
+    setup(props: SidebarProps, { emit, listeners }) {
         const state = reactive({
             proxyVisible: listeners.close || listeners['update:visible'] ? computed({
                 get() {
@@ -128,7 +143,7 @@ export default defineComponent({
             font-size: 1.125rem;
             line-height: 1.4;
         }
-        .close-btn {
+        .close-button {
             @apply absolute text-gray-400;
             top: 1.5rem;
             right: 1.5rem;
@@ -163,26 +178,22 @@ export default defineComponent({
     @screen lg {
         flex-direction: row;
 
-        $min-width: 20rem;
         .sidebar-wrapper {
             position: static;
             height: 100%;
             max-height: 100%;
-            min-width: $(min-width);
             z-index: unset;
             flex-shrink: 0;
             border-top-width: 0;
             border-left-width: 1px;
-        }
 
-        &.primary {
-            .sidebar-wrapper {
+            &.sm {
+                width: 16.25rem;
+            }
+            &.md {
                 width: 25%;
             }
-        }
-
-        &.secondary {
-            .sidebar-wrapper {
+            &.lg {
                 width: 30%;
             }
         }
