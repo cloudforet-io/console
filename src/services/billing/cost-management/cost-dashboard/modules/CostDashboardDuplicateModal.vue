@@ -1,12 +1,12 @@
 <template>
-    <p-button-modal :visible="proxyVisible" header-title="Duplicate Dashboard"
+    <p-button-modal :visible="proxyVisible" :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.DUPLICATE_DASHBOARD')"
                     size="sm"
                     :disabled="!isAllValid"
                     @confirm="handleConfirm"
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <p-field-group :label="'Dashboard Name'"
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.DASHBOARD_NAME')"
                            :invalid="invalidState.name"
                            :invalid-text="invalidTexts.name"
                            required
@@ -18,7 +18,7 @@
             <p-check-box v-model="includesFilter">
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.APPLIED_FILTER') }}
             </p-check-box>
-            <p-field-group label="Dashboard Visibility"
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.DASHBOARD_VISIBILITY')"
                            :invalid="invalidState.visibility"
                            :invalida-text="invalidTexts.visibility"
                            required

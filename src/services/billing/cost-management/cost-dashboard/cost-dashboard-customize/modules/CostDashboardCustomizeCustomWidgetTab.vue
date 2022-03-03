@@ -1,7 +1,7 @@
 <template>
     <div class="cost-dashboard-customize-custom-widget-tab">
         <div class="left-area">
-            <div class="widgets-area">
+            <p-data-loader class="widgets-area" :data="widgetList" :loading="loading">
                 <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ widgetList.length }})</p-label>
                 <ul class="widget-list">
                     <li v-for="(widget, idx) in widgetList" :key="`widget-${idx}-${widget.name}`" class="widget-card"
@@ -23,7 +23,17 @@
                     :all-page="allPage"
                     @pageChange="listCustomWidget"
                 />
-            </div>
+                <template #no-data>
+                    <div class="help-text-wrapper">
+                        <p class="title">
+                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_CUSTOM_WIDGET') }}
+                        </p>
+                        <p class="text">
+                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_CUSTOM_WIDGET_HELP_TEXT') }}
+                        </p>
+                    </div>
+                </template>
+            </p-data-loader>
             <cost-dashboard-customize-cost-query :selected-query.sync="selectedQuery"
                                                  :widget-list="widgetList"
                                                  class="cost-query-area"
@@ -54,7 +64,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PRadio, PTextPagination, PButton, PLabel,
+    PRadio, PTextPagination, PButton, PLabel, PDataLoader,
 } from '@spaceone/design-system';
 
 import CostDashboardCustomizeCostQuery
@@ -87,6 +97,7 @@ export default {
         PRadio,
         PButton,
         PLabel,
+        PDataLoader,
     },
     setup() {
         const state = reactive({
@@ -188,11 +199,26 @@ export default {
 <style lang="postcss" scoped>
 .cost-dashboard-customize-custom-widget-tab {
     .left-area {
+        overflow: hidden;
         .widgets-area {
             @apply mb-4 border-b border-gray-200;
+            min-height: 23.5rem;
+            .help-text-wrapper {
+                font-size: 0.875rem;
+                .title {
+                    @apply text-primary2;
+                    font-weight: bold;
+                    margin-bottom: 0.5rem;
+                }
+                .text {
+                    @apply text-gray-600;
+                }
+            }
         }
         .cost-query-area {
             @apply mr-8;
+            height: 14.5rem;
+            overflow-y: auto;
         }
     }
     .right-area {

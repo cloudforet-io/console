@@ -33,7 +33,7 @@
                     <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm"
                                         @click.stop="handleClickCustomize"
                     >
-                        Customize
+                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE') }}
                     </p-icon-text-button>
                 </div>
             </div>
@@ -51,11 +51,11 @@
             />
             <div v-else class="empty-dashboard">
                 <img src="@/assets/images/illust_circle_boy.svg" class="empty-img">
-                <span class="empty-text">No saved Dashboard Found</span>
+                <span class="empty-text">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.NO_SAVED_DASHBOARD_FOUND') }}</span>
                 <p-icon-text-button v-if="isAdmin" name="ic_plus" style-type="primary1"
                                     @click="handleClickCreate"
                 >
-                    <span>Create Dashboard</span>
+                    <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE_DASHBOARD') }}</span>
                 </p-icon-text-button>
             </div>
         </div>

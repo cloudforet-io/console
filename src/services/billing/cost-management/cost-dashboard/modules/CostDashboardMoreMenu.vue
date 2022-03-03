@@ -55,7 +55,7 @@ export default {
     setup(props) {
         const defaultMenuItems = computed(() => [
             { name: 'duplicate', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.DUPLICATE'), disabled: false },
-            { name: 'delete', label: 'Delete', disabled: false },
+            { name: 'delete', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.DELETE'), disabled: false },
             { name: 'setHome', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.SET_HOME'), disabled: false },
         ]);
 

@@ -2,7 +2,7 @@
     <cost-dashboard-customize-widget-preview :layout="layout">
         <template #chart>
             <div class="info-item">
-                <p-label>Type</p-label>
+                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.TYPE') }}</p-label>
                 <div class="image-wrapper">
                     <img :src="require(`@/assets/images/${chartTypeImageFileName}.svg`)">
                 </div>

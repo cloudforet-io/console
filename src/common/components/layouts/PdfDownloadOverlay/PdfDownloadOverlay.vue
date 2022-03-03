@@ -1,19 +1,19 @@
 <template>
     <div v-if="visible" class="pdf-download-overlay">
         <div class="header-wrapper">
-            <span class="title">PDF preview</span>
+            <span class="title">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.PDF_PREVIEW') }}</span>
             <div class="button-group">
                 <p-button style-type="gray-border" :outline="true"
                           @click="handleClickCancel"
                 >
-                    Cancel
+                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.CANCEL') }}
                 </p-button>
                 <p-icon-text-button v-if="mode === 'ELEMENT_EMBED'" name="ic_download"
                                     style-type="secondary-dark"
                                     :loading="loading"
                                     @click="handleClickDownload"
                 >
-                    Download PDF
+                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.DOWNLOAD_PDF') }}
                 </p-icon-text-button>
             </div>
         </div>
@@ -32,7 +32,7 @@
                 <div class="progress-rate">
                     {{ progressRate }}%
                 </div>
-                <span>Processing...</span>
+                <span>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.PROCESSING') }}...</span>
             </div>
         </div>
         <iframe v-if="mode === 'PDF_EMBED' && pdfDataUrl" :src="pdfDataUrl" />

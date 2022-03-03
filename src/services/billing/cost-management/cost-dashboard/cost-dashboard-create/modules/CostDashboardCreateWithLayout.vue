@@ -13,7 +13,7 @@
                 </p-select-card>
                 <div v-if="layoutData.widgetList.length" class="widget-list-wrapper">
                     <div class="widget-title-wrapper">
-                        <span class="widget-list-title">List of widgets</span>
+                        <span class="widget-list-title">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.LIST_OF_WIDGETS') }}</span>
                         <p-collapsible-toggle :is-collapsed="!unfoldedIndices.includes(idx)"
                                               toggle-position="contents"
                                               @update:isCollapsed="handleUpdateCollapsed(idx, ...arguments)"
