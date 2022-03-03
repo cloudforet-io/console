@@ -34,6 +34,13 @@ import { SpaceRouter } from '@/router';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import { DASHBOARD_TYPE } from '@/services/billing/cost-management/cost-dashboard/lib/config';
+
+const MENU = Object.freeze({
+    DUPLICATE: 'duplicate',
+    DELETE: 'delete',
+    SET_HOME: 'setHome',
+} as const);
 
 export default {
     name: 'CostDashboardMoreMenu',
@@ -54,9 +61,9 @@ export default {
     },
     setup(props) {
         const defaultMenuItems = computed(() => [
-            { name: 'duplicate', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.DUPLICATE'), disabled: false },
-            { name: 'delete', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.DELETE'), disabled: false },
-            { name: 'setHome', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.SET_HOME'), disabled: false },
+            { name: MENU.DUPLICATE, label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.DUPLICATE'), disabled: false },
+            { name: MENU.DELETE, label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.DELETE'), disabled: false },
+            { name: MENU.SET_HOME, label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.SET_HOME'), disabled: false },
         ]);
 
         const state = reactive({
@@ -67,7 +74,7 @@ export default {
                     menuItems[2].disabled = true;
                     return menuItems;
                 }
-                if (state.dashboardType === 'public' && !state.isDomainOwner) {
+                if (state.dashboardType === DASHBOARD_TYPE.PUBLIC && !state.isAdmin) {
                     if (state.homeDashboardId === props.dashboardId) {
                         menuItems[1].disabled = true;
                         menuItems[2].disabled = true;
@@ -77,10 +84,10 @@ export default {
                 }
                 return defaultMenuItems.value;
             }),
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            isAdmin: computed((() => store.getters['user/isAdmin'])),
             homeDashboardId: computed<string|undefined>(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
             duplicateModalVisible: false,
-            dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(props.dashboard, 'public_dashboard_id') ? 'public' : 'user')),
+            dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(props.dashboard, 'public_dashboard_id') ? DASHBOARD_TYPE.PUBLIC : DASHBOARD_TYPE.USER)),
         });
 
         const checkDeleteState = reactive({
@@ -116,15 +123,15 @@ export default {
 
 
         const handleSelectMoreMenu = (item) => {
-            if (item === 'setHome' && props.dashboardId) {
+            if (item === MENU.SET_HOME && props.dashboardId) {
                 store.dispatch('settings/setItem', {
                     key: 'homeDashboard',
                     value: props.dashboardId,
                     path: '/costDashboard',
                 });
-            } else if (item === 'duplicate') {
+            } else if (item === MENU.DUPLICATE) {
                 state.duplicateModalVisible = true;
-            } else if (item === 'delete') {
+            } else if (item === MENU.DELETE) {
                 checkDeleteState.visible = true;
             }
         };

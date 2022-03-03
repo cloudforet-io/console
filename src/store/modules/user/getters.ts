@@ -11,7 +11,7 @@ export const isAdmin = (state: UserState): boolean => {
 
     if (state.roles) {
         state.roles.forEach((role) => {
-            if (role.roleType === 'DOMAIN') {
+            if (role.name === 'Domain Admin') {
                 isAdminUser = true;
             }
         });
