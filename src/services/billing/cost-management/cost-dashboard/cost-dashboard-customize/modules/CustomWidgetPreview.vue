@@ -1,11 +1,26 @@
 <template>
     <cost-dashboard-customize-widget-preview :layout="LAYOUT">
         <template #description>
-            <div><p-label>Query Name</p-label> <span>{{ queryName }}</span></div>
-            <div><p-label>Granularity</p-label> <span>{{ getGranularityText(granularity) }}</span></div>
-            <div><p-label>Stack</p-label> <span>{{ stack ? 'On' : 'Off' }}</span></div>
-            <div><p-label>Group By</p-label> <span :class="{ 'text-gray-500': !groupBy }">{{ getGroupByText(groupBy) }}</span></div>
-            <div><p-label>Filters</p-label> <span :class="{'text-gray-500': !filters}">{{ getFiltersText(filters) }}</span></div>
+            <div>
+                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_QUERY_NAME') }}</p-label>
+                <span>{{ queryName }}</span>
+            </div>
+            <div>
+                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_GRANULARITY') }}</p-label>
+                <span>{{ granularityLabel }}</span>
+            </div>
+            <div>
+                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_STACK') }}</p-label>
+                <span>{{ stack ? 'On' : 'Off' }}</span>
+            </div>
+            <div>
+                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_GROUP_BY') }}</p-label>
+                <span :class="{ 'text-gray-500': !groupBy }">{{ getGroupByText(groupBy) }}</span>
+            </div>
+            <div>
+                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_FILTERS') }}</p-label>
+                <span :class="{'text-gray-500': noFilters }">{{ getFiltersText(filters) }}</span>
+            </div>
         </template>
         <template #extra>
             <p-anchor :to="getViewQueryLink()"
@@ -33,11 +48,12 @@ import CostDashboardCustomizeWidgetPreview
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetPreview.vue';
 
 import { CostQuerySetModel } from '@/services/billing/cost-management/type';
-import { GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { WidgetInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 import { getFiltersText } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { i18n } from '@/translations';
 
 
 const LAYOUT = 100;
@@ -68,7 +84,13 @@ export default {
                 if (Array.isArray(options.group_by)) return options.group_by[0];
                 return options.group_by;
             }),
+            granularityLabel: computed(() => {
+                if (state.granularity === GRANULARITY.ACCUMULATED) return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ACCUMULATED');
+                if (state.granularity === GRANULARITY.MONTHLY) return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY');
+                return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY');
+            }),
             filters: computed(() => props.selectedItem?.options.filters),
+            noFilters: computed(() => !state.filters || !Object.keys(state.filters).length),
         });
 
         /* Util */

@@ -15,7 +15,7 @@
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}
                 </p-icon-text-button>
                 <p class="widget-count">
-                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SIDEBAR_WIDGET') }}
+                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CURRENT_WIDGETS') }}
                 </p>
                 <draggable v-model="editingCustomLayout" tag="ul" class="widget-list"
                            ghost-class="ghost"

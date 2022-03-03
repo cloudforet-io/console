@@ -1,12 +1,12 @@
 <template>
-    <p-button-modal :visible="proxyVisible" header-title="Update Dashboard"
+    <p-button-modal :visible="proxyVisible" :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.UPDATE_DASHBOARD')"
                     :disabled="!isAllValid"
                     size="sm"
                     @confirm="handleConfirm"
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <p-field-group :label="'Dashboard Name'"
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.DASHBOARD_NAME')"
                            :invalid="invalidState.name"
                            :invalid-text="invalidTexts.name"
                            required

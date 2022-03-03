@@ -1,6 +1,6 @@
 <template>
     <p-button-modal :visible="proxyVisible"
-                    header-title="Add New Widget"
+                    :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.TITLE')"
                     size="lg"
                     :disabled="!isSelectedWidgetExist"
                     @confirm="handleConfirm"
@@ -35,6 +35,7 @@ import CostDashboardCustomizeDefaultWidgetTab
 import CostDashboardCustomizeCustomWidgetTab
     from '@/services/billing/cost-management/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeCustomWidgetTab.vue';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 interface Props {
     visible: boolean;
@@ -69,8 +70,8 @@ export default {
         });
         const tabState = reactive({
             tabs: computed(() => ([
-                { name: 'default-widget', label: 'Default' },
-                { name: 'custom-widget', label: 'Custom' },
+                { name: 'default-widget', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.DEFAULT') },
+                { name: 'custom-widget', label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CUSTOM') },
             ] as TabItem[])),
             activeTab: 'default-widget',
         });
