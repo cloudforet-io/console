@@ -97,7 +97,7 @@ export default defineComponent<DynamicWidgetSummaryProps>({
     }
     > .value {
         display: inline-flex;
-        font-size: 1.375rem;
+        font-size: 1.125rem;
         font-weight: bold;
         line-height: 1.75rem;
         .p-skeleton {
