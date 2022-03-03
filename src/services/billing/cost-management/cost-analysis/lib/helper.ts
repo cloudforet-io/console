@@ -23,7 +23,7 @@ export const getConvertedFilter = (filters: CostQueryFilters): QueryStoreFilter[
 export const getConvertedBudgetFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
     const result: QueryStoreFilter[] = [];
     Object.entries(filters).forEach(([key, data]) => {
-        if (key === 'project_id' && data?.length) {
+        if ((key === 'project_id' || key === 'project_group_id') && data?.length) {
             result.push({
                 k: key,
                 v: data,
