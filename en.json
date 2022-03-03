@@ -459,6 +459,12 @@
 				"MY_QUERY": "My Query",
 				"NO_FILTERS": "No Filters",
 				"NO_ITEMS": "No Items",
+				"PDF": {
+					"CANCEL": "Cancel",
+					"DOWNLOAD_PDF": "Download PDF",
+					"PDF_PREVIEW": "PDF Preview",
+					"PROCESSING": "Processing"
+				},
 				"PERIOD": {
 					"CUSTOM_DATE_RANGE": "Custom Date Range",
 					"LAST_14_DAYS": "Last 14 Days",
@@ -484,6 +490,7 @@
 				"SET_QUERY": "Set query",
 				"SHOW_ALL": "Show all",
 				"STACK": "Stack",
+				"STACKED": "Stacked",
 				"STACKED_COLUMN": "Stacked Column",
 				"STACKED_LINE": "Stacked Line",
 				"START_DATE": "Start Date",
@@ -493,7 +500,6 @@
 			},
 			"DASHBOARD": {
 				"AVAILABLE": "Available",
-				"BUDGET": "budgets",
 				"BUDGET_STATUS": "Budget Status",
 				"BUDGET_USAGE": "Budget Usage",
 				"BUDGET_USAGE_SUMMARY": "Budget Usage Summary",
@@ -513,6 +519,7 @@
 						"BASIC_TEMPLATE": "Basic Template",
 						"EXISTING_DASHBOARD": "Clone an Existing Dashboard",
 						"FILTER": "Filter",
+						"LIST_OF_WIDGETS": "List of widgets",
 						"TEMPLATE": "Template",
 						"VIEW": "View",
 						"VIEW_FILTER": "View Filter"
@@ -524,23 +531,40 @@
 						"VISIBILITY": "Visibility"
 					}
 				},
+				"CREATE_DASHBOARD": "Create Dashboard",
 				"CUSTOM": "Custom",
 				"CUSTOMIZE": {
 					"ADD_WIDGET": "Add Widget",
 					"ADD_WIDGET_MODAL": {
+						"ACCUMULATED": "Accumulated",
 						"ADD_TO_CUSTOM_WIDGET": "Add to Custom Widget",
 						"ALL": "All",
 						"COST_ANALYSIS_QUERY": "Cost Analysis Query",
 						"CREATE_QUERY": "Create Query",
-						"IN_RATIO": "In ratio",
+						"CUSTOM": "Custom",
+						"DAILY": "Daily",
+						"DEFAULT": "Default",
+						"IN_RATIO": "In ratio {ratio}%",
+						"LABEL_FILTERS": "Filters",
+						"LABEL_GRANULARITY": "Granularity",
+						"LABEL_GROUP_BY": "Group By",
+						"LABEL_QUERY_NAME": "Query Name",
+						"LABEL_STACK": "Stack",
+						"LAYOUT": "Layout",
+						"MONTHLY": "Monthly",
+						"NO_CUSTOM_WIDGET": "No custom widget found",
+						"NO_CUSTOM_WIDGET_HELP_TEXT": "Make new custom widget using saved queries listed below",
 						"NO_SAVED_QUERY": "No Saved Query",
 						"NO_SAVED_QUERY_HELP_TEXT": "Set a new query from 'Cost Analysis' page in order to use it as a widget.",
 						"RECOMMENDED_WIDGET": "Recommended Widget",
 						"REMOVE_WIDGET": "Remove Widget",
 						"TITLE": "Add New Widget",
+						"TYPE": "Type",
 						"VIEW_QUERY": "View Query"
 					},
 					"CANCEL": "Cancel",
+					"CURRENT_WIDGETS": "Current widgets",
+					"CUSTOMIZE": "Customize",
 					"CUSTOMIZE_TITLE": "Customize Dashboard",
 					"FORM": {
 						"DELETE_CONTENTS": "You will not be able to recover this widget.",
@@ -550,11 +574,14 @@
 						"UPDATE_TITLE": "Update Widget"
 					},
 					"SAVE": "Save",
-					"SIDEBAR_DESC": "You can add, move and remove your widgets.",
-					"SIDEBAR_WIDGET": "Widget"
+					"SIDEBAR_DESC": "You can add, move and remove your widgets."
 				},
+				"DASHBOARD_NAME": "Dashboard Name",
+				"DASHBOARD_VISIBILITY": "Dashboard Visibility",
 				"DECREASE": "Decreased from {date}",
+				"DELETE": "Delete",
 				"DUPLICATE": "Duplicate",
+				"DUPLICATE_DASHBOARD": "Duplicate Dashboard",
 				"FIELD_LABEL": {
 					"ACCUMULATED_SPENT": "Accumulated Spent",
 					"AMOUNT_SPENT": "Amount Spent",
@@ -576,6 +603,7 @@
 				"LAST_MONTH_TOTAL_SPEND": "Last Month Total Spend",
 				"MONTH_TO_DATE_SPEND": "Month-to-Date Spend",
 				"MY_DASHBOARD": "My Dashboard",
+				"NO_SAVED_DASHBOARD_FOUND": "No saved Dashboard Found",
 				"PROJECT_WISE_BUDGET_USAGE_SUMMARY": "Project-wise Budget Usage Summary",
 				"PUBLIC": "Public",
 				"SET_HOME": "Set as Home Dashboard",
@@ -584,7 +612,7 @@
 				"SPENT": "spent",
 				"TOTAL_BUDGET_USAGE": "Budget Usage",
 				"TOTAL_COST": "Total Cost",
-				"VISIBILITY": "Edit Visibility"
+				"UPDATE_DASHBOARD": "Update Dashboard"
 			},
 			"MAIN": {
 				"ALT_E_EDIT_FILTER": "Failed to Update Filter",
