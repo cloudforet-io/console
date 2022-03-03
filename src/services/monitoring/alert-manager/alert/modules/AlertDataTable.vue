@@ -106,7 +106,7 @@
                 </template>
             </p-toolbox-table>
         </div>
-        <alert-form-modal :visible.sync="visibleAlertFormModal" :project-id="projectId" @confirm="onAlertFormConfirm" />
+        <alert-form-modal :visible.sync="visibleAlertFormModal" :project-id.sync="projectId" @confirm="onAlertFormConfirm" />
     </fragment>
 </template>
 <script lang="ts">

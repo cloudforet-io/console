@@ -100,7 +100,7 @@ export default {
             // inputs
             title: undefined as undefined|string,
             urgency: ALERT_URGENCY.HIGH,
-            selectedProjectId: computed(() => props.projectId),
+            selectedProjectId: props.projectId,
             description: '',
             // validation
             titleInvalidText: computed(() => {
@@ -181,7 +181,7 @@ export default {
 
         const reset = () => {
             state.title = undefined;
-            state.selectedProjectId = undefined;
+            state.selectedProjectId = props.projectId ?? undefined;
             state.urgency = ALERT_URGENCY.HIGH;
             state.description = '';
 
@@ -191,6 +191,7 @@ export default {
         watch(() => state.proxyVisible, (visible) => {
             if (!visible) reset();
         });
+
 
         return {
             ...toRefs(state),
