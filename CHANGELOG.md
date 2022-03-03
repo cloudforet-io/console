@@ -1,3 +1,10 @@
+# [1.1.0-beta.256](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.255...v1.1.0-beta.256) (2022-03-03)
+
+
+### Bug Fixes
+
+* add `size`, `hideCloseButton` props to Sidebar ([#882](https://github.com/spaceone-dev/spaceone-design-system/issues/882)) ([6377f6f](https://github.com/spaceone-dev/spaceone-design-system/commit/6377f6fac7a0820a70d545b7e6ee91757655a684))
+
 # [1.1.0-beta.255](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.254...v1.1.0-beta.255) (2022-03-03)
 
 
