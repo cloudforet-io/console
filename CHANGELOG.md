@@ -1,3 +1,10 @@
+# [1.1.0-beta.254](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.253...v1.1.0-beta.254) (2022-03-03)
+
+
+### Bug Fixes
+
+* fix dynamicWidget font size ([#881](https://github.com/spaceone-dev/spaceone-design-system/issues/881)) ([23c3909](https://github.com/spaceone-dev/spaceone-design-system/commit/23c39090e7ba443f476f6f1727616d15dd511319))
+
 # [1.1.0-beta.253](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.252...v1.1.0-beta.253) (2022-03-03)
 
 
