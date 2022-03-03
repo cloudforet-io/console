@@ -154,7 +154,7 @@ export default defineComponent<Props>({
         const setChartDataAndLegends = () => {
             const start = props.widgetType === 'SHORT' ? dayjs.utc(props.period.end).subtract(SHORT_TYPE_RANGE - 1, 'month') : dayjs.utc(props.period.start);
             const _period = {
-                start: start.format('YYYY-MM-01'),
+                start: start.format('YYYY-MM-DD'),
                 end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
             };
             state.chartData = getXYChartData(state.items, GRANULARITY.MONTHLY, _period, props.groupBy as GROUP_BY);
@@ -255,8 +255,8 @@ export default defineComponent<Props>({
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
                     group_by: [props.groupBy],
-                    start: start.format('YYYY-MM-01'),
-                    end: dayjs.utc(period.end).add(1, 'month').format('YYYY-MM-01'),
+                    start: start.format('YYYY-MM-DD'),
+                    end: dayjs.utc(period.end).endOf('month').format('YYYY-MM-DD'),
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
