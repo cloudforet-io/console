@@ -8,27 +8,30 @@
                     @update:visible="handleUpdateVisible"
                     @confirm="handleUpdateVisible(false)"
     >
+        <cloud-service-period-filter read-only :period="period" />
         <template #body>
             <cloud-service-period-filter read-only :period="period" />
-            <p-query-search-tags :tags="queryTags" read-only class="pt-4 border-t border-gray-200" />
-            <cloud-service-usage-overview-summary v-if="summaryDataList.length"
-                                                  :data-loading="dataLoading"
-                                                  :data-list="summaryDataList"
-                                                  :widget-schema-list="summaryWidgetSchemaList"
-                                                  :cloud-service-type-id="cloudServiceTypeId"
-            />
-            <div class="chart-widget-wrapper">
-                <template v-for="(schema, idx) in chartWidgetSchemaList">
-                    <p-dynamic-widget :key="`${cloudServiceTypeId}-${idx}`"
-                                      :index="idx"
-                                      :type="schema.type"
-                                      :name="schema.name"
-                                      :data="chartDataList[idx]"
-                                      :loading="dataLoading"
-                                      :schema-options="schema.options"
-                                      :field-handler="fieldHandler"
-                    />
-                </template>
+            <div class="modal-inner">
+                <p-query-search-tags :tags="queryTags" read-only class="pt-4 border-t border-gray-200" />
+                <cloud-service-usage-overview-summary v-if="summaryDataList.length"
+                                                      :data-loading="dataLoading"
+                                                      :data-list="summaryDataList"
+                                                      :widget-schema-list="summaryWidgetSchemaList"
+                                                      :cloud-service-type-id="cloudServiceTypeId"
+                />
+                <div class="chart-widget-wrapper">
+                    <template v-for="(schema, idx) in chartWidgetSchemaList">
+                        <p-dynamic-widget :key="`${cloudServiceTypeId}-${idx}`"
+                                          :index="idx"
+                                          :type="schema.type"
+                                          :name="schema.name"
+                                          :data="chartDataList[idx]"
+                                          :loading="dataLoading"
+                                          :schema-options="schema.options"
+                                          :field-handler="fieldHandler"
+                        />
+                    </template>
+                </div>
             </div>
         </template>
         <template #confirm-button>
@@ -227,11 +230,11 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .cloud-service-usage-overview-detail-modal::v-deep {
-    .modal-body {
+    .modal-inner {
         @apply bg-gray-100;
         display: flex;
         flex-direction: column;
-        padding: 1rem 2.5rem;
+        padding: 1rem 1.25rem;
     }
     .chart-widget-wrapper {
         @apply overflow-visible;
@@ -257,7 +260,7 @@ export default defineComponent<Props>({
 
     .p-dynamic-widget-chart {
         @apply overflow-visible h-auto;
-        min-height: 21.625rem;
+        min-height: 17.5rem;
     }
 
     .amcharts-Polyspline {
@@ -275,7 +278,7 @@ export default defineComponent<Props>({
 
 @screen tablet {
     .cloud-service-usage-overview-detail-modal::v-deep {
-        .modal-body {
+        .modal-inner {
             height: 70vh;
         }
         .chart-widget-wrapper {
@@ -286,7 +289,7 @@ export default defineComponent<Props>({
 
 @screen mobile {
     .cloud-service-usage-overview-detail-modal::v-deep {
-        .modal-body {
+        .modal-inner {
             padding: 0;
         }
     }
