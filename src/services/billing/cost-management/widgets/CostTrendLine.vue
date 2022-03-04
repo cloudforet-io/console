@@ -282,7 +282,7 @@ export default {
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
-                state.legends = getLegends(results, state.groupBy);
+                state.legends = getLegends(results, GRANULARITY.MONTHLY, state.groupBy);
                 state.totalCount = total_count > 15 ? 15 : total_count;
                 return results;
             } catch (e) {

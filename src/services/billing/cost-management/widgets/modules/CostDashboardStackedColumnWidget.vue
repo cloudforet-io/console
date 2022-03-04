@@ -158,7 +158,7 @@ export default defineComponent<Props>({
                 end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
             };
             state.chartData = getXYChartData(state.items, GRANULARITY.MONTHLY, _period, props.groupBy as GROUP_BY);
-            state.legends = getLegends(state.items, props.groupBy as GROUP_BY);
+            state.legends = getLegends(state.items, GRANULARITY.MONTHLY, props.groupBy as GROUP_BY);
         };
         const disposeChart = (chartContext) => {
             if (state.chartRegistry[chartContext]) {

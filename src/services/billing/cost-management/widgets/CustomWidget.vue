@@ -203,7 +203,7 @@ export default {
 
             const rawData = await listCostAnalysisData();
             tableState.items = rawData;
-            state.legends = getLegends(rawData, groupBy);
+            state.legends = getLegends(rawData, granularity, groupBy);
             if (props.options?.granularity === GRANULARITY.ACCUMULATED) {
                 state.chartData = getPieChartData(rawData, groupBy);
             } else {

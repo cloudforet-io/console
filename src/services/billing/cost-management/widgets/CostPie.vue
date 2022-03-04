@@ -233,7 +233,7 @@ export default defineComponent<WidgetProps>({
 
                 tableState.items = results;
                 state.chartData = getPieChartData(results, state.groupBy);
-                state.legends = getLegends(results, state.groupBy);
+                state.legends = getLegends(results, GRANULARITY.ACCUMULATED, state.groupBy);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.chartData = [];

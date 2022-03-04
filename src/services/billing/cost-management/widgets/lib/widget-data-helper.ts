@@ -46,7 +46,7 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
  * @description Extract legends from raw data.
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary
  */
-export const getLegends = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY): Legend[] => {
+export const getLegends = (rawData: CostAnalyzeModel[], granularity: GRANULARITY, groupBy?: GROUP_BY): Legend[] => {
     if (groupBy) {
         const _providers = store.state.resource.provider.items;
         const _serviceAccounts = store.state.resource.serviceAccount.items;
@@ -55,38 +55,46 @@ export const getLegends = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY): Leg
 
         const legends: Legend[] = [];
         rawData.forEach((d) => {
-            let _name = d[groupBy];
-            let _label = d[groupBy];
-            let _color;
-            if (groupBy === GROUP_BY.PROJECT) {
-                _label = _projects[_name]?.label || _name;
-            } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
-                _label = _serviceAccounts[_name]?.label || _name;
-            } else if (groupBy === GROUP_BY.REGION) {
-                _label = _regions[_name]?.name || _name;
-            } else if (groupBy === GROUP_BY.PROVIDER) {
-                _label = _providers[_name]?.name || _name;
-                _color = _providers[_name]?.color;
-            }
-            if (!_name) {
-                if (d.is_others) {
-                    _name = 'aggregation';
-                    _label = 'Aggregation of the rest';
-                } else {
-                    _name = `no_${groupBy}`;
-                    _label = 'Unknown';
+            if (
+                (granularity === GRANULARITY.ACCUMULATED && d.usd_cost > 0)
+                || (granularity !== GRANULARITY.ACCUMULATED && Object.keys(d.usd_cost).length)
+            ) {
+                let _name = d[groupBy];
+                let _label = d[groupBy];
+                let _color;
+                if (groupBy === GROUP_BY.PROJECT) {
+                    _label = _projects[_name]?.label || _name;
+                } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
+                    _label = _serviceAccounts[_name]?.label || _name;
+                } else if (groupBy === GROUP_BY.REGION) {
+                    _label = _regions[_name]?.name || _name;
+                } else if (groupBy === GROUP_BY.PROVIDER) {
+                    _label = _providers[_name]?.name || _name;
+                    _color = _providers[_name]?.color;
                 }
+                if (!_name) {
+                    if (d.is_others) {
+                        _name = 'aggregation';
+                        _label = 'Others';
+                    } else {
+                        _name = `no_${groupBy}`;
+                        _label = 'Unknown';
+                    }
+                }
+                legends.push({
+                    name: _name,
+                    label: _label,
+                    disabled: false,
+                    color: _color,
+                });
             }
-            legends.push({
-                name: _name,
-                label: _label,
-                disabled: false,
-                color: _color,
-            });
         });
         return legends;
     }
-    return [{ name: 'totalCost', label: 'Total Cost', disabled: false }];
+    if (rawData.length) {
+        return [{ name: 'totalCost', label: 'Total Cost', disabled: false }];
+    }
+    return [];
 };
 
 
@@ -118,11 +126,13 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY)
                 const _projects = store.state.resource.project.items;
                 _category = _projects[_category]?.label || _category;
             }
-            chartData.push({
-                category: _category,
-                value: (d.usd_cost > 0 ? d.usd_cost : 0) as number,
-                color: _color,
-            });
+            if (d.usd_cost > 0) {
+                chartData.push({
+                    category: _category,
+                    value: d.usd_cost as number,
+                    color: _color,
+                });
+            }
         });
     } else if (rawData.length) {
         chartData = [{
