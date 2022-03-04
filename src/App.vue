@@ -11,7 +11,9 @@
                 <GNB class="gnb" />
                 <div class="app-body">
                     <p-sidebar :visible="$store.state.display.visibleSidebar"
-                               :style-type="$store.state.display.sidebarType"
+                               :style-type="$store.getters['display/sidebarProps'].styleType"
+                               :size="$store.getters['display/sidebarProps'].size"
+                               :hide-close-button="$store.getters['display/sidebarProps'].disableButton"
                                @close="$store.dispatch('display/hideSidebar')"
                     >
                         <main class="main">
@@ -22,10 +24,12 @@
                         </main>
                         <template #title>
                             <portal-target v-if="$store.state.display.sidebarType === SIDEBAR_TYPE.info" name="info-title" />
+                            <portal-target v-else-if="$store.state.display.sidebarType === SIDEBAR_TYPE.widget" name="widget-title" />
                             <portal-target v-else name="handbook-title" />
                         </template>
                         <template #sidebar>
                             <portal-target v-if="$store.state.display.sidebarType === SIDEBAR_TYPE.info" name="info-contents" />
+                            <portal-target v-else-if="$store.state.display.sidebarType === SIDEBAR_TYPE.widget" name="widget-contents" />
                             <portal-target v-else name="handbook-contents" />
                         </template>
                     </p-sidebar>

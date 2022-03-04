@@ -1,7 +1,9 @@
-export enum SIDEBAR_TYPE {
-    info = 'primary',
-    handbook = 'secondary'
-}
+export const SIDEBAR_TYPE = Object.freeze({
+    info: 'primary',
+    handbook: 'secondary',
+    widget: 'widget',
+});
+export type SIDEBAR_TYPE = typeof SIDEBAR_TYPE[keyof typeof SIDEBAR_TYPE];
 
 export const CURRENCY = Object.freeze({
     USD: 'USD',

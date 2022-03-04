@@ -220,7 +220,7 @@ export default {
 
         (() => {
             getDashboardData();
-            store.dispatch('display/showInfo');
+            store.dispatch('display/showWidget');
         })();
 
         // for preventing refresh
