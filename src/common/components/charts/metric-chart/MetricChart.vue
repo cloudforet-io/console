@@ -274,6 +274,12 @@ export default {
         }
     }
 
+    .p-data-loader {
+        .data-wrapper {
+            overflow-y: hidden;
+        }
+    }
+
     .tooltip-wrapper {
         @apply bg-white border border-gray-300 rounded-lg;
         position: absolute;
