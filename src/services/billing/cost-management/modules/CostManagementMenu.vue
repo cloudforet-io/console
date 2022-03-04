@@ -23,7 +23,7 @@
                 </div>
             </template>
             <template v-if="userDashboardList.length > 0">
-                <details v-if="!loading" class="dashboard-list" :open="openMyDashboardList">
+                <details v-if="!loading" class="dashboard-list">
                     <summary class="dashboard-type">
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.MY_DASHBOARD') }}
                     </summary>
@@ -94,7 +94,6 @@ export default {
             publicDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.publicDashboardList ?? []),
             userDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.userDashboardList ?? []),
             loading: true,
-            openMyDashboardList: computed(() => SpaceRouter.router.currentRoute.params?.dashboardId.startsWith('user') ?? false),
         });
 
         const listDashboard = async () => {
