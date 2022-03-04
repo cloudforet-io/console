@@ -215,7 +215,7 @@ export default defineComponent<WidgetProps>({
 
         watch([() => props.period, () => props.filters], async () => {
             await getChartData();
-            if (state.data.length === 0) emit('rendered');
+            if (state.data.length === 0 || state.noData) emit('rendered');
         }, { immediate: true });
 
 

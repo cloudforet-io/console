@@ -4,6 +4,7 @@
                                        class="budget-status"
                                        :widget-link="widgetLink"
                                        :print-mode="printMode"
+                                       :class="{ 'print-mode': printMode }"
     >
         <p-data-loader :loading="loading" class="chart-wrapper">
             <template #loader>
@@ -256,6 +257,11 @@ export default defineComponent<WidgetProps>({
                 height: 0.625rem;
             }
         }
+    }
+}
+.print-mode {
+    .legend {
+        white-space: nowrap;
     }
 }
 </style>

@@ -6,6 +6,7 @@
         :description="`${currencyMoneyFormatter(availableCost, currency, currencyRates, false, 10000000)} ${ $t('BILLING.COST_MANAGEMENT.DASHBOARD.AVAILABLE') }`"
         :loading="loading"
         :widget-link="widgetLink"
+        :class="{ 'print-mode': printMode }"
     >
         <template v-if="!loading" #title-extra>
             <p-i name="ic_budget" width="1em" height="1em"
@@ -197,6 +198,14 @@ export default {
         @apply text-gray-800;
         font-size: 0.875rem;
         line-height: 150%;
+    }
+}
+.print-mode {
+    .usage-cost {
+        white-space: nowrap;
+    }
+    .limit-cost {
+        white-space: nowrap;
     }
 }
 </style>
