@@ -105,13 +105,11 @@ export default {
         };
 
         const setInitialHomeDashboard = () => {
-            if (!state.homeDashboardId) {
-                store.dispatch('settings/setItem', {
-                    key: 'homeDashboard',
-                    value: state.dashboardList[0]?.dashboard_id,
-                    path: '/costDashboard',
-                });
-            }
+            store.dispatch('settings/setItem', {
+                key: 'homeDashboard',
+                value: state.dashboardList[0]?.public_dashboard_id ?? state.dashboardList[0]?.user_dashboard_id,
+                path: '/costDashboard',
+            });
         };
 
         (async () => {
