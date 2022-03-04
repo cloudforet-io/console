@@ -252,7 +252,7 @@ export default {
             state.loading = true;
 
             const rawData = await listCostAnalysisData();
-            state.legends = getLegends(rawData, groupBy);
+            state.legends = getLegends(rawData, granularity, groupBy);
             if (granularity === GRANULARITY.ACCUMULATED) {
                 state.chartData = getPieChartData(rawData, groupBy);
             } else {
