@@ -7,7 +7,7 @@
         :loading="loading"
         :widget-link="widgetLink"
     >
-        <template #title-extra>
+        <template v-if="!loading" #title-extra>
             <p-i name="ic_budget" width="1em" height="1em"
                  class="mr-1"
             />
