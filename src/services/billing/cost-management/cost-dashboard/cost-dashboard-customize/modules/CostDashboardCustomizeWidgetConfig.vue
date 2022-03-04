@@ -5,7 +5,7 @@
                        :invalid-text="invalidTexts.name"
                        required
         >
-            <p-text-input :value="name" :invalid="invalidState.name" class="w-full"
+            <p-text-input :value="name" :invalid="invalidState.name"
                           @input="handleName"
             />
         </p-field-group>
@@ -147,3 +147,10 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.widget-config {
+    .p-text-input {
+        @apply w-full;
+    }
+}
+</style>
