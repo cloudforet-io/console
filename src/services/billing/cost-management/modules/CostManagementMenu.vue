@@ -32,6 +32,7 @@
             </template>
         </div>
         <div v-for="(item) in menuList" :key="item.label"
+             class="link-wrapper"
              @click="showPage(item.routeName)"
         >
             <sidebar-title :title="item.label"
@@ -143,9 +144,8 @@ export default {
     padding-top: 1.5rem;
     padding-right: 1rem;
 }
-header.link {
-    padding-top: 1.5rem;
-    margin-bottom: 0;
+.link-wrapper {
+    margin-top: 1.5rem;
 }
 .dashboard-list {
     padding: 0 0.875rem;
