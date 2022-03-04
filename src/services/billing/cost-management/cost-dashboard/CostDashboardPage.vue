@@ -2,7 +2,7 @@
     <div class="cost-dashboard-page">
         <p-breadcrumbs :routes="routeState.route" />
         <div v-if="dashboardList.length" class="top-wrapper">
-            <p-i v-if="dashboardType==='public'" name="ic_public" width="1rem"
+            <p-i v-if="dashboardType === DASHBOARD_TYPE.PUBLIC" name="ic_public" width="1rem"
                  height="1rem" color="inherit"
                  class="mr-2 text-gray-500"
             />
@@ -15,6 +15,7 @@
                 <p-icon-button name="ic_edit-text"
                                class="edit-btn"
                                :outline="false"
+                               :disabled="!isAdmin && dashboardType === DASHBOARD_TYPE.PUBLIC"
                                @click.stop="handleClickEditDashboard"
                 />
                 <cost-dashboard-more-menu :dashboard-id="dashboardId" :dashboard="dashboard" />
@@ -106,6 +107,7 @@ import CostDashboardStoreModule from '@/services/billing/cost-management/cost-da
 import { getDashboardLayout } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
 import CostDashboardUpdateModal
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardUpdateModal.vue';
+import { DASHBOARD_TYPE } from '@/services/billing/cost-management/cost-dashboard/lib/config';
 
 const validateDashboardId = async (dashboardId): Promise<boolean> => {
     await store.dispatch('service/costDashboard/setDashboardList');
@@ -259,6 +261,7 @@ export default {
             handleClickCustomize,
             handlePreviewRendered,
             handleClickCreate,
+            DASHBOARD_TYPE,
         };
     },
 };

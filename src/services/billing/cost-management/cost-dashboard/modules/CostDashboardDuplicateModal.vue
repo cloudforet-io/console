@@ -50,7 +50,7 @@ import {
     CustomLayout,
     DASHBOARD_PRIVACY_TYPE, DashboardCreateParam,
     DashboardInfo,
-    DashboardPrivacyType,
+    DashboardPrivacyType, PERIOD_TYPE, PeriodType,
 } from '@/services/billing/cost-management/cost-dashboard/type';
 import { i18n } from '@/translations';
 import { fetchDefaultLayoutData } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
@@ -138,9 +138,10 @@ export default defineComponent<Props>({
         };
 
         const makeDashboardCreateParam = async (): Promise<DashboardCreateParam> => ({
-            name: `CLONE - ${name.value}`,
+            name: name.value,
             custom_layouts: await getCustomLayouts(),
-            period_type: 'AUTO',
+            period_type: props.dashboard.period_type as PeriodType ?? PERIOD_TYPE.AUTO,
+            period: props.dashboard.period,
             default_filter: state.includesFilter ? props.dashboard.default_filter : {},
         });
 
@@ -178,7 +179,7 @@ export default defineComponent<Props>({
         };
 
         const init = () => {
-            initForm('name', props.dashboard.name);
+            initForm('name', `CLONE - ${props.dashboard.name}`);
             initForm('visibility', '');
         };
 

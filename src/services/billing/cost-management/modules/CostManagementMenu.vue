@@ -23,7 +23,7 @@
                 </div>
             </template>
             <template v-if="userDashboardList.length > 0">
-                <details v-if="!loading" class="dashboard-list">
+                <details v-if="!loading" class="dashboard-list" open>
                     <summary class="dashboard-type">
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.MY_DASHBOARD') }}
                     </summary>

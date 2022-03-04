@@ -79,8 +79,11 @@ export interface DefaultLayout {
 
 export type CustomLayout = WidgetInfo[];
 
-const periodTypes = ['AUTO', 'FIXED'] as const;
-type PeriodType = typeof periodTypes[number];
+export const PERIOD_TYPE = Object.freeze({
+    AUTO: 'AUTO',
+    FIXED: 'FIXED',
+} as const);
+export type PeriodType = typeof PERIOD_TYPE[keyof typeof PERIOD_TYPE];
 
 export interface DashboardCreateParam {
     name: string;

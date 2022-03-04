@@ -31,6 +31,7 @@ import {
     DASHBOARD_PRIVACY_TYPE,
     DashboardCreateParam,
     DashboardPrivacyType,
+    PERIOD_TYPE, PeriodType,
 } from '@/services/billing/cost-management/cost-dashboard/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -75,7 +76,8 @@ export default {
         const makeDashboardCreateParam = async (): Promise<DashboardCreateParam> => ({
             name: 'Untitled Dashboard',
             custom_layouts: await getCustomLayouts(),
-            period_type: 'AUTO',
+            period_type: state.selectedTemplate.period_type as PeriodType ?? PERIOD_TYPE.AUTO,
+            period: state.selectedTemplate.period ?? null,
             default_filter: state.includesFilter ? state.defaultFilter : {},
         });
 
