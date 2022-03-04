@@ -14,3 +14,9 @@ export interface DisplayState {
 export type CurrencyRates = {
     [K in CURRENCY]: number;
 }
+
+export interface SidebarProps {
+    styleType: string;
+    disableButton: boolean;
+    size: string;
+}

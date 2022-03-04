@@ -21,6 +21,11 @@ export const showInfo = ({ commit }): void => {
     commit('setVisibleSidebar', true);
 };
 
+export const showWidget = ({ commit }): void => {
+    commit('setSidebarType', SIDEBAR_TYPE.widget);
+    commit('setVisibleSidebar', true);
+};
+
 export const hideSidebar = ({ commit }): void => {
     commit('setVisibleSidebar', false);
 };

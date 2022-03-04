@@ -1,9 +1,9 @@
 <template>
     <div>
-        <portal to="info-title">
+        <portal to="widget-title">
             <span class="sidebar-title">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE_TITLE') }}</span> <br>
         </portal>
-        <portal to="info-contents">
+        <portal to="widget-contents">
             <div class="sidebar-contents">
                 <p class="sidebar-desc">
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SIDEBAR_DESC') }}
