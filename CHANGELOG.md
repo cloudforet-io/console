@@ -1,3 +1,10 @@
+# [1.1.0-beta.257](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.256...v1.1.0-beta.257) (2022-03-04)
+
+
+### Bug Fixes
+
+* add margin-left to each size sidebar for smooth transition ([#883](https://github.com/spaceone-dev/spaceone-design-system/issues/883)) ([ecdc089](https://github.com/spaceone-dev/spaceone-design-system/commit/ecdc08903daa0b2b46cbe4d12d48b9770023efd1))
+
 # [1.1.0-beta.256](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.255...v1.1.0-beta.256) (2022-03-03)
 
 
