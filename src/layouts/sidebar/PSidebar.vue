@@ -178,6 +178,9 @@ export default defineComponent({
     @screen lg {
         flex-direction: row;
 
+        $sidebar-sm: 16.25rem;
+        $sidebar-md: 25%;
+        $sidebar-lg: 30%;
         .sidebar-wrapper {
             position: static;
             height: 100%;
@@ -188,19 +191,28 @@ export default defineComponent({
             border-left-width: 1px;
 
             &.sm {
-                width: 16.25rem;
+                width: $(sidebar-sm);
             }
             &.md {
-                width: 25%;
+                width: $(sidebar-md);
             }
             &.lg {
-                width: 30%;
+                width: $(sidebar-lg);
             }
         }
         .slide-fade-enter, .slide-fade-leave-to {
-            margin-left: -25%;
             transform: translateX(100%);
             opacity: 0;
+
+            &.sm {
+                margin-left: -$(sidebar-sm);
+            }
+            &.md {
+                margin-left: -$(sidebar-md);
+            }
+            &.lg {
+                margin-left: -$(sidebar-lg);
+            }
         }
     }
 }
