@@ -8,6 +8,7 @@
         :currency-symbol="currencySymbol"
         :description="thisMonthFormatter(currentMonth)"
         :no-data="!loading && !currentMonthCost && !lastMonthCost"
+        :class="{ 'print-mode': printMode }"
     >
         <template #default>
             <div class="cost-trend-wrapper flex">
@@ -199,6 +200,7 @@ export default defineComponent<WidgetProps>({
     @apply flex;
     .increase {
         @apply flex items-center;
+        white-space: nowrap;
         font-size: 1.125rem;
         line-height: 155%;
         .p-i-icon {
@@ -229,5 +231,10 @@ export default defineComponent<WidgetProps>({
     @apply text-gray-600;
     font-size: 0.875rem;
     line-height: 150%;
+}
+.print-mode {
+    .increase {
+        white-space: nowrap;
+    }
 }
 </style>
