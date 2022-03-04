@@ -1,6 +1,6 @@
 <template>
     <div class="cost-dashboard-data-table" :class="{'print-mode': printMode}">
-        <p-data-table :fields="fields"
+        <p-data-table :fields="items.length ? fields : []"
                       :items="slicedItems"
                       :total-count="totalCount"
                       :loading="loading"
