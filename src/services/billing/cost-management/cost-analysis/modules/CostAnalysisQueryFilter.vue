@@ -62,6 +62,7 @@ import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import { Period } from '@/services/billing/cost-management/type';
+import { getInitialDates } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 
 const CostAnalysisSetQueryModal = () => import('@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetQueryModal.vue');
 
@@ -109,6 +110,9 @@ export default {
 
         /* event */
         const handleSelectGranularity = async (granularity: string) => {
+            if (granularity !== state.granularity) {
+                await store.commit('service/costAnalysis/setPeriod', getInitialDates());
+            }
             store.commit('service/costAnalysis/setGranularity', granularity);
         };
         const handleToggleStack = async ({ value }) => {
