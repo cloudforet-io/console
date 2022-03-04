@@ -220,6 +220,7 @@ export default {
             valueAxis.renderer.minWidth = 20;
             valueAxis.fontSize = 12;
             valueAxis.extraMax = 0.01;
+            valueAxis.renderer.minGridDistance = 30;
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
             valueAxis.renderer.labels.template.fill = am4core.color(gray[600]);
@@ -252,14 +253,25 @@ export default {
                     return tooltipText;
                 });
 
-                const bullet = series.bullets.push(new am4charts.CircleBullet());
-                bullet.fill = am4core.color(seriesColor);
-                bullet.circle.radius = 3.5;
+                if (legend.name !== 'dummy') {
+                    const bullet = series.bullets.push(new am4charts.CircleBullet());
+                    bullet.fill = am4core.color(seriesColor);
+                    bullet.circle.radius = 3.5;
+                }
             };
 
-            legends.forEach((legend, idx) => {
-                createSeries(legend, idx);
-            });
+            if (legends.length) {
+                legends.forEach((legend, idx) => {
+                    createSeries(legend, idx);
+                });
+            } else {
+                const dummyChartData = [...chartData];
+                dummyChartData[0].dummy = 0;
+                chart.data = dummyChartData;
+                valueAxis.min = 0;
+                valueAxis.extraMax = 100;
+                createSeries({ name: 'dummy', label: 'dummy' }, 0);
+            }
 
             chart.cursor = new am4charts.XYCursor();
             chart.cursor.lineX.disabled = true;

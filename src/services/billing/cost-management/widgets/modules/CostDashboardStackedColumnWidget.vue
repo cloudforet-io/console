@@ -239,9 +239,19 @@ export default defineComponent<Props>({
                 return series;
             };
 
-            legends.forEach((legend) => {
-                createSeries(legend);
-            });
+            if (legends.length) {
+                legends.forEach((legend) => {
+                    createSeries(legend);
+                });
+            } else {
+                const dummyChartData = [...chartData];
+                dummyChartData[0].dummy = 0;
+                chart.data = dummyChartData;
+                valueAxis.min = 0;
+                valueAxis.extraMax = 100;
+                valueAxis.renderer.minGridDistance = 40;
+                createSeries({ name: 'dummy', label: 'dummy' });
+            }
 
             return chart;
         };

@@ -140,6 +140,11 @@ export default {
                 }
                 return text;
             });
+
+            if (!props.legends.length) {
+                valueAxis.min = 0;
+                valueAxis.extraMax = 100;
+            }
         };
 
         const _createSeries = (chart, legend, timeUnit) => {
@@ -191,6 +196,17 @@ export default {
 
             _createCategoryAxis(chart, timeUnit);
             _createValueAxis(chart);
+
+            if (props.legends.length) {
+                props.legends.forEach((legend) => {
+                    _createSeries(chart, legend, timeUnit);
+                });
+            } else {
+                const dummyChartData = [...USDChartData];
+                dummyChartData[0].dummy = 0;
+                chart.data = dummyChartData;
+                _createSeries(chart, { name: 'dummy', label: 'dummy' }, timeUnit);
+            }
             props.legends.forEach((legend) => {
                 _createSeries(chart, legend, timeUnit);
             });

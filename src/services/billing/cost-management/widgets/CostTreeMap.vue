@@ -321,5 +321,13 @@ export default defineComponent<WidgetProps>({
             display: none;
         }
     }
+
+    &.cost-dashboard-card-widget-layout::v-deep {
+        .body {
+            .no-data {
+                height: 18.75rem;
+            }
+        }
+    }
 }
 </style>
