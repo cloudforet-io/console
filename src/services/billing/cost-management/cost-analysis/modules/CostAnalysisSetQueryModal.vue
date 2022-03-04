@@ -64,6 +64,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { i18n } from '@/translations';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { getInitialDates } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 
 
 export default {
@@ -114,10 +115,14 @@ export default {
             }))),
         });
 
-        const handleFormConfirm = () => {
+        const handleFormConfirm = async () => {
+            if (store.state.service.costAnalysis.granularity !== state.granularity) {
+                await store.commit('service/costAnalysis/setPeriod', getInitialDates());
+            }
             store.commit('service/costAnalysis/setGranularity', state.granularity);
             store.commit('service/costAnalysis/setStack', state.stack);
             store.commit('display/setCurrency', state.currency);
+
             state.proxyVisible = false;
         };
         const handleSelectGranularity = (granularity: string) => {
