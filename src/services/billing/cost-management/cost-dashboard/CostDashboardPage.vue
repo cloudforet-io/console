@@ -148,7 +148,7 @@ export default {
                 return;
             }
             next();
-        })();
+        });
     },
     setup(props) {
         registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
