@@ -130,6 +130,7 @@ export default {
         }
         .value {
             @apply flex-shrink-0;
+            font-size: 1.125rem;
         }
     }
 }
