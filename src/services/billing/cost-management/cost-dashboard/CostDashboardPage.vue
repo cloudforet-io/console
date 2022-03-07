@@ -110,7 +110,7 @@ import CostDashboardUpdateModal
 import { DASHBOARD_TYPE } from '@/services/billing/cost-management/cost-dashboard/lib/config';
 import { gray } from '@/styles/colors';
 
-const PUBLIC_ICON_COLOR = gray[400];
+const PUBLIC_ICON_COLOR = gray[500];
 
 const validateDashboardId = async (dashboardId): Promise<boolean> => {
     await store.dispatch('service/costDashboard/setDashboardList');
