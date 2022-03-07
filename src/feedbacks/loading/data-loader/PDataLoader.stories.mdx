@@ -322,6 +322,74 @@ You can also change the backdrop color through the `loaderBackdropColor` prop.<b
 <br/>
 <br/>
 
+## Disable Transition
+
+<Canvas>
+    <Story name="Disable Transition" >
+        {{
+            components: { PDataLoader, PButton },
+            template: `
+<div class="w-full">
+    <p-button class="flex-shrink-0 mb-2" style-type="primary" :outline="true" @click="fetchData">Refresh</p-button>
+    <div class="grid grid-cols-2">
+        <div class="mx-2">
+            <p class="font-lg font-bold my-4">normal</p>
+            <p-data-loader :loading="loading" :data="data"
+                            show-data-from-scratch
+                            :loader-backdrop-opacity="1"
+                            class="p-3 bg-gray-100 border border-gray-200"
+                            style="width: 100%; height: 100px;"
+            >
+                <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                    {{d}}
+                </div>
+            </p-data-loader>
+        </div>
+        <div class="mx-2">
+            <p class="font-lg font-bold my-4">disable transition</p>
+            <p-data-loader :loading="loading" :data="data"
+                            show-data-from-scratch
+                            :loader-backdrop-opacity="1"
+                            disable-transition
+                            class="p-3 bg-gray-100 border border-gray-200"
+                            style="width: 100%; height: 100px;"
+            >
+                <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                    {{d}}
+                </div>
+            </p-data-loader>
+        </div>
+    </div>
+</div>
+<!--<div>-->
+    `,
+            setup() {
+                const state = reactive({
+                    loading: true,
+                    data: [],
+                })
+                const fetchData = async () => {
+                    state.loading = true;
+                    state.data = await new Promise(resolve => {
+                        setTimeout(() => {
+                            resolve(range(15).map(() => faker.lorem.lines()))
+                        }, 1000)
+                    })
+                    state.loading = false;
+                }
+                fetchData()
+                return {
+                    ...toRefs(state),
+                    fetchData
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Playground
 
 <Canvas>

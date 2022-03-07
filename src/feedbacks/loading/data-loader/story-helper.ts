@@ -179,6 +179,23 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
             type: 'color',
         },
     },
+    disableTransition: {
+        name: 'disableTransition',
+        type: { name: 'boolean' },
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     /* slots */
     loaderSlot: {
         name: 'loader',

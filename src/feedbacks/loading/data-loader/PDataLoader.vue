@@ -11,8 +11,12 @@
                 <slot />
             </div>
 
-            <transition name="fade-in">
-                <div v-if="showLoader" key="loader" class="loader-wrapper"
+            <transition name="fade-in"
+                        :appear-active-class="disableTransition ? 'fade-in-enter-to' : 'fade-in-enter-active'"
+                        :enter-active-class="disableTransition ? 'fade-in-enter-to' : 'fade-in-enter-active'"
+                        :leave-active-class="disableTransition ? 'fade-in-leave-to' : 'fade-in-leave-active'"
+            >
+                <div v-show="showLoader" key="loader" class="loader-wrapper"
                      :class="{'no-empty-case': disableEmptyCase && isEmpty}"
                 >
                     <div class="loader-backdrop"
@@ -41,7 +45,7 @@
 
 <script lang="ts">
 import {
-    computed, ComputedRef, defineComponent, reactive, toRefs, watch, WatchStopHandle,
+    computed, ComputedRef, defineComponent, PropType, reactive, toRefs, watch, WatchStopHandle,
 } from '@vue/composition-api';
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 import PLottie from '@/foundation/lottie/PLottie.vue';
@@ -59,6 +63,7 @@ interface Props {
     lazyLoadingTime: number;
     loaderBackdropOpacity: number;
     loaderBackdropColor: string;
+    disableTransition: boolean;
 }
 export default defineComponent<Props>({
     name: 'PDataLoader',
@@ -74,10 +79,10 @@ export default defineComponent<Props>({
             default: undefined,
         },
         loaderType: {
-            type: String,
+            type: String as PropType<LOADER_TYPES>,
             default: LOADER_TYPES.spinner,
-            validator(loaderType) {
-                return Object.values(LOADER_TYPES).includes(loaderType as any);
+            validator(loaderType: LOADER_TYPES) {
+                return Object.values(LOADER_TYPES).includes(loaderType);
             },
         },
         spinnerSize: {
@@ -114,6 +119,10 @@ export default defineComponent<Props>({
             type: String,
             default: 'white',
         },
+        disableTransition: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props) {
         const state = reactive({
@@ -126,6 +135,7 @@ export default defineComponent<Props>({
             }),
             lazyLoading: props.loading,
             minLoading: props.loading,
+            contextKey: Math.floor(Math.random() * Date.now()),
         });
 
         const registerLazyLoadingWatch = () => {
@@ -215,6 +225,20 @@ export default defineComponent<Props>({
     .data-loader-container {
         @apply relative w-full h-full overflow-hidden;
         min-height: inherit;
+
+        /* transitions */
+        > .fade-in-enter-active {
+            transition: opacity 0s;
+        }
+        > .fade-in-leave-active {
+            transition: opacity 0.2s;
+        }
+        > .fade-in-enter, > .fade-in-leave-to {
+            opacity: 0;
+        }
+        > .fade-in-leave, > .fade-in-enter-to {
+            opacity: 1;
+        }
     }
     .loader-wrapper {
         @apply absolute w-full h-full overflow-hidden;
@@ -250,20 +274,6 @@ export default defineComponent<Props>({
 
     .data-wrapper {
         @apply overflow-y-auto h-full;
-    }
-
-    /* transitions */
-    .fade-in-enter-active {
-        transition: opacity 0s;
-    }
-    .fade-in-leave-active {
-        transition: opacity 0.2s;
-    }
-    .fade-in-enter, .fade-in-leave-to {
-        opacity: 0;
-    }
-    .fade-in-leave, .fade-in-enter-to {
-        opacity: 1;
     }
 }
 </style>
