@@ -207,9 +207,6 @@ export default {
                 chart.data = dummyChartData;
                 _createSeries(chart, { name: 'dummy', label: 'dummy' }, timeUnit);
             }
-            props.legends.forEach((legend) => {
-                _createSeries(chart, legend, timeUnit);
-            });
 
             const start = dayjs.utc(props.period.start);
             const end = dayjs.utc(props.period.end);

@@ -100,6 +100,8 @@ const CostAnalysisStackedColumnChart = () => import('@/services/billing/cost-man
 const CostAnalysisPieChart = () => import('@/services/billing/cost-management/cost-analysis/modules/CostAnalysisPieChart.vue');
 
 const PAGE_SIZE = 5;
+const DAILY_CHART_COUNT = 14;
+const MONTHLY_CHART_COUNT = 6;
 
 export default {
     name: 'CustomWidget',
@@ -143,10 +145,18 @@ export default {
             chartData: [] as Array<XYChartData | PieChartData>,
             legends: [] as Legend[],
             title: '',
-            convertedPeriod: computed<Period>(() => ({
-                start: dayjs.utc(props.period.end).subtract(5, 'month').format('YYYY-MM'),
-                end: dayjs.utc(props.period.end).format('YYYY-MM-DD'), // '-DD' format added because of accumulated chart
-            })),
+            convertedPeriod: computed<Period>(() => {
+                if (props.options?.granularity === GRANULARITY.DAILY) {
+                    return {
+                        start: dayjs.utc(props.period.end).subtract(DAILY_CHART_COUNT - 1, 'day').format('YYYY-MM-DD'),
+                        end: dayjs.utc(props.period.end).format('YYYY-MM-DD'),
+                    };
+                }
+                return {
+                    start: dayjs.utc(props.period.end).subtract(MONTHLY_CHART_COUNT - 1, 'month').format('YYYY-MM'),
+                    end: dayjs.utc(props.period.end).format('YYYY-MM-DD'), // '-DD' format added because of accumulated chart
+                };
+            }),
             filters: computed(() => props.options?.filters),
             widgetLink: computed(() => ({
                 name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
@@ -154,8 +164,9 @@ export default {
                 query: {
                     granularity: primitiveToQueryString(props.options?.granularity),
                     groupBy: arrayToQueryString([props.options?.group_by]),
-                    period: objectToQueryString(props.options?.period),
+                    period: objectToQueryString(state.convertedPeriod),
                     filters: objectToQueryString(props.options?.filters),
+                    stack: primitiveToQueryString(props.options?.stack),
                 },
             })),
             viewFilterModalVisible: false,
