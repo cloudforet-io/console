@@ -1,7 +1,8 @@
 <template functional>
     <component
         :is="props.vertical ? 'div' : 'hr'"
-        :class="[{'p-divider': true}, {'vertical': props.vertical}]"
+        v-bind="data.attrs"
+        :class="[{'p-divider': true}, {'vertical': props.vertical}, data.staticClass || '', data.class]"
     />
 </template>
 
