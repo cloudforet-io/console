@@ -317,7 +317,8 @@ export default {
             state.loading = true;
             try {
                 const { results } = await SpaceConnector.client.identity.endpoint.list();
-                const filteredEndpointItem: EndpointItem[] = results.filter(d => d.service === 'inventory' || d.service === 'statistics') || [];
+                const filteredEndpointItem: EndpointItem[] = results.filter(d => d.service === 'inventory' || d.service === 'statistics' || d.service === 'monitoring'
+                    || d.service === 'cost-analysis' || d.service === 'notification') || [];
 
                 const endpoints = {};
                 filteredEndpointItem.forEach((data) => {
