@@ -1,6 +1,8 @@
 <template>
     <div class="cost-dashboard-stacked-column-widget" :class="{responsive: !printMode}">
-        <p-data-loader :loading="loading" class="chart-wrapper" :class="widgetType">
+        <p-data-loader :loading="loading" class="chart-wrapper" :class="widgetType"
+                       :disable-transition="printMode"
+        >
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
@@ -31,7 +33,8 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 
 import {
-    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, defineComponent, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -120,6 +123,7 @@ export default defineComponent<Props>({
         },
     },
     setup(props: Props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             providers: computed(() => store.state.resource.provider.items),
             //
@@ -175,8 +179,13 @@ export default defineComponent<Props>({
             const chart = createChart();
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
-            chart.events.on('ready', () => {
-                emit('rendered');
+            vm.$nextTick(() => {
+                chart.events.on('ready', () => {
+                    // wait for animation. amcharts animation is global settings.
+                    setTimeout(() => {
+                        emit('rendered');
+                    }, 500);
+                });
             });
 
             chart.paddingLeft = -5;
@@ -293,7 +302,6 @@ export default defineComponent<Props>({
         watch([() => props.period, () => props.filters], async ([period, filters]) => {
             state.loading = true;
             state.items = await listCostAnalysisData(period, filters);
-            if (state.items.length === 0) emit('rendered');
             await setChartDataAndLegends();
             state.chart = drawChart(state.chartRef, state.chartData, state.legends);
             state.loading = false;

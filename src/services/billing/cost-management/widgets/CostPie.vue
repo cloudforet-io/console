@@ -5,7 +5,7 @@
                                        :data-range="20"
                                        :print-mode="printMode"
     >
-        <p-data-loader :loading="loading" class="chart-wrapper">
+        <p-data-loader :loading="loading" :disalbe-transition="printMode" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
@@ -44,7 +44,8 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, defineComponent, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -120,6 +121,7 @@ export default defineComponent<WidgetProps>({
         },
     },
     setup(props: WidgetProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as PieChart | null,
@@ -167,9 +169,16 @@ export default defineComponent<WidgetProps>({
                 return state.chartRegistry[chartContext];
             };
             const chart = createChart();
-            chart.events.on('ready', () => {
-                emit('rendered');
+
+            vm.$nextTick(() => {
+                chart.events.on('ready', () => {
+                    // wait for animation. amcharts animation is global settings.
+                    setTimeout(() => {
+                        emit('rendered');
+                    }, 500);
+                });
             });
+
 
             chart.paddingTop = 5;
             chart.paddingBottom = 5;
@@ -260,7 +269,6 @@ export default defineComponent<WidgetProps>({
 
         watch([() => props.period, () => props.filters], async () => {
             await getData();
-            if (state.chartData.length === 0) emit('rendered');
         }, { immediate: true });
 
         onUnmounted(() => {

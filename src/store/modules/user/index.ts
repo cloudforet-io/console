@@ -20,7 +20,7 @@ const state: UserState = {
     backend: storedUserState.backend,
     name: storedUserState.name,
     email: storedUserState.email,
-    language: storedUserState.language,
+    language: storedUserState.language || 'en',
     timezone: storedUserState.timezone,
     roles: storedUserState.roles,
     powerSchedulerState: storedUserState.powerSchedulerState,
