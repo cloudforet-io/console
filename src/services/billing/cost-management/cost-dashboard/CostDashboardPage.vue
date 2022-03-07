@@ -3,8 +3,8 @@
         <p-breadcrumbs :routes="routeState.route" />
         <div v-if="dashboardList.length" class="top-wrapper">
             <p-i v-if="dashboardType === DASHBOARD_TYPE.PUBLIC" name="ic_public" width="1rem"
-                 height="1rem" color="inherit"
-                 class="mr-2 text-gray-500"
+                 height="1rem" :color="PUBLIC_ICON_COLOR"
+                 class="mr-2"
             />
             <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
             <div class="left-part">
@@ -108,6 +108,9 @@ import { getDashboardLayout } from '@/services/billing/cost-management/cost-dash
 import CostDashboardUpdateModal
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardUpdateModal.vue';
 import { DASHBOARD_TYPE } from '@/services/billing/cost-management/cost-dashboard/lib/config';
+import { gray } from '@/styles/colors';
+
+const PUBLIC_ICON_COLOR = gray[400];
 
 const validateDashboardId = async (dashboardId): Promise<boolean> => {
     await store.dispatch('service/costDashboard/setDashboardList');
@@ -262,6 +265,7 @@ export default {
             handlePreviewRendered,
             handleClickCreate,
             DASHBOARD_TYPE,
+            PUBLIC_ICON_COLOR,
         };
     },
 };
@@ -346,11 +350,9 @@ export default {
     .p-page-title::v-deep .title-wrapper h2 {
         width: 100%;
     }
-
     .left-part {
         margin-left: 0;
     }
-
     .right-part {
         @apply flex flex-wrap justify-end;
     }

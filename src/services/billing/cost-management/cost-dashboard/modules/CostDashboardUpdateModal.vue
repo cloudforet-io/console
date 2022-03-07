@@ -2,6 +2,7 @@
     <p-button-modal :visible="proxyVisible" :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.UPDATE_DASHBOARD')"
                     :disabled="!isAllValid"
                     size="sm"
+                    class="cost-dashboard-update-modal"
                     @confirm="handleConfirm"
                     @update:visible="handleUpdateVisible"
     >
@@ -11,7 +12,7 @@
                            :invalid-text="invalidTexts.name"
                            required
             >
-                <p-text-input :value="name" :invalid="invalidState.name" class="w-full"
+                <p-text-input :value="name" :invalid="invalidState.name"
                               @input="setForm('name', $event)"
                 />
             </p-field-group>
@@ -132,3 +133,10 @@ export default defineComponent<Props>({
     },
 });
 </script>
+<style lang="postcss" scoped>
+.cost-dashboard-update-modal {
+    .p-text-input {
+        @apply w-full;
+    }
+}
+</style>

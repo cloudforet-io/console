@@ -10,7 +10,7 @@ export const currencySymbol: Getter<DisplayState, any> = (state): string => CURR
 
 export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarProps> => {
     if (state.sidebarType === SIDEBAR_TYPE.info) return { styleType: 'primary', disableButton: false, size: 'md' };
-    if (state.sidebarType === SIDEBAR_TYPE.handbook) return { styleType: 'secondary', disableButton: false, size: 'md ' };
+    if (state.sidebarType === SIDEBAR_TYPE.handbook) return { styleType: 'secondary', disableButton: false, size: 'md' };
     if (state.sidebarType === SIDEBAR_TYPE.widget) return { styleType: 'primary', disableButton: true, size: 'sm' };
     return { styleType: 'primary', disableButton: false, size: 'md' };
 };
