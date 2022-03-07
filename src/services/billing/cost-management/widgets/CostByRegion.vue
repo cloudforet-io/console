@@ -10,6 +10,7 @@
                 <p-data-loader :loading="loading"
                                loader-type="skeleton"
                                disable-empty-case
+                               :disable-transition="printMode"
                                class="chart-wrapper"
                 >
                     <div ref="chartRef" class="chart" />
@@ -46,7 +47,8 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent,
+    ComponentRenderProxy,
+    computed, defineComponent, getCurrentInstance,
     onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { cloneDeep } from 'lodash';
@@ -136,6 +138,7 @@ export default defineComponent<WidgetProps>({
         },
     },
     setup(props: WidgetProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
@@ -198,11 +201,14 @@ export default defineComponent<WidgetProps>({
             const chart = createChart();
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
-            chart.events.on('ready', () => {
-                (async () => {
-                    const image = await chart.exporting.getImage('png');
-                    emit('rendered', image);
-                })();
+
+            vm.$nextTick(() => {
+                chart.events.on('ready', () => {
+                    // wait for animation. amcharts animation is global settings.
+                    setTimeout(() => {
+                        emit('rendered');
+                    }, 500);
+                });
             });
 
             chart.geodata = am4geodataContinentsLow;
@@ -319,7 +325,6 @@ export default defineComponent<WidgetProps>({
 
         watch([() => props.period, () => props.filters], async () => {
             await getChartData();
-            if (state.chartData.length === 0) emit('rendered');
         });
 
         (async () => {
