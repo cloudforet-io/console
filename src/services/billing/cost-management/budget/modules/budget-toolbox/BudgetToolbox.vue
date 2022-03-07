@@ -12,6 +12,7 @@
                 >
                     {{ status.label }}
                 </p-select-status>
+                <currency-select-dropdown />
             </div>
         </div>
         <p-toolbox search-type="query"
@@ -77,6 +78,7 @@ import BudgetToolboxUsageRange
 import { BudgetUsageAnalyzeRequestParam, BudgetUsageRange } from '@/services/billing/cost-management/budget/type';
 import { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import { TranslateResult } from 'vue-i18n';
+import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
 
 export interface Pagination {
     pageStart: number;
@@ -91,6 +93,7 @@ type Sort = BudgetUsageAnalyzeRequestParam['sort'];
 export default {
     name: 'BudgetToolbox',
     components: {
+        CurrencySelectDropdown,
         BudgetToolboxUsageRange,
         PToolbox,
         PSelectStatus,
