@@ -254,6 +254,19 @@ export default {
             await loadDashboardAndSetStates(dashboardId);
         }, { immediate: true });
 
+        watch(() => state.filters, (after) => {
+            if (after) {
+                state.dashboard.default_filter = after;
+            }
+        });
+
+        watch([() => state.period, () => state.periodType], (after) => {
+            if (after) {
+                state.dashboard.period = after[0];
+                state.dashboard.period_type = after[1];
+            }
+        });
+
 
         return {
             ...toRefs(state),
