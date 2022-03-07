@@ -6,7 +6,7 @@
                     <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
                     <p-select-dropdown :items="granularityItems"
                                        :selected="granularity"
-                                       without-outline
+                                       style-type="transparent"
                                        :read-only="printMode"
                                        @select="handleSelectGranularity"
                     />

@@ -2,7 +2,7 @@
     <div class="cost-analysis-header" :class="{'interactive-mode': !printMode}">
         <section class="title-section">
             <p-select-dropdown v-if="!printMode"
-                               :items="queryItemList" type="icon-button" button-icon="ic_list"
+                               :items="queryItemList" style-type="icon-button" button-icon="ic_list"
                                class="list-button"
                                @select="handleClickQueryItem"
             >

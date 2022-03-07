@@ -31,7 +31,6 @@
                 </p-icon-text-button>
                 <p-select-dropdown class="left-toolbox-item"
                                    :items="dropdownMenu"
-
                                    @select="handleSelectDropdown"
                 >
                     {{ $t('IDENTITY.USER.MAIN.ACTION') }}
