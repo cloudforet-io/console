@@ -1,3 +1,10 @@
+# [1.1.0-beta.259](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.258...v1.1.0-beta.259) (2022-03-07)
+
+
+### Features
+
+* add disableTransition prop to data loader ([#887](https://github.com/spaceone-dev/spaceone-design-system/issues/887)) ([a99a24d](https://github.com/spaceone-dev/spaceone-design-system/commit/a99a24dda23981893c4db4810a42159dc21b063f))
+
 # [1.1.0-beta.258](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.257...v1.1.0-beta.258) (2022-03-07)
 
 
