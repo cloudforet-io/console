@@ -9,7 +9,7 @@ import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 
 import {getSelectDropdownArgTypes} from '@/inputs/dropdown/select-dropdown/story-helper';
 import {menuItems} from '@/inputs/context-menu/mock';
-import { BUTTON_STYLE } from '@/inputs/buttons/button/type.ts';
+import { BUTTON_STYLE } from '@/inputs/buttons/button/type.ts'; import { SELECT_DROPDOWN_STYLE_TYPE } from './type';
 
 <Meta title='Inputs/Dropdown/Select Dropdown' parameters={{
     design: {
@@ -35,10 +35,8 @@ export const Template = (args, { argTypes }) => ({
             :disabled="disabled"
             :index-mode="indexMode"
             :placeholder="placeholder"
-            :without-outline="withoutOutline"
             :read-only="readOnly"
-            :type="type"
-            :button-style-type="buttonStyleType"
+            :style-type="styleType"
             :button-icon="buttonIcon"
             :menu-position="menuPosition"
             @select="onSelect"
@@ -137,42 +135,37 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Without Outline
+## Button Style Type
 
 <Canvas>
-    <Story name="Without Outline">
+    <Story name="Button Style Type">
         {{
             i18n,
             components: { PSelectDropdown },
             template: `
-<table style="border-collapse: separate; border-spacing: 16px;">
-    <thead>
-        <tr>
-            <th>case / variations</th>
-            <th>default</th>
-            <th>disabled</th>
-            <th>invalid</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th>default(outline)</th>
-            <td><p-select-dropdown :items="menuItems" /></td>
-            <td><p-select-dropdown :items="menuItems" disabled /></td>
-            <td><p-select-dropdown :items="menuItems" invalid /></td>
-        </tr>
-        <tr>
-            <th>without outline</th>
-            <td><p-select-dropdown :items="menuItems" without-outline /></td>
-            <td><p-select-dropdown :items="menuItems" without-outline disabled /></td>
-            <td><p-select-dropdown :items="menuItems" without-outline invalid /></td>
-        </tr>
-    </tbody>
-</table>
-    `,
+                <table style="border-collapse: separate; border-spacing: 16px;">
+                    <thead>
+                        <tr>
+                            <th>default</th>
+                            <th>icon-button</th>
+                            <th>transparent</th>
+                            <th>primary-button</th>
+                            <th>secondary-button</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th v-for="styleType in styleTypes" :key="styleType">
+                                <p-select-dropdown :items="menuItems" :styleType="styleType" style="margin: 0.5rem;"/>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            `,
             setup() {
                 return {
-                    menuItems
+                    menuItems,
+                    styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
                 }
             }
         }}
@@ -190,88 +183,38 @@ export const Template = (args, { argTypes }) => ({
             i18n,
             components: { PSelectDropdown },
             template: `
-<table style="border-collapse: separate; border-spacing: 24px;">
-    <thead>
-        <tr>
-            <th>case / type</th>
-            <th>default</th>
-            <th>default</th>
-            <th>button/ outline-button</th>
-            <th>icon-button</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th>without outline</th>
-            <td><p><code>false</code></p></td>
-            <td><p><code>true</code></p></td>
-            <td><p>any</p></td>
-            <td><p>any</p></td>
-        </tr>
-        <tr>
-            <th>read only</th>
-            <td><p-select-dropdown :items="menuItems" read-only /></td>
-            <td><p-select-dropdown :items="menuItems" read-only without-outline /></td>
-            <td><p-select-dropdown :items="menuItems" read-only type="button" /></td>
-            <td><p-select-dropdown :items="menuItems" read-only type="icon-button"/></td>
-        </tr>
-    </tbody>
-</table>
-    `,
-            setup() {
-                return {
-                    menuItems
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Button Type
-
-<Canvas>
-    <Story name="Button Type">
-        {{
-            i18n,
-            components: { PSelectDropdown },
-            template: `
-    <div class="h-full w-full overflow p-8">
-        <p-select-dropdown v-for="buttonStyle in buttonStyles" :key="buttonStyle" :items="menuItems" type="button" :button-style-type="buttonStyle" style="margin: 0.5rem;"></p-select-dropdown>
-    </div>
-    `,
+                <table style="border-collapse: separate; border-spacing: 16px;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>default</th>
+                            <th>icon-button</th>
+                            <th>transparent</th>
+                            <th>primary-button</th>
+                            <th>secondary-button</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>default</th>
+                            <th v-for="styleType in styleTypes" :key="styleType">
+                                <p-select-dropdown :items="menuItems" :styleType="styleType" style="margin: 0.5rem;"/>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>readOnly</th>
+                            <th v-for="styleType in styleTypes" :key="styleType">
+                                <p-select-dropdown read-only :items="menuItems" :styleType="styleType" style="margin: 0.5rem;"/>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            `,
             setup() {
                 return {
                     menuItems,
-                    buttonStyles: Object.values(BUTTON_STYLE),
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Outline Button Type
-
-<Canvas>
-    <Story name="Outline Button Type">
-        {{
-            i18n,
-            components: { PSelectDropdown },
-            template: `
-    <div class="h-full w-full overflow p-8">
-        <p-select-dropdown v-for="buttonStyle in buttonStyles" :key="buttonStyle" :items="menuItems" type="outline-button" :button-style-type="buttonStyle" style="margin: 0.5rem;"></p-select-dropdown>
-    </div>
-    `,
-            setup() {
-                return {
-                    menuItems,
-                    buttonStyles: Object.values(BUTTON_STYLE),
-                }
+                    styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
+                };
             }
         }}
     </Story>
@@ -286,37 +229,39 @@ export const Template = (args, { argTypes }) => ({
     <Story name="Icon Button Type">
         {{
             i18n,
-            components: { PSelectDropdown },
+            components: {
+                PSelectDropdown
+            },
             template: `
-<table style="border-collapse: separate; border-spacing: 16px;">
-    <thead>
-        <tr>
-            <th>icon / variations</th>
-            <th>default</th>
-            <th>disabled</th>
-            <th>invalid</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th>default</th>
-            <td><p-select-dropdown :items="menuItems" type="icon-button" /></td>
-            <td><p-select-dropdown :items="menuItems" type="icon-button" disabled /></td>
-            <td><p-select-dropdown :items="menuItems" type="icon-button" invalid /></td>
-        </tr>
-        <tr>
-            <th>custom</th>
-            <td><p-select-dropdown :items="menuItems" type="icon-button" button-icon="ic_setting" /></td>
-            <td><p-select-dropdown :items="menuItems" type="icon-button" button-icon="ic_setting" disabled /></td>
-            <td><p-select-dropdown :items="menuItems" type="icon-button" button-icon="ic_setting" invalid /></td>
-        </tr>
-    </tbody>
-</table>
-    `,
+                <table style="border-collapse: separate; border-spacing: 16px;">
+                    <thead>
+                        <tr>
+                            <th>icon / variations</th>
+                            <th>default</th>
+                            <th>disabled</th>
+                            <th>invalid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>default</th>
+                            <td><p-select-dropdown :items="menuItems" style-type="icon-button" /></td>
+                            <td><p-select-dropdown :items="menuItems" style-type="icon-button" disabled /></td>
+                            <td><p-select-dropdown :items="menuItems" style-type="icon-button" invalid /></td>
+                        </tr>
+                        <tr>
+                            <th>custom</th>
+                            <td><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_setting" /></td>
+                            <td><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_setting" disabled /></td>
+                            <td><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_setting" invalid /></td>
+                        </tr>
+                    </tbody>
+                </table>
+            `,
             setup() {
                 return {
-                    menuItems,
-                }
+                    menuItems
+                };
             }
         }}
     </Story>
@@ -324,6 +269,7 @@ export const Template = (args, { argTypes }) => ({
 
 <br/>
 <br/>
+
 
 ## Default Slot
 

@@ -2,8 +2,7 @@ import { camelCase } from 'lodash';
 import { ArgTypes } from '@storybook/addons';
 import { menuItems } from '@/inputs/context-menu/mock';
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
-import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
-import { SELECT_DROPDOWN_TYPE, CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';
+import { SELECT_DROPDOWN_STYLE_TYPE, CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';
 
 export const getSelectDropdownArgTypes = (): ArgTypes => {
     const contextMenuArgTypes = getContextMenuArgTypes();
@@ -147,24 +146,6 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
                 type: 'text',
             },
         },
-        withoutOutline: {
-            name: 'withoutOutline',
-            type: { name: 'boolean' },
-            description: 'Whether to show outline or not. Useful when `type` props is `default`.',
-            defaultValue: false,
-            table: {
-                type: {
-                    summary: 'boolean',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'false',
-                },
-            },
-            control: {
-                type: 'boolean',
-            },
-        },
         readOnly: {
             name: 'readOnly',
             type: { name: 'boolean' },
@@ -183,12 +164,12 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
-        type: {
-            name: 'type',
+        styleType: {
+            name: 'styleType',
             type: { name: 'string' },
-            description: `Select dropdown Types. ${
-                [...Object.values(SELECT_DROPDOWN_TYPE)].map(d => `\`${d}\``)} are available.`,
-            defaultValue: SELECT_DROPDOWN_TYPE.DEFAULT,
+            description: `Select dropdown style Types. ${
+                [...Object.values(SELECT_DROPDOWN_STYLE_TYPE)].map(d => `\`${d}\``)} are available.`,
+            defaultValue: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
             table: {
                 type: {
                     summary: 'string',
@@ -200,26 +181,7 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
             },
             control: {
                 type: 'select',
-                options: [undefined, ...Object.values(SELECT_DROPDOWN_TYPE)],
-            },
-        },
-        buttonStyleType: {
-            name: 'buttonStyleType',
-            type: { name: 'string' },
-            description: 'Button style types. Useful when `type` props is `button` or `outline-button`,`buttonStyleType` props can be applied.',
-            defaultValue: 'primary-dark',
-            table: {
-                type: {
-                    summary: 'string',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'primary-dark',
-                },
-            },
-            control: {
-                type: 'select',
-                options: [undefined, ...Object.values(BUTTON_STYLE)],
+                options: [undefined, ...Object.values(SELECT_DROPDOWN_STYLE_TYPE)],
             },
         },
         buttonIcon: {
@@ -244,14 +206,14 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
             name: 'menuPosition',
             type: { name: 'string' },
             description: 'Position of Context menu',
-            defaultValue: CONTEXT_MENU_POSITION.RIGHT,
+            defaultValue: CONTEXT_MENU_POSITION.LEFT,
             table: {
                 type: {
                     summary: 'string',
                 },
                 category: 'props',
                 defaultValue: {
-                    summary: CONTEXT_MENU_POSITION.RIGHT,
+                    summary: CONTEXT_MENU_POSITION.LEFT,
                 },
             },
             control: {

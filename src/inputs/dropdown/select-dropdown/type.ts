@@ -1,20 +1,20 @@
 import { MenuItem } from '@/inputs/context-menu/type';
-import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 export const CONTEXT_MENU_POSITION = Object.freeze({
     LEFT: 'left',
     RIGHT: 'right',
 } as const);
 
-export const SELECT_DROPDOWN_TYPE = Object.freeze({
+export const SELECT_DROPDOWN_STYLE_TYPE = Object.freeze({
     DEFAULT: 'default',
-    BUTTON: 'button',
-    OUTLINE_BUTTON: 'outline-button',
     ICON_BUTTON: 'icon-button',
+    TRANSPARENT: 'transparent',
+    PRIMARY_BUTTON: 'primary-button',
+    SECONDARY_BUTTON: 'secondary-button',
 } as const);
 
 export type CONTEXT_MENU_POSITION = typeof CONTEXT_MENU_POSITION[keyof typeof CONTEXT_MENU_POSITION];
-export type SELECT_DROPDOWN_TYPE = typeof SELECT_DROPDOWN_TYPE[keyof typeof SELECT_DROPDOWN_TYPE];
+export type SELECT_DROPDOWN_STYLE_TYPE = typeof SELECT_DROPDOWN_STYLE_TYPE[keyof typeof SELECT_DROPDOWN_STYLE_TYPE];
 
 export type SelectDropdownMenu = MenuItem;
 
@@ -26,11 +26,9 @@ export interface SelectDropdownProps {
     loading?: boolean;
     indexMode?: boolean;
     placeholder?: string;
-    type?: SELECT_DROPDOWN_TYPE;
-    buttonStyleType?: BUTTON_STYLE;
+    styleType?: SELECT_DROPDOWN_STYLE_TYPE;
     buttonIcon?: string;
     readOnly?: boolean;
-    withoutOutline?: boolean;
     // context menu fixed style props
     useFixedMenuStyle?: boolean;
     visibleMenu?: boolean;
