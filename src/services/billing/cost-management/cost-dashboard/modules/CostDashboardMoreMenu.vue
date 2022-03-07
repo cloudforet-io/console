@@ -2,8 +2,7 @@
     <div>
         <p-select-dropdown class="more-button"
                            :items="moreMenuItems"
-                           button-style-type="transparent"
-                           type="icon-button"
+                           style-type="icon-button"
                            button-icon="ic_more"
                            :menu-position="'left'"
                            @select="handleSelectMoreMenu"

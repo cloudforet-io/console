@@ -22,7 +22,7 @@
         <p-select-dropdown v-if="!printMode"
                            :items="MonthMenuItems"
                            :selected="selectedMonthMenuItem"
-                           without-outline
+                           style-type="transparent"
                            :disabled="isFixedTypeSelected"
                            :read-only="printMode"
                            @select="handleSelectMonthMenuItem"

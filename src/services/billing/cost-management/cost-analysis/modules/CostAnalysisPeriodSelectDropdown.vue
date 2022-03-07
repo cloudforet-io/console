@@ -11,7 +11,7 @@
         <p-select-dropdown v-if="!printMode"
                            :items="periodMenuItems"
                            :selected="selectedPeriodMenuItem"
-                           without-outline
+                           style-type="transparent"
                            @select="handleSelectPeriodMenuItem"
         />
         <cost-management-custom-range-modal v-if="customRangeModalVisible"

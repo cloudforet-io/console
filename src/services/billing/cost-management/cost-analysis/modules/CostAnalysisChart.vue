@@ -68,7 +68,7 @@
                 <p-select-dropdown v-if="groupByItems.length"
                                    :items="groupByItems"
                                    :selected="primaryGroupBy"
-                                   without-outline
+                                   style-type="transparent"
                                    :read-only="printMode"
                                    @select="handlePrimaryGroupByItem"
                 />

@@ -1,7 +1,7 @@
 <template>
     <p-select-dropdown :items="currencyItems"
                        :selected="currency"
-                       without-outline
+                       style-type="transparent"
                        :read-only="printMode"
                        @select="handleSelectCurrency"
     />
