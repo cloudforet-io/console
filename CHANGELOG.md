@@ -1,3 +1,11 @@
+# [1.1.0-beta.258](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.257...v1.1.0-beta.258) (2022-03-07)
+
+
+### Bug Fixes
+
+* fix PDivider to apply the class received from the parent element ([#886](https://github.com/spaceone-dev/spaceone-design-system/issues/886)) ([2b79ab6](https://github.com/spaceone-dev/spaceone-design-system/commit/2b79ab6936f94d50199c6b9ffd60a75cd5749f2c))
+* rollback dynamicWidget fontSize ([#885](https://github.com/spaceone-dev/spaceone-design-system/issues/885)) ([94201e4](https://github.com/spaceone-dev/spaceone-design-system/commit/94201e46b9361a5715d02e9ac9fa152f751719a2))
+
 # [1.1.0-beta.257](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.256...v1.1.0-beta.257) (2022-03-04)
 
 
