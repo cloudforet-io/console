@@ -110,6 +110,7 @@ export default {
             showPreview: computed<boolean>(() => !!Object.keys(state.selectedItem).length),
             allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
             thisPage: 1,
+            userId: computed(() => store.state.user.userId),
         });
 
         /* Api */
@@ -120,6 +121,7 @@ export default {
                 .setSort('created_at', true);
             return {
                 query: apiQueryHelper.data,
+                user_id: state.userId,
             };
         };
         const listCustomWidget = async () => {
