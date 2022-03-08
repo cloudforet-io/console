@@ -152,6 +152,7 @@ export default {
                     fields.push({
                         name: `usd_cost.${date.format('YYYY-MM')}`,
                         label: thisMonth.isSame(date, 'month') ? `${date.format('MMM')} (MTD)` : date.format('MMM'),
+                        textAlign: 'right',
                     });
                 });
                 return fields;
