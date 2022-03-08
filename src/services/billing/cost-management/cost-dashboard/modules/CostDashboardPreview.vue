@@ -169,9 +169,13 @@ export default {
     min-width: 62.25rem;
     max-width: 117rem;
     padding-right: 1.5rem;
-    .p-page-title {
+    .p-page-title::v-deep {
         width: auto;
         margin-bottom: 0;
+        > .title-wrapper > h2 {
+            word-break: break-word;
+            max-width: 100%;
+        }
     }
     .right-part {
         @apply flex items-center;
