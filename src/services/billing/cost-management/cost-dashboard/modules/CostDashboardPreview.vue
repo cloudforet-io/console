@@ -173,7 +173,7 @@ export default {
         width: auto;
         margin-bottom: 0;
         > .title-wrapper > h2 {
-            word-break: break-word;
+            white-space: nowrap;
             max-width: 100%;
         }
     }
