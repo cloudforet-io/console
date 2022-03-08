@@ -50,6 +50,10 @@ interface Props extends WidgetProps {
     stack: boolean;
 }
 
+interface DummyChartData extends XYChartData {
+    dummy?: number;
+}
+
 export default {
     name: 'CostAnalysisStackedColumnChart',
     components: {
@@ -202,7 +206,7 @@ export default {
                     _createSeries(chart, legend, timeUnit);
                 });
             } else {
-                const dummyChartData = [...USDChartData];
+                const dummyChartData: DummyChartData[] = [...USDChartData];
                 dummyChartData[0].dummy = 0;
                 chart.data = dummyChartData;
                 _createSeries(chart, { name: 'dummy', label: 'dummy' }, timeUnit);

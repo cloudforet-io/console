@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
@@ -125,6 +125,11 @@ export default {
         (() => {
             if (SpaceRouter.router.currentRoute.query.period) state.selectedPeriodMenuItem = 'custom';
         })();
+
+        watch(() => state.granularity, (after, before) => {
+            if (after !== before) state.period = PERIOD_MENU_LIST.thisMonth;
+            state.selectedPeriodMenuItem = 'thisMonth';
+        });
 
         return {
             ...toRefs(state),
