@@ -11,7 +11,7 @@
                         dashboardId: item.dashboard_id
                     }
                 }"
-                class="link inline-block"
+                class="link"
             >
                 <span class="title">
                     {{ item.name }}
@@ -157,14 +157,14 @@ export default {
         max-width: calc(100% - 0.75rem);
     }
     .link {
-        display: inline-block;
+        @apply flex items-center;
         width: 100%;
         height: 2rem;
         .home-icon {
             display: inline-block;
             flex-shrink: 0;
             margin-left: 0.125rem;
-            margin-top: -1.5rem;
+            margin-right: 0.75rem;
         }
         .favorite-icon {
             flex-shrink: 0;
