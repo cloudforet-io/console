@@ -398,7 +398,7 @@ export default {
     }
 }
 .chart {
-    height: 13rem;
+    min-height: 13rem;
 }
 .p-data-table::v-deep {
     @apply rounded-xs;
