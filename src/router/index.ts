@@ -62,8 +62,7 @@ export class SpaceRouter {
                     if (to.name !== IDENTITY_ROUTE.USER.ACCOUNT._NAME) nextLocation = { name: IDENTITY_ROUTE.USER.ACCOUNT._NAME };
                 }
             } else if (!to.meta?.excludeAuth) {
-                const res = await SpaceConnector.refreshAccessToken(false);
-                if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
+                nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
             }
             next(nextLocation);
         });
