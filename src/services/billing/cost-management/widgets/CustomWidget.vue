@@ -152,10 +152,13 @@ export default {
                         end: dayjs.utc(props.period.end).format('YYYY-MM-DD'),
                     };
                 }
-                return {
-                    start: dayjs.utc(props.period.end).subtract(MONTHLY_CHART_COUNT - 1, 'month').format('YYYY-MM'),
-                    end: dayjs.utc(props.period.end).format('YYYY-MM-DD'), // '-DD' format added because of accumulated chart
-                };
+                if (props.options?.granularity === GRANULARITY.MONTHLY) {
+                    return {
+                        start: dayjs.utc(props.period.end).subtract(MONTHLY_CHART_COUNT - 1, 'month').format('YYYY-MM'),
+                        end: dayjs.utc(props.period.end).format('YYYY-MM-DD'), // '-DD' format added because of accumulated chart
+                    };
+                }
+                return props.period;
             }),
             filters: computed(() => props.options?.filters),
             widgetLink: computed(() => ({
