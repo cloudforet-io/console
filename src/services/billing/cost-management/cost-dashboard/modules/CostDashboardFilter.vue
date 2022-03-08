@@ -1,5 +1,5 @@
 <template>
-    <div class="set-filter-part">
+    <div class="set-filter-part" :class="{responsive: !printMode}">
         <p class="applied-filter">
             <span class="label">{{ $t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER') }}: </span>
             <span class="text">{{ getFiltersText(proxyFilters) }}</span>
@@ -173,21 +173,22 @@ export default {
     width: 100%;
     .applied-filter {
         margin-right: 0.5rem;
+        white-space: nowrap;
         .text {
             @apply text-gray-800;
         }
     }
-}
-
-@screen mobile {
-    .set-filter-part {
-        @apply flex flex-wrap;
-        .applied-filter {
-            width: 100%;
-            .label {
-                display: none;
+    &.responsive {
+        @screen mobile {
+            @apply flex flex-wrap;
+            .applied-filter {
+                width: 100%;
+                .label {
+                    display: none;
+                }
             }
         }
     }
 }
+
 </style>

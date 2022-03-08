@@ -8,8 +8,8 @@
                       table-style-type="simple"
                       disable-hover
         >
-            <template #col-format="{field: { name }, value, index}">
-                <div>
+            <template #col-format="{field: { name }, value, index, colIndex}">
+                <div class="status-wrapper" :class="{legend: showLegend && colIndex === 0}">
                     <template v-if="fields[0].name === name">
                         <p-status v-if="showLegend"
                                   class="toggle-button"
@@ -19,7 +19,7 @@
                                   @click="handleClickLegend(index)"
                         />
                         <slot :name="`${name}-format`" v-bind="{ value }">
-                            <span :style="{ color: labelColorFormatter(index) }">
+                            <span class="name" :style="{ color: labelColorFormatter(index) }">
                                 {{ labelTextFormatter(index) }}
                             </span>
                         </slot>
@@ -224,15 +224,26 @@ export default {
         text-align: center;
         font-size: 0.875rem;
     }
+
     .p-data-table::v-deep {
-        .toggle-button {
-            cursor: pointer;
-            padding-right: 1rem;
-            > .text {
-                flex-shrink: 0;
-                white-space: nowrap;
+        .status-wrapper {
+            display: inline-flex;
+            .toggle-button {
+                cursor: pointer;
+                padding-right: 1rem;
+                > .text {
+                    flex-shrink: 0;
+                    white-space: nowrap;
+                }
+            }
+            &.legend {
+                width: 100%;
+                > .name {
+                    word-break: break-all;
+                }
             }
         }
+
         .raised {
             @apply text-alert;
         }
@@ -246,6 +257,9 @@ export default {
 
     &.print-mode {
         .p-data-table::v-deep {
+            .table-container {
+                overflow: hidden;
+            }
             table {
                 width: 100%;
             }
