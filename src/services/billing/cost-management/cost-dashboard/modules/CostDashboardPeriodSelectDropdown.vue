@@ -231,7 +231,7 @@ export default {
             if (period === state.selectedPeriod) return;
 
             initStates(props.printMode || periodType === 'FIXED');
-        });
+        }, { immediate: true });
         return {
             ...toRefs(state),
             handleSelectMonthMenuItem,
