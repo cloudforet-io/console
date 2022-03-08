@@ -86,7 +86,7 @@ const getDataTableDateFields = (granularity: GRANULARITY, period: Period): DataT
     while (now.isSameOrBefore(end, timeUnit)) {
         dateFields.push({
             name: `usd_cost.${now.format(nameDateFormat)}`,
-            label: now.format(labelDateFormat),
+            label: now.locale('en').format(labelDateFormat),
             textAlign: 'right',
             sortable: true,
         });
