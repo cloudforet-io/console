@@ -3,6 +3,8 @@
                        :selected="currency"
                        style-type="transparent"
                        :read-only="printMode"
+                       class="currency-select-dropdown"
+                       :class="{ 'print-mode': printMode }"
                        @select="handleSelectCurrency"
     />
 </template>
@@ -53,3 +55,14 @@ export default {
     },
 };
 </script>
+
+<style lang="postcss" scoped>
+.currency-select-dropdown::v-deep {
+    &.print-mode {
+        .text {
+            white-space: nowrap;
+        }
+    }
+}
+
+</style>

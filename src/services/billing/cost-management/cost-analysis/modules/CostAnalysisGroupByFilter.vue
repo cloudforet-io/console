@@ -1,6 +1,6 @@
 <template>
-    <div class="cost-analysis-group-by-filter">
-        <b class="mr-3">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
+    <div class="cost-analysis-group-by-filter" :class="{ 'print-mode': printMode }">
+        <b class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
         <p-select-button v-for="groupByItem in (printMode ? selectedGroupByItems : allGroupByItems)"
                          :key="groupByItem.name"
                          :value="groupByItem"
@@ -71,5 +71,11 @@ export default {
     font-size: 0.875rem;
     padding: 1rem;
     margin-bottom: 1rem;
+    &.print-mode {
+        .label {
+            @apply mr-3;
+            white-space: nowrap;
+        }
+    }
 }
 </style>

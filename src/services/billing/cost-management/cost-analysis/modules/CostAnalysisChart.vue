@@ -452,6 +452,11 @@ export default {
             height: auto;
             overflow-y: visible;
         }
+        .query-section {
+            .title {
+                white-space: nowrap;
+            }
+        }
     }
     &:not(.print-mode) {
         @screen tablet {
