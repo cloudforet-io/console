@@ -733,6 +733,7 @@ export default {
             padding-right: 0.25rem;
         }
         .number {
+            @apply text-indigo-400;
             font-size: 2rem;
             font-weight: bold;
         }
@@ -751,6 +752,9 @@ export default {
     &.selected {
         .count {
             @apply text-white;
+            .number {
+                @apply text-white;
+            }
 
             .dollar-sign {
                 @apply text-white;
