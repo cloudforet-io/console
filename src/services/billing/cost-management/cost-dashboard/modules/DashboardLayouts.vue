@@ -1,9 +1,8 @@
 <template>
-    <div>
+    <div class="dashboard-layouts">
         <p-data-loader :loading="loading" :data="layout"
                        :min-loading-time="printMode ? 0 : 1000"
                        :lazy-loading-time="printMode ? 0 : 1000"
-                       class="dashboard-layouts"
                        :class="{responsive: !printMode}"
         >
             <template #no-data>
@@ -228,71 +227,76 @@ export default {
 
 <style lang="postcss" scoped>
 .dashboard-layouts::v-deep {
-    margin-top: 1.5rem;
-    .data-loader-container {
-        .data-wrapper {
-            @apply flex flex-col;
-            row-gap: 1rem;
-            .row {
-                @apply flex;
-                column-gap: 1rem;
-                min-width: 60.75rem;
-                min-height: 12.8125rem;
-                [class^='col-'] {
-                    @apply relative w-full;
-                }
-                .col-100 {
+    > .p-data-loader {
+        margin-top: 1.5rem;
+        > .data-loader-container {
+            > .data-wrapper {
+                @apply flex flex-col;
+                row-gap: 1rem;
+                .row {
+                    @apply flex;
+                    column-gap: 1rem;
                     min-width: 60.75rem;
-                    width: 100%;
-                }
-                .col-50 {
-                    min-width: 29.875rem;
-                    width: 50%;
-                }
-                .col-33 {
-                    min-width: 19.5625rem;
-                    width: 33.33%;
-                }
-
-                &.customize {
-                    @apply border border-gray-300 rounded-lg;
-                    $border-width: 0.1875rem;
-
-                    border-width: $border-width;
-                    min-width: calc(60.75rem + $border-width * 2);
-
-                    .btn-group {
-                        @apply absolute z-10 flex gap-2;
-                        top: 1rem;
-                        right: 1rem;
+                    min-height: 12.8125rem;
+                    [class^='col-'] {
+                        @apply relative w-full;
                     }
-                    .empty-widget {
-                        @apply grid bg-white border border-dashed border-gray-300 rounded-lg;
-                        place-content: center;
+                    .col-100 {
+                        min-width: 60.75rem;
+                        width: 100%;
+                    }
+                    .col-50 {
+                        min-width: 29.875rem;
+                        width: 50%;
+                    }
+                    .col-33 {
+                        min-width: 19.5625rem;
+                        width: 33.33%;
+                    }
+
+                    &.customize {
+                        @apply border border-gray-300 rounded-lg;
+                        $border-width: 0.1875rem;
+
+                        border-width: $border-width;
+                        min-width: calc(60.75rem + $border-width * 2);
+
+                        .btn-group {
+                            @apply absolute z-10 flex gap-2;
+                            top: 1rem;
+                            right: 1rem;
+                        }
+                        .empty-widget {
+                            @apply grid bg-white border border-dashed border-gray-300 rounded-lg;
+                            place-content: center;
+                        }
                     }
                 }
             }
-        }
-        .no-data-wrapper {
-            @apply text-gray-900;
-            margin-top: 12.5rem;
+            > .no-data-wrapper {
+                @apply text-gray-900;
+                margin-top: 12.5rem;
+            }
         }
     }
+
     &.responsive {
-        .data-loader-container {
-            .data-wrapper {
-                @screen tablet {
-                    row-gap: 1rem;
-                    min-width: 100%;
-                    max-width: 100%;
-                    .row {
-                        @apply flex-col;
+        > .p-data-loader {
+            > .data-loader-container {
+                > .data-wrapper {
+                    @screen tablet {
                         row-gap: 1rem;
-                        min-width: auto;
-                    }
-                    [class^='col-'] {
-                        width: 100%;
                         min-width: 100%;
+                        max-width: 100%;
+                        .row {
+                            @apply flex-col;
+                            row-gap: 1rem;
+                            min-width: auto;
+                        }
+                        [class^='col-'] {
+                            width: 100%;
+                            min-width: 100%;
+                        }
                     }
                 }
             }

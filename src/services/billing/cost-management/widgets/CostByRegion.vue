@@ -16,7 +16,7 @@
                     <div ref="chartRef" class="chart" />
                     <div class="legend-wrapper">
                         <span v-for="(item) in chartLegends" :key="item" class="circle-wrapper">
-                            <span v-if="providers" class="circle" :style="{background: providers[item].color}" /><span>{{ providers[item].label || '' }}</span>
+                            <span v-if="providers" class="circle" :style="{background: providers[item].color}" /><span class="label">{{ providers[item].label || '' }}</span>
                         </span>
                     </div>
                 </p-data-loader>
@@ -207,7 +207,7 @@ export default defineComponent<WidgetProps>({
                     // wait for animation. amcharts animation is global settings.
                     setTimeout(() => {
                         emit('rendered');
-                    }, 500);
+                    }, 1000);
                 });
             });
 
@@ -376,10 +376,11 @@ export default defineComponent<WidgetProps>({
             width: 0.5rem;
             height: 0.5rem;
         }
-        span {
+        .label {
             @apply mr-4 text-gray-500;
             font-size: 0.75rem;
             line-height: 1.5;
+            white-space: nowrap;
         }
     }
 

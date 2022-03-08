@@ -85,6 +85,7 @@ export default {
             @apply flex items-center text-gray-500;
             font-size: 0.875rem;
             line-height: 150%;
+            white-space: nowrap;
             .tooltip-button {
                 @apply text-gray-300 ml-1 mr-2;
             }
