@@ -1,13 +1,14 @@
 <template>
-    <div class="cost-analysis-query-filter">
+    <div class="cost-analysis-query-filter" :class="{ 'print-mode': printMode }">
         <div class="filter-wrapper tablet-off">
             <div class="left-part">
                 <div class="filter-item">
-                    <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
+                    <b class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
                     <p-select-dropdown :items="granularityItems"
                                        :selected="granularity"
                                        style-type="transparent"
                                        :read-only="printMode"
+                                       class="select-dropdown"
                                        @select="handleSelectGranularity"
                     />
                 </div>
@@ -185,6 +186,17 @@ export default {
     }
     .tablet-on {
         display: none;
+    }
+
+    &.print-mode {
+        .label {
+            white-space: nowrap;
+        }
+        .select-dropdown::v-deep {
+            .text {
+                white-space: nowrap;
+            }
+        }
     }
 
     @screen tablet {
