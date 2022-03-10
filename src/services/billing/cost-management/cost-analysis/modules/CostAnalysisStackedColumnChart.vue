@@ -205,7 +205,7 @@ export default {
                 props.legends.forEach((legend) => {
                     _createSeries(chart, legend, timeUnit);
                 });
-            } else {
+            } else if (USDChartData.length) {
                 const dummyChartData: DummyChartData[] = [...USDChartData];
                 dummyChartData[0].dummy = 0;
                 chart.data = dummyChartData;

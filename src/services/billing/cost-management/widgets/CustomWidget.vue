@@ -58,6 +58,7 @@
 
 <script lang="ts">
 import dayjs from 'dayjs';
+import { isEqual } from 'lodash';
 
 import {
     computed, reactive, toRefs, watch,
@@ -79,7 +80,7 @@ import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/billing/cos
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import {
-    getConvertedFilter, getDataTableCostFields,
+    getConvertedFilter, getDataTableCostFields, getInitialDates,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -146,19 +147,26 @@ export default {
             legends: [] as Legend[],
             title: '',
             convertedPeriod: computed<Period>(() => {
+                let period = props.period;
+                if (!props.period || !Object.keys(props.period).length) {
+                    period = getInitialDates();
+                }
                 if (props.options?.granularity === GRANULARITY.DAILY) {
                     return {
-                        start: dayjs.utc(props.period.end).subtract(DAILY_CHART_COUNT - 1, 'day').format('YYYY-MM-DD'),
-                        end: dayjs.utc(props.period.end).format('YYYY-MM-DD'),
+                        start: dayjs.utc(period.end).subtract(DAILY_CHART_COUNT - 1, 'day').format('YYYY-MM-DD'),
+                        end: dayjs.utc(period.end).format('YYYY-MM-DD'),
                     };
                 }
                 if (props.options?.granularity === GRANULARITY.MONTHLY) {
                     return {
-                        start: dayjs.utc(props.period.end).subtract(MONTHLY_CHART_COUNT - 1, 'month').format('YYYY-MM'),
-                        end: dayjs.utc(props.period.end).format('YYYY-MM-DD'), // '-DD' format added because of accumulated chart
+                        start: dayjs.utc(period.end).subtract(MONTHLY_CHART_COUNT - 1, 'month').format('YYYY-MM'),
+                        end: dayjs.utc(period.end).format('YYYY-MM'),
                     };
                 }
-                return props.period;
+                return {
+                    start: dayjs.utc(period.start).format('YYYY-MM'),
+                    end: dayjs.utc(period.end).format('YYYY-MM'),
+                };
             }),
             filters: computed(() => props.options?.filters),
             widgetLink: computed(() => ({
@@ -207,7 +215,7 @@ export default {
                 return results;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                return undefined;
+                return [];
             } finally {
                 tableState.loading = false;
             }
@@ -237,7 +245,11 @@ export default {
             setChartData(options.granularity, period, options?.group_by as GROUP_BY);
             tableState.fields = getFields(options.granularity, period, options?.group_by as GROUP_BY);
         };
-        watch([() => props.options, () => state.convertedPeriod], ([options, convertedPeriod]) => {
+
+        watch([() => props.options, () => state.convertedPeriod], (after, before) => {
+            if (isEqual(after, before)) return;
+            const options = after[0];
+            const convertedPeriod = after[1];
             refreshAll(options, convertedPeriod);
         }, { immediate: true });
 
