@@ -111,6 +111,24 @@ import PSkeleton from "@/feedbacks/loading/skeleton/PSkeleton";
             type: 'text',
         }
     },
+    opacity: {
+        name: 'opacity',
+        type: {name: 'number'},
+        description: 'Opacity of skeleton',
+        defaultValue: 0.4,
+        table: {
+            type: {
+                summary: 'number'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 0.4
+            },
+        },
+        control: {
+            type: 'number',
+        }
+    }
 }}/>
 
 export const Template = (args,{argTypes})=>({

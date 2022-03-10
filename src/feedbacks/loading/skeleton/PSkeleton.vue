@@ -43,12 +43,16 @@ export default {
             type: Boolean,
             default: true,
         },
+        opacity: {
+            type: Number,
+            default: 0.4,
+        },
     },
     render(h, {
         props, slots, data,
     }) {
         const {
-            loading, duration, width, height, tag, animation,
+            loading, duration, width, height, tag, animation, opacity,
         } = props;
         const style: CSSStyleDeclaration = {} as CSSStyleDeclaration;
         const showLoading = loading || isEmptyVNode(slots().default);
@@ -56,6 +60,7 @@ export default {
         if (showLoading) {
             if (width) style.width = width;
             if (height) style.height = height;
+            style.opacity = opacity;
 
             if (animation) {
                 style.backgroundImage = `linear-gradient(90deg, ${gray[200]}, ${gray[100]}, ${gray[200]})`;
@@ -86,7 +91,6 @@ export default {
 <style lang="postcss">
 .p-skeleton {
     @apply rounded-lg inline-block w-full bg-gray-200;
-    opacity: 0.4;
     height: 0.875rem;
     line-height: inherit;
     background-repeat: no-repeat;
