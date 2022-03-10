@@ -20,6 +20,8 @@
         </section>
         <dashboard-layouts :loading="loading"
                            :layout="editingCustomLayout"
+                           :period="period"
+                           :filters="filters"
                            :customize-mode="true"
                            @add-widget="handleAddWidget"
                            @delete-widget="handleDeleteWidget"
@@ -55,6 +57,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import DashboardLayouts from '@/services/billing/cost-management/cost-dashboard/modules/DashboardLayouts.vue';
 import { getDashboardLayout } from '@/services/billing/cost-management/cost-dashboard/lib/helper';
+import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 
 
 export default {
@@ -73,14 +76,6 @@ export default {
             default: '',
         },
     },
-    // beforeRouteLeave(to, from, next) {
-    //     // eslint-disable-next-line no-alert
-    //     const answer = window.confirm(
-    //         'Are you sure you want to discard changes? Changes will not be saved.',
-    //     );
-    //     if (!answer) return false;
-    //     return next();
-    // },
     setup(props) {
         registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
         const routeState = reactive({
@@ -106,6 +101,9 @@ export default {
             selectedWidget: computed(() => store.state.service.costDashboard?.editedSelectedWidget),
             selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => store.state.service?.costDashboard?.selectedTemplate),
             defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboard?.defaultFilter),
+            period: {} as Period,
+            periodType: '',
+            filters: {} as CostQueryFilters,
             widgetPosition: computed(() => store.state.service.costDashboard?.widgetPosition),
             layoutOfSpace: computed(() => store.state.service.costDashboard?.layoutOfSpace),
         });
@@ -186,6 +184,9 @@ export default {
                 }
                 state.dashboardTitle = state.dashboardData?.name || '';
                 state.layout = await getDashboardLayout(state.dashboardData);
+                state.filters = state.dashboardData.default_filter ?? {};
+                state.period = state.dashboardData.period ?? {};
+                state.periodType = state.dashboardData.period_type ?? 'AUTO';
                 state.loading = false;
             } catch (e) {
                 ErrorHandler.handleError(e);
