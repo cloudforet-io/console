@@ -101,6 +101,7 @@
     "eslint-import-resolver-typescript": "^2.0.0",
     "eslint-plugin-vue": "^5.0.0",
     "fork-ts-checker-webpack-plugin": "^6.0.3",
+    "fsevents": "2.3.2",
     "https-proxy-agent": "^2.2.4",
     "husky": "^7.0.4",
     "lint-staged": "^11.2.6",
