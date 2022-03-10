@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.PROJECT_WISE_BUDGET_USAGE_SUMMARY')"
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.PROJECT_WISE_BUDGET_USAGE_SUMMARY')"
                                        class="project-wise-budget-usage-summary"
                                        :widget-link="widgetLink"
                                        :no-data="!loading && !items.length"
@@ -86,6 +86,10 @@ export default {
         PProgressBar,
     },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
         options: {
             type: Object,
             default: () => ({}),
