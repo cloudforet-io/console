@@ -1,3 +1,11 @@
+# [1.1.0-beta.260](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.259...v1.1.0-beta.260) (2022-03-11)
+
+
+### Features
+
+* add select prop to PTag component ([#894](https://github.com/spaceone-dev/spaceone-design-system/issues/894)) ([aeeca0b](https://github.com/spaceone-dev/spaceone-design-system/commit/aeeca0b1e44d00fadb58a426c19e62a88fa3c580))
+* create opacity props on PSkeleton ([#888](https://github.com/spaceone-dev/spaceone-design-system/issues/888)) ([85e9130](https://github.com/spaceone-dev/spaceone-design-system/commit/85e9130498437013f2f8799c9387a359eb03a12e))
+
 # [1.1.0-beta.259](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.258...v1.1.0-beta.259) (2022-03-07)
 
 
