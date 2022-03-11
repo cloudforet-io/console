@@ -128,9 +128,11 @@ export default defineComponent<SearchProps>({
 <style lang="postcss">
 .p-search {
     @apply flex items-center border border-gray-300 bg-white text-gray-900 px-2 w-full rounded;
-    height: 2rem;
-    line-height: 2rem;
+    height: auto;
+    min-height: 2rem;
     min-width: 0;
+    line-height: 2rem;
+    box-sizing: border-box;
     &.invalid {
         @apply border-alert;
     }
@@ -144,15 +146,15 @@ export default defineComponent<SearchProps>({
         @apply border-secondary;
     }
     .input-wrapper {
-        display: flex;
-        flex-grow: 1;
+        @apply flex flex-wrap flex-grow row-gap-2;
     }
     input {
         @apply border-0 bg-transparent w-full;
         color: inherit;
         font-size: 0.875rem;
         appearance: none;
-        height: calc(2rem - 2px);
+        min-height: 1.125rem;
+        line-height: 1.125rem;
         &::placeholder {
             @apply text-gray-300;
         }

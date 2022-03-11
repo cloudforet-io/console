@@ -5,6 +5,7 @@ import {
 import { throttle } from 'lodash';
 import { Vue } from 'vue/types/vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
+import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
 
 export interface ContextMenuFixedStyleProps {
     useFixedMenuStyle?: boolean;
@@ -47,13 +48,7 @@ export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu }: Sta
         if (contextMenuFixedStyleState.proxyVisibleMenu) contextMenuFixedStyleState.proxyVisibleMenu = false;
     }, 300);
 
-    watch(() => contextMenuFixedStyleState.proxyVisibleMenu, async () => {
-        if (!contextMenuFixedStyleState.proxyVisibleMenu || !contextMenuFixedStyleState.targetRef) {
-            contextMenuFixedStyleState.contextMenuStyle = {};
-        }
-
-        await vm.$nextTick(); // Needed codes for timing issues between painting DOM and proxyVisibleMenu
-
+    const setStyleOfContextMenu = () => {
         const targetRects: DOMRect = contextMenuFixedStyleState.targetElement?.getBoundingClientRect();
 
         const contextMenuStyle: Partial<CSSStyleDeclaration> = {
@@ -82,6 +77,16 @@ export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu }: Sta
         }
 
         contextMenuFixedStyleState.contextMenuStyle = contextMenuStyle;
+    };
+
+    watch(() => contextMenuFixedStyleState.proxyVisibleMenu, async () => {
+        if (!contextMenuFixedStyleState.proxyVisibleMenu || !contextMenuFixedStyleState.targetRef) {
+            contextMenuFixedStyleState.contextMenuStyle = {};
+        }
+
+        await vm.$nextTick(); // Needed codes for timing issues between painting DOM and proxyVisibleMenu
+
+        setStyleOfContextMenu();
     }, { immediate: true });
 
     if (state.useFixedMenuStyle) {
@@ -106,6 +111,15 @@ export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu }: Sta
         });
     }
 
+    const observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+        entries.forEach(() => {
+            setStyleOfContextMenu();
+        });
+    });
+
+    onMounted(() => {
+        observer.observe(contextMenuFixedStyleState.targetElement);
+    });
 
     return {
         ...toRefs(contextMenuFixedStyleState),

@@ -1,5 +1,5 @@
 <template>
-    <div class="p-search-dropdown">
+    <div class="p-search-dropdown" :class="[ {'multi-selectable' : multiSelectable}, {'invisible-menu' : !proxyVisibleMenu} ]">
         <p-search ref="targetRef"
                   v-model="proxyValue"
                   :placeholder="_placeholder ? _placeholder : $t('COMPONENT.SEARCH_DROPDOWN.PLACEHOLDER')"
@@ -8,7 +8,6 @@
                   :invalid="invalid"
                   :disabled="disabled"
                   :readonly="readonly"
-                  :style="{height: `${searchHeight}px`}"
                   @delete="onDeleteSearchText"
                   @click.native.stop="handleClick"
                   v-on="searchListeners"
@@ -26,6 +25,13 @@
                      @click="onDeleteTag(proxySelected[0], 0)"
                 />
             </div>
+            <template v-if="multiSelectable && proxySelected.length" v-slot:left>
+                <p-tag v-for="(selectedItem, index) in proxySelected" :key="`tag-box-${index}`" :deletable="!disabled"
+                       @delete="onDeleteTag(selectedItem, index)"
+                >
+                    {{ selectedItem.label || selectedItem.name }}
+                </p-tag>
+            </template>
             <template v-if="searchDropdownType !== SEARCH_DROPDOWN_TYPE.default || !proxySelected.length || proxyVisibleMenu" #right>
                 <p-i :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                      color="inherit" class="dropdown-button" :class="disabled"
@@ -65,13 +71,6 @@
                 <slot :name="`menu-${slot}`" v-bind="scope" />
             </template>
         </p-context-menu>
-        <div v-if="multiSelectable && proxySelected.length" class="p-search-dropdown__tag-box">
-            <p-tag v-for="(selectedItem, index) in proxySelected" :key="`tag-box-${index}`" :deletable="!disabled"
-                   @delete="onDeleteTag(selectedItem, index)"
-            >
-                {{ selectedItem.label || selectedItem.name }}
-            </p-tag>
-        </div>
     </div>
 </template>
 
@@ -223,13 +222,6 @@ export default defineComponent<SearchDropdownProps>({
                 if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
                 return res;
             }, {})),
-            searchHeight: computed<number>(() => {
-                if (!state.selectedRadioRef) return 32;
-                if (!contextMenuFixedStyleState.proxyVisibleMenu && state.proxySelected.length && state.searchDropdownType === SEARCH_DROPDOWN_TYPE.radioButton) {
-                    return state.selectedRadioRef.clientHeight + 12;
-                }
-                return 32;
-            }),
         });
 
         const defaultHandler = (inputText: string, list: SearchDropdownMenuItem[]) => {
@@ -378,6 +370,7 @@ export default defineComponent<SearchDropdownProps>({
             if (state.searchDropdownType === SEARCH_DROPDOWN_TYPE.default) {
                 state.proxyValue = item.label ?? item.name ?? '';
             }
+            if (props.multiSelectable) state.proxyIsFocused = true;
 
             emit('select-menu', item);
         };
@@ -522,6 +515,8 @@ export default defineComponent<SearchDropdownProps>({
     }
     .selected-radio-label {
         @apply w-full flex justify-between items-center;
+        padding-top: 0.375rem;
+        padding-bottom: 0.375rem;
         line-height: 1.125rem;
     }
     .delete-icon {
@@ -556,12 +551,24 @@ export default defineComponent<SearchDropdownProps>({
             flex-grow: 1;
         }
     }
-    .p-search-dropdown__tag-box {
-        @apply text-gray-900;
-        margin-top: 0.625rem;
-        .p-tag {
-            align-items: center;
-            margin-bottom: 0.5rem;
+
+    &.multi-selectable {
+        .p-search {
+            @apply relative flex-wrap row-gap-1;
+            padding-right: 2rem;
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+
+            .dropdown-button {
+                @apply absolute;
+                top: 0.1875rem;
+                right: 0.5rem;
+            }
+        }
+        &.invisible-menu {
+            .input-wrapper {
+                @apply hidden;
+            }
         }
     }
 }
