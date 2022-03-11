@@ -1,10 +1,10 @@
 <template>
-    <span v-tooltip.bottom="isError ? errorMessage : ''"
+    <span v-tooltip.bottom="invalid ? errorMessage : ''"
           class="p-tag"
-          :class="{deletable: deletable, activated: activated, outline: outline, error: isError}"
+          :class="{deletable: deletable, selected: selected, outline: outline, invalid: invalid}"
           v-on="$listeners"
     >
-        <p-i v-if="isError" class="error-icon"
+        <p-i v-if="invalid" class="invalid-icon"
              name="ic_alert"
              width="0.8rem"
              height="0.8rem"
@@ -28,8 +28,8 @@ import { defineComponent } from '@vue/composition-api';
 interface Props {
     deletable?: boolean;
     outline?: boolean;
-    activated?: boolean;
-    isError?: boolean;
+    selected?: boolean;
+    invalid?: boolean;
     errorMessage?: string;
 }
 
@@ -47,11 +47,11 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
-        activated: {
+        selected: {
             type: Boolean,
             default: false,
         },
-        isError: {
+        invalid: {
             type: Boolean,
             default: false,
         },
@@ -70,13 +70,17 @@ export default defineComponent<Props>({
 .p-tag {
     @apply bg-gray-200 text-gray-dark rounded;
     display: inline-flex;
-    align-items: flex-start;
+    align-items: center;
     overflow: hidden;
     padding: 0.125rem 0.25rem 0.125rem 0.5rem;
     height: auto;
     max-width: 100%;
     width: fit-content;
     margin-right: 0.5rem;
+    &.selected {
+        @apply bg-blue-300;
+    }
+
     &.deletable {
         .delete-icon {
             @apply text-gray-400;
@@ -85,28 +89,26 @@ export default defineComponent<Props>({
             flex-shrink: 0;
         }
         &:hover {
-            @apply bg-gray-100;
-
-            &.outline, &.error {
-                @apply border-gray-100;
-            }
-
+            cursor: pointer;
             .delete-icon {
-                @apply text-alert;
+                @apply text-gray-dark;
             }
         }
     }
-    &.activated {
-        @apply bg-blue-300;
-    }
     &.outline {
         @apply text-gray-dark bg-transparent border border-gray-200;
+        &.selected {
+            @apply bg-blue-200 border-blue-300;
+        }
     }
-    &.error {
-        @apply bg-white border border-alert;
+    &.invalid {
+        @apply bg-red-100 border border-alert;
 
-        .error-icon {
+        .invalid-icon {
             margin-right: 0.3rem;
+        }
+        &.selected {
+            @apply bg-red-200 border-red-500;
         }
     }
     .text {
