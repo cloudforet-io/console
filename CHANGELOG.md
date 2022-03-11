@@ -1,3 +1,10 @@
+# [1.1.0-beta.261](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.260...v1.1.0-beta.261) (2022-03-11)
+
+
+### Features
+
+* make search-input resizable ([#895](https://github.com/spaceone-dev/spaceone-design-system/issues/895)) ([5b88984](https://github.com/spaceone-dev/spaceone-design-system/commit/5b889846bc1ad6173fa5ec831801135a0433814d))
+
 # [1.1.0-beta.260](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.259...v1.1.0-beta.260) (2022-03-11)
 
 
