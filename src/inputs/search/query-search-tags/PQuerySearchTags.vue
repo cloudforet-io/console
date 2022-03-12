@@ -14,15 +14,13 @@
             <div class="tags-wrapper">
                 <p-tag v-for="(tag, idx) in _tags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
                        class="tag"
-                       :class="{invalid: tag.invalid}"
+                       :invalid="tag.invalid"
                        :deletable="!readOnly"
+                       :outline="true"
+                       :selected="!tag.invalid"
+                       :error-message="tag.description"
                        @delete="deleteTag(idx)"
                 >
-                    <p-i v-if="tag.invalid"
-                         v-tooltip.bottom="{content: tag.description, delay: {show: 200}, classes: ['p-tooltip']}"
-                         class="alert-icon"
-                         name="ic_alert" height="1em" width="1em"
-                    />
                     <template v-if="tag.key">
                         <span class="key-label">
                             {{ tag.key.label || tag.key.name }}
@@ -171,11 +169,11 @@ export default defineComponent({
     .tags-wrapper {
         flex-grow: 1;
         overflow-x: hidden;
+        display: flex;
+        flex-wrap: wrap;
         .tag {
+            height: 1.5rem;
             margin-bottom: 0.5rem;
-            &.invalid {
-                @apply border-alert border bg-white;
-            }
             .text {
                 @apply inline-flex;
                 .alert-icon {
