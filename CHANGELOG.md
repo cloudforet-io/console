@@ -1,3 +1,10 @@
+# [1.1.0-beta.262](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.261...v1.1.0-beta.262) (2022-03-12)
+
+
+### Features
+
+* apply the newly updated tag to PQuerySearchTags ([#896](https://github.com/spaceone-dev/spaceone-design-system/issues/896)) ([aad8510](https://github.com/spaceone-dev/spaceone-design-system/commit/aad851009c97817e5434fb61eed74a3fcbe5ccc8))
+
 # [1.1.0-beta.261](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.260...v1.1.0-beta.261) (2022-03-11)
 
 
