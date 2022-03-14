@@ -1,3 +1,10 @@
+# [1.1.0-beta.263](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.262...v1.1.0-beta.263) (2022-03-14)
+
+
+### Bug Fixes
+
+* hide treemap label if the value is 5 or less ([#891](https://github.com/spaceone-dev/spaceone-design-system/issues/891)) ([1a4c387](https://github.com/spaceone-dev/spaceone-design-system/commit/1a4c3876362be84acda45da2b12a2cc4201f81d6))
+
 # [1.1.0-beta.262](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.261...v1.1.0-beta.262) (2022-03-12)
 
 
