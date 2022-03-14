@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { maxBy, minBy } from 'lodash';
+import { maxBy, minBy, sum } from 'lodash';
 import {
     computed,
     defineComponent,
@@ -125,7 +125,8 @@ export default defineComponent<DynamicChartTreemapProps>({
 
             const chart = am4core.create(ctx, TreeMap);
 
-            drawTreemapChart(chart, props.nameOptions, props.valueOptions);
+            const totalValue = sum(state.filteredData.map(d => d[props.valueOptions.key] ?? 0));
+            drawTreemapChart(chart, props.nameOptions, props.valueOptions, totalValue);
             state.chart = chart;
 
             state.chart.data = getColoredData(state.filteredData, props.theme, props.valueOptions);

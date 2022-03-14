@@ -6,12 +6,19 @@ import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-sc
 import { palette } from '@/styles/colors';
 import { drawSeriesTooltip } from '@/data-display/dynamic/dynamic-chart/helper';
 
-const drawSeriesLabelBullet = (series: TreeMapSeries, nameOptions: DynamicField): LabelBullet => {
+const drawSeriesLabelBullet = (series: TreeMapSeries, nameOptions: DynamicField, totalValue: number): LabelBullet => {
     const labelBullet = series.bullets.push(new LabelBullet());
     labelBullet.locationY = 0.5;
     labelBullet.locationX = 0.5;
-    labelBullet.label.text = `[font-size: 14px; {textColor};]{${nameOptions.key}}[/]`;
-
+    labelBullet.label.adapter.add('text', (text, target: any) => {
+        if (target.dataItem?.value) {
+            const percentage = (100 * target.dataItem.value) / totalValue;
+            if (percentage >= 5) {
+                return `[font-size: 14px; {textColor};]{${nameOptions.key}}[/]`;
+            }
+        }
+        return '';
+    });
     return labelBullet;
 };
 
@@ -23,7 +30,7 @@ const drawSeries = (chart: TreeMap, nameOptions: DynamicField): TreeMapSeries =>
     return drawSeriesTooltip(series, nameOptions) as TreeMapSeries;
 };
 
-export const drawTreemapChart = (chart: TreeMap, nameOptions: DynamicField, valueOptions: DynamicField) => {
+export const drawTreemapChart = (chart: TreeMap, nameOptions: DynamicField, valueOptions: DynamicField, totalValue: number) => {
     if (chart.hasLicense() && chart.logo) chart.logo.disabled = true;
 
     chart.paddingTop = 0;
@@ -41,5 +48,5 @@ export const drawTreemapChart = (chart: TreeMap, nameOptions: DynamicField, valu
 
 
     const series = drawSeries(chart, nameOptions);
-    drawSeriesLabelBullet(series, nameOptions);
+    drawSeriesLabelBullet(series, nameOptions, totalValue);
 };
