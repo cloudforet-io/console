@@ -3,33 +3,39 @@
         <router-link :to="getCloudServiceDetailLink(item)"
                      class="item-wrapper"
         >
-            <div class="provider-title-wrapper">
-                <p-lazy-img width="1rem" height="1rem"
-                            :src="providers[item.provider].icon"
-                            error-icon="ic_provider_other"
-                            :alt="item.name"
-                            class="icon"
-                />
-                <span class="provider">{{ providers[item.provider] ? providers[item.provider].label : item.provider }}</span>
+            <div class="card-title-wrapper">
+                <div class="provider-title-wrapper">
+                    <span class="provider">{{ providers[item.provider] ? providers[item.provider].label : item.provider }}</span>
+                </div>
+                <div class="service-group-wrapper">
+                    <p-lazy-img width="1.25rem" height="1.25rem"
+                                :src="assetUrlConverter(item.icon) || (providers[item.provider] ? providers[item.provider].icon : '')"
+                                error-icon="ic_provider_other"
+                                :alt="item.name"
+                                class="icon"
+                    />
+                    <span class="service-group">{{ item.cloud_service_group }}</span>
+                </div>
             </div>
-            <div class="service-group-wrapper">
-                <p-lazy-img width="1.5rem" height="1.5rem"
-                            :src="assetUrlConverter(item.icon) || (providers[item.provider] ? providers[item.provider].icon : '')"
-                            error-icon="ic_provider_other"
-                            :alt="item.name"
-                            class="icon"
-                />
-                <span class="service-group">{{ item.cloud_service_group }}</span>
-            </div>
+            <p-divider />
             <div class="service-type-list">
-                <router-link v-for="(cloudServiceType, idx) in item.resources"
-                             :key="`${cloudServiceType}-${idx}`"
-                             :to="getCloudServiceDetailLink({ ...item, cloudServiceTypeName: cloudServiceType.cloud_service_type })"
-                             class="service-type-item"
+                <template
+                    v-for="(cloudServiceType, idx) in slicedResources"
                 >
-                    <span class="service-type-name">{{ cloudServiceType.cloud_service_type }}</span>
-                    <span class="service-type-count">{{ cloudServiceType.count }}</span>
-                </router-link>
+                    <router-link
+                        :key="`${cloudServiceType}-${idx}`"
+                        :to="getCloudServiceDetailLink({ ...item, cloudServiceTypeName: cloudServiceType.cloud_service_type })"
+                        class="service-type-item"
+                    >
+                        <span class="service-type-name">{{ cloudServiceType.cloud_service_type }} </span>
+                        <span class="service-type-count">{{ cloudServiceType.count }}</span>
+                    </router-link>
+                    <p-divider
+                        v-if="item.resources.length > 1 && idx === 0"
+                        :key="idx"
+                        :vertical="true"
+                    />
+                </template>
             </div>
         </router-link>
     </div>
@@ -39,7 +45,7 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { Location } from 'vue-router';
 
-import { PLazyImg } from '@spaceone/design-system';
+import { PLazyImg, PDivider } from '@spaceone/design-system';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
@@ -61,6 +67,7 @@ export default {
     name: 'CloudServiceListCard',
     components: {
         PLazyImg,
+        PDivider,
     },
     props: {
         item: {
@@ -83,6 +90,7 @@ export default {
     setup(props: Props) {
         const state = reactive({
             providers: computed(() => store.state.resource.provider.items),
+            slicedResources: computed(() => props.item?.resources.slice(0, 2)),
         });
         const cloudServiceDetailQueryHelper = new QueryHelper();
         const getCloudServiceDetailLink = (item) => {
@@ -122,8 +130,7 @@ export default {
 <style scoped lang="postcss">
 .cloud-service-type-item {
     @apply bg-white border border-gray-200 rounded-lg;
-    min-height: 9rem;
-    filter: drop-shadow(0 2px 4px rgba(theme('colors.black'), 0.06));
+    box-shadow: 0 0.02rem 0.04rem rgba(0, 0, 0, 0.06);
 
     &:hover {
         @apply border-l border-secondary border-gray-200 bg-blue-100;
@@ -135,61 +142,74 @@ export default {
     }
 
     .item-wrapper {
-        @apply flex flex-col w-full h-full flex-wrap gap-2 p-4;
+        @apply flex flex-col w-full h-full;
 
         .icon {
             @apply overflow-hidden flex-shrink-0 rounded-md;
         }
 
-        .provider-title-wrapper {
-            @apply flex flex-wrap gap-1 items-center;
-            margin: 0 0.5rem;
+        .card-title-wrapper {
+            min-height: 5.5rem;
+            padding: 1rem 1rem 0.5rem;
+        }
 
+        .provider-title-wrapper {
+            margin-bottom: 0.35rem;
+
+            @apply flex flex-wrap gap-1 items-center;
             .provider {
-                @apply text-gray-700 text-sm;
-                line-height: 150%;
+                @apply text-gray-500 text-xs;
+                line-height: 130%;
             }
         }
 
         .service-group-wrapper {
-            @apply w-full flex gap-2 items-center;
-            padding: 0 0.5rem;
+            @apply w-full flex gap-1 items-start;
 
             .service-group {
-                @apply inline-block font-bold text-lg text-gray-900 truncate;
-                max-width: calc(100% - 1.5rem);
+                @apply inline-block font-bold text-lg text-gray-900;
+                max-width: calc(100% - 1rem);
                 line-height: 1.2;
             }
         }
 
         .service-type-list {
-            @apply flex flex-wrap flex-col w-full;
-            height: 3rem;
-            gap: 0.125rem;
+            @apply flex w-full items-center;
+            padding: 0.75rem 0.25rem;
+
             .service-type-item {
-                @apply flex justify-between w-full rounded;
-                margin-top: auto;
-                padding: 0.15rem 0.5rem;
+                @apply flex w-full items-center;
+                margin-left: 0.75rem;
+                white-space: break-spaces;
+
                 .service-type-name {
-                    @apply text-sm text-gray-900 truncate;
-                    max-width: 90%;
+                    @apply text-sm text-gray-700;
+                    max-width: 80%;
+                    font-weight: 600;
+                    line-height: 1.3;
                 }
                 .service-type-count {
                     @apply text-gray-500;
+                    font-size: 0.875rem;
+                    line-height: 1.3;
                 }
 
                 &:hover {
-                    @apply bg-blue-200;
-
                     .service-type-name {
                         @apply text-blue-600 underline;
                     }
 
                     .service-type-count {
-                        @apply text-blue-600;
+                        @apply text-blue-600 underline;
                     }
                 }
             }
+        }
+    }
+
+    .p-divider {
+        &.vertical {
+            @apply h-full;
         }
     }
 }

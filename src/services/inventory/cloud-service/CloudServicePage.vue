@@ -310,7 +310,7 @@ export default {
 }
 .cloud-service-type-wrapper {
     @apply grid w-full;
-    grid-template-columns: repeat(auto-fill, minmax(16.93rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr));
     gap: 1rem;
 }
 
