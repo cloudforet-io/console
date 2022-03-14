@@ -84,7 +84,7 @@
     "v-tooltip": "^2.0.2",
     "velocity-animate": "^1.5.2",
     "vue": "^2.6.10",
-    "vue-filepond": "^7.0.2",
+    "vue-filepond": "^6.0.3",
     "vue-focus": "^2.1.0",
     "vue-form-json-schema": "^2.8.2",
     "vue-fragment": "^1.5.1",
