@@ -1,3 +1,10 @@
+# [1.1.0-beta.264](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.263...v1.1.0-beta.264) (2022-03-14)
+
+
+### Bug Fixes
+
+* fix fileUploader component error ([#898](https://github.com/spaceone-dev/spaceone-design-system/issues/898)) ([3b9f18f](https://github.com/spaceone-dev/spaceone-design-system/commit/3b9f18fe5272de99e1ed9dc2c54ddaf14575cc41))
+
 # [1.1.0-beta.263](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.262...v1.1.0-beta.263) (2022-03-14)
 
 
