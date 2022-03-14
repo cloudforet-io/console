@@ -51,6 +51,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: GRANULARITY
         const _providers = store.state.resource.provider.items;
         const _serviceAccounts = store.state.resource.serviceAccount.items;
         const _projects = store.state.resource.project.items;
+        const _projectGroups = store.state.resource.projectGroup.items;
         const _regions = store.state.resource.region.items;
 
         const legends: Legend[] = [];
@@ -62,7 +63,9 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: GRANULARITY
                 let _name = d[groupBy];
                 let _label = d[groupBy];
                 let _color;
-                if (groupBy === GROUP_BY.PROJECT) {
+                if (groupBy === GROUP_BY.PROJECT_GROUP) {
+                    _label = _projectGroups[_name]?.label || _name;
+                } else if (groupBy === GROUP_BY.PROJECT) {
                     _label = _projects[_name]?.label || _name;
                 } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
                     _label = _serviceAccounts[_name]?.label || _name;

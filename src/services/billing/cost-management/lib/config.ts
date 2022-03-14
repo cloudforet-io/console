@@ -7,6 +7,7 @@ export const GRANULARITY = Object.freeze({
 export type GRANULARITY = typeof GRANULARITY[keyof typeof GRANULARITY];
 
 export const GROUP_BY = Object.freeze({
+    PROJECT_GROUP: 'project_group_id',
     PROJECT: 'project_id',
     PROVIDER: 'provider',
     SERVICE_ACCOUNT: 'service_account_id',
@@ -19,6 +20,7 @@ export const GROUP_BY = Object.freeze({
 export type GROUP_BY = typeof GROUP_BY[keyof typeof GROUP_BY];
 
 export const GROUP_BY_ITEM_MAP = Object.freeze({
+    [GROUP_BY.PROJECT_GROUP]: { name: GROUP_BY.PROJECT_GROUP, label: 'Project Group' },
     [GROUP_BY.PROJECT]: { name: GROUP_BY.PROJECT, label: 'Project' },
     [GROUP_BY.PROVIDER]: { name: GROUP_BY.PROVIDER, label: 'Provider' },
     [GROUP_BY.SERVICE_ACCOUNT]: { name: GROUP_BY.SERVICE_ACCOUNT, label: 'Service Account' },
@@ -30,12 +32,10 @@ export const GROUP_BY_ITEM_MAP = Object.freeze({
 });
 
 export const FILTER = Object.freeze({
-    PROJECT_GROUP: 'project_group_id',
     ...GROUP_BY,
 } as const);
 export type FILTER = typeof FILTER[keyof typeof FILTER];
 
 export const FILTER_ITEM_MAP = Object.freeze({
-    [FILTER.PROJECT_GROUP]: { name: FILTER.PROJECT_GROUP, label: 'Project Group' },
     ...GROUP_BY_ITEM_MAP,
 });

@@ -16,6 +16,9 @@
             <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
                 --
             </span>
+            <span v-else-if="field.name === GROUP_BY.PROJECT_GROUP">
+                {{ projectGroups[value] ? projectGroups[value].label : value }}
+            </span>
             <span v-else-if="field.name === GROUP_BY.PROJECT">
                 {{ projects[value] ? projects[value].label : value }}
             </span>
@@ -117,6 +120,7 @@ export default {
                 return 'YYYY-MM-DD';
             }),
             //
+            projectGroups: computed(() => store.state.resource.projectGroup.items),
             projects: computed(() => store.state.resource.project.items),
             providers: computed(() => store.state.resource.provider.items),
             regions: computed(() => store.state.resource.region.items),
@@ -132,6 +136,7 @@ export default {
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             groupByStoreMap: computed<Record<string, ResourceMap>>(() => ({
+                [GROUP_BY.PROJECT_GROUP]: state.projectGroups,
                 [GROUP_BY.PROJECT]: state.projects,
                 [GROUP_BY.PROVIDER]: state.providers,
                 [GROUP_BY.REGION]: state.regions,
