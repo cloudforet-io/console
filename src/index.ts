@@ -38,8 +38,8 @@ export const numberFormatter = (num, digits = 1) => {
     if (Math.abs(num) < 10000) {
         return Math.round(num * 100) / 100;
     }
-    const options = { notation: 'compact', signDisplay: 'auto', maximumFractionDigits: digits };
-    return Intl.NumberFormat('en', options).format(num);
+
+    return Intl.NumberFormat('en', { notation: 'compact', signDisplay: 'auto', maximumFractionDigits: digits }).format(num);
 };
 export const commaFormatter = (num) => {
     if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');

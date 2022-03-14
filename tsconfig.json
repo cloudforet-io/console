@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "target": "es2016",
-    "module": "CommonJS",
+    "target": "es6",
+    "module": "esnext",
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
