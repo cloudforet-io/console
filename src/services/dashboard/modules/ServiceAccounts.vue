@@ -116,7 +116,6 @@ export default {
             fields: computed(() => [
                 { name: 'provider', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
                 { name: 'service_account_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
-                { name: 'project_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROJECT') },
             ]),
         });
 
