@@ -206,6 +206,11 @@ export default {
 <style lang="postcss" scoped>
 .cloud-service-menu {
     padding-bottom: 2.75rem;
+    .count {
+        margin-left: 0.25rem;
+        font-size: 0.875rem;
+        line-height: 170%;
+    }
     .favorite-list {
         @apply px-4;
     }
