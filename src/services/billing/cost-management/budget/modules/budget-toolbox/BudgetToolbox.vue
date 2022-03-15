@@ -2,6 +2,7 @@
     <div class="budget-toolbox">
         <div class="top">
             <budget-toolbox-usage-range @update="handleUpdateUsageRange" />
+            <p-divider :vertical="true" />
             <div class="period-box">
                 <span class="label">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PERIOD') }}</span>
                 <p-select-status v-for="(status, idx) in periodList" :key="idx"
@@ -12,6 +13,7 @@
                 >
                     {{ status.label }}
                 </p-select-status>
+                <p-divider :vertical="true" />
                 <currency-select-dropdown />
             </div>
         </div>
@@ -57,7 +59,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToolbox, PSelectStatus, PButton, PI, PSelectDropdown,
+    PToolbox, PSelectStatus, PButton, PI, PSelectDropdown, PDivider,
 } from '@spaceone/design-system';
 import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
@@ -100,6 +102,7 @@ export default {
         PSelectDropdown,
         PButton,
         PI,
+        PDivider,
     },
     props: {
         filters: {
@@ -235,22 +238,17 @@ export default {
     @apply flex flex-wrap flex-col gap-4;
     padding-top: 1.5rem;
     .top {
+        @apply flex items-center;
+        .p-divider {
+            &.vertical {
+                height: 1rem;
+            }
+        }
         .period-box {
-            @apply relative inline-flex flex-wrap gap-4 items-center pl-4;
+            @apply relative inline-flex gap-4 items-center pl-4;
             height: 1.25rem;
             font-size: 0.875rem;
 
-            &::before {
-                @apply bg-gray-300;
-                position: absolute;
-                top: 50%;
-                left: 0;
-                display: inline-block;
-                width: 0.0625rem;
-                height: 1rem;
-                content: ' ';
-                margin-top: calc(-1rem / 2);
-            }
             .label {
                 @apply text-gray-500;
                 font-size: 0.875rem;
