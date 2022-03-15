@@ -33,8 +33,8 @@
             <p class="desc">
                 {{ $t('IDENTITY.USER.HANDBOOK.DESC_2-2') }}
             </p>
-            <pre lang="commandline">
-                <code class="code-block">
+            <pre lang="commandline" class="code-block">
+                <code>
                     {{ codeBlock.installCode }}
                 </code>
             </pre>
@@ -44,9 +44,9 @@
             <p class="desc">
                 {{ $t('IDENTITY.USER.HANDBOOK.DESC_2-3') }}
             </p>
-            <pre lang="commandline">
-                <code class="code-block">
-                    {{ codeBlock.installCode }}
+            <pre lang="commandline" class="code-block">
+                <code>
+                    {{ codeBlock.configCode }}
                 </code>
             </pre>
         </article>
@@ -57,16 +57,16 @@
             <p class="desc">
                 {{ $t('IDENTITY.USER.HANDBOOK.DESC_3-1') }}
             </p>
-            <pre lang="commandline">
-                <code class="code-block">
+            <pre lang="commandline" class="code-block">
+                <code>
                     {{ codeBlock.startCode }}
                 </code>
             </pre>
             <p class="desc">
                 {{ $t('IDENTITY.USER.HANDBOOK.DESC_3-2') }}
             </p>
-            <pre lang="commandline">
-                <code class="code-block">
+            <pre lang="commandline" class="code-block">
+                <code>
                     {{ codeBlock.helpCode }}
                 </code>
             </pre>
@@ -88,8 +88,8 @@ import { PAnchor } from '@spaceone/design-system';
 
 const githubLink = 'https://github.com/spaceone-dev/spacectl';
 const codeBlock = {
-    installCode: 'sudo pip3 install --upgrade pip \n'
-      + 'sudo pip3 install spaceone-core spaceone-api --upgrade --pre\n'
+    installCode: 'sudo pip3 install --upgrade pip \n\n'
+      + 'sudo pip3 install spaceone-core spaceone-api --upgrade --pre\n\n'
       + 'sudo pip3 install spacectl',
     configCode: 'spacectl config init -f <spacectl_config.yaml>',
     startCode: 'spacectl api-resources',
@@ -134,9 +134,14 @@ export default {
     line-height: 150%;
 }
 .code-block {
-    min-height: auto;
+    @apply bg-black text-green-300 rounded-lg;
+    white-space: pre-line;
     margin-top: 0.5rem;
+    padding: 1rem;
+    font-size: 0.875rem;
+    line-height: 150%;
 }
+
 .link {
     @apply text-blue-600;
     &:hover {
