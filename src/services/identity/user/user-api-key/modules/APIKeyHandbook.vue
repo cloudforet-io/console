@@ -33,14 +33,22 @@
             <p class="desc">
                 {{ $t('IDENTITY.USER.HANDBOOK.DESC_2-2') }}
             </p>
-            <p-raw-data :raw="codeBlock.installCode" class="code-block" />
+            <pre lang="commandline">
+                <code class="code-block">
+                    {{ codeBlock.installCode }}
+                </code>
+            </pre>
             <h3 class="sub-title">
                 {{ $t('IDENTITY.USER.HANDBOOK.TITLE_2-3') }}
             </h3>
             <p class="desc">
                 {{ $t('IDENTITY.USER.HANDBOOK.DESC_2-3') }}
             </p>
-            <p-raw-data :raw="codeBlock.configCode" class="code-block" />
+            <pre lang="commandline">
+                <code class="code-block">
+                    {{ codeBlock.installCode }}
+                </code>
+            </pre>
         </article>
         <article class="desc-wrapper">
             <h2 class="title">
@@ -49,11 +57,19 @@
             <p class="desc">
                 {{ $t('IDENTITY.USER.HANDBOOK.DESC_3-1') }}
             </p>
-            <p-raw-data :raw="codeBlock.startCode" class="code-block" />
+            <pre lang="commandline">
+                <code class="code-block">
+                    {{ codeBlock.startCode }}
+                </code>
+            </pre>
             <p class="desc">
                 {{ $t('IDENTITY.USER.HANDBOOK.DESC_3-2') }}
             </p>
-            <p-raw-data :raw="codeBlock.helpCode" class="code-block" />
+            <pre lang="commandline">
+                <code class="code-block">
+                    {{ codeBlock.helpCode }}
+                </code>
+            </pre>
             <p class="desc last">
                 <i18n path="IDENTITY.USER.HANDBOOK.DESC_3-3">
                     <template #document>
@@ -68,16 +84,16 @@
 </template>
 
 <script lang="ts">
-import { PAnchor, PRawData } from '@spaceone/design-system';
+import { PAnchor } from '@spaceone/design-system';
 
 const githubLink = 'https://github.com/spaceone-dev/spacectl';
 const codeBlock = {
-    installCode: `${'sudo pip3 install --upgrade pip \n'
-      + 'sudo pip3 install spaceone-core spaceone-api --upgrade --pre\n'}${
-        'sudo pip3 install spacectl'.replace(/['"]+/g, '')}`,
-    configCode: 'spacectl config init -f <spacectl_config.yaml>'.replace(/['"]+/g, ''),
-    startCode: 'spacectl api-resources'.replace(/['"]+/g, ''),
-    helpCode: 'spacectl --help'.replace(/['"]+/g, ''),
+    installCode: 'sudo pip3 install --upgrade pip \n'
+      + 'sudo pip3 install spaceone-core spaceone-api --upgrade --pre\n'
+      + 'sudo pip3 install spacectl',
+    configCode: 'spacectl config init -f <spacectl_config.yaml>',
+    startCode: 'spacectl api-resources',
+    helpCode: 'spacectl --help',
 };
 
 
@@ -85,7 +101,6 @@ export default {
     name: 'UserAPIKeyHandbook',
     components: {
         PAnchor,
-        PRawData,
     },
     setup() {
         return {
