@@ -39,12 +39,12 @@
                 </template>
             </p-data-table>
         </p-pane-layout>
-        <user-a-p-i-key-modal v-if="visible && !modalState.loading"
-                              :visible.sync="visible"
-                              :api-key-item="modalState.items"
-                              :endpoints="modalState.endpoints"
-                              @clickButton="confirm"
-        />
+        <!--        <user-a-p-i-key-modal v-if="visible && !modalState.loading"-->
+        <!--                              :visible.sync="visible"-->
+        <!--                              :api-key-item="modalState.items"-->
+        <!--                              :endpoints="modalState.endpoints"-->
+        <!--                              @clickButton="confirm"-->
+        <!--        />-->
         <p-table-check-modal
             :fields="checkModalState.fields"
             :mode="checkModalState.mode"
@@ -75,7 +75,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import UserAPIKeyModal from '@/services/identity/user/user-api-key/modules/APIKeyModal.vue';
+// import UserAPIKeyModal from '@/services/identity/user/user-api-key/modules/APIKeyModal.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { userStateFormatter } from '@/services/identity/user/lib/helper';
@@ -118,7 +118,7 @@ interface EndpointItem {
 export default {
     name: 'UserAPIKey',
     components: {
-        UserAPIKeyModal,
+        // UserAPIKeyModal,
         PStatus,
         PPaneLayout,
         PIconTextButton,
