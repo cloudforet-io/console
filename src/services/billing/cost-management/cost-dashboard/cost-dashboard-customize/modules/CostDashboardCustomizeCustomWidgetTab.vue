@@ -219,7 +219,7 @@ export default {
         }
         .cost-query-area {
             @apply mr-8;
-            height: 14.5rem;
+            height: auto;
             overflow-y: auto;
         }
     }
