@@ -25,7 +25,9 @@
             <ul v-if="channelData.subscriptions.length > 0">
                 <li v-for="(item, index) in channelData.subscriptions" :key="`topic-${index}`">
                     <p-badge style-type="gray200" shape="square">
-                        {{ item }}
+                        <span v-if="item === 'monitoring.Alert'">Alert</span>
+                        <span v-else-if="item === 'cost_analysis.Budget'">Budget</span>
+                        <span v-else>{{ item }}</span>
                     </p-badge>
                 </li>
             </ul>

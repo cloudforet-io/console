@@ -34,8 +34,8 @@ import {
 import { PRadio, PCheckBox } from '@spaceone/design-system';
 
 const TOPIC_LIST = [
-    { label: 'monitoring.Alert', value: 'monitoring.Alert' },
-    { label: 'billing.Budget', value: 'cost_analysis.Budget' },
+    { label: 'Alert', value: 'monitoring.Alert' },
+    { label: 'Budget', value: 'cost_analysis.Budget' },
 ];
 
 export default {

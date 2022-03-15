@@ -30,7 +30,7 @@
         </p-pane-layout>
         <p-pane-layout class="summary-card">
             <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }}
-                <span v-if="!loading" class="text-gray-900 font-normal">{{ costTypeMap[costTypeKey] || 'All' }}</span>
+                <span v-if="!loading" class="text-gray-900 font-normal">{{ costTypeMap[costTypeKey] }}</span>
             </span>
             <p v-if="!loading" class="summary-content cost-type">
                 <span class="cost-type-content">{{ processedCostTypeValue }}</span>
