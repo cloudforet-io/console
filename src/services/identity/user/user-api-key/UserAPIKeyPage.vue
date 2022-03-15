@@ -3,16 +3,16 @@
         <div class="flex">
             <p-breadcrumbs v-if="isAdmin" class="flex-grow" :routes="routeState.adminRoutes" />
             <p-breadcrumbs v-else class="flex-grow" :routes="routeState.userRoutes" />
-            <handbook-button :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"
-                             type="identity/user/api-key"
-                             class="flex-shrink-0"
-            >
-                <template #spacectl>
-                    <keep-alive>
-                        <user-a-p-i-key-handbook />
-                    </keep-alive>
-                </template>
-            </handbook-button>
+            <!--            <handbook-button :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"-->
+            <!--                             type="identity/user/api-key"-->
+            <!--                             class="flex-shrink-0"-->
+            <!--            >-->
+            <!--                <template #spacectl>-->
+            <!--                    <keep-alive>-->
+            <!--                        <user-a-p-i-key-handbook />-->
+            <!--                    </keep-alive>-->
+            <!--                </template>-->
+            <!--            </handbook-button>-->
         </div>
         <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
                       :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')" class="page-title"
@@ -38,7 +38,7 @@
 import {
     PBreadcrumbs, PDataTable, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
-import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
+// import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
@@ -46,7 +46,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import UserAPIKeyTable from '@/services/identity/user/user-api-key/modules/APIKeyTable.vue';
 import { store } from '@/store';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import UserAPIKeyHandbook from '@/services/identity/user/user-api-key/modules/APIKeyHandbook.vue';
+// import UserAPIKeyHandbook from '@/services/identity/user/user-api-key/modules/APIKeyHandbook.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface EndpointItem {
@@ -60,9 +60,9 @@ interface EndpointItem {
 export default {
     name: 'UserAPIKeyPage',
     components: {
-        HandbookButton,
+        // HandbookButton,
         UserAPIKeyTable,
-        UserAPIKeyHandbook,
+        // UserAPIKeyHandbook,
         PPaneLayout,
         PBreadcrumbs,
         PDataTable,
