@@ -6,7 +6,7 @@
             <job-status-chart :job-id="jobId" />
             <job-basic-information :job-id="jobId" />
         </div>
-        <p-horizontal-layout class="job-tasks-wrapper">
+        <p-horizontal-layout class="job-tasks-wrapper" :min-height="350">
             <template #container="{ height }">
                 <job-table :style="{height: `${height}px`}"
                            :job-id="jobId"
@@ -37,7 +37,7 @@ import { store } from '@/store';
 
 
 export default {
-    name: 'CollectorHistoryJob',
+    name: 'CollectorJobPage',
     components: {
         JobTaskDetails,
         JobTable,
@@ -93,10 +93,26 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+>>> .p-horizontal-layout .horizontal-contents {
+    overflow: unset;
+}
+
 .top-wrapper {
     display: grid;
     grid-gap: 1rem;
     grid-template-columns: repeat(auto-fit, minmax(352px, 1fr));
     margin-bottom: 1rem;
+}
+
+@screen mobile {
+    >>> .p-toolbox-table .p-data-table {
+        min-height: unset;
+    }
+}
+
+@screen tablet {
+    >>> .p-toolbox-table .p-data-table {
+        min-height: unset;
+    }
 }
 </style>
