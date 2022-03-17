@@ -1,5 +1,6 @@
 <template>
     <div class="right-side-menu">
+        <g-n-b-search />
         <div class="menu-wrapper">
             <router-link :to="{ name: IDENTITY_ROUTE.USER.API_KEY._NAME }">
                 <div v-if="!userState.isDomainOwner" class="menu-button code" :class="{'new-icon':!isNewIconHidden}"
@@ -127,10 +128,12 @@ import config from '@/lib/config';
 import GNBNotifications from '@/common/modules/navigations/gnb/modules/gnb-notification/GNBNotifications.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
 
 export default {
     name: 'RightSideMenu',
     components: {
+        GNBSearch,
         GNBNotifications,
         PDivider,
         PAnchor,
