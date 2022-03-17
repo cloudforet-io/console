@@ -63,7 +63,7 @@ export class SpaceConnector {
         SpaceConnector.instance.api.flushToken();
     }
 
-    static async refreshAccessToken(executeSessionTimeoutCallback: boolean): Promise<boolean> {
+    static async refreshAccessToken(executeSessionTimeoutCallback: boolean): Promise<boolean|undefined> {
         return SpaceConnector.instance.api.refreshAccessToken(executeSessionTimeoutCallback);
     }
 
