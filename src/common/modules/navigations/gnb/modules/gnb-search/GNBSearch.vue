@@ -35,7 +35,12 @@
                                           default-icon="ic_provider_other"
             />
             <template #no-data>
-                <!-- TODO: add markups -->
+                <div v-if="trimmedInputText">
+                    <!-- TODO: no data case -->
+                </div>
+                <div v-else>
+                    <!-- TODO: before searching case -->
+                </div>
             </template>
         </p-data-loader>
     </div>
@@ -61,6 +66,10 @@ export default {
         const state = reactive({
             showSuggestion: false,
             inputText: '',
+            trimmedInputText: computed<string>(() => {
+                if (state.inputText) return state.inputText.trim();
+                return '';
+            }),
             loading: false,
             menuItems: [
                 { name: 'project', label: 'Project' },
