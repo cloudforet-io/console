@@ -81,7 +81,7 @@ class API {
         return window.localStorage.removeItem(IS_REFRESHING_KEY);
     }
 
-    async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean> {
+    async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
         if (API.checkRefreshingState() !== 'true') {
             try {
                 API.setRefreshingState();
@@ -93,7 +93,7 @@ class API {
                 if (executeSessionTimeoutCallback) this.sessionTimeoutCallback();
                 return false;
             }
-        } else return true;
+        } else return undefined;
     }
 
     async getActivatedToken() {
