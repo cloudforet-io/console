@@ -15,6 +15,7 @@ import {
 } from '@vue/composition-api';
 import { PTab } from '@spaceone/design-system';
 import JobTaskErrorList from '@/services/management/collector-history/collect-job/modules/JobTaskErrorList.vue';
+import { JobTaskData } from '@/services/management/collector-history/collect-job/type';
 
 interface Props {
   selectedItem: any;
@@ -27,7 +28,7 @@ export default {
     },
     props: {
         selectedItem: {
-            type: Object,
+            type: Object as () => JobTaskData,
             default: () => ({}),
             required: true,
         },

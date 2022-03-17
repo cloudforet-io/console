@@ -34,6 +34,7 @@ import JobBasicInformation from '@/services/management/collector-history/collect
 import JobTable from '@/services/management/collector-history/collect-job/modules/JobTaskTable.vue';
 import JobTaskDetails from '@/services/management/collector-history/collect-job/modules/JobTaskDetails.vue';
 import { store } from '@/store';
+import { JobTaskData } from '@/services/management/collector-history/collect-job/type';
 
 
 export default {
@@ -58,7 +59,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            selectedItem: null as null|any,
+            selectedItem: null as null|JobTaskData,
         });
 
         const routeState = reactive({

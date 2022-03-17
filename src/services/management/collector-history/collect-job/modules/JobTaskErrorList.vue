@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="job-task-error-list">
         <p-panel-top :use-total-count="true" :total-count="errorItems.length">
             {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST') }}
         </p-panel-top>
@@ -11,10 +11,16 @@
                       table-style-type="light"
                       bordered
         >
-            <template #col-message-format="{ value }" style="width: 20rem;">
-                <div class="error-message">
-                    <pre>{{ value }}</pre>
-                </div>
+            <template #col-format="{field: { name }, item, value}">
+                <template v-if="name === 'message'">
+                    <div class="error-message">
+                        <pre class="content" :class="{ 'text-overflow': errorItemsCollapsibleList[item.sequence - 1] }">{{ value }}</pre>
+                        <p-collapsible-toggle :is-collapsed.sync="errorItemsCollapsibleList[item.sequence - 1]" />
+                    </div>
+                </template>
+                <template v-else>
+                    <span>{{ value ? value : '--' }}</span>
+                </template>
             </template>
             <template #no-data-format>
                 {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.NO_ERROR') }}
@@ -24,15 +30,15 @@
 </template>
 
 <script lang="ts">
-import { PDataTable, PPanelTop } from '@spaceone/design-system';
+import { PDataTable, PPanelTop, PCollapsibleToggle } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
+import { JobTaskData } from '@/services/management/collector-history/collect-job/type';
 
 interface Props {
-    selectedItem: any;
+    selectedItem: JobTaskData;
 }
-
 const errorMessageFormatter = (message) => {
     let result = message
         .replace(/'/g, '')
@@ -47,16 +53,18 @@ export default {
     components: {
         PDataTable,
         PPanelTop,
+        PCollapsibleToggle,
     },
     props: {
         selectedItem: {
-            type: Object,
+            type: Object as () => JobTaskData,
             default: () => ({}),
             required: true,
         },
     },
     setup(props: Props) {
         const state = reactive({
+            errorItemsCollapsibleList: props.selectedItem?.errors.map(() => true),
             errorItems: computed(() => {
                 if (Array.isArray(props?.selectedItem?.errors)) {
                     return props.selectedItem.errors.map((d, idx) => ({
@@ -69,10 +77,10 @@ export default {
             }),
             errorFields: [
                 { label: 'No.', name: 'sequence' },
-                { label: 'Error Code', name: 'error_code' },
                 { label: 'Error Message', name: 'message' },
                 { label: 'Resource Type', name: 'additional.resource_type' },
                 { label: 'Resource ID', name: 'additional.resource_id' },
+                { label: 'Error Code', name: 'error_code' },
             ],
         });
 
@@ -84,6 +92,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+$maxText:    80ch;
+
 .p-data-table {
     th {
         border-top: none;
@@ -99,9 +109,16 @@ export default {
     }
     .error-message {
         @apply bg-gray-100 rounded-lg;
-        white-space: pre-wrap;
         padding: 0.5rem 0.75rem;
         margin: 0.75rem 0;
+        .content {
+            line-height: 1.225rem;
+            white-space: pre-wrap;
+            width: $maxText;
+            &.text-overflow {
+                @apply truncate;
+            }
+        }
     }
 }
 </style>
