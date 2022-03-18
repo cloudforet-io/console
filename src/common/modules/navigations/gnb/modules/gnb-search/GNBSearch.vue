@@ -4,19 +4,10 @@
         <p-i name="ic_search--bold" />
         -->
 
-        <!-- TODO: Split the code below into GNBSearchInput component -->
-        <div>
-            <p-i v-if="!inputText"
-                 name="ic_search"
-                 height="1rem"
-                 width="1rem"
-            />
-            <input v-model="inputText"
-                   placeholder="Search..."
-                   @focus="showSuggestion = true"
-                   @blur="showSuggestion = false"
-            >
-        </div>
+        <g-n-b-search-input v-model="inputText"
+                            @focus="showSuggestion = true"
+                            @blur="showSuggestion = false"
+        />
 
         <!-- TODO: Split the code below into GNBSearchDropdown component -->
         <p-data-loader v-if="showSuggestion"
@@ -66,17 +57,19 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 import {
-    PDataLoader, PDivider, PI, PSkeleton,
+    PDataLoader, PDivider, PSkeleton,
 } from '@spaceone/design-system';
 import GNBSearchSuggestionList, { Item as SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchSuggestionList.vue';
+import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
 
 export default {
     name: 'GNBSearch',
     components: {
+        GNBSearchInput,
         GNBSearchSuggestionList,
         PDivider,
         PDataLoader,
-        PI,
+        // PI,
         PSkeleton,
     },
     setup() {
