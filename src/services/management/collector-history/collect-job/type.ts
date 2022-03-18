@@ -8,10 +8,11 @@ interface JobTaskErrorAdditional {
     resource_type?: string;
 }
 
-interface JobTaskError {
+export interface JobTaskError {
     additional: JobTaskErrorAdditional;
     error_code: string;
     message: string;
+    sequence?: number;
 }
 
 export interface JobTaskData {

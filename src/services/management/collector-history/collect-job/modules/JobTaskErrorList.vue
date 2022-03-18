@@ -12,10 +12,27 @@
                       bordered
         >
             <template #col-format="{field: { name }, item, value}">
-                <template v-if="name === 'message'">
-                    <div class="error-message">
-                        <pre class="content" :class="{ 'text-overflow': errorItemsCollapsibleList[item.sequence - 1] }">{{ value }}</pre>
-                        <p-collapsible-toggle :is-collapsed.sync="errorItemsCollapsibleList[item.sequence - 1]" />
+                <template v-if="name === 'message' && value">
+                    <div v-if="value.length >= 80" class="error-message">
+                        <pre class="content" :class="{ 'text-overflow': errorItemsToggleList[item.sequence - 1] }">{{ value }}</pre>
+                        <div class="toggle-box">
+                            <p-collapsible-toggle v-if="value.length >= 80"
+                                                  :is-collapsed="errorItemsToggleList[item.sequence - 1]"
+                                                  @update:isCollapsed="handleUpdateErrorItemCollapsedState(item.sequence - 1, $event)"
+                            />
+                        </div>
+                    </div>
+                    <span v-else :style="{whiteSpace: 'nowrap'}">
+                        {{ value ? value : '--' }}
+                    </span>
+                </template>
+                <template v-else-if="name === 'additional'">
+                    <div class="error-location">
+                        <span> {{ value.resource_type ? referenceTypeLabels[value.resource_type] : '--' }}</span>
+                        <template v-if="detailErrorLocationList.includes(value.resource_type)">
+                            <span> {{ value.cloud_service_group ? `> ${value.cloud_service_group}` : '' }}</span>
+                            <span> {{ value.cloud_service_type ? `> ${value.cloud_service_type}` : '' }}</span>
+                        </template>
                     </div>
                 </template>
                 <template v-else>
@@ -32,13 +49,17 @@
 <script lang="ts">
 import { PDataTable, PPanelTop, PCollapsibleToggle } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { JobTaskData } from '@/services/management/collector-history/collect-job/type';
+import { JobTaskData, JobTaskError } from '@/services/management/collector-history/collect-job/type';
+import { referenceTypeLabels } from '@/lib/reference/type';
 
 interface Props {
     selectedItem: JobTaskData;
 }
+
+const detailErrorLocationList = ['inventory.CloudService', 'inventory.Server'];
+
 const errorMessageFormatter = (message) => {
     let result = message
         .replace(/'/g, '')
@@ -63,9 +84,11 @@ export default {
         },
     },
     setup(props: Props) {
+        const initErrorItemsToggleList = (): boolean[] => props.selectedItem?.errors.map(() => true);
+
         const state = reactive({
-            errorItemsCollapsibleList: props.selectedItem?.errors.map(() => true),
-            errorItems: computed(() => {
+            errorItemsToggleList: initErrorItemsToggleList(),
+            errorItems: computed<JobTaskError[]>(() => {
                 if (Array.isArray(props?.selectedItem?.errors)) {
                     return props.selectedItem.errors.map((d, idx) => ({
                         ...d,
@@ -77,6 +100,7 @@ export default {
             }),
             errorFields: [
                 { label: 'No.', name: 'sequence' },
+                { label: 'Error Location', name: 'additional' },
                 { label: 'Error Message', name: 'message' },
                 { label: 'Resource Type', name: 'additional.resource_type' },
                 { label: 'Resource ID', name: 'additional.resource_id' },
@@ -84,15 +108,27 @@ export default {
             ],
         });
 
+        const handleUpdateErrorItemCollapsedState = (idx, isCollapsed) => {
+            state.errorItemsToggleList[idx] = isCollapsed;
+            state.errorItemsToggleList = [...state.errorItemsToggleList];
+        };
+
+        watch(() => props.selectedItem, () => {
+            state.errorItemsToggleList = initErrorItemsToggleList();
+        });
+
         return {
             ...toRefs(state),
+            detailErrorLocationList,
+            referenceTypeLabels,
+            handleUpdateErrorItemCollapsedState,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-$maxText:    80ch;
+$maxText:    79ch;
 
 .p-data-table {
     th {
@@ -111,14 +147,23 @@ $maxText:    80ch;
         @apply bg-gray-100 rounded-lg;
         padding: 0.5rem 0.75rem;
         margin: 0.75rem 0;
+        width: $maxText;
         .content {
             line-height: 1.225rem;
             white-space: pre-wrap;
-            width: $maxText;
             &.text-overflow {
                 @apply truncate;
             }
         }
+    }
+    .error-location {
+        white-space: nowrap;
+    }
+}
+
+@screen tablet {
+    .toggle-box {
+        @apply flex justify-center;
     }
 }
 </style>
