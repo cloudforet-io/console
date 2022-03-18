@@ -1,3 +1,10 @@
+# [1.1.0-beta.265](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.264...v1.1.0-beta.265) (2022-03-18)
+
+
+### Bug Fixes
+
+* prevent scrolling when single line in modal ([#901](https://github.com/spaceone-dev/spaceone-design-system/issues/901)) ([18fd21e](https://github.com/spaceone-dev/spaceone-design-system/commit/18fd21e3e9e0d3fb54d158b010e4102babe989a4))
+
 # [1.1.0-beta.264](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.263...v1.1.0-beta.264) (2022-03-14)
 
 
