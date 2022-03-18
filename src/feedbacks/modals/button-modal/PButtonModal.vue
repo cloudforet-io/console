@@ -274,6 +274,7 @@ export default defineComponent<ButtonModalProps>({
         .modal-body {
             flex-grow: 1;
             max-height: $body-max-height;
+            min-height: 1.25rem;
             overflow: auto;
         }
 
