@@ -104,9 +104,9 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { PROJECT_ROUTE } from '@/services/project/routes';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-import { ALERT_STATE } from '@/services/monitoring/alert-manager/lib/config';
+import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import MaintenanceWindowFormModal from '@/services/project/project-detail/modules/MaintenanceWindowFormModal.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';

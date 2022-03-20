@@ -60,10 +60,10 @@ import {
     PListCard, PSelectButton, PTextPagination,
 } from '@spaceone/design-system';
 
-import AlertListItem from '@/services/monitoring/alert-manager/modules/AlertListItem.vue';
+import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
 
-import { ALERT_STATE } from '@/services/monitoring/alert-manager/lib/config';
-import { AlertListPageUrlQuery } from '@/services/monitoring/alert-manager/type';
+import { ALERT_STATE } from '@/services/alert-manager/lib/config';
+import { AlertListPageUrlQuery } from '@/services/alert-manager/type';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -71,7 +71,7 @@ import { getPageStart } from '@spaceone/console-core-lib/component-util/paginati
 import { i18n } from '@/translations';
 import { alert, secondary } from '@/styles/colors';
 import { store } from '@/store';
-import { PROJECT_ROUTE } from '@/services/project/routes';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { commaFormatter } from '@spaceone/console-core-lib';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

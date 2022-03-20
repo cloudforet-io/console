@@ -78,7 +78,7 @@ import { PDynamicLayout, PI, PLottie } from '@spaceone/design-system';
 import {
     DynamicLayoutEventListener,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
-import Monitoring from '@/services/monitoring/modules/monitoring/Monitoring.vue';
+import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';

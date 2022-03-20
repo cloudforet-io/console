@@ -37,7 +37,7 @@
                                         <router-link v-for="(provider, index) in getDistinctProviders(item.providers)"
                                                      :key="index"
                                                      :to="{
-                                                         name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
+                                                         name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME,
                                                          query: { provider: getProvider(provider) ? provider : null },
                                                      }"
                                                      class="icon-link"
@@ -46,15 +46,15 @@
                                                      }"
                                         />
                                     </div>
-                                    <router-link v-if="getDistinctProviders(item.providers).length !== 0" class="icon-wrapper" :to="{ name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME }">
+                                    <router-link v-if="getDistinctProviders(item.providers).length !== 0" class="icon-wrapper" :to="{ name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME }">
                                         <p-i name="ic_plus_thin" scale="0.8" color="inherit" />
                                     </router-link>
                                 </div>
                                 <div v-if="getDistinctProviders(item.providers).length === 0" class="account-add">
-                                    <router-link :to="{ name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME }">
+                                    <router-link :to="{ name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME }">
                                         <p-i name="ic_plus_thin" scale="0.8" color="inherit" />
                                     </router-link>
-                                    <router-link :to="{ name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME }">
+                                    <router-link :to="{ name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME }">
                                         <span class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
                                     </router-link>
                                 </div>
@@ -74,7 +74,7 @@
                                         </div>
                                         <router-link v-if="cardSummary[item.project_id]"
                                                      class="summary-item-num"
-                                                     :to="getLocation(summaryType, INVENTORY_ROUTE.CLOUD_SERVICE._NAME, item.project_id)"
+                                                     :to="getLocation(summaryType, ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE._NAME, item.project_id)"
                                         >
                                             {{ getItemSummaryCount(summaryType, item.project_id) }}
                                         </router-link>
@@ -143,9 +143,8 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { store } from '@/store';
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
-import { INVENTORY_ROUTE } from '@/services/inventory/routes';
-import { IDENTITY_ROUTE } from '@/services/identity/routes';
-import { PROJECT_ROUTE } from '@/services/project/routes';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { i18n } from '@/translations';
 import bytes from 'bytes';
@@ -219,7 +218,7 @@ export default {
         const getProvider = name => vm.$store.state.resource.provider.items[name] || {};
         const goToServiceAccount = (provider) => {
             vm.$router.push({
-                name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
+                name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME,
                 query: { provider: getProvider(provider) ? provider : null },
             });
         };
@@ -356,8 +355,7 @@ export default {
 
         return {
             ...toRefs(state),
-            INVENTORY_ROUTE,
-            IDENTITY_ROUTE,
+            ASSET_MANAGEMENT_ROUTE,
             PROJECT_ROUTE,
             getProvider,
             goToServiceAccount,

@@ -40,7 +40,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import CloudServices from '@/services/inventory/cloud-service/modules/CloudServices.vue';
+import CloudServices from '@/services/asset-management/cloud-service/modules/CloudServices.vue';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 import ServiceAccounts from '@/services/dashboard/modules/ServiceAccounts.vue';
 import AllSummary from '@/services/dashboard/modules/AllSummary.vue';

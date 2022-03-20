@@ -74,14 +74,14 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from '@vue/composition-api';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import NotificationChannelItem from '@/services/notification/modules/notification-channel-item/NotificationChannelItem.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
-import { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/identity/user/type';
+import { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/administration/iam/user/type';
 import { PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 export default {
     name: 'NotificationChannelList',
@@ -148,7 +148,7 @@ export default {
             const enrichedProtocolList: EnrichedProtocolItem[] = await Promise.all(protocolResp.map(async d => ({
                 label: computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
                 link: {
-                    name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
+                    name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
                     params: {
                         protocol: d.name.replace(/(\s*)/g, ''),
                         protocolId: d.protocol_id,

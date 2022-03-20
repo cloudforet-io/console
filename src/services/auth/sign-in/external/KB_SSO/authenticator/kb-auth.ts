@@ -1,6 +1,6 @@
 import { store } from '@/store';
 import { Authenticator } from '@/services/auth/authenticator';
-import { AUTH_ROUTE } from '@/services/auth/routes';
+import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { SpaceRouter } from '@/router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';

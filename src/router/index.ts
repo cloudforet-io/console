@@ -3,10 +3,10 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { GTag } from '@/lib/gtag';
 import config from '@/lib/config';
-import { IDENTITY_ROUTE } from '@/services/identity/routes';
-import { DASHBOARD_ROUTE } from '@/services/dashboard/routes';
-import { AUTH_ROUTE } from '@/services/auth/routes';
+import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
+import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { ERROR_ROUTE } from '@/router/error-routes';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
@@ -59,7 +59,7 @@ export class SpaceRouter {
                 } else if (to.meta?.isDomainOwnerOnly && !isAdmin) {
                     nextLocation = { name: ERROR_ROUTE._NAME };
                 } else if (!hasPermission && to.name !== AUTH_ROUTE.SIGN_OUT._NAME) {
-                    if (to.name !== IDENTITY_ROUTE.USER.ACCOUNT._NAME) nextLocation = { name: IDENTITY_ROUTE.USER.ACCOUNT._NAME };
+                    if (to.name !== MY_PAGE_ROUTE.MY_ACCOUNT._NAME) nextLocation = { name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME };
                 }
             } else if (!to.meta?.excludeAuth) {
                 const res = await SpaceConnector.refreshAccessToken(false);

@@ -5,7 +5,7 @@
             <!--            <p-select-dropdown class="more-button" :items="moreMenuItems"-->
             <!--                               type="icon-button" button-icon="ic_more"-->
             <!--            />-->
-            <!--            <router-link :to="{name: IDENTITY_ROUTE.USER.NOTIFICATION._NAME}"-->
+            <!--            <router-link :to="{name: ADMINISTRATION_ROUTE.USER.NOTIFICATION._NAME}"-->
             <!--                         class="inline-flex"-->
             <!--                         @click.native="$emit('click-settings')"-->
             <!--            >-->
@@ -58,7 +58,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
-import { IDENTITY_ROUTE } from '@/services/identity/routes';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import GNBNotificationItem from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationItem.vue';
 import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationDateHeader.vue';
 import dayjs from 'dayjs';
@@ -188,7 +188,7 @@ export default {
 
         return {
             ...toRefs(state),
-            IDENTITY_ROUTE,
+            ADMINISTRATION_ROUTE,
         };
     },
 };

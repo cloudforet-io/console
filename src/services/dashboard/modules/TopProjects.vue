@@ -99,8 +99,8 @@ import {
     gray, peacock, secondary,
 } from '@/styles/colors';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { INVENTORY_ROUTE } from '@/services/inventory/routes';
-import { PROJECT_ROUTE } from '@/services/project/routes';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -259,7 +259,7 @@ export default {
             if (type === 'storage') query.primary = 'false';
 
             const location: Location = {
-                name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
+                name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.TYPE._NAME,
                 query: {
                     filters: queryHelper.setFilters([
                         { k: 'project_id', v: projectId, o: '=' },

@@ -119,7 +119,7 @@ import { commaFormatter } from '@spaceone/console-core-lib';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { gray, primary, primary1 } from '@/styles/colors';
 import { store } from '@/store';
-import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -341,7 +341,7 @@ export default {
             if (type === DATA_TYPE.storage) query.primary = 'false';
 
             const location: Location = {
-                name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
+                name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.TYPE._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,
                     ...query,
@@ -555,14 +555,14 @@ export default {
                         filters.push({ k: 'provider', o: '=', v: d.provider },
                             { k: 'cloud_service_type', o: '=', v: d.cloud_service_type });
                         detailLocation = {
-                            name: INVENTORY_ROUTE.SERVER._NAME,
+                            name: ASSET_MANAGEMENT_ROUTE.SERVER._NAME,
                             query: {
                                 filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
                             },
                         };
                     } else {
                         detailLocation = {
-                            name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                            name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                             params: {
                                 provider: d.provider,
                                 group: d.cloud_service_group,
@@ -600,7 +600,7 @@ export default {
                         let detailLocation: Location = {};
                         if (d.provider && d.cloud_service_group && d.cloud_service_type) {
                             detailLocation = {
-                                name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                                name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                                 params: {
                                     provider: d.provider,
                                     group: d.cloud_service_group,

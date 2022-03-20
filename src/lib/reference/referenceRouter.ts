@@ -3,11 +3,9 @@ import { concat } from 'lodash';
 import { Location } from 'vue-router';
 import { Reference, ReferenceType } from '@/lib/reference/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { INVENTORY_ROUTE } from '@/services/inventory/routes';
-import { PLUGIN_ROUTE } from '@/services/plugin/routes';
-import { PROJECT_ROUTE } from '@/services/project/routes';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { AUTOMATION_ROUTE } from '@/services/automation/routes';
-import { IDENTITY_ROUTE } from '@/services/identity/routes';
 
 interface LinkFormatter {
     (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;
@@ -107,7 +105,7 @@ type RouterMap = Record<ReferenceType, { name: string; formatter: LinkFormatter}
 const routerMap: RouterMap = {
     'inventory.Server':
         {
-            name: INVENTORY_ROUTE.SERVER._NAME,
+            name: ASSET_MANAGEMENT_ROUTE.SERVER._NAME,
             formatter: serverLinkFormatter,
         },
     'identity.Project':
@@ -122,22 +120,22 @@ const routerMap: RouterMap = {
         },
     'inventory.Collector':
         {
-            name: PLUGIN_ROUTE.COLLECTOR._NAME,
+            name: ASSET_MANAGEMENT_ROUTE.COLLECTOR._NAME,
             formatter: collectorLinkFormatter,
         },
     'identity.ServiceAccount':
         {
-            name: IDENTITY_ROUTE.SERVICE_ACCOUNT.SEARCH._NAME,
+            name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT.SEARCH._NAME,
             formatter: serviceAccountLinkFormatter,
         },
     'inventory.CloudService':
         {
-            name: INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME,
+            name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.SEARCH._NAME,
             formatter: cloudServiceLinkFormatter,
         },
     'inventory.CloudServiceType':
         {
-            name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
+            name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
             formatter: cloudServiceTypeLinkFormatter,
         },
     'spot_automation.SpotGroup':

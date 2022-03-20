@@ -63,14 +63,14 @@ import {
 import {
     PBadge, PDivider, PI, PAnchor,
 } from '@spaceone/design-system';
-import ProjectChannelList from '@/services/monitoring/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
+import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
 
-import { FINISH_CONDITION } from '@/services/monitoring/alert-manager/lib/config';
+import { FINISH_CONDITION } from '@/services/alert-manager/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { MONITORING_ROUTE } from '@/services/monitoring/routes';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -120,7 +120,7 @@ export default {
                 const filters: QueryStoreFilter[] = [];
                 filters.push({ k: 'escalation_policy_id', o: '=', v: get(props.escalationPolicy, 'escalation_policy_id') });
                 return {
-                    name: MONITORING_ROUTE.ALERT_MANAGER.ESCALATION_POLICY._NAME,
+                    name: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ESCALATION_POLICY._NAME,
                     query: {
                         filters: queryHelper.setFilters(filters).rawQueryStrings,
                     },
@@ -161,7 +161,7 @@ export default {
 
         return {
             ...toRefs(state),
-            MONITORING_ROUTE,
+            ALERT_MANAGER_ROUTE,
             notificationLevelFormatter,
             channelFormatter,
         };

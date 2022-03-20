@@ -62,7 +62,7 @@ import {
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import { ProjectGroup } from '@/services/identity/service-account/type';
+import { ProjectGroup } from '@/services/asset-management/service-account/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/type';
 

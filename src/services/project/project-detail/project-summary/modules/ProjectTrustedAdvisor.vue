@@ -66,7 +66,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { green, red, yellow } from '@/styles/colors';
 import { store } from '@/store';
-import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -170,7 +170,7 @@ export default {
             filters.push({ k: 'data.category', o: '=', v: category });
 
             return {
-                name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 query: {
                     filters: queryHelper.setFilters(filters).rawQueryStrings,
                 },

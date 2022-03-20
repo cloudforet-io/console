@@ -104,7 +104,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { store } from '@/store';
-import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -229,7 +229,7 @@ export default {
                     isServer: true,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
-                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -244,7 +244,7 @@ export default {
                         },
                     },
                     deletedHref: {
-                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -265,7 +265,7 @@ export default {
                     title: d.cloud_service_group,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
-                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -279,7 +279,7 @@ export default {
                         },
                     },
                     deletedHref: {
-                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -306,7 +306,7 @@ export default {
                     isServer: true,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
-                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -320,7 +320,7 @@ export default {
                         },
                     },
                     deletedHref: {
-                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -340,7 +340,7 @@ export default {
                     title: d.cloud_service_group,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
-                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -353,7 +353,7 @@ export default {
                         },
                     },
                     deletedHref: {
-                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,

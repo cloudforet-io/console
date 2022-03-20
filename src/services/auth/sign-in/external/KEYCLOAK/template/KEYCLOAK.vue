@@ -19,7 +19,7 @@ import {
 
 import { PButton } from '@spaceone/design-system';
 import KeycloakPage from '@/services/auth/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue';
-import { AUTH_ROUTE } from '@/services/auth/routes';
+import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 export default defineComponent({
     name: 'KEYCLOAK',

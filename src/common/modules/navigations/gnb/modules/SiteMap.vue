@@ -49,7 +49,7 @@ import {
 
 import { PI } from '@spaceone/design-system';
 
-import { DASHBOARD_ROUTE } from '@/services/dashboard/routes';
+import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 

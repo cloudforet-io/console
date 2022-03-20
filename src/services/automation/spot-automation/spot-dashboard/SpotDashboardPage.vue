@@ -151,7 +151,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { Tags, TimeStamp } from '@/models';
 import { AUTOMATION_ROUTE } from '@/services/automation/routes';
-import { PROJECT_ROUTE } from '@/services/project/routes';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

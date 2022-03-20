@@ -2,7 +2,7 @@
     <div class="right-side-menu">
         <g-n-b-search />
         <div class="menu-wrapper">
-            <router-link :to="{ name: IDENTITY_ROUTE.USER.API_KEY._NAME }">
+            <router-link :to="{ name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME }">
                 <div v-if="!userState.isDomainOwner" class="menu-button code" :class="{'new-icon':!isNewIconHidden}"
                      @click="hideNewIcon"
                 >
@@ -123,12 +123,12 @@ import GNBNewIcon from '@/common/components/marks/GNBNewIcon.vue';
 import { store } from '@/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { languages } from '@/store/modules/user/config';
-import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import config from '@/lib/config';
 import GNBNotifications from '@/common/modules/navigations/gnb/modules/gnb-notification/GNBNotifications.vue';
-import { AUTH_ROUTE } from '@/services/auth/routes';
+import { AUTH_ROUTE } from '@/services/auth/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 export default {
     name: 'RightSideMenu',
@@ -192,7 +192,7 @@ export default {
         };
         const openProfile = () => {
             emit('hide-menu');
-            vm.$router.replace({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME }).catch(() => {});
+            vm.$router.replace({ name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME }).catch(() => {});
         };
         const toggleLanguageMenu = () => {
             state.showLanguageMenu = !state.showLanguageMenu;
@@ -246,7 +246,7 @@ export default {
         return {
             ...toRefs(state),
             userState,
-            IDENTITY_ROUTE,
+            MY_PAGE_ROUTE,
             signOut,
             changeLanguage,
             hideMenu,

@@ -5,7 +5,7 @@
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { loadAuth } from '@/services/auth/authenticator/loader';
-import { AUTH_ROUTE } from '@/services/auth/routes';
+import { AUTH_ROUTE } from '@/services/auth/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {

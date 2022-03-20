@@ -149,7 +149,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
 import { store } from '@/store';
-import { userStateFormatter } from '@/services/identity/user/lib/helper';
+import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -157,7 +157,7 @@ import {
     makeDistinctValueHandler, makeEnumValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { WEBHOOK_STATE } from '@/services/monitoring/alert-manager/lib/config';
+import { WEBHOOK_STATE } from '@/services/alert-manager/lib/config';
 import { i18n } from '@/translations';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';

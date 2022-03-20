@@ -68,9 +68,9 @@ import {
     gray, violet, white,
 } from '@/styles/colors';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 
 
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
@@ -184,7 +184,7 @@ export default {
 
         const getLink = (data) => {
             const link = {
-                name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
+                name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME,
                 params: {
                     provider: data.provider,
                 },
@@ -226,7 +226,7 @@ export default {
 
         const goToServiceAccountPage = (item) => {
             const res: Location = {
-                name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
+                name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME,
                 query: {
                     provider: item.provider,
                 },

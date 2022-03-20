@@ -55,7 +55,7 @@ import {
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 import { range } from 'lodash';
 import { store } from '@/store';
-import { timezoneToUtcFormatter } from '@/services/identity/user/lib/helper';
+import { timezoneToUtcFormatter } from '@/services/administration/iam/user/lib/helper';
 
 const START_TIME_LIST = range(0, 24);
 const END_TIME_LIST = range(1, 25);

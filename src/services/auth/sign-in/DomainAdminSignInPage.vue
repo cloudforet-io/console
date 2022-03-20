@@ -35,7 +35,7 @@ import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightCon
 
 import { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
-import { AUTH_ROUTE } from '@/services/auth/routes';
+import { AUTH_ROUTE } from '@/services/auth/route-config';
 import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

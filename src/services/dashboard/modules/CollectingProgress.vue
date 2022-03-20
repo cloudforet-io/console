@@ -6,7 +6,7 @@
                     {{ $t('COMMON.WIDGETS.COLLECTING_JOBS') }}
                 </p>
                 <router-link
-                    :to="{ name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME }"
+                    :to="{ name: ASSET_MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME }"
                     class="more-btn"
                 >
                     <div class="more">
@@ -67,11 +67,11 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { COLLECT_MODE, CollectorModel } from '@/services/plugin/collector/type';
+import { COLLECT_MODE, CollectorModel } from '@/services/asset-management/collector/type';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
-import { MANAGEMENT_ROUTE } from '@/services/management/routes';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 
 enum JOB_STATE {
     created = 'CREATED',
@@ -169,7 +169,7 @@ export default {
 
         const goToCollectorHistory = async (item) => {
             await vm.$router.push({
-                name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME,
+                name: ASSET_MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME,
                 hash: item.job_id,
             });
         };
@@ -181,7 +181,7 @@ export default {
 
         return {
             ...toRefs(state),
-            MANAGEMENT_ROUTE,
+            ASSET_MANAGEMENT_ROUTE,
             timeFormatter,
             getData,
             goToCollectorHistory,

@@ -80,7 +80,7 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import { Location } from 'vue-router';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import config from '@/lib/config';
-import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -339,7 +339,7 @@ export default {
 
         const goToCloudService = (item) => {
             const res: Location = {
-                name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: item.provider,
                     group: item.cloud_service_group,

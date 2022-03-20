@@ -49,7 +49,7 @@ import {
     EDIT_TYPE,
     PROTOCOL_TYPE,
 } from '@/services/notification/modules/notification-channel-item/type';
-import { utcToTimezoneFormatter } from '@/services/identity/user/lib/helper';
+import { utcToTimezoneFormatter } from '@/services/administration/iam/user/lib/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';

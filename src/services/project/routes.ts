@@ -1,4 +1,5 @@
 import { RouteConfig } from 'vue-router';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 const ProjectPage = () => import(/* webpackChunkName: "ProjectPage" */ '@/services/project/ProjectPage.vue');
 const ProjectDetailPage = () => import(/* webpackChunkName: "ProjectDetailPage" */ '@/services/project/project-detail/ProjectDetailPage.vue');
@@ -17,32 +18,6 @@ const ProjectAlertListPage = () => import(/* webpackChunkName: "ProjectAlertList
 const ProjectMaintenanceWindowPage = () => import(/* webpackChunkName: "ProjectMaintenanceWindowPage" */ '@/services/project/project-detail/project-alert/project-maintenance-window/ProjectMaintenanceWindowPage.vue');
 const ProjectWebhookPage = () => import(/* webpackChunkName: "ProjectWebhookPage" */ '@/services/project/project-detail/project-alert/project-webhook/ProjectWebhookPage.vue');
 const ProjectAlertSettingsPage = () => import(/* webpackChunkName: "ProjectAlertSettingsPage" */ '@/services/project/project-detail/project-alert/project-alert-settings/ProjectAlertSettingsPage.vue');
-
-
-export const PROJECT_ROUTE = Object.freeze({
-    _NAME: 'projectMain',
-    DETAIL: {
-        _NAME: 'projectDetail',
-        TAB: {
-            _NAME: 'projectTab',
-            SUMMARY: { _NAME: 'projectSummary' },
-            MEMBER: { _NAME: 'projectMember' },
-            ALERT: {
-                _NAME: 'projectAlert',
-                ALERT: { _NAME: 'projectAlertList' },
-                WEBHOOK: { _NAME: 'projectWebhook' },
-                MAINTENANCE_WINDOW: { _NAME: 'projectMaintenanceWindow' },
-                SETTINGS: { _NAME: 'projectSettings' },
-            },
-            NOTIFICATIONS: {
-                _NAME: 'projectNotifications',
-                ADD: { _NAME: 'addProjectNotification' },
-            },
-            TAG: { _NAME: 'projectTag' },
-        },
-        EVENT_RULE: { _NAME: 'projectEventRule' },
-    },
-});
 
 export default {
     path: 'project',

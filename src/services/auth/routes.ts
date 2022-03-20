@@ -1,4 +1,5 @@
 import { RouteConfig } from 'vue-router';
+import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 const SignOutPage = () => import(/* webpackChunkName: "SignOutPage" */ '@/services/auth/sign-out/SignOutPage.vue');
 
@@ -6,20 +7,6 @@ const SignInPage = () => import(/* webpackChunkName: "SignInPage" */ '@/services
 const DomainAdminSignInPage = () => import(/* webpackChunkName: "DomainAdminSignInPage" */ '@/services/auth/sign-in/DomainAdminSignInPage.vue');
 const KeycloakPage = () => import(/* webpackChunkName: "KeycloakPage" */ '@/services/auth/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue');
 const KB_SSO = () => import(/* webpackChunkName: "KB_SSO" */ '@/services/auth/sign-in/external/KB_SSO/pages/KB_SSOPage.vue');
-
-export const AUTH_ROUTE = Object.freeze({
-    _NAME: 'auth',
-    ADMIN_SIGN_IN: { _NAME: 'domainAdminSignIn' },
-    SIGN_IN: {
-        _NAME: 'signIn',
-        KEYCLOAK: { _NAME: 'keycloak' },
-        KB: { _NAME: 'KB_SSO', _PATH: 'kbfg-sso' },
-    },
-    SIGN_OUT: {
-        _NAME: 'signOut',
-    },
-
-});
 
 export default [
     {

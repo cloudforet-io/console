@@ -67,7 +67,7 @@ import { Location } from 'vue-router';
 
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
-import { AUTH_ROUTE } from '@/services/auth/routes';
+import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 export default defineComponent({
     name: 'App',

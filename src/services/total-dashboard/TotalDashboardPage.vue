@@ -82,7 +82,7 @@ import FavoritesWidget from '@/services/dashboard/modules/FavoritesWidget.vue';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 import ServiceAccounts from '@/services/dashboard/modules/ServiceAccounts.vue';
 import CollectorProgress from '@/services/dashboard/modules/CollectingProgress.vue';
-import CloudServices from '@/services/inventory/cloud-service/modules/CloudServices.vue';
+import CloudServices from '@/services/asset-management/cloud-service/modules/CloudServices.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface ExtraParams {

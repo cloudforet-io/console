@@ -45,18 +45,17 @@ import RightSideMenu from '@/common/modules/navigations/gnb/modules/RightSideMen
 import GNBMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBMenu.vue';
 import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';
 
-import { INVENTORY_ROUTE } from '@/services/inventory/routes';
-import { PLUGIN_ROUTE } from '@/services/plugin/routes';
-import { MANAGEMENT_ROUTE } from '@/services/management/routes';
-import { DASHBOARD_ROUTE } from '@/services/dashboard/routes';
-import { IDENTITY_ROUTE } from '@/services/identity/routes';
-import { PROJECT_ROUTE } from '@/services/project/routes';
-import { MONITORING_ROUTE } from '@/services/monitoring/routes';
-import { BILLING_ROUTE } from '@/services/billing/routes';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import config from '@/lib/config';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 
 const PARENT_MENU = Object.freeze({
@@ -148,34 +147,34 @@ export default {
                 {
                     name: PARENT_MENU.inventory,
                     label: i18n.t('MENU.INVENTORY.INVENTORY'),
-                    to: { name: INVENTORY_ROUTE._NAME },
+                    to: { name: ASSET_MANAGEMENT_ROUTE._NAME },
                     subMenuList: [
                         {
                             name: SUB_MENU['inventory.cloudService'],
                             label: i18n.t('MENU.INVENTORY.CLOUD_SERVICE'),
-                            to: { name: INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
+                            to: { name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE._NAME },
                         },
                         {
                             name: SUB_MENU['inventory.server'],
                             label: i18n.t('MENU.INVENTORY.SERVER'),
-                            to: { name: INVENTORY_ROUTE.SERVER._NAME },
+                            to: { name: ASSET_MANAGEMENT_ROUTE.SERVER._NAME },
                         },
                     ],
                 },
                 {
                     name: PARENT_MENU.identity,
                     label: i18n.t('MENU.IDENTITY.IDENTITY'),
-                    to: { name: IDENTITY_ROUTE._NAME },
+                    to: { name: ADMINISTRATION_ROUTE._NAME },
                     subMenuList: [
                         {
                             name: SUB_MENU['identity.serviceAccount'],
                             label: i18n.t('MENU.IDENTITY.SERVICE_ACCOUNT'),
-                            to: { name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME },
+                            to: { name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME },
                         },
                         {
                             name: SUB_MENU['identity.user'],
                             label: i18n.t('MENU.IDENTITY.USER'),
-                            to: { name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME },
+                            to: { name: ADMINISTRATION_ROUTE.USER.MANAGEMENT._NAME },
                             show: state.isAdmin,
                         },
                     ],
@@ -183,12 +182,12 @@ export default {
                 {
                     name: PARENT_MENU.monitoring,
                     label: i18n.t('MENU.MONITORING.MONITORING'),
-                    to: { name: MONITORING_ROUTE._NAME },
+                    to: { name: ALERT_MANAGER_ROUTE._NAME },
                     subMenuList: [
                         {
                             name: SUB_MENU['monitoring.alertManager'],
                             label: i18n.t('MENU.MONITORING.ALERT_MANAGER'),
-                            to: { name: MONITORING_ROUTE.ALERT_MANAGER._NAME },
+                            to: { name: ALERT_MANAGER_ROUTE.ALERT_MANAGER._NAME },
                             isBeta: true,
                         },
                     ],
@@ -196,37 +195,37 @@ export default {
                 {
                     name: PARENT_MENU.billing,
                     label: i18n.t('MENU.BILLING.BILLING'),
-                    to: { name: BILLING_ROUTE._NAME },
+                    to: { name: COST_EXPLORER_ROUTE._NAME },
                     show: state.showBilling,
                     subMenuList: [
                         {
                             name: SUB_MENU['billing.costManagement'],
                             label: i18n.t('MENU.BILLING.COST_MANAGEMENT'),
-                            to: { name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME },
+                            to: { name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME },
                         },
                     ],
                 },
                 {
                     name: PARENT_MENU.plugin,
                     label: i18n.t('MENU.PLUGIN.PLUGIN'),
-                    to: { name: PLUGIN_ROUTE._NAME },
+                    to: { name: ASSET_MANAGEMENT_ROUTE._NAME },
                     subMenuList: [
                         {
                             name: SUB_MENU['plugin.collector'],
                             label: i18n.t('MENU.PLUGIN.COLLECTOR'),
-                            to: { name: PLUGIN_ROUTE.COLLECTOR._NAME },
+                            to: { name: ASSET_MANAGEMENT_ROUTE.COLLECTOR._NAME },
                         },
                     ],
                 },
                 {
                     name: PARENT_MENU.management,
                     label: i18n.t('MENU.MANAGEMENT.MANAGEMENT'),
-                    to: { name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME },
+                    to: { name: ASSET_MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME },
                     subMenuList: [
                         {
                             name: SUB_MENU['management.collectorHistory'],
                             label: i18n.t('MENU.MANAGEMENT.COLLECTOR_HISTORY'),
-                            to: { name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME },
+                            to: { name: ASSET_MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME },
                         },
                     ],
                 },
@@ -250,6 +249,22 @@ export default {
                 state.showSiteMap = false;
             }
         };
+
+        const init = async () => {
+            const { menu } = await SpaceConnector.client.addOns.menu.list();
+            const menuList = menu.map(d => ({
+                label: d.label,
+                name: d.name,
+                to: { name: d.name },
+                subMenuList: d.sub_menu ? d.sub_menu.map(item => ({
+                    ...item,
+                    to: { name: item.name },
+                })) : [],
+            }));
+            console.log(menuList);
+        };
+
+        (() => init())();
 
         return {
             ...toRefs(state),

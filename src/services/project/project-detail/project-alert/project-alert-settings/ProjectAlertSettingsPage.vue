@@ -107,15 +107,15 @@ import ProjectAutoRecoveryUpdateModal
     from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectAutoRecoveryUpdateModal.vue';
 import ProjectEscalationPolicyChangeModal
     from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectEscalationPolicyChangeModal.vue';
-import EscalationPolicyFormModal from '@/services/monitoring/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
+import EscalationPolicyFormModal from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
 
 import {
     PI, PIconButton, PPaneLayout, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ACTION, SCOPE } from '@/services/monitoring/alert-manager/lib/config';
-import { PROJECT_ROUTE } from '@/services/project/routes';
+import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
