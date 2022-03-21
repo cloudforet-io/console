@@ -31,7 +31,8 @@
                 >
                     {{ selectedItem.label || selectedItem.name }}
                 </p-tag>
-                <p-i class="delete-icon" name="ic_delete"
+                <p-i v-if="!disableDeleteAll"
+                     class="delete-icon" name="ic_delete"
                      height="1rem" width="1rem"
                      @click="onDeleteAllTags"
                 />
@@ -183,6 +184,10 @@ export default defineComponent<SearchDropdownProps>({
             default: true,
         },
         strictSelectMode: {
+            type: Boolean,
+            default: false,
+        },
+        disableDeleteAll: {
             type: Boolean,
             default: false,
         },
@@ -346,6 +351,7 @@ export default defineComponent<SearchDropdownProps>({
 
         const onDeleteAllTags = () => {
             state.proxySelected = [];
+            emit('delete-all-tags');
         };
 
         const onDeleteSearchText = () => {

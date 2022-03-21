@@ -79,6 +79,24 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
+    disableDeleteAll: {
+        name: 'disableDeleteAll',
+        type: { name: 'boolean' },
+        description: 'If it is `true`, disable delete all and hide delete all button.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     // context menu fixed style props
     useFixedMenuStyle: {
         name: 'useFixedMenuStyle',
@@ -205,6 +223,7 @@ const initContextMenuArgTypes = (): ArgTypes => {
         selected: contextMenuArgTypes.selected,
         multiSelectable: contextMenuArgTypes.multiSelectable,
         strictSelectMode: contextMenuArgTypes.strictSelectMode,
+        disableDeleteAll: contextMenuArgTypes.disableDeleteAll,
     };
     Object.keys(contextMenuArgTypes).forEach((k) => {
         const item = contextMenuArgTypes[k];

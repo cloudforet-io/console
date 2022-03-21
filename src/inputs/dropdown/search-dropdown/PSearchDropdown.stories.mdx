@@ -36,6 +36,8 @@ export const Template = (args, { argTypes }) => ({
             :strict-select-mode="strictSelectMode"
             :invalid="invalid"
             :disabled="disabled"
+            :multi-selectable="multiSelectable"
+            :disable-delete-all="disableDeleteAll"
             @search="onSearch"
             @focus="onFocus"
             @blur="onBlur"
@@ -273,6 +275,23 @@ export const Template = (args, { argTypes }) => ({
             components: { PSearchDropdown },
             template: `
         <p-search-dropdown :menu="menu" :multi-selectable="true" use-fixed-menu-style />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Multi Selectable With no Delete All Button
+
+<Canvas>
+    <Story name="Multi Selectable With no Delete All Button" args={{menu: getSearchDropdownMenu()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PSearchDropdown },
+            template: `
+        <p-search-dropdown :menu="menu" :multi-selectable="true" :disable-delete-all="true" use-fixed-menu-style />
 `,
         }}
     </Story>

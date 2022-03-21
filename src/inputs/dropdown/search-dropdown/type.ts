@@ -35,4 +35,5 @@ export interface SearchDropdownProps extends ContextMenuFixedStyleProps {
     disableHandler?: boolean;
     exactMode?: boolean;
     strictSelectMode?: boolean;
+    disableDeleteAll?: boolean;
 }
