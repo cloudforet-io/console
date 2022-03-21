@@ -1,9 +1,19 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ProjectGroupResourceMap } from '@/store/modules/resource/project-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { REFERENCE_LOAD_TTL } from '@/store/modules/resource/config';
+
+let lastLoadedTime = 0;
 
 export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
-    if (lazyLoad && Object.keys(state.items).length > 0) return;
+    const currentTime = new Date().getTime();
+
+    if (
+        (lazyLoad && Object.keys(state.items).length > 0)
+        || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
+    ) return;
+    lastLoadedTime = currentTime;
+
     try {
         const response = await SpaceConnector.client.identity.projectGroup.list({
             query: {
