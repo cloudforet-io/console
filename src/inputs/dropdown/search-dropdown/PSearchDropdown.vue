@@ -1,5 +1,5 @@
 <template>
-    <div class="p-search-dropdown" :class="[ {'multi-selectable' : multiSelectable}, {'invisible-menu' : !proxyVisibleMenu} ]">
+    <div class="p-search-dropdown" :class="[ {'multi-selectable' : multiSelectable} ]">
         <p-search ref="targetRef"
                   v-model="proxyValue"
                   :placeholder="_placeholder ? _placeholder : $t('COMPONENT.SEARCH_DROPDOWN.PLACEHOLDER')"
@@ -281,6 +281,8 @@ export default defineComponent<SearchDropdownProps>({
             const isRadioItemSelected = state.searchDropdownType === SEARCH_DROPDOWN_TYPE.radioButton && (mode === 'click' || state.proxySelected.length);
             if (isRadioItemSelected) {
                 state._placeholder = '';
+            } else if (props.multiSelectable && state.proxySelected.length) {
+                state._placeholder = ' ';
             } else {
                 state._placeholder = props.placeholder;
             }
@@ -584,11 +586,6 @@ export default defineComponent<SearchDropdownProps>({
                 right: 2rem;
                 top: 0.4375rem;
                 height: 100%;
-            }
-        }
-        &.invisible-menu {
-            .input-wrapper {
-                @apply hidden;
             }
         }
     }
