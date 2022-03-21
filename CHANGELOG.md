@@ -1,3 +1,10 @@
+# [1.1.0-beta.266](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.265...v1.1.0-beta.266) (2022-03-21)
+
+
+### Features
+
+* add delete all button to multi-selectable searchDropdown ([#903](https://github.com/spaceone-dev/spaceone-design-system/issues/903)) ([6e9bcf7](https://github.com/spaceone-dev/spaceone-design-system/commit/6e9bcf7b0380c181e155c176245297e148780fdc))
+
 # [1.1.0-beta.265](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.264...v1.1.0-beta.265) (2022-03-18)
 
 
