@@ -12,6 +12,7 @@
                            :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
                            :selected.sync="selectedItems"
                            :readonly="true"
+                           :disable-delete-all="true"
                            @update:visible-menu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
         >
