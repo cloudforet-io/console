@@ -1,3 +1,10 @@
+# [1.1.0-beta.267](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.266...v1.1.0-beta.267) (2022-03-21)
+
+
+### Bug Fixes
+
+* add disableDeleteAll to PSearchDropdown ([#905](https://github.com/spaceone-dev/spaceone-design-system/issues/905)) ([2ea2352](https://github.com/spaceone-dev/spaceone-design-system/commit/2ea2352599992913f8410269049b8622205289a1))
+
 # [1.1.0-beta.266](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.265...v1.1.0-beta.266) (2022-03-21)
 
 
