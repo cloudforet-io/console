@@ -19,12 +19,13 @@ function registerStore<T>(path: Path, storeModule: Module<T, any>, afterRegister
 
 export function registerServiceStore<T>(_path: Path, storeModule: Module<T, any>, afterRegister?: AfterRegisterFunc) {
     const path = getPath(_path);
-    registerStore(path, storeModule, afterRegister);
 
     onUnmounted(() => {
         store.unregisterModule(path);
     });
 
     // for hot reloading
-    onMounted(() => { registerStore(path, storeModule); });
+    onMounted(() => { registerStore(path, storeModule, afterRegister); });
+
+    registerStore(path, storeModule, afterRegister);
 }

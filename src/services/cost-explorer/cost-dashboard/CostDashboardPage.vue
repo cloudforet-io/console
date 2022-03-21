@@ -100,9 +100,6 @@ import { CostQueryFilters, Period } from '@/services/cost-explorer/type';
 import { SpaceRouter } from '@/router';
 import PdfDownloadOverlay, { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import CostDashboardPreview from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardPreview.vue';
-import { registerServiceStore } from '@/common/composables/register-service-store';
-import { CostDashboardState } from '@/services/cost-explorer/cost-dashboard/store/type';
-import CostDashboardStoreModule from '@/services/cost-explorer/cost-dashboard/store';
 import { getDashboardLayout } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import CostDashboardUpdateModal
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardUpdateModal.vue';
@@ -153,7 +150,6 @@ export default {
         });
     },
     setup(props) {
-        registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
         const state = reactive({
             dashboard: {} as DashboardInfo,
             loading: true,
