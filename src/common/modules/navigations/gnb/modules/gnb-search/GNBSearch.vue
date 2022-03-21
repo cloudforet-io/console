@@ -5,12 +5,13 @@
         -->
 
         <g-n-b-search-input v-model="inputText"
-                            @focus="showSuggestion = true"
-                            @blur="showSuggestion = false"
+                            @click.stop="showSuggestion"
+                            @keyup.esc="hideSuggestion"
+                            @keyup.down="showSuggestion"
         />
 
         <!-- TODO: Split the code below into GNBSearchDropdown component -->
-        <p-data-loader v-if="showSuggestion"
+        <p-data-loader v-if="visibleSuggestion"
                        :data="allSuggestionItems"
                        :loading="loading"
         >
@@ -33,14 +34,12 @@
             />
             <template #no-data>
                 <div v-if="trimmedInputText" class="no-data">
-                    <!-- TODO: no data case -->
                     <img src="@/assets/images/illust_ghost.svg" class="no-data-img">
                     <p class="no-data-text">
                         Search for navigation menus or cloud services.
                     </p>
                 </div>
                 <div v-else class="no-data">
-                    <!-- TODO: before searching case -->
                     <img src="@/assets/images/illust_microscope.svg" class="no-data-img">
                     <p class="no-data-text">
                         No result found for "<em>search keyword</em>" <br>Try again with different term.
@@ -53,7 +52,7 @@
 
 <script lang="ts">
 import {
-    computed,
+    computed, onMounted, onUnmounted,
     reactive, toRefs,
 } from '@vue/composition-api';
 import {
@@ -74,7 +73,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            showSuggestion: false,
+            visibleSuggestion: false,
             inputText: '',
             trimmedInputText: computed<string>(() => {
                 if (state.inputText) return state.inputText.trim();
@@ -97,9 +96,27 @@ export default {
             allSuggestionItems: computed<SuggestionItem[]>(() => state.menuItems.concat(state.cloudServiceItems)),
         });
 
+        const showSuggestion = () => {
+            state.visibleSuggestion = true;
+        };
+
+        const hideSuggestion = () => {
+            state.visibleSuggestion = false;
+        };
+
+        onMounted(() => {
+            window.addEventListener('click', hideSuggestion);
+            window.addEventListener('blur', hideSuggestion);
+        });
+        onUnmounted(() => {
+            window.removeEventListener('click', hideSuggestion);
+            window.removeEventListener('blur', hideSuggestion);
+        });
 
         return {
             ...toRefs(state),
+            showSuggestion,
+            hideSuggestion,
         };
     },
 };
