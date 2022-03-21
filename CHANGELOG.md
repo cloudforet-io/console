@@ -1,3 +1,10 @@
+# [1.1.0-beta.268](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.267...v1.1.0-beta.268) (2022-03-21)
+
+
+### Bug Fixes
+
+* fix placeholder bug in PSearchDropdown ([#906](https://github.com/spaceone-dev/spaceone-design-system/issues/906)) ([6728e1b](https://github.com/spaceone-dev/spaceone-design-system/commit/6728e1b275262877e7826d13499ef3dd72a2a456))
+
 # [1.1.0-beta.267](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.266...v1.1.0-beta.267) (2022-03-21)
 
 
