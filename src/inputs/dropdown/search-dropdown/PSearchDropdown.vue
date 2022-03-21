@@ -25,12 +25,16 @@
                      @click="onDeleteTag(proxySelected[0], 0)"
                 />
             </div>
-            <template v-if="multiSelectable && proxySelected.length" v-slot:left>
+            <template v-if="multiSelectable && proxySelected.length" #left>
                 <p-tag v-for="(selectedItem, index) in proxySelected" :key="`tag-box-${index}`" :deletable="!disabled"
                        @delete="onDeleteTag(selectedItem, index)"
                 >
                     {{ selectedItem.label || selectedItem.name }}
                 </p-tag>
+                <p-i class="delete-icon" name="ic_delete"
+                     height="1rem" width="1rem"
+                     @click="onDeleteAllTags"
+                />
             </template>
             <template v-if="searchDropdownType !== SEARCH_DROPDOWN_TYPE.default || !proxySelected.length || proxyVisibleMenu" #right>
                 <p-i :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
@@ -340,6 +344,10 @@ export default defineComponent<SearchDropdownProps>({
             emit('delete-tag', item, index);
         };
 
+        const onDeleteAllTags = () => {
+            state.proxySelected = [];
+        };
+
         const onDeleteSearchText = () => {
             if (state.proxyValue) {
                 state.proxyValue = '';
@@ -487,6 +495,7 @@ export default defineComponent<SearchDropdownProps>({
             focusSearch,
             onFocusMenuItem,
             onDeleteTag,
+            onDeleteAllTags,
             onDeleteSearchText,
             handleClickDropdownButton,
             handleClick,
@@ -555,7 +564,7 @@ export default defineComponent<SearchDropdownProps>({
     &.multi-selectable {
         .p-search {
             @apply relative flex-wrap row-gap-1;
-            padding-right: 2rem;
+            padding-right: 3rem;
             padding-top: 0.25rem;
             padding-bottom: 0.25rem;
 
@@ -563,6 +572,12 @@ export default defineComponent<SearchDropdownProps>({
                 @apply absolute;
                 top: 0.1875rem;
                 right: 0.5rem;
+            }
+            > .delete-icon {
+                @apply absolute cursor-pointer;
+                right: 2rem;
+                top: 0.4375rem;
+                height: 100%;
             }
         }
         &.invisible-menu {
