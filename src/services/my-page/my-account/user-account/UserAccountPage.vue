@@ -1,7 +1,6 @@
 <template>
     <section class="account-wrapper">
-        <p-breadcrumbs v-if="isAdmin" :routes="routeState.adminRoutes" />
-        <p-breadcrumbs v-else :routes="routeState.userRoutes" />
+        <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE')" />
         <p-pane-layout class="form-wrapper">
             <p class="form-title">
@@ -114,6 +113,7 @@ import { store } from '@/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 
 export default {
@@ -177,16 +177,10 @@ export default {
             showValidation: false,
         });
         const routeState = reactive({
-            userRoutes: computed(() => ([
-                { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE') },
-            ])),
-            adminRoutes: computed(() => ([
-                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
-                { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE') },
-            ])),
+            route: [
+                { name: 'My Page', to: { name: MY_PAGE_ROUTE._NAME } },
+                { name: 'My Account', to: { name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME } },
+            ],
         });
 
         const checkEmail = async () => {

@@ -1,48 +1,53 @@
 <template>
-    <vertical-page-layout>
-        <template #sidebar>
-            <div class="member-profile">
-                <p-i v-if="userState.isDomainOwner" class="member-icon" name="root-account"
-                     width="3rem" height="3rem"
-                />
-                <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" class="member-icon" name="admin"
-                     width="3rem" height="3rem"
-                />
-                <p-i v-else class="member-icon" name="user"
-                     width="3rem" height="3rem"
-                />
-                <p class="member-id">
-                    {{ userState.userId }}
-                </p>
-                <p v-if="userState.isDomainOwner" class="member-type">
-                    {{ $t('IDENTITY.USER.MAIN.ROOT_ACCOUNT') }}
-                </p>
-                <p v-else class="member-type">
-                    {{ $t('IDENTITY.USER.MAIN.SPACEONE_USER') }}
-                </p>
-            </div>
-            <div class="menu-title">
-                {{ $t('IDENTITY.USER.MAIN.MY_ACCOUNT') }}
-            </div>
-            <p-divider class="menu-divider" />
-            <ul v-for="(item) in sidebarState.MenuList" :key="item.label"
-                class="menu-item"
-                :class="{'selected': item.label === sidebarState.selectedItem.label,
-                         'hide': (item.userOnly && userState.isDomainOwner)
-                             || item.isAdminMenu
-                             || item.userOnly && !userState.hasPermission}"
-                @click="showPage(item)"
-            >
-                <li v-if="!item.isAdminMenu">
-                    {{ item.label }}
-                    <span v-if="item.beta" class="beta">beta</span>
-                </li>
-            </ul>
-        </template>
-        <template #default>
+    <fragment>
+        <vertical-page-layout v-if="$route.meta.isVerticalLayout">
+            <template #sidebar>
+                <div class="member-profile">
+                    <p-i v-if="userState.isDomainOwner" class="member-icon" name="root-account"
+                         width="3rem" height="3rem"
+                    />
+                    <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" class="member-icon" name="admin"
+                         width="3rem" height="3rem"
+                    />
+                    <p-i v-else class="member-icon" name="user"
+                         width="3rem" height="3rem"
+                    />
+                    <p class="member-id">
+                        {{ userState.userId }}
+                    </p>
+                    <p v-if="userState.isDomainOwner" class="member-type">
+                        {{ $t('IDENTITY.USER.MAIN.ROOT_ACCOUNT') }}
+                    </p>
+                    <p v-else class="member-type">
+                        {{ $t('IDENTITY.USER.MAIN.SPACEONE_USER') }}
+                    </p>
+                </div>
+                <div class="menu-title">
+                    {{ $t('IDENTITY.USER.MAIN.MY_ACCOUNT') }}
+                </div>
+                <p-divider class="menu-divider" />
+                <ul v-for="(item) in sidebarState.MenuList" :key="item.label"
+                    class="menu-item"
+                    :class="{'selected': item.label === sidebarState.selectedItem.label,
+                             'hide': (item.userOnly && userState.isDomainOwner)
+                                 || item.isAdminMenu
+                                 || item.userOnly && !userState.hasPermission}"
+                    @click="showPage(item)"
+                >
+                    <li v-if="!item.isAdminMenu">
+                        {{ item.label || '' }}
+                        <span v-if="item.beta" class="beta">beta</span>
+                    </li>
+                </ul>
+            </template>
+            <template #default>
+                <router-view />
+            </template>
+        </vertical-page-layout>
+        <general-page-layout v-else>
             <router-view />
-        </template>
-    </vertical-page-layout>
+        </general-page-layout>
+    </fragment>
 </template>
 
 <script lang="ts">
@@ -58,6 +63,7 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 import { store } from '@/store';
 import VueI18n from 'vue-i18n';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -72,6 +78,7 @@ interface SidebarItemType {
 export default {
     name: 'MyAccountPage',
     components: {
+        GeneralPageLayout,
         VerticalPageLayout,
         PI,
         PDivider,
@@ -91,17 +98,17 @@ export default {
             showManagementPage: true,
             MenuList: [
                 {
-                    label: vm.$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE'),
+                    label: 'Account & Profile',
                     routeName: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME,
                     userOnly: false,
                 },
                 {
-                    label: vm.$t('IDENTITY.USER.MAIN.API_KEY'),
+                    label: 'Access with API & CLI',
                     routeName: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME,
                     userOnly: true,
                 },
                 {
-                    label: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION'),
+                    label: 'Notifications Channel',
                     routeName: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME,
                     userOnly: true,
                     beta: true,
@@ -116,7 +123,7 @@ export default {
         const selectSidebarItem = (routeName) => {
             if (routeName === MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME && !userState.isDomainOwner) {
                 sidebarState.selectedItem = sidebarState.MenuList[1];
-            } else if (routeName) sidebarState.selectedItem = sidebarState.MenuList.find(d => d.routeName === routeName) as SidebarItemType;
+            } else if (routeName) sidebarState.selectedItem = sidebarState.MenuList.find(d => d.routeName === routeName) as SidebarItemType ?? {};
         };
 
         watch(() => vm.$route.name, (after) => {

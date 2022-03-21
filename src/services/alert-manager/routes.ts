@@ -8,40 +8,43 @@ const EscalationPolicyPage = () => import(/* webpackChunkName: "EscalationPolicy
 const AlertDetailPage = () => import(/* webpackChunkName: "AlertDetailPage" */ '@/services/alert-manager/alert/alert-detail/AlertDetailPage.vue');
 
 export default {
-    path: 'monitoring',
+    path: 'alert-manager',
     name: ALERT_MANAGER_ROUTE._NAME,
-    redirect: '/monitoring/alert-manager/dashboard',
-    meta: { label: 'Monitoring' },
+    redirect: '/alert-manager/dashboard',
+    meta: { label: 'Alert Manager' },
     component: { template: '<router-view />' },
     children: [
         {
             path: '/',
-            name: ALERT_MANAGER_ROUTE.ALERT_MANAGER._NAME,
+            name: ALERT_MANAGER_ROUTE._NAME,
             redirect: 'dashboard',
             component: AlertManagerPage,
             children: [
                 {
                     path: 'dashboard',
-                    name: ALERT_MANAGER_ROUTE.ALERT_MANAGER.DASHBOARD._NAME,
+                    name: ALERT_MANAGER_ROUTE.DASHBOARD._NAME,
+                    meta: { isVerticalLayout: true },
                     component: AlertDashboardPage,
                 },
                 {
                     path: 'alert',
-                    name: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ALERT._NAME,
+                    name: ALERT_MANAGER_ROUTE.ALERT._NAME,
+                    meta: { isVerticalLayout: true },
                     component: AlertPage,
                 },
                 {
+                    path: 'alert/:id?',
+                    name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+                    props: true,
+                    component: AlertDetailPage,
+                },
+                {
                     path: 'escalation-policy',
-                    name: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ESCALATION_POLICY._NAME,
+                    name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
+                    meta: { isVerticalLayout: true },
                     component: EscalationPolicyPage,
                 },
             ],
-        },
-        {
-            path: 'alert/:id',
-            name: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME,
-            props: true,
-            component: AlertDetailPage,
         },
     ],
 } as RouteConfig;

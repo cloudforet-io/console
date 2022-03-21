@@ -33,7 +33,6 @@ import {
 } from '@/services/cost-explorer/cost-analysis/store/type';
 import costAnalysisStoreModule from '@/services/cost-explorer/cost-analysis/store';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 import { SpaceRouter } from '@/router';
 import {
     arrayToQueryString,
@@ -79,11 +78,10 @@ export default {
         });
 
         const routeState = reactive({
-            route: computed(() => [
-                { name: i18n.t('MENU.BILLING.BILLING'), to: { name: COST_EXPLORER_ROUTE._NAME } },
-                { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), to: { name: COST_EXPLORER_ROUTE.COST_MANAGEMENT._NAME } },
-                { name: i18n.t('MENU.BILLING.COST_ANALYSIS') },
-            ]),
+            route: [
+                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
+                { name: 'Cost Analysis' },
+            ],
         });
 
         /* util */

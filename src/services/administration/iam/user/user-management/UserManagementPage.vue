@@ -25,13 +25,13 @@ import {
 
 import { store } from '@/store';
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-import { i18n } from '@/translations';
 import { User } from '@/services/administration/iam/user/type';
 import UserManagementTab from '@/services/administration/iam/user/user-management/modules/user-management-tab/UserManagementTab.vue';
 import UserManagementTable from '@/services/administration/iam/user/user-management/modules/UserManagementTable.vue';
 import { UserStoreState } from '@/services/administration/iam/user/store/type';
 import UserStoreModule from '@/services/administration/iam/user/store';
 import { registerServiceStore } from '@/common/composables/register-service-store';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 export default {
     name: 'UserManagement',
@@ -58,10 +58,9 @@ export default {
 
         const routeState = reactive({
             routes: computed(() => ([
-                { name: i18n.t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: i18n.t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
-                { name: i18n.t('IDENTITY.USER.MAIN.ROOT_ACCOUNT'), path: '/identity/user/user-management' },
-                { name: i18n.t('IDENTITY.USER.MAIN.USER_MANAGEMENT') },
+                { name: 'Administration', to: { name: ADMINISTRATION_ROUTE._NAME } },
+                { name: 'IAM', to: { name: ADMINISTRATION_ROUTE.IAM._NAME } },
+                { name: 'User Management', to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME } },
             ])),
         });
 

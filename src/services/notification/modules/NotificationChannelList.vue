@@ -113,9 +113,8 @@ export default {
         });
         const routeState = reactive({
             routes: computed(() => ([
-                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
+                { name: 'My Page', to: { name: MY_PAGE_ROUTE._NAME } },
+                { name: 'Notifications Channel' },
             ])),
         });
 

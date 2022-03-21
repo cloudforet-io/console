@@ -14,10 +14,10 @@ const BudgetUpdatePage = () => import(/* webpackChunkName: "BudgetUpdatePage" */
 const BudgetDetailPage = () => import(/* webpackChunkName: "BudgetDetailPage" */ '@/services/cost-explorer/budget/budget-detail/BudgetDetailPage.vue');
 
 export default {
-    path: 'billing',
+    path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
-    redirect: '/billing/dashboard',
-    meta: { label: 'Billing' },
+    redirect: '/cost-explorer/dashboard',
+    meta: { label: 'Cost Explorer' },
     component: { template: '<router-view />' },
     children: [
         // {
@@ -28,32 +28,32 @@ export default {
         //     children: [
         {
             path: '/',
-            name: COST_EXPLORER_ROUTE.COST_MANAGEMENT._NAME,
+            name: COST_EXPLORER_ROUTE._NAME,
             redirect: 'dashboard',
             component: CostManagementPage,
             children: [
                 {
                     path: 'dashboard/create',
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD.CREATE._NAME,
+                    name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME,
                     props: true,
                     component: CostDashboardCreatePage,
                 },
                 {
                     path: 'dashboard/customize/:dashboardId',
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE._NAME,
+                    name: COST_EXPLORER_ROUTE.DASHBOARD.CUSTOMIZE._NAME,
                     props: true,
                     component: CostDashboardCustomizePage,
                 },
                 {
                     path: 'dashboard/:dashboardId?',
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                    name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
                     meta: { isVerticalLayout: true },
                     props: true,
                     component: CostDashboardPage,
                 },
                 {
                     path: 'cost-analysis/:querySetId?',
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     meta: { isVerticalLayout: true },
                     props: true,
                     component: CostAnalysisPage,
@@ -64,31 +64,31 @@ export default {
                     children: [
                         {
                             path: '/',
-                            name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
+                            name: COST_EXPLORER_ROUTE.BUDGET._NAME,
                             meta: { isVerticalLayout: true },
                             component: BudgetPage,
                         },
                         {
                             path: 'create',
-                            name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET.CREATE._NAME,
+                            name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
                             props: true,
                             component: BudgetCreatePage,
                         },
                         {
                             path: 'bulk-create',
-                            name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET.BULK_CREATE._NAME,
+                            name: COST_EXPLORER_ROUTE.BUDGET.BULK_CREATE._NAME,
                             props: true,
                             component: BudgetBulkCreatePage,
                         },
                         {
                             path: 'update/:budgetId',
-                            name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET.UPDATE._NAME,
+                            name: COST_EXPLORER_ROUTE.BUDGET.UPDATE._NAME,
                             props: true,
                             component: BudgetUpdatePage,
                         },
                         {
                             path: ':budgetId',
-                            name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
+                            name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                             props: true,
                             component: BudgetDetailPage,
                         },

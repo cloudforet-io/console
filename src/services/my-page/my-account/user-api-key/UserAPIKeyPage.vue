@@ -1,8 +1,7 @@
 <template>
     <section class="api-key-wrapper">
         <div class="flex">
-            <p-breadcrumbs v-if="isAdmin" class="flex-grow" :routes="routeState.adminRoutes" />
-            <p-breadcrumbs v-else class="flex-grow" :routes="routeState.userRoutes" />
+            <p-breadcrumbs class="flex-grow" :routes="routeState.route" />
             <handbook-button :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"
                              type="identity/user/api-key"
                              class="flex-shrink-0"
@@ -40,14 +39,15 @@ import {
 } from '@spaceone/design-system';
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import UserAPIKeyTable from '@/services/administration/iam/user/user-api-key/modules/APIKeyTable.vue';
+import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
 import { store } from '@/store';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import UserAPIKeyHandbook from '@/services/administration/iam/user/user-api-key/modules/APIKeyHandbook.vue';
+import UserAPIKeyHandbook from '@/services/my-page/my-account/user-api-key/modules/APIKeyHandbook.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 interface EndpointItem {
     endpoint: string;
@@ -69,7 +69,6 @@ export default {
         PPageTitle,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
             fields: [
@@ -83,16 +82,10 @@ export default {
             isAdmin: computed(() => store.getters['user/isAdmin']).value,
         });
         const routeState = reactive({
-            userRoutes: computed(() => ([
-                { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.MAIN.API_KEY') },
-            ])),
-            adminRoutes: computed(() => ([
-                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
-                { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.MAIN.API_KEY') },
-            ])),
+            route: [
+                { name: 'My Page', to: { name: MY_PAGE_ROUTE._NAME } },
+                { name: 'Access with API & CLI' },
+            ],
         });
         const tabState = reactive({
             tabs: computed(() => ([

@@ -23,11 +23,8 @@ export const ASSET_MANAGEMENT_ROUTE = Object.freeze({
         ADD: { _NAME: 'addServiceAccount' },
         NO_RESOURCE: { _NAME: 'noServiceAccount' },
     },
-    HISTORY: {
-        _NAME: 'history',
-        COLLECTOR: {
-            _NAME: 'collectorHistory',
-            JOB: { _NAME: 'collectorJobHistory' },
-        },
+    COLLECTOR_HISTORY: {
+        _NAME: 'collectorHistory',
+        JOB: { _NAME: 'collectorJobHistory' },
     },
 });

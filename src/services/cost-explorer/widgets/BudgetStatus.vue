@@ -121,7 +121,7 @@ export default defineComponent<WidgetProps>({
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
                 return {
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
+                    name: COST_EXPLORER_ROUTE.BUDGET._NAME,
                     params: {},
                     query: {
                         filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(props.filters)).rawQueryStrings,
@@ -154,7 +154,7 @@ export default defineComponent<WidgetProps>({
                     limit: d.limit,
                     usdCost: d.usd_cost,
                     linkLocation: {
-                        name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
+                        name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                         params: {
                             budgetId: d.budget_id,
                         },

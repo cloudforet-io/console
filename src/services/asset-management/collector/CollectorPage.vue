@@ -308,8 +308,8 @@ export default {
         });
         const routeState = reactive({
             routes: computed(() => ([
-                { name: i18n.t('MENU.PLUGIN.PLUGIN'), path: '/plugin' },
-                { name: i18n.t('MENU.PLUGIN.COLLECTOR') },
+                { name: 'Asset Management', to: { name: ASSET_MANAGEMENT_ROUTE._NAME } },
+                { name: 'Collector' },
             ])),
         });
         const checkModalState = reactive({
@@ -372,7 +372,7 @@ export default {
                     plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
                     plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
                     detailLink: {
-                        name: ASSET_MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME,
+                        name: ASSET_MANAGEMENT_ROUTE.COLLECTOR_HISTORY._NAME,
                         query: { filters: detailLinkQueryHelper.setFilters([{ k: 'collector_id', v: d.collector_id, o: '=' }]).rawQueryStrings },
                     },
                     ...d,

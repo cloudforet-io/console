@@ -251,10 +251,10 @@ export default {
             modalVisible: false,
         });
         const routeState = reactive({
-            route: computed(() => ([
-                { name: vm.$t('MENU.MANAGEMENT.MANAGEMENT'), path: '/management/collector-history' },
-                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY') },
-            ])),
+            route: [
+                { name: 'Asset Management', to: { name: ASSET_MANAGEMENT_ROUTE._NAME } },
+                { name: 'Collector History' },
+            ],
         });
 
         /* api */
@@ -300,7 +300,7 @@ export default {
         /* event */
         const onSelect = (item) => {
             vm.$router.push({
-                name: ASSET_MANAGEMENT_ROUTE.HISTORY.COLLECTOR.JOB._NAME,
+                name: ASSET_MANAGEMENT_ROUTE.COLLECTOR_HISTORY.JOB._NAME,
                 params: { jobId: item.job_id },
             }).catch(() => {});
         };

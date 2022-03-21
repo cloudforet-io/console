@@ -9,8 +9,8 @@ import { locationQueryToString } from '@/lib/router-query-string';
 import { NoSearchResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-const DEFAULT_URL = '/inventory/cloud-service';
-const ERROR_URL = '/inventory/cloud-service/no-resource';
+const DEFAULT_URL = '/asset-management/cloud-service';
+const ERROR_URL = '/asset-management/cloud-service/no-resource';
 
 export default {
     name: 'CloudServiceTypeSearch',

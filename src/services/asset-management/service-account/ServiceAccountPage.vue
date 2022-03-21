@@ -231,10 +231,10 @@ export default {
 
         /** Page Navigation * */
         const routeState = reactive({
-            route: computed(() => ([
-                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT') },
-            ])),
+            route: [
+                { name: 'Asset Management', to: { name: ASSET_MANAGEMENT_ROUTE._NAME } },
+                { name: 'Service Account' },
+            ],
         });
 
         /** States for Dynamic Layout(search table type) * */

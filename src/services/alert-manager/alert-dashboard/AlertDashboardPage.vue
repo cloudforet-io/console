@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -32,7 +32,7 @@ import ProjectSearchWidget from '@/services/alert-manager/alert-dashboard/module
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
-import { i18n } from '@/translations';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 export default {
     name: 'AlertDashboardPage',
@@ -50,11 +50,10 @@ export default {
             activatedProjects: [] as string[],
         });
         const routeState = reactive({
-            route: computed(() => [
-                { name: i18n.t('MENU.MONITORING.MONITORING'), path: '/monitoring' },
-                { name: i18n.t('MENU.MONITORING.ALERT_MANAGER'), path: '/monitoring/alert-manager/dashboard' },
-                { name: i18n.t('MONITORING.ALERT.DASHBOARD.DASHBOARD') },
-            ]),
+            route: [
+                { name: 'Alert Manager', to: { name: ALERT_MANAGER_ROUTE._NAME } },
+                { name: 'Dashboard' },
+            ],
         });
 
         /* api */

@@ -58,12 +58,12 @@ export default {
     //     next((vm) => {
     //         const isAdmin = vm.$store.getters['user/isAdmin'];
     //         const isDomainOwner = vm.$store.getters['user/isDomainOwner'];
-    //         if (to.name === ADMINISTRATION_ROUTE.USER._NAME) {
-    //             if (isAdmin) next({ name: ADMINISTRATION_ROUTE.USER.MANAGEMENT._NAME, query: to.query });
-    //             else next({ name: ADMINISTRATION_ROUTE.USER.ACCOUNT._NAME, query: to.query });
-    //         } else if (to.name === ADMINISTRATION_ROUTE.USER.MANAGEMENT._NAME && !isAdmin) next({ name: ADMINISTRATION_ROUTE.USER.ACCOUNT._NAME, query: to.query });
-    //         else if (to.name === ADMINISTRATION_ROUTE.USER.API_KEY._NAME && isDomainOwner) next({ name: ADMINISTRATION_ROUTE.USER.ACCOUNT._NAME, query: to.query });
-    //         else if (to.name === ADMINISTRATION_ROUTE.USER.NOTIFICATION._NAME && isDomainOwner) next({ name: ADMINISTRATION_ROUTE.USER.ACCOUNT._NAME, query: to.query });
+    //         if (to.name === ADMINISTRATION_ROUTE.IAM.USER._NAME) {
+    //             if (isAdmin) next({ name: ADMINISTRATION_ROUTE.IAM.USER._NAME, query: to.query });
+    //             else next({ name: ADMINISTRATION_ROUTE.IAM.USER.ACCOUNT._NAME, query: to.query });
+    //         } else if (to.name === ADMINISTRATION_ROUTE.IAM.USER._NAME && !isAdmin) next({ name: ADMINISTRATION_ROUTE.IAM.USER.ACCOUNT._NAME, query: to.query });
+    //         else if (to.name === ADMINISTRATION_ROUTE.IAM.USER.API_KEY._NAME && isDomainOwner) next({ name: ADMINISTRATION_ROUTE.IAM.USER.ACCOUNT._NAME, query: to.query });
+    //         else if (to.name === ADMINISTRATION_ROUTE.IAM.USER.NOTIFICATION._NAME && isDomainOwner) next({ name: ADMINISTRATION_ROUTE.IAM.USER.ACCOUNT._NAME, query: to.query });
     //         else next(to);
     //     });
     // },
@@ -83,7 +83,7 @@ export default {
             MenuList: [
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT'),
-                    routeName: ADMINISTRATION_ROUTE.USER.MANAGEMENT._NAME,
+                    routeName: ADMINISTRATION_ROUTE.IAM.USER._NAME,
                     userOnly: false,
                     isAdminMenu: true,
                 },

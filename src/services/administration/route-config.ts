@@ -1,7 +1,9 @@
 export const ADMINISTRATION_ROUTE = Object.freeze({
-    _NAME: 'identity',
-    USER: {
-        _NAME: 'user',
-        MANAGEMENT: { _NAME: 'userManagement' },
+    _NAME: 'administration',
+    IAM: {
+        _NAME: 'iam',
+        USER: {
+            _NAME: 'user',
+        },
     },
 });

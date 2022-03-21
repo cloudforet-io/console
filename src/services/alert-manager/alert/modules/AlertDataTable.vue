@@ -60,7 +60,7 @@
                                   :show-icon="false"
                                   highlight
                                   :to="{
-                                      name: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME,
+                                      name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
                                       params: { id: item.alert_id }
                                   }"
                         >

@@ -3,12 +3,12 @@ import { RouteConfig } from 'vue-router';
 // Routes
 import authRoutes from '@/services/auth/routes';
 import dashboardRoute from '@/services/dashboard/routes';
-import identityRoute from '@/services/administration/routes';
-import inventoryRoute from '@/services/asset-management/routes';
+import administrationRoute from '@/services/administration/routes';
+import assetManagementRoute from '@/services/asset-management/routes';
 import projectRoute from '@/services/project/routes';
 import automationRoute from '@/services/automation/routes';
-import monitoringRoute from '@/services/alert-manager/routes';
-import billingRoute from '@/services/cost-explorer/routes';
+import alertManagerRoute from '@/services/alert-manager/routes';
+import costExplorerRoute from '@/services/cost-explorer/routes';
 import myPageRoute from '@/services/my-page/routes';
 import { errorRoutes } from '@/router/error-routes';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
@@ -27,12 +27,12 @@ export const serviceRoutes: RouteConfig[] = [
         component: { template: '<router-view />' },
         children: [
             dashboardRoute,
-            identityRoute,
-            inventoryRoute,
+            administrationRoute,
+            assetManagementRoute,
             projectRoute,
             automationRoute,
-            monitoringRoute,
-            billingRoute,
+            alertManagerRoute,
+            costExplorerRoute,
             myPageRoute,
         ],
     },

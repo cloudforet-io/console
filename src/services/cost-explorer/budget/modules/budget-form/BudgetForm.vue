@@ -75,7 +75,7 @@ export default {
 
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '', root);
                 SpaceRouter.router.push({
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
+                    name: COST_EXPLORER_ROUTE.BUDGET._NAME,
                 });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET'));

@@ -19,7 +19,7 @@
                 </p-badge>
             </template>
             <template #data-escalation_policy_id>
-                <p-anchor :to="{ name: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ESCALATION_POLICY._NAME }" highlight>
+                <p-anchor :to="{ name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME }" highlight>
                     {{ escalationPolicyName }}
                 </p-anchor>
             </template>

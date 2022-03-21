@@ -163,6 +163,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 
 
 export default {
@@ -262,9 +263,9 @@ export default {
 
         const routeState = reactive({
             routes: computed(() => ([
-                { name: i18n.t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: i18n.t('MENU.IDENTITY.SERVICE_ACCOUNT'), path: '/identity/service-account' },
-                { name: i18n.t('MENU.IDENTITY.SERVICE_ACCOUNT_ADD_ACCOUNT') },
+                { name: 'Asset Management', to: { name: ASSET_MANAGEMENT_ROUTE._NAME } },
+                { name: 'Service Account', to: { name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME } },
+                { name: 'Add Account' },
             ])),
         });
 

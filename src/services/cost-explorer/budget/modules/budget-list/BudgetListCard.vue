@@ -131,7 +131,7 @@ export default {
     setup(props: Props) {
         const state = reactive({
             linkLocation: computed<Location>(() => ({
-                name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
+                name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                 params: {
                     budgetId: props.budgetUsage.budget_id,
                 },

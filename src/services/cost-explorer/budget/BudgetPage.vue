@@ -59,22 +59,21 @@ export default {
         const queryHelper = new QueryHelper();
 
         const routeState = reactive({
-            route: computed(() => [
-                { name: i18n.t('MENU.BILLING.BILLING'), path: '/billing' },
-                { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), path: '/billing/cost-management' },
-                { name: i18n.t('MENU.BILLING.BUDGET') },
-            ]),
+            route: [
+                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
+                { name: 'Budget' },
+            ],
         });
 
         const state = reactive({
             createButtonItemList: computed(() => [
                 {
                     label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.SINGLE_BUDGET'),
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET.CREATE._NAME,
+                    name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
                 },
                 // {
                 //     label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BULK_BUDGET'),
-                //     name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET.BULK_CREATE._NAME,
+                //     name: COST_EXPLORER_ROUTE.BUDGET.BULK_CREATE._NAME,
                 // },
             ]),
             filters: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).filters,

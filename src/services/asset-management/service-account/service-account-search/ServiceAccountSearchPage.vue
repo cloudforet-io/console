@@ -10,8 +10,8 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { NoSearchResourceError } from '@/common/composables/error/error';
 
-const DEFAULT_URL = '/identity/service-account';
-const ERROR_URL = '/identity/service-account/no-resource';
+const DEFAULT_URL = '/asset-management/service-account';
+const ERROR_URL = '/asset-management/service-account/no-resource';
 
 export default {
     name: 'ServiceAccountSearchPage',

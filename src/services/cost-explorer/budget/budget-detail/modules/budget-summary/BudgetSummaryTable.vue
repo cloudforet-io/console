@@ -115,7 +115,7 @@ export default {
                 // const ratio = (budgetTimeUnit === BUDGET_TIME_UNIT.TOTAL) ? `${Math.round((d.usd_cost / totalBudgetLimit) * 100)}%`
                 //     : `${Math.round((d.usd_cost / d.limit) * 100)}%`;
                 const link = {
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         groupBy: arrayToQueryString([GROUP_BY.PRODUCT]),

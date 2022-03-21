@@ -1,7 +1,6 @@
 <template>
     <section class="notification-wrapper">
-        <p-breadcrumbs v-if="isAdmin" class="flex-grow" :routes="routeState.adminRoutes" />
-        <p-breadcrumbs v-else class="flex-grow" :routes="routeState.userRoutes" />
+        <p-breadcrumbs class="flex-grow" :routes="routeState.route" />
         <p-page-title :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')" />
         <p-pane-layout class="list-wrapper">
             <notification-channel-list />
@@ -14,10 +13,11 @@ import {
     PBreadcrumbs, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
 import { store } from '@/store';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 export default {
     name: 'NotificationPage',
@@ -28,21 +28,14 @@ export default {
         PPaneLayout,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             isAdmin: computed(() => store.getters['user/isAdmin']).value,
         });
         const routeState = reactive({
-            userRoutes: computed(() => ([
-                { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
-            ])),
-            adminRoutes: computed(() => ([
-                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
-                { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
-            ])),
+            route: [
+                { name: 'My Page', to: { name: MY_PAGE_ROUTE._NAME } },
+                { name: 'Notifications Channel', to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME } },
+            ],
         });
         return {
             routeState,

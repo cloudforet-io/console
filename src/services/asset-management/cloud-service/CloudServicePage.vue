@@ -41,7 +41,7 @@
                             <p class="text-primary2 mb-12">
                                 {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.EMPTY_CLOUD_SERVICE') }}
                             </p>
-                            <router-link :to="`/identity/service-account/?provider=${selectedProvider}`">
+                            <router-link :to="{ name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT.ADD._NAME, params: { provider: selectedProvider}}">
                                 <p-icon-text-button style-type="primary" name="ic_plus_bold"
                                                     class="mx-auto text-center"
                                 >
@@ -94,7 +94,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { CloudServiceStoreState } from '@/services/asset-management/cloud-service/store/type';
 import cloudServiceStoreModule from '@/services/asset-management/cloud-service/store';
 import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
 import { store } from '@/store';
 import { Period } from '@/services/cost-explorer/type';
 import CloudServiceListCard
@@ -106,6 +105,7 @@ import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 
 
 export default {
@@ -181,10 +181,10 @@ export default {
         });
 
         const routeState = reactive({
-            route: computed(() => ([
-                { name: i18n.t('MENU.INVENTORY.INVENTORY'), path: '/inventory' },
-                { name: i18n.t('MENU.INVENTORY.CLOUD_SERVICE') },
-            ])),
+            route: [
+                { name: 'Asset Management', to: { name: ASSET_MANAGEMENT_ROUTE._NAME } },
+                { name: 'Cloud Service' },
+            ],
         });
 
         /* api */
@@ -293,6 +293,7 @@ export default {
             assetUrlConverter,
             handleToolbox,
             handleDeletePeriod,
+            ASSET_MANAGEMENT_ROUTE,
         };
     },
 };

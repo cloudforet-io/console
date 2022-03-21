@@ -166,10 +166,10 @@ export default {
         });
         const routeState = reactive({
             routes: computed(() => ([
-                { name: i18n.t('MENU.PROJECT.PROJECT'), path: '/project' },
+                { name: 'Project', path: '/project' },
                 { name: state.project?.project_group_info?.name, path: `/project?select_pg=${state.project?.project_group_info?.project_group_id}` },
                 { name: state.project?.name, path: `/project/${props.projectId}` },
-                { name: i18n.t('PROJECT.EVENT_RULE.EVENT_RULE') },
+                { name: 'Event Rule' },
             ])),
         });
         const checkDeleteState = reactive({

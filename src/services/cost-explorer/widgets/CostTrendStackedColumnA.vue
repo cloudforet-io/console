@@ -80,7 +80,7 @@ export default defineComponent<WidgetProps>({
                     end: dayjs.utc(props.period.end).format('YYYY-MM'),
                 };
                 return {
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     params: {},
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.MONTHLY),

@@ -1,11 +1,11 @@
 <template>
-    <general-page-layout class="manage-notification-page">
+    <div class="manage-notification-page">
         <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
         <p-page-title child :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')"
                       @goBack="goToUserManagement"
         />
         <notification-channel-list />
-    </general-page-layout>
+    </div>
 </template>
 
 <script lang="ts">
@@ -14,28 +14,26 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
 import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { i18n } from '@/translations';
 
 export default {
     name: 'ManageNotificationPage',
     components: {
-        GeneralPageLayout, NotificationChannelList, PBreadcrumbs, PPageTitle,
+        NotificationChannelList, PBreadcrumbs, PPageTitle,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const routeState = reactive({
             routes: computed(() => ([
-                { name: i18n.t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: i18n.t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
-                { name: i18n.t('IDENTITY.USER.MAIN.ROOT_ACCOUNT'), path: '/identity/user/user-management' },
-                { name: i18n.t('IDENTITY.USER.MAIN.USER_MANAGEMENT'), path: '/identity/user/user-management' },
+                { name: 'Administration', to: { name: ADMINISTRATION_ROUTE._NAME } },
+                { name: 'IAM', to: { name: ADMINISTRATION_ROUTE.IAM._NAME } },
+                { name: 'User Management', to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME } },
                 { name: i18n.t('IDENTITY.USER.NOTIFICATION.MANAGE_CHANNEL') },
             ])),
         });
         const goToUserManagement = () => {
-            vm.$router.push({ name: ADMINISTRATION_ROUTE.USER.MANAGEMENT._NAME });
+            vm.$router.push({ name: ADMINISTRATION_ROUTE.IAM.USER._NAME });
         };
         return {
             routeState,

@@ -172,7 +172,7 @@ export default defineComponent<Props>({
             await store.dispatch('service/costDashboard/setDashboardList');
             if (duplicatedDashboardId) {
                 await SpaceRouter.router.push({
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                    name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
                     params: { dashboardId: duplicatedDashboardId },
                 });
             }

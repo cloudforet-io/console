@@ -8,7 +8,7 @@
                 <p-anchor class="title"
                           target="_self"
                           :show-icon="false"
-                          :to="{ name: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME, params: { id: item.alert_id } }"
+                          :to="{ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: item.alert_id } }"
                 >
                     <span v-tooltip.bottom="item.title">{{ item.title }}</span>
                 </p-anchor>

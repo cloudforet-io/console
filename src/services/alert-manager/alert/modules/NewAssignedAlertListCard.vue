@@ -62,7 +62,7 @@ export default {
             items: [],
             totalCount: 0,
             assignedVisible: true,
-            lastCheckedTime: computed(() => store.getters['settings/getItem']('last_checked_time', ALERT_MANAGER_ROUTE.ALERT_MANAGER.ALERT._NAME)),
+            lastCheckedTime: computed(() => store.getters['settings/getItem']('last_checked_time', ALERT_MANAGER_ROUTE.ALERT._NAME)),
             isVisible: computed(() => {
                 if (state.totalCount && state.assignedVisible) return true;
                 return false;
@@ -103,13 +103,13 @@ export default {
             store.dispatch('settings/setItem', {
                 key: 'last_checked_time',
                 value: lastCheckedTime,
-                path: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ALERT._NAME,
+                path: ALERT_MANAGER_ROUTE.ALERT._NAME,
             });
         };
 
         const onClickListItem = (idx) => {
             const alertId = get(state.items[idx], 'alert_id');
-            if (alertId) vm.$router.push({ name: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME, params: { id: alertId } });
+            if (alertId) vm.$router.push({ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: alertId } });
         };
 
         /* init */

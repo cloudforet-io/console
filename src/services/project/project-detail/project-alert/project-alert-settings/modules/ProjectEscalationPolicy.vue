@@ -120,7 +120,7 @@ export default {
                 const filters: QueryStoreFilter[] = [];
                 filters.push({ k: 'escalation_policy_id', o: '=', v: get(props.escalationPolicy, 'escalation_policy_id') });
                 return {
-                    name: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ESCALATION_POLICY._NAME,
+                    name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
                     query: {
                         filters: queryHelper.setFilters(filters).rawQueryStrings,
                     },

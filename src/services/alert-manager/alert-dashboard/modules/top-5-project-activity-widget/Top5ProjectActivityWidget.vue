@@ -222,7 +222,7 @@ export default {
                 { k: 'created_at', v: date.split(' ')[0], o: '=t' },
             ]);
             vm.$router.replace({
-                name: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ALERT._NAME,
+                name: ALERT_MANAGER_ROUTE.ALERT._NAME,
                 query: { filters: urlQueryHelper.rawQueryStrings },
             });
         };

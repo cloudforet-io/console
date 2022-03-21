@@ -86,7 +86,7 @@ import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/ty
 import UserDetail from '@/services/administration/iam/user/user-management/modules/user-management-tab/UserDetail.vue';
 import UserAssignedRole from '@/services/administration/iam/user/user-management/modules/user-management-tab/UserAssignedRole.vue';
 import PTagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
-import UserAPIKeyTable from '@/services/administration/iam/user/user-api-key/modules/APIKeyTable.vue';
+import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
 import UserNotifications from '@/services/administration/iam/user/user-management/modules/user-management-tab/UserNotifications.vue';
 
 import { store } from '@/store';

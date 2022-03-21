@@ -6,7 +6,7 @@
                     {{ $t('COMMON.WIDGETS.COLLECTING_JOBS') }}
                 </p>
                 <router-link
-                    :to="{ name: ASSET_MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME }"
+                    :to="{ name: ASSET_MANAGEMENT_ROUTE.COLLECTOR_HISTORY._NAME }"
                     class="more-btn"
                 >
                     <div class="more">
@@ -169,7 +169,7 @@ export default {
 
         const goToCollectorHistory = async (item) => {
             await vm.$router.push({
-                name: ASSET_MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME,
+                name: ASSET_MANAGEMENT_ROUTE.COLLECTOR_HISTORY._NAME,
                 hash: item.job_id,
             });
         };

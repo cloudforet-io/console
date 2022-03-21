@@ -20,8 +20,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
-    getCurrentInstance, ComponentRenderProxy, onActivated,
+    reactive, toRefs, onActivated,
 } from '@vue/composition-api';
 
 import {
@@ -35,6 +34,7 @@ import JobTable from '@/services/asset-management/collector-history/collect-job/
 import JobTaskDetails from '@/services/asset-management/collector-history/collect-job/modules/JobTaskDetails.vue';
 import { store } from '@/store';
 import { JobTaskData } from '@/services/asset-management/collector-history/collect-job/type';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 
 
 export default {
@@ -56,18 +56,16 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
             selectedItem: null as null|JobTaskData,
         });
 
         const routeState = reactive({
-            routes: computed(() => [
-                { name: vm.$t('MENU.MANAGEMENT.MANAGEMENT'), path: '/management/collector-history' },
-                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), path: '/management/collector-history' },
-                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY_JOB_MANAGEMENT') },
-            ]),
+            routes: [
+                { name: 'Asset Management', to: { name: ASSET_MANAGEMENT_ROUTE._NAME } },
+                { name: 'Collector History', to: { name: ASSET_MANAGEMENT_ROUTE.COLLECTOR_HISTORY._NAME } },
+                { name: 'Job Information' },
+            ],
         });
 
         /* Init */

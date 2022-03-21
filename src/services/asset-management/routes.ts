@@ -21,10 +21,10 @@ const CollectorHistoryPage = () => import(/* webpackChunkName: "CollectorHistory
 const CollectJobPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/services/asset-management/collector-history/collect-job/CollectJobPage.vue');
 
 export default {
-    path: 'inventory',
+    path: 'asset-management',
     name: ASSET_MANAGEMENT_ROUTE._NAME,
-    redirect: 'inventory/cloud-service',
-    meta: { label: 'Inventory' },
+    redirect: 'asset-management/cloud-service',
+    meta: { label: 'Asset Management' },
     component: { template: '<router-view />' },
     children: [
         {
@@ -36,7 +36,7 @@ export default {
         {
             path: 'cloud-service',
             name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE._NAME,
-            redirect: '/inventory/cloud-service',
+            redirect: '/asset-management/cloud-service',
             meta: { label: 'Cloud Service' },
             component: { template: '<router-view />' },
             children: [
@@ -92,7 +92,7 @@ export default {
                     path: 'create',
                     name: ASSET_MANAGEMENT_ROUTE.COLLECTOR.CREATE._NAME,
                     meta: { label: 'Create Collector' },
-                    redirect: './create/plugins',
+                    redirect: '/create/plugins',
                     component: { template: '<router-view />' },
                     children: [
                         {
@@ -153,12 +153,12 @@ export default {
             children: [
                 {
                     path: '/',
-                    name: ASSET_MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME,
+                    name: ASSET_MANAGEMENT_ROUTE.COLLECTOR_HISTORY._NAME,
                     component: CollectorHistoryPage,
                 },
                 {
                     path: ':jobId',
-                    name: ASSET_MANAGEMENT_ROUTE.HISTORY.COLLECTOR.JOB._NAME,
+                    name: ASSET_MANAGEMENT_ROUTE.COLLECTOR_HISTORY.JOB._NAME,
                     props: true,
                     component: CollectJobPage,
                 },

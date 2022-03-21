@@ -111,7 +111,7 @@ export default {
                     });
                 }
                 await store.dispatch('service/costDashboard/setDashboardList');
-                await SpaceRouter.router.replace({ name: COST_EXPLORER_ROUTE.COST_MANAGEMENT._NAME });
+                await SpaceRouter.router.replace({ name: COST_EXPLORER_ROUTE._NAME });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, 'Failed to delete dashboard');
             } finally {

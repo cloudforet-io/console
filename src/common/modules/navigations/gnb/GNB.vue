@@ -174,7 +174,7 @@ export default {
                         {
                             name: SUB_MENU['identity.user'],
                             label: i18n.t('MENU.IDENTITY.USER'),
-                            to: { name: ADMINISTRATION_ROUTE.USER.MANAGEMENT._NAME },
+                            to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME },
                             show: state.isAdmin,
                         },
                     ],
@@ -187,7 +187,7 @@ export default {
                         {
                             name: SUB_MENU['monitoring.alertManager'],
                             label: i18n.t('MENU.MONITORING.ALERT_MANAGER'),
-                            to: { name: ALERT_MANAGER_ROUTE.ALERT_MANAGER._NAME },
+                            to: { name: ALERT_MANAGER_ROUTE._NAME },
                             isBeta: true,
                         },
                     ],
@@ -201,7 +201,7 @@ export default {
                         {
                             name: SUB_MENU['billing.costManagement'],
                             label: i18n.t('MENU.BILLING.COST_MANAGEMENT'),
-                            to: { name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME },
+                            to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME },
                         },
                     ],
                 },
@@ -220,12 +220,12 @@ export default {
                 {
                     name: PARENT_MENU.management,
                     label: i18n.t('MENU.MANAGEMENT.MANAGEMENT'),
-                    to: { name: ASSET_MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME },
+                    to: { name: ASSET_MANAGEMENT_ROUTE.COLLECTOR_HISTORY._NAME },
                     subMenuList: [
                         {
                             name: SUB_MENU['management.collectorHistory'],
                             label: i18n.t('MENU.MANAGEMENT.COLLECTOR_HISTORY'),
-                            to: { name: ASSET_MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME },
+                            to: { name: ASSET_MANAGEMENT_ROUTE.COLLECTOR_HISTORY._NAME },
                         },
                     ],
                 },

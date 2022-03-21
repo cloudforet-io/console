@@ -6,7 +6,7 @@
         >
             <router-link
                 :to="{
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                    name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
                     params: {
                         dashboardId: item.dashboard_id
                     }
@@ -99,7 +99,7 @@ export default {
 
         const showHomeDashboardPage = () => {
             SpaceRouter.router.replace({
-                name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
                 params: { dashboardId: state.homeDashboardId },
             });
         };
@@ -115,7 +115,7 @@ export default {
         (async () => {
             if (!state.homeDashboardId) setInitialHomeDashboard();
 
-            if (vm.$route.name === COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME && !state.dashboardIdFromRoute) { // with no params
+            if (vm.$route.name === COST_EXPLORER_ROUTE.DASHBOARD._NAME && !state.dashboardIdFromRoute) { // with no params
                 showHomeDashboardPage();
             }
         })();

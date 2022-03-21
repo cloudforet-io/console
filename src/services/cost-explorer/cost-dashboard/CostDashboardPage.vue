@@ -81,7 +81,6 @@ import dayjs from 'dayjs';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { i18n } from '@/translations';
 import {
     PBreadcrumbs, PI, PIconButton, PIconTextButton, PPageTitle,
 } from '@spaceone/design-system';
@@ -145,7 +144,7 @@ export default {
         next(async () => {
             if (!await validateDashboardId(to.params.dashboardId)) {
                 next({
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                    name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
                     params: {},
                 });
                 return;
@@ -177,8 +176,8 @@ export default {
 
         const routeState = reactive({
             route: computed(() => [
-                { name: i18n.t('MENU.BILLING.BILLING'), to: { name: COST_EXPLORER_ROUTE._NAME } },
-                { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), to: { name: COST_EXPLORER_ROUTE.COST_MANAGEMENT._NAME } },
+                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
+                { name: 'Dashboard', to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME } },
                 { name: state.dashboard.name || props.dashboardId },
             ]),
         });
@@ -197,7 +196,7 @@ export default {
         };
 
         const handleClickCustomize = () => {
-            SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });
+            SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.DASHBOARD.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });
         };
 
         const handlePreviewRendered = (elements: HTMLElement[]) => {
@@ -222,7 +221,7 @@ export default {
 
         const handleClickCreate = () => {
             SpaceRouter.router.push({
-                name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD.CREATE._NAME,
+                name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME,
             });
         };
 

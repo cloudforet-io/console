@@ -52,9 +52,9 @@ export default {
         registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
         const routeState = reactive({
             route: computed(() => [
-                { name: i18n.t('MENU.BILLING.BILLING'), path: '/billing' },
-                { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), path: '/billing/cost-management' },
-                { name: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.CREATE_DASHBOARD') },
+                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
+                { name: 'Dashboard', to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME } },
+                { name: 'Create Dashboard' },
             ]),
         });
 
@@ -103,7 +103,7 @@ export default {
 
         const goToCustomizePage = (dashboardId: string) => {
             SpaceRouter.router.push({
-                name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE._NAME,
+                name: COST_EXPLORER_ROUTE.DASHBOARD.CUSTOMIZE._NAME,
                 params: { dashboardId },
                 query: {
                     from: 'create',

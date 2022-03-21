@@ -28,13 +28,10 @@
 
 <script lang="ts">
 import {
-    computed,
     reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PBreadcrumbs, PButton, PPageTitle } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
 
 import BudgetBulkCreateTemplateDownload
     from '@/services/cost-explorer/budget/budget-bulk-create/modules/BudgetBulkCreateTemplateDownload.vue';
@@ -43,6 +40,7 @@ import BudgetBulkCreateFileUpload
 import BudgetBulkCreateModal
     from '@/services/cost-explorer/budget/budget-bulk-create/modules/BudgetBulkCreateModal.vue';
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
 export default {
     name: 'BudgetBulkCreatePage',
@@ -57,12 +55,11 @@ export default {
     },
     setup() {
         const routeState = reactive({
-            route: computed(() => [
-                { name: i18n.t('MENU.BILLING.BILLING'), path: '/billing' },
-                { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), path: '/billing/cost-management' },
-                { name: i18n.t('MENU.BILLING.BUDGET'), path: '/billing/cost-management/budget' },
+            route: [
+                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
+                { name: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME } },
                 { name: 'Create Bulk Budget' },
-            ]),
+            ],
         });
 
         const state = reactive({

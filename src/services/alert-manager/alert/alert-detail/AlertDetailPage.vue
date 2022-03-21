@@ -1,5 +1,5 @@
 <template>
-    <general-page-layout v-if="!loading" class="alert-detail-page">
+    <div v-if="!loading" class="alert-detail-page">
         <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="alertInfo.title" child class="page-title"
                       @goBack="$router.go(-1)"
@@ -60,7 +60,7 @@
                       :contents="$t('MONITORING.ALERT.DETAIL.DELETE_MODAL_DESC')"
                       @confirm="alertDeleteConfirm"
         />
-    </general-page-layout>
+    </div>
 </template>
 
 <script lang="ts">
@@ -68,7 +68,6 @@ import { PBreadcrumbs, PIconButton, PPageTitle } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import AlertSummary from '@/services/alert-manager/alert/alert-detail/modules/alert-summary/AlertSummary.vue';
 import AlertKeyInfo from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/AlertKeyInfo.vue';
 import AlertResponder from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/AlertResponder.vue';
@@ -101,7 +100,6 @@ export default {
         AlertResponder,
         AlertKeyInfo,
         AlertSummary,
-        GeneralPageLayout,
         DeleteModal,
         PBreadcrumbs,
         PPageTitle,
@@ -126,8 +124,8 @@ export default {
 
         const routeState = reactive({
             route: computed(() => [
-                { name: i18n.t('MENU.MONITORING.MONITORING'), path: '/monitoring' },
-                { name: i18n.t('MENU.MONITORING.ALERT_MANAGER'), path: '/monitoring/alert-manager/dashboard' },
+                { name: 'Alert Manager', to: { name: ALERT_MANAGER_ROUTE._NAME } },
+                { name: 'Alert', to: { name: ALERT_MANAGER_ROUTE.ALERT._NAME } },
                 { name: `${props.id} #${state.alertInfo?.alert_number}` },
             ]),
         });
@@ -147,7 +145,7 @@ export default {
                     alerts: [props.id],
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '', root);
-                await vm.$router.push({ name: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ALERT._NAME });
+                await vm.$router.push({ name: ALERT_MANAGER_ROUTE.ALERT._NAME });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'));
             } finally {

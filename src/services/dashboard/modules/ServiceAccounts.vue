@@ -5,7 +5,7 @@
                 <p class="title">
                     {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS') }}
                 </p>
-                <router-link :to="'/identity/service-account'" class="add-btn">
+                <router-link :to="{ name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME }" class="add-btn">
                     <p-i name="ic_plus" width="1rem" height="1rem"
                          color="inherit"
                     /> {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ADD') }}
@@ -255,6 +255,7 @@ export default {
         return {
             ...toRefs(state),
             goToServiceAccountPage,
+            ASSET_MANAGEMENT_ROUTE,
         };
     },
 };

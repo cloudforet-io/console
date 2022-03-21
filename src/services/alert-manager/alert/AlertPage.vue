@@ -35,6 +35,7 @@ import {
     AlertListPageUrlQuery, AlertListTableFilters,
 } from '@/services/alert-manager/type';
 import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 export default {
     name: 'AlertPage',
@@ -57,11 +58,10 @@ export default {
         });
 
         const routeState = reactive({
-            route: computed(() => [
-                { name: i18n.t('MENU.MONITORING.MONITORING'), path: '/monitoring' },
-                { name: i18n.t('MENU.MONITORING.ALERT_MANAGER'), path: '/monitoring/alert-manager/dashboard' },
-                { name: i18n.t('MONITORING.ALERT.ALERT_LIST.ALERT') },
-            ]),
+            route: [
+                { name: 'Alert Manager', path: ALERT_MANAGER_ROUTE._NAME },
+                { name: 'Alert' },
+            ],
         });
 
         const replaceAlertListPageUrlQuery = (query: AlertListPageUrlQuery) => {

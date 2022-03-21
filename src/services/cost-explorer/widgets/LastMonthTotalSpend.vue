@@ -103,7 +103,7 @@ export default defineComponent<WidgetProps>({
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
                 return {
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         period: objectToQueryString({ start: state.lastMonth.startOf('month'), end: state.lastMonth.endOf('month') }),

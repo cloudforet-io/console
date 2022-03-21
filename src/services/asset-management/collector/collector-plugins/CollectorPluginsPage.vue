@@ -209,9 +209,9 @@ export default {
         });
         const routeState = reactive({
             routes: computed(() => ([
-                { name: vm.$t('MENU.PLUGIN.PLUGIN'), path: '/plugin' },
-                { name: vm.$t('MENU.PLUGIN.COLLECTOR'), path: '/plugin/collector' },
-                { name: vm.$t('MENU.PLUGIN.CREATE_COLLECTOR') },
+                { name: 'Asset Management', to: { name: ASSET_MANAGEMENT_ROUTE._NAME } },
+                { name: 'Collector', to: { name: ASSET_MANAGEMENT_ROUTE.COLLECTOR._NAME } },
+                { name: 'Create Collector' },
             ])),
         });
 

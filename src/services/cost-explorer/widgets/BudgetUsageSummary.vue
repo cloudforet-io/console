@@ -76,7 +76,7 @@ export default {
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
                 return {
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
+                    name: COST_EXPLORER_ROUTE.BUDGET._NAME,
                     params: {},
                     query: {
                         filters: budgetQueryHelper.setFilters(state.queryStoreFilters).rawQueryStrings,

@@ -103,12 +103,12 @@ export default {
             const queryId = props.selectedItem?.cost_query_set_id;
             if (queryId) {
                 return {
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     params: { querySetId: queryId },
                 };
             }
             return {
-                name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                 params: {},
                 query: {
                     granularity: primitiveToQueryString(state.granularity),

@@ -1,21 +1,29 @@
 <template>
-    <vertical-page-layout class="monitoring-main-page">
-        <template #sidebar>
-            <aside class="sidebar-menu">
-                <div v-for="(item) in menuList" :key="item.label"
-                     @click="showPage(item.routeName)"
-                >
-                    <sidebar-title :title="item.label"
-                                   :selected="item.label === selectedItem.label"
-                                   style-type="link"
-                    />
-                </div>
-            </aside>
-        </template>
-        <template #default>
+    <fragment>
+        <vertical-page-layout
+            v-if="$route.meta.isVerticalLayout"
+            class="monitoring-main-page"
+        >
+            <template #sidebar>
+                <aside class="sidebar-menu">
+                    <div v-for="(item) in menuList" :key="item.label"
+                         @click="showPage(item.routeName)"
+                    >
+                        <sidebar-title :title="item.label"
+                                       :selected="selectedItem ? item.label === selectedItem.label : ''"
+                                       style-type="link"
+                        />
+                    </div>
+                </aside>
+            </template>
+            <template #default>
+                <router-view />
+            </template>
+        </vertical-page-layout>
+        <general-page-layout v-else>
             <router-view />
-        </template>
-    </vertical-page-layout>
+        </general-page-layout>
+    </fragment>
 </template>
 
 <script lang="ts">
@@ -29,6 +37,7 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
 
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 
 interface MenuItem {
@@ -41,21 +50,22 @@ export default {
     components: {
         SidebarTitle,
         VerticalPageLayout,
+        GeneralPageLayout,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             menuList: computed(() => [
                 {
-                    routeName: ALERT_MANAGER_ROUTE.ALERT_MANAGER.DASHBOARD._NAME,
+                    routeName: ALERT_MANAGER_ROUTE.DASHBOARD._NAME,
                     label: vm.$t('MONITORING.ALERT.MAIN.DASHBOARD'),
                 },
                 {
-                    routeName: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ALERT._NAME,
+                    routeName: ALERT_MANAGER_ROUTE.ALERT._NAME,
                     label: vm.$t('MONITORING.ALERT.MAIN.ALERT'),
                 },
                 {
-                    routeName: ALERT_MANAGER_ROUTE.ALERT_MANAGER.ESCALATION_POLICY._NAME,
+                    routeName: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
                     label: vm.$t('MONITORING.ALERT.MAIN.ESCALATION_POLICY'),
                 },
             ]) as unknown as MenuItem[],
@@ -67,6 +77,7 @@ export default {
         };
         const selectSidebarItem = (route) => {
             if (route) state.selectedItem = state.menuList.find(d => d.routeName === route) as MenuItem;
+            else state.selectedItem = {} as MenuItem;
         };
 
         watch(() => vm.$route.name, (after) => {

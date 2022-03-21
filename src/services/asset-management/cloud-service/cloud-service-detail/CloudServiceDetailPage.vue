@@ -316,9 +316,9 @@ export default {
         /** Breadcrumb */
         const routeState = reactive({
             route: computed(() => ([
-                { name: vm.$t('MENU.INVENTORY.INVENTORY'), path: '/inventory' },
-                { name: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), path: '/inventory/cloud-service' },
-                { name: `${props.group}`, path: `/inventory/cloud-service/${props.provider}/${props.group}/${props.name}` },
+                { name: vm.$t('MENU.INVENTORY.INVENTORY'), to: { name: ASSET_MANAGEMENT_ROUTE._NAME } },
+                { name: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), to: { name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE._NAME } },
+                { name: `${props.group}`, to: { name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { provider: props.provider, group: props.group, name: props.name } } },
                 { name: `${props.name}` },
             ])),
         });

@@ -141,7 +141,7 @@ export default defineComponent<WidgetProps>({
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
                 return {
-                    name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     params: {},
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),

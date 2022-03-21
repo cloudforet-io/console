@@ -12,7 +12,6 @@ import {
 } from '@vue/composition-api';
 import { PBreadcrumbs } from '@spaceone/design-system';
 
-import { i18n } from '@/translations';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -37,9 +36,9 @@ export default {
 
         const routeState = reactive({
             routes: computed(() => [
-                { name: i18n.t('MENU.BILLING.BILLING'), to: { name: COST_EXPLORER_ROUTE._NAME } },
-                { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), to: { name: COST_EXPLORER_ROUTE.COST_MANAGEMENT._NAME } },
-                { name: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.UPDATE_BUDGET') },
+                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
+                { name: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME } },
+                { name: 'Update Budget' },
             ]),
         });
 

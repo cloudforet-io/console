@@ -1,8 +1,8 @@
 import { RouteConfig } from 'vue-router';
 import authRoutes from '@/services/auth/routes';
 import { errorRoutes } from '@/router/error-routes';
-import { userRoute } from '@/services/administration/routes';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { userRoute } from '@/services/administration/routes';
 
 const TotalDashboardPage = () => import(/* webpackChunkName: "TotalDashboardPage" */ '@/services/total-dashboard/TotalDashboardPage.vue');
 
@@ -12,7 +12,7 @@ const ROOT_DOMAIN_ROUTE = Object.freeze({
     DASHBOARD: { _NAME: 'dashboard' },
     IDENTITY: {
         _NAME: ADMINISTRATION_ROUTE._NAME,
-        USER: ADMINISTRATION_ROUTE.USER,
+        USER: ADMINISTRATION_ROUTE.IAM.USER,
     },
 });
 

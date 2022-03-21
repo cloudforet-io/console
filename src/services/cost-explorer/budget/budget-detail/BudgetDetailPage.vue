@@ -44,7 +44,6 @@ import BudgetStoreModule from '@/services/cost-explorer/budget/store';
 import { BudgetStoreState } from '@/services/cost-explorer/budget/store/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { i18n } from '@/translations';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import BudgetDeleteModal from '@/services/cost-explorer/budget/budget-detail/modules/BudgetDeleteModal.vue';
 import { BudgetData } from '@/services/cost-explorer/budget/type';
@@ -78,9 +77,8 @@ export default {
         });
         const routeState = reactive({
             route: computed(() => ([
-                { name: i18n.t('MENU.BILLING.BILLING'), to: { name: COST_EXPLORER_ROUTE._NAME } },
-                { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), to: { name: COST_EXPLORER_ROUTE.COST_MANAGEMENT._NAME } },
-                { name: 'Budget', to: { name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET._NAME } },
+                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
+                { name: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME } },
                 { name: state.budgetData?.name, to: { name: '' } },
             ])),
         });
@@ -98,7 +96,7 @@ export default {
         };
 
         const handleConfirmDelete = () => {
-            SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET._NAME });
+            SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.BUDGET._NAME });
         };
 
         (async () => {

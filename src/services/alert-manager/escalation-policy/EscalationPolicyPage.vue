@@ -85,6 +85,7 @@ import { store } from '@/store';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 
 export default {
@@ -162,9 +163,8 @@ export default {
         });
         const routeState = reactive({
             route: computed(() => [
-                { name: vm.$t('MENU.MONITORING.MONITORING'), path: '/monitoring' },
-                { name: vm.$t('MENU.MONITORING.ALERT_MANAGER'), path: '/monitoring/alert-manager/dashboard' },
-                { name: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY') },
+                { name: 'Alert Manager', to: { name: ALERT_MANAGER_ROUTE._NAME } },
+                { name: 'Escalation Policy' },
             ]),
         });
 

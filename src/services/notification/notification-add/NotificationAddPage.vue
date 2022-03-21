@@ -1,5 +1,5 @@
 <template>
-    <general-page-layout class="add-noti-wrapper">
+    <div class="add-noti-wrapper">
         <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
         <p-page-title child :title="pageTitle" class="page-title"
                       @goBack="$router.go(-1)"
@@ -48,7 +48,7 @@
                 {{ $t('COMMON.TAGS.SAVE') }}
             </p-button>
         </div>
-    </general-page-layout>
+    </div>
 </template>
 
 <script lang="ts">
@@ -58,7 +58,6 @@ import {
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import AddNotificationData from '@/services/notification/notification-add/modules/AddNotificationData.vue';
 import AddNotificationTopic from '@/services/notification/modules/AddNotificationTopic.vue';
 import AddNotificationSchedule from '@/services/notification/modules/AddNotificationSchedule.vue';
@@ -66,6 +65,7 @@ import VueI18n from 'vue-i18n';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -75,7 +75,6 @@ export default {
         AddNotificationData,
         AddNotificationSchedule,
         AddNotificationTopic,
-        GeneralPageLayout,
         PBreadcrumbs,
         PPaneLayout,
         PPageTitle,
@@ -113,13 +112,13 @@ export default {
 
         const routeState = reactive({
             userRoutes: computed(() => [
-                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
+                { name: 'My Page', to: { name: MY_PAGE_ROUTE._NAME } },
+                { name: 'Notifications Channel', to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME } },
+                { name: 'Add Notifications Channel' },
             ]),
             projectRoutes: computed(() => [
-                { name: vm.$t('MENU.PROJECT.PROJECT'), path: `/project/${state.projectId}` },
-                { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
+                { name: 'Project', path: `/project/${state.projectId}` },
+                { name: 'Add Notifications Channel' },
             ]),
             routes: computed(() => (state.projectId ? routeState.projectRoutes : routeState.userRoutes)),
         });

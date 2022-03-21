@@ -4,7 +4,7 @@
             <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.COST_ANALYSIS_QUERY') }}</p-label>
             <template v-if="!loading && costQuerySetList.length">
                 <p-icon-button name="ic_refresh" @click="handleRefresh" />
-                <p-anchor :to="{ name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME }"
+                <p-anchor :to="{ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME }"
                           :show-icon="false"
                 >
                     <p-icon-text-button style-type="primary1" name="ic_plus_bold">
@@ -39,7 +39,7 @@
                     <p class="help-text">
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_SAVED_QUERY_HELP_TEXT') }}
                     </p>
-                    <p-anchor :to="{ name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME }"
+                    <p-anchor :to="{ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME }"
                               :show-icon="false"
                               class="btn-add-query"
                     >

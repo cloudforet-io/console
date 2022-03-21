@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive,
+    reactive,
 } from '@vue/composition-api';
 
 import { PBreadcrumbs } from '@spaceone/design-system';
@@ -17,7 +17,7 @@ import { PBreadcrumbs } from '@spaceone/design-system';
 import ServerMain from '@/services/asset-management/server/modules/ServerMain.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import { store } from '@/store';
-import { i18n } from '@/translations';
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 
 export default {
     name: 'Server',
@@ -28,10 +28,10 @@ export default {
     },
     setup() {
         const routeState = reactive({
-            route: computed(() => [
-                { name: i18n.t('MENU.INVENTORY.INVENTORY'), path: '/inventory' },
-                { name: i18n.t('MENU.INVENTORY.SERVER') },
-            ]),
+            route: [
+                { name: 'Asset Management', to: { name: ASSET_MANAGEMENT_ROUTE._NAME } },
+                { name: 'Server' },
+            ],
         });
         (async () => {
             await store.dispatch('resource/loadAll');

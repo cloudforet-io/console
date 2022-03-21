@@ -16,7 +16,7 @@
                 </p-select-card>
                 <p-anchor
                     target="_blank"
-                    :to=" { name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                    :to=" { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
                             params: { dashboardId: dashboardData.public_dashboard_id ? dashboardData.public_dashboard_id : dashboardData.user_dashboard_id } }"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.VIEW') }}

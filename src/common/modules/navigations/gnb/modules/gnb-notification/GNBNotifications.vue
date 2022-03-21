@@ -5,7 +5,7 @@
             <!--            <p-select-dropdown class="more-button" :items="moreMenuItems"-->
             <!--                               type="icon-button" button-icon="ic_more"-->
             <!--            />-->
-            <!--            <router-link :to="{name: ADMINISTRATION_ROUTE.USER.NOTIFICATION._NAME}"-->
+            <!--            <router-link :to="{name: ADMINISTRATION_ROUTE.IAM.USER.NOTIFICATION._NAME}"-->
             <!--                         class="inline-flex"-->
             <!--                         @click.native="$emit('click-settings')"-->
             <!--            >-->

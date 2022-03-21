@@ -82,11 +82,11 @@ export default {
         const state = reactive({
             menuList: computed<ListItem[]>(() => [
                 {
-                    routeName: COST_EXPLORER_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    routeName: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.COST_ANALYSIS'),
                 },
                 {
-                    routeName: COST_EXPLORER_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
+                    routeName: COST_EXPLORER_ROUTE.BUDGET._NAME,
                     label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.BUDGET'),
                 },
             ]),
@@ -119,7 +119,7 @@ export default {
 
         const handleClickCreate = () => {
             SpaceRouter.router.push({
-                name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD.CREATE._NAME,
+                name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME,
             });
         };
 

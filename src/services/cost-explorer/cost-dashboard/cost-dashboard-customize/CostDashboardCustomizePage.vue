@@ -38,7 +38,6 @@ import {
 import {
     computed, onBeforeUnmount, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
-import { i18n } from '@/translations';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import CostDashboardStoreModule
     from '@/services/cost-explorer/cost-dashboard/store';
@@ -79,11 +78,11 @@ export default {
     setup(props) {
         registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
         const routeState = reactive({
-            route: computed(() => [
-                { name: i18n.t('MENU.BILLING.BILLING'), path: '/billing' },
-                { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), path: '/billing/cost-management' },
-                { name: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE_TITLE') },
-            ]),
+            route: [
+                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
+                { name: 'Dashboard', to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME } },
+                { name: 'Customize Dashboard' },
+            ],
         });
 
         const state = reactive({
@@ -109,7 +108,7 @@ export default {
         });
 
         const goToMainDashboardPage = () => {
-            SpaceRouter.router.replace({ name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME, params: { dashboardId: state.dashboardIdFromRoute } });
+            SpaceRouter.router.replace({ name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: state.dashboardIdFromRoute } });
         };
 
         const rollbackDashboard = async () => {
@@ -131,7 +130,7 @@ export default {
         const handleClickCancel = () => {
             if (SpaceRouter.router.currentRoute.query.from === 'create') {
                 rollbackDashboard();
-                SpaceRouter.router.replace({ name: COST_EXPLORER_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME });
+                SpaceRouter.router.replace({ name: COST_EXPLORER_ROUTE.DASHBOARD._NAME });
                 return;
             }
             goToMainDashboardPage();
