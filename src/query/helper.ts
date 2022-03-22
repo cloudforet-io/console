@@ -40,11 +40,11 @@ export const convertDatetimeQueryStoreFilterToFilters = (filter: QueryStoreFilte
     }
 
     if (Array.isArray(f.v)) {
-        const newFilters: Filter[] = [];
+        let newFilters: Filter[] = [];
         f.v.forEach((v) => {
             const filtersByValue: Filter[]|undefined = convertDatetimeQueryStoreFilterToFilters({ k: f.k, v, o: f.o }, timezone);
             if (filtersByValue) {
-                newFilters.concat(filtersByValue);
+                newFilters = newFilters.concat(filtersByValue);
             }
         });
         return newFilters.length === 0 ? undefined : newFilters;
