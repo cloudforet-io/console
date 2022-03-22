@@ -1,3 +1,10 @@
+# [1.1.0-beta.269](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.268...v1.1.0-beta.269) (2022-03-22)
+
+
+### Features
+
+* add useProxyValue hook ([#907](https://github.com/spaceone-dev/spaceone-design-system/issues/907)) ([febb999](https://github.com/spaceone-dev/spaceone-design-system/commit/febb99944940594d1eb47d0bdb3a199a2003ed8e))
+
 # [1.1.0-beta.268](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.267...v1.1.0-beta.268) (2022-03-21)
 
 
