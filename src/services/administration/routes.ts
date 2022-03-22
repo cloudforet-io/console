@@ -12,7 +12,7 @@ export const userRoute = {
     component: UserPage,
     children: [
         {
-            path: 'user-management',
+            path: 'user',
             name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
             component: UserManagementPage,
         },

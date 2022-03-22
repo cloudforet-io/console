@@ -14,44 +14,37 @@ export default {
     name: MY_PAGE_ROUTE._NAME,
     redirect: '/my-page/account',
     meta: { label: 'My Page' },
-    component: { template: '<router-view />' },
+    component: MyAccountPage,
     children: [
         {
-            path: '/',
-            name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
-            component: MyAccountPage,
-            children: [
-                {
-                    path: 'account',
-                    name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME,
-                    meta: { isVerticalLayout: true },
-                    component: UserAccountPage,
-                },
-                {
-                    path: 'api-key',
-                    name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME,
-                    meta: { isVerticalLayout: true },
-                    component: UserAPIKeyPage,
-                },
-                {
-                    path: 'notification',
-                    name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME,
-                    meta: { isVerticalLayout: true },
-                    component: UserNotificationPage,
-                },
-                {
-                    path: 'notification/:userId',
-                    name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME,
-                    component: ManageUserNotificationPage,
-                    props: true,
-                },
-                {
-                    path: 'notification/:protocol/:protocolId/:userId',
-                    name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
-                    component: NotificationAddPage,
-                    props: true,
-                },
-            ],
+            path: 'account',
+            name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME,
+            meta: { isVerticalLayout: true },
+            component: UserAccountPage,
+        },
+        {
+            path: 'api-key',
+            name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME,
+            meta: { isVerticalLayout: true },
+            component: UserAPIKeyPage,
+        },
+        {
+            path: 'notification',
+            name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME,
+            meta: { isVerticalLayout: true },
+            component: UserNotificationPage,
+        },
+        {
+            path: 'notification/:userId',
+            name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME,
+            component: ManageUserNotificationPage,
+            props: true,
+        },
+        {
+            path: 'notification/:protocol/:protocolId/:userId',
+            name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
+            component: NotificationAddPage,
+            props: true,
         },
     ],
 } as RouteConfig;
