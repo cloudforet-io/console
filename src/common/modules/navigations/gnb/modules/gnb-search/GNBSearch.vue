@@ -10,43 +10,12 @@
                             @keyup.down="showSuggestion"
         />
 
-        <!-- TODO: Split the code below into GNBSearchDropdown component -->
-        <p-data-loader v-if="visibleSuggestion"
-                       :data="allSuggestionItems"
-                       :loading="loading"
-        >
-            <template #loader>
-                <div class="skeleton-wrapper">
-                    <p-skeleton width="36%" height="1rem" class="mb-2" />
-                    <p-skeleton width="100%" height="2rem" />
-                </div>
-            </template>
-            <g-n-b-search-suggestion-list title="recent searches menu"
-                                          :items="menuItems"
-                                          :input-text="inputText"
-            />
-            <p-divider />
-            <g-n-b-search-suggestion-list title="recent searches cloud service"
-                                          :items="cloudServiceItems"
-                                          :input-text="inputText"
-                                          show-icon
-                                          default-icon="ic_provider_other"
-            />
-            <template #no-data>
-                <div v-if="trimmedInputText" class="no-data">
-                    <img src="@/assets/images/illust_ghost.svg" class="no-data-img">
-                    <p class="no-data-text">
-                        Search for navigation menus or cloud services.
-                    </p>
-                </div>
-                <div v-else class="no-data">
-                    <img src="@/assets/images/illust_microscope.svg" class="no-data-img">
-                    <p class="no-data-text">
-                        No result found for "<em>search keyword</em>" <br>Try again with different term.
-                    </p>
-                </div>
-            </template>
-        </p-data-loader>
+        <g-n-b-search-dropdown v-if="visibleSuggestion"
+                               :input-text="trimmedInputText"
+                               :loading="loading"
+                               :menu-list="menuList"
+                               :cloud-service-list="cloudServiceList"
+        />
     </div>
 </template>
 
@@ -55,21 +24,15 @@ import {
     computed, onMounted, onUnmounted,
     reactive, toRefs,
 } from '@vue/composition-api';
-import {
-    PDataLoader, PDivider, PSkeleton,
-} from '@spaceone/design-system';
-import GNBSearchSuggestionList, { Item as SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchSuggestionList.vue';
 import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
+import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchDropdown.vue';
 
 export default {
     name: 'GNBSearch',
     components: {
+        GNBSearchDropdown,
         GNBSearchInput,
-        GNBSearchSuggestionList,
-        PDivider,
-        PDataLoader,
         // PI,
-        PSkeleton,
     },
     setup() {
         const state = reactive({
@@ -80,20 +43,36 @@ export default {
                 return '';
             }),
             loading: false,
-            menuItems: [
-                { name: 'project', label: 'Project' },
-                { name: 'cost_explorer', label: 'Cost Explorer', parents: [{ name: 'dashboard', label: 'Dashboard' }] },
-            ] as SuggestionItem[],
-            cloudServiceItems: [
-                { name: 'lambda', label: 'Lambda', icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Lambda.svg' },
+            menuList: [] as any[],
+            cloudServiceList: [
                 {
-                    name: 'ec2',
-                    label: 'EC2',
-                    icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
-                    parents: [{ name: 'instance', label: 'Instance' }],
+                    cloud_service_type_id: 'cloud-svc-type-aaa',
+                    group: 'Lambda',
+                    tags: {
+                        'spaceone:icon': 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Lambda.svg',
+                    },
+                    name: 'Function',
+                    provider: 'aws',
                 },
-            ] as SuggestionItem[],
-            allSuggestionItems: computed<SuggestionItem[]>(() => state.menuItems.concat(state.cloudServiceItems)),
+                {
+                    cloud_service_type_id: 'cloud-svc-type-bbb',
+                    group: 'Lambda',
+                    tags: {
+                        'spaceone:icon': 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Lambda.svg',
+                    },
+                    name: 'Layer',
+                    provider: 'aws',
+                },
+                {
+                    cloud_service_type_id: 'cloud-svc-type-ccc',
+                    group: 'EC2',
+                    tags: {
+                        'spaceone:icon': 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
+                    },
+                    name: 'Instance',
+                    provider: 'aws',
+                },
+            ] as any[],
         });
 
         const showSuggestion = () => {
@@ -125,27 +104,5 @@ export default {
 <style lang="postcss" scoped>
 .gnb-search {
     /* TODO */
-    .p-data-loader {
-        @apply bg-white;
-        width: 27.5rem;
-        padding: 0 0.75rem;
-        min-height: 14.875rem;
-    }
-    .skeleton-wrapper {
-        @apply flex flex-col w-full self-start;
-    }
-    .no-data {
-        padding: 2.5rem 0;
-        .no-data-img {
-            @apply ml-auto mr-auto;
-        }
-        .no-data-text {
-            margin-top: 1.5rem;
-            font-size: 0.875rem;
-            em {
-                @apply font-bold;
-            }
-        }
-    }
 }
 </style>

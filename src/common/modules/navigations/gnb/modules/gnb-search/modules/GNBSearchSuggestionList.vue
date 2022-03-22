@@ -1,9 +1,14 @@
 <template>
-    <div class="gnb-search-suggestion-list">
-        <p>{{ title }}</p>
-        <div v-for="item in items" :key="item.name">
-            <p-lazy-img v-if="showIcon" :src="item.icon || ''"
-                        :error-icon="defaultIcon"
+    <p-context-menu class="gnb-search-suggestion-list"
+                    :menu="items"
+    >
+        <template #header-title="{ item }">
+            {{ item.label }}
+        </template>
+        <template #item--format="{ item }">
+            <p-lazy-img v-if="item.icon || item.defaultIcon"
+                        :src="item.icon || ''"
+                        :error-icon="item.defaultIcon"
                         width="1rem" height="1rem"
             />
             <span>
@@ -15,43 +20,39 @@
                 </template>
                 <span>{{ item.label }}</span>
             </span>
-        </div>
-    </div>
+        </template>
+    </p-context-menu>
 </template>
 
 <script lang="ts">
+import Vue from 'vue';
 import {
     defineComponent, PropType,
     reactive, toRefs,
 } from '@vue/composition-api';
-import { PI, PLazyImg } from '@spaceone/design-system';
+import { PContextMenu, PI, PLazyImg } from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-export interface Item {
-    label: string;
-    name: string;
+export interface Item extends MenuItem {
     parents?: Item[];
     icon?: string;
+    defaultIcon?: string;
 }
 
 interface Props {
-    title: string;
     items: Item[];
+    cloudServiceItems: Item[];
     inputText: string;
-    showIcon: boolean;
-    defaultIcon: string;
 }
 
 export default defineComponent<Props>({
     name: 'GNBSearchSuggestionList',
     components: {
+        PContextMenu,
         PLazyImg,
         PI,
     },
     props: {
-        title: {
-            type: String,
-            default: '',
-        },
         items: {
             type: Array as PropType<Item[]>,
             default: () => [],
@@ -60,17 +61,11 @@ export default defineComponent<Props>({
             type: String,
             default: '',
         },
-        showIcon: {
-            type: Boolean,
-            default: false,
-        },
-        defaultIcon: {
-            type: String,
-            default: '',
-        },
     },
     setup() {
-        const state = reactive({});
+        const state = reactive({
+            contextMenuRef: null as null | Vue,
+        });
 
         return {
             ...toRefs(state),
