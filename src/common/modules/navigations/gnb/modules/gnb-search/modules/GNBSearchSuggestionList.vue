@@ -36,20 +36,16 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { PContextMenu, PI, PLazyImg } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import {
+    focusStartPositions,
+    FocusStartPosition,
+    SuggestionItem,
+} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 
-export interface Item extends MenuItem {
-    parents?: Item[];
-    icon?: string;
-    defaultIcon?: string;
-}
-
-export const focusStartPositions = ['START', 'END'] as const;
-export type FocusStartPosition = typeof focusStartPositions[number]
 
 interface Props {
-    items: Item[];
-    cloudServiceItems: Item[];
+    items: SuggestionItem[];
+    cloudServiceSuggestionItems: SuggestionItem[];
     inputText: string;
     isFocused: boolean;
     focusStartPosition: FocusStartPosition;
@@ -64,7 +60,7 @@ export default defineComponent<Props>({
     },
     props: {
         items: {
-            type: Array as PropType<Item[]>,
+            type: Array as PropType<SuggestionItem[]>,
             default: () => [],
         },
         inputText: {

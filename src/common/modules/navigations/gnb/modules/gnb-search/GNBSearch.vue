@@ -15,8 +15,8 @@
         <g-n-b-search-dropdown v-if="visibleSuggestion"
                                :input-text="trimmedInputText"
                                :loading="loading"
-                               :menu-list="menuList"
-                               :cloud-service-list="cloudServiceList"
+                               :menu-items="menuItems"
+                               :cloud-service-items="cloudServiceItems"
                                :focus-start-position="focusStartPosition"
                                :is-focused.sync="isFocusOnSuggestion"
                                @move-focus-end="handleMoveFocusEnd"
@@ -30,9 +30,29 @@ import {
     computed, onMounted, onUnmounted,
     reactive, toRefs,
 } from '@vue/composition-api';
+
+
 import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
 import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchDropdown.vue';
-import { FocusStartPosition } from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchSuggestionList.vue';
+import {
+    FocusStartPosition,
+    SuggestionItem,
+} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+
+
+interface ConsoleMenu {
+    name: string;
+    label: string;
+    parent?: ConsoleMenu;
+}
+
+interface CloudService {
+    cloud_service_type_id: string;
+    provider: string;
+    group: string;
+    name: string;
+    tags: object;
+}
 
 export default {
     name: 'GNBSearch',
@@ -50,7 +70,17 @@ export default {
                 return '';
             }),
             loading: false,
-            menuList: [] as any[],
+            menuList: [
+                { name: 'project', label: 'Project' },
+                {
+                    name: 'asset_management.service_account',
+                    label: 'Service Account',
+                    parent: {
+                        name: 'asset_management',
+                        label: 'Asset Management',
+                    },
+                },
+            ] as ConsoleMenu[],
             cloudServiceList: [
                 {
                     cloud_service_type_id: 'cloud-svc-type-aaa',
@@ -79,7 +109,19 @@ export default {
                     name: 'Instance',
                     provider: 'aws',
                 },
-            ] as any[],
+            ] as CloudService[],
+            menuItems: computed<SuggestionItem[]>(() => state.menuList.map(d => ({
+                name: d.name,
+                label: d.label,
+                parents: d.parent ? [d.parent] : undefined,
+            }))),
+            cloudServiceItems: computed<SuggestionItem[]>(() => state.cloudServiceList.map(d => ({
+                name: d.cloud_service_type_id,
+                label: d.name,
+                icon: d.tags['spaceone:icon'],
+                defaultIcon: 'ic_provider_other',
+                parents: [{ name: d.group, label: d.group }],
+            }))),
             isFocusOnInput: false,
             isFocusOnSuggestion: false,
             focusStartPosition: 'START',

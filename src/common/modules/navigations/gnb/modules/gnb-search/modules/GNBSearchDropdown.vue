@@ -40,19 +40,18 @@ import {
     defineComponent, PropType,
     reactive, toRefs,
 } from '@vue/composition-api';
-import GNBSearchSuggestionList, {
-    FocusStartPosition,
-    focusStartPositions,
-    Item as SuggestionItem,
-} from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchSuggestionList.vue';
+import GNBSearchSuggestionList from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchSuggestionList.vue';
 import { PDataLoader, PDivider, PSkeleton } from '@spaceone/design-system';
+import {
+    FocusStartPosition,
+    SuggestionItem,
+} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 
 interface Props {
     inputText: string;
     loading: boolean;
-    // TODO: declare types of menuList and cloudServiceList
-    menuList: any[];
-    cloudServiceList: any[];
+    menuItems: SuggestionItem[];
+    cloudServiceItems: SuggestionItem[];
     isFocused: boolean;
     focusStartPosition: FocusStartPosition;
 }
@@ -74,12 +73,12 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
-        menuList: {
-            type: Array as PropType<any[]>,
+        menuItems: {
+            type: Array as PropType<SuggestionItem[]>,
             default: () => [],
         },
-        cloudServiceList: {
-            type: Array as PropType<any[]>,
+        cloudServiceItems: {
+            type: Array as PropType<SuggestionItem[]>,
             default: () => [],
         },
         isFocused: {
@@ -89,32 +88,18 @@ export default defineComponent<Props>({
         focusStartPosition: {
             type: String as PropType<FocusStartPosition>,
             default: 'START',
-            validator(position: FocusStartPosition) {
-                return focusStartPositions.includes(position);
-            },
         },
     },
     setup(props) {
         const state = reactive({
-            menuItems: [
-                { name: 'project', label: 'Project' },
-                { name: 'cost_explorer', label: 'Cost Explorer', parents: [{ name: 'dashboard', label: 'Dashboard' }] },
-            ] as SuggestionItem[],
-            cloudServiceItems: computed<SuggestionItem[]>(() => props.cloudServiceList.map(d => ({
-                name: d.cloud_service_type_id,
-                label: d.name,
-                icon: d.tags['spaceone:icon'],
-                defaultIcon: 'ic_provider_other',
-                parents: [{ name: d.group, label: d.group }],
-            }))),
             suggestionItems: computed<SuggestionItem[]>(() => [
                 { name: 'title', label: 'RECENT SEARCHES MENU', type: 'header' },
-                ...state.menuItems,
+                ...props.menuItems,
                 { type: 'divider' },
                 { name: 'title', label: 'RECENT SEARCHES CLOUD SERVICE', type: 'header' },
-                ...state.cloudServiceItems,
+                ...props.cloudServiceItems,
             ] as SuggestionItem[]),
-            allSelectableItems: computed<any[]>(() => state.menuItems.concat(state.cloudServiceItems)),
+            allSelectableItems: computed<any[]>(() => props.menuItems.concat(props.cloudServiceItems)),
         });
 
         return {
