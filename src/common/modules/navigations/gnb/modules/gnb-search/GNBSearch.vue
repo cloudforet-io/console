@@ -5,9 +5,11 @@
         -->
 
         <g-n-b-search-input v-model="inputText"
+                            :is-focused.sync="isFocusOnInput"
                             @click.stop="showSuggestion"
                             @keyup.esc="hideSuggestion"
-                            @keyup.down="showSuggestion"
+                            @keydown.up="moveFocusToSuggestion('END')"
+                            @keydown.down="moveFocusToSuggestion('START')"
         />
 
         <g-n-b-search-dropdown v-if="visibleSuggestion"
@@ -15,6 +17,10 @@
                                :loading="loading"
                                :menu-list="menuList"
                                :cloud-service-list="cloudServiceList"
+                               :focus-start-position="focusStartPosition"
+                               :is-focused.sync="isFocusOnSuggestion"
+                               @move-focus-end="handleMoveFocusEnd"
+                               @close="hideSuggestion"
         />
     </div>
 </template>
@@ -26,6 +32,7 @@ import {
 } from '@vue/composition-api';
 import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
 import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchDropdown.vue';
+import { FocusStartPosition } from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchSuggestionList.vue';
 
 export default {
     name: 'GNBSearch',
@@ -73,6 +80,9 @@ export default {
                     provider: 'aws',
                 },
             ] as any[],
+            isFocusOnInput: false,
+            isFocusOnSuggestion: false,
+            focusStartPosition: 'START',
         });
 
         const showSuggestion = () => {
@@ -81,6 +91,20 @@ export default {
 
         const hideSuggestion = () => {
             state.visibleSuggestion = false;
+            state.isFocusOnInput = false;
+            state.isFocusOnSuggestion = false;
+        };
+
+        const moveFocusToSuggestion = (focusStartPosition: FocusStartPosition) => {
+            if (!state.visibleSuggestion) state.visibleSuggestion = true;
+            state.isFocusOnInput = false;
+            state.focusStartPosition = focusStartPosition;
+            state.isFocusOnSuggestion = true;
+        };
+
+        const handleMoveFocusEnd = () => {
+            state.isFocusOnSuggestion = false;
+            state.isFocusOnInput = true;
         };
 
         onMounted(() => {
@@ -96,6 +120,8 @@ export default {
             ...toRefs(state),
             showSuggestion,
             hideSuggestion,
+            moveFocusToSuggestion,
+            handleMoveFocusEnd,
         };
     },
 };

@@ -54,7 +54,7 @@
             </div>
         </div>
     </div>
-</template>addPair
+</template>
 
 <script lang="ts">
 import { some } from 'lodash';

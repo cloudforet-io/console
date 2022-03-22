@@ -11,6 +11,11 @@
         </template>
         <g-n-b-search-suggestion-list :items="suggestionItems"
                                       :input-text="inputText"
+                                      :is-focused="isFocused"
+                                      :focus-start-position="focusStartPosition"
+                                      @update:isFocused="$emit('update:isFocused', $event)"
+                                      @move-focus-end="$emit('move-focus-end')"
+                                      @close="$emit('close')"
         />
         <template #no-data>
             <div v-if="inputText" class="no-data">
@@ -35,7 +40,11 @@ import {
     defineComponent, PropType,
     reactive, toRefs,
 } from '@vue/composition-api';
-import GNBSearchSuggestionList, { Item as SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchSuggestionList.vue';
+import GNBSearchSuggestionList, {
+    FocusStartPosition,
+    focusStartPositions,
+    Item as SuggestionItem,
+} from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchSuggestionList.vue';
 import { PDataLoader, PDivider, PSkeleton } from '@spaceone/design-system';
 
 interface Props {
@@ -44,6 +53,8 @@ interface Props {
     // TODO: declare types of menuList and cloudServiceList
     menuList: any[];
     cloudServiceList: any[];
+    isFocused: boolean;
+    focusStartPosition: FocusStartPosition;
 }
 
 export default defineComponent<Props>({
@@ -71,6 +82,17 @@ export default defineComponent<Props>({
             type: Array as PropType<any[]>,
             default: () => [],
         },
+        isFocused: {
+            type: Boolean,
+            default: false,
+        },
+        focusStartPosition: {
+            type: String as PropType<FocusStartPosition>,
+            default: 'START',
+            validator(position: FocusStartPosition) {
+                return focusStartPositions.includes(position);
+            },
+        },
     },
     setup(props) {
         const state = reactive({
@@ -94,7 +116,6 @@ export default defineComponent<Props>({
             ] as SuggestionItem[]),
             allSelectableItems: computed<any[]>(() => state.menuItems.concat(state.cloudServiceItems)),
         });
-
 
         return {
             ...toRefs(state),

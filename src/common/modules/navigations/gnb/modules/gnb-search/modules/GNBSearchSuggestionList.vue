@@ -1,6 +1,12 @@
 <template>
-    <p-context-menu class="gnb-search-suggestion-list"
+    <p-context-menu ref="contextMenuRef"
+                    class="gnb-search-suggestion-list"
                     :menu="items"
+                    @keyup:up:end="$emit('move-focus-end')"
+                    @keyup:down:end="$emit('move-focus-end')"
+                    @keyup:esc="$emit('close')"
+                    @focus="$emit('update:isFocused', true)"
+                    @blur="$emit('update:isFocused', false)"
     >
         <template #header-title="{ item }">
             {{ item.label }}
@@ -25,10 +31,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import {
     defineComponent, PropType,
-    reactive, toRefs,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { PContextMenu, PI, PLazyImg } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -39,10 +44,15 @@ export interface Item extends MenuItem {
     defaultIcon?: string;
 }
 
+export const focusStartPositions = ['START', 'END'] as const;
+export type FocusStartPosition = typeof focusStartPositions[number]
+
 interface Props {
     items: Item[];
     cloudServiceItems: Item[];
     inputText: string;
+    isFocused: boolean;
+    focusStartPosition: FocusStartPosition;
 }
 
 export default defineComponent<Props>({
@@ -61,10 +71,31 @@ export default defineComponent<Props>({
             type: String,
             default: '',
         },
+        isFocused: {
+            type: Boolean,
+            default: false,
+        },
+        focusStartPosition: {
+            type: String as PropType<FocusStartPosition>,
+            default: 'START',
+            validator(position: FocusStartPosition) {
+                return focusStartPositions.includes(position);
+            },
+        },
     },
-    setup() {
+    setup(props) {
         const state = reactive({
-            contextMenuRef: null as null | Vue,
+            contextMenuRef: null as null | any,
+        });
+
+        watch(() => props.isFocused, (isFocused) => {
+            if (!state.contextMenuRef) return;
+            if (!isFocused) return;
+            if (props.focusStartPosition === 'START') {
+                state.contextMenuRef.focus(0);
+            } else {
+                state.contextMenuRef.focus(-1);
+            }
         });
 
         return {
