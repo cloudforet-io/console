@@ -63,12 +63,16 @@ interface Menu {
 
 const ALLOWED_MENUS_FOR_ALL_USERS = ['support', 'account', 'notifications'];
 
-const filterMenuByRoute = (menuList: Menu[], disabledMenu: string[], isAdmin: boolean, router: VueRouter): Menu[] => menuList.reduce((results, _menu) => {
+const filterMenuByRoute = (menuList: Menu[], disabledMenu: string[], showBilling: boolean, isAdmin: boolean, router: VueRouter): Menu[] => menuList.reduce((results, _menu) => {
     if (disabledMenu.includes(_menu.name) && !isAdmin) return results;
 
     const menu = { ..._menu };
+    if (!showBilling) {
+        const idx = results.findIndex(item => item.name === 'cost_explorer');
+        if (idx > -1) results.splice(idx, 1);
+    }
     if (menu.subMenuList) {
-        menu.subMenuList = filterMenuByRoute(menu.subMenuList, disabledMenu, isAdmin, router);
+        menu.subMenuList = filterMenuByRoute(menu.subMenuList, disabledMenu, showBilling, isAdmin, router);
         if (menu.subMenuList.length) {
             results.push(menu);
             return results;
@@ -105,7 +109,7 @@ export default {
             hasPermission: computed((() => store.getters['user/hasPermission'])),
             dashboardLink: computed(() => (state.hasPermission ? { name: DASHBOARD_ROUTE._NAME } : undefined)),
             allMenuList: [] as Menu[],
-            menuList: computed<Menu[]>(() => filterMenuByRoute(state.allMenuList, state.disabledMenu, state.isAdmin, vm.$router)),
+            menuList: computed<Menu[]>(() => filterMenuByRoute(state.allMenuList, state.disabledMenu, state.showBilling, state.isAdmin, vm.$router)),
             selectedMenu: computed(() => {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;
@@ -127,14 +131,22 @@ export default {
 
         const init = async () => {
             const { menu } = await SpaceConnector.client.addOns.menu.list();
+
+            // const subMenuList = menu.map(d => (d.sub_menu ? d.sub_menu.map(item => ({
+            //     ...item,
+            //     parent_labels: [d.label],
+            // })) : { id: d.id, label: d.label }));
+            // console.log(subMenuList);
+            //
+            // await store.dispatch('display/setMenuList');
+
             state.allMenuList = menu.map(d => ({
                 label: d.label,
-                name: d.name,
-                to: { name: menuRouterMap[d.name].name },
-                show: d.name === 'cost_explorer' ? state.showBilling : true,
+                name: d.id,
+                to: { name: menuRouterMap[d.id].name },
                 subMenuList: d.sub_menu ? d.sub_menu.map(item => ({
                     ...item,
-                    to: { name: menuRouterMap[item.name].name },
+                    to: { name: menuRouterMap[item.id].name },
                 })) : [],
             }));
         };
