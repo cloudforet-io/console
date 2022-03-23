@@ -112,3 +112,4 @@ export { default as PCollapsibleList } from './data-display/collapsibles/collaps
 
 export { default as PDynamicChart } from './data-display/dynamic/dynamic-chart/PDynamicChart.vue';
 export { default as PDynamicWidget } from './data-display/dynamic/dynamic-widget/PDynamicWidget.vue';
+export { default as PPopover } from './data-display/popover/PPopover.vue';

@@ -1,0 +1,56 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
+
+import { getPopoverArgTypes } from './story-helper';
+import PPopover from './PPopover';
+import PButton from '../../inputs/buttons/button/PButton';
+
+<Meta title='Data Display/Popover' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=2667%3A173604'
+    }
+}} argTypes={getPopoverArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PPopover, PButton },
+    template: `
+        <div class="w-full overflow p-8 flex justify-center items-center" style="height: 250px;">
+            <p-popover :position="_position" :isVisible="_isVisible">
+                <p-button style-type="primary">default slot</p-button>
+                <template #content>
+                    <div>
+                        <p style="margin-top:12px">content slot</p>
+                    </div>
+                </template>
+            </p-popover>
+        </div>
+    `,
+    setup(props) {
+        const vm = getCurrentInstance();
+        const state = reactive({
+            _position: props.position,
+            _isVisible: props.isVisible,
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# PPopover
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
