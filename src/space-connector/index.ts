@@ -129,6 +129,9 @@ export class SpaceConnector {
         }
         return async (params: object = {}, config?: AxiosRequestConfig): Promise<any> => {
             const response: AxiosPostResponse = await this.api.instance.post(path, params, config);
+
+            if (afterCall) afterCall(response.data);
+
             return response.data;
         };
     }
