@@ -16,6 +16,7 @@
                                       @update:isFocused="$emit('update:isFocused', $event)"
                                       @move-focus-end="$emit('move-focus-end')"
                                       @close="$emit('close')"
+                                      @select="handleSelect"
         />
         <template #no-data>
             <div v-if="inputText" class="no-data">
@@ -44,6 +45,7 @@ import GNBSearchSuggestionList from '@/common/modules/navigations/gnb/modules/gn
 import { PDataLoader, PDivider, PSkeleton } from '@spaceone/design-system';
 import {
     FocusStartPosition,
+    SuggestionType,
     SuggestionItem,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 
@@ -90,7 +92,7 @@ export default defineComponent<Props>({
             default: 'START',
         },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const state = reactive({
             suggestionItems: computed<SuggestionItem[]>(() => [
                 { name: 'title', label: 'RECENT SEARCHES MENU', type: 'header' },
@@ -102,8 +104,27 @@ export default defineComponent<Props>({
             allSelectableItems: computed<any[]>(() => props.menuItems.concat(props.cloudServiceItems)),
         });
 
+        const emitSelect = (item: any, listType: SuggestionType) => {
+            emit('select', item, listType);
+        };
+
+        const nonSelectableBeforeMenuItems = 1;
+        const nonSelectableBeforeCloudServiceItems = 3;
+        const handleSelect = (item, index) => {
+            if (index < props.menuItems.length + nonSelectableBeforeMenuItems) {
+                // subtract number of non-selectable items before menu items
+                const menuIndex = index - nonSelectableBeforeMenuItems;
+                emitSelect(menuIndex, 'MENU');
+            } else {
+                // subtract number of non-selectable items & menu items before cloud service items
+                const cloudServiceIndex = index - props.menuItems.length - nonSelectableBeforeCloudServiceItems;
+                emitSelect(cloudServiceIndex, 'CLOUD_SERVICE');
+            }
+        };
+
         return {
             ...toRefs(state),
+            handleSelect,
         };
     },
 });

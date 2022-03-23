@@ -13,7 +13,7 @@ try {
 } catch (e) {
     window.localStorage.removeItem(STORAGE_KEY);
 }
-// test
+
 const state: DisplayState = {
     visibleSidebar: storedDisplayState.visibleSidebar ?? false,
     sidebarType: storedDisplayState.sidebarType ?? SIDEBAR_TYPE.info,

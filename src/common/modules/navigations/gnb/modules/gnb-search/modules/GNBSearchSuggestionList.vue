@@ -7,6 +7,7 @@
                     @keyup:esc="$emit('close')"
                     @focus="$emit('update:isFocused', true)"
                     @blur="$emit('update:isFocused', false)"
+                    @select="handleSelect"
     >
         <template #header-title="{ item }">
             {{ item.label }}
@@ -79,10 +80,14 @@ export default defineComponent<Props>({
             },
         },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const state = reactive({
             contextMenuRef: null as null | any,
         });
+
+        const handleSelect = (item, index) => {
+            emit('select', item, index);
+        };
 
         watch(() => props.isFocused, (isFocused) => {
             if (!state.contextMenuRef) return;
@@ -96,6 +101,7 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
+            handleSelect,
         };
     },
 });

@@ -10,6 +10,7 @@
                             @keyup.esc="hideSuggestion"
                             @keydown.up="moveFocusToSuggestion('END')"
                             @keydown.down="moveFocusToSuggestion('START')"
+                            @input="handleUpdateInput"
         />
 
         <g-n-b-search-dropdown v-if="visibleSuggestion"
@@ -21,6 +22,7 @@
                                :is-focused.sync="isFocusOnSuggestion"
                                @move-focus-end="handleMoveFocusEnd"
                                @close="hideSuggestion"
+                               @select="handleSelect"
         />
     </div>
 </template>
@@ -31,14 +33,19 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 
+import { SpaceRouter } from '@/router';
 
 import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
 import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchDropdown.vue';
 import {
     FocusStartPosition,
     SuggestionItem,
+    SuggestionType,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 
+import { menuRouterMap } from '@/lib/router/menu-router-map';
+
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 
 interface ConsoleMenu {
     name: string;
@@ -149,6 +156,35 @@ export default {
             state.isFocusOnInput = true;
         };
 
+        const handleUpdateInput = () => {
+            // TODO: update items
+        };
+
+        const handleSelect = (index: number, type: SuggestionType) => {
+            if (type === 'MENU') {
+                const menu: ConsoleMenu = state.menuList[index];
+                const menuRoute = menuRouterMap[menu.name];
+                if (menuRoute) {
+                    SpaceRouter.router.push({
+                        name: menuRoute.name,
+                    });
+                }
+            } else {
+                const cloudService: CloudService = state.cloudServiceList[index];
+                if (cloudService) {
+                    SpaceRouter.router.push({
+                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE._NAME,
+                        params: {
+                            provider: cloudService.provider,
+                            group: cloudService.group,
+                            name: cloudService.name,
+                        },
+                    });
+                }
+            }
+            hideSuggestion();
+        };
+
         onMounted(() => {
             window.addEventListener('click', hideSuggestion);
             window.addEventListener('blur', hideSuggestion);
@@ -164,6 +200,8 @@ export default {
             hideSuggestion,
             moveFocusToSuggestion,
             handleMoveFocusEnd,
+            handleUpdateInput,
+            handleSelect,
         };
     },
 };
