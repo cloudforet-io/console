@@ -1,6 +1,7 @@
 {
 	"APP": {
 		"MAIN": {
+			"CLOSE": "Close",
 			"NO": "No",
 			"YES": "Yes"
 		},
