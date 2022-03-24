@@ -95,10 +95,10 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const state = reactive({
             suggestionItems: computed<SuggestionItem[]>(() => [
-                { name: 'title', label: 'RECENT SEARCHES MENU', type: 'header' },
+                { name: 'title', label: props.inputText ? 'MENU' : 'RECENT SEARCHES MENU', type: 'header' },
                 ...props.menuItems,
                 { type: 'divider' },
-                { name: 'title', label: 'RECENT SEARCHES CLOUD SERVICE', type: 'header' },
+                { name: 'title', label: props.inputText ? 'CLOUD SERVICE' : 'RECENT SEARCHES CLOUD SERVICE', type: 'header' },
                 ...props.cloudServiceItems,
             ] as SuggestionItem[]),
             allSelectableItems: computed<any[]>(() => props.menuItems.concat(props.cloudServiceItems)),

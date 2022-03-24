@@ -50,7 +50,7 @@ import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config
 interface ConsoleMenu {
     name: string;
     label: string;
-    parent?: ConsoleMenu;
+    parents?: string[];
 }
 
 interface CloudService {
@@ -58,7 +58,7 @@ interface CloudService {
     provider: string;
     group: string;
     name: string;
-    tags: object;
+    icon: string;
 }
 
 export default {
@@ -82,39 +82,30 @@ export default {
                 {
                     name: 'asset_management.service_account',
                     label: 'Service Account',
-                    parent: {
-                        name: 'asset_management',
-                        label: 'Asset Management',
-                    },
+                    parents: ['Asset Management'],
                 },
             ] as ConsoleMenu[],
             cloudServiceList: [
                 {
                     cloud_service_type_id: 'cloud-svc-type-aaa',
                     group: 'Lambda',
-                    tags: {
-                        'spaceone:icon': 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Lambda.svg',
-                    },
                     name: 'Function',
                     provider: 'aws',
+                    icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Lambda.svg',
                 },
                 {
                     cloud_service_type_id: 'cloud-svc-type-bbb',
                     group: 'Lambda',
-                    tags: {
-                        'spaceone:icon': 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Lambda.svg',
-                    },
                     name: 'Layer',
                     provider: 'aws',
+                    icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Lambda.svg',
                 },
                 {
                     cloud_service_type_id: 'cloud-svc-type-ccc',
                     group: 'EC2',
-                    tags: {
-                        'spaceone:icon': 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
-                    },
                     name: 'Instance',
                     provider: 'aws',
+                    icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
                 },
             ] as CloudService[],
             menuItems: computed<SuggestionItem[]>(() => state.menuList.map(d => ({
@@ -125,7 +116,7 @@ export default {
             cloudServiceItems: computed<SuggestionItem[]>(() => state.cloudServiceList.map(d => ({
                 name: d.cloud_service_type_id,
                 label: d.name,
-                icon: d.tags['spaceone:icon'],
+                icon: d.icon,
                 defaultIcon: 'ic_provider_other',
                 parents: [{ name: d.group, label: d.group }],
             }))),
@@ -157,21 +148,30 @@ export default {
         };
 
         const handleUpdateInput = () => {
-            // TODO: update items
+            /*
+             TODO: update menuList & cloudServiceList
+             if (inputText)
+                 filter store.state.display.gnbMenuList by inputText for menuList
+                 call autocomplete.reference api for cloudServiceList
+             else
+                 show recent items
+             */
+
         };
 
         const handleSelect = (index: number, type: SuggestionType) => {
             if (type === 'MENU') {
                 const menu: ConsoleMenu = state.menuList[index];
                 const menuRoute = menuRouterMap[menu.name];
-                if (menuRoute) {
+                if (menuRoute && SpaceRouter.router.currentRoute.name !== menuRoute.name) {
                     SpaceRouter.router.push({
                         name: menuRoute.name,
                     });
+                    // TODO: update recent
                 }
             } else {
                 const cloudService: CloudService = state.cloudServiceList[index];
-                if (cloudService) {
+                if (cloudService && SpaceRouter.router.currentRoute.name !== ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE._NAME) {
                     SpaceRouter.router.push({
                         name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE._NAME,
                         params: {
@@ -180,6 +180,7 @@ export default {
                             name: cloudService.name,
                         },
                     });
+                    // TODO: update recent
                 }
             }
             hideSuggestion();
