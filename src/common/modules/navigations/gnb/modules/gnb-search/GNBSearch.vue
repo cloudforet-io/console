@@ -30,7 +30,7 @@
 <script lang="ts">
 import {
     computed, onMounted, onUnmounted,
-    reactive, toRefs,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { flatten } from 'lodash';
 
@@ -49,9 +49,11 @@ import { menuRouterMap } from '@/lib/router/menu-router-map';
 import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 import { store } from '@/store';
 import { GNBMenu } from '@/store/modules/display/type';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface CloudService {
-    cloud_service_type_id: string;
+    id: string;
     provider: string;
     group: string;
     name: string;
@@ -85,49 +87,85 @@ export default {
             }),
             cloudServiceList: [
                 {
-                    cloud_service_type_id: 'cloud-svc-type-aaa',
+                    id: 'cloud-svc-type-aaa',
                     group: 'Lambda',
                     name: 'Function',
                     provider: 'aws',
                     icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Lambda.svg',
                 },
                 {
-                    cloud_service_type_id: 'cloud-svc-type-bbb',
+                    id: 'cloud-svc-type-bbb',
                     group: 'Lambda',
                     name: 'Layer',
                     provider: 'aws',
                     icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Lambda.svg',
                 },
                 {
-                    cloud_service_type_id: 'cloud-svc-type-ccc',
+                    id: 'cloud-svc-type-ccc',
                     group: 'EC2',
                     name: 'Instance',
                     provider: 'aws',
                     icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
                 },
             ] as CloudService[],
-            menuItems: computed<SuggestionItem[]>(() => state.allMenuItems.map(d => ({
-                name: d.id,
-                label: d.label,
-                parents: d.parents ? d.parents : undefined,
-            }))),
-            cloudServiceItems: computed<SuggestionItem[]>(() => state.cloudServiceList.map(d => ({
-                name: d.cloud_service_type_id,
-                label: d.name,
-                icon: d.icon,
-                defaultIcon: 'ic_provider_other',
-                parents: [{ name: d.group, label: d.group }],
-            }))),
+            menuItems: computed<SuggestionItem[]>(() => {
+                if (state.showRecent) return state.recentMenuList;
+                return state.allMenuItems.map(d => ({
+                    name: d.id,
+                    label: d.label,
+                    parents: d.parents ? d.parents : undefined,
+                }));
+            }),
+            cloudServiceItems: computed<SuggestionItem[]>(() => {
+                const cloudServiceList = state.showRecent ? state.recentCloudServiceList : state.cloudServiceList;
+                return cloudServiceList.map(d => ({
+                    name: d.id,
+                    label: d.name,
+                    icon: d.icon,
+                    defaultIcon: d.icon,
+                    parents: [{ name: d.group, label: d.group }],
+                }));
+            }),
             isFocusOnInput: false,
             isFocusOnSuggestion: false,
             focusStartPosition: 'START',
+            showRecent: computed(() => state.visibleSuggestion && !state.inputText.length),
+            recentMenuList: [] as SuggestionItem[],
+            recentCloudServiceList: [] as CloudService[],
         });
 
+        /* API */
+        const listRecent = async (type) => {
+            try {
+                const { results } = await SpaceConnector.client.addOns.recent.list({
+                    type,
+                    limit: 5,
+                });
+                if (type === 'MENU') state.recentMenuList = results.map(d => d.data);
+                if (type === 'CLOUD_SERVICE') state.recentCloudServiceList = results.map(d => d.data);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
+        const createRecent = async (type: SuggestionType, item: SuggestionItem|CloudService) => {
+            try {
+                await SpaceConnector.client.addOns.recent.create({
+                    type,
+                    id: item.name,
+                    data: item,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
+
+        /* Event */
         const showSuggestion = () => {
             state.visibleSuggestion = true;
         };
 
         const hideSuggestion = () => {
+            state.inputText = '';
             state.visibleSuggestion = false;
             state.isFocusOnInput = false;
             state.isFocusOnSuggestion = false;
@@ -159,17 +197,18 @@ export default {
 
         const handleSelect = (index: number, type: SuggestionType) => {
             if (type === 'MENU') {
-                const menu = state.menuList[index];
+                const menu = state.menuItems[index];
                 const menuRoute = menuRouterMap[menu.name];
                 if (menuRoute && SpaceRouter.router.currentRoute.name !== menuRoute.name) {
+                    createRecent(type, menu);
                     SpaceRouter.router.push({
                         name: menuRoute.name,
                     });
-                    // TODO: update recent
                 }
             } else {
                 const cloudService: CloudService = state.cloudServiceList[index];
                 if (cloudService && SpaceRouter.router.currentRoute.name !== ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE._NAME) {
+                    createRecent(type, cloudService);
                     SpaceRouter.router.push({
                         name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE._NAME,
                         params: {
@@ -178,7 +217,6 @@ export default {
                             name: cloudService.name,
                         },
                     });
-                    // TODO: update recent
                 }
             }
             hideSuggestion();
@@ -191,6 +229,14 @@ export default {
         onUnmounted(() => {
             window.removeEventListener('click', hideSuggestion);
             window.removeEventListener('blur', hideSuggestion);
+        });
+
+        /* Watcher */
+        watch(() => state.visibleSuggestion, (visibleSuggestion) => {
+            if (visibleSuggestion) {
+                listRecent('MENU');
+                listRecent('CLOUD_SERVICE');
+            }
         });
 
         return {
