@@ -32,6 +32,7 @@ import {
     computed, onMounted, onUnmounted,
     reactive, toRefs,
 } from '@vue/composition-api';
+import { flatten } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
@@ -46,12 +47,8 @@ import {
 import { menuRouterMap } from '@/lib/router/menu-router-map';
 
 import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
-
-interface ConsoleMenu {
-    name: string;
-    label: string;
-    parents?: string[];
-}
+import { store } from '@/store';
+import { GNBMenu } from '@/store/modules/display/type';
 
 interface CloudService {
     cloud_service_type_id: string;
@@ -60,6 +57,11 @@ interface CloudService {
     name: string;
     icon: string;
 }
+
+const getSubMenuList = (menu: GNBMenu[]) => menu.map(d => (d.subMenuList?.length ? d.subMenuList.map(item => ({
+    ...item,
+    parents: [{ id: d.id, label: d.label }],
+})) : { id: d.id, label: d.label }));
 
 export default {
     name: 'GNBSearch',
@@ -77,14 +79,10 @@ export default {
                 return '';
             }),
             loading: false,
-            menuList: [
-                { name: 'project', label: 'Project' },
-                {
-                    name: 'asset_management.service_account',
-                    label: 'Service Account',
-                    parents: ['Asset Management'],
-                },
-            ] as ConsoleMenu[],
+            allMenuItems: computed<SuggestionItem[]>(() => {
+                const menu = store.getters['display/GNBMenuList'];
+                return flatten(getSubMenuList(menu));
+            }),
             cloudServiceList: [
                 {
                     cloud_service_type_id: 'cloud-svc-type-aaa',
@@ -108,10 +106,10 @@ export default {
                     icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
                 },
             ] as CloudService[],
-            menuItems: computed<SuggestionItem[]>(() => state.menuList.map(d => ({
-                name: d.name,
+            menuItems: computed<SuggestionItem[]>(() => state.allMenuItems.map(d => ({
+                name: d.id,
                 label: d.label,
-                parents: d.parent ? [d.parent] : undefined,
+                parents: d.parents ? d.parents : undefined,
             }))),
             cloudServiceItems: computed<SuggestionItem[]>(() => state.cloudServiceList.map(d => ({
                 name: d.cloud_service_type_id,
@@ -161,7 +159,7 @@ export default {
 
         const handleSelect = (index: number, type: SuggestionType) => {
             if (type === 'MENU') {
-                const menu: ConsoleMenu = state.menuList[index];
+                const menu = state.menuList[index];
                 const menuRoute = menuRouterMap[menu.name];
                 if (menuRoute && SpaceRouter.router.currentRoute.name !== menuRoute.name) {
                     SpaceRouter.router.push({

@@ -33,3 +33,7 @@ export const setCurrency: Mutation<DisplayState> = (state, currency: CURRENCY): 
 export const setCurrencyRates: Mutation<DisplayState> = (state, rates: CurrencyRates): void => {
     state.currencyRates = rates;
 };
+
+export const setMenuList: Mutation<DisplayState> = (state, menuList): void => {
+    state.menuList = menuList;
+};
