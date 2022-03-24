@@ -49,6 +49,8 @@
         <iframe class="hidden"
                 :src="$store.state.file.downloadSource" width="1" height="1"
         />
+        <!-- Modal for Cross Browsing -->
+        <recommended-browser-modal v-if="showsBrowserRecommendation()" />
     </div>
 </template>
 
@@ -68,10 +70,12 @@ import { Location } from 'vue-router';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
+import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
 
 export default defineComponent({
     name: 'App',
     components: {
+        RecommendedBrowserModal,
         TopNotification,
         GNB: GNB as any,
         PNoticeAlert,
@@ -96,11 +100,17 @@ export default defineComponent({
             vm.$router.push(res);
             vm.$store.dispatch('user/setIsSessionExpired', false);
         };
-
+        const showsBrowserRecommendation = () => {
+            const agent = window.navigator.userAgent.toLowerCase();
+            const isChrome = agent.indexOf('chrome') !== -1;
+            const isEdge = agent.indexOf('edge') !== -1;
+            return !(isChrome || isEdge) && !window.localStorage.getItem('showBrowserRecommendation');
+        };
         return {
             ...toRefs(state),
             goToSignIn,
             SIDEBAR_TYPE,
+            showsBrowserRecommendation,
         };
     },
 });

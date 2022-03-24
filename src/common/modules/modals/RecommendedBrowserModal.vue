@@ -1,0 +1,106 @@
+<template>
+    <p-button-modal class="recommended-browser-modal"
+                    :hide-header-close-button="true"
+                    :hide-footer-close-button="true"
+                    :visible="isVisible"
+                    :header-title="$t('APP.MODAL.RECOMMEND_BROWSER.HEADER')"
+                    size="sm"
+                    @confirm="handleCloseModal"
+    >
+        <template #body>
+            <div class="browser-icon-wrapper">
+                <a v-for="(browser, idx) in browserList" :key="idx"
+                   class="browser-icon-container" :href="browser.link"
+                >
+                    <img class="browser-img" :src="require(`@/assets/images/${browser.img}`)">
+                    <span class="browser-name">{{ browser.label }}</span>
+                </a>
+            </div>
+            <p class="recommend-browser-help-text">
+                {{ $t('APP.MODAL.RECOMMEND_BROWSER.BODY_HELP_TEXT') }}
+            </p>
+        </template>
+        <template #footer-extra>
+            <div>
+                <p-check-box v-model="isSelected">
+                    {{ $t('APP.MODAL.RECOMMEND_BROWSER.DO_NOT_SHOW_AGAIN') }}
+                </p-check-box>
+            </div>
+        </template>
+        <template #confirm-button>
+            {{ $t('APP.MAIN.CLOSE') }}
+        </template>
+    </p-button-modal>
+</template>
+<script lang="ts">
+import { reactive, toRefs } from '@vue/composition-api';
+import { PButtonModal, PCheckBox } from '@spaceone/design-system';
+import { i18n } from '@/translations';
+
+const browserList = [
+    { label: i18n.t('APP.MODAL.RECOMMEND_BROWSER.CHROME'), img: 'ic_chrome_2x.png', link: 'https://www.google.com/chrome' },
+    { label: i18n.t('APP.MODAL.RECOMMEND_BROWSER.EDGE'), img: 'ic_edge_2x.png', link: 'https://www.microsoft.com/edge' },
+];
+
+export default {
+    name: 'RecommendedBrowserModal',
+    components: {
+        PButtonModal,
+        PCheckBox,
+    },
+    setup() {
+        const state = reactive({
+            isVisible: true,
+            isSelected: false,
+        });
+        const handleCloseModal = () => {
+            if (state.isSelected) window.localStorage.setItem('showBrowserRecommendation', 'showBrowserRecommendation');
+            state.isVisible = false;
+        };
+        return {
+            ...toRefs(state),
+            handleCloseModal,
+            browserList,
+        };
+    },
+};
+</script>
+<style lang="postcss" scoped>
+.recommended-browser-modal {
+    .browser-icon-wrapper {
+        @apply flex flex-wrap gap-2;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        .browser-icon-container {
+            @apply bg-gray-100 rounded-2xl flex-grow flex flex-col items-center flex-wrap gap-2;
+            padding: 1.5rem 0;
+
+            .browser-img {
+                width: 4rem;
+            }
+            .browser-name {
+                @apply text-gray-500;
+            }
+
+            &:hover {
+                @apply bg-blue-200 cursor-pointer;
+            }
+        }
+        .recommend-browser-help-text {
+            line-height: 150%;
+        }
+    }
+}
+
+@screen mobile {
+    .recommended-browser-modal {
+        .browser-icon-wrapper {
+            .browser-icon-container {
+                .browser-img {
+                    width: 2rem;
+                }
+            }
+        }
+    }
+}
+</style>
