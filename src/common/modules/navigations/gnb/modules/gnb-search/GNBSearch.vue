@@ -30,11 +30,12 @@
 
 <script lang="ts">
 import axios, { CancelTokenSource } from 'axios';
+import { flatten } from 'lodash';
+
 import {
     computed, onMounted, onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { flatten } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
@@ -111,13 +112,33 @@ export default {
                     icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
                 },
             ] as CloudService[],
+            searchRegex: computed(() => {
+                let regex = '';
+                if (state.inputText) {
+                    // remove spaces in the search term
+                    const text = state.inputText.replace(/\s/g, '');
+                    for (let i = 0; i < text.length; i++) {
+                        regex += text[i];
+                        // add space regex after every single character to find matching keywords ignoring spaces
+                        if (i < text.length - 1) regex += '\\s*';
+                    }
+                }
+                return new RegExp(regex, 'i');
+            }),
             menuItems: computed<SuggestionItem[]>(() => {
                 if (state.showRecent) return state.recentMenuList;
+
+                const regex = state.searchRegex;
+
                 return state.allMenuItems.map(d => ({
                     name: d.id,
                     label: d.label,
                     parents: d.parents ? d.parents : undefined,
-                }));
+                })).filter((d) => {
+                    if (regex.test(d.label)) return true;
+                    if (d.parents && d.parents.some(p => regex.test(p.label))) return true;
+                    return false;
+                });
             }),
             cloudServiceItems: computed<SuggestionItem[]>(() => {
                 const cloudServiceList = state.showRecent ? state.recentCloudServiceList : state.cloudServiceList;
