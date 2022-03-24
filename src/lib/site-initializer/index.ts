@@ -21,7 +21,10 @@ const initApiClient = async () => {
     await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
         // Add session expiration process
         store.dispatch('user/setIsSessionExpired', true);
-    }, { endpoint: config.get('MOCK.ENDPOINT'), all: config.get('MOCK.ALL') });
+    }, { endpoint: config.get('MOCK.ENDPOINT'), all: config.get('MOCK.ALL') }, {
+        '/inventory/collector/create': (data) => { store.dispatch('resource/collector/sync', data); },
+        '/inventory/collector/update': (data) => { store.dispatch('resource/collector/sync', data); },
+    });
 };
 
 const initDomain = async (): Promise<string|undefined> => {

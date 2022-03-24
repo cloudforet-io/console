@@ -1,7 +1,8 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ResourceMap } from '@/store/modules/resource/type';
+import { ResourceMap, ResourceState } from '@/store/modules/resource/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/resource/config';
+import { Action } from 'vuex';
 
 const regionMap = {
     africa: {
@@ -73,4 +74,16 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     } catch (e) {
         ErrorHandler.handleError(e);
     }
+};
+
+export const sync: Action<ResourceState, any> = ({ state, commit }, regionInfo): void => {
+    const regions = {
+        ...state.items,
+        [regionInfo.region_code]: {
+            label: `${regionInfo.name} | ${regionInfo.region_code}`,
+            name: regionInfo.name,
+            continent: regionMap[regionInfo.tags.continent] || {},
+        },
+    };
+    commit('setRegions', regions);
 };

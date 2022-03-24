@@ -1,9 +1,10 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ResourceMap } from '@/store/modules/resource/type';
+import { ResourceMap, ResourceState } from '@/store/modules/resource/type';
 import { indigo } from '@/styles/colors';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/resource/config';
+import { Action } from 'vuex';
 
 let lastLoadedTime = 0;
 
@@ -41,4 +42,18 @@ export const load = async ({ commit, state }, lazyLoad = false): Promise<void|Er
     } catch (e) {
         ErrorHandler.handleError(e);
     }
+};
+
+export const sync: Action<ResourceState, any> = ({ state, commit }, providerInfo): void => {
+    const providers = {
+        ...state.items,
+        [providerInfo.provider]: {
+            label: providerInfo.tags.label || providerInfo.name,
+            name: providerInfo.name,
+            icon: assetUrlConverter(providerInfo.tags.icon),
+            color: providerInfo.tags.color || indigo[400],
+            linkTemplate: providerInfo.tags.external_link_template,
+        },
+    };
+    commit('setProviders', providers);
 };

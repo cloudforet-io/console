@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ResourceMap } from '@/store/modules/resource/type';
+import { ResourceMap, ResourceState } from '@/store/modules/resource/type';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/resource/config';
+import { Action } from 'vuex';
 
 let lastLoadedTime = 0;
 
@@ -30,4 +31,15 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
 
         commit('setSpotGroups', spotGroups);
     } catch (e) {}
+};
+
+export const sync: Action<ResourceState, any> = ({ state, commit }, spotGroupInfo): void => {
+    const spotGroups = {
+        ...state.items,
+        [spotGroupInfo.spot_group_id]: {
+            label: spotGroupInfo.name,
+            name: spotGroupInfo.name,
+        },
+    };
+    commit('setSpotGroups', spotGroups);
 };
