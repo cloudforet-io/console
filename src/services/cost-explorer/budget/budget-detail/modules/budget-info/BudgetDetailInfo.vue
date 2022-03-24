@@ -113,6 +113,14 @@ export default {
         };
 
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('resource/project/load'),
+                store.dispatch('resource/projectGroup/load'),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
             referenceRouter,

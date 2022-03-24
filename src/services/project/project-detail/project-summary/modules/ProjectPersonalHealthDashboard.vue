@@ -274,7 +274,12 @@ export default {
 
         /* init */
         (async () => {
-            await Promise.all([getEvents(), getCount()]);
+            await Promise.allSettled([
+                getEvents(), getCount(),
+                store.dispatch('resource/region/load'),
+                store.dispatch('resource/cloudServiceType/load'),
+                store.dispatch('resource/provider/load'),
+            ]);
         })();
 
         return {

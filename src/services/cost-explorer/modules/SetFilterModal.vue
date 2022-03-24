@@ -188,6 +188,17 @@ export default {
             if (after) init();
         });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('resource/project/load'),
+                store.dispatch('resource/projectGroup/load'),
+                store.dispatch('resource/serviceAccount/load'),
+                store.dispatch('resource/provider/load'),
+                store.dispatch('resource/region/load'),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
             FILTER_ITEM_MAP,

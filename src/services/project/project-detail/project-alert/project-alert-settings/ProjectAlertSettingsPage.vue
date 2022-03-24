@@ -117,7 +117,6 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { i18n } from '@/translations';
-import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -235,10 +234,9 @@ export default {
 
         const init = async () => {
             if (props.id) {
-                await Promise.all([
+                await Promise.allSettled([
                     getProjectAlertConfig(),
                     getEventRuleCount(),
-                    store.dispatch('resource/protocol/load'),
                 ]);
             }
         };

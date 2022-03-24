@@ -218,7 +218,7 @@ export default {
         };
         const handleExport = async () => {
             try {
-                store.dispatch('display/startLoading', { loadingMessage: i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD') });
+                await store.dispatch('display/startLoading', { loadingMessage: i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD') });
 
                 const cloudServiceResourcesPayload = getCloudServiceResourcesPayload();
                 const excelPayloadList = await getExcelPayloadList();
@@ -229,9 +229,14 @@ export default {
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {
-                store.dispatch('display/finishLoading');
+                await store.dispatch('display/finishLoading');
             }
         };
+
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/provider/load');
+        })();
 
         return {
             ...toRefs(state),

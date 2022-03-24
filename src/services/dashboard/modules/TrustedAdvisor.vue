@@ -379,8 +379,12 @@ export default {
             getOverallData();
         };
         const asyncInit = async () => {
-            await store.dispatch('favorite/project/load');
-            await store.dispatch('resource/project/load');
+            await Promise.allSettled([
+                store.dispatch('favorite/project/load'),
+                // LOAD REFERENCE STORE
+                store.dispatch('resource/project/load'),
+                store.dispatch('resource/provider/load'),
+            ]);
             await getProjectSummary();
         };
         init();

@@ -34,6 +34,7 @@ import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { gray } from '@/styles/colors';
 import { getUUID } from '@/lib/component-util/getUUID';
+import { store } from '@/store';
 
 export default {
     name: 'CloudServiceUsageOverviewSummary',
@@ -75,6 +76,11 @@ export default {
             }
             return {};
         };
+
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/loadAll');
+        })();
 
         return {
             ...toRefs(state),

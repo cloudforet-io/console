@@ -261,7 +261,8 @@ export default {
 
         /* init */
         (async () => {
-            await Promise.all([
+            await Promise.allSettled([
+                // LOAD REFERENCE STORE
                 store.dispatch('resource/project/load'),
                 store.dispatch('resource/projectGroup/load'),
             ]);

@@ -18,7 +18,6 @@
 
 <script lang="ts">
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
-import { store } from '@/store';
 import CostManagementMenu from '@/services/cost-explorer/modules/CostManagementMenu.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
@@ -30,17 +29,6 @@ export default {
         VerticalPageLayout,
     },
     setup() {
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('resource/serviceAccount/load'),
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/projectGroup/load'),
-                store.dispatch('resource/region/load'),
-                store.dispatch('resource/provider/load'),
-                store.dispatch('display/loadCurrencyRates'),
-            ]);
-        })();
-
         return {
         };
     },

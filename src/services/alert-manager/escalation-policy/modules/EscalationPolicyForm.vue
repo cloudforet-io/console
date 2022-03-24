@@ -243,6 +243,11 @@ export default {
             onChangeInputModel();
         }, { deep: true });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/project/load');
+        })();
+
         return {
             ...toRefs(state),
             referenceRouter,

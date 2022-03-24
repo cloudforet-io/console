@@ -39,7 +39,6 @@ import { i18n } from '@/translations';
 import BudgetList from '@/services/cost-explorer/budget/modules/budget-list/BudgetList.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 
@@ -91,17 +90,6 @@ export default {
                 },
             });
         };
-
-        /* Init */
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('resource/serviceAccount/load'),
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/projectGroup/load'),
-                store.dispatch('resource/region/load'),
-                store.dispatch('resource/provider/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

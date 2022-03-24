@@ -145,10 +145,14 @@ export default {
             }
         };
 
+        // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/project/load');
-            await getEscalationPolicy();
+            await Promise.allSettled([
+                getEscalationPolicy(),
+                store.dispatch('resource/project/load'),
+            ]);
         })();
+
 
         return {
             ...toRefs(state),

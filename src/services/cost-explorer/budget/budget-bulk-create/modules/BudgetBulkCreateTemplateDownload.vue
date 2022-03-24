@@ -103,7 +103,7 @@ export default {
         };
 
         const downloadTemplate = async (param) => {
-            store.dispatch('display/startLoading', { loadingMessage: i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD') });
+            await store.dispatch('display/startLoading', { loadingMessage: i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD') });
             try {
                 const blob = await SpaceConnector.client.costAnalysis.budget.create.template(param, { responseType: 'blob' });
                 const link = document.createElement('a');

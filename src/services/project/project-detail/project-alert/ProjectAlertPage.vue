@@ -35,7 +35,6 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { i18n } from '@/translations';
-import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -112,13 +111,6 @@ export default {
         watch(() => props.id, (projectId) => {
             if (projectId) getProjectAlertConfig();
         }, { immediate: true });
-
-        (async () => {
-            await Promise.all([
-                store.dispatch('resource/user/load'),
-                store.dispatch('resource/webhook/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

@@ -328,6 +328,7 @@ export default defineComponent<WidgetProps>({
         });
 
         (async () => {
+            // LOAD REFERENCE STORE
             await Promise.allSettled([
                 store.dispatch('resource/region/load'),
                 store.dispatch('resource/provider/load'),

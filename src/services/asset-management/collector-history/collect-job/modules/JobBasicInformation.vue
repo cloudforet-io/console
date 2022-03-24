@@ -123,6 +123,15 @@ export default {
             getJob();
         });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('resource/collector/load'),
+                store.dispatch('resource/provider/load'),
+                store.dispatch('resource/plugin/load'),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
             iso8601Formatter,

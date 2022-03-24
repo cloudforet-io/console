@@ -192,6 +192,11 @@ export default {
             listRegionByProvider(selectedProvider);
         }), { immediate: true });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/provider/load');
+        })();
+
         return {
             ...toRefs(state),
             handleFavoriteDelete,

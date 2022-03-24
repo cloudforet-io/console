@@ -508,7 +508,7 @@ export default {
             }
             if (changed.pageLimit !== undefined) {
                 fetchOptionState.pageLimit = changed.pageLimit;
-                store.dispatch('settings/setItem', {
+                await store.dispatch('settings/setItem', {
                     key: 'pageLimit',
                     value: changed.pageLimit,
                     path: STORAGE_PREFIX,
@@ -769,18 +769,12 @@ export default {
 
         (async () => {
             await initSidebar();
-            await Promise.all([
-                store.dispatch('resource/loadAll'),
-                store.dispatch('favorite/cloudServiceType/load'),
-            ]);
-            if (!props.name) {
-                await routeFirstItem();
-            }
+            await store.dispatch('favorite/cloudServiceType/load');
+            if (!props.name) await routeFirstItem();
             tableState.schema = await getTableSchema();
             await fetchTableData();
         })();
         /** ************************* */
-
 
         return {
             /* Breadcrumb */

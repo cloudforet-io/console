@@ -114,6 +114,11 @@ export default {
             getCollectorDetailData();
         }, { immediate: true });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/plugin/load');
+        })();
+
         return {
             baseState,
             filterState,

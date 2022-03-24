@@ -80,10 +80,10 @@ export default {
         };
 
         (async () => {
-            await Promise.all([
-                store.dispatch('resource/cloudServiceType/load'),
-                store.dispatch('resource/region/load'),
+            await Promise.allSettled([
                 getProjectAlertConfig(),
+                // LOAD REFERENCE STORE
+                store.dispatch('resource/cloudServiceType/load'),
             ]);
         })();
 

@@ -356,6 +356,7 @@ export default {
 
         const init = async () => {
             state.loading = true;
+            // LOAD REFERENCE STORE
             await store.dispatch('resource/provider/load', true);
             await getRegionList();
             if (state.data.length > 0) {

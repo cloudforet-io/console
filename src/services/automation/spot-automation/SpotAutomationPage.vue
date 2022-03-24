@@ -91,7 +91,9 @@ export default {
 
         (async () => {
             selectSidebarItem(vm.$route.name);
-            await Promise.all([vm.$store.dispatch('favorite/spotGroup/load'), vm.$store.dispatch('resource/spotGroup/load')]);
+            await Promise.allSettled([
+                vm.$store.dispatch('favorite/spotGroup/load'),
+            ]);
         })();
 
         return {

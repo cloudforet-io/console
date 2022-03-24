@@ -32,7 +32,6 @@ import JobStatusChart from '@/services/asset-management/collector-history/collec
 import JobBasicInformation from '@/services/asset-management/collector-history/collect-job/modules/JobBasicInformation.vue';
 import JobTable from '@/services/asset-management/collector-history/collect-job/modules/JobTaskTable.vue';
 import JobTaskDetails from '@/services/asset-management/collector-history/collect-job/modules/JobTaskDetails.vue';
-import { store } from '@/store';
 import { JobTaskData } from '@/services/asset-management/collector-history/collect-job/type';
 import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 
@@ -67,17 +66,6 @@ export default {
                 { name: 'Job Information' },
             ],
         });
-
-        /* Init */
-        (() => {
-            Promise.all([
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/serviceAccount/load'),
-                store.dispatch('resource/plugin/load'),
-                store.dispatch('resource/collector/load'),
-                store.dispatch('resource/provider/load'),
-            ]);
-        })();
 
         onActivated(() => {
             state.selectedItem = null;

@@ -346,7 +346,7 @@ export default {
 
 
         // Url query
-        const setSearchTags = () => {
+        const setSearchTags = async () => {
             queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters)
                 .setKeyItemSets(state.querySearchHandlers.keyItemSets);
             state.searchTags = queryHelper.queryTags;
@@ -489,6 +489,7 @@ export default {
         };
 
         const init = async () => {
+            // LOAD REFERENCE STORE
             await store.dispatch('resource/plugin/load');
             await Promise.all([setSearchTags(), getCollectors()]);
         };

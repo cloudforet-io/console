@@ -277,6 +277,11 @@ export default {
             }
         }, { immediate: true });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/plugin/load');
+        })();
+
         return {
             ...toRefs(state),
             ...toRefs(formState),

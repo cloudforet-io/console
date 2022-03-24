@@ -281,6 +281,14 @@ export default {
             if (stopSelectStatusWatch) stopSelectStatusWatch();
         });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('resource/serviceAccount/load'),
+                store.dispatch('resource/project/load'),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
             querySearchHandlers,

@@ -112,6 +112,14 @@ export default {
         };
         const projectNameFormatter = projectId => state.projects[projectId]?.label || projectId;
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('resource/project/load'),
+                store.dispatch('resource/user/load'),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
             ALERT_URGENCY,

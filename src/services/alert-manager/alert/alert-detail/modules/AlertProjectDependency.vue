@@ -60,6 +60,7 @@ export default {
             projects: computed(() => store.state.resource.project.items),
         });
 
+        // LOAD REFERENCE STORE
         (async () => {
             await store.dispatch('resource/project/load');
         })();

@@ -115,6 +115,10 @@ export default {
             if (after !== before) listMember();
         }, { immediate: true });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/user/load');
+        })();
 
         return {
             ...toRefs(state),

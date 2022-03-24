@@ -116,6 +116,11 @@ export default {
             alertDetailItemState.dataForUpdate = selected[0]?.id;
         };
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/project/load');
+        })();
+
         return {
             EDIT_MODE,
             ...toRefs(alertDetailItemState),

@@ -125,6 +125,7 @@ export default {
 
         (async () => {
             getData();
+            // LOAD REFERENCE STORE
             await store.dispatch('resource/project/load');
         })();
 

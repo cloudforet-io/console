@@ -250,8 +250,7 @@ export default {
 
         /* Init */
         (async () => {
-            await Promise.all([getOccupiedResourceList(), store.dispatch('resource/loadAll', true)]);
-
+            await Promise.allSettled([getOccupiedResourceList(), store.dispatch('resource/loadAll', true)]);
 
             // set project tag
             if (props.projectId) {
@@ -276,7 +275,6 @@ export default {
                 }
             }, { immediate: true });
         })();
-
 
         return {
             ...toRefs(state),

@@ -105,7 +105,6 @@ export default {
                 await Promise.allSettled([
                     store.dispatch('service/budget/getBudgetData', props.budgetId),
                     store.dispatch('service/budget/getBudgetUsageData', props.budgetId),
-                    store.dispatch('resource/project/load'),
                 ]);
             } catch (e) {
                 ErrorHandler.handleError(e);

@@ -31,7 +31,6 @@ import Top5ProjectActivityWidget from '@/services/alert-manager/alert-dashboard/
 import ProjectSearchWidget from '@/services/alert-manager/alert-dashboard/modules/project-search-widget/ProjectSearchWidget.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { store } from '@/store';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 export default {
@@ -65,11 +64,9 @@ export default {
             }
         };
 
+        /* init */
         (async () => {
-            await Promise.all([
-                listProjectAlertConfig(),
-                store.dispatch('resource/project/load'),
-            ]);
+            await listProjectAlertConfig();
         })();
 
         return {

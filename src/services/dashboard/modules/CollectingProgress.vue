@@ -176,6 +176,8 @@ export default {
 
         const init = async () => {
             await getData();
+            // LOAD REFERENCE STORE
+            await store.dispatch('resource/provider/load');
         };
         init();
 

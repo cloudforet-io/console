@@ -475,7 +475,7 @@ export default {
                 }
                 if (changed.pageLimit !== undefined) {
                     fetchOptionState.pageLimit = changed.pageLimit;
-                    store.dispatch('settings/setItem', {
+                    await store.dispatch('settings/setItem', {
                         key: 'pageLimit',
                         value: changed.pageLimit,
                         path: STORAGE_PREFIX,
@@ -571,6 +571,11 @@ export default {
         watch(() => props.disabled, (disabled) => {
             if (!disabled) init();
         }, { immediate: true });
+
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/loadAll');
+        })();
 
         return {
             /* Server Table */

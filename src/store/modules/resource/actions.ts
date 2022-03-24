@@ -1,5 +1,5 @@
 export const loadAll = async ({ dispatch }): Promise<void|Error> => {
-    await Promise.all([
+    await Promise.allSettled([
         dispatch('provider/load'),
         dispatch('project/load'),
         dispatch('serviceAccount/load'),

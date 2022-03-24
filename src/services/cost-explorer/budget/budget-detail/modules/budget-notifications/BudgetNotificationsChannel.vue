@@ -119,7 +119,11 @@ export default {
         const protocolFormatter = val => state.protocols[val]?.name || val;
 
         (async () => {
-            await Promise.allSettled([listNotificationsChannel(), store.dispatch('resource/protocol/load')]);
+            await Promise.allSettled([
+                listNotificationsChannel(),
+                // LOAD REFERENCE STORE
+                store.dispatch('resource/protocol/load'),
+            ]);
         })();
 
         return {

@@ -23,7 +23,6 @@ import {
 } from '@vue/composition-api';
 import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 
@@ -100,15 +99,6 @@ export default {
             }
             replaceAlertListPageUrlQuery(query);
         };
-
-        /* init */
-        (async () => {
-            await Promise.all([
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/user/load'),
-                store.dispatch('resource/webhook/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

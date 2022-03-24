@@ -406,7 +406,6 @@ export default {
 
         /* init */
         (async () => {
-            await store.dispatch('resource/plugin/load');
             await listWebhooks();
         })();
 

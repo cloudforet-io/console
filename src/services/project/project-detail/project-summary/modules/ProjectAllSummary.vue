@@ -554,6 +554,11 @@ export default {
             if (state.chart) state.chart.dispose();
         });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/provider/load');
+        })();
+
         return {
             ...toRefs(state),
             chartState,

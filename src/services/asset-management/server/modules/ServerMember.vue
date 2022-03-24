@@ -134,6 +134,11 @@ export default {
             } else if (after !== before) listAdmin();
         }, { immediate: true });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/user/load');
+        })();
+
         return {
             ...toRefs(state),
             onChange,

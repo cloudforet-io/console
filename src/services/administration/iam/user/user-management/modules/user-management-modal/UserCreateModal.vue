@@ -465,8 +465,13 @@ export default {
             setValidationState();
         };
 
+        /* init */
         (async () => {
-            await Promise.all([initAuthTypeList(), getRoleList()]);
+            await Promise.allSettled([
+                initAuthTypeList(), getRoleList(),
+                // LOAD REFERENCE STORE
+                store.dispatch('resource/user/load'),
+            ]);
         })();
 
         watch(() => formState.activeTab, (after) => {

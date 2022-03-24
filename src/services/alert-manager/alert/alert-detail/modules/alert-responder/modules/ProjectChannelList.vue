@@ -65,6 +65,11 @@ export default {
             return protocolName ? protocolName.label : protocolId;
         };
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/protocol/load');
+        })();
+
         return {
             ...toRefs(state),
             CHANNEL_STATE,

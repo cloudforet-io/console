@@ -118,6 +118,12 @@ export default {
             };
             return res;
         };
+
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/provider/load');
+        })();
+
         return {
             ...toRefs(state),
             assetUrlConverter,

@@ -284,12 +284,9 @@ export default {
         (async () => {
             const exactRoute = vm.$route.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
             singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
-            await Promise.all([
+            await Promise.allSettled([
                 // getPageNavigation(),
-                store.dispatch('resource/project/load'),
                 store.dispatch('favorite/project/load'),
-                store.dispatch('resource/user/load'),
-                store.dispatch('resource/provider/load'),
                 store.dispatch('service/projectDetail/getAlertCounts'),
             ]);
         })();

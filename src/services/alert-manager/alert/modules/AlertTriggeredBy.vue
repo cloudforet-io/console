@@ -70,6 +70,12 @@ export default {
             }),
         });
 
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('resource/webhook/load'),
+                store.dispatch('resource/user/load'),
+            ]);
+        })();
 
         return {
             ...toRefs(state),

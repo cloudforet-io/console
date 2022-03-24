@@ -243,7 +243,7 @@ export default {
 
         /* Init */
         (async () => {
-            await Promise.all([
+            await Promise.allSettled([
                 store.dispatch('resource/provider/load'),
                 store.dispatch('resource/serviceAccount/load'),
                 store.dispatch('resource/cloudServiceType/load'),

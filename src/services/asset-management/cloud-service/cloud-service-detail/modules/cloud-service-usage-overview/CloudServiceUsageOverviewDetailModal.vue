@@ -73,6 +73,7 @@ import { Period } from '@/services/cost-explorer/type';
 import CloudServicePeriodFilter from '@/services/asset-management/cloud-service/modules/CloudServicePeriodFilter.vue';
 import CloudServiceUsageOverviewSummary
     from '@/services/asset-management/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewSummary.vue';
+import { store } from '@/store';
 
 
 interface Props {
@@ -218,6 +219,11 @@ export default defineComponent<Props>({
                 state.chartDataList = [];
             }
         }, { immediate: true });
+
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/loadAll');
+        })();
 
         return {
             ...toRefs(state),

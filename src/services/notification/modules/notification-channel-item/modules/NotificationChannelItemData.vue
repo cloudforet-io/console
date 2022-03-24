@@ -184,7 +184,11 @@ export default {
         };
 
         (async () => {
-            await Promise.all([setKeyListForEdit(), setKeyListForRead(), setValueList()]);
+            await Promise.allSettled([
+                setKeyListForEdit(), setKeyListForRead(), setValueList(),
+                // LOAD REFERENCE STORE
+                store.dispatch('resource/user/load'),
+            ]);
         })();
 
         return {

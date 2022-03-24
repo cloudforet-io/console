@@ -214,6 +214,14 @@ export default {
             emit('rendered');
         }, { immediate: true });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('resource/projectGroup/load'),
+                store.dispatch('resource/project/load'),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
             currencyMoneyFormatter,

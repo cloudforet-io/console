@@ -311,10 +311,7 @@ export default {
 
         /* Init */
         (async () => {
-            await Promise.all([
-                store.dispatch('resource/provider/load'),
-                store.dispatch('resource/projectGroup/load'),
-                store.dispatch('resource/project/load'),
+            await Promise.allSettled([
                 store.dispatch('favorite/projectGroup/load'),
                 store.dispatch('favorite/project/load'),
             ]);

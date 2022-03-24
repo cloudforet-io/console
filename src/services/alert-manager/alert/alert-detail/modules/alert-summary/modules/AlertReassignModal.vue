@@ -137,9 +137,15 @@ export default {
             assignApiQuery = getApiQueryWithToolboxOptions(assignApiQueryHelper, options) ?? assignApiQuery;
             await listMemberInProject();
         };
+
+        // LOAD REFERENCE STORE
         (async () => {
-            await Promise.all([store.dispatch('resource/user/load'), listMemberInProject()]);
+            await Promise.allSettled([
+                listMemberInProject(),
+                store.dispatch('resource/user/load'),
+            ]);
         })();
+
         return {
             ...toRefs(state),
             onClickReassign,

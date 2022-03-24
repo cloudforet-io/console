@@ -208,6 +208,14 @@ export default {
         };
         init();
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('resource/cloudServiceType/load'),
+                store.dispatch('resource/provider/load'),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
             countFormatter,

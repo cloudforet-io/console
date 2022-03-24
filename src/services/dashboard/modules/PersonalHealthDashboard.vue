@@ -152,7 +152,8 @@ export default {
 
         const init = async () => {
             state.loading = true;
-            await Promise.all([
+            // LOAD REFERENCE STORE
+            await Promise.allSettled([
                 store.dispatch('resource/project/load'),
                 store.dispatch('favorite/project/load'),
                 store.dispatch('resource/region/load'),

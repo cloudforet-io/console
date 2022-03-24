@@ -275,6 +275,11 @@ export default defineComponent<WidgetProps>({
             if (state.chart) state.chart.dispose();
         });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/project/load');
+        })();
+
         return {
             ...toRefs(state),
             tableState,

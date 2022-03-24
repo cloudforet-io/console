@@ -184,6 +184,15 @@ export default defineComponent<Props>({
             emit('update', costTypeInfo, isValid);
         }, 300), { immediate: true });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('resource/provider/load'),
+                store.dispatch('resource/region/load'),
+                store.dispatch('resource/serviceAccount/load'),
+            ]);
+        })();
+
         return {
             selectedCostType,
             selectedResources,

@@ -210,11 +210,14 @@ export default {
             }));
         };
 
+        // LOAD REFERENCE STORE
         (async () => {
-            await Promise.all([listProjectChannel(), listMember(), listEscalationPolicy(),
-                store.dispatch('resource/protocol/load'), store.dispatch('resource/user/load')]);
+            await Promise.allSettled([
+                listProjectChannel(), listMember(), listEscalationPolicy(),
+                store.dispatch('resource/protocol/load'),
+                store.dispatch('resource/user/load'),
+            ]);
         })();
-
 
         return {
             ...toRefs(state),

@@ -14,7 +14,6 @@ import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import BudgetForm from '@/services/cost-explorer/budget/modules/budget-form/BudgetForm.vue';
-import { store } from '@/store';
 
 export default {
     name: 'BudgetCreatePage',
@@ -38,17 +37,6 @@ export default {
         const handleFormConfirm = () => {
 
         };
-
-        /* Init */
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('resource/serviceAccount/load'),
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/projectGroup/load'),
-                store.dispatch('resource/region/load'),
-                store.dispatch('resource/provider/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

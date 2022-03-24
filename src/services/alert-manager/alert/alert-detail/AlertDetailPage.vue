@@ -161,14 +161,11 @@ export default {
             state.alertTitleEditFormVisible = false;
         };
 
+        /* init */
         (async () => {
             state.loading = true;
             try {
-                await Promise.allSettled([
-                    store.dispatch('resource/webhook/load'),
-                    store.dispatch('resource/user/load'),
-                    store.dispatch('service/alert/getAlertData', props.id),
-                ]);
+                await store.dispatch('service/alert/getAlertData', props.id);
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {

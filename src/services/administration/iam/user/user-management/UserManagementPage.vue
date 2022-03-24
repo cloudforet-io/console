@@ -23,7 +23,6 @@ import {
     PBreadcrumbs, PHorizontalLayout, PPageTitle,
 } from '@spaceone/design-system';
 
-import { store } from '@/store';
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import { User } from '@/services/administration/iam/user/type';
 import UserManagementTab from '@/services/administration/iam/user/user-management/modules/user-management-tab/UserManagementTab.vue';
@@ -63,15 +62,6 @@ export default {
                 { name: 'User Management', to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME } },
             ])),
         });
-
-        const init = async () => {
-            await Promise.all([
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/projectGroup/load'),
-                store.dispatch('resource/user/load'),
-            ]);
-        };
-        init();
 
         return {
             ...toRefs(state),

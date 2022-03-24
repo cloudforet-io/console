@@ -78,19 +78,6 @@ export default {
             timezone: computed(() => vm.$store.state.user.timezone || 'UTC'),
         });
 
-        /** Init */
-        (async () => {
-            await Promise.all([
-                vm.$store.dispatch('resource/provider/load'),
-                vm.$store.dispatch('resource/projectGroup/load'),
-                vm.$store.dispatch('resource/project/load'),
-                vm.$store.dispatch('resource/cloudServiceType/load'),
-                vm.$store.dispatch('favorite/projectGroup/load'),
-                vm.$store.dispatch('favorite/project/load'),
-                vm.$store.dispatch('favorite/cloudServiceType/load'),
-            ]);
-        })();
-
         return {
             ...toRefs(state),
         };

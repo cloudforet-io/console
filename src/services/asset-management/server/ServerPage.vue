@@ -16,7 +16,6 @@ import { PBreadcrumbs } from '@spaceone/design-system';
 
 import ServerMain from '@/services/asset-management/server/modules/ServerMain.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import { store } from '@/store';
 import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 
 export default {
@@ -33,9 +32,7 @@ export default {
                 { name: 'Server' },
             ],
         });
-        (async () => {
-            await store.dispatch('resource/loadAll');
-        })();
+
         return {
             routeState,
         };

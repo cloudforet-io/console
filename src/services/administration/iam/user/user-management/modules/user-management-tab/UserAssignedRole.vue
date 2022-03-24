@@ -134,6 +134,14 @@ export default {
             getUserDetailData(userId);
         }, { immediate: true });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await Promise.allSettled([
+                vm.$store.dispatch('resource/project/load'),
+                vm.$store.dispatch('resource/projectGroup/load'),
+            ]);
+        })();
+
         return {
             ...toRefs(baseState),
             userStateFormatter,

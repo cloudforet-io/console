@@ -362,10 +362,9 @@ export default {
         };
 
         (async () => {
-            await Promise.all([
+            await Promise.allSettled([
                 listSpotGroups(),
                 listProjects(),
-                vm.$store.dispatch('resource/spotGroup/load'),
             ]);
         })();
 

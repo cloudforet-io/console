@@ -249,11 +249,13 @@ export default {
             }
         }, { immediate: false });
 
-        const init = async () => {
-            await loadSchemaAndData();
-        };
-
-        init();
+        (async () => {
+            await Promise.allSettled([
+                loadSchemaAndData(),
+                // LOAD REFERENCE STORE
+                store.dispatch('resource/loadAll'),
+            ]);
+        })();
 
         return {
             ...toRefs(state),

@@ -352,6 +352,10 @@ export default {
             if (isInitiated) await listProjects(groupId, searchText);
         }, { immediate: true });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/provider/load');
+        })();
 
         return {
             ...toRefs(state),

@@ -251,6 +251,11 @@ export default {
             }
         }, { immediate: true });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/project/load');
+        })();
+
         return {
             ...toRefs(state),
         };

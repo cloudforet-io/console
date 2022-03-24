@@ -421,6 +421,11 @@ export default {
             initPage();
         }
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/project/load');
+        })();
+
         return {
             ...toRefs(state),
             querySearchHandlerState,

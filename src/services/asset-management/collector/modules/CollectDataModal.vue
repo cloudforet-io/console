@@ -248,6 +248,11 @@ export default {
             else state.credential = null;
         }, { immediate: true });
 
+        // LOAD REFERENCE STORE
+        (async () => {
+            await store.dispatch('resource/plugin/load');
+        })();
+
         return {
             ...toRefs(state),
             onClickReset,

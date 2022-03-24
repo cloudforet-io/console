@@ -80,7 +80,11 @@ export default {
         };
 
         (async () => {
-            await Promise.all([store.dispatch('resource/user/load'), listProjectMember()]);
+            await Promise.allSettled([
+                listProjectMember(),
+                // LOAD REFERENCE STORE
+                store.dispatch('resource/user/load'),
+            ]);
         })();
 
         watch(() => state.selectedMemberItems, () => {

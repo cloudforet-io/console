@@ -203,14 +203,14 @@ export default {
             await listCredentials();
         };
 
-        const init = async () => {
-            await Promise.all([
+        (async () => {
+            await Promise.allSettled([
+                // LOAD REFERENCE STORE
                 store.dispatch('resource/serviceAccount/load'),
                 store.dispatch('resource/project/load'),
             ]);
             await listCredentials();
-        };
-        init();
+        })();
 
         watch(() => props.collectorId, () => {
             listCredentials();

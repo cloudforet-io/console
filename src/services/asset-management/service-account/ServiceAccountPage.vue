@@ -550,10 +550,9 @@ export default {
         };
 
         const init = async () => {
-            await Promise.all([
+            await Promise.allSettled([
                 store.dispatch('resource/project/load'),
                 store.dispatch('resource/provider/load'),
-                store.dispatch('resource/user/load'),
             ]);
             const providerFilter = Array.isArray(vm.$route.query.provider) ? vm.$route.query.provider[0] : vm.$route.query.provider;
             if (providerState.items.length > 0) {

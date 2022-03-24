@@ -338,6 +338,7 @@ export default {
         };
 
         (async () => {
+            // LOAD REFERENCE STORE
             await vm.$store.dispatch('resource/user/load');
             await listMembers();
         })();
