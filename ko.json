@@ -504,6 +504,7 @@
 				"STACKED_COLUMN": "누적 컬럼",
 				"STACKED_LINE": "누적 라인",
 				"START_DATE": "시작 일",
+				"SUPPORT_PDF_HELP_TEXT": "해당 기능을 지원하지 않는 브라우저 또는 디바이스입니다. <b>데스크탑</b> 환경의 <b>크롬</b> 또는 <b>엣지</b> 브라우저에서 이용해주세요.",
 				"TOO_MANY_ITEMS": "상위 15개 항목만을 보여줍니다. 자세한 보기를 위해 필터를 설정하세요.",
 				"TOTAL_COST": "총 비용",
 				"YEARLY": "연도별 데이터"
