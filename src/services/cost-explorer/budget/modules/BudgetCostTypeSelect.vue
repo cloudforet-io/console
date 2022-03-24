@@ -19,6 +19,7 @@
                            :invalid="!disableValidation && invalidState.selectedResources"
                            :selected="selectedResources"
                            multi-selectable
+                           class="mt-2"
                            @update:selected="setForm('selectedResources', $event)"
         />
     </p-field-group>

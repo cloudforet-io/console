@@ -127,7 +127,7 @@ export default {
         text-transform: capitalize;
 
         &.opened, &:hover {
-            @apply text-secondary;
+            @apply text-violet-600;
         }
         .arrow-button {
             margin-left: 0.125rem;

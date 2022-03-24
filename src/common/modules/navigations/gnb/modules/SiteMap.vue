@@ -130,9 +130,9 @@ export default {
         cursor: pointer;
         text-decoration: none;
         &:hover, &.visible {
-            @apply text-secondary;
+            @apply text-violet-600;
             .sitemap-icon {
-                @apply bg-blue-200;
+                @apply bg-violet-200;
             }
         }
         .sitemap-icon {
@@ -160,10 +160,10 @@ export default {
             display: block;
             font-size: 0.875rem;
             &:hover {
-                @apply text-secondary;
+                @apply text-violet-600;
                 transition: color ease 0.4s;
                 &.menu .p-i-icon {
-                    @apply text-secondary;
+                    @apply text-violet-600;
                     transition: color ease 0.4s;
                 }
             }
@@ -182,7 +182,7 @@ export default {
                 line-height: 1.75rem;
                 padding-left: 3.5rem;
                 &:hover {
-                    @apply text-secondary;
+                    @apply text-violet-500;
                     transition: color ease 0.4s;
                 }
             }

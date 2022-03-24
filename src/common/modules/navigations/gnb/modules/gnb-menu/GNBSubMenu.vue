@@ -54,7 +54,7 @@ export default {
         cursor: pointer;
         padding: 0.5rem;
         &:hover, &:focus {
-            @apply bg-secondary-2 text-secondary;
+            @apply bg-violet-100 text-violet-600;
         }
         &:active {
             @apply bg-white;

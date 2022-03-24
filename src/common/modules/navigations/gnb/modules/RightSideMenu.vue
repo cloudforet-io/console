@@ -276,12 +276,12 @@ export default {
             cursor: pointer;
 
             &.opened {
-                @apply text-secondary;
+                @apply text-violet-400;
             }
 
             @media (hover: hover) {
                 &:hover {
-                    @apply text-secondary;
+                    @apply text-violet-400;
                 }
             }
 
@@ -343,7 +343,7 @@ export default {
                 cursor: pointer;
                 padding: 0.5rem;
                 &:hover, &:focus {
-                    @apply bg-secondary2 text-secondary;
+                    @apply bg-violet-100 text-violet-600;
                 }
                 &:active {
                     @apply bg-white;
@@ -369,7 +369,7 @@ export default {
                         display: inline-flex;
                         cursor: pointer;
                         &:hover, &:focus {
-                            @apply bg-secondary-2 text-secondary rounded-xs;
+                            @apply bg-violet-100 text-violet-600 rounded-xs;
                         }
                         .p-i-icon {
                             display: inline-block;
