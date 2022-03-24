@@ -4,6 +4,15 @@
 			"NO": "No",
 			"YES": "Yes"
 		},
+		"MODAL": {
+			"RECOMMEND_BROWSER": {
+				"BODY_HELP_TEXT": "Internet Explorer, Safari or outdated browsers can cause compatibility issues and low performance.",
+				"CHROME": "Chrome",
+				"DO_NOT_SHOW_AGAIN": "Do not show again",
+				"EDGE": "Edge",
+				"HEADER": "Recommend using Chrome or Edge browser for this site."
+			}
+		},
 		"TOP_NOTI": {
 			"HAS_NO_ROLE": "Every SpaceONE user {needRole}. Please, Contact administrator to get a role.",
 			"NEED_ROLE": "requires Role ",

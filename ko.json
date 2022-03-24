@@ -4,6 +4,15 @@
 			"NO": "아니요",
 			"YES": "네"
 		},
+		"MODAL": {
+			"RECOMMEND_BROWSER": {
+				"BODY_HELP_TEXT": "인터넷 익스플로러, 사파리 또는 구 버전 브라우저 사용시 사이트 이용에 문제가 있을 수 있습니다.",
+				"CHROME": "크롬",
+				"DO_NOT_SHOW_AGAIN": "다시 보지 않기",
+				"EDGE": "엣지",
+				"HEADER": "본 사이트는 크롬 및 엣지 브라우저에 최적화 되어 있습니다."
+			}
+		},
 		"TOP_NOTI": {
 			"HAS_NO_ROLE": "스페이스원 사용을 위해서는 {needRole}  합니다.\n관리자(Administrator)를 통해 필요한 권한을 받으세요.",
 			"NEED_ROLE": "권한(Role)이 필요",
