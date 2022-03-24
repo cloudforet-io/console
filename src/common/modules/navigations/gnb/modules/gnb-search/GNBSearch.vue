@@ -20,6 +20,7 @@
                                :cloud-service-items="cloudServiceItems"
                                :focus-start-position="focusStartPosition"
                                :is-focused.sync="isFocusOnSuggestion"
+                               :is-recent="showRecent"
                                @move-focus-end="handleMoveFocusEnd"
                                @close="hideSuggestion"
                                @select="handleSelect"
@@ -28,6 +29,7 @@
 </template>
 
 <script lang="ts">
+import axios, { CancelTokenSource } from 'axios';
 import {
     computed, onMounted, onUnmounted,
     reactive, toRefs, watch,
@@ -43,14 +45,15 @@ import {
     SuggestionItem,
     SuggestionType,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-
-import { menuRouterMap } from '@/lib/router/menu-router-map';
-
-import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 import { store } from '@/store';
 import { GNBMenu } from '@/store/modules/display/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { menuRouterMap } from '@/lib/router/menu-router-map';
+
+import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+
 
 interface CloudService {
     id: string;
@@ -80,7 +83,7 @@ export default {
                 if (state.inputText) return state.inputText.trim();
                 return '';
             }),
-            loading: false,
+            loading: true,
             allMenuItems: computed<SuggestionItem[]>(() => {
                 const menu = store.getters['display/GNBMenuList'];
                 return flatten(getSubMenuList(menu));
@@ -135,16 +138,33 @@ export default {
         });
 
         /* API */
+        let listRecentToken: CancelTokenSource | undefined;
         const listRecent = async (type) => {
+            state.loading = true;
+
+            if (listRecentToken) {
+                listRecentToken.cancel('Next request has been called.');
+                listRecentToken = undefined;
+            }
+
+            listRecentToken = axios.CancelToken.source();
             try {
                 const { results } = await SpaceConnector.client.addOns.recent.list({
                     type,
                     limit: 5,
+                }, {
+                    cancelToken: listRecentToken.token,
                 });
+                listRecentToken = undefined;
+
                 if (type === 'MENU') state.recentMenuList = results.map(d => d.data);
                 if (type === 'CLOUD_SERVICE') state.recentCloudServiceList = results.map(d => d.data);
             } catch (e) {
-                ErrorHandler.handleError(e);
+                if (!axios.isCancel(e.axiosError)) {
+                    ErrorHandler.handleError(e);
+                }
+            } finally {
+                state.loading = false;
             }
         };
         const createRecent = async (type: SuggestionType, item: SuggestionItem|CloudService) => {
