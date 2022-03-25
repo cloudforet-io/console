@@ -1,6 +1,6 @@
 <template>
     <div class="right-side-menu">
-        <g-n-b-search />
+        <g-n-b-search class="menu-wrapper" />
         <div v-if="!userState.isDomainOwner" class="menu-wrapper">
             <div class="menu-button notifications"
                  :class="{opened: openedMenu === 'notifications'}"
@@ -21,76 +21,86 @@
                  @click.stop="toggleMenu('account')"
             >
                 <p-i v-if="userState.isDomainOwner" name="root-account" class="menu-icon" />
-                <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" name="admin" class="menu-icon" />
+                <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" name="admin" class="menu-icon"
+                     width="1.75rem" height="1.75rem"
+                />
                 <p-i v-else name="user" class="menu-icon" />
             </div>
             <div v-if="openedMenu === 'account'"
                  v-click-outside="hideMenu"
                  class="sub-menu-wrapper right-align account"
             >
-                <div class="info-top">
+                <div class="user-info">
                     <p-i v-if="userState.isDomainOwner" name="root-account" />
                     <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" name="admin" />
                     <p-i v-else name="user" />
                     <span class="value">{{ userState.userId }}</span>
                 </div>
                 <div class="info-wrapper">
-                    <div class="info-row">
+                    <div class="info-menu">
                         <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
                         <span class="value">{{ userState.role }}</span>
                     </div>
-                    <div class="info-row language"
+                    <div class="info-menu language"
                          @click="toggleLanguageMenu"
                     >
                         <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
                         <div class="value">
                             <span>{{ userState.language }}</span>
                             <div v-if="showLanguageMenu" class="sub-menu-wrapper">
-                                <template v-for="(item, index) in languageMenu" @click.native="hideMenu">
-                                    <div :key="index" class="sub-menu" @click="changeLanguage(item.name)">
-                                        <span>{{ item.label }}</span>
-                                    </div>
-                                </template>
+                                <div class="sub-menu-list">
+                                    <template v-for="(item, index) in languageMenu" @click.native="hideMenu">
+                                        <div :key="index" class="sub-menu" @click="changeLanguage(item.name)">
+                                            <span>{{ item.label }}</span>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                         <p-i :name="showLanguageMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                              width="1rem" height="1rem"
                         />
                     </div>
-                    <div class="info-row">
+                    <div class="info-menu">
                         <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_TIMEZONE') }}</span>
                         <span class="value">{{ userState.timezone }}</span>
                     </div>
-                    <div class="info-row">
+                    <div class="info-menu">
                         <router-link :to="{name: MY_PAGE_ROUTE._NAME }">
                             <p-button style-type="primary" :outline="true" size="sm"
                                       class="my-page-button"
                             >
-                                Go to My Page
+                                {{ $t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
                             </p-button>
                         </router-link>
                     </div>
                 </div>
                 <p-divider class="divider" />
-                <div class="sub-menu">
-                    <router-link :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}">
-                        Access with API & CLI
-                    </router-link>
+                <div class="sub-menu-list">
+                    <div class="sub-menu">
+                        <router-link :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}">
+                            Access with API & CLI
+                        </router-link>
+                    </div>
                 </div>
                 <p-divider class="divider" />
-                <div v-for="{ link, label} in supportMenu" :key="label" class="sub-menu support-menu">
-                    <a :href="link" target="_blank">
-                        {{ label }}
-                    </a>
-                    <p-i name="ic_external-link"
-                         height="1em" width="1em"
-                         color="inherit"
-                         class="external-icon"
-                    />
+                <div class="sub-menu-list">
+                    <div v-for="{ link, label} in supportMenu" :key="label" class="sub-menu support-menu">
+                        <a :href="link" target="_blank">
+                            {{ label }}
+                        </a>
+                        <p-i name="ic_external-link"
+                             height="1em" width="1em"
+                             color="inherit"
+                             class="external-icon"
+                        />
+                    </div>
                 </div>
                 <p-divider class="divider" />
-                <div class="sub-menu" @click="signOut">
-                    <span>{{ $t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}</span>
+                <div class="sub-menu-list">
+                    <div class="sub-menu" @click="signOut">
+                        <span>{{ $t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -254,18 +264,23 @@ export default {
         position: relative;
         margin-left: 1.5rem;
 
-        @screen laptop {
-            margin-left: 0.75rem;
-        }
         &:first-of-type {
             margin-left: 0;
         }
+
         .menu-button {
             @apply text-gray-500;
             cursor: pointer;
+            line-height: $gnb-height;
 
             &.opened {
                 @apply text-violet-400;
+            }
+
+            &.account {
+                .menu-icon {
+                    @apply rounded-xl;
+                }
             }
 
             @media (hover: hover) {
@@ -273,28 +288,89 @@ export default {
                     @apply text-violet-400;
                 }
             }
-            &.account {
-                .menu-icon {
-                    @apply rounded-xl;
-                    width: 1.75rem;
-                    height: 1.75rem;
+        }
+    }
+
+    .sub-menu-wrapper {
+        @apply bg-white border border-gray-200 rounded-xs;
+        position: absolute;
+        top: 100%;
+        right: -0.5rem;
+        left: auto;
+        margin-top: -0.5rem;
+        max-width: 17.5rem;
+        box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
+
+        &.account {
+            min-width: 15.125rem;
+        }
+
+        .user-info {
+            @apply flex items-center;
+            padding: 1.25rem 1rem 0.25rem;
+
+            .p-i-icon {
+                @apply rounded-xl flex-shrink-0;
+            }
+
+            .value {
+                @apply font-bold break-all;
+                margin-left: 0.5rem;
+                font-size: 0.875rem;
+                line-height: 125%;
+            }
+        }
+
+        .info-wrapper {
+            padding: 0.5rem;
+
+            .info-menu {
+                position: relative;
+                width: 100%;
+                padding: 0 0.5rem;
+                line-height: 1.5rem;
+                font-size: 0.75rem;
+                letter-spacing: 0.02em;
+
+                .label {
+                    @apply text-gray-500 font-bold;
+                    padding-right: 0.5rem;
+                }
+
+                .my-page-button {
+                    @apply w-full;
+                    margin-top: 0.75rem;
+                    margin-bottom: 0.5rem;
+                }
+
+                &.language {
+                    display: inline-flex;
+                    cursor: pointer;
+                    &:hover, &:focus {
+                        @apply bg-violet-100 text-violet-600 rounded-xs;
+                    }
+                    .p-i-icon {
+                        display: inline-block;
+                        margin-top: 0.25rem;
+                    }
+                    .value {
+                        position: relative;
+                        .sub-menu-wrapper {
+                            left: -1rem;
+                            min-width: 9.25rem;
+                            max-height: 21rem;
+                            margin-top: -0.125rem;
+                            overflow-y: auto;
+                            z-index: 10;
+                        }
+                    }
                 }
             }
         }
-        .sub-menu-wrapper {
-            @apply bg-white border border-gray-200 rounded-xs;
-            position: absolute;
-            top: 1.5rem;
-            right: 0;
-            left: auto;
-            margin-top: 0.25rem;
-            max-width: 17.5rem;
-            box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
+
+        .sub-menu-list {
             padding: 0.5rem;
 
-            &.account {
-                min-width: 15.125rem;
-            }
             .sub-menu {
                 @apply text-gray-900 rounded;
                 position: relative;
@@ -303,89 +379,48 @@ export default {
                 align-items: center;
                 width: 100%;
                 height: 2rem;
+                padding: 0 0.5rem;
                 font-size: 0.875rem;
                 text-decoration: none;
                 white-space: nowrap;
                 cursor: pointer;
-                padding: 0.5rem;
 
                 &:hover, &:focus {
                     @apply bg-violet-100 text-violet-600;
                 }
+
                 &:active {
                     @apply bg-white;
                 }
+
                 &.p-anchor::v-deep:hover .text {
                     text-decoration: none;
                 }
+
                 .support-menu {
                     @apply justify-between;
                 }
             }
-            .divider {
-                margin-top: 0.5rem;
-                margin-bottom: 0.5rem;
-            }
-            .info-top {
-                padding-left: 0.5rem;
-                padding-top: 0.75rem;
-                margin-bottom: 1rem;
-                .value {
-                    @apply font-bold;
-                    margin-left: 0.5rem;
-                    font-size: 0.875rem;
-                    line-height: 125%;
-                }
-            }
-            .info-wrapper {
-                .info-row {
-                    position: relative;
-                    width: 100%;
-                    line-height: 1.5rem;
-                    font-size: 0.75rem;
-                    letter-spacing: 0.02em;
-                    padding-left: 0.5rem;
-                    padding-right: 0.5rem;
-                    .label {
-                        @apply text-gray-500 font-bold;
-                        padding-right: 0.5rem;
-                    }
-                    .my-page-button {
-                        @apply w-full;
-                        margin-top: 0.75rem;
-                        margin-bottom: 0.5rem;
-                    }
-                    &.language {
-                        display: inline-flex;
-                        cursor: pointer;
-                        &:hover, &:focus {
-                            @apply bg-violet-100 text-violet-600 rounded-xs;
-                        }
-                        .p-i-icon {
-                            display: inline-block;
-                            margin-top: 0.25rem;
-                        }
-                        .value {
-                            position: relative;
-                            .sub-menu-wrapper {
-                                top: 1.5rem;
-                                left: -1rem;
-                                min-width: 9.25rem;
-                                max-height: 21rem;
-                                overflow-y: auto;
-                                z-index: 10;
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
+
     .gnb-notifications {
         position: absolute;
         right: 0;
         left: auto;
-        margin: 3px 0;
+        margin-top: -0.5rem;
+    }
+
+    @screen laptop {
+        .menu-wrapper {
+            margin-left: 1.25rem;
+        }
+    }
+
+    @screen tablet {
+        .sub-menu-wrapper.accout {
+            width: 13.1875rem;
+        }
     }
 
     @screen mobile {

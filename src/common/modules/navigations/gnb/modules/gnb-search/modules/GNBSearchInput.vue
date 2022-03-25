@@ -1,9 +1,10 @@
 <template>
     <div class="gnb-search-input">
-        <p-i v-if="!value"
+        <p-i v-if="!isFocused"
              name="ic_search"
-             height="1rem"
-             width="1rem"
+             height="1.5rem"
+             width="1.5rem"
+             color="inherit"
         />
         <input ref="inputRef"
                :value="value"
@@ -68,6 +69,36 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .gnb-search-input {
-    /* TODO */
+    @apply flex items-center border border-transparent bg-gray-100 rounded-full text-gray-400;
+    width: 17.5rem;
+    height: 2rem;
+    padding: 0 0.75rem;
+    font-size: 0.875rem;
+
+    &:hover {
+        @apply bg-secondary-2 cursor-pointer;
+        input {
+            @apply cursor-pointer;
+        }
+    }
+
+    &:focus-within {
+        @apply border-secondary bg-secondary-2;
+        box-shadow: 0 0 0 2px rgba(73, 167, 247, 0.2);
+    }
+
+    input {
+        @apply flex-grow text-gray-900;
+        background-color: inherit;
+    }
+}
+
+@screen laptop {
+    .gnb-search-input {
+        width: calc(100% - 1.5rem);
+        margin-left: 0.75rem;
+        margin-right: 0.75rem;
+        margin-bottom: 1rem;
+    }
 }
 </style>

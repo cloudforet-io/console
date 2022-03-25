@@ -21,15 +21,15 @@
             />
             <template #no-data>
                 <div v-if="isRecent" class="no-data">
-                    <img src="@/assets/images/illust_ghost.svg" class="no-data-img">
+                    <img src="@/assets/images/illust_microscope.svg" class="no-data-img" style="width: 7.75rem;">
                     <p class="no-data-text">
-                        Search for navigation menus or cloud services.
+                        {{ $t('COMMON.GNB.SEARCH.HELP_TEXT') }}
                     </p>
                 </div>
                 <div v-else class="no-data">
-                    <img src="@/assets/images/illust_microscope.svg" class="no-data-img">
+                    <img src="@/assets/images/illust_ghost.svg" class="no-data-img" style="width: 6.44rem;">
                     <p class="no-data-text">
-                        No result found for "<em>{{ inputText }}</em>" <br>Try again with different term.
+                        {{ $t('COMMON.GNB.SEARCH.NO_RESULT_1') }} "<em>{{ inputText }}</em>" <br>{{ $t('COMMON.GNB.SEARCH.NO_RESULT_2') }}
                     </p>
                 </div>
             </template>
@@ -158,23 +158,59 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .gnb-search-dropdown {
-    @apply bg-white;
+    @apply absolute bg-white rounded-xs;
     width: 27.5rem;
-    padding: 0 0.75rem;
     min-height: 14.875rem;
+    padding: 1rem 0;
+    top: 100%;
+    right: 0;
+    margin-top: 0.25rem;
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
+
     .skeleton-wrapper {
         @apply flex flex-col w-full self-start;
+        padding: 0 0.75rem;
     }
+
     .no-data {
-        padding: 2.5rem 0;
+        margin: 2.5rem 0;
+
         .no-data-img {
             @apply ml-auto mr-auto;
         }
+
         .no-data-text {
             margin-top: 1.5rem;
             font-size: 0.875rem;
+            line-height: 1.5;
             em {
                 @apply font-bold;
+            }
+        }
+    }
+}
+
+@screen laptop {
+    .gnb-search-dropdown {
+        margin-top: -0.5rem;
+    }
+}
+
+@screen mobile {
+    .gnb-search-dropdown {
+        @apply flex flex-col;
+        position: fixed;
+        top: $gnb-height;
+        width: 100vw;
+        height: calc(100vh - $gnb-height - 0.5rem);
+        margin-top: -0.375rem;
+
+        &::v-deep {
+            .p-data-loader {
+                @apply flex-grow;
+                .data-loader-container {
+                    @apply flex items-center;
+                }
             }
         }
     }

@@ -10,7 +10,9 @@
                     @select="handleSelect"
     >
         <template #header-title="{ item }">
-            {{ item.label }}
+            <div :key="index" class="context-header">
+                {{ item.label }}
+            </div>
         </template>
         <template #item--format="{ item }">
             <p-lazy-img v-if="item.icon || item.defaultIcon"
@@ -142,7 +144,25 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .gnb-search-suggestion-list {
-    @apply bg-white;
+    @apply bg-white border-none;
+
+    &::v-deep {
+        .context-header {
+            margin-top: 0;
+            margin-bottom: 0.25rem;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+
+        .context-item {
+            line-height: 1.75;
+            padding: 0.25rem 1.25rem;
+        }
+
+        .context-divider {
+            margin: 0.875rem 0 1rem;
+        }
+    }
 
     .matched-character {
         @apply text-blue-700 bg-blue-200;

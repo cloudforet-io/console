@@ -112,16 +112,10 @@ export default {
     display: inline-block;
     margin-left: 2rem;
 
-    @screen laptop {
-        margin-left: 1rem;
-    }
-
-    @screen tablet {
-        display: none;
-    }
     .menu-button {
         @apply text-gray-900;
         font-size: 0.875rem;
+        line-height: $gnb-height;
         cursor: pointer;
         text-decoration: none;
         text-transform: capitalize;
@@ -133,6 +127,7 @@ export default {
             margin-left: 0.125rem;
         }
     }
+
     &.disabled {
         .menu-button {
             @apply text-gray-300;
@@ -143,15 +138,29 @@ export default {
             }
         }
     }
+
     .sub-menu-wrapper {
         @apply bg-white border border-gray-200 rounded-xs;
         position: absolute;
-        top: 2.5rem;
-        margin-top: 0.5rem;
+        top: $gnb-height;
+        margin-top: -0.5rem;
         left: -1.125rem;
         min-width: 10rem;
         box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
         padding: 0.5rem;
     }
 }
+
+@screen laptop {
+    .gnb-menu {
+        margin-left: 1.5rem;
+    }
+}
+
+@screen tablet {
+    .gnb-menu {
+        display: none;
+    }
+}
+
 </style>

@@ -20,13 +20,12 @@
                         @toggle="toggleMenu"
                         @hide="hideMenu"
             />
-
-            <right-side-menu class="right-part"
-                             :opened-menu="openedMenu"
-                             @toggle-menu="toggleMenu"
-                             @hide-menu="hideMenu"
-            />
         </div>
+        <right-side-menu class="right-part"
+                         :opened-menu="openedMenu"
+                         @toggle-menu="toggleMenu"
+                         @hide-menu="hideMenu"
+        />
     </div>
 </template>
 

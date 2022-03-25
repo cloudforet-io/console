@@ -340,8 +340,11 @@ export default {
 
 <style lang="postcss" scoped>
 .gnb-search {
+    @apply relative;
+
     .menu-button {
         @apply text-gray-500;
+        line-height: $gnb-height;
         cursor: pointer;
 
         &.opened {
