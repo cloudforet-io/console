@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top :use-total-count="true" :total-count="tags.length">
+        <p-panel-top :use-total-count="true" :total-count="items.length">
             <template>{{ $t('COMMON.TAGS.TITLE') }}</template>
             <template #extra>
                 <p-button style-type="primary-dark"
