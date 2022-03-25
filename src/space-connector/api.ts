@@ -148,9 +148,7 @@ class API {
             throw new BadRequestError(error);
         }
         case 401: {
-            const res = this.refreshAccessToken();
-            if (!res) throw new AuthenticationError(error);
-            else break;
+            throw new AuthenticationError(error);
         }
         case 403: {
             throw new AuthorizationError(error);
