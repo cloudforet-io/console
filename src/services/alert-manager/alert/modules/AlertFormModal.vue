@@ -115,7 +115,7 @@ export default {
                 return undefined;
             }),
             projectInvalid: computed(() => state.selectedProjectId !== undefined && !!state.projectInvalidText),
-            isAllValid: computed(() => state.title !== undefined && !state.titleInvalid && state.selectedProjectId !== undefined && !state.projectInvalid),
+            isAllValid: computed(() => state.title !== undefined && !state.titleInvalid && state.selectedProjectId && !state.projectInvalid),
         });
 
         const checkProject = async () => {
