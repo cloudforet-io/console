@@ -9,4 +9,5 @@ export interface SuggestionItem extends MenuItem {
     parents?: SuggestionItem[];
     icon?: string;
     defaultIcon?: string;
+    provider?: string;
 }

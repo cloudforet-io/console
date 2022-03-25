@@ -85,33 +85,12 @@ export default {
                 return '';
             }),
             loading: true,
+            cloudServiceTypes: computed(() => store.state.resource.cloudServiceType.items),
             allMenuItems: computed<SuggestionItem[]>(() => {
                 const menu = store.getters['display/GNBMenuList'];
                 return flatten(getSubMenuList(menu));
             }),
-            cloudServiceList: [
-                {
-                    id: 'cloud-svc-type-aaa',
-                    group: 'Lambda',
-                    name: 'Function',
-                    provider: 'aws',
-                    icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Lambda.svg',
-                },
-                {
-                    id: 'cloud-svc-type-bbb',
-                    group: 'Lambda',
-                    name: 'Layer',
-                    provider: 'aws',
-                    icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Lambda.svg',
-                },
-                {
-                    id: 'cloud-svc-type-ccc',
-                    group: 'EC2',
-                    name: 'Instance',
-                    provider: 'aws',
-                    icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
-                },
-            ] as CloudService[],
+            cloudServiceList: [] as CloudService[],
             searchRegex: computed(() => {
                 let regex = '';
                 if (state.inputText) {
@@ -141,13 +120,14 @@ export default {
                 });
             }),
             cloudServiceItems: computed<SuggestionItem[]>(() => {
-                const cloudServiceList = state.showRecent ? state.recentCloudServiceList : state.cloudServiceList;
-                return cloudServiceList.map(d => ({
+                if (state.showRecent) return state.recentCloudServiceList;
+                return state.cloudServiceList.map(d => ({
                     name: d.id,
                     label: d.name,
                     icon: d.icon,
                     defaultIcon: d.icon,
                     parents: [{ name: d.group, label: d.group }],
+                    provider: d.provider,
                 }));
             }),
             isFocusOnInput: false,
@@ -155,8 +135,25 @@ export default {
             focusStartPosition: 'START',
             showRecent: computed(() => state.visibleSuggestion && !state.inputText.length),
             recentMenuList: [] as SuggestionItem[],
-            recentCloudServiceList: [] as CloudService[],
+            recentCloudServiceList: [] as SuggestionItem[],
         });
+
+        /* Util */
+        const getConvertedCloudServiceList = (rawData): CloudService[] => {
+            const cloudServiceList: CloudService[] = [];
+            rawData.forEach((d) => {
+                const data = state.cloudServiceTypes[d.key];
+                cloudServiceList.push({
+                    id: d.key,
+                    name: d.data.name,
+                    group: d.data.group,
+                    provider: d.data.provider,
+                    icon: data.icon,
+                });
+            });
+            return cloudServiceList;
+        };
+
 
         /* API */
         let listRecentToken: CancelTokenSource | undefined;
@@ -188,7 +185,8 @@ export default {
                 state.loading = false;
             }
         };
-        const createRecent = async (type: SuggestionType, item: SuggestionItem|CloudService) => {
+
+        const createRecent = async (type: SuggestionType, item: SuggestionItem) => {
             try {
                 await SpaceConnector.client.addOns.recent.create({
                     type,
@@ -197,6 +195,34 @@ export default {
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
+            }
+        };
+
+        let resourceToken: CancelTokenSource | undefined;
+        const getCloudServiceResources = async (inputText) => {
+            if (resourceToken) {
+                resourceToken.cancel('Next request has been called.');
+                resourceToken = undefined;
+            }
+            resourceToken = axios.CancelToken.source();
+
+            try {
+                const { results } = await SpaceConnector.client.addOns.autocomplete.resource({
+                    resource_type: 'inventory.CloudServiceType',
+                    search: inputText,
+                    options: {
+                        limit: 5,
+                    },
+                }, {
+                    cancelToken: resourceToken.token,
+                });
+                resourceToken = undefined;
+                return results;
+            } catch (e) {
+                if (!axios.isCancel(e.axiosError)) {
+                    ErrorHandler.handleError(e);
+                }
+                return [];
             }
         };
 
@@ -224,7 +250,11 @@ export default {
             state.isFocusOnInput = true;
         };
 
-        const handleUpdateInput = () => {
+        const handleUpdateInput = async () => {
+            if (state.trimmedInputText) {
+                const results = await getCloudServiceResources(state.trimmedInputText);
+                state.cloudServiceList = getConvertedCloudServiceList(results);
+            }
             /*
              TODO: update menuList & cloudServiceList
              if (inputText)
@@ -233,7 +263,6 @@ export default {
              else
                  show recent items
              */
-
         };
 
         const handleSelect = (index: number, type: SuggestionType) => {
@@ -247,15 +276,15 @@ export default {
                     });
                 }
             } else {
-                const cloudService: CloudService = state.cloudServiceList[index];
-                if (cloudService && SpaceRouter.router.currentRoute.name !== ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE._NAME) {
-                    createRecent(type, cloudService);
+                const cloudServiceItem = state.cloudServiceItems[index];
+                if (cloudServiceItem) {
+                    createRecent(type, cloudServiceItem);
                     SpaceRouter.router.push({
-                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE._NAME,
+                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
-                            provider: cloudService.provider,
-                            group: cloudService.group,
-                            name: cloudService.name,
+                            provider: cloudServiceItem.provider,
+                            group: cloudServiceItem.parents[0].name,
+                            name: cloudServiceItem.label,
                         },
                     });
                 }
@@ -279,6 +308,10 @@ export default {
                 listRecent('CLOUD_SERVICE');
             }
         });
+
+        (async () => {
+            await store.dispatch('resource/cloudServiceType/load');
+        })();
 
         return {
             ...toRefs(state),
