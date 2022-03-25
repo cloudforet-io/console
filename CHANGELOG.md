@@ -1,3 +1,10 @@
+# [1.1.0-beta.271](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.270...v1.1.0-beta.271) (2022-03-25)
+
+
+### Features
+
+* update icons ([#909](https://github.com/spaceone-dev/spaceone-design-system/issues/909)) ([92e6f7b](https://github.com/spaceone-dev/spaceone-design-system/commit/92e6f7b04fba98001ef464723814488ca2571e85))
+
 # [1.1.0-beta.270](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.269...v1.1.0-beta.270) (2022-03-23)
 
 
