@@ -71,6 +71,7 @@ import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
+import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
 export default defineComponent({
     name: 'App',
@@ -100,12 +101,7 @@ export default defineComponent({
             vm.$router.push(res);
             vm.$store.dispatch('user/setIsSessionExpired', false);
         };
-        const showsBrowserRecommendation = () => {
-            const agent = window.navigator.userAgent.toLowerCase();
-            const isChrome = agent.indexOf('chrome') !== -1;
-            const isEdge = agent.indexOf('edge') !== -1;
-            return !(isChrome || isEdge) && !window.localStorage.getItem('showBrowserRecommendation');
-        };
+        const showsBrowserRecommendation = () => !supportsBrowser() && !window.localStorage.getItem('showBrowserRecommendation');
         return {
             ...toRefs(state),
             goToSignIn,

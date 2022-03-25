@@ -26,9 +26,14 @@
                                                        :period-type.sync="periodType"
                 />
                 <div class="left-divider download-pdf">
-                    <p-icon-button name="ic_download" style-type="gray-border" size="sm"
-                                   @click="handleClickPdfDownload"
-                    />
+                    <pdf-download-button>
+                        <p-icon-button name="ic_download" style-type="gray-border" size="sm"
+                                       @click="handleClickPdfDownload"
+                        />
+                        <template #content>
+                            <p class="popover-content" v-html="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SUPPORT_PDF_HELP_TEXT')" />
+                        </template>
+                    </pdf-download-button>
                 </div>
                 <div class="left-divider">
                     <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm"
@@ -105,6 +110,8 @@ import CostDashboardUpdateModal
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardUpdateModal.vue';
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import { gray } from '@/styles/colors';
+import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
+import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
 
 const PUBLIC_ICON_COLOR = gray[500];
 
@@ -118,6 +125,7 @@ const validateDashboardId = async (dashboardId): Promise<boolean> => {
 export default {
     name: 'CostDashboardPage',
     components: {
+        PdfDownloadButton,
         CostDashboardUpdateModal,
         CostDashboardPreview,
         PdfDownloadOverlay,
@@ -188,6 +196,7 @@ export default {
         };
 
         const handleClickPdfDownload = () => {
+            if (!supportsBrowser()) return;
             state.visiblePdfDownload = true;
         };
 
@@ -310,10 +319,12 @@ export default {
     .right-part {
         @apply flex items-center;
         margin-left: auto;
-        .download-pdf::v-deep {
-            margin-left: 0;
-            .p-button {
-                padding: 0 1rem;
+        .download-pdf {
+            &::v-deep {
+                margin-left: 0;
+                .p-button {
+                    padding: 0 1rem;
+                }
             }
         }
     }
