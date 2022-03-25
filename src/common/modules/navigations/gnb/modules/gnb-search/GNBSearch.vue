@@ -85,7 +85,6 @@ export default {
                 return '';
             }),
             loading: true,
-            cloudServiceTypes: computed(() => store.state.resource.cloudServiceType.items),
             allMenuItems: computed<SuggestionItem[]>(() => {
                 const menu = store.getters['display/GNBMenuList'];
                 return flatten(getSubMenuList(menu));
@@ -120,8 +119,8 @@ export default {
                 });
             }),
             cloudServiceItems: computed<SuggestionItem[]>(() => {
-                if (state.showRecent) return state.recentCloudServiceList;
-                return state.cloudServiceList.map(d => ({
+                const cloudServiceList = state.showRecent ? state.recentCloudServiceList : state.cloudServiceList;
+                return cloudServiceList.map(d => ({
                     name: d.id,
                     label: d.name,
                     icon: d.icon,
@@ -135,24 +134,17 @@ export default {
             focusStartPosition: 'START',
             showRecent: computed(() => state.visibleSuggestion && !state.inputText.length),
             recentMenuList: [] as SuggestionItem[],
-            recentCloudServiceList: [] as SuggestionItem[],
+            recentCloudServiceList: [] as CloudService[],
         });
 
         /* Util */
-        const getConvertedCloudServiceList = (rawData): CloudService[] => {
-            const cloudServiceList: CloudService[] = [];
-            rawData.forEach((d) => {
-                const data = state.cloudServiceTypes[d.key];
-                cloudServiceList.push({
-                    id: d.key,
-                    name: d.data.name,
-                    group: d.data.group,
-                    provider: d.data.provider,
-                    icon: data.icon,
-                });
-            });
-            return cloudServiceList;
-        };
+        const getConvertedCloudServiceList = (rawData): CloudService[] => rawData.map(d => ({
+            id: d.data.id,
+            name: d.data.name,
+            group: d.data.group,
+            provider: d.data.provider,
+            icon: d.data.icon,
+        }));
 
 
         /* API */
@@ -212,6 +204,7 @@ export default {
                     search: inputText,
                     options: {
                         limit: 5,
+                        targets: ['name', 'group'],
                     },
                 }, {
                     cancelToken: resourceToken.token,
@@ -308,10 +301,6 @@ export default {
                 listRecent('CLOUD_SERVICE');
             }
         });
-
-        (async () => {
-            await store.dispatch('resource/cloudServiceType/load');
-        })();
 
         return {
             ...toRefs(state),
