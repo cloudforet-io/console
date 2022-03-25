@@ -1,10 +1,6 @@
 <template>
     <div class="gnb-search">
-        <!-- TODO: apply responsive view - laptop, tablet, mobile
-        <p-i name="ic_search--bold" />
-        -->
-
-        <g-n-b-search-input v-model="inputText"
+        <g-n-b-search-input v-if="isOverLaptopSize" v-model="inputText"
                             :is-focused.sync="isFocusOnInput"
                             @click.stop="showSuggestion"
                             @keyup.esc="hideSuggestion"
@@ -12,6 +8,16 @@
                             @keydown.down="moveFocusToSuggestion('START')"
                             @input="handleUpdateInput"
         />
+
+        <span v-else
+              class="menu-button"
+              @click.stop="showSuggestion"
+        >
+            <p-i name="ic_search--bold"
+                 height="1.5rem" width="1.5rem"
+                 color="inherit"
+            />
+        </span>
 
         <g-n-b-search-dropdown v-if="visibleSuggestion"
                                :input-text="trimmedInputText"
@@ -24,20 +30,39 @@
                                @move-focus-end="handleMoveFocusEnd"
                                @close="hideSuggestion"
                                @select="handleSelect"
-        />
+        >
+            <template #search-input>
+                <g-n-b-search-input v-if="!isOverLaptopSize"
+                                    v-model="inputText"
+                                    :is-focused.sync="isFocusOnInput"
+                                    @click.stop="showSuggestion"
+                                    @keyup.esc="hideSuggestion"
+                                    @keydown.up="moveFocusToSuggestion('END')"
+                                    @keydown.down="moveFocusToSuggestion('START')"
+                                    @input="handleUpdateInput"
+                />
+            </template>
+        </g-n-b-search-dropdown>
     </div>
 </template>
 
 <script lang="ts">
 import axios, { CancelTokenSource } from 'axios';
-import { flatten } from 'lodash';
+import { flatten, throttle } from 'lodash';
 
 import {
     computed, onMounted, onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { PI } from '@spaceone/design-system';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { laptop } from '@spaceone/design-system/src/styles/screens';
+
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+import { GNBMenu } from '@/store/modules/display/type';
+
 
 import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
 import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchDropdown.vue';
@@ -46,9 +71,6 @@ import {
     SuggestionItem,
     SuggestionType,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import { store } from '@/store';
-import { GNBMenu } from '@/store/modules/display/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { menuRouterMap } from '@/lib/router/menu-router-map';
@@ -64,6 +86,8 @@ interface CloudService {
     icon: string;
 }
 
+const LAPTOP_WINDOW_SIZE = laptop.max;
+
 const getSubMenuList = (menu: GNBMenu[]) => menu.map(d => (d.subMenuList?.length ? d.subMenuList.map(item => ({
     ...item,
     parents: [{ id: d.id, label: d.label }],
@@ -74,7 +98,7 @@ export default {
     components: {
         GNBSearchDropdown,
         GNBSearchInput,
-        // PI,
+        PI,
     },
     setup() {
         const state = reactive({
@@ -135,6 +159,7 @@ export default {
             showRecent: computed(() => state.visibleSuggestion && !state.inputText.length),
             recentMenuList: [] as SuggestionItem[],
             recentCloudServiceList: [] as CloudService[],
+            isOverLaptopSize: window.innerWidth > LAPTOP_WINDOW_SIZE,
         });
 
         /* Util */
@@ -248,14 +273,6 @@ export default {
                 const results = await getCloudServiceResources(state.trimmedInputText);
                 state.cloudServiceList = getConvertedCloudServiceList(results);
             }
-            /*
-             TODO: update menuList & cloudServiceList
-             if (inputText)
-                 filter store.state.display.gnbMenuList by inputText for menuList
-                 call autocomplete.reference api for cloudServiceList
-             else
-                 show recent items
-             */
         };
 
         const handleSelect = (index: number, type: SuggestionType) => {
@@ -285,13 +302,19 @@ export default {
             hideSuggestion();
         };
 
+        const onWindowResize = throttle(() => {
+            state.isOverLaptopSize = window.innerWidth > LAPTOP_WINDOW_SIZE;
+        }, 500);
+
         onMounted(() => {
             window.addEventListener('click', hideSuggestion);
             window.addEventListener('blur', hideSuggestion);
+            window.addEventListener('resize', onWindowResize);
         });
         onUnmounted(() => {
             window.removeEventListener('click', hideSuggestion);
             window.removeEventListener('blur', hideSuggestion);
+            window.removeEventListener('resize', onWindowResize);
         });
 
         /* Watcher */
@@ -317,6 +340,19 @@ export default {
 
 <style lang="postcss" scoped>
 .gnb-search {
-    /* TODO */
+    .menu-button {
+        @apply text-gray-500;
+        cursor: pointer;
+
+        &.opened {
+            @apply text-violet-400;
+        }
+
+        @media (hover: hover) {
+            &:hover {
+                @apply text-violet-400;
+            }
+        }
+    }
 }
 </style>

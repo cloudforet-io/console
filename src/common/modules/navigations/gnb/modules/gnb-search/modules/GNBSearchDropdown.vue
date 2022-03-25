@@ -1,38 +1,40 @@
 <template>
-    <p-data-loader :data="allSelectableItems"
-                   :loading="loading"
-                   class="gnb-search-dropdown"
-    >
-        <template #loader>
-            <div class="skeleton-wrapper">
-                <p-skeleton width="36%" height="1rem" class="mb-2" />
-                <p-skeleton width="100%" height="2rem" />
-            </div>
-        </template>
-        <g-n-b-search-suggestion-list :items="suggestionItems"
-                                      :input-text="inputText"
-                                      :is-focused="isFocused"
-                                      :focus-start-position="focusStartPosition"
-                                      @update:isFocused="$emit('update:isFocused', $event)"
-                                      @move-focus-end="$emit('move-focus-end')"
-                                      @close="$emit('close')"
-                                      @select="handleSelect"
-        />
-        <template #no-data>
-            <div v-if="isRecent" class="no-data">
-                <img src="@/assets/images/illust_ghost.svg" class="no-data-img">
-                <p class="no-data-text">
-                    Search for navigation menus or cloud services.
-                </p>
-            </div>
-            <div v-else class="no-data">
-                <img src="@/assets/images/illust_microscope.svg" class="no-data-img">
-                <p class="no-data-text">
-                    No result found for "<em>{{ inputText }}</em>" <br>Try again with different term.
-                </p>
-            </div>
-        </template>
-    </p-data-loader>
+    <div class="gnb-search-dropdown">
+        <slot name="search-input" />
+        <p-data-loader :data="allSelectableItems"
+                       :loading="loading"
+        >
+            <template #loader>
+                <div class="skeleton-wrapper">
+                    <p-skeleton width="36%" height="1rem" class="mb-2" />
+                    <p-skeleton width="100%" height="2rem" />
+                </div>
+            </template>
+            <g-n-b-search-suggestion-list :items="suggestionItems"
+                                          :input-text="inputText"
+                                          :is-focused="isFocused"
+                                          :focus-start-position="focusStartPosition"
+                                          @update:isFocused="$emit('update:isFocused', $event)"
+                                          @move-focus-end="$emit('move-focus-end')"
+                                          @close="$emit('close')"
+                                          @select="handleSelect"
+            />
+            <template #no-data>
+                <div v-if="isRecent" class="no-data">
+                    <img src="@/assets/images/illust_ghost.svg" class="no-data-img">
+                    <p class="no-data-text">
+                        Search for navigation menus or cloud services.
+                    </p>
+                </div>
+                <div v-else class="no-data">
+                    <img src="@/assets/images/illust_microscope.svg" class="no-data-img">
+                    <p class="no-data-text">
+                        No result found for "<em>{{ inputText }}</em>" <br>Try again with different term.
+                    </p>
+                </div>
+            </template>
+        </p-data-loader>
+    </div>
 </template>
 
 <script lang="ts">
