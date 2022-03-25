@@ -72,8 +72,9 @@ export default {
         margin-top: 2rem;
         margin-bottom: 1rem;
         .browser-icon-container {
-            @apply bg-gray-100 rounded-2xl flex-grow flex flex-col items-center flex-wrap gap-2;
+            @apply bg-gray-100 rounded-2xl flex flex-col items-center flex-wrap gap-2;
             padding: 1.5rem 0;
+            width: calc(50% - 0.25rem);
 
             .browser-img {
                 width: 4rem;
@@ -84,10 +85,24 @@ export default {
 
             &:hover {
                 @apply bg-blue-200 cursor-pointer;
+                .browser-name {
+                    text-decoration: underline;
+                }
             }
         }
-        .recommend-browser-help-text {
-            line-height: 150%;
+    }
+    .recommend-browser-help-text {
+        line-height: 150%;
+    }
+}
+.p-button-modal::v-deep {
+    .modal-mask {
+        .modal-header {
+            height: unset;
+        }
+        .modal-body {
+            max-height: unset;
+            overflow: unset;
         }
     }
 }

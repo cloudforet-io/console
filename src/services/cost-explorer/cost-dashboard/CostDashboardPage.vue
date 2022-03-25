@@ -30,9 +30,6 @@
                         <p-icon-button name="ic_download" style-type="gray-border" size="sm"
                                        @click="handleClickPdfDownload"
                         />
-                        <template #content>
-                            <p class="popover-content" v-html="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SUPPORT_PDF_HELP_TEXT')" />
-                        </template>
                     </pdf-download-button>
                 </div>
                 <div class="left-divider">
