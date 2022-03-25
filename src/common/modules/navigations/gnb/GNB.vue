@@ -120,13 +120,9 @@ export default {
 
 <style lang="postcss" scoped>
 .gnb {
-    @apply bg-white;
+    @apply bg-white items-center;
     display: flex !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-
-    .left-part, .right-part {
-        line-height: $gnb-height;
-    }
     .left-part {
         padding-left: 1.5rem;
 
@@ -151,8 +147,7 @@ export default {
         }
     }
     .right-part {
-        position: absolute;
-        display: inline-flex;
+        @apply absolute inline-flex items-center;
         right: 0;
         padding-right: 1.5rem;
     }

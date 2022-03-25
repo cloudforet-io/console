@@ -1,19 +1,6 @@
 <template>
     <div class="right-side-menu">
         <g-n-b-search />
-        <div class="menu-wrapper">
-            <router-link :to="{ name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME }">
-                <div v-if="!userState.isDomainOwner" class="menu-button code" :class="{'new-icon':!isNewIconHidden}"
-                     @click="hideNewIcon"
-                >
-                    <p-i class="menu-icon code"
-                         name="ic_code"
-                         color="inherit transparent"
-                    />
-                    <g-n-b-new-icon v-if="!isNewIconHidden" />
-                </div>
-            </router-link>
-        </div>
         <div v-if="!userState.isDomainOwner" class="menu-wrapper">
             <div class="menu-button notifications"
                  :class="{opened: openedMenu === 'notifications'}"
@@ -29,54 +16,28 @@
                                  @click-settings="hideMenu"
             />
         </div>
-        <div class="menu-wrapper">
-            <div class="menu-button opacity"
-                 :class="{opened: openedMenu === 'support'}"
-                 @click.stop="toggleMenu('support')"
-            >
-                <p-i class="menu-icon"
-                     name="ic_support"
-                     color="inherit transparent"
-                />
-            </div>
-            <div v-if="openedMenu === 'support'"
-                 v-click-outside="hideMenu"
-                 class="sub-menu-wrapper right-align"
-            >
-                <p-anchor v-for="(item, index) in supportMenu" :key="index"
-                          :href="item.link" target="_blank"
-                          class="sub-menu"
-                >
-                    {{ item.label }}
-                </p-anchor>
-            </div>
-        </div>
         <div class="menu-wrapper account">
             <div class="menu-button account"
                  @click.stop="toggleMenu('account')"
             >
-                <div class="menu-icon"
-                     :class="[{opened: openedMenu === 'account'}, userState.isDomainOwner ? 'root' : ( userState.isAdmin ? 'admin' : 'member') ]"
-                />
+                <p-i v-if="userState.isDomainOwner" name="root-account" class="menu-icon" />
+                <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" name="admin" class="menu-icon" />
+                <p-i v-else name="user" class="menu-icon" />
             </div>
             <div v-if="openedMenu === 'account'"
                  v-click-outside="hideMenu"
                  class="sub-menu-wrapper right-align account"
             >
+                <div class="info-top">
+                    <p-i v-if="userState.isDomainOwner" name="root-account" />
+                    <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" name="admin" />
+                    <p-i v-else name="user" />
+                    <span class="value">{{ userState.userId }}</span>
+                </div>
                 <div class="info-wrapper">
-                    <div class="info-row">
-                        <p-i v-if="userState.isDomainOwner" class="icon" name="root-account" />
-                        <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" class="icon" name="admin" />
-                        <p-i v-else class="icon" name="user" />
-                        <span class="value">{{ userState.userId }}</span>
-                    </div>
                     <div class="info-row">
                         <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
                         <span class="value">{{ userState.role }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_TIMEZONE') }}</span>
-                        <span class="value">{{ userState.timezone }}</span>
                     </div>
                     <div class="info-row language"
                          @click="toggleLanguageMenu"
@@ -96,11 +57,38 @@
                              width="1rem" height="1rem"
                         />
                     </div>
-                    <p-divider />
+                    <div class="info-row">
+                        <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_TIMEZONE') }}</span>
+                        <span class="value">{{ userState.timezone }}</span>
+                    </div>
+                    <div class="info-row">
+                        <router-link :to="{name: MY_PAGE_ROUTE._NAME }">
+                            <p-button style-type="primary" :outline="true" size="sm"
+                                      class="my-page-button"
+                            >
+                                Go to My Page
+                            </p-button>
+                        </router-link>
+                    </div>
                 </div>
-                <div class="sub-menu" @click="openProfile">
-                    <span>{{ $t('COMMON.GNB.ACCOUNT.LABEL_PROFILE') }}</span>
+                <p-divider class="divider" />
+                <div class="sub-menu">
+                    <router-link :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}">
+                        Access with API & CLI
+                    </router-link>
                 </div>
+                <p-divider class="divider" />
+                <div v-for="{ link, label} in supportMenu" :key="label" class="sub-menu support-menu">
+                    <a :href="link" target="_blank">
+                        {{ label }}
+                    </a>
+                    <p-i name="ic_external-link"
+                         height="1em" width="1em"
+                         color="inherit"
+                         class="external-icon"
+                    />
+                </div>
+                <p-divider class="divider" />
                 <div class="sub-menu" @click="signOut">
                     <span>{{ $t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}</span>
                 </div>
@@ -117,8 +105,9 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PAnchor, PI, PDivider } from '@spaceone/design-system';
-import GNBNewIcon from '@/common/components/marks/GNBNewIcon.vue';
+import {
+    PI, PDivider, PButton,
+} from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -129,6 +118,7 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import { SpaceRouter } from '@/router';
 
 export default {
     name: 'RightSideMenu',
@@ -136,9 +126,8 @@ export default {
         GNBSearch,
         GNBNotifications,
         PDivider,
-        PAnchor,
         PI,
-        GNBNewIcon,
+        PButton,
     },
     directives: {
         clickOutside: vClickOutside.directive,
@@ -192,7 +181,7 @@ export default {
         };
         const openProfile = () => {
             emit('hide-menu');
-            vm.$router.replace({ name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME }).catch(() => {});
+            SpaceRouter.router.push({ name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME });
         };
         const toggleLanguageMenu = () => {
             state.showLanguageMenu = !state.showLanguageMenu;
@@ -284,47 +273,24 @@ export default {
                     @apply text-violet-400;
                 }
             }
-
-            &.new-icon {
-                @apply relative;
-            }
             &.account {
-
                 .menu-icon {
-                    width: 2rem;
-                    height: 2rem;
-                    overflow: hidden;
-                    background-size: cover;
-                    box-shadow: inset 0 0 0 2px theme('colors.gray.200');
-                    margin-top: 0.625rem;
-                    border-radius: 0.625rem;
-
-                    &.admin {
-                        background: url('~@/assets/icons/admin.svg') no-repeat center center;
-                    }
-                    &.member {
-                        background: url('~@/assets/icons/user.svg') no-repeat center center;
-                    }
-                    &.root {
-                        background: url('~@/assets/icons/root-account.svg') no-repeat center center;
-                    }
-                    &.opened {
-                        box-shadow: inset 0 0 0 2px theme('colors.secondary');
-                    }
+                    @apply rounded-xl;
+                    width: 1.75rem;
+                    height: 1.75rem;
                 }
             }
         }
         .sub-menu-wrapper {
             @apply bg-white border border-gray-200 rounded-xs;
             position: absolute;
-            top: 2.5rem;
+            top: 1.5rem;
             right: 0;
             left: auto;
-            min-width: 10rem;
-            line-height: 1rem;
+            margin-top: 0.25rem;
+            max-width: 17.5rem;
             box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
             padding: 0.5rem;
-            margin: 3px 0;
 
             &.account {
                 min-width: 15.125rem;
@@ -342,6 +308,7 @@ export default {
                 white-space: nowrap;
                 cursor: pointer;
                 padding: 0.5rem;
+
                 &:hover, &:focus {
                     @apply bg-violet-100 text-violet-600;
                 }
@@ -351,19 +318,42 @@ export default {
                 &.p-anchor::v-deep:hover .text {
                     text-decoration: none;
                 }
+                .support-menu {
+                    @apply justify-between;
+                }
+            }
+            .divider {
+                margin-top: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+            .info-top {
+                padding-left: 0.5rem;
+                padding-top: 0.75rem;
+                margin-bottom: 1rem;
+                .value {
+                    @apply font-bold;
+                    margin-left: 0.5rem;
+                    font-size: 0.875rem;
+                    line-height: 125%;
+                }
             }
             .info-wrapper {
-                padding: 1rem 0.5rem 0.5rem 0.5rem;
                 .info-row {
                     position: relative;
                     width: 100%;
                     line-height: 1.5rem;
                     font-size: 0.75rem;
-
-                    &:first-child {
-                        @apply text-primary;
-                        font-size: 0.875rem;
-                        padding-bottom: 1rem;
+                    letter-spacing: 0.02em;
+                    padding-left: 0.5rem;
+                    padding-right: 0.5rem;
+                    .label {
+                        @apply text-gray-500 font-bold;
+                        padding-right: 0.5rem;
+                    }
+                    .my-page-button {
+                        @apply w-full;
+                        margin-top: 0.75rem;
+                        margin-bottom: 0.5rem;
                     }
                     &.language {
                         display: inline-flex;
@@ -387,25 +377,12 @@ export default {
                             }
                         }
                     }
-
-                    .icon {
-                        border-radius: 0.625rem;
-                        margin-right: 0.5rem;
-                    }
-                    .label {
-                        @apply text-gray-500 font-bold;
-                        padding-right: 0.5rem;
-                    }
-                }
-                .p-divider {
-                    margin-top: 1rem;
                 }
             }
         }
     }
     .gnb-notifications {
         position: absolute;
-        top: 2.5rem;
         right: 0;
         left: auto;
         margin: 3px 0;
