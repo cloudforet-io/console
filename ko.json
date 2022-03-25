@@ -719,6 +719,7 @@
 			"ACCOUNT": {
 				"ALT_E_UPDATE": "언어 편집 실패",
 				"ALT_S_UPDATE": "언어 편집 완료",
+				"GO_TO_MYPAGE": "",
 				"LABEL_LANGUAGE": "언어",
 				"LABEL_PROFILE": "프로필",
 				"LABEL_ROLE": "역할",
@@ -735,6 +736,11 @@
 				"TITLE": "알림",
 				"TODAY": "오늘",
 				"YESTERDAY": "어제"
+			},
+			"SEARCH": {
+				"HELP_TEXT": "",
+				"NO_RESULT_1": "",
+				"NO_RESULT_2": ""
 			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "API 가이드",

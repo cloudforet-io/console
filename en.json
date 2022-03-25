@@ -719,6 +719,7 @@
 			"ACCOUNT": {
 				"ALT_E_UPDATE": "Failed to Update Language",
 				"ALT_S_UPDATE": "Successfully Updated Language",
+				"GO_TO_MYPAGE": "Go to My Page",
 				"LABEL_LANGUAGE": "Language",
 				"LABEL_PROFILE": "Profile",
 				"LABEL_ROLE": "Role",
@@ -735,6 +736,11 @@
 				"TITLE": "Notifications",
 				"TODAY": "Today",
 				"YESTERDAY": "Yesterday"
+			},
+			"SEARCH": {
+				"HELP_TEXT": "Search for navigation menus or cloud services.",
+				"NO_RESULT_1": "No result found for",
+				"NO_RESULT_2": "Try again with different term."
 			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "API Guide",

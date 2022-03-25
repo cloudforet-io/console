@@ -719,6 +719,7 @@
 			"ACCOUNT": {
 				"ALT_E_UPDATE": "言語編集に失敗",
 				"ALT_S_UPDATE": "言語編集完了",
+				"GO_TO_MYPAGE": "",
 				"LABEL_LANGUAGE": "言語",
 				"LABEL_PROFILE": "プロフィール ",
 				"LABEL_ROLE": "ロール",
@@ -735,6 +736,11 @@
 				"TITLE": "通知",
 				"TODAY": "今日",
 				"YESTERDAY": "昨日"
+			},
+			"SEARCH": {
+				"HELP_TEXT": "",
+				"NO_RESULT_1": "",
+				"NO_RESULT_2": ""
 			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "APIガイド ",
