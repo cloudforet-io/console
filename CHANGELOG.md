@@ -1,3 +1,10 @@
+# [1.1.0-beta.272](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.271...v1.1.0-beta.272) (2022-03-25)
+
+
+### Bug Fixes
+
+* change to use class binding transition in data loader ([#910](https://github.com/spaceone-dev/spaceone-design-system/issues/910)) ([8d54a2e](https://github.com/spaceone-dev/spaceone-design-system/commit/8d54a2e3cb1c81ddffbd0240c3dafe372daab324))
+
 # [1.1.0-beta.271](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.270...v1.1.0-beta.271) (2022-03-25)
 
 
