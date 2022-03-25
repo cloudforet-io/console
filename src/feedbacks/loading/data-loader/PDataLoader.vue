@@ -11,34 +11,33 @@
                 <slot />
             </div>
 
-            <transition name="fade-in"
-                        :appear-active-class="disableTransition ? 'fade-in-enter-to' : 'fade-in-enter-active'"
-                        :enter-active-class="disableTransition ? 'fade-in-enter-to' : 'fade-in-enter-active'"
-                        :leave-active-class="disableTransition ? 'fade-in-leave-to' : 'fade-in-leave-active'"
+            <div v-show="showLoader" key="loader" class="loader-wrapper"
+                 :class="{
+                     'no-empty-case': disableEmptyCase && isEmpty,
+                     'fade-out': isTransitioning,
+                     'fade-out-from': isLoading,
+                     'fade-out-to': !isLoading,
+                 }"
             >
-                <div v-show="showLoader" key="loader" class="loader-wrapper"
-                     :class="{'no-empty-case': disableEmptyCase && isEmpty}"
-                >
-                    <div class="loader-backdrop"
-                         :style="{
-                             opacity: loaderBackdropOpacity,
-                             backgroundColor: loaderBackdropColor
-                         }"
-                    />
-                    <div class="loader">
-                        <slot name="loader">
-                            <template v-if="loaderType === LOADER_TYPES.spinner">
-                                <p-lottie name="thin-spinner" :size="spinnerSize"
-                                          auto class="spinner"
-                                />
-                            </template>
-                            <template v-else-if="loaderType === LOADER_TYPES.skeleton">
-                                <p-skeleton class="skeleton" />
-                            </template>
-                        </slot>
-                    </div>
+                <div class="loader-backdrop"
+                     :style="{
+                         opacity: loaderBackdropOpacity,
+                         backgroundColor: loaderBackdropColor
+                     }"
+                />
+                <div class="loader">
+                    <slot name="loader">
+                        <template v-if="loaderType === LOADER_TYPES.spinner">
+                            <p-lottie name="thin-spinner" :size="spinnerSize"
+                                      auto class="spinner"
+                            />
+                        </template>
+                        <template v-else-if="loaderType === LOADER_TYPES.skeleton">
+                            <p-skeleton class="skeleton" />
+                        </template>
+                    </slot>
                 </div>
-            </transition>
+            </div>
         </div>
     </div>
 </template>
@@ -75,7 +74,7 @@ export default defineComponent<Props>({
             default: true,
         },
         data: {
-            type: [Array, Object],
+            type: [Array, Object, Boolean, String, Number],
             default: undefined,
         },
         loaderType: {
@@ -125,17 +124,20 @@ export default defineComponent<Props>({
         },
     },
     setup(props) {
+        let isLoading: ComputedRef<boolean>;
         const state = reactive({
             dataLoadOccurred: false,
             showEmptyCase: computed(() => !props.disableEmptyCase && state.isEmpty),
             isEmpty: computed(() => {
                 if (!props.data) return false;
                 if (Array.isArray(props.data)) return props.data.length === 0;
+                if (typeof props.data === 'boolean') return props.data;
                 return isEmpty(props.data);
             }),
             lazyLoading: props.loading,
             minLoading: props.loading,
-            contextKey: Math.floor(Math.random() * Date.now()),
+            isTransitioning: false,
+            showLoader: computed(() => (props.disableTransition ? isLoading.value : (isLoading.value || state.isTransitioning))),
         });
 
         const registerLazyLoadingWatch = () => {
@@ -189,31 +191,51 @@ export default defineComponent<Props>({
         };
 
 
-        let showLoader: ComputedRef<boolean>;
         if (props.lazyLoadingTime) {
-            if (props.minLoadingTime) showLoader = computed<boolean>(() => state.minLoading || state.lazyLoading);
-            else showLoader = computed<boolean>(() => state.lazyLoading);
+            if (props.minLoadingTime) isLoading = computed<boolean>(() => state.minLoading || state.lazyLoading);
+            else isLoading = computed<boolean>(() => state.lazyLoading);
             registerLazyLoadingWatch();
         } else if (props.minLoadingTime) {
-            showLoader = computed<boolean>(() => state.minLoading || props.loading);
+            isLoading = computed<boolean>(() => state.minLoading || props.loading);
             registerMinLoadingWatch();
-        } else showLoader = computed<boolean>(() => props.loading);
+        } else isLoading = computed<boolean>(() => props.loading);
 
 
         let stopDataLoadCheckWatch: WatchStopHandle;
-        // CAUTION: Do not make stopDataLoadCheckWatch as const variable. Related issue: https://github.com/webpack/webpack/issues/12724
+        /*
+            CAUTION: Do not make stopDataLoadCheckWatch as const variable.
+            Related issue: https://github.com/webpack/webpack/issues/12724
+         */
         // eslint-disable-next-line prefer-const
-        stopDataLoadCheckWatch = watch(() => showLoader.value, (loading) => {
+        stopDataLoadCheckWatch = watch(() => isLoading.value, (loading) => {
             if (!loading) {
                 state.dataLoadOccurred = true;
                 if (stopDataLoadCheckWatch) stopDataLoadCheckWatch();
             }
         }, { immediate: true });
 
+
+        if (!props.disableTransition) {
+            let transitionTimout;
+            watch(() => isLoading.value, (loading) => {
+                if (!loading) {
+                    state.isTransitioning = true;
+                    transitionTimout = setTimeout(() => {
+                        state.isTransitioning = false;
+                        transitionTimout = undefined;
+                    }, 200);
+                } else if (transitionTimout) {
+                    clearTimeout(transitionTimout);
+                    transitionTimout = undefined;
+                    state.isTransitioning = false;
+                }
+            }, { immediate: true });
+        }
+
         return {
             LOADER_TYPES,
             ...toRefs(state),
-            showLoader,
+            isLoading,
         };
     },
 });
@@ -225,28 +247,23 @@ export default defineComponent<Props>({
     .data-loader-container {
         @apply relative w-full h-full overflow-hidden;
         min-height: inherit;
-
-        /* transitions */
-        > .fade-in-enter-active {
-            transition: opacity 0s;
-        }
-        > .fade-in-leave-active {
-            transition: opacity 0.2s;
-        }
-        > .fade-in-enter, > .fade-in-leave-to {
-            opacity: 0;
-        }
-        > .fade-in-leave, > .fade-in-enter-to {
-            opacity: 1;
-        }
     }
     .loader-wrapper {
         @apply absolute w-full h-full overflow-hidden;
+        top: 0;
+        z-index: 1;
         &.no-empty-case {
             @apply static;
         }
-        top: 0;
-        z-index: 1;
+        &.fade-out {
+            transition: opacity 0.2s;
+        }
+        &.fade-out-from {
+            opacity: 1;
+        }
+        &.fade-out-to {
+            opacity: 0;
+        }
         .loader-backdrop {
             @apply w-full h-full;
         }
