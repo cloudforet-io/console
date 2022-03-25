@@ -504,7 +504,6 @@
 				"STACKED_COLUMN": "",
 				"STACKED_LINE": "",
 				"START_DATE": "",
-				"SUPPORT_PDF_HELP_TEXT": "",
 				"TOO_MANY_ITEMS": "",
 				"TOTAL_COST": "",
 				"YEARLY": ""
@@ -643,6 +642,12 @@
 		}
 	},
 	"COMMON": {
+		"BUTTONS": {
+			"PDF_DOWNLOAD_BUTTON": {
+				"DESKTOP": "",
+				"SUPPORT_PDF_HELP_TEXT": ""
+			}
+		},
 		"COLLECT_MODAL": {
 			"ALT_E_COLLECT_DATA": "データ収集に失敗",
 			"ALT_S_COLLECT_DATA": "データ収集完了",

@@ -504,7 +504,6 @@
 				"STACKED_COLUMN": "Stacked Column",
 				"STACKED_LINE": "Stacked Line",
 				"START_DATE": "Start Date",
-				"SUPPORT_PDF_HELP_TEXT": "This feature is not supported on your browser or device. Try again with <b>Chrome</b> or <b>Edge</b> browser on <b>desktop</b>.",
 				"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items.",
 				"TOTAL_COST": "Total Cost",
 				"YEARLY": "Yearly"
@@ -643,6 +642,12 @@
 		}
 	},
 	"COMMON": {
+		"BUTTONS": {
+			"PDF_DOWNLOAD_BUTTON": {
+				"DESKTOP": "desktop",
+				"SUPPORT_PDF_HELP_TEXT": "This feature is not supported on your browser or device. Try again with {chrome} or {edge} browser on {desktop}."
+			}
+		},
 		"COLLECT_MODAL": {
 			"ALT_E_COLLECT_DATA": "Failed to Collect Data",
 			"ALT_S_COLLECT_DATA": "Successfully Collected Data",
