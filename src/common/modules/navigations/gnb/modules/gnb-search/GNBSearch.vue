@@ -83,7 +83,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { menuRouterMap } from '@/lib/router/menu-router-map';
 
-import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
 interface CloudServiceTypeData {
@@ -341,7 +341,7 @@ export default defineComponent<Props>({
 
                 try {
                     SpaceRouter.router.push({
-                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: cloudServiceType.provider,
                             group: cloudServiceType.group,

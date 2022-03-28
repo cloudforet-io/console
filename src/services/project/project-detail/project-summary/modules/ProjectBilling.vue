@@ -128,7 +128,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import {
     gray, safe, secondary, secondary1, green, blue,
 } from '@/styles/colors';
-import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { CURRENCY } from '@/store/modules/display/config';
@@ -327,7 +327,7 @@ export default {
             state.chart = chart;
         };
         const getLink = data => ({
-            name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
             params: {
                 provider: data.provider,
                 group: data.cloud_service_group,

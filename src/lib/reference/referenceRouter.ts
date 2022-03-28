@@ -3,7 +3,7 @@ import { concat } from 'lodash';
 import { Location } from 'vue-router';
 import { Reference, ReferenceType } from '@/lib/reference/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { AUTOMATION_ROUTE } from '@/services/automation/routes';
 
@@ -105,7 +105,7 @@ type RouterMap = Record<ReferenceType, { name: string; formatter: LinkFormatter}
 const routerMap: RouterMap = {
     'inventory.Server':
         {
-            name: ASSET_MANAGEMENT_ROUTE.SERVER._NAME,
+            name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
             formatter: serverLinkFormatter,
         },
     'identity.Project':
@@ -120,22 +120,22 @@ const routerMap: RouterMap = {
         },
     'inventory.Collector':
         {
-            name: ASSET_MANAGEMENT_ROUTE.COLLECTOR._NAME,
+            name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
             formatter: collectorLinkFormatter,
         },
     'identity.ServiceAccount':
         {
-            name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT.SEARCH._NAME,
+            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.SEARCH._NAME,
             formatter: serviceAccountLinkFormatter,
         },
     'inventory.CloudService':
         {
-            name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.SEARCH._NAME,
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME,
             formatter: cloudServiceLinkFormatter,
         },
     'inventory.CloudServiceType':
         {
-            name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
             formatter: cloudServiceTypeLinkFormatter,
         },
     'spot_automation.SpotGroup':

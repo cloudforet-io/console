@@ -78,7 +78,7 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { objectToQueryString, primitiveToQueryString, arrayToQueryString } from '@/lib/router-query-string';
 import { store } from '@/store';
-import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Location } from 'vue-router';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
@@ -228,7 +228,7 @@ export default {
             }
 
             return {
-                name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.TYPE._NAME,
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
                 params: {},
                 query: {
                     filters: queryHelper.setFilters(filters).rawQueryStrings,

@@ -1,27 +1,27 @@
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
-const assetManagementRouter = {
-    asset_management: {
-        name: ASSET_MANAGEMENT_ROUTE._NAME,
+const assetInventoryRouter = {
+    asset_inventory: {
+        name: ASSET_INVENTORY_ROUTE._NAME,
     },
-    'asset_management.cloud_service': {
-        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE._NAME,
+    'asset_inventory.cloud_service': {
+        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
     },
-    'asset_management.server': {
-        name: ASSET_MANAGEMENT_ROUTE.SERVER._NAME,
+    'asset_inventory.server': {
+        name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
     },
-    'asset_management.collector': {
-        name: ASSET_MANAGEMENT_ROUTE.COLLECTOR._NAME,
+    'asset_inventory.collector': {
+        name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
     },
-    'asset_management.collector_history': {
-        name: ASSET_MANAGEMENT_ROUTE.COLLECTOR_HISTORY._NAME,
+    'asset_inventory.collector_history': {
+        name: ASSET_INVENTORY_ROUTE.COLLECTOR_HISTORY._NAME,
     },
-    'asset_management.service_account': {
-        name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME,
+    'asset_inventory.service_account': {
+        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
     },
 };
 
@@ -73,7 +73,7 @@ const administrationMenuRouter = {
 
 
 export const menuRouterMap = {
-    ...assetManagementRouter,
+    ...assetInventoryRouter,
     ...alertManagerRouter,
     ...costExplorerRouter,
     ...projectRouter,

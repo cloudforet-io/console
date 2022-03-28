@@ -4,7 +4,7 @@ import { RouteConfig } from 'vue-router';
 import authRoutes from '@/services/auth/routes';
 import dashboardRoute from '@/services/dashboard/routes';
 import administrationRoute from '@/services/administration/routes';
-import assetManagementRoute from '@/services/asset-management/routes';
+import assetInventoryRoute from '@/services/asset-inventory/routes';
 import projectRoute from '@/services/project/routes';
 import automationRoute from '@/services/automation/routes';
 import alertManagerRoute from '@/services/alert-manager/routes';
@@ -28,7 +28,7 @@ export const serviceRoutes: RouteConfig[] = [
         children: [
             dashboardRoute,
             administrationRoute,
-            assetManagementRoute,
+            assetInventoryRoute,
             projectRoute,
             automationRoute,
             alertManagerRoute,

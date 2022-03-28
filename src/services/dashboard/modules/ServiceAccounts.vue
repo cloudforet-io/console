@@ -5,7 +5,7 @@
                 <p class="title">
                     {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS') }}
                 </p>
-                <router-link :to="{ name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME }" class="add-btn">
+                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }" class="add-btn">
                     <p-i name="ic_plus" width="1rem" height="1rem"
                          color="inherit"
                     /> {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ADD') }}
@@ -70,7 +70,7 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
@@ -184,7 +184,7 @@ export default {
 
         const getLink = (data) => {
             const link = {
-                name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME,
+                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
                 params: {
                     provider: data.provider,
                 },
@@ -226,7 +226,7 @@ export default {
 
         const goToServiceAccountPage = (item) => {
             const res: Location = {
-                name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME,
+                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
                 query: {
                     provider: item.provider,
                 },
@@ -255,7 +255,7 @@ export default {
         return {
             ...toRefs(state),
             goToServiceAccountPage,
-            ASSET_MANAGEMENT_ROUTE,
+            ASSET_INVENTORY_ROUTE,
         };
     },
 };

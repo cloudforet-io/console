@@ -57,7 +57,7 @@ import BetaMark from '@/common/components/marks/BetaMark.vue';
 enum MENU_ICON {
     dashboard = 'ic_dashboard',
     project = 'ic_project',
-    'asset_management' = 'ic_inventory',
+    'asset_inventory' = 'ic_inventory',
     'cost_explorer' = 'ic_analytics',
     'alert_manager' = 'ic_monitoring',
     administration = 'ic_management'
