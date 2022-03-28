@@ -767,14 +767,13 @@ export default {
             sidebarState.selectedItem = sidebarState.cloudServiceTypeList[0];
         };
 
-        (async () => {
+        watch(() => props.group, async () => {
             await initSidebar();
             await store.dispatch('favorite/cloudServiceType/load');
             if (!props.name) await routeFirstItem();
             tableState.schema = await getTableSchema();
             await fetchTableData();
-        })();
-        /** ************************* */
+        }, { immediate: true });
 
         return {
             /* Breadcrumb */

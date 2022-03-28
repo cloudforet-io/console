@@ -3,6 +3,7 @@
         <slot name="search-input" />
         <p-data-loader :data="allSelectableItems"
                        :loading="loading"
+                       :loader-backdrop-opacity="1"
         >
             <template #loader>
                 <div class="skeleton-wrapper">
@@ -56,7 +57,7 @@ interface Props {
     inputText: string;
     loading: boolean;
     menuItems: SuggestionItem[];
-    cloudServiceItems: SuggestionItem[];
+    cloudServiceTypeItems: SuggestionItem[];
     isFocused: boolean;
     focusStartPosition: FocusStartPosition;
     isRecent: boolean;
@@ -83,7 +84,7 @@ export default defineComponent<Props>({
             type: Array as PropType<SuggestionItem[]>,
             default: () => [],
         },
-        cloudServiceItems: {
+        cloudServiceTypeItems: {
             type: Array as PropType<SuggestionItem[]>,
             default: () => [],
         },
@@ -109,14 +110,14 @@ export default defineComponent<Props>({
                     results.push({ name: 'title', label: props.isRecent ? i18n.t('COMMON.GNB.SEARCH.RECENT_MENU') : i18n.t('COMMON.GNB.SEARCH.MENU'), type: 'header' });
                     results.push(...props.menuItems);
                 }
-                if (props.cloudServiceItems.length) {
+                if (props.cloudServiceTypeItems.length) {
                     if (results.length !== 0) results.push({ type: 'divider' });
                     results.push({ name: 'title', label: props.isRecent ? i18n.t('COMMON.GNB.SEARCH.RECENT_CLOUD_SERVICE') : 'CLOUD SERVICE', type: 'header' });
-                    results.push(...props.cloudServiceItems);
+                    results.push(...props.cloudServiceTypeItems);
                 }
                 return results;
             }),
-            allSelectableItems: computed<any[]>(() => props.menuItems.concat(props.cloudServiceItems)),
+            allSelectableItems: computed<any[]>(() => props.menuItems.concat(props.cloudServiceTypeItems)),
         });
 
         const emitSelect = (index: number, listType: SuggestionType) => {
@@ -168,6 +169,13 @@ export default defineComponent<Props>({
     margin-top: 0.25rem;
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
 
+    display: flex;
+    flex-direction: column;
+    .p-data-loader {
+        flex-grow: 1;
+        height: 100%;
+        min-height: inherit;
+    }
     .skeleton-wrapper {
         @apply flex flex-col w-full self-start;
         padding: 0 0.75rem;
