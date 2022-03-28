@@ -124,6 +124,8 @@ export default {
 
 <style lang="postcss" scoped>
 .sitemap-container {
+    @apply relative;
+
     .sitemap-button {
         @apply text-gray-900;
         position: relative;
@@ -142,7 +144,7 @@ export default {
     .sitemap {
         @apply bg-white border border-gray-200 text-gray-900;
         position: absolute;
-        top: 2.5rem;
+        top: 100%;
         left: 0;
         max-height: calc(100vh - 4rem);
         width: 15rem;
@@ -151,7 +153,7 @@ export default {
         overflow-y: auto;
         z-index: 999;
         padding: 1.5rem 0;
-        margin-left: 1.5rem;
+        margin-left: -0.5rem;
         ul:first-child .menu {
             margin-top: 0;
         }
