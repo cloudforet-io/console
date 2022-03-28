@@ -10,7 +10,7 @@
                     @select="handleSelect"
     >
         <template #header-title="{ item }">
-            <div :key="index" class="context-header">
+            <div class="context-header">
                 {{ item.label }}
             </div>
         </template>
@@ -23,22 +23,18 @@
             <span>
                 <template v-if="item.parents">
                     <template v-for="parent in item.parents">
-                        <span v-for="(text, i) in parent.label.split(searchRegex)"
+                        <span v-for="({text, matched}, i) in getTextList(parent.label)"
                               :key="`parent-label-${text}-${i}`"
                         >
-                            <span v-if="i !== 0"
-                                  class="matched-character"
-                            >{{ getMatchText(parent.label) }}</span><span>{{ text }}</span>
+                            <span :class="{'matched-character': matched}">{{ text }}</span>
                         </span>
                         <p-i :key="item.name + parent.name + 'arrow'" name="ic_breadcrumb_arrow" />
                     </template>
                 </template>
-                <span v-for="(text, i) in item.label.split(searchRegex)"
+                <span v-for="({text, matched}, i) in getTextList(item.label)"
                       :key="`label-${text}-${i}`"
                 >
-                    <span v-if="i !== 0"
-                          class="matched-character"
-                    >{{ getMatchText(item.label) }}</span><span>{{ text }}</span>
+                    <span :class="{'matched-character': matched}">{{ text }}</span>
                 </span>
             </span>
         </template>
@@ -113,10 +109,43 @@ export default defineComponent<Props>({
             }),
         });
 
-        const getMatchText = (text: string): string => {
-            const res = state.searchRegex.exec(text);
-            if (res) return res[0];
+        const getFirstMatchedString = (str: string): string => {
+            const matched = state.searchRegex.exec(str);
+            if (matched?.index === 0) {
+                return matched[0];
+            }
             return '';
+        };
+
+        const getTextList = (str = ''): {text: string; matched: boolean}[] => {
+            if (!props.inputText?.trim()) return [{ text: str, matched: false }];
+
+            const regex = state.searchRegex;
+            const unmatchedTexts = str.split(regex);
+            const textList: {text: string; matched: boolean}[] = [];
+
+            let remainedStr = str;
+
+            const setMatchedItem = () => {
+                const text = getFirstMatchedString(remainedStr);
+                if (text) {
+                    textList.push({ text, matched: true });
+                    remainedStr = remainedStr.slice(text.length);
+                }
+            };
+
+            setMatchedItem();
+            unmatchedTexts.forEach((t) => {
+                if (t) {
+                    textList.push({ text: t, matched: false });
+                    remainedStr = remainedStr.slice(t.length);
+                }
+                if (remainedStr) {
+                    setMatchedItem();
+                }
+            });
+
+            return textList;
         };
 
         const handleSelect = (item, index) => {
@@ -135,7 +164,7 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            getMatchText,
+            getTextList,
             handleSelect,
         };
     },

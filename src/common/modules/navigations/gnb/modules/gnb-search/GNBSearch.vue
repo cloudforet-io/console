@@ -1,5 +1,5 @@
 <template>
-    <div class="gnb-search">
+    <div v-click-outside="handleClickOutside" class="gnb-search">
         <g-n-b-search-input v-if="isOverLaptopSize" v-model="inputText"
                             :is-focused.sync="isFocusOnInput"
                             @click.stop="showSuggestion"
@@ -11,19 +11,25 @@
 
         <span v-else
               class="menu-button"
-              @click.stop="showSuggestion"
         >
-            <p-i name="ic_search--bold"
+            <p-i v-if="proxyVisibleSuggestion"
+                 name="ic_delete--bold"
                  height="1.5rem" width="1.5rem"
                  color="inherit"
+                 @click.stop="hideSuggestion"
+            />
+            <p-i v-else
+                 name="ic_search--bold"
+                 height="1.5rem" width="1.5rem"
+                 color="inherit"
+                 @click.stop="showSuggestion"
             />
         </span>
-
-        <g-n-b-search-dropdown v-if="visibleSuggestion"
+        <g-n-b-search-dropdown v-show="proxyVisibleSuggestion"
                                :input-text="trimmedInputText"
                                :loading="loading"
-                               :menu-items="menuItems"
-                               :cloud-service-items="cloudServiceItems"
+                               :menu-items="menuSuggestions"
+                               :cloud-service-type-items="cloudServiceTypeSuggestions"
                                :focus-start-position="focusStartPosition"
                                :is-focused.sync="isFocusOnSuggestion"
                                :is-recent="showRecent"
@@ -49,10 +55,11 @@
 <script lang="ts">
 import axios, { CancelTokenSource } from 'axios';
 import { flatten, throttle } from 'lodash';
+import vClickOutside from 'v-click-outside';
 
 import {
-    computed, onMounted, onUnmounted,
-    reactive, toRefs, watch,
+    computed, defineComponent, onMounted, onUnmounted,
+    reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
@@ -72,6 +79,7 @@ import {
     SuggestionType,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { menuRouterMap } from '@/lib/router/menu-router-map';
 
@@ -88,63 +96,68 @@ interface CloudService {
 
 const LAPTOP_WINDOW_SIZE = laptop.max;
 
-const getSubMenuList = (menu: GNBMenu[]) => menu.map(d => (d.subMenuList?.length ? d.subMenuList.map(item => ({
-    ...item,
-    parents: [{ id: d.id, label: d.label }],
-})) : { id: d.id, label: d.label }));
+const getSubMenuList = (menu: GNBMenu[]): SuggestionItem[] => flatten(menu.map(({ id, label, subMenuList }) => {
+    if (subMenuList) {
+        return subMenuList.map(item => ({
+            name: item.id,
+            label: item.label,
+            parents: [{ name: id, label }],
+        } as SuggestionItem));
+    }
+    return [{ name: id, label }] as SuggestionItem[];
+}));
 
-export default {
+interface Props {
+    visibleSuggestion: boolean;
+}
+
+export default defineComponent<Props>({
     name: 'GNBSearch',
     components: {
         GNBSearchDropdown,
         GNBSearchInput,
         PI,
     },
-    setup() {
+    directives: {
+        clickOutside: vClickOutside.directive,
+    },
+    props: {
+        visibleSuggestion: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props, { emit }) {
         const state = reactive({
-            visibleSuggestion: false,
+            proxyVisibleSuggestion: useProxyValue('visibleSuggestion', props, emit),
+            isFocusOnInput: false,
+            isFocusOnSuggestion: false,
+            focusStartPosition: 'START',
             inputText: '',
             trimmedInputText: computed<string>(() => {
                 if (state.inputText) return state.inputText.trim();
                 return '';
             }),
+            showRecent: computed(() => !state.inputText.length),
+            isOverLaptopSize: window.innerWidth > LAPTOP_WINDOW_SIZE,
             loading: true,
-            allMenuItems: computed<SuggestionItem[]>(() => {
+            // data
+            allMenuList: computed<SuggestionItem[]>(() => {
                 const menu = store.getters['display/GNBMenuList'];
-                return flatten(getSubMenuList(menu));
+                return getSubMenuList(menu);
             }),
-            cloudServiceList: [] as CloudService[],
-            searchRegex: computed(() => {
-                let regex = '';
-                if (state.inputText) {
-                    // remove spaces in the search term
-                    const text = state.inputText.replace(/\s/g, '');
-                    for (let i = 0; i < text.length; i++) {
-                        regex += text[i];
-                        // add space regex after every single character to find matching keywords ignoring spaces
-                        if (i < text.length - 1) regex += '\\s*';
-                    }
-                }
-                return new RegExp(regex, 'i');
-            }),
-            menuItems: computed<SuggestionItem[]>(() => {
+            filteredMenuList: [] as SuggestionItem[],
+            cloudServiceTypeList: [] as CloudService[],
+            recentMenuList: [] as SuggestionItem[],
+            recentCloudServiceList: [] as CloudService[],
+            // suggestion items
+            menuSuggestions: computed<SuggestionItem[]>(() => {
                 if (state.showRecent) return state.recentMenuList;
-
-                const regex = state.searchRegex;
-
-                return state.allMenuItems.map(d => ({
-                    name: d.id,
-                    label: d.label,
-                    parents: d.parents ? d.parents : undefined,
-                })).filter((d) => {
-                    if (regex.test(d.label)) return true;
-                    if (d.parents && d.parents.some(p => regex.test(p.label))) return true;
-                    return false;
-                });
+                return state.filteredMenuList;
             }),
-            cloudServiceItems: computed<SuggestionItem[]>(() => {
-                const cloudServiceList = state.showRecent ? state.recentCloudServiceList : state.cloudServiceList;
-                return cloudServiceList.map(d => ({
+            cloudServiceTypeSuggestions: computed<SuggestionItem[]>(() => {
+                const cloudServiceTypeList = state.showRecent ? state.recentCloudServiceList : state.cloudServiceTypeList;
+                return cloudServiceTypeList.map(d => ({
                     name: d.id,
                     label: d.name,
                     icon: d.icon,
@@ -153,44 +166,66 @@ export default {
                     provider: d.provider,
                 }));
             }),
-            isFocusOnInput: false,
-            isFocusOnSuggestion: false,
-            focusStartPosition: 'START',
-            showRecent: computed(() => state.visibleSuggestion && !state.inputText.length),
-            recentMenuList: [] as SuggestionItem[],
-            recentCloudServiceList: [] as CloudService[],
-            isOverLaptopSize: window.innerWidth > LAPTOP_WINDOW_SIZE,
         });
 
         /* Util */
         const getConvertedCloudServiceList = (rawData): CloudService[] => rawData.map(d => ({
-            id: d.data.id,
+            id: d.key,
             name: d.data.name,
             group: d.data.group,
             provider: d.data.provider,
             icon: d.data.icon,
         }));
 
+        const getSearchRegex = (inputText?: string) => {
+            let regex = '';
+            if (inputText) {
+                // remove spaces in the search term
+                const text = state.inputText.replace(/\s/g, '');
+                for (let i = 0; i < text.length; i++) {
+                    regex += text[i];
+                    // add space regex after every single character to find matching keywords ignoring spaces
+                    if (i < text.length - 1) regex += '\\s*';
+                }
+            }
+            return new RegExp(regex, 'i');
+        };
+
+        const filterMenuItemsBySearchTerm = (menuSuggestions: SuggestionItem[], searchTerm?: string) => {
+            const regex = getSearchRegex(searchTerm);
+
+            return menuSuggestions.map(d => ({
+                name: d.name,
+                label: d.label,
+                parents: d.parents ? d.parents : undefined,
+            })).filter((d) => {
+                if (regex.test(d.label as string)) return true;
+                if (d.parents && d.parents.some(p => regex.test(p.label as string))) return true;
+                return false;
+            }).slice(0, 5);
+        };
+
 
         /* API */
-        let listRecentToken: CancelTokenSource | undefined;
+        const listRecentTokens: Partial<Record<SuggestionType, CancelTokenSource|undefined>> = {
+            MENU: undefined,
+            CLOUD_SERVICE: undefined,
+        };
         const listRecent = async (type) => {
-            state.loading = true;
-
-            if (listRecentToken) {
-                listRecentToken.cancel('Next request has been called.');
-                listRecentToken = undefined;
+            if (listRecentTokens[type]) {
+                listRecentTokens[type].cancel('Next request has been called.');
+                listRecentTokens[type] = undefined;
             }
 
-            listRecentToken = axios.CancelToken.source();
+            listRecentTokens[type] = axios.CancelToken.source();
             try {
                 const { results } = await SpaceConnector.client.addOns.recent.list({
                     type,
                     limit: 5,
                 }, {
-                    cancelToken: listRecentToken.token,
+                    cancelToken: listRecentTokens[type].token,
                 });
-                listRecentToken = undefined;
+                listRecentTokens[type] = undefined;
 
                 if (type === 'MENU') state.recentMenuList = results.map(d => d.data);
                 if (type === 'CLOUD_SERVICE') state.recentCloudServiceList = results.map(d => d.data);
@@ -198,8 +233,6 @@ export default {
                 if (!axios.isCancel(e.axiosError)) {
                     ErrorHandler.handleError(e);
                 }
-            } finally {
-                state.loading = false;
             }
         };
 
@@ -245,19 +278,28 @@ export default {
         };
 
         /* Event */
-        const showSuggestion = () => {
-            state.visibleSuggestion = true;
+        const showSuggestion = async () => {
+            if (!state.proxyVisibleSuggestion) {
+                state.loading = true;
+                state.proxyVisibleSuggestion = true;
+                await Promise.allSettled([listRecent('MENU'), listRecent('CLOUD_SERVICE')]);
+                state.loading = false;
+            }
         };
 
         const hideSuggestion = () => {
-            state.inputText = '';
-            state.visibleSuggestion = false;
-            state.isFocusOnInput = false;
-            state.isFocusOnSuggestion = false;
+            if (state.proxyVisibleSuggestion) {
+                state.proxyVisibleSuggestion = false;
+                state.inputText = '';
+                state.isFocusOnInput = false;
+                state.isFocusOnSuggestion = false;
+                state.cloudServiceTypeList = [];
+                state.filteredMenuList = [];
+            }
         };
 
         const moveFocusToSuggestion = (focusStartPosition: FocusStartPosition) => {
-            if (!state.visibleSuggestion) state.visibleSuggestion = true;
+            if (!state.proxyVisibleSuggestion) state.proxyVisibleSuggestion = true;
             state.isFocusOnInput = false;
             state.focusStartPosition = focusStartPosition;
             state.isFocusOnSuggestion = true;
@@ -271,35 +313,45 @@ export default {
         const handleUpdateInput = async () => {
             if (state.trimmedInputText) {
                 const results = await getCloudServiceResources(state.trimmedInputText);
-                state.cloudServiceList = getConvertedCloudServiceList(results);
+                state.cloudServiceTypeList = getConvertedCloudServiceList(results);
+                state.filteredMenuList = filterMenuItemsBySearchTerm(state.allMenuList, state.trimmedInputText);
             }
         };
 
         const handleSelect = (index: number, type: SuggestionType) => {
             if (type === 'MENU') {
-                const menu = state.menuItems[index];
+                const menu = state.menuSuggestions[index];
                 const menuRoute = menuRouterMap[menu.name];
                 if (menuRoute && SpaceRouter.router.currentRoute.name !== menuRoute.name) {
-                    createRecent(type, menu);
-                    SpaceRouter.router.push({
-                        name: menuRoute.name,
-                    });
+                    try {
+                        SpaceRouter.router.push({
+                            name: menuRoute.name,
+                        });
+                        createRecent(type, menu);
+                    } catch (e) {}
                 }
             } else {
-                const cloudServiceItem = state.cloudServiceItems[index];
-                if (cloudServiceItem) {
-                    createRecent(type, cloudServiceItem);
-                    SpaceRouter.router.push({
-                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                        params: {
-                            provider: cloudServiceItem.provider,
-                            group: cloudServiceItem.parents[0].name,
-                            name: cloudServiceItem.label,
-                        },
-                    });
+                const cloudServiceTypeList = state.showRecent ? state.recentCloudServiceList : state.cloudServiceTypeList;
+                const cloudServiceType = cloudServiceTypeList[index];
+                if (cloudServiceType) {
+                    try {
+                        SpaceRouter.router.push({
+                            name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                            params: {
+                                provider: cloudServiceType.provider,
+                                group: cloudServiceType.group,
+                                name: cloudServiceType.name,
+                            },
+                        });
+                        createRecent(type, cloudServiceType);
+                    } catch (e) {}
                 }
             }
             hideSuggestion();
+        };
+
+        const handleClickOutside = () => {
+            if (!state.isOverLaptopSize) hideSuggestion();
         };
 
         const onWindowResize = throttle(() => {
@@ -307,22 +359,10 @@ export default {
         }, 500);
 
         onMounted(() => {
-            window.addEventListener('click', hideSuggestion);
-            window.addEventListener('blur', hideSuggestion);
             window.addEventListener('resize', onWindowResize);
         });
         onUnmounted(() => {
-            window.removeEventListener('click', hideSuggestion);
-            window.removeEventListener('blur', hideSuggestion);
             window.removeEventListener('resize', onWindowResize);
-        });
-
-        /* Watcher */
-        watch(() => state.visibleSuggestion, (visibleSuggestion) => {
-            if (visibleSuggestion) {
-                listRecent('MENU');
-                listRecent('CLOUD_SERVICE');
-            }
         });
 
         return {
@@ -333,9 +373,10 @@ export default {
             handleMoveFocusEnd,
             handleUpdateInput,
             handleSelect,
+            handleClickOutside,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

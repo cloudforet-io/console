@@ -1,6 +1,9 @@
 <template>
     <div class="right-side-menu">
-        <g-n-b-search class="menu-wrapper" />
+        <g-n-b-search v-click-outside="hideMenu"
+                      :visible-suggestion="openedMenu === 'search'"
+                      @update:visibleSuggestion="toggleMenu('search')"
+        />
         <div v-if="!userState.isDomainOwner" class="menu-wrapper">
             <div class="menu-button notifications"
                  :class="{opened: openedMenu === 'notifications'}"
