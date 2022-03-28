@@ -54,7 +54,7 @@ import { store } from '@/store';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 enum DATA_TYPE {
@@ -113,7 +113,7 @@ export default {
             ]);
 
             const location: Location = {
-                name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.TYPE._NAME,
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,
                     ...query,
@@ -135,7 +135,7 @@ export default {
                     provider: {
                         label: state.providers[item.provider].label,
                         color: state.providers[item.provider].color,
-                        to: { name: ASSET_MANAGEMENT_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: item.provider } },
+                        to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: item.provider } },
                     },
                     service_account: {
                         label: item.service_account_name,

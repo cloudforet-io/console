@@ -91,7 +91,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { store } from '@/store';
-import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import numeral from 'numeral';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -199,7 +199,7 @@ export default {
             filters.push({ k: 'data.status_code', o: '=', v: status });
 
             return {
-                name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 query: {
                     filters: queryHelper.setFilters(filters).rawQueryStrings,
                 },

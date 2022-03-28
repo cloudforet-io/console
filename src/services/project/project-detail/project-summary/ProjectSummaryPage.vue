@@ -28,7 +28,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import CloudServices from '@/services/asset-management/cloud-service/modules/CloudServices.vue';
+import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 import ProjectPersonalHealthDashboard from '@/services/project/project-detail/project-summary/modules/ProjectPersonalHealthDashboard.vue';
 import ProjectAllSummary from '@/services/project/project-detail/project-summary/modules/ProjectAllSummary.vue';

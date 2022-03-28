@@ -67,7 +67,7 @@ import { makeProxy } from '@spaceone/design-system/src/util/composition-helpers'
 
 import { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ProjectGroup } from '@/services/asset-management/service-account/type';
+import { ProjectGroup } from '@/services/asset-inventory/service-account/type';
 import Vue from 'vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
