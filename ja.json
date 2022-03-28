@@ -739,8 +739,12 @@
 			},
 			"SEARCH": {
 				"HELP_TEXT": "",
+				"MENU": "",
 				"NO_RESULT_1": "",
-				"NO_RESULT_2": ""
+				"NO_RESULT_2": "",
+				"RECENT_CLOUD_SERVICE": "",
+				"RECENT_MENU": "",
+				"SERACH": ""
 			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "APIガイド ",

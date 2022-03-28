@@ -739,8 +739,12 @@
 			},
 			"SEARCH": {
 				"HELP_TEXT": "Search for navigation menus or cloud services.",
+				"MENU": "MENU",
 				"NO_RESULT_1": "No result found for",
-				"NO_RESULT_2": "Try again with different term."
+				"NO_RESULT_2": "Try again with different term.",
+				"RECENT_CLOUD_SERVICE": "RECENT SEARCHES CLOUD SERVICE",
+				"RECENT_MENU": "RECENT SEARCHES MENU",
+				"SERACH": "Search..."
 			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "API Guide",
