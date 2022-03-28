@@ -1,6 +1,6 @@
 {{- if .Values.enabled }}
 {{- if .Values.ingress.enabled }}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -16,20 +16,27 @@ metadata:
   namespace: {{ .Values.global.namespace | default .Release.Namespace }}
 
 spec:
+  ingressClassName: alb
   rules:
     - http:
         paths:
           - path: /*
+            pathType: Prefix
             backend:
-              serviceName: ssl-redirect
-              servicePort: use-annotation
+              service:
+                name: ssl-redirect
+                port:
+                  name: use-annotation
 
     - host: "{{ .Values.ingress.host }}"
       http:
         paths:
-          - backend:
-              serviceName: console
-              servicePort: 80
-            path: /*
+          - path: /*
+            pathType: Prefix
+            backend:
+              service:
+                name: console
+                port:
+                  number: 80
 {{- end }}
 {{- end }}
