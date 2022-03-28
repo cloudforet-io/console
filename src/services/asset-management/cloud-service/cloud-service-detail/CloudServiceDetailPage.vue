@@ -767,7 +767,7 @@ export default {
             sidebarState.selectedItem = sidebarState.cloudServiceTypeList[0];
         };
 
-        watch(() => props.group, async () => {
+        watch([() => props.group, () => props.name], async () => {
             await initSidebar();
             await store.dispatch('favorite/cloudServiceType/load');
             if (!props.name) await routeFirstItem();
