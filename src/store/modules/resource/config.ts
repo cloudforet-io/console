@@ -1,1 +1,1 @@
-export const REFERENCE_LOAD_TTL = 3000;
+export const REFERENCE_LOAD_TTL = 600000;
