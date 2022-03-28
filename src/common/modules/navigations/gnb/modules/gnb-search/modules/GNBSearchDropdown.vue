@@ -50,6 +50,7 @@ import {
     SuggestionType,
     SuggestionItem,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import { i18n } from '@/translations';
 
 interface Props {
     inputText: string;
@@ -105,12 +106,12 @@ export default defineComponent<Props>({
                 const results: SuggestionItem[] = [];
 
                 if (props.menuItems.length) {
-                    results.push({ name: 'title', label: props.isRecent ? 'RECENT SEARCHES MENU' : 'MENU', type: 'header' });
+                    results.push({ name: 'title', label: props.isRecent ? i18n.t('COMMON.GNB.SEARCH.RECENT_MENU') : i18n.t('COMMON.GNB.SEARCH.MENU'), type: 'header' });
                     results.push(...props.menuItems);
                 }
                 if (props.cloudServiceItems.length) {
                     if (results.length !== 0) results.push({ type: 'divider' });
-                    results.push({ name: 'title', label: props.isRecent ? 'RECENT SEARCHES CLOUD SERVICE' : 'CLOUD SERVICE', type: 'header' });
+                    results.push({ name: 'title', label: props.isRecent ? i18n.t('COMMON.GNB.SEARCH.RECENT_CLOUD_SERVICE') : 'CLOUD SERVICE', type: 'header' });
                     results.push(...props.cloudServiceItems);
                 }
                 return results;

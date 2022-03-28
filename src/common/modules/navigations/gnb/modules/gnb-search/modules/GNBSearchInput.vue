@@ -8,7 +8,7 @@
         />
         <input ref="inputRef"
                :value="value"
-               placeholder="Search..."
+               :placeholder="placeholder"
                @input="$emit('update:value', $event.target.value)"
                @focus="$emit('update:isFocused', true)"
                @blur="$emit('update:isFocused', false)"
@@ -19,10 +19,12 @@
 
 <script lang="ts">
 import {
+    computed,
     defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { PI } from '@spaceone/design-system';
+import { i18n } from '@/translations';
 
 interface Props {
     value: string;
@@ -51,6 +53,7 @@ export default defineComponent<Props>({
     setup(props) {
         const state = reactive({
             inputRef: null as null|HTMLElement,
+            placeholder: computed(() => (i18n.t('COMMON.GNB.SEARCH.SERACH'))),
         });
 
         watch(() => props.isFocused, (isFocused) => {
