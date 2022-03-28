@@ -13,7 +13,7 @@
                 <template v-if="menu.show !== false">
                     <router-link :to="menu.to">
                         <li class="menu" @click="hideMenu">
-                            <p-i :name="MENU_ICON[menu.name]"
+                            <p-i :name="MENU_ICON[menu.id]"
                                  color="inherit inherit"
                                  height="1.5rem" width="1.5rem"
                             /> {{ menu.label }}
@@ -57,12 +57,10 @@ import BetaMark from '@/common/components/marks/BetaMark.vue';
 enum MENU_ICON {
     dashboard = 'ic_dashboard',
     project = 'ic_project',
-    inventory = 'ic_inventory',
-    identity = 'ic_identity',
-    monitoring = 'ic_monitoring',
-    automation = 'ic_automation',
-    plugin = 'ic_plugin',
-    management = 'ic_management',
+    'asset_management' = 'ic_inventory',
+    'cost_explorer' = 'ic_analytics',
+    'alert_manager' = 'ic_monitoring',
+    administration = 'ic_management'
 }
 
 export default {
@@ -94,7 +92,7 @@ export default {
         const state = reactive({
             siteMapMenuList: computed(() => ([
                 {
-                    name: DASHBOARD_ROUTE._NAME,
+                    id: DASHBOARD_ROUTE._NAME,
                     label: vm.$t('MENU.DASHBOARD.DASHBOARD'),
                     to: { name: DASHBOARD_ROUTE._NAME },
                     subMenuList: [],
