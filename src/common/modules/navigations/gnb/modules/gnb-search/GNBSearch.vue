@@ -86,7 +86,7 @@ import { menuRouterMap } from '@/lib/router/menu-router-map';
 import { ASSET_MANAGEMENT_ROUTE } from '@/services/asset-management/route-config';
 
 
-interface CloudService {
+interface CloudServiceTypeData {
     id: string;
     provider: string;
     group: string;
@@ -94,17 +94,25 @@ interface CloudService {
     icon: string;
 }
 
+interface MenuData {
+    id: string;
+    label: string;
+    parents?: MenuData[];
+}
+
 const LAPTOP_WINDOW_SIZE = laptop.max;
 
-const getSubMenuList = (menu: GNBMenu[]): SuggestionItem[] => flatten(menu.map(({ id, label, subMenuList }) => {
+// convert gnb data structure to console menu.
+// in suggestion items, each item must have reference of parents, not children(sub menu).
+const convertToConsoleMenuList = (menu: GNBMenu[]): MenuData[] => flatten(menu.map(({ id, label, subMenuList }) => {
     if (subMenuList) {
         return subMenuList.map(item => ({
-            name: item.id,
+            id: item.id,
             label: item.label,
-            parents: [{ name: id, label }],
-        } as SuggestionItem));
+            parents: [{ id, label }],
+        } as MenuData));
     }
-    return [{ name: id, label }] as SuggestionItem[];
+    return [{ id, label }] as MenuData[];
 }));
 
 interface Props {
@@ -142,18 +150,22 @@ export default defineComponent<Props>({
             isOverLaptopSize: window.innerWidth > LAPTOP_WINDOW_SIZE,
             loading: true,
             // data
-            allMenuList: computed<SuggestionItem[]>(() => {
+            allMenuList: computed<MenuData[]>(() => {
                 const menu = store.getters['display/GNBMenuList'];
-                return getSubMenuList(menu);
+                return convertToConsoleMenuList(menu);
             }),
-            filteredMenuList: [] as SuggestionItem[],
-            cloudServiceTypeList: [] as CloudService[],
-            recentMenuList: [] as SuggestionItem[],
-            recentCloudServiceList: [] as CloudService[],
+            filteredMenuList: [] as MenuData[],
+            cloudServiceTypeList: [] as CloudServiceTypeData[],
+            recentMenuList: [] as MenuData[],
+            recentCloudServiceList: [] as CloudServiceTypeData[],
             // suggestion items
             menuSuggestions: computed<SuggestionItem[]>(() => {
-                if (state.showRecent) return state.recentMenuList;
-                return state.filteredMenuList;
+                const menuList = state.showRecent ? state.recentMenuList : state.filteredMenuList;
+                return menuList.map(d => ({
+                    name: d.id,
+                    label: d.label,
+                    parents: d.parents ? d.parents.map(p => ({ name: p.id, label: p.label })) : undefined,
+                }));
             }),
             cloudServiceTypeSuggestions: computed<SuggestionItem[]>(() => {
                 const cloudServiceTypeList = state.showRecent ? state.recentCloudServiceList : state.cloudServiceTypeList;
@@ -167,15 +179,6 @@ export default defineComponent<Props>({
                 }));
             }),
         });
-
-        /* Util */
-        const getConvertedCloudServiceList = (rawData): CloudService[] => rawData.map(d => ({
-            id: d.key,
-            name: d.data.name,
-            group: d.data.group,
-            provider: d.data.provider,
-            icon: d.data.icon,
-        }));
 
         const getSearchRegex = (inputText?: string) => {
             let regex = '';
@@ -191,11 +194,11 @@ export default defineComponent<Props>({
             return new RegExp(regex, 'i');
         };
 
-        const filterMenuItemsBySearchTerm = (menuSuggestions: SuggestionItem[], searchTerm?: string) => {
+        const filterMenuItemsBySearchTerm = (menu: MenuData[], searchTerm?: string): MenuData[] => {
             const regex = getSearchRegex(searchTerm);
 
-            return menuSuggestions.map(d => ({
-                name: d.name,
+            return menu.map(d => ({
+                id: d.id,
                 label: d.label,
                 parents: d.parents ? d.parents : undefined,
             })).filter((d) => {
@@ -236,11 +239,11 @@ export default defineComponent<Props>({
             }
         };
 
-        const createRecent = async (type: SuggestionType, item: SuggestionItem) => {
+        const createRecent = async (type: SuggestionType, item: MenuData|CloudServiceTypeData) => {
             try {
                 await SpaceConnector.client.addOns.recent.create({
                     type,
-                    id: item.name,
+                    id: item.id,
                     data: item,
                 });
             } catch (e) {
@@ -313,39 +316,40 @@ export default defineComponent<Props>({
         const handleUpdateInput = async () => {
             if (state.trimmedInputText) {
                 const results = await getCloudServiceResources(state.trimmedInputText);
-                state.cloudServiceTypeList = getConvertedCloudServiceList(results);
+                state.cloudServiceTypeList = results.map(d => d.data);
                 state.filteredMenuList = filterMenuItemsBySearchTerm(state.allMenuList, state.trimmedInputText);
             }
         };
 
         const handleSelect = (index: number, type: SuggestionType) => {
             if (type === 'MENU') {
-                const menu = state.menuSuggestions[index];
-                const menuRoute = menuRouterMap[menu.name];
-                if (menuRoute && SpaceRouter.router.currentRoute.name !== menuRoute.name) {
-                    try {
-                        SpaceRouter.router.push({
-                            name: menuRoute.name,
-                        });
-                        createRecent(type, menu);
-                    } catch (e) {}
-                }
+                const menu: MenuData = state.showRecent ? state.recentMenuList[index] : state.filteredMenuList[index];
+                if (!menu) return;
+
+                const menuRoute = menuRouterMap[menu.id];
+                if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.name) return;
+
+                try {
+                    SpaceRouter.router.push({
+                        name: menuRoute.name,
+                    });
+                    createRecent(type, menu);
+                } catch (e) {}
             } else {
-                const cloudServiceTypeList = state.showRecent ? state.recentCloudServiceList : state.cloudServiceTypeList;
-                const cloudServiceType = cloudServiceTypeList[index];
-                if (cloudServiceType) {
-                    try {
-                        SpaceRouter.router.push({
-                            name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                            params: {
-                                provider: cloudServiceType.provider,
-                                group: cloudServiceType.group,
-                                name: cloudServiceType.name,
-                            },
-                        });
-                        createRecent(type, cloudServiceType);
-                    } catch (e) {}
-                }
+                const cloudServiceType = state.showRecent ? state.recentCloudServiceList[index] : state.cloudServiceTypeList[index];
+                if (!cloudServiceType) return;
+
+                try {
+                    SpaceRouter.router.push({
+                        name: ASSET_MANAGEMENT_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        params: {
+                            provider: cloudServiceType.provider,
+                            group: cloudServiceType.group,
+                            name: cloudServiceType.name,
+                        },
+                    });
+                    createRecent(type, cloudServiceType);
+                } catch (e) {}
             }
             hideSuggestion();
         };
