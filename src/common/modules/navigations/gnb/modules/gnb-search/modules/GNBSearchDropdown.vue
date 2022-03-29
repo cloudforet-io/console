@@ -3,14 +3,7 @@
         <slot name="search-input" />
         <p-data-loader :data="allSelectableItems"
                        :loading="loading"
-                       :loader-backdrop-opacity="1"
         >
-            <template #loader>
-                <div class="skeleton-wrapper">
-                    <p-skeleton width="36%" height="1rem" class="mb-2" />
-                    <p-skeleton width="100%" height="2rem" />
-                </div>
-            </template>
             <g-n-b-search-suggestion-list :items="suggestionItems"
                                           :input-text="inputText"
                                           :is-focused="isFocused"
@@ -45,7 +38,7 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 import GNBSearchSuggestionList from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchSuggestionList.vue';
-import { PDataLoader, PDivider, PSkeleton } from '@spaceone/design-system';
+import { PDataLoader, PDivider } from '@spaceone/design-system';
 import {
     FocusStartPosition,
     SuggestionType,
@@ -69,7 +62,6 @@ export default defineComponent<Props>({
         GNBSearchSuggestionList,
         PDivider,
         PDataLoader,
-        PSkeleton,
     },
     props: {
         inputText: {

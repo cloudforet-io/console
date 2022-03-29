@@ -2,10 +2,10 @@
     <div v-click-outside="handleClickOutside" class="gnb-search">
         <g-n-b-search-input v-if="isOverLaptopSize" v-model="inputText"
                             :is-focused.sync="isFocusOnInput"
-                            @click.stop="showSuggestion"
-                            @keyup.esc="hideSuggestion"
-                            @keydown.up="moveFocusToSuggestion('END')"
-                            @keydown.down="moveFocusToSuggestion('START')"
+                            @click="showSuggestion"
+                            @esc="hideSuggestion"
+                            @arrow-up="moveFocusToSuggestion('END')"
+                            @arrow-down="moveFocusToSuggestion('START')"
                             @input="handleUpdateInput"
         />
 
@@ -41,10 +41,10 @@
                 <g-n-b-search-input v-if="!isOverLaptopSize"
                                     v-model="inputText"
                                     :is-focused.sync="isFocusOnInput"
-                                    @click.stop="showSuggestion"
-                                    @keyup.esc="hideSuggestion"
-                                    @keydown.up="moveFocusToSuggestion('END')"
-                                    @keydown.down="moveFocusToSuggestion('START')"
+                                    @click="showSuggestion"
+                                    @esc="hideSuggestion"
+                                    @arrow-up="moveFocusToSuggestion('END')"
+                                    @arrow-down="moveFocusToSuggestion('START')"
                                     @input="handleUpdateInput"
                 />
             </template>
@@ -282,6 +282,7 @@ export default defineComponent<Props>({
 
         /* Event */
         const showSuggestion = async () => {
+            if (!state.isFocusOnInput) state.isFocusOnInput = true;
             if (!state.proxyVisibleSuggestion) {
                 state.loading = true;
                 state.proxyVisibleSuggestion = true;
