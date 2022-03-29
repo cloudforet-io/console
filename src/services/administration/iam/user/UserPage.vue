@@ -82,7 +82,7 @@ export default {
             showManagementPage: true,
             MenuList: [
                 {
-                    label: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT'),
+                    label: 'User',
                     routeName: ADMINISTRATION_ROUTE.IAM.USER._NAME,
                     userOnly: false,
                     isAdminMenu: true,

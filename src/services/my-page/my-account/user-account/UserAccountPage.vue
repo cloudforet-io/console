@@ -180,6 +180,7 @@ export default {
             route: [
                 { name: 'My Page', to: { name: MY_PAGE_ROUTE._NAME } },
                 { name: 'My Account', to: { name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME } },
+                { name: 'Account & Profile' },
             ],
         });
 

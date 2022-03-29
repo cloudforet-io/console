@@ -22,9 +22,9 @@
             <div v-if="!loading && filteredData.length > 0" class="col-span-12 lg:col-span-3 resource-info-wrapper">
                 <div class="resource-info-title">
                     <span class="resource-info-provider"
-                          :style="{color: providers[selectedProvider||'aws'] ? providers[selectedProvider||'aws'].color : undefined }"
+                          :style="{color: providers[selectedProvider] ? providers[selectedProvider].color : undefined }"
                     >
-                        {{ providers[selectedProvider].label }} </span>
+                        {{ providers[selectedProvider].label }}</span>
                     <span class="resource-info-region">{{ selectedRegion }}</span>
                 </div>
                 <div class="grid-cols-1 sm:grid-cols-2 lg:grid-cols-1
