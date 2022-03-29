@@ -88,6 +88,7 @@ import alertStoreModule from '@/services/alert-manager/store';
 import { AlertStoreState } from '@/services/alert-manager/store/type';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { NoResourceError } from '@/common/composables/error/error';
 
 export default {
     name: 'AlertDetailPage',
@@ -167,7 +168,7 @@ export default {
             try {
                 await store.dispatch('service/alert/getAlertData', props.id);
             } catch (e) {
-                ErrorHandler.handleError(e);
+                ErrorHandler.handleError(new NoResourceError({ name: ALERT_MANAGER_ROUTE.ALERT._NAME }));
             } finally {
                 state.loading = false;
             }
