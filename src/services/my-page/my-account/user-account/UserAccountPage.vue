@@ -257,13 +257,22 @@ export default {
             await updateUser(userParam);
         };
 
+        const resetPasswordForm = () => {
+            formState.password = '';
+            formState.passwordCheck = '';
+        };
+
         const onClickPasswordConfirm = async () => {
             await checkPassword(formState.password);
-            if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
+            if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) {
+                resetPasswordForm();
+                return;
+            }
             const userParam: UpdateUserRequest = {
                 password: formState.password,
             };
             await updateUser(userParam);
+            resetPasswordForm();
         };
 
         const getProfile = async () => {
