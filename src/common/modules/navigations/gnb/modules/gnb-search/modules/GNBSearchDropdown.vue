@@ -23,7 +23,12 @@
                 <div v-else class="no-data">
                     <img src="@/assets/images/illust_ghost.svg" class="img-no-data">
                     <p class="no-data-text">
-                        {{ $t('COMMON.GNB.SEARCH.NO_RESULT_1') }} "<em>{{ inputText }}</em>" <br>{{ $t('COMMON.GNB.SEARCH.NO_RESULT_2') }}
+                        <i18n path="COMMON.GNB.SEARCH.NO_RESULT_1">
+                            <template #inputText>
+                                <em>{{ inputText }}</em>
+                            </template>
+                        </i18n>
+                        <br>{{ $t('COMMON.GNB.SEARCH.NO_RESULT_2') }}
                     </p>
                 </div>
             </template>
@@ -104,7 +109,7 @@ export default defineComponent<Props>({
                 }
                 if (props.cloudServiceTypeItems.length) {
                     if (results.length !== 0) results.push({ type: 'divider' });
-                    results.push({ name: 'title', label: props.isRecent ? i18n.t('COMMON.GNB.SEARCH.RECENT_CLOUD_SERVICE') : 'CLOUD SERVICE', type: 'header' });
+                    results.push({ name: 'title', label: props.isRecent ? i18n.t('COMMON.GNB.SEARCH.RECENT_CLOUD_SERVICE') : i18n.t('COMMON.GNB.SEARCH.CLOUD_SERVICE'), type: 'header' });
                     results.push(...props.cloudServiceTypeItems);
                 }
                 return results;
