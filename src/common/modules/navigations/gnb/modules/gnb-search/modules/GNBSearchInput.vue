@@ -1,5 +1,5 @@
 <template>
-    <div class="gnb-search-input">
+    <div class="gnb-search-input" @click.stop="$emit('click')">
         <p-i v-if="!isFocused"
              name="ic_search"
              height="1.5rem"
@@ -9,11 +9,20 @@
         <input ref="inputRef"
                :value="value"
                :placeholder="placeholder"
-               @input="$emit('update:value', $event.target.value)"
+               @input="$emit('input', $event.target.value)"
                @focus="$emit('update:isFocused', true)"
                @blur="$emit('update:isFocused', false)"
-               v-on="$listeners"
+               @keyup.esc="$emit('esc')"
+               @keydown.up="$emit('arrow-up')"
+               @keydown.down="$emit('arrow-down')"
         >
+        <p-i name="ic_delete"
+             height="1rem"
+             width="1rem"
+             color="inherit"
+             class="delete-button"
+             @click.stop="$emit('input', '')"
+        />
     </div>
 </template>
 
@@ -38,7 +47,7 @@ export default defineComponent<Props>({
     },
     model: {
         prop: 'value',
-        event: 'update:value',
+        event: 'input',
     },
     props: {
         value: {
@@ -94,6 +103,11 @@ export default defineComponent<Props>({
         &::placeholder {
             @apply text-gray-400;
         }
+    }
+
+    .delete-button {
+        @apply text-gray-400;
+        cursor: pointer;
     }
 }
 
