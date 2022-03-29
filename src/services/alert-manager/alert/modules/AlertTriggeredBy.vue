@@ -10,11 +10,13 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, PropType, reactive, toRefs,
+} from '@vue/composition-api';
 import { Location } from 'vue-router';
 import { PAnchor } from '@spaceone/design-system';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { store } from '@/store';
+import { ResourceItem } from '@/store/modules/resource/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 export default {
@@ -35,17 +37,25 @@ export default {
             type: Boolean,
             default: false,
         },
+        webhookReference: {
+            type: Object as PropType<ResourceItem>,
+            default: undefined,
+        },
+        userReference: {
+            type: Object as PropType<ResourceItem>,
+            default: undefined,
+        },
     },
     setup(props) {
         const queryHelper = new QueryHelper();
 
         const state = reactive({
-            webhookLabel: computed<string|undefined>(() => store.state.resource.webhook.items[props.value]?.label),
-            userLabel: computed<string|undefined>(() => store.state.resource.user.items[props.value]?.label),
+            webhookLabel: computed<string|undefined>(() => props.webhookReference?.label),
+            userLabel: computed<string|undefined>(() => props.userReference?.label),
             label: computed(() => state.webhookLabel || state.userLabel || props.value),
             link: computed<Location|undefined>(() => {
                 if (props.disableLink) return undefined;
-                if (state.webhookLabel) {
+                if (props.webhookReference) {
                     return {
                         name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK._NAME,
                         params: {
@@ -55,7 +65,7 @@ export default {
                             filters: queryHelper.setFilters([{ k: 'webhook_id', v: props.value, o: '=' }]).rawQueryStrings,
                         },
                     };
-                } if (state.userLabel) {
+                } if (state.userReference) {
                     return {
                         name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
                         params: {
@@ -69,13 +79,6 @@ export default {
                 return undefined;
             }),
         });
-
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('resource/webhook/load'),
-                store.dispatch('resource/user/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

@@ -17,7 +17,7 @@
                          style-type="primary2"
                          class="member-name"
                 >
-                    {{ users[item.assignee] ? users[item.assignee].name : item.assignee }}
+                    {{ userReference ? userReference.label : item.assignee }}
                 </p-badge>
             </div>
             <div class="right-part">
@@ -52,8 +52,11 @@ import {
 } from '@spaceone/design-system';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, PropType, reactive, toRefs,
+} from '@vue/composition-api';
 import { store } from '@/store';
+import { ResourceItem } from '@/store/modules/resource/type';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 
@@ -91,12 +94,18 @@ export default {
             type: Boolean,
             default: false,
         },
+        projectReference: {
+            type: Object as PropType<ResourceItem>,
+            default: () => ({}),
+        },
+        userReference: {
+            type: Object as PropType<ResourceItem>,
+            default: () => ({}),
+        },
     },
-    setup() {
+    setup(props) {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            projects: computed(() => store.state.resource.project.items),
-            users: computed(() => store.state.resource.user.items),
         });
 
         /* util */
@@ -110,15 +119,8 @@ export default {
             const timezoneDate = dayjs(date).utcOffset(offset);
             return timezoneDate.format('MM/DD HH:mm');
         };
-        const projectNameFormatter = projectId => state.projects[projectId]?.label || projectId;
+        const projectNameFormatter = projectId => props.projectReference?.label || projectId;
 
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/user/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

@@ -27,7 +27,11 @@
                 <alert-info-project :id="id" :alert-data="data" @update="$emit('update')" />
             </template>
             <template #data-triggered_by="{ value }">
-                <alert-triggered-by :value="value" :project-id="data.project_id" disable-link />
+                <alert-triggered-by :value="value" :project-id="data.project_id"
+                                    :webhook-reference="$store.state.resource.webhook.items[value]"
+                                    :user-reference="$store.state.resource.user.items[value]"
+                                    disable-link
+                />
             </template>
             <template #data-created_at>
                 {{ iso8601Formatter(data.created_at, timezone) }}
@@ -149,6 +153,8 @@ export default {
         (async () => {
             await Promise.allSettled([
                 getEscalationPolicy(),
+                store.dispatch('resource/webhook/load'),
+                store.dispatch('resource/user/load'),
                 store.dispatch('resource/project/load'),
             ]);
         })();

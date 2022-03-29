@@ -23,6 +23,8 @@
         <template #item="{item, index}">
             <alert-list-item :item="item"
                              :show-project-link="true"
+                             :project-reference="$store.state.resource.project.items[item.project_id]"
+                             :user-reference="$store.state.resource.user.items[item.assignee]"
             />
         </template>
     </p-list-card>
@@ -114,7 +116,11 @@ export default {
 
         /* init */
         (async () => {
-            await getAssignedAlerts();
+            await Promise.allSettled([
+                store.dispatch('resource/project/load'),
+                store.dispatch('resource/user/load'),
+                getAssignedAlerts(),
+            ]);
         })();
 
         return {
