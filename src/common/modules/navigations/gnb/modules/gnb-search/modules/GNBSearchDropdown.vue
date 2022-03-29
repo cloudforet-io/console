@@ -22,13 +22,13 @@
             />
             <template #no-data>
                 <div v-if="isRecent" class="no-data">
-                    <img src="@/assets/images/illust_microscope.svg" class="no-data-img" style="width: 7.75rem;">
+                    <img src="@/assets/images/illust_microscope.svg" class="img-help">
                     <p class="no-data-text">
                         {{ $t('COMMON.GNB.SEARCH.HELP_TEXT') }}
                     </p>
                 </div>
                 <div v-else class="no-data">
-                    <img src="@/assets/images/illust_ghost.svg" class="no-data-img" style="width: 6.44rem;">
+                    <img src="@/assets/images/illust_ghost.svg" class="img-no-data">
                     <p class="no-data-text">
                         {{ $t('COMMON.GNB.SEARCH.NO_RESULT_1') }} "<em>{{ inputText }}</em>" <br>{{ $t('COMMON.GNB.SEARCH.NO_RESULT_2') }}
                     </p>
@@ -160,7 +160,9 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .gnb-search-dropdown {
-    @apply absolute bg-white rounded-xs;
+    @apply absolute bg-white rounded-xs border border-gray-200;
+    display: flex;
+    flex-direction: column;
     width: 27.5rem;
     min-height: 14.875rem;
     padding: 1rem 0;
@@ -169,8 +171,6 @@ export default defineComponent<Props>({
     margin-top: 0.25rem;
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
 
-    display: flex;
-    flex-direction: column;
     .p-data-loader {
         flex-grow: 1;
         height: 100%;
@@ -184,16 +184,27 @@ export default defineComponent<Props>({
     .no-data {
         margin: 2.5rem 0;
 
-        .no-data-img {
+        > img {
             @apply ml-auto mr-auto;
+
+            &.img-help {
+                width: 7.75rem;
+                opacity: 0.7;
+            }
+
+            &.img-no-data {
+                width: 6.44rem;
+                opacity: 0.5;
+            }
         }
 
         .no-data-text {
+            @apply text-gray-400;
             margin-top: 1.5rem;
             font-size: 0.875rem;
             line-height: 1.5;
             em {
-                @apply font-bold;
+                @apply font-bold text-gray-500;
             }
         }
     }
@@ -219,6 +230,9 @@ export default defineComponent<Props>({
                 @apply flex-grow;
                 .data-loader-container {
                     @apply flex items-center;
+                    .data-wrapper {
+                        width: 100%;
+                    }
                 }
             }
         }

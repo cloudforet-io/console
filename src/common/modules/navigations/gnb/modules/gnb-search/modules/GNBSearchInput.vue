@@ -79,20 +79,21 @@ export default defineComponent<Props>({
     font-size: 0.875rem;
 
     &:hover {
-        @apply bg-secondary-2 cursor-pointer;
-        input {
-            @apply cursor-pointer;
-        }
+        @apply bg-secondary-2;
     }
 
     &:focus-within {
-        @apply border-secondary bg-secondary-2;
+        @apply border-secondary-1 bg-secondary-2;
         box-shadow: 0 0 0 2px rgba(73, 167, 247, 0.2);
     }
 
     input {
         @apply flex-grow text-gray-900;
         background-color: inherit;
+
+        &::placeholder {
+            @apply text-gray-400;
+        }
     }
 }
 
