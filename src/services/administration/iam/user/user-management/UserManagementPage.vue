@@ -1,7 +1,7 @@
 <template>
     <section class="management-wrapper">
         <p-breadcrumbs :routes="routes" />
-        <p-page-title :title="$t('IDENTITY.USER.MAIN.USER_MANAGEMENT')"
+        <p-page-title title="User"
                       use-selected-count
                       :selected-count="selectedIndex.length"
         />
@@ -59,7 +59,7 @@ export default {
             routes: computed(() => ([
                 { name: 'Administration', to: { name: ADMINISTRATION_ROUTE._NAME } },
                 { name: 'IAM', to: { name: ADMINISTRATION_ROUTE.IAM._NAME } },
-                { name: 'User Management', to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME } },
+                { name: 'User', to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME } },
             ])),
         });
 
