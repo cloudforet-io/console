@@ -5,6 +5,10 @@ export const supportsBrowser = () => {
     const agent = window.navigator.userAgent.toLowerCase();
     const isWhale = agent.includes('whale');
     const isEdge = agent.includes('edge');
-    const isChrome = agent.includes('chrome') && !isWhale;
-    return (isChrome || isEdge);
+    const isAndroid = agent.includes('android');
+    const isIphone = agent.includes('iphone');
+    const isOpera = agent.includes('opr');
+    const isBrave = agent.includes('brave');
+    const isDesktopChrome = agent.includes('chrome') && !isWhale && !isAndroid && !isIphone && isOpera && !isBrave;
+    return (isDesktopChrome || isEdge);
 };
