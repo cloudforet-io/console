@@ -87,6 +87,7 @@ export default {
                 { name: FILTER.PROJECT, title: FILTER_ITEM_MAP[FILTER.PROJECT].label },
                 { name: FILTER.SERVICE_ACCOUNT, title: FILTER_ITEM_MAP[FILTER.SERVICE_ACCOUNT].label },
                 { name: FILTER.PROVIDER, title: FILTER_ITEM_MAP[FILTER.PROVIDER].label },
+                { name: FILTER.RESOURCE_GROUP, title: FILTER_ITEM_MAP[FILTER.RESOURCE_GROUP].label },
             ],
             filterItemsMap: computed<CostQueryFilterItemsMap>(() => {
                 const itemsMap: CostQueryFilterItemsMap = {};
