@@ -19,6 +19,7 @@
                         :src="item.icon || ''"
                         :error-icon="item.defaultIcon"
                         width="1rem" height="1rem"
+                        class="ic-lazy-img"
             />
             <span>
                 <template v-if="item.parents">
@@ -28,7 +29,9 @@
                         >
                             <span :class="{'matched-character': matched}">{{ text }}</span>
                         </span>
-                        <p-i :key="item.name + parent.name + 'arrow'" name="ic_breadcrumb_arrow" />
+                        <p-i :key="item.name + parent.name + 'arrow'" name="ic_breadcrumb_arrow" width="1rem"
+                             height="1rem"
+                        />
                     </template>
                 </template>
                 <span v-for="({text, matched}, i) in getTextList(item.label)"
@@ -174,22 +177,39 @@ export default defineComponent<Props>({
 <style lang="postcss" scoped>
 .gnb-search-suggestion-list {
     @apply bg-white border-none;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
 
     &::v-deep {
         .context-header {
             margin-top: 0;
             margin-bottom: 0.25rem;
-            padding-left: 1.25rem;
-            padding-right: 1.25rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
         }
 
         .context-item {
+            justify-content: flex-start;
             line-height: 1.75;
-            padding: 0.25rem 1.25rem;
+            padding: 0.25rem 0.5rem;
+
+            &:focus {
+                @apply border border-blue-400 rounded-xs;
+                box-shadow: 0 0 0 0.125rem rgba(73, 167, 247, 0.2);
+                outline: none;
+
+                &:not(:hover) {
+                    @apply bg-white;
+                }
+            }
+
+            .ic-lazy-img {
+                margin-right: 0.25rem;
+            }
         }
 
         .context-divider {
-            margin: 0.875rem 0 1rem;
+            margin: 0.875rem -0.75rem 1rem;
         }
     }
 
