@@ -45,7 +45,7 @@
                         <span class="value">{{ userState.role }}</span>
                     </div>
                     <div class="info-menu language"
-                         @click="toggleLanguageMenu"
+                         @click.stop="toggleLanguageMenu"
                     >
                         <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
                         <div class="value">
@@ -65,7 +65,7 @@
                         />
                     </div>
                     <div class="info-menu">
-                        <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_TIMEZONE') }}</span>
+                        <span class="label">{{ $t('COMMON.PROFILE.TIMEZONE') }}</span>
                         <span class="value">{{ userState.timezone }}</span>
                     </div>
                     <div class="info-menu">
@@ -313,7 +313,7 @@ export default {
             padding: 1.25rem 1rem 0.25rem;
 
             .p-i-icon {
-                @apply rounded-xl flex-shrink-0;
+                @apply rounded-lg flex-shrink-0;
             }
 
             .value {
