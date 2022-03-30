@@ -17,6 +17,7 @@
 </template>
 
 <script lang="ts">
+import { store } from '@/store';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 import CostManagementMenu from '@/services/cost-explorer/modules/CostManagementMenu.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -29,8 +30,11 @@ export default {
         VerticalPageLayout,
     },
     setup() {
-        return {
-        };
+        (async () => {
+            await store.dispatch('display/loadCurrencyRates');
+        })();
+
+        return {};
     },
 };
 </script>
