@@ -45,7 +45,8 @@ const filterMenuByRoute = (menuList: GNBMenu[], disabledMenu: string[], showBill
 
 export const GNBMenuList: Getter<DisplayState, any> = (state): GNBMenu[] => {
     const _isAdmin = SpaceRouter.router.app.$store.getters['user/isAdmin'];
-    const _showBilling = config.get('BILLING_ENABLED');
+    const _billingEnabledMenuList: string[] = config.get('BILLING_ENABLED') ?? [];
+    const _showBilling = _billingEnabledMenuList.includes(SpaceRouter.router.app.$store.state.domain.domainId);
     const _disabledMenu = config.get('DISABLED_MENU');
     const _menuList = state.menuList as Menu[];
 
