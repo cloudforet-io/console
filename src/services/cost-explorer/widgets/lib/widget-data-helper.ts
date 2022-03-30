@@ -131,6 +131,9 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY)
             } else if (groupBy === GROUP_BY.PROJECT_GROUP) {
                 const _projectGroups = store.state.resource.projectGroup.items;
                 _category = _projectGroups[_category]?.label || _category;
+            } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
+                const _serviceAccounts = store.state.resource.serviceAccount.items;
+                _category = _serviceAccounts[_category]?.name || _category;
             }
             if (d.usd_cost > 0) {
                 chartData.push({
