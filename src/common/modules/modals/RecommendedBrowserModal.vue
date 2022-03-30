@@ -11,6 +11,7 @@
             <div class="browser-icon-wrapper">
                 <a v-for="(browser, idx) in browserList" :key="idx"
                    class="browser-icon-container" :href="browser.link"
+                   target="_blank"
                 >
                     <img class="browser-img" :src="require(`@/assets/images/${browser.img}`)">
                     <span class="browser-name">{{ browser.label }}</span>

@@ -9,6 +9,6 @@ export const supportsBrowser = () => {
     const isIphone = agent.includes('iphone');
     const isOpera = agent.includes('opr');
     const isBrave = agent.includes('brave');
-    const isDesktopChrome = agent.includes('chrome') && !isWhale && !isAndroid && !isIphone && isOpera && !isBrave;
+    const isDesktopChrome = agent.includes('chrome') && !isWhale && !isAndroid && !isIphone && !isOpera && !isBrave;
     return (isDesktopChrome || isEdge);
 };
