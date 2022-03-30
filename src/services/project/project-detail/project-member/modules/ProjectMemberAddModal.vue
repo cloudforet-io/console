@@ -45,19 +45,6 @@
                                 {{ $t('PROJECT.DETAIL.MEMBER.TOO_MANY_RESULTS') }}
                             </div>
                         </template>
-                        <template #menu-no-data-format>
-                            <div class="external-user-no-data">
-                                <div v-if="!loading">
-                                    <p class="title">
-                                        <p-i name="ic_search" color="inherit" />
-                                        {{ $t('PROJECT.DETAIL.MEMBER.NO_RESULTS_FOUND') }}
-                                    </p>
-                                    <p class="help-text">
-                                        {{ $t('PROJECT.DETAIL.MEMBER.NO_RESULTS_FOUND_HELP_TEXT') }}
-                                    </p>
-                                </div>
-                            </div>
-                        </template>
                     </p-search-dropdown>
                     <p-data-table
                         :fields="fields"
@@ -167,7 +154,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PButton, PBoxTab, PSearchDropdown, PDataTable, PIconButton, PRadio, PTag, PI, PBadge,
+    PButtonModal, PFieldGroup, PTextInput, PButton, PBoxTab, PSearchDropdown, PDataTable, PIconButton, PRadio, PTag, PBadge,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
@@ -198,7 +185,6 @@ export default {
         PIconButton,
         PRadio,
         PTag,
-        PI,
         PBadge,
     },
     directives: {
@@ -533,24 +519,6 @@ export default {
                     font-size: 0.75rem;
                     line-height: 1.3;
                     padding: 0.25rem 0.5rem;
-                }
-                .external-user-no-data {
-                    text-align: center;
-                    padding: 1.75rem 0;
-                    margin: auto;
-
-                    .title {
-                        @apply text-primary2;
-                        font-size: 1.125rem;
-                        font-weight: bold;
-                        line-height: 1.55;
-                        opacity: 0.7;
-                        padding-bottom: 0.625rem;
-                    }
-                    .help-text {
-                        @apply text-gray-400;
-                        font-size: 0.875rem;
-                    }
                 }
                 .context-item {
                     &.empty {
