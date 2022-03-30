@@ -42,19 +42,6 @@
                                         <span v-if="externalItems.length > 100">{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
                                     </div>
                                 </template>
-                                <template #menu-no-data-format>
-                                    <div class="external-user-no-data">
-                                        <div v-if="!loading">
-                                            <p class="title">
-                                                <p-i name="ic_search" color="inherit" />
-                                                {{ $t('IDENTITY.USER.FORM.NO_RESULTS_FOUND') }}
-                                            </p>
-                                            <p class="help-text">
-                                                {{ $t('IDENTITY.USER.FORM.NO_RESULTS_FOUND_HELP_TEXT') }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </template>
                             </p-search-dropdown>
                         </div>
                         <div v-else class="id-input-form">
@@ -140,7 +127,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PSelectDropdown, PFieldGroup, PButton, PTextInput, PBoxTab, PSearchDropdown, PI,
+    PButtonModal, PSelectDropdown, PFieldGroup, PButton, PTextInput, PBoxTab, PSearchDropdown,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -188,7 +175,6 @@ export default {
         PButton,
         PBoxTab,
         PSearchDropdown,
-        PI,
     },
     directives: {
         focus: {
@@ -524,24 +510,6 @@ export default {
             font-size: 0.75rem;
             line-height: 1.3;
             padding: 0.25rem 0.5rem;
-        }
-        .external-user-no-data {
-            text-align: center;
-            padding: 1.75rem 0;
-            margin: auto;
-
-            .title {
-                @apply text-primary2;
-                font-size: 1.125rem;
-                font-weight: bold;
-                line-height: 1.55;
-                opacity: 0.7;
-                padding-bottom: 0.625rem;
-            }
-            .help-text {
-                @apply text-gray-400;
-                font-size: 0.875rem;
-            }
         }
         .p-context-menu {
             .p-search-dropdown__item-label {
