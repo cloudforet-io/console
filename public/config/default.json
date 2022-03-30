@@ -25,7 +25,7 @@
     { "label": "API Guide", "link": "https://spaceone-dev.gitbook.io/spaceone-apis" },
     { "label": "GitHub", "link": "https://github.com/spaceone-dev" }
   ],
-  "BILLING_ENABLED": true,
+  "BILLING_ENABLED": [],
   "DISABLED_MENU": [],
   "CONTACT_LINK": ""
 }

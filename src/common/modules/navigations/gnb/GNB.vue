@@ -46,7 +46,6 @@ import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 import { GNBMenu as GNBMenuType } from '@/store/modules/display/type';
 import { store } from '@/store';
-import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const ALLOWED_MENUS_FOR_ALL_USERS = ['support', 'account', 'notifications'];
@@ -68,10 +67,6 @@ export default {
         const state = reactive({
             openedMenu: '',
             showSiteMap: false,
-            showPowerScheduler: computed(() => store.state.user.powerSchedulerState),
-            showBilling: computed(() => config.get('BILLING_ENABLED')),
-            disabledMenu: computed(() => config.get('DISABLED_MENU')),
-            isAdmin: computed((() => store.getters['user/isAdmin'])),
             hasPermission: computed((() => store.getters['user/hasPermission'])),
             dashboardLink: computed(() => (state.hasPermission ? { name: DASHBOARD_ROUTE._NAME } : undefined)),
             menuList: computed<GNBMenuType[]>(() => store.getters['display/GNBMenuList']),
