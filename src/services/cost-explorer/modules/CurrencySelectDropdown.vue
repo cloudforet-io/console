@@ -19,7 +19,7 @@ import { PSelectDropdown } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { store } from '@/store';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 export default {
     name: 'CurrencySelectDropdown',
@@ -35,7 +35,7 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             currency: computed(() => store.state.display.currency),
-            currencyItems: computed<MenuItem[]>(() => Object.values(CURRENCY).map(currency => ({
+            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.display.currencyRates).map(currency => ({
                 type: 'item',
                 name: currency,
                 label: `${CURRENCY_SYMBOL[currency]}${currency}`,
