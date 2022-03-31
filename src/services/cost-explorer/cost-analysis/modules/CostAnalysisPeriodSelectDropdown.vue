@@ -35,7 +35,6 @@ import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import { store } from '@/store';
-import { SpaceRouter } from '@/router';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 
 const CostManagementCustomRangeModal = () => import('@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue');
@@ -122,13 +121,22 @@ export default {
             state.customRangeModalVisible = false;
         };
 
-        (() => {
-            if (SpaceRouter.router.currentRoute.query.period) state.selectedPeriodMenuItem = 'custom';
-        })();
+        const setPeriodMenuItemWithPeriod = (period?: Period) => {
+            const start = dayjs.utc(period?.start).format('YYYY-MM-DD');
+            const end = dayjs.utc(period?.end).format('YYYY-MM-DD');
+            let selectedMenuItem = 'custom';
+            Object.entries(PERIOD_MENU_LIST).forEach(([key, value]) => {
+                if (start === value.start && end === value.end) {
+                    selectedMenuItem = key;
+                }
+            });
+            state.selectedPeriodMenuItem = selectedMenuItem;
+        };
 
-        watch(() => state.granularity, (after, before) => {
-            if (after !== before) state.period = PERIOD_MENU_LIST.thisMonth;
-            state.selectedPeriodMenuItem = 'thisMonth';
+        watch(() => state.period, (period) => {
+            if (period) {
+                setPeriodMenuItemWithPeriod(period);
+            }
         });
 
         return {
