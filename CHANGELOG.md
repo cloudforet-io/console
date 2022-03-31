@@ -1,3 +1,10 @@
+# [1.1.0-beta.273](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.272...v1.1.0-beta.273) (2022-03-31)
+
+
+### Features
+
+* add Trigger prop to PPopover and fix some features ([#911](https://github.com/spaceone-dev/spaceone-design-system/issues/911)) ([da9fcc9](https://github.com/spaceone-dev/spaceone-design-system/commit/da9fcc956ca6d70c5b1047552c0de1df99734005))
+
 # [1.1.0-beta.272](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.271...v1.1.0-beta.272) (2022-03-25)
 
 
