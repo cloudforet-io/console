@@ -115,7 +115,7 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY)
             let _category = d[groupBy];
             let _color;
             if (!_category) {
-                if (d.is_others) _category = 'aggregation';
+                if (d.is_others) _category = 'Others';
                 else _category = 'Unknown';
             }
             if (groupBy === GROUP_BY.PROVIDER) {
@@ -172,7 +172,7 @@ export const getXYChartData = (rawData: CostAnalyzeModel[], granularity: GRANULA
             if (groupBy) {
                 let groupByName = d[groupBy];
                 if (!groupByName) {
-                    if (d.is_others) groupByName = 'aggregation';
+                    if (d.is_others) groupByName = 'Others';
                     else groupByName = `no_${groupBy}`;
                 }
                 if (d.usd_cost[_date]) chartDataByDate[groupByName] = d.usd_cost[_date];
