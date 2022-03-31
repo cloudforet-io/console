@@ -119,8 +119,8 @@ export default {
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
                 const _period = {
-                    start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM'),
-                    end: dayjs.utc(props.period.end).format('YYYY-MM'),
+                    start: dayjs.utc(props.period.end).subtract(5, 'month').format('YYYY-MM-01'),
+                    end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
                 };
                 return {
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
