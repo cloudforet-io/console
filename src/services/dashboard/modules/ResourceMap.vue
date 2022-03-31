@@ -117,6 +117,7 @@ export default {
             selectedRegion: '', // Asia Pacific (Seoul)
             selectedRegionCode: '', // ap-northeast-2
             providers: computed(() => store.state.resource.provider.items),
+            regionList: [],
             loading: true,
             maxValue: 0,
             initialRegion: {} as any,
@@ -162,21 +163,29 @@ export default {
         };
 
         const getRegionList = async () => {
-            const resp = await SpaceConnector.client.inventory.region.list({
-                ...props.extraParams,
-                query: {
-                    filter: [
-                        {
-                            k: 'region_code',
-                            v: 'global',
-                            o: 'not',
-                        },
-                    ],
-                },
-            });
-
+            try {
+                const resp = await SpaceConnector.client.inventory.region.list({
+                    ...props.extraParams,
+                    query: {
+                        filter: [
+                            {
+                                k: 'region_code',
+                                v: 'global',
+                                o: 'not',
+                            },
+                        ],
+                    },
+                });
+                state.regionList = resp?.results;
+                return state.regionList;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return [];
+            }
+        };
+        const convertRegionListToData = (regionList) => {
             state.data = [
-                ...resp.results.map(d => ({
+                ...regionList.map(d => ({
                     title: d.name,
                     latitude: parseFloat(d.tags.latitude),
                     longitude: parseFloat(d.tags.longitude),
@@ -354,28 +363,30 @@ export default {
             return res;
         };
 
-        const init = async () => {
-            state.loading = true;
-            // LOAD REFERENCE STORE
-            await store.dispatch('resource/provider/load', true);
-            await getRegionList();
-            if (state.data.length > 0) {
-                await setInitialRegionSetting();
-                await getFilteredData(state.initialRegion.region_code, state.initialRegion.provider);
-            }
-            state.loading = false;
-        };
-        init();
-
         watch([() => state.chartRef, () => state.loading], ([chartCtx, loading]) => {
             if (chartCtx && !loading) {
                 drawChart(chartCtx);
             }
         }, { immediate: true });
 
+        watch(() => state.providers, (providers) => {
+            if (providers) convertRegionListToData(state.regionList);
+        });
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
         });
+
+        (async () => {
+            state.loading = true;
+            // LOAD REFERENCE STORE
+            await store.dispatch('resource/provider/load', true);
+            convertRegionListToData(await getRegionList());
+            if (state.data.length > 0) {
+                await setInitialRegionSetting();
+                await getFilteredData(state.initialRegion.region_code, state.initialRegion.provider);
+            }
+            state.loading = false;
+        })();
 
         return {
             ...toRefs(state),
