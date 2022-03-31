@@ -225,7 +225,7 @@ export default {
         const setProjectDashboardData = async () => {
             state.data = [
                 ...state.serverData.map(d => ({
-                    title: d.cloud_service_group,
+                    title: d.cloud_service_type,
                     isServer: true,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
@@ -262,7 +262,7 @@ export default {
                     ...d,
                 })),
                 ...state.cloudServiceData.map(d => ({
-                    title: d.cloud_service_group,
+                    title: d.cloud_service_type,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
                         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
@@ -302,7 +302,7 @@ export default {
         const setDashboardData = async () => {
             state.data = [
                 ...state.serverData.map(d => ({
-                    title: d.cloud_service_group,
+                    title: d.cloud_service_type,
                     isServer: true,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
@@ -337,7 +337,7 @@ export default {
                     ...d,
                 })),
                 ...state.cloudServiceData.map(d => ({
-                    title: d.cloud_service_group,
+                    title: d.cloud_service_type,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
                         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
