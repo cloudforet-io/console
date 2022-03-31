@@ -107,7 +107,6 @@ import CostDashboardUpdateModal
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardUpdateModal.vue';
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import { gray } from '@/styles/colors';
-import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
 
 const PUBLIC_ICON_COLOR = gray[500];
@@ -193,7 +192,6 @@ export default {
         };
 
         const handleClickPdfDownload = () => {
-            if (!supportsBrowser()) return;
             state.visiblePdfDownload = true;
         };
 

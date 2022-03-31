@@ -97,7 +97,6 @@ import { SpaceRouter } from '@/router';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import { CURRENCY } from '@/store/modules/display/config';
-import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
 const SaveQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue');
 const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
@@ -264,7 +263,6 @@ export default {
         };
 
         const handleClickPdf = () => {
-            if (!supportsBrowser()) return;
             state.visiblePdfOverlay = true;
         };
 
