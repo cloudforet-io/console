@@ -1,9 +1,10 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from '@vue/composition-api';
 
 import { getPopoverArgTypes } from './story-helper';
 import PPopover from './PPopover';
 import PButton from '../../inputs/buttons/button/PButton';
+import faker from 'faker'; import PTextInput from '../../inputs/input/PTextInput';
 
 <Meta title='Data Display/Popover' parameters={{
     design: {
@@ -18,24 +19,31 @@ export const Template = (args, { argTypes }) => ({
     components: { PPopover, PButton },
     template: `
         <div class="w-full overflow p-8 flex justify-center items-center" style="height: 250px;">
-            <p-popover :position="_position" :isVisible="_isVisible">
-                <p-button style-type="primary">default slot</p-button>
+            <p-popover :position="_position" :isVisible="_isVisible"
+                       :ignore-target-click="ignoreTargetClick" :trigger="trigger">
+                <div v-if="defaultSlot" v-html="defaultSlot" />
+                <p-button v-else style-type="primary" :outline="true" @click="onClick">default</p-button>
                 <template #content>
-                    <div>
-                        <p style="margin-top:12px">content slot</p>
+                    <div v-if="contentRefSlot" v-html="contentRefSlot" />
+                    <div v-else>
+                        <p style="margin-top:12px">content: {{defautlContentValue}}</p>
                     </div>
                 </template>
             </p-popover>
         </div>
     `,
     setup(props) {
-        const vm = getCurrentInstance();
         const state = reactive({
             _position: props.position,
             _isVisible: props.isVisible,
+            defautlContentValue: faker.lorem.sentence(10),
         })
+        const onClick = () => {
+            alert('default slot clicked')
+        }
         return {
-            ...toRefs(state)
+            ...toRefs(state),
+            onClick,
         }
     }
 });
@@ -44,6 +52,51 @@ export const Template = (args, { argTypes }) => ({
 # PPopover
 <br/>
 <br/>
+
+## Trigger
+
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Trigger">
+        {{
+            components: { PPopover, PTextInput, PButton },
+            template: `
+        <div class="w-full overflow p-8 flex flex-col justify-center" style="height: 500px;">
+            <b>click (default)</b>
+            <br/>
+            <p-popover>
+                <p-button style-type="primary" :outline="true">default</p-button>
+                <template #content>
+                    <p style="margin-top:12px">content slot</p>
+                </template>
+            </p-popover>
+            <br/>
+            <br/>
+            <b>hover</b>
+            <br/>
+            <p-popover trigger="hover">
+                <p-button style-type="primary" :outline="true">default</p-button>
+                <template #content>
+                    <p style="margin-top:12px">content slot</p>
+                </template>
+            </p-popover>
+            <br/>
+            <br/>
+            <b>focus</b>
+            <br/>
+            <p-popover trigger="focus">
+                <p-text-input style-type="primary" :outline="true">default</p-text-input>
+                <template #content>
+                    <p style="margin-top:12px">content slot</p>
+                </template>
+            </p-popover>
+        </div>
+    `,
+        }}
+    </Story>
+</Canvas>
 
 ## Playground
 
@@ -54,3 +107,6 @@ export const Template = (args, { argTypes }) => ({
 </Canvas>
 
 <ArgsTable story="Playground"/>
+
+
+

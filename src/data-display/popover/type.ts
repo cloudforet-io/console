@@ -14,3 +14,11 @@ export const POPOVER_PLACEMENT = Object.freeze({
 } as const);
 
 export type POPOVER_PLACEMENT = typeof POPOVER_PLACEMENT[keyof typeof POPOVER_PLACEMENT];
+
+export const POPOVER_TRIGGER = Object.freeze({
+    CLICK: 'click',
+    HOVER: 'hover',
+    FOCUS: 'focus',
+} as const);
+
+export type POPOVER_TRIGGER = typeof POPOVER_TRIGGER[keyof typeof POPOVER_TRIGGER];
