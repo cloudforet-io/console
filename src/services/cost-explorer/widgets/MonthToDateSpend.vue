@@ -164,8 +164,14 @@ export default defineComponent<WidgetProps>({
 
         const getLastMonthChartData = async () => {
             const start = state.lastMonth.format('YYYY-MM');
-            const end = checkThisMonth() ? `${state.lastMonth.format('YYYY-MM')}-${thisDay}`
-                : state.lastMonth.format('YYYY-MM');
+            let end = state.lastMonth.format('YYYY-MM');
+            if (checkThisMonth()) {
+                if (Number(thisDay) > state.lastMonth.daysInMonth()) {
+                    end = state.lastMonth.endOf('month').format('YYYY-MM-DD');
+                } else {
+                    end = `${state.lastMonth.format('YYYY-MM')}-${thisDay}`;
+                }
+            }
             state.lastMonthCost = await getData(start, end) || 0;
         };
 
