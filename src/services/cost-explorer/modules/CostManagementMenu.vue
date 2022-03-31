@@ -144,7 +144,7 @@ export default {
     padding-right: 1rem;
 }
 .link-wrapper {
-    margin-top: 1.5rem;
+    margin-top: 0.75rem;
 }
 .dashboard-list {
     padding: 0 0.875rem;
