@@ -105,13 +105,14 @@ const LAPTOP_WINDOW_SIZE = laptop.max;
 // convert gnb data structure to console menu.
 // in suggestion items, each item must have reference of parents, not children(sub menu).
 const convertToConsoleMenuList = (menu: GNBMenu[]): MenuData[] => flatten(menu.map(({ id, label, subMenuList }) => {
-    if (subMenuList) {
+    if (subMenuList?.length) {
         return subMenuList.map(item => ({
             id: item.id,
             label: item.label,
             parents: [{ id, label }],
         } as MenuData));
     }
+    console.debug('menu', id);
     return [{ id, label }] as MenuData[];
 }));
 
