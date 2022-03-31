@@ -1,27 +1,31 @@
 <template>
-    <p-popover class="popover" position="bottom-end">
-        <slot />
-        <template #content>
-            <i18n class="popover-content"
-                  path="COMMON.BUTTONS.PDF_DOWNLOAD_BUTTON.SUPPORT_PDF_HELP_TEXT"
-            >
-                <template #desktop>
-                    <span class="font-bold">{{ $t('COMMON.BUTTONS.PDF_DOWNLOAD_BUTTON.DESKTOP') }}</span>
-                </template>
-                <template #chrome>
-                    <span class="font-bold">{{ $t('APP.MODAL.RECOMMEND_BROWSER.CHROME') }}</span>
-                </template>
-                <template #edge>
-                    <span class="font-bold">{{ $t('APP.MODAL.RECOMMEND_BROWSER.EDGE') }}</span>
-                </template>
-            </i18n>
-        </template>
-    </p-popover>
+    <span>
+        <p-popover v-if="!supportsBrowser()" class="popover" position="bottom-end">
+            <slot />
+            <template #content>
+                <i18n class="popover-content"
+                      path="COMMON.BUTTONS.PDF_DOWNLOAD_BUTTON.SUPPORT_PDF_HELP_TEXT"
+                >
+                    <template #desktop>
+                        <span class="font-bold">{{ $t('COMMON.BUTTONS.PDF_DOWNLOAD_BUTTON.DESKTOP') }}</span>
+                    </template>
+                    <template #chrome>
+                        <span class="font-bold">{{ $t('APP.MODAL.RECOMMEND_BROWSER.CHROME') }}</span>
+                    </template>
+                    <template #edge>
+                        <span class="font-bold">{{ $t('APP.MODAL.RECOMMEND_BROWSER.EDGE') }}</span>
+                    </template>
+                </i18n>
+            </template>
+        </p-popover>
+        <slot v-else />
+    </span>
 </template>
 
 <script lang="ts">
 import { PPopover } from '@spaceone/design-system';
 import { i18n } from '@/translations';
+import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
 export default {
     name: 'PdfDownloadButton',
@@ -31,6 +35,7 @@ export default {
     setup() {
         return {
             i18n,
+            supportsBrowser,
         };
     },
 };
