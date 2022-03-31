@@ -108,7 +108,7 @@ export default {
                     label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
                 },
             ])),
-            currencyItems: computed<MenuItem[]>(() => Object.values(CURRENCY).map(currency => ({
+            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.display.currencyRates).map(currency => ({
                 type: 'item',
                 name: currency,
                 label: `${CURRENCY_SYMBOL[currency]}${currency}`,

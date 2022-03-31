@@ -136,15 +136,16 @@ type ExchangeRateData = {
     currency: CURRENCY;
     rate: number;
     is_default: boolean;
+    state: string;
 }
 
 const getCurrencyRates = async (): Promise<CurrencyRates> => {
     try {
         const { results } = await SpaceConnector.client.costAnalysis.exchangeRate.list();
 
-        const rates = {} as CurrencyRates;
-        results.forEach(({ currency, rate }: ExchangeRateData) => {
-            rates[currency] = rate;
+        const rates = { USD: 1 } as CurrencyRates;
+        results.forEach(({ currency, rate, state }: ExchangeRateData) => {
+            if (CURRENCY[currency] && state === 'ENABLED') rates[currency] = rate;
         });
         return rates;
     } catch (e) {
