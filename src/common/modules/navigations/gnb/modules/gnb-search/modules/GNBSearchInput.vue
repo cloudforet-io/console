@@ -16,7 +16,8 @@
                @keydown.up="$emit('arrow-up')"
                @keydown.down="$emit('arrow-down')"
         >
-        <p-i name="ic_delete"
+        <p-i v-if="value"
+             name="ic_delete"
              height="1rem"
              width="1rem"
              color="inherit"
