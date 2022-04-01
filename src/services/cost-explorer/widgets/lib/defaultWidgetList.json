@@ -50,6 +50,22 @@
     }
   },
   {
+    "widget_id": "linegraph-lg-02",
+    "name": "Amazon CloudFront Cost Trend",
+    "options": {
+      "chart_type": "LINE",
+      "layout": 100
+    }
+  },
+  {
+    "widget_id": "linegraph-lg-03",
+    "name": "Traffic Cost Trend",
+    "options": {
+      "chart_type": "LINE",
+      "layout": 100
+    }
+  },
+  {
     "widget_id": "stackedcol-lg-01",
     "name": "Cost Trend(Stacked) A",
     "options": {
@@ -79,6 +95,14 @@
   {
     "widget_id": "map-lg-01",
     "name": "Cost By Region",
+    "options": {
+      "chart_type": "MAP",
+      "layout": 100
+    }
+  },
+  {
+    "widget_id": "map-lg-02",
+    "name": "Traffic Cost By Region",
     "options": {
       "chart_type": "MAP",
       "layout": 100

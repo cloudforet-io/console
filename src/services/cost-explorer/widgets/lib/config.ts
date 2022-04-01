@@ -29,6 +29,16 @@ export const defaultWidgetMap = {
         widget_file_name: 'CostTrendLine',
         widget_name: 'Cost Trend',
     },
+    'linegraph-lg-02': {
+        widget_id: 'linegraph-lg-02',
+        widget_file_name: 'AmazonCloudFrontCostTrend',
+        widget_name: 'Amazon CloudFront Cost Trend',
+    },
+    'linegraph-lg-03': {
+        widget_id: 'linegraph-lg-03',
+        widget_file_name: 'TrafficCostTrend',
+        widget_name: 'Traffic Cost Trend',
+    },
     'stackedcol-lg-01': {
         widget_id: 'stackedcol-lg-01',
         widget_file_name: 'CostTrendStackedColumnA',
@@ -48,6 +58,11 @@ export const defaultWidgetMap = {
         widget_id: 'map-lg-01',
         widget_file_name: 'CostByRegion',
         widget_name: 'Cost By Region',
+    },
+    'map-lg-02': {
+        widget_id: 'map-lg-02',
+        widget_file_name: 'TrafficCostByRegion',
+        widget_name: 'Traffic Cost By Region',
     },
     'waffle-md-01': {
         widget_id: 'waffle-md-01',

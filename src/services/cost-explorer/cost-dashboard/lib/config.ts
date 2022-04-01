@@ -1,4 +1,5 @@
 import Layout1WidgetList from '@/services/cost-explorer/cost-dashboard/dashboard-layouts/layout-1.json';
+import Layout4WidgetList from '@/services/cost-explorer/cost-dashboard/dashboard-layouts/layout-4.json';
 import { CHART_TYPE, DefaultLayout } from '@/services/cost-explorer/cost-dashboard/type';
 
 export const defaultLayoutMap = {
@@ -7,16 +8,16 @@ export const defaultLayoutMap = {
         name: 'Monthly Cost Summary',
         widgetList: Layout1WidgetList,
     },
-    // 'layout-4': {
-    //     default_layout_id: 'layout-4',
-    //     name: 'CDN & Traffic Cost',
-    //     widgetList: Layout4WidgetList,
-    // },
+    'layout-4': {
+        default_layout_id: 'layout-4',
+        name: 'CDN & Traffic Cost',
+        widgetList: Layout4WidgetList,
+    },
 };
 export const defaultLayoutList: Record<string, DefaultLayout> = {
     ...{ blank: { name: 'Blank', widgetList: [] } },
     ...{ 'layout-1': { ...defaultLayoutMap['layout-1'] } },
-    // ...{ 'layout-4': { ...defaultLayoutMap['layout-4'] } },
+    ...{ 'layout-4': { ...defaultLayoutMap['layout-4'] } },
 };
 export const defaultLayoutData = Object.values(defaultLayoutList);
 

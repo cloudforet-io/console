@@ -1,5 +1,15 @@
 <template>
-    <div ref="chartRef" class="chart" />
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROJECT')"
+                                       class="cost-trend-line"
+                                       :print-mode="printMode"
+    >
+        <div ref="chartRef" class="chart" />
+        <!--        <p-data-loader :loading="loading" class="chart-wrapper">-->
+        <!--            <template #loader>-->
+        <!--                <p-skeleton height="100%" />-->
+        <!--            </template>-->
+        <!--        </p-data-loader>-->
+    </cost-dashboard-card-widget-layout>
 </template>
 
 <script lang="ts">
@@ -14,6 +24,10 @@ import config from '@/lib/config';
 import {
     gray, red, yellow, green, violet,
 } from '@/styles/colors';
+import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
+// import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import { CURRENCY } from '@/store/modules/display/config';
 
 
 const tempMapData = [
@@ -47,7 +61,36 @@ const valueName = 'value';
 
 export default {
     name: 'TrafficCostByRegion',
+    components: {
+        CostDashboardCardWidgetLayout,
+        // PDataLoader,
+        // PSkeleton,
+    },
     props: {
+        name: {
+            type: String,
+            default: undefined,
+        },
+        options: {
+            type: Object as () => WidgetOptions,
+            default: () => ({}),
+        },
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
+        filters: {
+            type: Object,
+            default: () => ({}),
+        },
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
+        },
         printMode: {
             type: Boolean,
             default: false,
