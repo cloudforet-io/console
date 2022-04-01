@@ -205,7 +205,9 @@ export default {
                 filters.push({ k: 'project_id', v: state.filters.project_id, o: '=' });
             }
 
-            if (state.filters.project_group_id?.length) {
+            if (item.project_group_id) {
+                filters.push({ k: 'project_group_id', v: item.project_group_id, o: '=' });
+            } else if (state.filters.project_group_id?.length) {
                 filters.push({ k: 'project_group_id', v: state.filters.project_group_id, o: '=' });
             }
 
