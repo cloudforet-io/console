@@ -179,6 +179,7 @@ export default defineComponent<Props>({
     @apply bg-white border-none;
     padding-left: 0.75rem;
     padding-right: 0.75rem;
+    padding-bottom: 0.125rem;
 
     &::v-deep {
         .context-header {
@@ -198,7 +199,7 @@ export default defineComponent<Props>({
                 box-shadow: 0 0 0 0.125rem rgba(73, 167, 247, 0.2);
                 outline: none;
 
-                &:not(:hover) {
+                &:not(:hover):not(.disabled):not(.empty) {
                     @apply bg-white;
                 }
             }
