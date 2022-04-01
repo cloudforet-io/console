@@ -199,7 +199,7 @@ export const getStackedChartData = (chartData: XYChartData[], period: Period, ti
     while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
         let eachChartData: XYChartData = { date: now.format('YYYY-MM-DD') };
         // eslint-disable-next-line no-loop-func
-        const existData = chartData.find(d => now.isSame(d.date, timeUnit));
+        const existData = chartData.find(d => now.isSame(dayjs.utc(d.date), timeUnit));
         accumulatedData = _mergePrevChartDataAndCurrChartData(accumulatedData, existData);
         eachChartData = {
             ...eachChartData,
