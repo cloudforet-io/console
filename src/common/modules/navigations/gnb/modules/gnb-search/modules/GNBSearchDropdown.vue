@@ -161,7 +161,6 @@ export default defineComponent<Props>({
     display: flex;
     flex-direction: column;
     width: 27.5rem;
-    min-height: 14.875rem;
     padding: 1rem 0;
     top: 100%;
     right: 0;
@@ -171,11 +170,6 @@ export default defineComponent<Props>({
     .p-data-loader {
         flex-grow: 1;
         height: 100%;
-        min-height: inherit;
-    }
-    .skeleton-wrapper {
-        @apply flex flex-col w-full self-start;
-        padding: 0 0.75rem;
     }
 
     .no-data {
