@@ -265,6 +265,7 @@ export default defineComponent<Props>({
                     resource_type: 'inventory.CloudServiceType',
                     search: inputText,
                     options: {
+                        limit: 15,
                         targets: ['name', 'group'],
                     },
                 }, {
