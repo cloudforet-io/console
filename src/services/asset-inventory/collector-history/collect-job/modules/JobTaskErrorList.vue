@@ -19,12 +19,14 @@
                             <p-collapsible-toggle v-if="value.length >= 80"
                                                   :is-collapsed="errorItemsToggleList[item.sequence - 1]"
                                                   @update:isCollapsed="handleUpdateErrorItemCollapsedState(item.sequence - 1, $event)"
-                            />
+                            >
+                                {{ errorItemsToggleList[item.sequence - 1] ? $t('COMMON.MONITORING.MORE') : $t('COMPONENT.COLLAPSIBLE_TOGGLE.HIDE') }}
+                            </p-collapsible-toggle>
                         </div>
                     </div>
-                    <span v-else :style="{whiteSpace: 'nowrap'}">
+                    <pre v-else>
                         {{ value ? value : '--' }}
-                    </span>
+                    </pre>
                 </template>
                 <template v-else-if="name === 'additional'">
                     <div class="error-location">
@@ -102,7 +104,6 @@ export default {
                 { label: 'No.', name: 'sequence' },
                 { label: 'Error Location', name: 'additional' },
                 { label: 'Error Message', name: 'message' },
-                { label: 'Resource Type', name: 'additional.resource_type' },
                 { label: 'Resource ID', name: 'additional.resource_id' },
                 { label: 'Error Code', name: 'error_code' },
             ],
@@ -144,15 +145,25 @@ $maxText:    79ch;
         @apply text-gray-500;
     }
     .error-message {
-        @apply bg-gray-100 rounded-lg;
+        @apply flex items-end;
         padding: 0.5rem 0.75rem;
         margin: 0.75rem 0;
-        width: $maxText;
         .content {
+            width: $maxText;
             line-height: 1.225rem;
             white-space: pre-wrap;
             &.text-overflow {
                 @apply truncate;
+                height: 1.225rem;
+                white-space: pre;
+            }
+        }
+        .toggle-box {
+            width: 2.625rem;
+            ::v-deep .p-collapsible-toggle {
+                span {
+                    @apply flex;
+                }
             }
         }
     }
