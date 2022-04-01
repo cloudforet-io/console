@@ -27,7 +27,7 @@
                         :to="getCloudServiceDetailLink({ ...item, cloudServiceTypeName: cloudServiceType.cloud_service_type })"
                         class="service-type-item"
                     >
-                        <span class="service-type-name">{{ cloudServiceType.cloud_service_type }} </span>
+                        <span class="service-type-name">{{ cloudServiceType.cloud_service_type }} &nbsp;</span>
                         <span class="service-type-count">{{ cloudServiceType.count }}</span>
                     </router-link>
                     <p-divider
@@ -184,20 +184,22 @@ export default {
             padding: 0.75rem 0.25rem;
 
             .service-type-item {
-                @apply flex w-full items-center;
+                @apply flex items-center;
+                width: 45%;
                 margin-left: 0.75rem;
                 white-space: break-spaces;
 
                 .service-type-name {
-                    @apply text-sm text-gray-700;
+                    @apply text-sm text-gray-600;
                     max-width: 80%;
-                    font-weight: 600;
-                    line-height: 1.3;
+                    font-weight: 400;
+                    line-height: 1.25;
                 }
                 .service-type-count {
-                    @apply text-gray-500;
+                    @apply text-gray-800;
+                    font-weight: 400;
                     font-size: 0.875rem;
-                    line-height: 1.3;
+                    line-height: 1.25;
                 }
 
                 &:hover {
@@ -214,6 +216,7 @@ export default {
     }
 
     .p-divider {
+        opacity: 0.7;
         &.vertical {
             @apply h-full;
         }
