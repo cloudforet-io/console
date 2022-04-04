@@ -49,7 +49,7 @@ import {
 } from '@vue/composition-api';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
-import { ResourceMap } from '@/store/modules/resource/type';
+import { ResourceMap } from '@/store/modules/reference/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -71,9 +71,9 @@ export default {
         const state = reactive({
             loading: true,
             job: {} as any,
-            collectors: computed<ResourceMap>(() => store.state.resource.collector.items || {}),
-            providers: computed<ResourceMap>(() => store.state.resource.provider.items || {}),
-            plugins: computed<ResourceMap>(() => store.state.resource.plugin.items || {}),
+            collectors: computed<ResourceMap>(() => store.state.reference.collector.items || {}),
+            providers: computed<ResourceMap>(() => store.state.reference.provider.items || {}),
+            plugins: computed<ResourceMap>(() => store.state.reference.plugin.items || {}),
             timezone: computed(() => store.state.user.timezone),
             collector: computed(() => {
                 const id = state.job.collector_info?.collector_id || '';
@@ -126,9 +126,9 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/collector/load'),
-                store.dispatch('resource/provider/load'),
-                store.dispatch('resource/plugin/load'),
+                store.dispatch('reference/collector/load'),
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/plugin/load'),
             ]);
         })();
 

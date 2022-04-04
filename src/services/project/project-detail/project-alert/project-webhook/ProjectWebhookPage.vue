@@ -214,7 +214,7 @@ export default {
         const state = reactive({
             loading: true,
             timezone: computed(() => store.state.user.timezone),
-            plugins: computed(() => store.state.resource.plugin.items),
+            plugins: computed(() => store.state.reference.plugin.items),
             dropdown: computed(() => ([
                 {
                     type: 'item',

@@ -51,7 +51,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            protocols: computed(() => store.state.resource.protocol.items),
+            protocols: computed(() => store.state.reference.protocol.items),
         });
 
         const channelFormatter = (level) => {
@@ -67,7 +67,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/protocol/load');
+            await store.dispatch('reference/protocol/load');
         })();
 
         return {

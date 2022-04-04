@@ -198,7 +198,7 @@ export default {
             providerLoading: true,
             providerObj: {} as ProviderModel,
             serviceAccountId: '',
-            providerIcon: computed(() => store.state.resource.provider.items[state.providerObj?.provider]?.icon),
+            providerIcon: computed(() => store.state.reference.provider.items[state.providerObj?.provider]?.icon),
             description: computed(() => get(state.providerObj, 'metadata.view.layouts.help:service_account:create', undefined)),
             selectedSecretType: '',
             hasCredentialKey: true,
@@ -274,7 +274,7 @@ export default {
             try {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const [_, res] = await Promise.all([
-                    store.dispatch('resource/provider/load'),
+                    store.dispatch('reference/provider/load'),
                     await SpaceConnector.client.identity.provider.get({
                         provider: props.provider,
                     }),

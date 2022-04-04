@@ -103,8 +103,8 @@ export default {
         const state = reactive({
             loading: true,
             skeletons: range(3),
-            providers: computed(() => store.state.resource.provider.items),
-            regions: computed(() => store.state.resource.region.items),
+            providers: computed(() => store.state.reference.provider.items),
+            regions: computed(() => store.state.reference.region.items),
             loaderRef: null,
             chartRef: null as HTMLElement | null,
             data: [] as Data[],
@@ -250,8 +250,8 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/provider/load'),
-                store.dispatch('resource/region/load'),
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/region/load'),
             ]);
         })();
 

@@ -109,7 +109,7 @@ export default {
         const state = reactive({
             loading: false,
             trustedAdvisorId: computed<string>(() => {
-                const cloudServiceTypes = vm.$store.state.resource.cloudServiceType.items;
+                const cloudServiceTypes = vm.$store.state.reference.cloudServiceType.items;
                 const trustedAdvisorId = findKey(cloudServiceTypes, { name: TRUSTED_ADVISER });
                 return trustedAdvisorId || '';
             }),
@@ -158,7 +158,7 @@ export default {
                 },
             ])),
             data: null as any,
-            awsProvider: computed(() => store.state.resource.provider.items.aws),
+            awsProvider: computed(() => store.state.reference.provider.items.aws),
         });
 
         const linkFormatter = (category, status) => {
@@ -211,8 +211,8 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/cloudServiceType/load'),
-                store.dispatch('resource/provider/load'),
+                store.dispatch('reference/cloudServiceType/load'),
+                store.dispatch('reference/provider/load'),
             ]);
         })();
 

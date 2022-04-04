@@ -71,7 +71,7 @@ import CostAnalysisFilterItem from '@/services/cost-explorer/cost-analysis/modul
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
-import { ResourceItem } from '@/store/modules/resource/type';
+import { ResourceItem } from '@/store/modules/reference/type';
 import { store } from '@/store';
 
 
@@ -115,11 +115,11 @@ export default {
             selectedItemsMap: computed<CostQueryFilterItemsMap>(() => {
                 const itemsMap: CostQueryFilterItemsMap = {};
                 const resourceItemsMap = {
-                    project_id: store.state.resource.project.items,
-                    project_group_id: store.state.resource.projectGroup.items,
-                    service_account_id: store.state.resource.serviceAccount.items,
-                    provider: store.state.resource.provider.items,
-                    region_code: store.state.resource.region.items,
+                    project_id: store.state.reference.project.items,
+                    project_group_id: store.state.reference.projectGroup.items,
+                    service_account_id: store.state.reference.serviceAccount.items,
+                    provider: store.state.reference.provider.items,
+                    region_code: store.state.reference.region.items,
                 };
 
                 Object.entries(state.filters as CostQueryFilters).forEach(([key, data]) => {
@@ -191,11 +191,11 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/projectGroup/load'),
-                store.dispatch('resource/serviceAccount/load'),
-                store.dispatch('resource/provider/load'),
-                store.dispatch('resource/region/load'),
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/serviceAccount/load'),
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/region/load'),
             ]);
         })();
 

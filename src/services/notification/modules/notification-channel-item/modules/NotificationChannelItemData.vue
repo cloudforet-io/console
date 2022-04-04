@@ -140,7 +140,7 @@ export default {
             keyListForRead: [],
             valueList: [],
             //
-            userItems: computed(() => store.state.resource.user.items),
+            userItems: computed(() => store.state.reference.user.items),
             schema: props.channelData?.schema,
             isSecretData: computed(() => props.channelData?.secret_id.length > 0),
             isSpaceOneUserProtocol: computed(() => state.keyListForEdit.includes('users')),
@@ -187,7 +187,7 @@ export default {
             await Promise.allSettled([
                 setKeyListForEdit(), setKeyListForRead(), setValueList(),
                 // LOAD REFERENCE STORE
-                store.dispatch('resource/user/load'),
+                store.dispatch('reference/user/load'),
             ]);
         })();
 

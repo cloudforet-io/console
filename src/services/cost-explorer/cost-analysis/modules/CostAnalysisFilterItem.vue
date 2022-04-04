@@ -81,9 +81,9 @@ export default {
                 name: selectedName,
                 label: state.menuItems.find(d => d.name === selectedName)?.label || selectedName,
             }))),
-            serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
-            providers: computed(() => store.state.resource.provider.items),
-            regions: computed(() => store.state.resource.region.items),
+            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+            providers: computed(() => store.state.reference.provider.items),
+            regions: computed(() => store.state.reference.region.items),
             menuItems: computed(() => {
                 if (props.type === FILTER.SERVICE_ACCOUNT) {
                     return Object.keys(state.serviceAccounts).map(k => ({
@@ -156,9 +156,9 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/serviceAccount/load'),
-                store.dispatch('resource/provider/load'),
-                store.dispatch('resource/region/load'),
+                store.dispatch('reference/serviceAccount/load'),
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/region/load'),
             ]);
         })();
 

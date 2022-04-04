@@ -200,7 +200,7 @@ export default {
             chart: null as any,
             chartRef: null as HTMLElement | null,
             skeletons: range(4),
-            providers: computed(() => store.state.resource.provider.items),
+            providers: computed(() => store.state.reference.provider.items),
             //
             selectedDateType: DATE_TYPE.daily,
             dateTypes: computed(() => ([
@@ -678,7 +678,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/provider/load');
+            await store.dispatch('reference/provider/load');
         })();
 
         return {

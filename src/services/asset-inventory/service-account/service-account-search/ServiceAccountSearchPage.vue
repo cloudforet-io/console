@@ -11,7 +11,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { NoSearchResourceError } from '@/common/composables/error/error';
 
 const DEFAULT_URL = '/asset-inventory/service-account';
-const ERROR_URL = '/asset-inventory/service-account/no-resource';
+const ERROR_URL = '/asset-inventory/service-account/no-reference';
 
 export default {
     name: 'ServiceAccountSearchPage',

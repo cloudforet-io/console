@@ -72,7 +72,7 @@ export default {
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            providers: computed(() => vm.$store.state.resource.provider.items),
+            providers: computed(() => vm.$store.state.reference.provider.items),
             project: computed(() => [...vm.$store.getters['favorite/projectGroup/sortedItems'], ...vm.$store.getters['favorite/project/sortedItems']]),
             cloudService: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
             timezone: computed(() => vm.$store.state.user.timezone || 'UTC'),

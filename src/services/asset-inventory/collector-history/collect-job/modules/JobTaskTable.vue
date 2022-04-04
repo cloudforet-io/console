@@ -163,8 +163,8 @@ export default {
             totalCount: 0,
             searchTags: [],
             // references
-            serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
-            projects: computed(() => store.state.resource.project.items),
+            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+            projects: computed(() => store.state.reference.project.items),
         });
 
         const querySearchHandlers = {
@@ -284,8 +284,8 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/serviceAccount/load'),
-                store.dispatch('resource/project/load'),
+                store.dispatch('reference/serviceAccount/load'),
+                store.dispatch('reference/project/load'),
             ]);
         })();
 

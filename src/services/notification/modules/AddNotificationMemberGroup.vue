@@ -47,7 +47,7 @@ export default {
                 }));
             }),
             selectedMemberItems: props.users.map(d => ({ name: d, label: d })),
-            userItems: computed(() => store.state.resource.user.items),
+            userItems: computed(() => store.state.reference.user.items),
         });
 
         const emitChange = () => {
@@ -83,7 +83,7 @@ export default {
             await Promise.allSettled([
                 listProjectMember(),
                 // LOAD REFERENCE STORE
-                store.dispatch('resource/user/load'),
+                store.dispatch('reference/user/load'),
             ]);
         })();
 

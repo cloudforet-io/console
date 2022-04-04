@@ -207,7 +207,7 @@ export default {
             // external user
             loading: false,
             supportFind: computed(() => !!store.state.domain.authOptions?.support_find),
-            users: computed(() => store.state.resource.user.items),
+            users: computed(() => store.state.reference.user.items),
             searchText: '',
             externalItems: [] as MenuItem[],
             selectedItems: [] as MenuItem[],
@@ -456,7 +456,7 @@ export default {
             await Promise.allSettled([
                 initAuthTypeList(), getRoleList(),
                 // LOAD REFERENCE STORE
-                store.dispatch('resource/user/load'),
+                store.dispatch('reference/user/load'),
             ]);
         })();
 

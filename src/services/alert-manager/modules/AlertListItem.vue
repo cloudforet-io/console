@@ -56,7 +56,7 @@ import {
     computed, PropType, reactive, toRefs,
 } from '@vue/composition-api';
 import { store } from '@/store';
-import { ResourceItem } from '@/store/modules/resource/type';
+import { ResourceItem } from '@/store/modules/reference/type';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 

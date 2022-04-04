@@ -165,7 +165,7 @@ export default {
                 // })),
                 { name: state.projectName },
             ]),
-            users: computed(() => store.state.resource.user.items),
+            users: computed(() => store.state.reference.user.items),
             maintenanceWindowFormVisible: false,
             counts: computed(() => ({
                 TRIGGERED: find(store.state.service.projectDetail.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,

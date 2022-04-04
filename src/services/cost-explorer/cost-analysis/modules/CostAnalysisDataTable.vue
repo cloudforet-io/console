@@ -86,7 +86,7 @@ import { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type
 import { ExcelDataField } from '@/store/modules/file/type';
 import { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import { i18n } from '@/translations';
-import { ResourceMap } from '@/store/modules/resource/type';
+import { ResourceMap } from '@/store/modules/reference/type';
 // eslint-disable-next-line import/extensions,import/no-unresolved
 import { Table } from 'pdfmake/interfaces';
 
@@ -120,11 +120,11 @@ export default {
                 return 'YYYY-MM-DD';
             }),
             //
-            projectGroups: computed(() => store.state.resource.projectGroup.items),
-            projects: computed(() => store.state.resource.project.items),
-            providers: computed(() => store.state.resource.provider.items),
-            regions: computed(() => store.state.resource.region.items),
-            serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
+            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projects: computed(() => store.state.reference.project.items),
+            providers: computed(() => store.state.reference.provider.items),
+            regions: computed(() => store.state.reference.region.items),
+            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
             //
             granularity: computed(() => store.state.service.costAnalysis.granularity),
             stack: computed(() => store.state.service.costAnalysis.stack),
@@ -402,11 +402,11 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/projectGroup/load'),
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/provider/load'),
-                store.dispatch('resource/region/load'),
-                store.dispatch('resource/serviceAccount/load'),
+                store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/region/load'),
+                store.dispatch('reference/serviceAccount/load'),
             ]);
         })();
 

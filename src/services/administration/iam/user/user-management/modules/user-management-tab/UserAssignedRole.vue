@@ -89,8 +89,8 @@ export default {
                 { name: 'labels', label: 'Labels' },
             ]),
             items: [] as UserRoleItem[],
-            projectGroups: computed(() => vm.$store.state.resource.projectGroup.items),
-            projects: computed(() => vm.$store.state.resource.project.items),
+            projectGroups: computed(() => vm.$store.state.reference.projectGroup.items),
+            projects: computed(() => vm.$store.state.reference.project.items),
         });
 
         const getProjectLink = (value, isProject: true) => {
@@ -137,8 +137,8 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                vm.$store.dispatch('resource/project/load'),
-                vm.$store.dispatch('resource/projectGroup/load'),
+                vm.$store.dispatch('reference/project/load'),
+                vm.$store.dispatch('reference/projectGroup/load'),
             ]);
         })();
 

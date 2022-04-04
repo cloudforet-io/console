@@ -57,12 +57,12 @@ export default {
     setup(props) {
         const state = reactive({
             projectList: props.alertData?.project_dependencies,
-            projects: computed(() => store.state.resource.project.items),
+            projects: computed(() => store.state.reference.project.items),
         });
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/project/load');
+            await store.dispatch('reference/project/load');
         })();
 
         return {

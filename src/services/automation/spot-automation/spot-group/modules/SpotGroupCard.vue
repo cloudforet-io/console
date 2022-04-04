@@ -103,7 +103,7 @@ export default {
             projectGroupName: '',
             loading: true,
             spotGroupId: props.cardData.spot_group_id,
-            regions: computed(() => store.state.resource.region.items),
+            regions: computed(() => store.state.reference.region.items),
         });
         const getProjectName = async () => {
             state.loading = true;
@@ -123,7 +123,7 @@ export default {
 
         (async () => {
             await getProjectName();
-            await store.dispatch('resource/region/load');
+            await store.dispatch('reference/region/load');
         })();
         return {
             ...toRefs(state),

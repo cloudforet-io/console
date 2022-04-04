@@ -259,7 +259,7 @@ export default {
 
         (async () => {
             await listProtocol();
-            await store.dispatch('resource/user/load');
+            await store.dispatch('reference/user/load');
             await listChannel();
         })();
 

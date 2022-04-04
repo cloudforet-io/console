@@ -236,7 +236,7 @@ export default {
 
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            plugins: computed(() => store.state.resource.plugin.items),
+            plugins: computed(() => store.state.reference.plugin.items),
             fields: computed(() => [
                 { name: 'name', label: 'Name' },
                 { name: 'state', label: 'State' },
@@ -490,7 +490,7 @@ export default {
 
         const init = async () => {
             // LOAD REFERENCE STORE
-            await store.dispatch('resource/plugin/load');
+            await store.dispatch('reference/plugin/load');
             await Promise.all([setSearchTags(), getCollectors()]);
         };
         init();

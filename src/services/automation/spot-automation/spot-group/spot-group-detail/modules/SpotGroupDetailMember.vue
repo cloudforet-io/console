@@ -60,7 +60,7 @@ export default {
     setup(props) {
         const vm: ComponentRenderProxy = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            users: computed(() => store.state.resource.user.items),
+            users: computed(() => store.state.reference.user.items),
             fields: [
                 { label: 'User ID', name: 'user_id' },
                 { label: 'User Name', name: 'resource_id' },
@@ -114,7 +114,7 @@ export default {
         };
 
         (async () => {
-            await vm.$store.dispatch('resource/user/load');
+            await vm.$store.dispatch('reference/user/load');
             await listMember();
         })();
 

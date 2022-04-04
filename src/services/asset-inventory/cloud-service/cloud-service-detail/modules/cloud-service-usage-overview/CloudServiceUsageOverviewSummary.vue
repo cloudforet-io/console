@@ -79,7 +79,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/loadAll');
+            await store.dispatch('reference/loadAll');
         })();
 
         return {

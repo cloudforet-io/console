@@ -48,11 +48,11 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
  */
 export const getLegends = (rawData: CostAnalyzeModel[], granularity: GRANULARITY, groupBy?: GROUP_BY): Legend[] => {
     if (groupBy) {
-        const _providers = store.state.resource.provider.items;
-        const _serviceAccounts = store.state.resource.serviceAccount.items;
-        const _projects = store.state.resource.project.items;
-        const _projectGroups = store.state.resource.projectGroup.items;
-        const _regions = store.state.resource.region.items;
+        const _providers = store.state.reference.provider.items;
+        const _serviceAccounts = store.state.reference.serviceAccount.items;
+        const _projects = store.state.reference.project.items;
+        const _projectGroups = store.state.reference.projectGroup.items;
+        const _regions = store.state.reference.region.items;
 
         const legends: Legend[] = [];
         rawData.forEach((d) => {
@@ -119,20 +119,20 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY)
                 else _category = 'Unknown';
             }
             if (groupBy === GROUP_BY.PROVIDER) {
-                const _providers = store.state.resource.provider.items;
+                const _providers = store.state.reference.provider.items;
                 _color = _providers[_category]?.color;
                 _category = _providers[_category]?.label || _category;
             } else if (groupBy === GROUP_BY.REGION) {
-                const _regions = store.state.resource.region.items;
+                const _regions = store.state.reference.region.items;
                 _category = _regions[_category]?.name || _category;
             } else if (groupBy === GROUP_BY.PROJECT) {
-                const _projects = store.state.resource.project.items;
+                const _projects = store.state.reference.project.items;
                 _category = _projects[_category]?.label || _category;
             } else if (groupBy === GROUP_BY.PROJECT_GROUP) {
-                const _projectGroups = store.state.resource.projectGroup.items;
+                const _projectGroups = store.state.reference.projectGroup.items;
                 _category = _projectGroups[_category]?.label || _category;
             } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
-                const _serviceAccounts = store.state.resource.serviceAccount.items;
+                const _serviceAccounts = store.state.reference.serviceAccount.items;
                 _category = _serviceAccounts[_category]?.name || _category;
             }
             if (d.usd_cost > 0) {

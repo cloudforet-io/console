@@ -16,7 +16,7 @@ import {
 import { Location } from 'vue-router';
 import { PAnchor } from '@spaceone/design-system';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { ResourceItem } from '@/store/modules/resource/type';
+import { ResourceItem } from '@/store/modules/reference/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 export default {

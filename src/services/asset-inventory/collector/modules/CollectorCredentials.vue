@@ -177,8 +177,8 @@ export default {
                     query: getQuery(),
                 });
                 state.items = res.results.map(d => ({
-                    service_account_name: computed(() => store.state.resource.serviceAccount.items[d.service_account_id]?.label || d.service_account_id).value,
-                    project_name: computed(() => store.state.resource.project.items[d.project_id]?.label || d.project_id).value,
+                    service_account_name: computed(() => store.state.reference.serviceAccount.items[d.service_account_id]?.label || d.service_account_id).value,
+                    project_name: computed(() => store.state.reference.project.items[d.project_id]?.label || d.project_id).value,
                     ...d,
                 }));
                 state.totalCount = res.total_count;
@@ -206,8 +206,8 @@ export default {
         (async () => {
             await Promise.allSettled([
                 // LOAD REFERENCE STORE
-                store.dispatch('resource/serviceAccount/load'),
-                store.dispatch('resource/project/load'),
+                store.dispatch('reference/serviceAccount/load'),
+                store.dispatch('reference/project/load'),
             ]);
             await listCredentials();
         })();

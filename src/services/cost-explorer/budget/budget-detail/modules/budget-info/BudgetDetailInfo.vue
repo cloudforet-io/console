@@ -87,8 +87,8 @@ export default {
     },
     setup() {
         const state = reactive({
-            projects: computed(() => store.state.resource.project.items),
-            projectGroups: computed(() => store.state.resource.projectGroup.items),
+            projects: computed(() => store.state.reference.project.items),
+            projectGroups: computed(() => store.state.reference.projectGroup.items),
             budgetData: computed<BudgetData>(() => store.state.service.budget.budgetData),
             costTypeKey: computed(() => (state.budgetData ? getKeyOfCostType(state.budgetData?.cost_types) : '')),
             costTypeValue: computed(() => (state.budgetData ? getValueOfCostType(state.budgetData?.cost_types, state.costTypeKey) : [])),
@@ -116,8 +116,8 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/projectGroup/load'),
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
             ]);
         })();
 

@@ -117,7 +117,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            providers: computed(() => store.state.resource.provider.items),
+            providers: computed(() => store.state.reference.provider.items),
             favoriteItems: computed(() => store.getters['favorite/cloudServiceType/sortedItems']),
             regionItems: [] as RegionItem[],
             categoryItems: [
@@ -194,7 +194,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/provider/load');
+            await store.dispatch('reference/provider/load');
         })();
 
         return {

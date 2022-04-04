@@ -211,7 +211,7 @@ export default {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             loading: true,
-            plugins: computed(() => store.state.resource.plugin.items),
+            plugins: computed(() => store.state.reference.plugin.items),
             isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
             fields: computed(() => [
                 { label: 'Job ID', name: 'job_id' },
@@ -341,7 +341,7 @@ export default {
         };
 
         const init = async () => {
-            await store.dispatch('resource/plugin/load');
+            await store.dispatch('reference/plugin/load');
 
             await getJobs();
             if (state.totalCount === 0) state.modalVisible = true;

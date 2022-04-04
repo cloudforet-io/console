@@ -150,7 +150,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            projects: computed(() => store.state.resource.project.items),
+            projects: computed(() => store.state.reference.project.items),
             proxyIsAllValid: makeProxy('isAllValid', props, emit),
             //
             inputModel: {
@@ -245,7 +245,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/project/load');
+            await store.dispatch('reference/project/load');
         })();
 
         return {

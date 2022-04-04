@@ -209,7 +209,7 @@ export default {
             chart: null,
             chartRef: null as HTMLElement | null,
             skeletons: range(4),
-            providers: computed(() => store.state.resource.provider.items),
+            providers: computed(() => store.state.reference.provider.items),
             //
             selectedIndex: 0,
             selectedLabel: computed(() => CLOUD_SERVICE_LABEL[state.activeTab]),
@@ -556,7 +556,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/provider/load');
+            await store.dispatch('reference/provider/load');
         })();
 
         return {

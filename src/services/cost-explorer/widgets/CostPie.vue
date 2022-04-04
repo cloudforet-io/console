@@ -129,7 +129,7 @@ export default defineComponent<WidgetProps>({
             loading: true,
             chartData: [] as PieChartData[],
             legends: [] as Legend[],
-            projects: computed(() => store.state.resource.project.items),
+            projects: computed(() => store.state.reference.project.items),
             groupBy: computed(() => props.options?.group_by),
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
@@ -277,7 +277,7 @@ export default defineComponent<WidgetProps>({
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/project/load');
+            await store.dispatch('reference/project/load');
         })();
 
         return {

@@ -151,7 +151,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            users: computed(() => store.state.resource.user.items),
+            users: computed(() => store.state.reference.user.items),
             userItems: computed(() => Object.keys(state.users).map(k => ({
                 name: k,
                 label: state.users[k]?.label || k,

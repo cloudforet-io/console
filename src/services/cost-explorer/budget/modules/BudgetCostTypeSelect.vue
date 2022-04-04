@@ -43,7 +43,7 @@ import {
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
-import { ResourceMap } from '@/store/modules/resource/type';
+import { ResourceMap } from '@/store/modules/reference/type';
 import { i18n } from '@/translations';
 import { useFormValidator } from '@/common/composables/form-validator';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -113,9 +113,9 @@ export default defineComponent<Props>({
                 product: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PRODUCT'),
             })),
             resourceMenuItems: computed<SearchDropdownMenuItem[]|undefined>(() => {
-                if (selectedCostType.value === 'provider') return getSearchDropdownItems(store.state.resource.provider.items);
-                if (selectedCostType.value === 'region_code') return getSearchDropdownItems(store.state.resource.region.items);
-                if (selectedCostType.value === 'service_account_id') return getSearchDropdownItems(store.state.resource.serviceAccount.items);
+                if (selectedCostType.value === 'provider') return getSearchDropdownItems(store.state.reference.provider.items);
+                if (selectedCostType.value === 'region_code') return getSearchDropdownItems(store.state.reference.region.items);
+                if (selectedCostType.value === 'service_account_id') return getSearchDropdownItems(store.state.reference.serviceAccount.items);
                 return undefined;
             }),
             resourceMenuLoading: false,
@@ -187,9 +187,9 @@ export default defineComponent<Props>({
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/provider/load'),
-                store.dispatch('resource/region/load'),
-                store.dispatch('resource/serviceAccount/load'),
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/region/load'),
+                store.dispatch('reference/serviceAccount/load'),
             ]);
         })();
 

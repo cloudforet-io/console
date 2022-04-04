@@ -111,7 +111,7 @@ export default {
         const createProjectGroup = async (item) => {
             try {
                 await store.dispatch('service/project/createProjectGroup', item);
-                await store.dispatch('resource/projectGroup/load');
+                await store.dispatch('reference/projectGroup/load');
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '', root);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));

@@ -126,7 +126,7 @@ export default {
     setup(props, { emit, root }) {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            projects: computed(() => store.state.resource.project.items),
+            projects: computed(() => store.state.reference.project.items),
             selectedItemsState: computed(() => {
                 const selectedItemsState = props.selectedItems.map(selectedItem => selectedItem.state);
                 return selectedItemsState;
@@ -169,7 +169,7 @@ export default {
                 HIGH: i18n.t('MONITORING.ALERT.ALERT_LIST.HIGH'),
                 LOW: i18n.t('MONITORING.ALERT.ALERT_LIST.LOW'),
             })),
-            webhooks: computed(() => store.state.resource.webhook.items),
+            webhooks: computed(() => store.state.reference.webhook.items),
         });
 
         const alertDurationFormatter = value => durationFormatter(value, dayjs().format(DATE_TIME_FORMAT), state.timezone) || '--';
@@ -203,8 +203,8 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/webhook/load'),
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/webhook/load'),
             ]);
         })();
 

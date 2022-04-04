@@ -63,7 +63,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            providers: computed(() => vm.$store.state.resource.provider.items),
+            providers: computed(() => vm.$store.state.reference.provider.items),
             hasAlertConfig: false,
         });
 
@@ -83,7 +83,7 @@ export default {
             await Promise.allSettled([
                 getProjectAlertConfig(),
                 // LOAD REFERENCE STORE
-                store.dispatch('resource/cloudServiceType/load'),
+                store.dispatch('reference/cloudServiceType/load'),
             ]);
         })();
 

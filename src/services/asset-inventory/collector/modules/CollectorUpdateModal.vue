@@ -126,7 +126,7 @@ export default {
             collector: null,
             proxyVisible: makeProxy<boolean>('visible', props, emit),
             pluginInfo: computed<CollectorPluginModel>(() => get(state.collector, 'plugin_info', {})),
-            imageUrl: computed<string>(() => get(store.state.resource.plugin.items[state.pluginInfo.plugin_id], 'icon', '')),
+            imageUrl: computed<string>(() => get(store.state.reference.plugin.items[state.pluginInfo.plugin_id], 'icon', '')),
             confirmBtnBind: computed(() => {
                 const defaultStyle: any = { style: { padding: 0 } };
                 defaultStyle.styleType = state.loading ? 'gray200' : 'primary-dark';
@@ -279,7 +279,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/plugin/load');
+            await store.dispatch('reference/plugin/load');
         })();
 
         return {

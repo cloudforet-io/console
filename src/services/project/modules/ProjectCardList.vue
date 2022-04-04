@@ -215,7 +215,7 @@ export default {
             }
             return {};
         };
-        const getProvider = name => vm.$store.state.resource.provider.items[name] || {};
+        const getProvider = name => vm.$store.state.reference.provider.items[name] || {};
         const goToServiceAccount = (provider) => {
             vm.$router.push({
                 name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
@@ -354,7 +354,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/provider/load');
+            await store.dispatch('reference/provider/load');
         })();
 
         return {

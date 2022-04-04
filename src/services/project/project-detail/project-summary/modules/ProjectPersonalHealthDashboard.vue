@@ -130,9 +130,9 @@ export default {
 
         const state = reactive({
             loading: false,
-            regions: computed(() => store.state.resource.region.items),
+            regions: computed(() => store.state.reference.region.items),
             timezone: computed(() => store.state.user.timezone),
-            cloudServiceTypes: computed(() => store.state.resource.cloudServiceType.items),
+            cloudServiceTypes: computed(() => store.state.reference.cloudServiceType.items),
             pageStart: 1,
             pageLimit: 5,
             totalCount: 0,
@@ -168,7 +168,7 @@ export default {
             search: '',
             sortBy: 'last_update_time',
             sortDesc: true,
-            awsProvider: computed(() => store.state.resource.provider.items.aws),
+            awsProvider: computed(() => store.state.reference.provider.items.aws),
         });
         const tabState = reactive({
             tabs: computed(() => [
@@ -276,9 +276,9 @@ export default {
         (async () => {
             await Promise.allSettled([
                 getEvents(), getCount(),
-                store.dispatch('resource/region/load'),
-                store.dispatch('resource/cloudServiceType/load'),
-                store.dispatch('resource/provider/load'),
+                store.dispatch('reference/region/load'),
+                store.dispatch('reference/cloudServiceType/load'),
+                store.dispatch('reference/provider/load'),
             ]);
         })();
 

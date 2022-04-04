@@ -88,7 +88,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            plugins: computed(() => store.state.resource.plugin.items),
+            plugins: computed(() => store.state.reference.plugin.items),
             proxyVisible: makeProxy('visible', props, emit),
             loading: false,
             webhookName: '',
@@ -184,7 +184,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/plugin/load');
+            await store.dispatch('reference/plugin/load');
         })();
 
         return {

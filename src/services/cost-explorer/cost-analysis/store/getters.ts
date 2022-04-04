@@ -2,7 +2,7 @@ import { Getter } from 'vuex';
 import {
     CostAnalysisStoreState, GroupByItem,
 } from '@/services/cost-explorer/cost-analysis/store/type';
-import { ResourceItem } from '@/store/modules/resource/type';
+import { ResourceItem } from '@/store/modules/reference/type';
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { CostQueryFilterItemsMap, CostQuerySetModel } from '@/services/cost-explorer/type';
 import { store } from '@/store';
@@ -11,11 +11,11 @@ import { store } from '@/store';
 export const filterItemsMap: Getter<CostAnalysisStoreState, any> = ({ filters }, getters, rootState): CostQueryFilterItemsMap => {
     const itemsMap: CostQueryFilterItemsMap = {};
     const resourceItemsMap = {
-        project_id: rootState.resource.project.items,
-        project_group_id: store.state.resource.projectGroup.items,
-        service_account_id: rootState.resource.serviceAccount.items,
-        provider: rootState.resource.provider.items,
-        region_code: rootState.resource.region.items,
+        project_id: rootState.reference.project.items,
+        project_group_id: store.state.reference.projectGroup.items,
+        service_account_id: rootState.reference.serviceAccount.items,
+        provider: rootState.reference.provider.items,
+        region_code: rootState.reference.region.items,
     };
 
     Object.entries(filters).forEach(([key, data]) => {

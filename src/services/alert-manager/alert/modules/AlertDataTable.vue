@@ -103,8 +103,8 @@
                 </template>
                 <template #col-triggered_by-format="{ value, item }">
                     <alert-triggered-by :value="value" :project-id="item.project_id"
-                                        :webhook-reference="$store.state.resource.webhook.items[value]"
-                                        :user-reference="$store.state.resource.user.items[value]"
+                                        :webhook-reference="$store.state.reference.webhook.items[value]"
+                                        :user-reference="$store.state.reference.user.items[value]"
                                         disable-link
                     />
                 </template>
@@ -250,8 +250,8 @@ export default {
 
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            projects: computed(() => store.state.resource.project.items),
-            webhooks: computed(() => store.state.resource.webhook.items),
+            projects: computed(() => store.state.reference.project.items),
+            webhooks: computed(() => store.state.reference.webhook.items),
             loading: true,
             selectIndex: [] as number[],
             selectedItems: computed(() => state.selectIndex.map(d => state.items[d])),
@@ -429,9 +429,9 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/webhook/load'),
-                store.dispatch('resource/user/load'),
-                store.dispatch('resource/project/load'),
+                store.dispatch('reference/webhook/load'),
+                store.dispatch('reference/user/load'),
+                store.dispatch('reference/project/load'),
             ]);
         })();
 

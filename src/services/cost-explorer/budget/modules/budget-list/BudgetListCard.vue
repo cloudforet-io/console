@@ -86,9 +86,9 @@ import {
 } from '@spaceone/design-system';
 import BudgetUsageProgressBar from '@/services/cost-explorer/modules/BudgetUsageProgressBar.vue';
 import { store } from '@/store';
-import { ProjectResourceItem } from '@/store/modules/resource/project/type';
-import { ProjectGroupResourceItem } from '@/store/modules/resource/project-group/type';
-import { ResourceMap } from '@/store/modules/resource/type';
+import { ProjectResourceItem } from '@/store/modules/reference/project/type';
+import { ProjectGroupResourceItem } from '@/store/modules/reference/project-group/type';
+import { ResourceMap } from '@/store/modules/reference/type';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
@@ -141,12 +141,12 @@ export default {
                 const projects: string[] = [];
                 if (state.isProject) {
                     const projectId = props.budgetUsage.project_id as string;
-                    const project: ProjectResourceItem|undefined = store.state.resource.project.items[projectId];
+                    const project: ProjectResourceItem|undefined = store.state.reference.project.items[projectId];
                     if (project?.data?.groupInfo.name) projects.push(project.data.groupInfo.name);
                     projects.push(project?.name ?? projectId);
                 } else {
                     const projectGroupId = props.budgetUsage.project_group_id as string;
-                    const projectGroup: ProjectGroupResourceItem|undefined = store.state.resource.projectGroup.items[projectGroupId];
+                    const projectGroup: ProjectGroupResourceItem|undefined = store.state.reference.projectGroup.items[projectGroupId];
                     if (projectGroup?.data?.parentGroupInfo?.name) projects.push(projectGroup.data.parentGroupInfo.name);
                     projects.push(projectGroup?.name ?? projectGroupId);
                 }
@@ -155,15 +155,15 @@ export default {
             resourceItemMap: computed<CostTypeResourceItemMap>(() => ({
                 provider: {
                     label: 'Provider',
-                    items: store.state.resource.provider.items,
+                    items: store.state.reference.provider.items,
                 },
                 region_code: {
                     label: 'Region',
-                    items: store.state.resource.region.items,
+                    items: store.state.reference.region.items,
                 },
                 service_account_id: {
                     label: 'Service Account',
-                    items: store.state.resource.serviceAccount.items,
+                    items: store.state.reference.serviceAccount.items,
                 },
             })),
             costTypeResourceListMap: computed<CostTypeResourceListMap>(() => {
@@ -195,10 +195,10 @@ export default {
                 return 'common';
             }),
 
-            // resource store items
-            providers: computed(() => store.state.resource.provider.items),
-            regions: computed(() => store.state.resource.region.items),
-            serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
+            // reference store items
+            providers: computed(() => store.state.reference.provider.items),
+            regions: computed(() => store.state.reference.region.items),
+            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
         });
@@ -206,11 +206,11 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/serviceAccount/load'),
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/projectGroup/load'),
-                store.dispatch('resource/region/load'),
-                store.dispatch('resource/provider/load'),
+                store.dispatch('reference/serviceAccount/load'),
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/region/load'),
+                store.dispatch('reference/provider/load'),
             ]);
         })();
 

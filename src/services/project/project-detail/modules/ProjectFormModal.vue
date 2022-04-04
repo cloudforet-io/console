@@ -118,7 +118,7 @@ export default {
 
         const createProject = async (params) => {
             store.dispatch('service/project/createProject', params);
-            await store.dispatch('resource/project/load');
+            await store.dispatch('reference/project/load');
         };
 
         const updateProject = async (params) => {

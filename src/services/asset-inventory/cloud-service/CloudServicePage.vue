@@ -153,8 +153,8 @@ export default {
 
         const queryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
-            providers: computed(() => store.state.resource.provider.items),
-            serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
+            providers: computed(() => store.state.reference.provider.items),
+            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
             favoriteItems: computed(() => store.getters['favorite/cloudServiceType/sortedItems']),
             selectedProvider: computed(() => store.state.service.cloudService.selectedProvider),
             selectedCategories: computed(() => store.state.service.cloudService.selectedCategories),
@@ -244,9 +244,9 @@ export default {
         /* Init */
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/provider/load'),
-                store.dispatch('resource/serviceAccount/load'),
-                store.dispatch('resource/cloudServiceType/load'),
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/serviceAccount/load'),
+                store.dispatch('reference/cloudServiceType/load'),
                 store.dispatch('favorite/cloudServiceType/load'),
             ]);
 

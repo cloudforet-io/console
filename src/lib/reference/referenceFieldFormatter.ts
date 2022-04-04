@@ -11,36 +11,36 @@ interface FieldFormatter {
 
 type FormatterMap = Record<ReferenceType, FieldFormatter>
 /**
- * getter - resource/fieldItems
+ * getter - reference/fieldItems
  *
  *
  */
 const formatterMap: FormatterMap = {
-    'identity.Provider': () => store.getters['resource/provider/fieldItems'],
+    'identity.Provider': () => store.getters['reference/provider/fieldItems'],
     'inventory.Server': (data, reference) => ({
         data,
         link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
     }),
     'identity.Project': (data, reference) => ({
-        data: store.state.resource.project.items[data]?.label || data,
+        data: store.state.reference.project.items[data]?.label || data,
         options: {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
     }),
     'inventory.Collector': (data, reference) => ({
-        data: store.state.resource.collector.items[data]?.label || data,
+        data: store.state.reference.collector.items[data]?.label || data,
         options: {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
     }),
     'identity.ServiceAccount': (data, reference) => ({
-        data: store.state.resource.serviceAccount.items[data]?.label || data,
+        data: store.state.reference.serviceAccount.items[data]?.label || data,
         options: {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
     }),
     'inventory.Region': data => ({
-        data: store.state.resource.region.items[data]?.label || data,
+        data: store.state.reference.region.items[data]?.label || data,
     }),
     'inventory.CloudService': (data, reference) => ({
         options: {
@@ -48,7 +48,7 @@ const formatterMap: FormatterMap = {
         },
     }),
     'secret.Secret': data => ({
-        data: store.state.resource.secret.items[data]?.label || data,
+        data: store.state.reference.secret.items[data]?.label || data,
     }),
 };
 

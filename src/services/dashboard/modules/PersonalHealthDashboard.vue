@@ -100,11 +100,11 @@ export default {
 
         const state = reactive({
             loading: false,
-            providers: computed(() => store.state.resource.provider.items),
+            providers: computed(() => store.state.reference.provider.items),
             timezone: computed(() => store.state.user.timezone),
-            projects: computed(() => store.state.resource.project.items),
+            projects: computed(() => store.state.reference.project.items),
             favoriteProjects: computed(() => store.state.favorite.project.items),
-            regions: computed(() => store.state.resource.region.items),
+            regions: computed(() => store.state.reference.region.items),
             data: [] as any[],
             fields: computed(() => [
                 { name: 'event', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_EVENT') },
@@ -154,9 +154,9 @@ export default {
             state.loading = true;
             // LOAD REFERENCE STORE
             await Promise.allSettled([
-                store.dispatch('resource/project/load'),
+                store.dispatch('reference/project/load'),
                 store.dispatch('favorite/project/load'),
-                store.dispatch('resource/region/load'),
+                store.dispatch('reference/region/load'),
             ]);
             await getData();
             state.loading = false;

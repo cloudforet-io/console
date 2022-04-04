@@ -40,7 +40,7 @@ export default {
         });
 
         const init = () => {
-            store.dispatch('resource/project/load');
+            store.dispatch('reference/project/load');
         };
         init();
 

@@ -118,7 +118,7 @@ export default {
             loading: false,
             skeletons: range(2),
             timezone: computed(() => store.state.user.timezone || 'UTC'),
-            providers: computed(() => store.state.resource.provider.items),
+            providers: computed(() => store.state.reference.provider.items),
             items: [] as JobModel[],
             fields: computed(() => [
                 { label: vm.$t('COMMON.WIDGETS.COLLECTING_JOBS_TITLE_TIME'), name: 'collector_info' },
@@ -177,7 +177,7 @@ export default {
         const init = async () => {
             await getData();
             // LOAD REFERENCE STORE
-            await store.dispatch('resource/provider/load');
+            await store.dispatch('reference/provider/load');
         };
         init();
 

@@ -4,7 +4,7 @@ import { sortBy } from 'lodash';
 
 
 export const items: Getter<FavoriteState, any> = (state: FavoriteState, getters, rootState): FavoriteItem[] => {
-    const resourceItems = rootState.resource.project.items;
+    const resourceItems = rootState.reference.project.items;
     return state.items.map((d) => {
         const resource = resourceItems[d.id];
         return {

@@ -83,7 +83,7 @@ export default {
     },
     setup(props: Props, { emit }) {
         const state = reactive({
-            providers: computed(() => store.state.resource.provider.items),
+            providers: computed(() => store.state.reference.provider.items),
             selectedProvider: computed(() => store.state.service.cloudService.selectedProvider),
             selectedCategories: computed(() => store.state.service.cloudService.selectedCategories),
             selectedRegions: computed(() => store.state.service.cloudService.selectedRegions),
@@ -235,7 +235,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/provider/load');
+            await store.dispatch('reference/provider/load');
         })();
 
         return {

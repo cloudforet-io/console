@@ -250,14 +250,14 @@ export default {
 
         /* Init */
         (async () => {
-            await Promise.allSettled([getOccupiedResourceList(), store.dispatch('resource/loadAll', true)]);
+            await Promise.allSettled([getOccupiedResourceList(), store.dispatch('reference/loadAll', true)]);
 
             // set project tag
             if (props.projectId) {
                 fetchOptionState.queryTags.push({
                     key: { name: 'project_id', label: 'Project' },
                     operator: '=',
-                    value: { name: props.projectId, label: store.state.resource.project.items[props.projectId]?.label || props.projectId },
+                    value: { name: props.projectId, label: store.state.reference.project.items[props.projectId]?.label || props.projectId },
                 } as unknown as QueryTag);
             }
 

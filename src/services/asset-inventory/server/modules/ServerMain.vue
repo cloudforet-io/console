@@ -448,7 +448,7 @@ export default {
                 } catch (e) {
                     ErrorHandler.handleRequestError(e, vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHANGE_PROJECT_TITLE'));
                 } finally {
-                    await store.dispatch('resource/project/load');
+                    await store.dispatch('reference/project/load');
                     await listServerData();
                 }
             } else {
@@ -574,7 +574,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/loadAll');
+            await store.dispatch('reference/loadAll');
         })();
 
         return {

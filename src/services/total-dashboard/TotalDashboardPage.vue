@@ -117,7 +117,7 @@ export default {
                 if (state.selectedDomainId) params.domain_id = state.selectedDomainId;
                 return params;
             }),
-            providers: computed(() => vm.$store.state.resource.provider.items),
+            providers: computed(() => vm.$store.state.reference.provider.items),
             project: computed(() => [...vm.$store.getters['favorite/projectGroup/sortedItems'], ...vm.$store.getters['favorite/project/sortedItems']]),
             cloudService: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
             timezone: computed(() => vm.$store.state.user.timezone || 'UTC'),
@@ -145,7 +145,7 @@ export default {
         /** Init */
         (async () => {
             await Promise.allSettled([
-                vm.$store.dispatch('resource/provider/load'),
+                vm.$store.dispatch('reference/provider/load'),
                 vm.$store.dispatch('favorite/projectGroup/load'),
                 vm.$store.dispatch('favorite/project/load'),
                 vm.$store.dispatch('favorite/cloudServiceType/load'),

@@ -479,7 +479,7 @@ export default {
 
             state.selectedTypeIndex = findIndex(state.supportResourceGroupTypeItems, { name: formState.resourceGroup?.resources[0]?.resource_type });
 
-            // reset resource
+            // reset reference
             state.resource = formState.resourceGroup?.resources[0] || { filter: [], keyword: '', resource_type: '' };
 
             await resetTable();

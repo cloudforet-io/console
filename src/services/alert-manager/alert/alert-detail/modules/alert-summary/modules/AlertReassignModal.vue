@@ -82,7 +82,7 @@ export default {
             ],
             items: [] as any,
             totalCount: 0,
-            users: computed(() => store.state.resource.user.items),
+            users: computed(() => store.state.reference.user.items),
         });
 
         const reassignMember = async () => {
@@ -142,7 +142,7 @@ export default {
         (async () => {
             await Promise.allSettled([
                 listMemberInProject(),
-                store.dispatch('resource/user/load'),
+                store.dispatch('reference/user/load'),
             ]);
         })();
 

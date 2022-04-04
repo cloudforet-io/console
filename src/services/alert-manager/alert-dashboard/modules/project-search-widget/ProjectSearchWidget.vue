@@ -75,7 +75,7 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            projects: computed(() => store.state.resource.project.items),
+            projects: computed(() => store.state.reference.project.items),
             totalCount: 0,
             pageLimit: 12,
             items: [],
@@ -155,7 +155,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/project/load');
+            await store.dispatch('reference/project/load');
         })();
 
         return {

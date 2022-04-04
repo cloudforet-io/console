@@ -122,7 +122,7 @@ export default {
             }),
             selectedMemberItems: props.alertData.responders.map(d => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[],
             selectedResourceIds: computed<string[]>(() => responderState.selectedMemberItems.map(d => d.name)),
-            userItem: computed(() => store.state.resource.user.items),
+            userItem: computed(() => store.state.reference.user.items),
         });
 
         const responderNameFormatter = (resourceId) => {
@@ -214,8 +214,8 @@ export default {
         (async () => {
             await Promise.allSettled([
                 listProjectChannel(), listMember(), listEscalationPolicy(),
-                store.dispatch('resource/protocol/load'),
-                store.dispatch('resource/user/load'),
+                store.dispatch('reference/protocol/load'),
+                store.dispatch('reference/user/load'),
             ]);
         })();
 

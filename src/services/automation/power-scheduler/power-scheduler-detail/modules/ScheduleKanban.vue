@@ -362,7 +362,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/provider/load');
+            await store.dispatch('reference/provider/load');
         })();
 
         return {
@@ -373,7 +373,7 @@ export default {
             finishEdit,
             deleteResourceGroup,
             onSave,
-            iconUrl: (item): string => assetUrlConverter(item.icon) || store.state.resource.provider.items[item.provider]?.icon || '',
+            iconUrl: (item): string => assetUrlConverter(item.icon) || store.state.reference.provider.items[item.provider]?.icon || '',
             onClickResourceGroup,
             onResourceGroupConfirm,
             hideGuide,

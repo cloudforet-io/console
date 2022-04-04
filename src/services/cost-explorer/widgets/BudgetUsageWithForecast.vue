@@ -133,8 +133,8 @@ export default {
                 },
             ])),
             items: [] as BudgetItem[],
-            projectGroups: computed(() => store.state.resource.projectGroup.items),
-            projects: computed(() => store.state.resource.project.items),
+            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projects: computed(() => store.state.reference.project.items),
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
                 return {
@@ -217,8 +217,8 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/projectGroup/load'),
-                store.dispatch('resource/project/load'),
+                store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/project/load'),
             ]);
         })();
 

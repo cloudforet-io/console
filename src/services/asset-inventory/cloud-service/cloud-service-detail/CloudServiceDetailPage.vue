@@ -636,7 +636,7 @@ export default {
                 } catch (e) {
                     ErrorHandler.handleRequestError(e, vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_CHANGE_PROJECT'));
                 } finally {
-                    await store.dispatch('resource/project/load');
+                    await store.dispatch('reference/project/load');
                     const { items, totalCount } = await getCloudServiceTableData();
                     tableState.items = items;
                     typeOptionState.totalCount = totalCount;

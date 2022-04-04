@@ -116,7 +116,7 @@ export default {
             selectedProvider: '', // aws
             selectedRegion: '', // Asia Pacific (Seoul)
             selectedRegionCode: '', // ap-northeast-2
-            providers: computed(() => store.state.resource.provider.items),
+            providers: computed(() => store.state.reference.provider.items),
             regionList: [],
             loading: true,
             maxValue: 0,
@@ -379,7 +379,7 @@ export default {
         (async () => {
             state.loading = true;
             // LOAD REFERENCE STORE
-            await store.dispatch('resource/provider/load', true);
+            await store.dispatch('reference/provider/load', true);
             convertRegionListToData(await getRegionList());
             if (state.data.length > 0) {
                 await setInitialRegionSetting();

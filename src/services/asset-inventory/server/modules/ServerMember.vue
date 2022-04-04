@@ -53,7 +53,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            users: computed(() => store.state.resource.user.items),
+            users: computed(() => store.state.reference.user.items),
             fields: [
                 { label: 'User ID', name: 'user_id' },
                 { label: 'User Name', name: 'resource_id' },
@@ -136,7 +136,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/user/load');
+            await store.dispatch('reference/user/load');
         })();
 
         return {

@@ -10,7 +10,7 @@
             <div class="left-part">
                 <!--                <favorite-button :item-id="'item-id1'"-->
                 <!--                                 favorite-type="project"-->
-                <!--                                 resource-type="identity.Project"-->
+                <!--                                 reference-type="identity.Project"-->
                 <!--                />-->
                 <p-icon-button name="ic_edit-text"
                                class="edit-btn"

@@ -165,7 +165,7 @@ export default {
             collector: null as CollectorModel | null,
             credential: null as SecretModel | null,
             selectedCollectMode: COLLECT_MODE.all as COLLECT_MODE,
-            plugin: computed(() => store.state.resource.plugin.items[state.collector?.plugin_info.plugin_id]),
+            plugin: computed(() => store.state.reference.plugin.items[state.collector?.plugin_info.plugin_id]),
             pluginName: computed<string>(() => get(state.plugin, 'name', '')),
             imageUrl: computed<string>(() => get(state.plugin, 'icon', '')),
             version: computed<string>(() => get(state.collector, 'plugin_info.version', '')),
@@ -250,7 +250,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/plugin/load');
+            await store.dispatch('reference/plugin/load');
         })();
 
         return {

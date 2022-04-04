@@ -26,6 +26,7 @@
                         :key="`${cloudServiceType}-${idx}`"
                         :to="getCloudServiceDetailLink({ ...item, cloudServiceTypeName: cloudServiceType.cloud_service_type })"
                         class="service-type-item"
+                        :style="{ width: `${90 /slicedResources.length}%` }"
                     >
                         <span class="service-type-name">{{ cloudServiceType.cloud_service_type }} &nbsp;</span>
                         <span class="service-type-count">{{ cloudServiceType.count }}</span>
@@ -89,7 +90,7 @@ export default {
     },
     setup(props: Props) {
         const state = reactive({
-            providers: computed(() => store.state.resource.provider.items),
+            providers: computed(() => store.state.reference.provider.items),
             slicedResources: computed(() => props.item?.resources.slice(0, 2)),
         });
         const cloudServiceDetailQueryHelper = new QueryHelper();
@@ -121,7 +122,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/provider/load');
+            await store.dispatch('reference/provider/load');
         })();
 
         return {
@@ -185,7 +186,6 @@ export default {
 
             .service-type-item {
                 @apply flex items-center;
-                width: 45%;
                 margin-left: 0.75rem;
                 white-space: break-spaces;
 

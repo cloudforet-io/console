@@ -68,7 +68,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/type';
 
 import { store } from '@/store';
-import { ResourceMap } from '@/store/modules/resource/type';
+import { ResourceMap } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
@@ -125,8 +125,8 @@ export default {
             selectedItems: computed<MenuItem[]>({
                 get() {
                     const items: ResourceMap = {
-                        ...store.state.resource.project.items,
-                        ...store.state.resource.projectGroup.items,
+                        ...store.state.reference.project.items,
+                        ...store.state.reference.projectGroup.items,
                     };
                     return state._selectedProjectIds.map(id => ({
                         name: id,
@@ -263,8 +263,8 @@ export default {
         (async () => {
             await Promise.allSettled([
                 // LOAD REFERENCE STORE
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/projectGroup/load'),
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
             ]);
         })();
         return {

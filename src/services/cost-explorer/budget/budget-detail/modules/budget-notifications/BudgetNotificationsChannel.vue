@@ -93,7 +93,7 @@ export default {
             ]),
             items: [] as ChannelItem[],
             timezone: computed(() => store.state.user.timezone),
-            protocols: computed(() => store.state.resource.protocol.items),
+            protocols: computed(() => store.state.reference.protocol.items),
         });
 
         const apiQueryHelper = new ApiQueryHelper();
@@ -122,7 +122,7 @@ export default {
             await Promise.allSettled([
                 listNotificationsChannel(),
                 // LOAD REFERENCE STORE
-                store.dispatch('resource/protocol/load'),
+                store.dispatch('reference/protocol/load'),
             ]);
         })();
 

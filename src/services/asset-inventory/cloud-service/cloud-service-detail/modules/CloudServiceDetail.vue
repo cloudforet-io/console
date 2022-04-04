@@ -253,7 +253,7 @@ export default {
             await Promise.allSettled([
                 loadSchemaAndData(),
                 // LOAD REFERENCE STORE
-                store.dispatch('resource/loadAll'),
+                store.dispatch('reference/loadAll'),
             ]);
         })();
 

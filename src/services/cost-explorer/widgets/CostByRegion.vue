@@ -143,8 +143,8 @@ export default defineComponent<WidgetProps>({
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
             chartRegistry: {},
-            regions: computed(() => store.state.resource.region.items),
-            providers: computed(() => store.state.resource.provider.items),
+            regions: computed(() => store.state.reference.region.items),
+            providers: computed(() => store.state.reference.provider.items),
             loading: true,
             chartData: [] as DefaultContinentData[],
             widgetLink: computed(() => {
@@ -330,8 +330,8 @@ export default defineComponent<WidgetProps>({
         (async () => {
             // LOAD REFERENCE STORE
             await Promise.allSettled([
-                store.dispatch('resource/region/load'),
-                store.dispatch('resource/provider/load'),
+                store.dispatch('reference/region/load'),
+                store.dispatch('reference/provider/load'),
             ]);
             await getChartData();
         })();

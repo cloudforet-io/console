@@ -109,8 +109,8 @@ const listMapper = {
 const getFormattedTime = time => dayjs(time).tz(store.state.user.timezone).format('YYYY-MM-DD');
 
 const validateProjectId = async (projectId): Promise<boolean> => {
-    await store.dispatch('resource/project/load');
-    return !!store.state.resource.project.items[projectId];
+    await store.dispatch('reference/project/load');
+    return !!store.state.reference.project.items[projectId];
 };
 
 export default {
@@ -157,7 +157,7 @@ export default {
 
         /** Breadcrumb */
         const routeState = reactive({
-            projectName: computed(() => store.state.resource.project.items[props.projectId]?.label || props.projectId),
+            projectName: computed(() => store.state.reference.project.items[props.projectId]?.label || props.projectId),
             route: computed(() => [
                 { name: vm.$t('MENU.AUTOMATION.AUTOMATION'), path: '/automation' },
                 { name: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), path: '/automation/power-scheduler' },

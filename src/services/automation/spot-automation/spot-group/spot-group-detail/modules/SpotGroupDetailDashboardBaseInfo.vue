@@ -125,7 +125,7 @@ export default {
             skeletons: range(3),
             title: '',
             resourceName: computed(() => props.spotGroup.resource_id), // todo: name 필드가 추가되면 name으로 바뀌어야 함
-            projects: computed(() => store.state.resource.project.items),
+            projects: computed(() => store.state.reference.project.items),
             projectId: computed(() => props.spotGroup.project_id),
             projectName: computed(() => state.projects[state.projectId]?.label),
             projectLink: computed(() => {
@@ -253,7 +253,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/project/load');
+            await store.dispatch('reference/project/load');
         })();
 
         return {

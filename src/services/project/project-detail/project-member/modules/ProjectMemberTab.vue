@@ -146,7 +146,7 @@ export default {
         // List api Handler for query search table
         const memberTableQuery = new ApiQueryHelper().setPageLimit(15).setFilters(props.filters);
         const memberTableState = reactive({
-            users: computed(() => vm.$store.state.resource.user.items),
+            users: computed(() => vm.$store.state.reference.user.items),
             searchText: memberTableQuery.filters.map(d => d.v).join(' ') || '',
             selectIndex: [] as number[],
             fields: [
@@ -339,7 +339,7 @@ export default {
 
         (async () => {
             // LOAD REFERENCE STORE
-            await vm.$store.dispatch('resource/user/load');
+            await vm.$store.dispatch('reference/user/load');
             await listMembers();
         })();
 

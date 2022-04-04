@@ -185,9 +185,9 @@ export default {
         const state = reactive({
             loading: false,
             chart: null as null | any,
-            providers: computed(() => store.state.resource.provider.items),
+            providers: computed(() => store.state.reference.provider.items),
             favoriteProjects: computed(() => store.state.favorite.project.items),
-            projects: computed(() => store.state.resource.project.items),
+            projects: computed(() => store.state.reference.project.items),
             chartRef: null as HTMLElement | null,
             thisPage: 1,
             allPage: 1,
@@ -382,8 +382,8 @@ export default {
             await Promise.allSettled([
                 store.dispatch('favorite/project/load'),
                 // LOAD REFERENCE STORE
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/provider/load'),
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/provider/load'),
             ]);
             await getProjectSummary();
         };

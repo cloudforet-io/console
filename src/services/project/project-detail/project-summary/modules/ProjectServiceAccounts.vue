@@ -94,7 +94,7 @@ export default {
                 { name: 'database', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.DATABASE') },
                 { name: 'storage', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.STORAGE') },
             ]),
-            providers: computed(() => store.state.resource.provider.items),
+            providers: computed(() => store.state.reference.provider.items),
         });
 
         /* util */
@@ -126,7 +126,7 @@ export default {
         const getData = async () => {
             state.loading = true;
             state.data = [];
-            await store.dispatch('resource/provider/load');
+            await store.dispatch('reference/provider/load');
             try {
                 const res = await SpaceConnector.client.statistics.topic.serviceAccountSummary({
                     project_id: props.projectId,

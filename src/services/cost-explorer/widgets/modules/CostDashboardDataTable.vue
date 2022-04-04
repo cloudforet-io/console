@@ -129,8 +129,8 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            providers: computed(() => store.state.resource.provider.items),
-            projects: computed(() => store.state.resource.project.items),
+            providers: computed(() => store.state.reference.provider.items),
+            projects: computed(() => store.state.reference.project.items),
             slicedItems: computed(() => {
                 if (props.printMode) return props.items;
                 const startIndex = state.proxyThisPage * props.pageSize - props.pageSize;
@@ -205,8 +205,8 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('resource/provider/load'),
-                store.dispatch('resource/project/load'),
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/project/load'),
             ]);
         })();
 

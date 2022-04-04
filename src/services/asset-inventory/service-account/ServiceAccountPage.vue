@@ -221,13 +221,13 @@ export default {
         /** Provider(located at sidebar) & Page Title * */
         const selectedProvider: Ref<string> = ref('aws');
         const providerState = reactive({
-            items: computed(() => Object.keys(store.state.resource.provider.items).map(k => ({
-                ...store.state.resource.provider.items[k],
+            items: computed(() => Object.keys(store.state.reference.provider.items).map(k => ({
+                ...store.state.reference.provider.items[k],
                 provider: k,
-                icon: assetUrlConverter(store.state.resource.provider.items[k].icon),
+                icon: assetUrlConverter(store.state.reference.provider.items[k].icon),
             }))),
         });
-        const selectedProviderName = computed(() => store.state.resource.provider.items[selectedProvider.value]?.label || selectedProvider.value);
+        const selectedProviderName = computed(() => store.state.reference.provider.items[selectedProvider.value]?.label || selectedProvider.value);
 
         /** Page Navigation * */
         const routeState = reactive({
@@ -490,7 +490,7 @@ export default {
                 } catch (e) {
                     ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_CHANGE_PROJECT'));
                 } finally {
-                    await store.dispatch('resource/project/load');
+                    await store.dispatch('reference/project/load');
                     await listServiceAccountData();
                 }
             } else {
@@ -551,8 +551,8 @@ export default {
 
         const init = async () => {
             await Promise.allSettled([
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/provider/load'),
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/provider/load'),
             ]);
             const providerFilter = Array.isArray(vm.$route.query.provider) ? vm.$route.query.provider[0] : vm.$route.query.provider;
             if (providerState.items.length > 0) {

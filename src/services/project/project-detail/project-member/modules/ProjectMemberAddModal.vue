@@ -229,7 +229,7 @@ export default {
             loading: false,
             projectId: computed(() => root.$route.params.id),
             authType: computed(() => store.state.domain.extendedAuthType),
-            users: computed(() => store.state.resource.user.items),
+            users: computed(() => store.state.reference.user.items),
             members: [] as any,
             //
             tabs: computed(() => {
@@ -467,7 +467,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/user/load');
+            await store.dispatch('reference/user/load');
         })();
 
         return {

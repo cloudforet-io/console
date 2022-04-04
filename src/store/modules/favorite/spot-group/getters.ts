@@ -3,7 +3,7 @@ import { Getter } from 'vuex';
 import { sortBy } from 'lodash';
 
 export const items: Getter<FavoriteState, any> = (state: FavoriteState, rootState): FavoriteItem[] => {
-    const resourceItems = rootState.resource.spotGroup.items;
+    const resourceItems = rootState.reference.spotGroup.items;
     return state.items.map((d) => {
         const resource = resourceItems[d.id];
         return {

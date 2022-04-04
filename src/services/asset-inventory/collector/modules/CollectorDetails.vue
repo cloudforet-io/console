@@ -103,9 +103,9 @@ export default {
             if (res) {
                 baseState.data = {
                     // eslint-disable-next-line camelcase
-                    plugin_name: store.state.resource.plugin.items[res.plugin_info.plugin_id]?.label,
+                    plugin_name: store.state.reference.plugin.items[res.plugin_info.plugin_id]?.label,
                     // eslint-disable-next-line camelcase
-                    plugin_icon: store.state.resource.plugin.items[res.plugin_info.plugin_id]?.icon,
+                    plugin_icon: store.state.reference.plugin.items[res.plugin_info.plugin_id]?.icon,
                     ...res,
                 };
             }
@@ -116,7 +116,7 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('resource/plugin/load');
+            await store.dispatch('reference/plugin/load');
         })();
 
         return {
