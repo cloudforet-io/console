@@ -1,4 +1,4 @@
-export interface ResourceItem<Data = Record<string, any>> {
+export interface ReferenceItem<Data = Record<string, any>> {
     label?: string;
     name?: string;
     color?: string;
@@ -10,8 +10,8 @@ export interface ResourceItem<Data = Record<string, any>> {
     data?: Data;
 }
 
-export type ResourceMap<ResourceItem = Record<string, any>> = Record<string, ResourceItem>;
+export type ReferenceMap<ReferenceItem = Record<string, any>> = Record<string, ReferenceItem>;
 
-export interface ResourceState<ResourceMap = Record<string, any>> {
-    items?: ResourceMap;
+export interface ReferenceState<ReferenceMap = Record<string, any>> {
+    items?: ReferenceMap;
 }

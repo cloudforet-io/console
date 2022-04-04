@@ -1,5 +1,5 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ResourceMap, ResourceState } from '@/store/modules/reference/type';
+import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
@@ -60,7 +60,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 only: ['name', 'region_code', 'tags', 'provider'],
             },
         }, { timeout: 3000 });
-        const regions: ResourceMap = {};
+        const regions: ReferenceMap = {};
 
         response.results.forEach((regionInfo: any): void => {
             regions[regionInfo.region_code] = {
@@ -76,7 +76,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ResourceState, any> = ({ state, commit }, regionInfo): void => {
+export const sync: Action<ReferenceState, any> = ({ state, commit }, regionInfo): void => {
     const regions = {
         ...state.items,
         [regionInfo.region_code]: {

@@ -88,7 +88,7 @@ import BudgetUsageProgressBar from '@/services/cost-explorer/modules/BudgetUsage
 import { store } from '@/store';
 import { ProjectResourceItem } from '@/store/modules/reference/project/type';
 import { ProjectGroupResourceItem } from '@/store/modules/reference/project-group/type';
-import { ResourceMap } from '@/store/modules/reference/type';
+import { ReferenceMap } from '@/store/modules/reference/type';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
@@ -99,7 +99,7 @@ interface Props {
 
 type ResourceItemMap = {
     label: string;
-    items: ResourceMap;
+    items: ReferenceMap;
 }
 
 type CostTypeResourceItemMap = Record<string, ResourceItemMap>

@@ -42,7 +42,7 @@ import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
 import { store } from '@/store';
-import { ResourceItem } from '@/store/modules/reference/type';
+import { ReferenceItem } from '@/store/modules/reference/type';
 
 
 const DASHBOARD_FILTER_NAMES = [FILTER.PROJECT_GROUP, FILTER.PROJECT, FILTER.SERVICE_ACCOUNT, FILTER.PROVIDER];
@@ -91,7 +91,7 @@ export default {
                     const resourceItems = resourceItemsMap[key];
                     if (resourceItems) {
                         itemsMap[key] = data?.map((d) => {
-                            const resourceItem: ResourceItem = resourceItems[d];
+                            const resourceItem: ReferenceItem = resourceItems[d];
                             return { name: d, label: resourceItem?.label ?? d };
                         });
                     } else itemsMap[key] = data?.map(d => ({ name: d, label: d }));

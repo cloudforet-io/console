@@ -43,7 +43,7 @@ import {
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
-import { ResourceMap } from '@/store/modules/reference/type';
+import { ReferenceMap } from '@/store/modules/reference/type';
 import { i18n } from '@/translations';
 import { useFormValidator } from '@/common/composables/form-validator';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -63,7 +63,7 @@ interface DistinctResult {
     total_count?: number;
 }
 
-const getSearchDropdownItems = (resourceItems: ResourceMap): SearchDropdownMenuItem[] => Object.keys(resourceItems).map(k => ({
+const getSearchDropdownItems = (resourceItems: ReferenceMap): SearchDropdownMenuItem[] => Object.keys(resourceItems).map(k => ({
     name: k, label: resourceItems[k].label,
 }));
 

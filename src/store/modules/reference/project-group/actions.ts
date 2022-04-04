@@ -3,7 +3,7 @@ import { ProjectGroupResourceMap } from '@/store/modules/reference/project-group
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
-import { ResourceState } from '@/store/modules/reference/type';
+import { ReferenceState } from '@/store/modules/reference/type';
 
 let lastLoadedTime = 0;
 
@@ -45,7 +45,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ResourceState, any> = ({ state, commit }, projectGroupInfo): void => {
+export const sync: Action<ReferenceState, any> = ({ state, commit }, projectGroupInfo): void => {
     const parentGroup = projectGroupInfo.parent_project_group_info;
     const projectGroups = {
         ...state.items,

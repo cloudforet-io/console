@@ -68,7 +68,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/type';
 
 import { store } from '@/store';
-import { ResourceMap } from '@/store/modules/reference/type';
+import { ReferenceMap } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
@@ -124,7 +124,7 @@ export default {
             _selectedProjectIds: [...props.selectedProjectIds] as string[],
             selectedItems: computed<MenuItem[]>({
                 get() {
-                    const items: ResourceMap = {
+                    const items: ReferenceMap = {
                         ...store.state.reference.project.items,
                         ...store.state.reference.projectGroup.items,
                     };

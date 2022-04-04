@@ -1,5 +1,5 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ResourceMap, ResourceState } from '@/store/modules/reference/type';
+import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
@@ -21,7 +21,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 only: ['secret_id', 'name'],
             },
         }, { timeout: 3000 });
-        const secrets: ResourceMap = {};
+        const secrets: ReferenceMap = {};
 
         response.results.forEach((secretInfo: any): void => {
             secrets[secretInfo.secret_id] = {
@@ -36,7 +36,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ResourceState, any> = ({ state, commit }, secretInfo): void => {
+export const sync: Action<ReferenceState, any> = ({ state, commit }, secretInfo): void => {
     const secrets = {
         ...state.items,
         [secretInfo.secret_id]: {

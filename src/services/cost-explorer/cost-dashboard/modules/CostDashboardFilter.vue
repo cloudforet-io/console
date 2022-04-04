@@ -38,7 +38,7 @@ import SetFilterModal from '@/services/cost-explorer/modules/SetFilterModal.vue'
 
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
-import { ResourceItem } from '@/store/modules/reference/type';
+import { ReferenceItem } from '@/store/modules/reference/type';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -100,7 +100,7 @@ export default {
                     const resourceItems = resourceItemsMap[key];
                     if (resourceItems) {
                         itemsMap[key] = data?.map((d) => {
-                            const resourceItem: ResourceItem = resourceItems[d];
+                            const resourceItem: ReferenceItem = resourceItems[d];
                             return { name: d, label: resourceItem?.label ?? d };
                         });
                     } else itemsMap[key] = data?.map(d => ({ name: d, label: d }));

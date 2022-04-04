@@ -1,5 +1,5 @@
-import { ResourceState, ResourceMap } from '@/store/modules/reference/type';
+import { ReferenceState, ReferenceMap } from '@/store/modules/reference/type';
 
-export const setCloudServiceTypes = (state: ResourceState, cloudServiceTypes: ResourceMap): void => {
+export const setCloudServiceTypes = (state: ReferenceState, cloudServiceTypes: ReferenceMap): void => {
     state.items = cloudServiceTypes;
 };

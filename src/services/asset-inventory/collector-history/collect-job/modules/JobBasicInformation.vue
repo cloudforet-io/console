@@ -49,7 +49,7 @@ import {
 } from '@vue/composition-api';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
-import { ResourceMap } from '@/store/modules/reference/type';
+import { ReferenceMap } from '@/store/modules/reference/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -71,9 +71,9 @@ export default {
         const state = reactive({
             loading: true,
             job: {} as any,
-            collectors: computed<ResourceMap>(() => store.state.reference.collector.items || {}),
-            providers: computed<ResourceMap>(() => store.state.reference.provider.items || {}),
-            plugins: computed<ResourceMap>(() => store.state.reference.plugin.items || {}),
+            collectors: computed<ReferenceMap>(() => store.state.reference.collector.items || {}),
+            providers: computed<ReferenceMap>(() => store.state.reference.provider.items || {}),
+            plugins: computed<ReferenceMap>(() => store.state.reference.plugin.items || {}),
             timezone: computed(() => store.state.user.timezone),
             collector: computed(() => {
                 const id = state.job.collector_info?.collector_id || '';

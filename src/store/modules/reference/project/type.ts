@@ -1,4 +1,4 @@
-import { ResourceItem, ResourceMap } from '@/store/modules/reference/type';
+import { ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
 
 export interface ProjectResourceItemData {
     groupInfo: {
@@ -7,6 +7,6 @@ export interface ProjectResourceItemData {
     };
 }
 
-export type ProjectResourceItem = ResourceItem<ProjectResourceItemData>
+export type ProjectResourceItem = ReferenceItem<ProjectResourceItemData>
 
-export type ProjectResourceMap = ResourceMap<ProjectResourceItem>
+export type ProjectResourceMap = ReferenceMap<ProjectResourceItem>

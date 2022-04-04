@@ -1,5 +1,5 @@
-import { ResourceState, ResourceMap } from '@/store/modules/reference/type';
+import { ReferenceState, ReferenceMap } from '@/store/modules/reference/type';
 
-export const setRegions = (state: ResourceState, regions: ResourceMap): void => {
+export const setRegions = (state: ReferenceState, regions: ReferenceMap): void => {
     state.items = regions;
 };

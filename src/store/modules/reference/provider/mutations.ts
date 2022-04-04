@@ -1,5 +1,5 @@
-import { ResourceState, ResourceMap } from '@/store/modules/reference/type';
+import { ReferenceState, ReferenceMap } from '@/store/modules/reference/type';
 
-export const setProviders = (state: ResourceState, providers: ResourceMap): void => {
+export const setProviders = (state: ReferenceState, providers: ReferenceMap): void => {
     state.items = providers;
 };

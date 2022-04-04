@@ -1,5 +1,5 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ResourceMap, ResourceState } from '@/store/modules/reference/type';
+import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
@@ -23,7 +23,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             },
         }, { timeout: 3000 });
 
-        const plugins: ResourceMap = {};
+        const plugins: ReferenceMap = {};
 
         const promises = repoResponse.results.map(async (repoInfo) => {
             const pluginResponse = await SpaceConnector.client.repository.plugin.list({
@@ -51,7 +51,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ResourceState, any> = ({ state, commit }, pluginInfo): void => {
+export const sync: Action<ReferenceState, any> = ({ state, commit }, pluginInfo): void => {
     const plugins = {
         ...state.items,
         [pluginInfo.plugin_id]: {

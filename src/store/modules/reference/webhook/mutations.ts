@@ -1,5 +1,5 @@
-import { ResourceState, ResourceMap } from '@/store/modules/reference/type';
+import { ReferenceState, ReferenceMap } from '@/store/modules/reference/type';
 
-export const setWebhooks = (state: ResourceState, webhooks: ResourceMap): void => {
+export const setWebhooks = (state: ReferenceState, webhooks: ReferenceMap): void => {
     state.items = webhooks;
 };

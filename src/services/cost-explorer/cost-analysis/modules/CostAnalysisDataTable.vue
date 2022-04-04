@@ -86,7 +86,7 @@ import { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type
 import { ExcelDataField } from '@/store/modules/file/type';
 import { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import { i18n } from '@/translations';
-import { ResourceMap } from '@/store/modules/reference/type';
+import { ReferenceMap } from '@/store/modules/reference/type';
 // eslint-disable-next-line import/extensions,import/no-unresolved
 import { Table } from 'pdfmake/interfaces';
 
@@ -135,7 +135,7 @@ export default {
             groupByItems: computed<GroupByItem[]>(() => store.getters['service/costAnalysis/groupByItems']),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-            groupByStoreMap: computed<Record<string, ResourceMap>>(() => ({
+            groupByStoreMap: computed<Record<string, ReferenceMap>>(() => ({
                 [GROUP_BY.PROJECT_GROUP]: state.projectGroups,
                 [GROUP_BY.PROJECT]: state.projects,
                 [GROUP_BY.PROVIDER]: state.providers,

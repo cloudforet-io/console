@@ -1,5 +1,5 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ResourceMap, ResourceState } from '@/store/modules/reference/type';
+import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
@@ -21,7 +21,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 only: ['webhook_id', 'name'],
             },
         }, { timeout: 3000 });
-        const webhooks: ResourceMap = {};
+        const webhooks: ReferenceMap = {};
 
         response.results.forEach((webhookInfo: any): void => {
             webhooks[webhookInfo.webhook_id] = {
@@ -36,7 +36,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ResourceState, any> = ({ state, commit }, webhookInfo): void => {
+export const sync: Action<ReferenceState, any> = ({ state, commit }, webhookInfo): void => {
     const webhooks = {
         ...state.items,
         [webhookInfo.webhook_id]: {

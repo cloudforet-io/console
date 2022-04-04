@@ -1,5 +1,5 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ResourceMap, ResourceState } from '@/store/modules/reference/type';
+import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import { indigo } from '@/styles/colors';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -26,7 +26,7 @@ export const load = async ({ commit, state }, lazyLoad = false): Promise<void|Er
                 },
             },
         }, { timeout: 3000 });
-        const providers: ResourceMap = {};
+        const providers: ReferenceMap = {};
 
         response.results.forEach((providerInfo: any): void => {
             providers[providerInfo.provider] = {
@@ -44,7 +44,7 @@ export const load = async ({ commit, state }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ResourceState, any> = ({ state, commit }, providerInfo): void => {
+export const sync: Action<ReferenceState, any> = ({ state, commit }, providerInfo): void => {
     const providers = {
         ...state.items,
         [providerInfo.provider]: {

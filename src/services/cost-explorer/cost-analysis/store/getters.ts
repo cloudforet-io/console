@@ -2,7 +2,7 @@ import { Getter } from 'vuex';
 import {
     CostAnalysisStoreState, GroupByItem,
 } from '@/services/cost-explorer/cost-analysis/store/type';
-import { ResourceItem } from '@/store/modules/reference/type';
+import { ReferenceItem } from '@/store/modules/reference/type';
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { CostQueryFilterItemsMap, CostQuerySetModel } from '@/services/cost-explorer/type';
 import { store } from '@/store';
@@ -22,7 +22,7 @@ export const filterItemsMap: Getter<CostAnalysisStoreState, any> = ({ filters },
         const resourceItems = resourceItemsMap[key];
         if (resourceItems) {
             itemsMap[key] = data?.map((d) => {
-                const resourceItem: ResourceItem = resourceItems[d];
+                const resourceItem: ReferenceItem = resourceItems[d];
                 const label = key === 'region_code' ? resourceItem?.name : resourceItem?.label;
                 return { name: d, label: label ?? d };
             });
