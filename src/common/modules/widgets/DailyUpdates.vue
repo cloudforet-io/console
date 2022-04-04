@@ -118,6 +118,7 @@ interface CloudService {
     deleted_count: number;
     create_warning: boolean;
     delete_warning: boolean;
+    display_name?: string;
 }
 
 interface Server {
@@ -130,6 +131,7 @@ interface Server {
     deleted_count: number;
     create_warning: boolean;
     delete_warning: boolean;
+    display_name?: string;
 }
 
 interface Data {
@@ -225,7 +227,7 @@ export default {
         const setProjectDashboardData = async () => {
             state.data = [
                 ...state.serverData.map(d => ({
-                    title: d.cloud_service_type,
+                    title: d.display_name ?? d.cloud_service_group,
                     isServer: true,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
@@ -262,7 +264,7 @@ export default {
                     ...d,
                 })),
                 ...state.cloudServiceData.map(d => ({
-                    title: d.cloud_service_type,
+                    title: d.display_name ?? d.cloud_service_group,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
                         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
@@ -302,7 +304,7 @@ export default {
         const setDashboardData = async () => {
             state.data = [
                 ...state.serverData.map(d => ({
-                    title: d.cloud_service_type,
+                    title: d.display_name ?? d.cloud_service_group,
                     isServer: true,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
@@ -337,7 +339,7 @@ export default {
                     ...d,
                 })),
                 ...state.cloudServiceData.map(d => ({
-                    title: d.cloud_service_type,
+                    title: d.display_name ?? d.cloud_service_group,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
                         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
