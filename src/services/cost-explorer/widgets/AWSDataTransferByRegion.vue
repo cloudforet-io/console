@@ -60,7 +60,7 @@ const tempMapData = [
 const valueName = 'value';
 
 export default {
-    name: 'TrafficCostByRegion',
+    name: 'AWSDataTransferByRegion',
     components: {
         CostDashboardCardWidgetLayout,
         // PDataLoader,

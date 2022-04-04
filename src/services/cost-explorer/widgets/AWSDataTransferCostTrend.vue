@@ -3,7 +3,7 @@
                                        class="cost-donut"
                                        :print-mode="printMode"
     >
-        Traffic Cost Trend
+        AWS Data-Transfer Cost Trend
     </cost-dashboard-card-widget-layout>
 </template>
 
@@ -13,7 +13,7 @@ import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { CURRENCY } from '@/store/modules/display/config';
 
 export default {
-    name: 'TrafficCostTrend',
+    name: 'AWSDataTransferCostTrend',
     components: {
         CostDashboardCardWidgetLayout,
     },

@@ -51,15 +51,7 @@
   },
   {
     "widget_id": "linegraph-lg-02",
-    "name": "Amazon CloudFront Cost Trend",
-    "options": {
-      "chart_type": "LINE",
-      "layout": 100
-    }
-  },
-  {
-    "widget_id": "linegraph-lg-03",
-    "name": "Traffic Cost Trend",
+    "name": "AWS Data-Transfer Cost Trend",
     "options": {
       "chart_type": "LINE",
       "layout": 100
@@ -84,6 +76,15 @@
     }
   },
   {
+    "widget_id": "stackedcol-lg-03",
+    "name": "AWS CloudFront Cost",
+    "options": {
+      "chart_type": "STACKED_COLUMN",
+      "layout": 100,
+      "group_by": "project_id"
+    }
+  },
+  {
     "widget_id": "donut-md-01",
     "name": "Cost Donut",
     "options": {
@@ -102,7 +103,7 @@
   },
   {
     "widget_id": "map-lg-02",
-    "name": "Traffic Cost By Region",
+    "name": "AWS Data-Transfer by Region",
     "options": {
       "chart_type": "MAP",
       "layout": 100

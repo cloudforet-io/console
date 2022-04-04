@@ -3,7 +3,7 @@
                                        class="cost-donut"
                                        :print-mode="printMode"
     >
-        Amazon CloudFront Cost Trend
+        AWS CloudFront Cost
     </cost-dashboard-card-widget-layout>
 </template>
 
@@ -13,7 +13,7 @@ import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { CURRENCY } from '@/store/modules/display/config';
 
 export default {
-    name: 'AmazonCloudFrontCostTrend',
+    name: 'AWSCloudFrontCost',
     components: {
         CostDashboardCardWidgetLayout,
     },
