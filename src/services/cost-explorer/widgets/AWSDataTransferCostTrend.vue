@@ -1,21 +1,68 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_PROVIDER')"
-                                       class="cost-donut"
+    <cost-dashboard-card-widget-layout :title="name ? name : 'AWS Data Transfer Cost Trend'"
+                                       class="aws-data-transfer-cost-trend"
+                                       :widget-link="widgetLink"
+                                       :data-range="6"
                                        :print-mode="printMode"
     >
-        AWS Data-Transfer Cost Trend
+        <p-data-loader :loading="loading" class="chart-wrapper">
+            <template #loader>
+                <p-skeleton height="100%" />
+            </template>
+            <div ref="chartRef" class="chart" />
+        </p-data-loader>
+        <div class="table-wrapper" />
     </cost-dashboard-card-widget-layout>
 </template>
 
 <script lang="ts">
+import dayjs from 'dayjs';
+import * as am4core from '@amcharts/amcharts4/core';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import { XYChart } from '@amcharts/amcharts4/charts';
+
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
+
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
+
+import { ChartData, CostAnalyzeModel, Legend } from '@/services/cost-explorer/widgets/type';
 import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { CURRENCY } from '@/store/modules/display/config';
+import {
+    getCurrencyAppliedChartData,
+    getTooltipText,
+    getXYChartData,
+} from '@/services/cost-explorer/widgets/lib/widget-data-helper';
+import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
+import {
+    gray, green, red, yellow,
+} from '@/styles/colors';
+import config from '@/lib/config';
+import { Period } from '@/services/cost-explorer/type';
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
+
+const GROUP_BY = 'usage_type';
+const CATEGORY_KEY = 'date';
+const TRANSFER_OUT_COLOR = red[400];
+const TRANSFER_IN_COLOR = green[500];
+const TRANSFER_ETC_COLOR = yellow[500];
+
 
 export default {
     name: 'AWSDataTransferCostTrend',
     components: {
         CostDashboardCardWidgetLayout,
+        PDataLoader,
+        PSkeleton,
     },
     props: {
         name: {
@@ -47,9 +94,214 @@ export default {
             default: false,
         },
     },
+    setup(props, { emit }) {
+        const state = reactive({
+            loading: false,
+            widgetLink: computed(() => {
+                if (props.printMode) return undefined;
+                return '';
+            }),
+            //
+            items: [] as CostAnalyzeModel[],
+            chartRegistry: {},
+            chart: null as XYChart | null,
+            chartRef: null as HTMLElement | null,
+            chartData: [] as ChartData[],
+            legends: [
+                {
+                    name: 'data-transfer.out',
+                    label: 'Transfer-Out',
+                    color: TRANSFER_OUT_COLOR,
+                },
+                {
+                    name: 'data-transfer.in',
+                    label: 'Transfer-In',
+                    color: TRANSFER_IN_COLOR,
+                },
+                {
+                    name: 'data-transfer.etc',
+                    label: 'etc.',
+                    color: TRANSFER_ETC_COLOR,
+                },
+            ] as Legend[],
+        });
 
-    setup() {
-        return {};
+        /* Util */
+        const disposeChart = (chartContext) => {
+            if (state.chartRegistry[chartContext]) {
+                state.chartRegistry[chartContext].dispose();
+                delete state.chartRegistry[chartContext];
+            }
+        };
+        const createSeries = (chart, legend) => {
+            const series = chart.series.push(new am4charts.LineSeries());
+            if (props.printMode) series.showOnInit = false;
+            series.name = legend.label;
+            series.dataFields.dateX = CATEGORY_KEY;
+            series.dataFields.valueY = legend.name;
+            series.stroke = am4core.color(legend.color);
+            series.fill = am4core.color(legend.color);
+            series.strokeWidth = 2;
+            series.tooltip.label.fontSize = 14;
+            series.tooltip.getFillFromObject = false;
+            series.tooltip.background.fill = am4core.color(legend.color);
+            series.smoothing = 'monotoneX';
+
+            series.adapter.add('tooltipText', (tooltipText, target) => {
+                if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
+                    const usdCost = target.tooltipDataItem.dataContext[legend.name] ? Number(target.tooltipDataItem.dataContext[legend.name]) : undefined;
+                    const currencyMoney = currencyMoneyFormatter(usdCost, props.currency, undefined, true);
+                    return getTooltipText('name', undefined, currencyMoney);
+                }
+                return tooltipText;
+            });
+
+            if (legend.name !== 'dummy') {
+                const bullet = series.bullets.push(new am4charts.CircleBullet());
+                bullet.fill = am4core.color(legend.color);
+                bullet.circle.radius = 3.5;
+            }
+        };
+        const createChartLegend = (chart) => {
+            chart.legend = new am4charts.Legend();
+            chart.legend.useDefaultMarker = true;
+            chart.legend.position = 'bottom';
+            chart.legend.contentAlign = 'left';
+            chart.legend.fontSize = 12;
+            chart.legend.labels.template.fill = am4core.color(gray[600]);
+            const marker = chart.legend.markers;
+            marker.template.width = 8;
+            marker.template.height = 8;
+            marker.template.children.getIndex(0).cornerRadius(12, 12, 12, 12);
+        };
+        const drawChart = (chartContext, chartData, legends) => {
+            const createChart = () => {
+                disposeChart(chartContext);
+                state.chartRegistry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
+                return state.chartRegistry[chartContext];
+            };
+            const chart = createChart();
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+            chart.events.on('ready', () => {
+                emit('rendered');
+            });
+            chart.paddingLeft = -5;
+            chart.paddingBottom = -10;
+            chart.data = getCurrencyAppliedChartData(chartData, props.currency, props.currencyRates);
+
+            chart.dateFormatter.inputDateFormat = 'yyyy-MM';
+            const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+            dateAxis.baseInterval = {
+                timeUnit: 'month',
+                count: 1,
+            };
+            dateAxis.dateFormats.setKey('month', 'MMM');
+            dateAxis.dataFields.category = CATEGORY_KEY;
+            dateAxis.renderer.minGridDistance = 30;
+            dateAxis.fontSize = 12;
+            dateAxis.tooltip.disabled = true;
+            dateAxis.renderer.grid.template.strokeOpacity = 1;
+            dateAxis.renderer.grid.template.location = 0;
+            dateAxis.startLocation = 0.45;
+            dateAxis.endLocation = 0.55;
+            dateAxis.renderer.labels.template.fill = am4core.color(gray[600]);
+            dateAxis.renderer.grid.template.strokeOpacity = 0;
+
+            const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            valueAxis.tooltip.disabled = true;
+            valueAxis.renderer.minWidth = 20;
+            valueAxis.fontSize = 12;
+            valueAxis.extraMax = 0.01;
+            valueAxis.renderer.minGridDistance = 30;
+            valueAxis.renderer.grid.template.strokeOpacity = 1;
+            valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
+            valueAxis.renderer.labels.template.fill = am4core.color(gray[600]);
+            valueAxis.renderer.labels.template.adapter.add('text', (text, target) => {
+                if (target.dataItem) {
+                    if (target.dataItem.value) return commaFormatter(numberFormatter(target.dataItem.value));
+                }
+                return text;
+            });
+
+            if (legends.length) {
+                legends.forEach((legend) => {
+                    createSeries(chart, legend);
+                });
+            } else {
+                const dummyChartData = [...chartData];
+                dummyChartData[0].dummy = 0;
+                chart.data = dummyChartData;
+                valueAxis.min = 0;
+                valueAxis.extraMax = 100;
+                createSeries(chart, { name: 'dummy', label: 'dummy' });
+            }
+
+            chart.cursor = new am4charts.XYCursor();
+            chart.cursor.lineX.disabled = true;
+            chart.cursor.lineY.disabled = true;
+            chart.cursor.behavior = 'none';
+
+            createChartLegend(chart);
+
+            return chart;
+        };
+
+        /* Api */
+        const queryHelper = new QueryHelper();
+        const listData = async (period: Period, filters): Promise<CostAnalyzeModel[]> => {
+            state.loading = true;
+
+            queryHelper.setFilters([
+                ...getConvertedFilter(filters),
+                { k: 'provider', v: 'aws', o: '=' },
+                { k: 'product', v: 'AWSDataTransfer', o: '=' },
+            ]);
+            try {
+                const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
+                    include_usage_quantity: true,
+                    include_others: false,
+                    granularity: GRANULARITY.MONTHLY,
+                    group_by: ['usage_type'],
+                    start: dayjs.utc(period.end).subtract(5, 'month').format('YYYY-MM'),
+                    end: dayjs.utc(period.end).format('YYYY-MM'),
+                    ...queryHelper.apiQuery,
+                });
+                return results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return [];
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        /* Watcher */
+        watch([() => props.period, () => props.filters], async ([period, filters]) => {
+            state.items = await listData(period, filters);
+            if (state.items.length === 0) emit('rendered');
+
+            const _period = {
+                start: dayjs(period.end).subtract(5, 'month').format('YYYY-MM'),
+                end: dayjs.utc(period.end).format('YYYY-MM'),
+            };
+            state.chartData = getXYChartData(state.items, GRANULARITY.MONTHLY, _period, GROUP_BY);
+            state.chart = drawChart(state.chartRef, state.chartData, state.legends);
+        }, { immediate: true });
+
+        return {
+            ...toRefs(state),
+        };
     },
 };
 </script>
+
+<style lang="postcss">
+.aws-data-transfer-cost-trend {
+    .chart-wrapper {
+        height: 11rem;
+        .chart {
+            height: 100%;
+        }
+    }
+}
+</style>
