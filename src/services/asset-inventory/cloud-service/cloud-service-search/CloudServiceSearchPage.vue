@@ -11,7 +11,7 @@ import { NoSearchResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const DEFAULT_URL = '/asset-inventory/cloud-service';
-const ERROR_URL = '/asset-inventory/cloud-service/no-reference';
+const ERROR_URL = '/asset-inventory/cloud-service/no-resource';
 
 export default {
     name: 'CloudServiceSearch',

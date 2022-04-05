@@ -11,7 +11,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { NoSearchResourceError } from '@/common/composables/error/error';
 
 const DEFAULT_URL = '/asset-inventory/service-account';
-const ERROR_URL = '/asset-inventory/service-account/no-reference';
+const ERROR_URL = '/asset-inventory/service-account/no-resource';
 
 export default {
     name: 'ServiceAccountSearchPage',
@@ -32,7 +32,6 @@ export default {
                     search: vm.$props.id,
                 });
                 if (result.url === DEFAULT_URL) {
-                    // vm.$router.push(ERROR_URL);
                     ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
                 } else {
                     link = `${result.url}&filters=["${vm.$props.id}"]`;
