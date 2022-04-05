@@ -274,8 +274,8 @@ export default defineComponent<Props>({
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
                     group_by: [props.groupBy],
-                    start: start.format('YYYY-MM-DD'),
-                    end: dayjs.utc(period.end).endOf('month').format('YYYY-MM-DD'),
+                    start: start.format('YYYY-MM'),
+                    end: dayjs.utc(period.end).format('YYYY-MM'),
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
