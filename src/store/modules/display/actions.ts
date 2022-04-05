@@ -178,7 +178,13 @@ export const loadCurrencyRates: Action<DisplayState, any> = async ({
 
     const now = dayjs();
     if (dayjs(storedData?.expireTime).isBefore(now, 'day') && storedData?.rates) {
-        commit('setCurrencyRates', storedData.rates);
+        const localData = { USD: 1 };
+
+        Object.keys(storedData.rates).forEach((k) => {
+            if (CURRENCY[k]) localData[k] = storedData.rates[k];
+        });
+
+        commit('setCurrencyRates', localData);
         return;
     }
 
