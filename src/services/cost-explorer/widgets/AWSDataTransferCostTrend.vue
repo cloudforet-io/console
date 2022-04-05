@@ -11,7 +11,18 @@
             </template>
             <div ref="chartRef" class="chart" />
         </p-data-loader>
-        <div class="table-wrapper" />
+        <div class="table-wrapper">
+            <cost-dashboard-data-table :fields="fields"
+                                       :items="tableItems"
+                                       :loading="loading"
+                                       :print-mode="printMode"
+                                       :page-size="6"
+                                       :currency-rates="currencyRates"
+                                       :currency="currency"
+                                       :show-index="false"
+                                       :pagination-visible="false"
+            />
+        </div>
     </cost-dashboard-card-widget-layout>
 </template>
 
@@ -27,8 +38,11 @@ import {
 
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
+import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 
-import { ChartData, CostAnalyzeModel, Legend } from '@/services/cost-explorer/widgets/type';
+import {
+    ChartData, CostAnalyzeModel, Legend, TrafficWidgetTableData,
+} from '@/services/cost-explorer/widgets/type';
 import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import {
@@ -48,6 +62,9 @@ import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { range } from 'lodash';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 
 const GROUP_BY = 'usage_type';
@@ -56,10 +73,19 @@ const TRANSFER_OUT_COLOR = red[400];
 const TRANSFER_IN_COLOR = green[500];
 const TRANSFER_ETC_COLOR = yellow[500];
 
+interface Data extends CostAnalyzeModel {
+    usage_quantity: number;
+    usage_type: 'data-transfer.out'|'data-transfer.in'|'data-transfer.etc';
+}
+
+interface TableData extends TrafficWidgetTableData {
+    month?: string;
+}
 
 export default {
     name: 'AWSDataTransferCostTrend',
     components: {
+        CostDashboardDataTable,
         CostDashboardCardWidgetLayout,
         PDataLoader,
         PSkeleton,
@@ -95,6 +121,7 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const { i18nDayjs } = useI18nDayjs();
         const state = reactive({
             loading: false,
             widgetLink: computed(() => {
@@ -102,7 +129,7 @@ export default {
                 return '';
             }),
             //
-            items: [] as CostAnalyzeModel[],
+            items: [] as Data[],
             chartRegistry: {},
             chart: null as XYChart | null,
             chartRef: null as HTMLElement | null,
@@ -124,6 +151,35 @@ export default {
                     color: TRANSFER_ETC_COLOR,
                 },
             ] as Legend[],
+            fields: computed<DataTableField[]>(() => [
+                { name: 'month', label: 'Month' },
+                { name: 'trafficOutCost', label: 'Transfer-Out', textAlign: 'right' },
+                { name: 'trafficOutSize', label: ' ', type: 'size' },
+                { name: 'trafficInCost', label: 'Transfer-In', textAlign: 'right' },
+                { name: 'trafficInSize', label: ' ', type: 'size' },
+                { name: 'trafficEtcCost', label: 'etc.', textAlign: 'right' },
+                { name: 'trafficEtcSize', label: ' ', type: 'size' },
+            ]),
+            tableItems: computed<TableData[]>(() => {
+                const months = range(6).map(i => i18nDayjs.value.utc(props.period.end)
+                    .subtract(i, 'month'));
+                const transferIn = state.items.find(item => item.usage_type === 'data-transfer.in');
+                const transferOut = state.items.find(item => item.usage_type === 'data-transfer.out');
+                const transferEtc = state.items.find(item => item.usage_type === 'data-transfer.etc');
+                const tableItems = months.map((m, idx) => {
+                    const month = m.format('YYYY-MM');
+                    return ({
+                        month: m.format('MMMM YYYY') + (idx === 0 ? ' (MTD)' : ''),
+                        trafficInCost: transferIn?.usd_cost[month],
+                        trafficInSize: transferIn?.usage_quantity[month],
+                        trafficOutCost: transferOut?.usd_cost[month],
+                        trafficOutSize: transferOut?.usage_quantity[month],
+                        trafficEtcCost: transferEtc?.usd_cost[month],
+                        trafficEtcSize: transferEtc?.usage_quantity[month],
+                    });
+                });
+                return tableItems;
+            }),
         });
 
         /* Util */
@@ -248,7 +304,7 @@ export default {
 
         /* Api */
         const queryHelper = new QueryHelper();
-        const listData = async (period: Period, filters): Promise<CostAnalyzeModel[]> => {
+        const listData = async (period: Period, filters): Promise<Data[]> => {
             state.loading = true;
 
             queryHelper.setFilters([
@@ -302,6 +358,9 @@ export default {
         .chart {
             height: 100%;
         }
+    }
+    .table-wrapper {
+        margin-top: 1rem;
     }
 }
 </style>

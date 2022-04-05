@@ -10,7 +10,7 @@
         >
             <template #col-format="{field: { name, type }, value, index, colIndex}">
                 <div class="status-wrapper" :class="{legend: showLegend && colIndex === 0}">
-                    <template v-if="fields[0].name === name">
+                    <template v-if="fields[0].name === name && showIndex">
                         <p-status v-if="showLegend"
                                   class="toggle-button"
                                   :text="(getConvertedIndex(index) + 1).toString()"
@@ -110,6 +110,10 @@ export default {
         pageSize: {
             type: Number,
             default: 5,
+        },
+        showIndex: {
+            type: Boolean,
+            default: true,
         },
         showLegend: {
             type: Boolean,

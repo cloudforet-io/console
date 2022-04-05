@@ -62,6 +62,7 @@ import dayjs from 'dayjs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import am4geodataContinentsLow from '@amcharts/amcharts4-geodata/continentsLow';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
+import { TrafficWidgetTableData } from '@/services/cost-explorer/widgets/type';
 
 const valueName = 'value';
 
@@ -79,15 +80,9 @@ interface BubbleChartData {
     color: string;
 }
 
-interface TableData {
+interface TableData extends TrafficWidgetTableData {
     provider?: string;
     region?: string;
-    trafficOutCost?: number;
-    trafficOutSize?: number;
-    trafficInCost?: number;
-    trafficInSize?: number;
-    trafficEtcCost?: number;
-    trafficEtcSize?: number;
 }
 
 const dataToTableFieldMap = {

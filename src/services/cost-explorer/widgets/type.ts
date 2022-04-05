@@ -51,3 +51,12 @@ export interface WidgetProps<Options = any> {
     currencyRates: CurrencyRates;
     printMode?: boolean;
 }
+
+export interface TrafficWidgetTableData {
+    trafficOutCost?: number;
+    trafficOutSize?: number;
+    trafficInCost?: number;
+    trafficInSize?: number;
+    trafficEtcCost?: number;
+    trafficEtcSize?: number;
+}
