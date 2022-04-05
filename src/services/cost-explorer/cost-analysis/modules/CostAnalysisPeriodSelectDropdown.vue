@@ -1,11 +1,8 @@
 <template>
     <div class="cost-analysis-period-select-dropdown" :class="{responsive: !printMode}">
         <p-badge style-type="gray200">
-            <p v-if="dateFormatter(period.start, 'M') !== dateFormatter(period.end, 'M')" class="text">
-                {{ dateFormatter(period.start, 'MMMM D') }}, {{ dateFormatter(period.start, 'YYYY') }} ~ {{ dateFormatter(period.end, 'MMMM D') }}, {{ dateFormatter(period.end, 'YYYY') }}
-            </p>
-            <p v-else class="text">
-                {{ dateFormatter(period.start, 'MMMM D') }} ~ {{ dateFormatter(period.end, 'D') }}, {{ dateFormatter(period.end, 'YYYY') }}
+            <p class="text">
+                {{ periodText }}
             </p>
         </p-badge>
         <p-select-dropdown v-if="!printMode"
@@ -71,8 +68,9 @@ export default {
     setup(props, { emit }) {
         const { i18nDayjs } = useI18nDayjs();
         const arraySelector = (selectedNums: number[], array) => selectedNums.map(num => array[num]);
+        const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
         const state = reactive({
-            period: computed({
+            period: computed<Period>({
                 get() { return props.fixedPeriod; },
                 set(period) { store.commit('service/costAnalysis/setPeriod', period); },
             }),
@@ -103,8 +101,19 @@ export default {
             ])),
             selectedPeriodMenuItem: 'thisMonth',
             customRangeModalVisible: false,
+            periodText: computed(() => {
+                const isSameMonth: boolean = dateFormatter(state.period.start, 'M') === dateFormatter(state.period.end, 'M');
+                const start = state.period.start;
+                const end = state.period.end;
+                if (isSameMonth) {
+                    return `${dateFormatter(start, 'MMMM D')} ~ ${dateFormatter(end, 'D')}, ${dateFormatter(end, 'YYYY')}`;
+                }
+                if (state.granularity === GRANULARITY.MONTHLY) {
+                    return `${dateFormatter(start, 'MMMM')}, ${dateFormatter(start, 'YYYY')} ~ ${dateFormatter(end, 'MMMM')}, ${dateFormatter(end, 'YYYY')}`;
+                }
+                return `${dateFormatter(start, 'MMMM D')}, ${dateFormatter(start, 'YYYY')} ~ ${dateFormatter(end, 'MMMM D')}, ${dateFormatter(end, 'YYYY')}`;
+            }),
         });
-        const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
 
         const setPeriod = (period: Period) => {
             state.period = period;

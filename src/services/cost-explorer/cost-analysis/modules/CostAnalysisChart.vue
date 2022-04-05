@@ -232,12 +232,13 @@ export default {
             listCostAnalysisRequest = axios.CancelToken.source();
             try {
                 costQueryHelper.setFilters(getConvertedFilter(state.filters));
+                const dateFormat = state.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_others: !!state.primaryGroupBy,
                     granularity: state.granularity,
                     group_by: state.primaryGroupBy ? [state.primaryGroupBy] : [],
-                    start: dayjs.utc(state.period.start).format('YYYY-MM-DD'),
-                    end: dayjs.utc(state.period.end).format('YYYY-MM-DD'),
+                    start: dayjs.utc(state.period.start).format(dateFormat),
+                    end: dayjs.utc(state.period.end).format(dateFormat),
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });

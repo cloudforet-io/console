@@ -285,11 +285,12 @@ export default {
                 const query = costApiQueryHelper.data;
                 if (props.printMode) query.page = undefined;
 
+                const dateFormat = state.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity,
                     group_by: groupBy,
-                    start: dayjs.utc(period.start).format('YYYY-MM-DD'),
-                    end: dayjs.utc(period.end).format('YYYY-MM-DD'),
+                    start: dayjs.utc(period.start).format(dateFormat),
+                    end: dayjs.utc(period.end).format(dateFormat),
                     ...query,
                 });
                 let items = results;

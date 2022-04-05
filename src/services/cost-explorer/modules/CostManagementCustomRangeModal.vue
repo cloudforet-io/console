@@ -43,6 +43,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { Period } from '@/services/cost-explorer/type';
 import { TranslateResult } from 'vue-i18n';
 import { i18n } from '@/translations';
 
@@ -144,10 +145,14 @@ export default {
         });
         const handleConfirm = () => {
             state.proxyVisible = false;
-            const period = {
-                start: state.startDate[0],
-                end: state.endDate[0],
-            };
+            const period: Period = {};
+            if (props.granularity === GRANULARITY.MONTHLY) {
+                period.start = dayjs.utc(state.startDate[0]).format('YYYY-MM');
+                period.end = dayjs.utc(state.endDate[0]).format('YYYY-MM');
+            } else {
+                period.start = state.startDate[0];
+                period.end = state.endDate[0];
+            }
             emit('confirm', period);
         };
         return {
