@@ -16,7 +16,7 @@
                 <cost-dashboard-data-table
                     :fields="tableState.fields"
                     :items="tableState.items"
-                    :loading="tableState.loading"
+                    :loading="loading"
                     :this-page.sync="tableState.thisPage"
                     :page-size="5"
                     :show-legend="false"
@@ -47,6 +47,7 @@ import {
 import { MapChart } from '@amcharts/amcharts4/maps';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
+import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import config from '@/lib/config';
 import { gray } from '@/styles/colors';
 import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
@@ -64,6 +65,13 @@ import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/Cos
 
 const valueName = 'value';
 
+interface Data {
+  region_code: string;
+  usage_quantity: number;
+  usage_type: 'data-transfer.out'|'data-transfer.in'|'data-transfer.etc';
+  usd_cost: number;
+}
+
 interface BubbleChartData {
     value: number;
     latitude: number;
@@ -72,12 +80,21 @@ interface BubbleChartData {
 }
 
 interface TableData {
-    usd_cost: number;
-    provider: string;
-    usage_quantity: number;
-    region: string;
-    usage_type: string;
+    provider?: string;
+    region?: string;
+    trafficOutCost?: number;
+    trafficOutSize?: number;
+    trafficInCost?: number;
+    trafficInSize?: number;
+    trafficEtcCost?: number;
+    trafficEtcSize?: number;
 }
+
+const dataToTableFieldMap = {
+    'data-transfer.out': ['trafficOutCost', 'trafficOutSize'],
+    'data-transfer.in': ['trafficInCost', 'trafficInSize'],
+    'data-transfer.etc': ['trafficEtcCost', 'trafficEtcSize'],
+};
 
 export default {
     name: 'AWSDataTransferByRegion',
@@ -124,19 +141,47 @@ export default {
             chartRegistry: {},
             regions: computed(() => store.state.reference.region.items),
             providers: computed(() => store.state.reference.provider.items),
-            chartData: [] as BubbleChartData[],
+            data: [] as Data[],
+            chartData: computed<BubbleChartData[]>(() => state.data.map(d => ({
+                value: d.usd_cost,
+                latitude: state.regions[d.region_code]?.continent?.latitude ?? 0,
+                longitude: state.regions[d.region_code]?.continent?.longitude ?? 0,
+                color: state.providers.aws?.color,
+            }))),
             loading: false,
         });
 
+        const convertOrMergeToTableData = (data: Data, _tableData?: TableData): TableData => {
+            const tableData: TableData = _tableData ?? {
+                provider: 'aws',
+                region: state.regions[data.region_code]?.name ?? data.region_code,
+            };
+            const [costField, sizeField] = dataToTableFieldMap[data.usage_type] ?? [];
+            if (costField) tableData[costField] = data.usd_cost;
+            if (sizeField) tableData[sizeField] = data.usage_quantity;
+            return tableData;
+        };
+        const getTableDataMapByRegion = (data: Data[]): Record<string, TableData> => {
+            const tableDataByRegion: Record<string, TableData> = {};
+            data.forEach((d) => {
+                const tableData: TableData = tableDataByRegion[d.region_code];
+                tableDataByRegion[d.region_code] = convertOrMergeToTableData(d, tableData);
+            });
+            return tableDataByRegion;
+        };
+
         const tableState = reactive({
-            loading: false,
-            items: [] as TableData[],
-            fields: computed(() => [
+            items: computed<TableData[]>(() => Object.values(getTableDataMapByRegion(state.data))),
+            fields: computed<DataTableFieldType[]>(() => [
                 { name: 'provider', label: 'Region' },
                 { name: 'region', label: ' ' },
-                { name: 'usd_cost', label: 'Cost', textAlign: 'right' },
+                { name: 'trafficOutCost', label: 'Traffic Out', textAlign: 'right' },
+                { name: 'trafficOutSize', label: ' ', type: 'size' },
+                { name: 'trafficInCost', label: 'Traffic In', textAlign: 'right' },
+                { name: 'trafficInSize', label: ' ', type: 'size' },
+                { name: 'trafficEtcCost', label: 'etc.', textAlign: 'right' },
+                { name: 'trafficEtcSize', label: ' ', type: 'size' },
             ]),
-            totalCount: 15,
             thisPage: 1,
         });
 
@@ -242,28 +287,13 @@ export default {
         const getChartData = async () => {
             try {
                 state.loading = true;
-                tableState.loading = true;
                 const results = await fetchData();
-                state.chartData = results.map(d => ({ // bubble chart data
-                    value: d.usd_cost,
-                    latitude: state.regions[d.region_code]?.continent?.latitude ?? 0,
-                    longitude: state.regions[d.region_code]?.continent?.longitude ?? 0,
-                    color: state.providers.aws?.color,
-                }));
-                tableState.items = results.map(d => ({ // table data
-                    usd_cost: d.usd_cost,
-                    provider: 'aws',
-                    usage_quantity: d.usage_quantity,
-                    region: state.regions[d.region_code]?.name || d.region_code,
-                    usage_type: d.usage_type,
-                }));
+                state.data = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.chartData = [];
-                tableState.items = [];
+                state.data = [];
             } finally {
                 state.loading = false;
-                tableState.loading = false;
             }
         };
 

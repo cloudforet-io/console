@@ -8,7 +8,7 @@
                       table-style-type="simple"
                       disable-hover
         >
-            <template #col-format="{field: { name }, value, index, colIndex}">
+            <template #col-format="{field: { name, type }, value, index, colIndex}">
                 <div class="status-wrapper" :class="{legend: showLegend && colIndex === 0}">
                     <template v-if="fields[0].name === name">
                         <p-status v-if="showLegend"
@@ -27,8 +27,16 @@
                     <template v-else-if="typeof value === 'string'">
                         {{ value }}
                     </template>
+                    <template v-else-if="typeof value === 'number'">
+                        <template v-if="type === 'size'">
+                            {{ byteFormatter(value) }}
+                        </template>
+                        <template v-else>
+                            {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
+                        </template>
+                    </template>
                     <template v-else>
-                        {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
+                        --
                     </template>
                     <!--                    <template v-else>-->
                     <!--                        <span v-if="value.isRaised" :class="{raised: value.isRaised}">-->
@@ -50,12 +58,13 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, PropType, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
     PDataTable, PTextPagination, PStatus,
 } from '@spaceone/design-system';
+import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
@@ -64,12 +73,16 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { CURRENCY } from '@/store/modules/display/config';
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { store } from '@/store';
+import { byteFormatter } from '@spaceone/console-core-lib';
 
 
 // interface Item {
 //     [key: string]: number | string;
 // }
 
+interface Field extends DataTableFieldType {
+    type?: 'cost'|'size';
+}
 export default {
     name: 'CostDashboardDataTable',
     components: {
@@ -83,7 +96,7 @@ export default {
             default: false,
         },
         fields: {
-            type: Array,
+            type: Array as PropType<Field[]>,
             default: () => ([]),
         },
         items: {
@@ -221,6 +234,7 @@ export default {
             labelColorFormatter,
             labelTextFormatter,
             currencyMoneyFormatter,
+            byteFormatter,
         };
     },
 };
