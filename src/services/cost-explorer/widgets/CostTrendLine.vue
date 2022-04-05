@@ -166,7 +166,7 @@ export default {
             try {
                 const slicedItems = state.items.slice((state.thisPage * 5) - 5, state.thisPage * 5);
                 const _period = {
-                    start: dayjs(props.period.end).subtract(5, 'month').format('YYYY-MM'),
+                    start: dayjs.utc(props.period.end).subtract(5, 'month').format('YYYY-MM'),
                     end: dayjs.utc(props.period.end).format('YYYY-MM'),
                 };
                 const slicedChartData = getXYChartData(slicedItems, GRANULARITY.MONTHLY, _period, state.groupBy);
