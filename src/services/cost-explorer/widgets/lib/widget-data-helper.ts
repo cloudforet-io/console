@@ -102,6 +102,28 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: GRANULARITY
 
 
 /**
+ * @name getReferenceLabel
+ * @description Extract label from raw string.
+ * @usage AWSCloudFrontCost
+ * @example ('project-111111', 'project_id') => 'SpaceOne Dev Project'
+ */
+export const getReferenceLabel = (data: string, groupBy: GROUP_BY): string => {
+    if (!data) return 'Unknown';
+    const _providers = store.state.reference.provider.items;
+    const _serviceAccounts = store.state.reference.serviceAccount.items;
+    const _projects = store.state.reference.project.items;
+    const _projectGroups = store.state.reference.projectGroup.items;
+    const _regions = store.state.reference.region.items;
+    if (groupBy === GROUP_BY.PROJECT_GROUP) return _projectGroups[data]?.label || data;
+    if (groupBy === GROUP_BY.PROJECT) return _projects[data]?.label || data;
+    if (groupBy === GROUP_BY.SERVICE_ACCOUNT) return _serviceAccounts[data]?.label || data;
+    if (groupBy === GROUP_BY.REGION) return _regions[data]?.name || data;
+    if (groupBy === GROUP_BY.PROVIDER) return _providers[data]?.name || data;
+    return 'Unknown';
+};
+
+
+/**
  * @name getPieChartData
  * @description Convert raw data to PieChart data.
  * @example [{ provider: 'aws', usd_cost: 100 }, { provider: 'azure', usd_cost: 30 }]
