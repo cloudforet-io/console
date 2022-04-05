@@ -66,6 +66,12 @@ export interface WidgetOptions {
     layout: number;
 }
 
+export const EDITABLE_WIDGET_OPTIONS = Object.freeze({
+    GRANULARITY: 'granularity',
+    GROUP_BY: 'group_by',
+} as const);
+export type EDITABLE_WIDGET_OPTIONS_TYPE = typeof EDITABLE_WIDGET_OPTIONS[keyof typeof EDITABLE_WIDGET_OPTIONS];
+
 export interface WidgetInfo {
     widget_id: string;
     name?: string;

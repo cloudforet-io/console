@@ -20,6 +20,13 @@ export const GROUP_BY = Object.freeze({
 } as const);
 export type GROUP_BY = typeof GROUP_BY[keyof typeof GROUP_BY];
 
+export const GRANULARITY_ITEM_MAP = Object.freeze({
+    [GRANULARITY.ACCUMULATED]: { name: GRANULARITY.ACCUMULATED, label: 'Accumulated' },
+    [GRANULARITY.DAILY]: { name: GRANULARITY.DAILY, label: 'Daily' },
+    [GRANULARITY.MONTHLY]: { name: GRANULARITY.MONTHLY, label: 'Monthly' },
+    [GRANULARITY.YEARLY]: { name: GRANULARITY.YEARLY, label: 'Yearly' },
+});
+
 export const GROUP_BY_ITEM_MAP = Object.freeze({
     [GROUP_BY.PROJECT_GROUP]: { name: GROUP_BY.PROJECT_GROUP, label: 'Project Group' },
     [GROUP_BY.PROJECT]: { name: GROUP_BY.PROJECT, label: 'Project' },

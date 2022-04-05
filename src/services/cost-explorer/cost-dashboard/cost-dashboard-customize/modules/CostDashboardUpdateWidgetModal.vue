@@ -8,7 +8,8 @@
         <template #body>
             <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length"
                                                     is-custom
-                                                    :selected-widget="selectedWidget" :show-group-by="hasGroupBy"
+                                                    :selected-widget="selectedWidget"
+                                                    :editable-widget-option-list="editableWidgetOptionList"
             />
         </template>
     </p-button-modal>
@@ -23,7 +24,11 @@ import {
 import { PButtonModal } from '@spaceone/design-system';
 import CostDashboardCustomizeWidgetConfig
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
-import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import {
+    EDITABLE_WIDGET_OPTIONS,
+    EDITABLE_WIDGET_OPTIONS_TYPE,
+    WidgetInfo,
+} from '@/services/cost-explorer/cost-dashboard/type';
 import { store } from '@/store';
 
 interface Props {
@@ -54,7 +59,12 @@ export default defineComponent<Props>({
         const state = reactive({
             proxyVisible: props.visible,
             selectedWidget: computed<WidgetInfo>(() => store.state.service.costDashboard?.editedSelectedWidget),
-            hasGroupBy: computed(() => state.selectedWidget.options?.group_by?.length > 0),
+            editableWidgetOptionList: computed(() => {
+                const optionList: EDITABLE_WIDGET_OPTIONS_TYPE[] = [];
+                if (state.selectedWidget?.options?.group_by) optionList.push(EDITABLE_WIDGET_OPTIONS.GROUP_BY);
+                if (state.selectedWidget?.options?.granularity) optionList.push(EDITABLE_WIDGET_OPTIONS.GRANULARITY);
+                return optionList;
+            }),
         });
         const handleConfirm = () => {
             emit('update:visible', false);

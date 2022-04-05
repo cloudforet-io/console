@@ -51,7 +51,9 @@
             </div>
         </div>
         <div class="right-area">
-            <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length" :selected-widget="selectedWidget" :show-group-by="hasGroupBy" />
+            <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length" :selected-widget="selectedWidget"
+                                                    :editable-widget-option-list="editableWidgetOptionList"
+            />
             <default-widget-preview v-if="Object.keys(selectedWidget).length" :selected-widget="selectedWidget" />
         </div>
     </div>
@@ -59,7 +61,12 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { CHART_TYPE, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import {
+    CHART_TYPE,
+    EDITABLE_WIDGET_OPTIONS,
+    EDITABLE_WIDGET_OPTIONS_TYPE,
+    WidgetInfo,
+} from '@/services/cost-explorer/cost-dashboard/type';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 import { PRadio, PLabel, PTextPagination } from '@spaceone/design-system';
 import CostDashboardCustomizeWidgetConfig
@@ -88,8 +95,13 @@ export default {
                 if (state.layoutOfSpace) return state.widgetList.filter(widget => widget.options.layout === state.layoutOfSpace);
                 return [];
             }),
-            selectedWidget: computed(() => store.state.service?.costDashboard?.originSelectedWidget),
-            hasGroupBy: computed(() => state.selectedWidget.options?.group_by?.length > 0),
+            selectedWidget: computed<WidgetInfo>(() => store.state.service?.costDashboard?.originSelectedWidget),
+            editableWidgetOptionList: computed<EDITABLE_WIDGET_OPTIONS_TYPE[]>(() => {
+                const optionList: EDITABLE_WIDGET_OPTIONS_TYPE[] = [];
+                if (state.selectedWidget?.options?.group_by) optionList.push(EDITABLE_WIDGET_OPTIONS.GROUP_BY);
+                if (state.selectedWidget?.options?.granularity) optionList.push(EDITABLE_WIDGET_OPTIONS.GRANULARITY);
+                return optionList;
+            }),
             widgetLabel: computed(() => widgetId => defaultWidgetMap[widgetId]?.widget_name ?? ''),
             // pagination
             totalCount: 0,
