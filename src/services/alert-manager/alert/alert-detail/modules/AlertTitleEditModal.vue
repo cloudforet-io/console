@@ -85,7 +85,6 @@ export default {
 
         const updateAlertTitle = async () => {
             try {
-                console.log(props.id);
                 state.loading = true;
                 await store.dispatch('service/alert/updateAlertData', {
                     updateParams: {

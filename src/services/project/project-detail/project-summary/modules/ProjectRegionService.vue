@@ -212,11 +212,11 @@ export default {
                 const colors = [coral[500], yellow[400], secondary1];
                 let data = orderBy(res.results, ['total'], ['desc']);
                 data = data.map((d, idx) => ({
-                    provider: state.providers[d.provider].label,
+                    provider: state.providers[d.provider]?.label,
                     region: d.region_code,
                     total: d.total,
                     count: d.label === 'Storage' ? byteFormatter(d.total) : d.total,
-                    providerColor: state.providers[d.provider].color,
+                    providerColor: state.providers[d.provider]?.color,
                     color: colors[idx] || gray[400],
                     to: getLocation(d.provider, d.region_code),
                 }));
@@ -231,7 +231,7 @@ export default {
 
         watch(() => state.providers, (providers) => {
             if (providers) getData();
-        }, { immediate: false });
+        }, { immediate: true });
         watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
             if (loading && loaderCtx) {
                 drawChart(loaderCtx, true);
