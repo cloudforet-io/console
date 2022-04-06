@@ -156,13 +156,13 @@ const getCurrencyRates = async (): Promise<CurrencyRates> => {
 
 interface CurrencyRatesStoredData {
     rates: CurrencyRates;
-    expireTime: string;
+    timestamp: number;
 }
 
 const storeCurrencyRates = (rates, dispatch: Dispatch) => {
     const currencyRatesStoreData: CurrencyRatesStoredData = {
         rates,
-        expireTime: dayjs().add(1, 'day').toISOString(),
+        timestamp: dayjs().unix(),
     };
     dispatch('settings/setItem', {
         key: 'currencyRates',
@@ -175,24 +175,22 @@ export const loadCurrencyRates: Action<DisplayState, any> = async ({
     commit, dispatch, rootGetters,
 }) => {
     const storedData: CurrencyRatesStoredData|undefined = rootGetters['settings/getItem']('currencyRates', '/common');
-
     const now = dayjs();
-    if (dayjs(storedData?.expireTime).isBefore(now, 'day') && storedData?.rates) {
+    const storedDate = storedData?.timestamp ? dayjs.unix(storedData?.timestamp) : undefined;
+    const storedRates = storedData?.rates ?? {};
+    const isDateStoredToday = storedDate ? storedDate.isSame(now, 'day') : false;
+    if (isDateStoredToday) {
         const localData = { USD: 1 };
-
-        Object.keys(storedData.rates).forEach((k) => {
-            if (CURRENCY[k]) localData[k] = storedData.rates[k];
+        Object.keys(storedRates).forEach((k) => {
+            if (CURRENCY[k]) localData[k] = storedRates[k];
         });
-
         commit('setCurrencyRates', localData);
         return;
     }
 
     const rates = await getCurrencyRates();
     commit('setCurrencyRates', rates);
-    if (rates !== DEFAULT_CURRENCY_RATES) {
-        storeCurrencyRates(rates, dispatch);
-    }
+    storeCurrencyRates(rates, dispatch);
 };
 
 export const setMenuList: Action<DisplayState, any> = async ({ commit }) => {
