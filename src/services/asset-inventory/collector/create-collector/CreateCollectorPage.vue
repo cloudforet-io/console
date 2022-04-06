@@ -261,7 +261,7 @@ export default {
             try {
                 await SpaceConnector.client.inventory.collector.create(params);
                 showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_S_CREATE_TITLE'), '', vm.$root);
-                await vm.$router.push({ name: ASSET_INVENTORY_ROUTE._NAME });
+                await vm.$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_CREATE_TITLE'));
             } finally {
