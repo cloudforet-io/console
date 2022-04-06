@@ -320,13 +320,14 @@ export default {
                 const _convertedFilters = getConvertedFilter(state.filters);
                 costApiQueryHelper.setFilters(_convertedFilters);
 
+                const dateFormat = state.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
                 await store.dispatch('file/downloadExcel', {
                     url: '/cost-analysis/cost/analyze',
                     param: {
                         granularity: state.granularity,
                         group_by: state.groupBy,
-                        start: dayjs.utc(state.period.start).format('YYYY-MM-DD'),
-                        end: dayjs.utc(state.period.end).format('YYYY-MM-DD'),
+                        start: dayjs.utc(state.period.start).format(dateFormat),
+                        end: dayjs.utc(state.period.end).format(dateFormat),
                         filter: costApiQueryHelper.data.filter,
                         query: costApiQueryHelper.data,
                     },
