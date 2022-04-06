@@ -487,7 +487,7 @@ export default {
 
                     summaryData.push({
                         provider: d.provider,
-                        label: state.providers[d.provider].label,
+                        label: state.providers[d.provider]?.label,
                         type: d.display_name || d.cloud_service_group,
                         count: type === DATA_TYPE.storage ? byteFormatter(d.size) : commaFormatter(d.count),
                         to: {
@@ -535,12 +535,12 @@ export default {
 
         watch(() => state.providers, (providers) => {
             if (providers) getSummaryInfo(DATA_TYPE.compute);
-        }, { immediate: false });
+        }, { immediate: true });
         watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
             if (!loading && chartContext) {
                 drawChart();
             }
-        }, { immediate: false });
+        }, { immediate: true });
         watch(() => state.activeTab, async (type) => {
             await Promise.all([getSummaryInfo(type), getTrend(type)]);
             drawChart();

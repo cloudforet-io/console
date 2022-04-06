@@ -133,8 +133,8 @@ export default {
                 });
                 state.data = res.results.map(item => ({
                     provider: {
-                        label: state.providers[item.provider].label,
-                        color: state.providers[item.provider].color,
+                        label: state.providers[item.provider]?.label,
+                        color: state.providers[item.provider]?.color,
                         to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: item.provider } },
                     },
                     service_account: {
@@ -163,10 +163,15 @@ export default {
             }
         };
 
-        const init = () => {
-            getData();
-        };
-        init();
+        // LOAD REFERENCE STORE
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/region/load'),
+            ]);
+            await getData();
+        })();
+
 
         return {
             ...toRefs(state),
