@@ -8,6 +8,14 @@
                       table-style-type="simple"
                       disable-hover
         >
+            <template v-for="field in fields" v-slot:[`th-${field.name}-format`]="{ field }">
+                <div :key="field.name" class="tooltip-container">
+                    <span>{{ field.label }}</span>
+                    <p-i v-if="field.tooltipText" v-tooltip.bottom="field.tooltipText"
+                         name="ic_tooltip" width="0.875rem" height="0.875rem"
+                    />
+                </div>
+            </template>
             <template #col-format="{field: { name, type }, value, index, colIndex}">
                 <div class="status-wrapper" :class="{legend: showLegend && colIndex === 0}">
                     <template v-if="fields[0].name === name && showIndex">
@@ -32,7 +40,7 @@
                             {{ byteFormatter(value) }}
                         </template>
                         <template v-else>
-                            {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
+                            {{ CURRENCY_SYMBOL[currency] }}{{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
                         </template>
                     </template>
                     <template v-else>
@@ -62,7 +70,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PDataTable, PTextPagination, PStatus,
+    PDataTable, PTextPagination, PStatus, PI,
 } from '@spaceone/design-system';
 import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
@@ -70,7 +78,7 @@ import { makeProxy } from '@/lib/helper/composition-helpers';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { store } from '@/store';
 import { byteFormatter } from '@spaceone/console-core-lib';
@@ -89,6 +97,7 @@ export default {
         PDataTable,
         PTextPagination,
         PStatus,
+        PI,
     },
     props: {
         loading: {
@@ -239,6 +248,7 @@ export default {
             labelTextFormatter,
             currencyMoneyFormatter,
             byteFormatter,
+            CURRENCY_SYMBOL,
         };
     },
 };
@@ -246,6 +256,13 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-dashboard-data-table {
+    .tooltip-container {
+        @apply flex flex-wrap gap-2 items-end;
+        line-height: 0.9375rem;
+        .tooltip-button:hover {
+            cursor: pointer;
+        }
+    }
     .table-pagination-wrapper {
         text-align: center;
         font-size: 0.875rem;

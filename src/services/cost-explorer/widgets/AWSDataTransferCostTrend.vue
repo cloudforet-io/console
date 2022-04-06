@@ -62,9 +62,9 @@ import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { range } from 'lodash';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 
 const GROUP_BY = 'usage_type';
@@ -77,11 +77,12 @@ interface Data extends CostAnalyzeModel {
     usage_quantity: number;
     usage_type: 'data-transfer.out'|'data-transfer.in'|'data-transfer.etc';
 }
-
+interface Field extends DataTableFieldType {
+    tooltipText?: string;
+}
 interface TableData extends TrafficWidgetTableData {
     month?: string;
 }
-
 export default {
     name: 'AWSDataTransferCostTrend',
     components: {
@@ -151,13 +152,19 @@ export default {
                     color: TRANSFER_ETC_COLOR,
                 },
             ] as Legend[],
-            fields: computed<DataTableField[]>(() => [
-                { name: 'month', label: 'Month' },
-                { name: 'trafficOutCost', label: 'Transfer-Out', textAlign: 'right' },
+            fields: computed<Field[]>(() => [
+                { name: 'month', label: 'Month', tooltipText: 'In descending order of recent month.' },
+                {
+                    name: 'trafficOutCost', label: 'Transfer-Out', textAlign: 'right', tooltipText: 'AWS에서 인터넷으로 송신한 내역',
+                },
                 { name: 'trafficOutSize', label: ' ', type: 'size' },
-                { name: 'trafficInCost', label: 'Transfer-In', textAlign: 'right' },
+                {
+                    name: 'trafficInCost', label: 'Transfer-In', textAlign: 'right', tooltipText: '인터넷에서 AWS로 데이터를 수신한 내역',
+                },
                 { name: 'trafficInSize', label: ' ', type: 'size' },
-                { name: 'trafficEtcCost', label: 'etc.', textAlign: 'right' },
+                {
+                    name: 'trafficEtcCost', label: 'etc.', textAlign: 'right', tooltipText: 'AWS Region 간 통신 내역',
+                },
                 { name: 'trafficEtcSize', label: ' ', type: 'size' },
             ]),
             tableItems: computed<TableData[]>(() => {
