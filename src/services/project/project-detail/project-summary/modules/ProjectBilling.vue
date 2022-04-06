@@ -327,7 +327,7 @@ export default {
             state.chart = chart;
         };
         const getLink = data => ({
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
             params: {
                 provider: data.provider,
                 group: data.cloud_service_group,
@@ -336,6 +336,7 @@ export default {
             query: {
                 filters: queryHelper.setFilters([
                     { k: 'project_id', v: props.projectId, o: '=' },
+                    { k: 'cloud_service_type', v: data.cloud_service_type, o: '=' },
                 ]).rawQueryStrings,
             },
         });
