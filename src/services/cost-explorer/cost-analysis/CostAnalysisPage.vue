@@ -179,7 +179,8 @@ export default {
 <style lang="postcss" scoped>
 .cost-analysis-page {
     .cost-analysis-chart {
-        @apply relative z-10;
+        @apply relative;
+        z-index: 100;
         margin-bottom: 1rem;
     }
 }
