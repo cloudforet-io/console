@@ -18,7 +18,9 @@
             :selected="selectedItems"
             multi-selectable
             use-fixed-menu-style
+            :exact-mode="false"
             @update:selected="handleSelectMenuItem"
+            @search="handleSearch"
         />
         <p-search-dropdown
             v-else
@@ -27,7 +29,9 @@
             :loading="menuLoading"
             multi-selectable
             use-fixed-menu-style
+            :exact-mode="false"
             @update:selected="handleSelectMenuItem"
+            @search="handleSearch"
         />
     </div>
 </template>
@@ -152,6 +156,9 @@ export default {
         const handleSelectMenuItem = (selectedItems) => {
             emit('update:selected', selectedItems.map(d => d.name));
         };
+        const handleSearch = (val: string) => {
+            emit('update:selected', state.selectedItems.map(d => d.name).concat([val]));
+        };
 
         // LOAD REFERENCE STORE
         (async () => {
@@ -168,6 +175,7 @@ export default {
             menuHandler,
             handleSelectedProjectIds,
             handleSelectMenuItem,
+            handleSearch,
         };
     },
 };
