@@ -103,8 +103,11 @@ export default {
                 if (props.granularity === GRANULARITY.DAILY) {
                     minDate = endDate.subtract(1, 'month').format('YYYY-MM-DD');
                     maxDate = endDate.format('YYYY-MM-DD');
-                } else if (props.granularity === GRANULARITY.MONTHLY || props.granularity === GRANULARITY.ACCUMULATED) {
-                    minDate = endDate.subtract(11, 'month').format('YYYY-MM-DD');
+                } else if (props.granularity === GRANULARITY.MONTHLY) {
+                    minDate = endDate.subtract(11, 'month').format('YYYY-MM');
+                    maxDate = endDate.format('YYYY-MM');
+                } else if (props.granularity === GRANULARITY.ACCUMULATED) {
+                    minDate = endDate.subtract(12, 'month').add(1, 'day').format('YYYY-MM-DD');
                     maxDate = endDate.format('YYYY-MM-DD');
                 }
                 return { minDate, maxDate };
@@ -118,9 +121,12 @@ export default {
                 if (props.granularity === GRANULARITY.DAILY) {
                     minDate = startDate.format('YYYY-MM-DD');
                     maxDate = startDate.add(1, 'month').format('YYYY-MM-DD');
-                } else if (props.granularity === GRANULARITY.MONTHLY || props.granularity === GRANULARITY.ACCUMULATED) {
+                } else if (props.granularity === GRANULARITY.MONTHLY) {
+                    minDate = startDate.format('YYYY-MM');
+                    maxDate = startDate.add(11, 'month').format('YYYY-MM');
+                } else if (props.granularity === GRANULARITY.ACCUMULATED) {
                     minDate = startDate.format('YYYY-MM-DD');
-                    maxDate = startDate.add(11, 'month').format('YYYY-MM-DD');
+                    maxDate = startDate.add(12, 'month').subtract(1, 'day').format('YYYY-MM-DD');
                 }
                 return { minDate, maxDate };
             }),
