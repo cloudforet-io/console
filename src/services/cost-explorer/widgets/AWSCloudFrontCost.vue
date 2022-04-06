@@ -11,7 +11,19 @@
             </template>
             <div ref="chartRef" class="chart" />
         </p-data-loader>
-        <div class="table-wrapper" />
+        <div class="table-wrapper">
+            <cost-dashboard-data-table :fields="tableState.fields"
+                                       :items="tableState.items"
+                                       :loading="loading"
+                                       :this-page.sync="tableState.thisPage"
+                                       :page-size="5"
+                                       :currency-rates="currencyRates"
+                                       :currency="currency"
+                                       :show-index="false"
+                                       :pagination-visible="!printMode"
+                                       :print-mode="printMode"
+            />
+        </div>
     </cost-dashboard-card-widget-layout>
 </template>
 
@@ -45,8 +57,38 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import {
     getReferenceLabel, getTooltipText,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
+import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
+import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
+interface Data {
+    project_id: string;
+    usage_quantity: number;
+    usage_type: 'data-transfer.out'|'requests.http'|'requests.https';
+    usd_cost: number;
+}
 
+interface TableItem {
+    usd_cost: number;
+    usage_quantity: number;
+}
+
+interface ConvertedTableData {
+    [key: string]: {
+        trafficOut: TableItem;
+        httpRequest: TableItem;
+        httpsRequest: TableItem;
+    };
+}
+
+interface TableData {
+    project: string;
+    trafficOutCost?: number;
+    trafficOutSize?: number;
+    httpReqCost?: number;
+    httpReqSize?: number;
+    httpsReqCost?: number;
+    httpsReqSize?: number;
+}
 interface CloudFrontChartData {
     category: string;
     'data-transfer.out'?: number;
@@ -60,6 +102,7 @@ export default {
     name: 'AWSCloudFrontCost',
     components: {
         CostDashboardCardWidgetLayout,
+        CostDashboardDataTable,
         PDataLoader,
         PSkeleton,
     },
@@ -120,6 +163,60 @@ export default {
                     label: 'Requests (HTTPS)',
                 },
             ] as Legend[],
+        });
+
+        const usageType = {
+            'data-transfer.out': 'trafficOut',
+            'requests.http': 'httpRequest',
+            'requests.https': 'httpsRequest',
+        };
+        const getConvertedTableData = (): ConvertedTableData => {
+            const temp = {};
+            state.items.forEach((item: CostAnalyzeModel) => {
+                if (temp[item.project_id]) {
+                    temp[item.project_id][usageType[item.usage_type]] = {
+                        usd_cost: item.usd_cost,
+                        usage_quantity: item.usage_quantity,
+                    };
+                } else {
+                    temp[item.project_id] = {
+                        [usageType[item.usage_type]]: {
+                            usd_cost: item.usd_cost,
+                            usage_quantity: item.usage_quantity,
+                        },
+                    };
+                }
+            });
+            return temp;
+        };
+
+        const tableState = reactive({
+            fields: computed<DataTableFieldType[]>(() => [
+                { name: 'project', label: ' Project' },
+                { name: 'trafficOutCost', label: 'Transfer-Out', textAlign: 'right' },
+                { name: 'trafficOutSize', label: ' ', type: 'size' },
+                { name: 'httpReqCost', label: 'Requests (HTTP)', textAlign: 'right' },
+                { name: 'httpReqSize', label: ' ', type: 'size' },
+                { name: 'httpsReqCost', label: 'Requests (HTTPS)', textAlign: 'right' },
+                { name: 'httpsReqSize', label: ' ', type: 'size' },
+            ]),
+            items: computed<TableData[]>(() => {
+                const convertedTableData = getConvertedTableData();
+                const tableItems = Object.keys(convertedTableData).map((item) => {
+                    const project = getReferenceLabel(item, state.groupBy);
+                    return ({
+                        project,
+                        trafficOutCost: convertedTableData[item]?.trafficOut?.usd_cost,
+                        trafficOutSize: convertedTableData[item]?.trafficOut?.usage_quantity,
+                        httpReqCost: convertedTableData[item]?.httpRequest?.usd_cost,
+                        httpReqSize: convertedTableData[item]?.httpRequest?.usage_quantity,
+                        httpsReqCost: convertedTableData[item]?.httpsRequest?.usd_cost,
+                        httpsReqSize: convertedTableData[item]?.httpsRequest?.usage_quantity,
+                    });
+                });
+                return tableItems;
+            }),
+            thisPage: 1,
         });
 
         /* Util */
@@ -268,6 +365,7 @@ export default {
 
         return {
             ...toRefs(state),
+            tableState,
         };
     },
 };
