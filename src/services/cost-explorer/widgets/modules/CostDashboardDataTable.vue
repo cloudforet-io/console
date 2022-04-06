@@ -310,6 +310,10 @@ export default {
                 cursor: default;
             }
         }
+        .status-wrapper {
+            min-width: 2rem;
+            padding: 0.125rem 0;
+        }
     }
 }
 </style>
