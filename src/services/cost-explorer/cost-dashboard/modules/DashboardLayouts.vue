@@ -11,10 +11,10 @@
             <template #loader>
                 <div />
             </template>
-            <div v-for="(row, rowIdx) in layout" :key="`row-${rowIdx}`" ref="dynamicWidgetRows"
+            <div v-for="(row, rowIdx) in layout" :key="`row-${row[0].name}-${contextId}`" ref="dynamicWidgetRows"
                  class="row" :class="{'customize':customizeMode}"
             >
-                <div v-for="(widget, colIdx) in row" :key="`widget-${widget.widget_id}-${rowIdx}-${colIdx}-${contextId}`"
+                <div v-for="(widget, colIdx) in row" :key="`widget-${widget.widget_id}-${contextId}`"
                      :class="`col-${widget.options.layout}`"
                 >
                     <div v-if="customizeMode" class="btn-group">

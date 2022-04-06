@@ -1,21 +1,21 @@
 <template>
-    <component :is="component"
-               :widget-id="widgetId"
-               :name="name"
-               :options="options"
-               :period="period"
-               :filters="filters"
-               :currency="currency"
-               :currency-rates="currencyRates"
-               :print-mode="printMode"
-               v-on="$listeners"
+    <component
+        :is="component"
+        :widget-id="widgetId"
+        :name="name"
+        :options="options"
+        :period="period"
+        :filters="filters"
+        :currency="currency"
+        :currency-rates="currencyRates"
+        :print-mode="printMode"
+        v-on="$listeners"
     />
 </template>
 
 <script lang="ts">
-import { isEqual } from 'lodash';
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { WidgetProps } from '@/services/cost-explorer/widgets/type';
 import { CURRENCY } from '@/store/modules/display/config';
@@ -85,12 +85,7 @@ export default {
             }
         };
 
-        watch(() => props.widgetFileName, (aft, bef) => {
-            if (!isEqual(aft, bef)) {
-                getComponent();
-            }
-        }, { immediate: true });
-
+        (() => getComponent())();
 
         return {
             ...toRefs(state),
