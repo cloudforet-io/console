@@ -5,7 +5,6 @@ import { Reference, ReferenceType } from '@/lib/reference/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { AUTOMATION_ROUTE } from '@/services/automation/routes';
 
 interface LinkFormatter {
     (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;
@@ -91,15 +90,6 @@ const cloudServiceTypeLinkFormatter: LinkFormatter = (name, data, reference, que
     return location;
 };
 
-const spotGroupLinkFormatter: LinkFormatter = (name, data, reference, query) => {
-    const location = {
-        name,
-        query,
-        params: { id: data },
-    };
-    return location;
-};
-
 type RouterMap = Record<ReferenceType, { name: string; formatter: LinkFormatter}>
 
 const routerMap: RouterMap = {
@@ -137,11 +127,6 @@ const routerMap: RouterMap = {
         {
             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
             formatter: cloudServiceTypeLinkFormatter,
-        },
-    'spot_automation.SpotGroup':
-        {
-            name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.DETAIL._NAME,
-            formatter: spotGroupLinkFormatter,
         },
 };
 

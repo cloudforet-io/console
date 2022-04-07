@@ -6,7 +6,6 @@ import dashboardRoute from '@/services/dashboard/routes';
 import administrationRoute from '@/services/administration/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes';
 import projectRoute from '@/services/project/routes';
-import automationRoute from '@/services/automation/routes';
 import alertManagerRoute from '@/services/alert-manager/routes';
 import costExplorerRoute from '@/services/cost-explorer/routes';
 import myPageRoute from '@/services/my-page/routes';
@@ -30,7 +29,6 @@ export const serviceRoutes: RouteConfig[] = [
             administrationRoute,
             assetInventoryRoute,
             projectRoute,
-            automationRoute,
             alertManagerRoute,
             costExplorerRoute,
             myPageRoute,
