@@ -36,7 +36,7 @@ export const GROUP_BY_ITEM_MAP = Object.freeze({
     [GROUP_BY.RESOURCE_GROUP]: { name: GROUP_BY.RESOURCE_GROUP, label: 'Resource Group' },
     [GROUP_BY.PRODUCT]: { name: GROUP_BY.PRODUCT, label: 'Product' },
     [GROUP_BY.REGION]: { name: GROUP_BY.REGION, label: 'Region' },
-    // [GROUP_BY.TYPE]: { name: GROUP_BY.TYPE, label: 'Type' },
+    [GROUP_BY.TYPE]: { name: GROUP_BY.TYPE, label: 'Type' },
     [GROUP_BY.ACCOUNT]: { name: GROUP_BY.ACCOUNT, label: 'Account ID' },
 });
 
