@@ -123,7 +123,7 @@
 
         <div class="button-group">
             <p-button class="text-button" style-type="primary-dark" size="lg"
-                      :disabled="!isValid"
+                      :disabled="!isValid || !isTagsValid"
                       @click="handleSave"
             >
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.SAVE') }}
@@ -387,15 +387,15 @@ export default {
                 ErrorHandler.handleRequestError(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
                 return;
             }
-            if (formState.isTagsValid) {
-                await createServiceAccount();
-                if (state.serviceAccountId && state.hasCredentialKey && state.enableCredentialInput) {
-                    if (formState.credentialModel.private_key) formState.credentialModel.private_key = formState.credentialModel.private_key.replace(/\\n/g, '\n');
-                    const isSecretCreationSuccess = await createSecret();
-                    if (!isSecretCreationSuccess) return;
-                }
-                SpaceRouter.router.back();
+            if (!formState.isTagsValid) return;
+
+            await createServiceAccount();
+            if (state.serviceAccountId && state.hasCredentialKey && state.enableCredentialInput) {
+                if (formState.credentialModel.private_key) formState.credentialModel.private_key = formState.credentialModel.private_key.replace(/\\n/g, '\n');
+                const isSecretCreationSuccess = await createSecret();
+                if (!isSecretCreationSuccess) return;
             }
+            SpaceRouter.router.back();
         };
         const handleGoBack = () => {
             const nextPath = SpaceRouter.router.currentRoute.query.nextPath as string|undefined;

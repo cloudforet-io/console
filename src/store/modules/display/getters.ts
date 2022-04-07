@@ -22,13 +22,13 @@ export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarP
 };
 
 const filterMenuByRoute = (menuList: GNBMenu[], disabledMenu: string[], showBilling: boolean, isAdmin: boolean, router: VueRouter): GNBMenu[] => menuList.reduce((results, _menu) => {
-    if (disabledMenu.includes(_menu.id) && !isAdmin) return results;
-
-    const menu = { ..._menu };
     if (!showBilling) {
         const idx = results.findIndex(item => item.id === 'cost_explorer');
         if (idx > -1) results.splice(idx, 1);
     }
+    if (disabledMenu.includes(_menu.id) && !isAdmin) return results;
+
+    const menu = { ..._menu };
     if (menu.subMenuList) {
         menu.subMenuList = filterMenuByRoute(menu.subMenuList, disabledMenu, showBilling, isAdmin, router);
         if (menu.subMenuList.length) {
