@@ -2,6 +2,7 @@
     <cost-dashboard-card-widget-layout :title="name ? name : 'AWS Data-Transfer by Region'"
                                        class="cost-trend-line"
                                        :data-range="15"
+                                       :widget-link="widgetLink"
                                        :print-mode="printMode"
     >
         <template #default>
@@ -63,6 +64,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import am4geodataContinentsLow from '@amcharts/amcharts4-geodata/continentsLow';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 import { TrafficWidgetTableData } from '@/services/cost-explorer/widgets/type';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 
 const valueName = 'value';
 
@@ -144,6 +148,19 @@ export default {
                 color: state.providers.aws?.color,
             }))),
             loading: false,
+            widgetLink: computed(() => {
+                if (props.printMode) return undefined;
+                return {
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                    params: {},
+                    query: {
+                        groupBy: arrayToQueryString([GROUP_BY.REGION]),
+                        granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                        period: objectToQueryString(props.period),
+                        filters: objectToQueryString(props.filters),
+                    },
+                };
+            }),
         });
 
         const convertOrMergeToTableData = (data: Data, _tableData?: TableData): TableData => {
@@ -208,8 +225,6 @@ export default {
             chart.events.on('ready', () => {
                 emit('rendered');
             });
-            chart.chartContainer.wheelable = true;
-            chart.zoomControl = new am4maps.ZoomControl();
 
             chart.geodata = am4geodataContinentsLow;
             chart.minWidth = 300;
@@ -282,8 +297,7 @@ export default {
         const getChartData = async () => {
             try {
                 state.loading = true;
-                const results = await fetchData();
-                state.data = results;
+                state.data = await fetchData();
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.data = [];

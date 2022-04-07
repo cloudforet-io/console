@@ -20,7 +20,8 @@
     "name": "AWS CloudFront Cost by Project",
     "options": {
       "chart_type": "STACKED_COLUMN",
-      "layout": 100
+      "layout": 100,
+      "group_by": "project_id"
     }
   }]
 ]
