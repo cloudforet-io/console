@@ -28,7 +28,6 @@
 </template>
 
 <script lang="ts">
-import { range } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -59,6 +58,8 @@ import {
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 interface Data {
     project_id: string;
@@ -142,7 +143,16 @@ export default {
             groupBy: computed(() => props.options?.group_by ?? GROUP_BY.PROJECT), // todo: temporary
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
-                return '';
+                return {
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                    params: {},
+                    query: {
+                        granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                        groupBy: arrayToQueryString([state.groupBy]),
+                        period: objectToQueryString(props.period),
+                        filters: objectToQueryString(props.filters),
+                    },
+                };
             }),
             //
             items: [] as CostAnalyzeModel[],
@@ -252,7 +262,6 @@ export default {
         const drawChart = (chartContext, chartData, legends) => {
             const chart: any = am4core.create(chartContext, am4charts.XYChart);
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-            chart.data = chartData;
 
             const categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
             categoryAxis.tooltip.disabled = true;
@@ -266,7 +275,6 @@ export default {
             categoryAxis.fontSize = 12;
             categoryAxis.renderer.labels.template.adapter.add('text', (label, target) => {
                 if (target.dataItem && (target.dataItem.category)) {
-                    if (target.dataItem.category.startsWith('dummy')) return '--';
                     return getReferenceLabel(target.dataItem.category, state.groupBy);
                 }
                 return label;
@@ -293,29 +301,28 @@ export default {
             });
             if (state.items.length) createChartLegend(chart);
 
+            if (chartData.length) {
+                chart.data = chartData;
+            } else {
+                chart.data = [{ category: '' }];
+                valueAxis.min = 0;
+            }
+
             return chart;
         };
         const getConvertedChartData = (rawData: CostAnalyzeModel[]): CloudFrontChartData[] => {
             const results: CloudFrontChartData[] = [];
-            if (rawData.length) {
-                rawData.forEach((data) => {
-                    const existData = results.find(d => d.category === data[state.groupBy]);
-                    if (existData) {
-                        existData[data.usage_type] = data.usd_cost;
-                    } else {
-                        results.push({
-                            category: data[state.groupBy],
-                            [data.usage_type]: data.usd_cost,
-                        });
-                    }
-                });
-            } else {
-                range(15).forEach((idx) => {
+            rawData.forEach((data) => {
+                const existData = results.find(d => d.category === data[state.groupBy]);
+                if (existData) {
+                    existData[data.usage_type] = data.usd_cost;
+                } else {
                     results.push({
-                        category: `dummy${idx}`,
+                        category: data[state.groupBy],
+                        [data.usage_type]: data.usd_cost,
                     });
-                });
-            }
+                }
+            });
             return results;
         };
 

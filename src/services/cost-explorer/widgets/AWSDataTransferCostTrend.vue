@@ -33,7 +33,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import { XYChart } from '@amcharts/amcharts4/charts';
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
@@ -41,7 +41,7 @@ import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modu
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 
 import {
-    ChartData, CostAnalyzeModel, Legend, TrafficWidgetTableData,
+    ChartData, CostAnalyzeModel, Legend, TrafficWidgetTableData, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
 import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { CURRENCY } from '@/store/modules/display/config';
@@ -65,6 +65,8 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { range } from 'lodash';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 
 const GROUP_BY = 'usage_type';
@@ -121,13 +123,21 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props: WidgetProps, { emit }) {
         const { i18nDayjs } = useI18nDayjs();
         const state = reactive({
             loading: false,
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
-                return '';
+                return {
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                    params: {},
+                    query: {
+                        granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+                        period: objectToQueryString(props.period),
+                        filters: objectToQueryString(props.filters),
+                    },
+                };
             }),
             //
             items: [] as Data[],
@@ -190,13 +200,7 @@ export default {
         });
 
         /* Util */
-        const disposeChart = (chartContext) => {
-            if (state.chartRegistry[chartContext]) {
-                state.chartRegistry[chartContext].dispose();
-                delete state.chartRegistry[chartContext];
-            }
-        };
-        const createSeries = (chart, legend) => {
+        const createChartSeries = (chart, legend) => {
             const series = chart.series.push(new am4charts.LineSeries());
             if (props.printMode) series.showOnInit = false;
             series.name = legend.label;
@@ -227,23 +231,19 @@ export default {
         };
         const createChartLegend = (chart) => {
             chart.legend = new am4charts.Legend();
-            chart.legend.useDefaultMarker = true;
             chart.legend.position = 'bottom';
             chart.legend.contentAlign = 'left';
             chart.legend.fontSize = 12;
             chart.legend.labels.template.fill = am4core.color(gray[600]);
-            const marker = chart.legend.markers;
-            marker.template.width = 8;
-            marker.template.height = 8;
-            marker.template.children.getIndex(0).cornerRadius(12, 12, 12, 12);
+            chart.legend.itemContainers.template.clickable = false;
+            chart.legend.itemContainers.template.focusable = false;
+            chart.legend.itemContainers.template.hoverable = false;
+            chart.legend.markers.template.width = 8;
+            chart.legend.markers.template.height = 8;
+            chart.legend.markers.template.children.getIndex(0).cornerRadius(12, 12, 12, 12);
         };
         const drawChart = (chartContext, chartData, legends) => {
-            const createChart = () => {
-                disposeChart(chartContext);
-                state.chartRegistry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
-                return state.chartRegistry[chartContext];
-            };
-            const chart = createChart();
+            const chart: any = am4core.create(chartContext, am4charts.XYChart);
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.events.on('ready', () => {
                 emit('rendered');
@@ -288,7 +288,7 @@ export default {
 
             if (legends.length) {
                 legends.forEach((legend) => {
-                    createSeries(chart, legend);
+                    createChartSeries(chart, legend);
                 });
             } else {
                 const dummyChartData = [...chartData];
@@ -296,7 +296,7 @@ export default {
                 chart.data = dummyChartData;
                 valueAxis.min = 0;
                 valueAxis.extraMax = 100;
-                createSeries(chart, { name: 'dummy', label: 'dummy' });
+                createChartSeries(chart, { name: 'dummy', label: 'dummy' });
             }
 
             chart.cursor = new am4charts.XYCursor();
@@ -344,12 +344,16 @@ export default {
             if (state.items.length === 0) emit('rendered');
 
             const _period = {
-                start: dayjs(period.end).subtract(5, 'month').format('YYYY-MM'),
-                end: dayjs.utc(period.end).format('YYYY-MM'),
+                start: dayjs.utc((period as Period).end).subtract(5, 'month').format('YYYY-MM'),
+                end: dayjs.utc((period as Period).end).format('YYYY-MM'),
             };
             state.chartData = getXYChartData(state.items, GRANULARITY.MONTHLY, _period, GROUP_BY);
             state.chart = drawChart(state.chartRef, state.chartData, state.legends);
         }, { immediate: true });
+
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
+        });
 
         return {
             ...toRefs(state),
@@ -358,7 +362,7 @@ export default {
 };
 </script>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 .aws-data-transfer-cost-trend {
     .chart-wrapper {
         height: 11rem;
