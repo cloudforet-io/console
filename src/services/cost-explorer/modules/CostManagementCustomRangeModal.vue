@@ -103,12 +103,9 @@ export default {
                 if (props.granularity === GRANULARITY.DAILY) {
                     minDate = endDate.subtract(1, 'month').format('YYYY-MM-DD');
                     maxDate = endDate.format('YYYY-MM-DD');
-                } else if (props.granularity === GRANULARITY.MONTHLY) {
+                } else {
                     minDate = endDate.subtract(11, 'month').format('YYYY-MM');
                     maxDate = endDate.format('YYYY-MM');
-                } else if (props.granularity === GRANULARITY.ACCUMULATED) {
-                    minDate = endDate.subtract(12, 'month').add(1, 'day').format('YYYY-MM-DD');
-                    maxDate = endDate.format('YYYY-MM-DD');
                 }
                 return { minDate, maxDate };
             }),
@@ -121,12 +118,9 @@ export default {
                 if (props.granularity === GRANULARITY.DAILY) {
                     minDate = startDate.format('YYYY-MM-DD');
                     maxDate = startDate.add(1, 'month').format('YYYY-MM-DD');
-                } else if (props.granularity === GRANULARITY.MONTHLY) {
+                } else {
                     minDate = startDate.format('YYYY-MM');
                     maxDate = startDate.add(11, 'month').format('YYYY-MM');
-                } else if (props.granularity === GRANULARITY.ACCUMULATED) {
-                    minDate = startDate.format('YYYY-MM-DD');
-                    maxDate = startDate.add(12, 'month').subtract(1, 'day').format('YYYY-MM-DD');
                 }
                 return { minDate, maxDate };
             }),
@@ -135,7 +129,7 @@ export default {
                 const customRangeModalSettingsByGranularity = {
                     [GRANULARITY.ACCUMULATED]: {
                         helpTextFrom: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_LAST_12_MONTHS'),
-                        dateType: DATA_TYPE.yearToDate,
+                        dateType: DATA_TYPE.yearToMonth,
                     },
                     [GRANULARITY.DAILY]: {
                         helpTextTo: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_31_DAYS'),
@@ -152,12 +146,12 @@ export default {
         const handleConfirm = () => {
             state.proxyVisible = false;
             const period: Period = {};
-            if (props.granularity === GRANULARITY.MONTHLY) {
-                period.start = dayjs.utc(state.startDate[0]).format('YYYY-MM');
-                period.end = dayjs.utc(state.endDate[0]).format('YYYY-MM');
-            } else {
+            if (props.granularity === GRANULARITY.DAILY) {
                 period.start = state.startDate[0];
                 period.end = state.endDate[0];
+            } else {
+                period.start = dayjs.utc(state.startDate[0]).format('YYYY-MM-01');
+                period.end = dayjs.utc(state.endDate[0]).endOf('month').format('YYYY-MM-DD');
             }
             emit('confirm', period);
         };

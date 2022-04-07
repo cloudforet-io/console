@@ -7,9 +7,9 @@
         </p-badge>
         <p-select-dropdown v-if="!printMode"
                            :items="periodMenuItems"
-                           :selected="selectedPeriodMenuItem"
+                           :selected="selectedPeriod"
                            style-type="transparent"
-                           @select="handleSelectPeriodMenuItem"
+                           @select="handleSelectPeriod"
         />
         <cost-management-custom-range-modal v-if="customRangeModalVisible"
                                             :visible.sync="customRangeModalVisible"
@@ -20,33 +20,34 @@
 </template>
 
 <script lang="ts">
+import dayjs, { Dayjs } from 'dayjs';
+
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import { PBadge, PSelectDropdown } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import dayjs, { Dayjs } from 'dayjs';
-import { Period } from '@/services/cost-explorer/type';
-import { PBadge, PSelectDropdown } from '@spaceone/design-system';
-import { i18n } from '@/translations';
-import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
-import { store } from '@/store';
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import CostManagementCustomRangeModal from '@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue';
 
-const CostManagementCustomRangeModal = () => import('@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue');
+import { Period } from '@/services/cost-explorer/type';
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+import { i18n } from '@/translations';
+import { store } from '@/store';
+import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { TranslateResult } from 'vue-i18n';
+
 
 const today = dayjs.utc();
-const basicFormat = (date: Dayjs) => date.format('YYYY-MM-DD');
-const subDate = (value: number, unit: string) => today.subtract(value, unit);
-export const PERIOD_MENU_LIST = Object.freeze({
-    last7days: { start: basicFormat(subDate(6, 'day')), end: basicFormat(today) },
-    last14days: { start: basicFormat(subDate(14, 'day')), end: basicFormat(today) },
-    thisMonth: { start: basicFormat(today.startOf('month')), end: basicFormat(today.endOf('month')) },
-    lastMonth: { start: basicFormat(subDate(1, 'month').startOf('month')), end: basicFormat(subDate(1, 'month').endOf('month')) },
-    last3months: { start: basicFormat(subDate(2, 'month').startOf('month')), end: basicFormat(today.endOf('month')) },
-    last6months: { start: basicFormat(subDate(5, 'month').startOf('month')), end: basicFormat(today.endOf('month')) },
-});
+interface PeriodItem {
+    name: string;
+    label: TranslateResult;
+    start: Dayjs;
+    end: Dayjs;
+    enabled: GRANULARITY[];
+}
 
 export default {
     name: 'CostAnalysisPeriodSelectDropdown',
@@ -58,7 +59,7 @@ export default {
     props: {
         fixedPeriod: {
             type: Object,
-            default: () => (PERIOD_MENU_LIST.thisMonth),
+            default: () => (getInitialDates()),
         },
         printMode: {
             type: Boolean,
@@ -67,7 +68,6 @@ export default {
     },
     setup(props, { emit }) {
         const { i18nDayjs } = useI18nDayjs();
-        const arraySelector = (selectedNums: number[], array) => selectedNums.map(num => array[num]);
         const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
         const state = reactive({
             period: computed<Period>({
@@ -75,31 +75,65 @@ export default {
                 set(period) { store.commit('service/costAnalysis/setPeriod', period); },
             }),
             granularity: computed(() => store.state.service.costAnalysis.granularity),
-            quickSelectPeriodMenuItems: computed(() => ([
-                { label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_7_DAYS'), name: 'last7days' },
-                { label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_14_DAYS'), name: 'last14days' },
-                { label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_MONTH'), name: 'thisMonth' },
-                { label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_MONTH'), name: 'lastMonth' },
-                { label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_3_MONTHS'), name: 'last3months' },
-                { label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_6_MONTHS'), name: 'last6months' },
+            periodItems: computed<PeriodItem[]>(() => ([
+                {
+                    name: 'last7days',
+                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_7_DAYS'),
+                    start: today.subtract(6, 'day'),
+                    end: today,
+                    enabled: [GRANULARITY.DAILY, GRANULARITY.ACCUMULATED],
+                },
+                {
+                    name: 'last14days',
+                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_14_DAYS'),
+                    start: today.subtract(13, 'day'),
+                    end: today,
+                    enabled: [GRANULARITY.DAILY, GRANULARITY.ACCUMULATED],
+                },
+                {
+                    name: 'thisMonth',
+                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_MONTH'),
+                    start: today.startOf('month'),
+                    end: today.endOf('month'),
+                    enabled: [GRANULARITY.DAILY, GRANULARITY.MONTHLY, GRANULARITY.ACCUMULATED],
+                },
+                {
+                    name: 'lastMonth',
+                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_MONTH'),
+                    start: today.subtract(1, 'month').startOf('month'),
+                    end: today.subtract(1, 'month').endOf('month'),
+                    enabled: [GRANULARITY.DAILY, GRANULARITY.MONTHLY, GRANULARITY.ACCUMULATED],
+                },
+                {
+                    name: 'last3Month',
+                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_3_MONTHS'),
+                    start: today.subtract(2, 'month').startOf('month'),
+                    end: today.endOf('month'),
+                    enabled: [GRANULARITY.MONTHLY, GRANULARITY.ACCUMULATED],
+                },
+                {
+                    name: 'last6Month',
+                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_6_MONTHS'),
+                    start: today.subtract(5, 'month').startOf('month'),
+                    end: today.endOf('month'),
+                    enabled: [GRANULARITY.MONTHLY, GRANULARITY.ACCUMULATED],
+                },
             ])),
-            quickSelectPeriodListByGranularity: computed(() => {
-                if (state.granularity === GRANULARITY.DAILY) return arraySelector([0, 1, 2, 3], state.quickSelectPeriodMenuItems);
-                if (state.granularity === GRANULARITY.MONTHLY) return arraySelector([2, 3, 4, 5], state.quickSelectPeriodMenuItems);
-                return state.quickSelectPeriodMenuItems;
+            periodMenuItems: computed<MenuItem[]>(() => {
+                const menuItems = state.periodItems.filter(d => d.enabled.includes(state.granularity));
+                return [
+                    ...menuItems,
+                    {
+                        type: 'divider',
+                    },
+                    {
+                        type: 'item',
+                        name: 'custom',
+                        label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOM'),
+                    },
+                ];
             }),
-            periodMenuItems: computed<MenuItem[]>(() => ([
-                ...state.quickSelectPeriodListByGranularity,
-                {
-                    type: 'divider',
-                },
-                {
-                    type: 'item',
-                    name: 'custom',
-                    label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOM'),
-                },
-            ])),
-            selectedPeriodMenuItem: 'thisMonth',
+            selectedPeriod: 'thisMonth',
             customRangeModalVisible: false,
             periodText: computed(() => {
                 const isSameMonth: boolean = dateFormatter(state.period.start, 'M') === dateFormatter(state.period.end, 'M');
@@ -115,33 +149,42 @@ export default {
             }),
         });
 
+        /* Util */
         const setPeriod = (period: Period) => {
             state.period = period;
             emit('update', period);
         };
+        const setPeriodMenuItemWithPeriod = (period?: Period) => {
+            const start = dayjs.utc(period?.start);
+            const end = dayjs.utc(period?.end);
+            let selectedMenu = 'custom';
+            const unit = GRANULARITY.DAILY ? 'day' : 'month';
+            state.periodItems.forEach((d) => {
+                if (start.isSame(d.start, unit) && end.isSame(d.end, unit)) {
+                    selectedMenu = d.name;
+                }
+            });
+            state.selectedPeriod = selectedMenu;
+        };
 
-        const handleSelectPeriodMenuItem = (periodMenuItem) => {
-            state.selectedPeriodMenuItem = periodMenuItem;
-            if (periodMenuItem === 'custom') state.customRangeModalVisible = true;
-            else setPeriod(PERIOD_MENU_LIST[periodMenuItem]);
+        /* Event */
+        const handleSelectPeriod = (periodMenuName) => {
+            state.selectedPeriod = periodMenuName;
+            if (periodMenuName === 'custom') state.customRangeModalVisible = true;
+            else {
+                const selectedPeriodItem: PeriodItem = state.periodItems.find(d => d.name === periodMenuName);
+                setPeriod({
+                    start: selectedPeriodItem.start.format(),
+                    end: selectedPeriodItem.end.format(),
+                });
+            }
         };
         const handleCustomRangeModalConfirm = (period: Period) => {
             setPeriod(period);
             state.customRangeModalVisible = false;
         };
 
-        const setPeriodMenuItemWithPeriod = (period?: Period) => {
-            const start = dayjs.utc(period?.start).format('YYYY-MM-DD');
-            const end = dayjs.utc(period?.end).format('YYYY-MM-DD');
-            let selectedMenuItem = 'custom';
-            Object.entries(PERIOD_MENU_LIST).forEach(([key, value]) => {
-                if (start === value.start && end === value.end) {
-                    selectedMenuItem = key;
-                }
-            });
-            state.selectedPeriodMenuItem = selectedMenuItem;
-        };
-
+        /* Watcher */
         watch(() => state.period, (period) => {
             if (period) {
                 setPeriodMenuItemWithPeriod(period);
@@ -150,10 +193,8 @@ export default {
 
         return {
             ...toRefs(state),
-            handleSelectPeriodMenuItem,
+            handleSelectPeriod,
             handleCustomRangeModalConfirm,
-            dateFormatter,
-            DATA_TYPE,
         };
     },
 };
