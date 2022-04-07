@@ -48,7 +48,7 @@ import {
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import config from '@/lib/config';
 import { gray } from '@/styles/colors';
@@ -82,7 +82,7 @@ interface ConvertedTableData {
 }
 
 interface TableData {
-    project: string;
+    groupBy: string;
     trafficOutCost?: number;
     trafficOutSize?: number;
     httpReqCost?: number;
@@ -183,13 +183,13 @@ export default {
         const getConvertedTableData = (): ConvertedTableData => {
             const temp = {};
             state.items.forEach((item: CostAnalyzeModel) => {
-                if (temp[item.project_id]) {
-                    temp[item.project_id][usageType[item.usage_type]] = {
+                if (temp[item[state.groupBy]]) {
+                    temp[item[state.groupBy]][usageType[item.usage_type]] = {
                         usd_cost: item.usd_cost,
                         usage_quantity: item.usage_quantity,
                     };
                 } else {
-                    temp[item.project_id] = {
+                    temp[item[state.groupBy]] = {
                         [usageType[item.usage_type]]: {
                             usd_cost: item.usd_cost,
                             usage_quantity: item.usage_quantity,
@@ -202,7 +202,9 @@ export default {
 
         const tableState = reactive({
             fields: computed<DataTableFieldType[]>(() => [
-                { name: 'project', label: ' Project' },
+                { name: 'groupBy', label: GROUP_BY_ITEM_MAP[state.groupBy].label },
+                { name: 'usd_cost', label: 'Cost (USD)' },
+                { name: 'usage_quantity', label: 'Usage Quantity' },
                 { name: 'trafficOutCost', label: 'Transfer-Out', textAlign: 'right' },
                 { name: 'trafficOutSize', label: ' ', type: 'size' },
                 { name: 'httpReqCost', label: 'Requests (HTTP)', textAlign: 'right' },
@@ -213,9 +215,9 @@ export default {
             items: computed<TableData[]>(() => {
                 const convertedTableData = getConvertedTableData();
                 const tableItems = Object.keys(convertedTableData).map((item) => {
-                    const project = getReferenceLabel(item, state.groupBy);
+                    const groupLabel = getReferenceLabel(item, state.groupBy);
                     return ({
-                        project,
+                        groupBy: groupLabel,
                         trafficOutCost: convertedTableData[item]?.trafficOut?.usd_cost,
                         trafficOutSize: convertedTableData[item]?.trafficOut?.usage_quantity,
                         httpReqCost: convertedTableData[item]?.httpRequest?.usd_cost,
