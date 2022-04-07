@@ -133,6 +133,7 @@ import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { CURRENCY } from '@/store/modules/display/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { primitiveToQueryString } from '@/lib/router-query-string';
 
 
 interface ChartData {
@@ -328,15 +329,11 @@ export default {
         };
         const getLink = data => ({
             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-            params: {
-                provider: data.provider,
-                group: data.cloud_service_group,
-                name: data.cloud_service_type,
-            },
             query: {
+                provider: primitiveToQueryString(data.provider),
                 filters: queryHelper.setFilters([
                     { k: 'project_id', v: props.projectId, o: '=' },
-                    { k: 'cloud_service_type', v: data.cloud_service_type, o: '=' },
+                    { k: 'cloud_service_group', v: data.cloud_service_group, o: '=' },
                 ]).rawQueryStrings,
             },
         });
