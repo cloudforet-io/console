@@ -44,8 +44,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
-    computed, defineComponent, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
+    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -121,7 +120,6 @@ export default defineComponent<WidgetProps>({
         },
     },
     setup(props: WidgetProps, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as PieChart | null,
@@ -170,13 +168,8 @@ export default defineComponent<WidgetProps>({
             };
             const chart = createChart();
 
-            vm.$nextTick(() => {
-                chart.events.on('ready', () => {
-                    // wait for animation. amcharts animation is global settings.
-                    setTimeout(() => {
-                        emit('rendered');
-                    }, 500);
-                });
+            chart.events.on('ready', () => {
+                emit('rendered');
             });
 
 

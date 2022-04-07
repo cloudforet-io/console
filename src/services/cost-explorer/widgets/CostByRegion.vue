@@ -47,9 +47,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
-    computed, defineComponent, getCurrentInstance,
-    onUnmounted, reactive, toRefs, watch,
+    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { cloneDeep } from 'lodash';
 import { MapChart } from '@amcharts/amcharts4/maps';
@@ -138,7 +136,6 @@ export default defineComponent<WidgetProps>({
         },
     },
     setup(props: WidgetProps, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
@@ -201,14 +198,8 @@ export default defineComponent<WidgetProps>({
             const chart = createChart();
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
-
-            vm.$nextTick(() => {
-                chart.events.on('ready', () => {
-                    // wait for animation. amcharts animation is global settings.
-                    setTimeout(() => {
-                        emit('rendered');
-                    }, 1000);
-                });
+            chart.events.on('ready', () => {
+                emit('rendered');
             });
 
             chart.geodata = am4geodataContinentsLow;

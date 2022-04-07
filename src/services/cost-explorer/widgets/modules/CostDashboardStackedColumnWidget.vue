@@ -33,8 +33,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 
 import {
-    ComponentRenderProxy,
-    computed, defineComponent, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
+    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -123,7 +122,6 @@ export default defineComponent<Props>({
         },
     },
     setup(props: Props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             providers: computed(() => store.state.reference.provider.items),
             //
@@ -179,13 +177,8 @@ export default defineComponent<Props>({
             const chart = createChart();
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
-            vm.$nextTick(() => {
-                chart.events.on('ready', () => {
-                    // wait for animation. amcharts animation is global settings.
-                    setTimeout(() => {
-                        emit('rendered');
-                    }, 500);
-                });
+            chart.events.on('ready', () => {
+                emit('rendered');
             });
 
             chart.paddingLeft = -5;

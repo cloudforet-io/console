@@ -204,7 +204,12 @@ export default {
         watch(() => state.isAllRendered, (isAllRendered) => {
             if (isAllRendered) {
                 const widgetRows: HTMLElement[] = vm.$refs.dynamicWidgetRows as HTMLElement[] ?? [];
-                emit('rendered', widgetRows);
+                vm.$nextTick(() => {
+                    // wait for animation. amcharts animation is global settings.
+                    setTimeout(() => {
+                        emit('rendered', widgetRows);
+                    }, 1000);
+                });
             }
         });
         return {

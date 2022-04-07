@@ -41,9 +41,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed,
-    getCurrentInstance,
-    onUnmounted, reactive, toRefs, watch,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { MapChart } from '@amcharts/amcharts4/maps';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -133,7 +131,6 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
@@ -212,19 +209,13 @@ export default {
             };
             const chart = createChart();
 
-            vm.$nextTick(() => {
-                chart.events.on('ready', () => {
-                    // wait for animation. amcharts animation is global settings.
-                    setTimeout(() => {
-                        emit('rendered');
-                    }, 1000);
-                });
-            });
-
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.events.on('ready', () => {
                 emit('rendered');
             });
+
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+            chart.chartContainer.wheelable = true;
+            chart.zoomControl = new am4maps.ZoomControl();
 
             chart.geodata = am4geodataContinentsLow;
             chart.minWidth = 300;
