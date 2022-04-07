@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="name ? name : 'AWS Data Transfer Cost Trend'"
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.AWS_DATA_TRANSFER_COST_TREND')"
                                        class="aws-data-transfer-cost-trend"
                                        :widget-link="widgetLink"
                                        :data-range="6"
@@ -67,6 +67,8 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { i18n } from '@/translations';
+import { TranslateResult } from 'vue-i18n';
 
 
 const GROUP_BY = 'usage_type';
@@ -80,7 +82,7 @@ interface Data extends CostAnalyzeModel {
     usage_type: 'data-transfer.out'|'data-transfer.in'|'data-transfer.etc';
 }
 interface Field extends DataTableFieldType {
-    tooltipText?: string;
+     tooltipText?: TranslateResult;
 }
 interface TableData extends TrafficWidgetTableData {
     month?: string;
@@ -163,17 +165,17 @@ export default {
                 },
             ] as Legend[],
             fields: computed<Field[]>(() => [
-                { name: 'month', label: 'Month', tooltipText: 'In descending order of recent month.' },
+                { name: 'month', label: 'Month', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_1') },
                 {
-                    name: 'trafficOutCost', label: 'Transfer-Out', textAlign: 'right', tooltipText: 'AWS에서 인터넷으로 송신한 내역',
+                    name: 'trafficOutCost', label: 'Transfer-Out', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
                 },
                 { name: 'trafficOutSize', label: ' ', type: 'size' },
                 {
-                    name: 'trafficInCost', label: 'Transfer-In', textAlign: 'right', tooltipText: '인터넷에서 AWS로 데이터를 수신한 내역',
+                    name: 'trafficInCost', label: 'Transfer-In', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_3'),
                 },
                 { name: 'trafficInSize', label: ' ', type: 'size' },
                 {
-                    name: 'trafficEtcCost', label: 'etc.', textAlign: 'right', tooltipText: 'AWS Region 간 통신 내역',
+                    name: 'trafficEtcCost', label: 'etc.', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_4'),
                 },
                 { name: 'trafficEtcSize', label: ' ', type: 'size' },
             ]),

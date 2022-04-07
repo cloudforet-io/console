@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="name ? name : 'AWS CloudFront Cost by Project'"
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.AWS_CLOUD_FRONT_COST')"
                                        class="aws-cloud-front-cost"
                                        :widget-link="widgetLink"
                                        :data-range="15"

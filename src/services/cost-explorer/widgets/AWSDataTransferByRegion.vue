@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout :title="name ? name : 'AWS Data-Transfer by Region'"
+    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.AWS_DATA_TRANSFER_REGION')"
                                        class="cost-trend-line"
                                        :data-range="15"
                                        :widget-link="widgetLink"
