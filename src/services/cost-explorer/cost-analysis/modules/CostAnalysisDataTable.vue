@@ -14,7 +14,7 @@
         <template #col-format="{field, value, item}">
             <span v-if="tableState.loading" />
             <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
-                --
+                Unknown
             </span>
             <span v-else-if="field.name === GROUP_BY.PROJECT_GROUP">
                 {{ projectGroups[value] ? projectGroups[value].label : value }}
