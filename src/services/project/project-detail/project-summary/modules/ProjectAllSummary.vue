@@ -114,6 +114,7 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { primitiveToQueryString } from '@/lib/router-query-string';
 import { gray, primary1, primary2 } from '@/styles/colors';
 import { store } from '@/store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
@@ -326,9 +327,11 @@ export default {
         };
         const getLocation = (type) => {
             const query: Location['query'] = {
-                provider: 'all',
-                service: CLOUD_SERVICE_LABEL[type],
+                provider: primitiveToQueryString('all'),
             };
+            if (type !== 'all') {
+                query.service = CLOUD_SERVICE_LABEL[type];
+            }
             if (type === DATA_TYPE.storage) query.primary = 'false';
 
             // set filters
