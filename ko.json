@@ -510,6 +510,9 @@
 			},
 			"DASHBOARD": {
 				"AVAILABLE": "사용가능",
+				"AWS_CLOUD_FRONT_COST": "",
+				"AWS_DATA_TRANSFER_COST_TREND": "",
+				"AWS_DATA_TRANSFER_REGION": "",
 				"BUDGET_STATUS": "예산 사용 상태",
 				"BUDGET_USAGE": "예산 사용량",
 				"BUDGET_USAGE_SUMMARY": "예산 사용 현황 요약",
@@ -620,6 +623,10 @@
 				"SHOWING_TOP_NUM": "상위 {num}개 데이터",
 				"SPC_USAGE_SUMMARY": "SPC 프로젝트별 예산 사용 현황 요약",
 				"SPENT": "사용함",
+				"TOOLTIP_AWS_DATA_COST_1": "",
+				"TOOLTIP_AWS_DATA_COST_2": "AWS에서 인터넷으로 송신한 내역",
+				"TOOLTIP_AWS_DATA_COST_3": "인터넷에서 AWS로 데이터를 수신한 내역",
+				"TOOLTIP_AWS_DATA_COST_4": "AWS Region 간 통신 내역",
 				"TOTAL_BUDGET_USAGE": "예산 총 사용량",
 				"TOTAL_COST": "총 비용",
 				"UPDATE_DASHBOARD": "대시보드 이름 변경"

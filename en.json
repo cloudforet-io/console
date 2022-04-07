@@ -510,6 +510,9 @@
 			},
 			"DASHBOARD": {
 				"AVAILABLE": "Available",
+				"AWS_CLOUD_FRONT_COST": "AWS CloudFront Cost by Project",
+				"AWS_DATA_TRANSFER_COST_TREND": "AWS Data Transfer Cost Trend",
+				"AWS_DATA_TRANSFER_REGION": "AWS Data-Transfer by Region",
 				"BUDGET_STATUS": "Budget Status",
 				"BUDGET_USAGE": "Budget Usage",
 				"BUDGET_USAGE_SUMMARY": "Budget Usage Summary",
@@ -620,6 +623,10 @@
 				"SHOWING_TOP_NUM": "Showing Top {num}",
 				"SPC_USAGE_SUMMARY": "SPC Project-Wise Usage Summary",
 				"SPENT": "spent",
+				"TOOLTIP_AWS_DATA_COST_1": "In descending order of recent month.",
+				"TOOLTIP_AWS_DATA_COST_2": "",
+				"TOOLTIP_AWS_DATA_COST_3": "",
+				"TOOLTIP_AWS_DATA_COST_4": "",
 				"TOTAL_BUDGET_USAGE": "Budget Usage",
 				"TOTAL_COST": "Total Cost",
 				"UPDATE_DASHBOARD": "Update Dashboard"
