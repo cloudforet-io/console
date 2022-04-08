@@ -80,7 +80,10 @@
                         </div>
                     </template>
                     <template #item="{item, index}">
-                        <alert-list-item :item="item" :show-project-link="true" />
+                        <alert-list-item :item="item"
+                                         :show-project-link="true"
+                                         :project-reference="projects[item.project_id]"
+                        />
                     </template>
                     <template #no-data>
                         <div>
@@ -191,6 +194,7 @@ export default {
         });
         const state = reactive({
             loading: true,
+            projects: computed(() => store.state.reference.project.items),
             urgencyList: computed(() => ([
                 {
                     name: ALERT_URGENCY.ALL,
@@ -291,7 +295,12 @@ export default {
             await listAlerts();
         };
 
-        /* init */
+        /* Init */
+        (async () => {
+            await store.dispatch('reference/project/load');
+        })();
+
+        /* Watcher */
         watch(() => props.activatedProjects, async (activatedProjects) => {
             if (activatedProjects.length) {
                 await Promise.all([listAlerts(), statAlerts()]);
