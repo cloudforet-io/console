@@ -60,5 +60,5 @@ export const sync: Action<ReferenceState, any> = ({ state, commit }, projectInfo
             },
         },
     };
-    commit('setCollectors', projects);
+    commit('setProjects', projects);
 };

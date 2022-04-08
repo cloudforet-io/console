@@ -112,7 +112,6 @@ const convertToConsoleMenuList = (menu: GNBMenu[]): MenuData[] => flatten(menu.m
             parents: [{ id, label }],
         } as MenuData));
     }
-    console.debug('menu', id);
     return [{ id, label }] as MenuData[];
 }));
 

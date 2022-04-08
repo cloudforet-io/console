@@ -6,6 +6,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
+import { BadRequestError } from '@spaceone/console-core-lib/space-connector/error';
 
 export const initRoot: Action<ProjectPageState, any> = ({ commit }, root) => {
     commit('setRootNode', root);
@@ -123,8 +124,7 @@ export const deleteProjectGroup: Action<ProjectPageState, any> = async ({ state,
         });
         state.rootNode.deleteNodeByPath(getters.actionTargetNodePath);
     } catch (e) {
-        ErrorHandler.handleError(e);
-        throw new Error(e);
+        throw new BadRequestError(e);
     } finally {
         commit('setActionTargetItem', {});
     }

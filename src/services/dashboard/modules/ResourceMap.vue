@@ -25,7 +25,7 @@
                           :style="{color: providers[selectedProvider] ? providers[selectedProvider].color : undefined }"
                     >
                         {{ providers[selectedProvider].label }}</span>
-                    <span class="resource-info-region">{{ selectedRegion }}</span>
+                    <span class="resource-info-region"> {{ selectedRegion }}</span>
                 </div>
                 <div class="grid-cols-1 sm:grid-cols-2 lg:grid-cols-1
                             progress-bar-wrapper"
