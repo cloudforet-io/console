@@ -239,7 +239,7 @@ export default defineComponent<ButtonModalProps>({
             justify-content: space-between;
 
             .modal-header {
-                height: $header-height;
+                min-height: $header-height;
                 font-size: 1.375rem;
                 line-height: 145%;
             }
