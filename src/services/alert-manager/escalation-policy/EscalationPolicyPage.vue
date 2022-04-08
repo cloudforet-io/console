@@ -210,6 +210,7 @@ export default {
                     escalation_policy_id: state.selectedItem.escalation_policy_id,
                 });
                 showSuccessMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_S_DELETE_POLICY'), '', root);
+                state.selectIndex = [];
                 await listEscalationPolicies();
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_DELETE_POLICY'));

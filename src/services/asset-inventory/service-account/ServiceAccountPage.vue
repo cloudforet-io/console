@@ -433,6 +433,7 @@ export default {
                     // eslint-disable-next-line camelcase
                     service_account_id: tableState.selectedAccountIds[0],
                 });
+                typeOptionState.selectIndex = [];
                 showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_DELETE_ACCOUNT'), '', vm.$root);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_DELETE_ACCOUNT'));
