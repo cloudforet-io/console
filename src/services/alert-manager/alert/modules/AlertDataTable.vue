@@ -281,7 +281,7 @@ export default {
                     { key: 'urgency', name: 'Urgency' },
                     { key: 'status_message', name: 'Status Details' },
                     { key: 'resource', name: 'Resource' },
-                    { name: 'project_id', label: 'Project' },
+                    { key: 'project_id', name: 'Project' },
                     { key: 'created_at', name: 'Created', type: 'datetime' },
                     { key: 'assignee', name: 'Assigned to' },
                     { key: 'triggered_by', name: 'Triggered by' },
