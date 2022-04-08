@@ -213,9 +213,11 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                listProjectChannel(), listMember(), listEscalationPolicy(),
                 store.dispatch('reference/protocol/load'),
                 store.dispatch('reference/user/load'),
+            ]);
+            await Promise.allSettled([
+                listProjectChannel(), listMember(), listEscalationPolicy(),
             ]);
         })();
 
