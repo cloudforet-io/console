@@ -1,3 +1,10 @@
+# [1.1.0-beta.274](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.273...v1.1.0-beta.274) (2022-04-08)
+
+
+### Bug Fixes
+
+* fix modal header height ([#916](https://github.com/spaceone-dev/spaceone-design-system/issues/916)) ([25dfc37](https://github.com/spaceone-dev/spaceone-design-system/commit/25dfc3790fa5d8b266fbe0527bbeef419a79f920))
+
 # [1.1.0-beta.273](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.272...v1.1.0-beta.273) (2022-03-31)
 
 
