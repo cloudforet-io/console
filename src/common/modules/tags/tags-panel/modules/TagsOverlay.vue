@@ -50,7 +50,6 @@
                 </p-button>
             </div>
         </p-pane-layout>
-        <f-n-b class="fnb" />
     </div>
 </template>
 
@@ -69,7 +68,6 @@ import {
 } from '@spaceone/design-system';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import FNB from '@/common/modules/navigations/FNB.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -86,7 +84,6 @@ export default {
     name: 'TagsOverlay',
     components: {
         TagsInputGroup,
-        FNB,
         PIconButton,
         PButton,
         PPaneLayout,
