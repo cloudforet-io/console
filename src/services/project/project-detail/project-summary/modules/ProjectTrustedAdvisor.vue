@@ -70,7 +70,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-const TRUSTED_ADVISER = 'TrustedAdvisor';
+const TRUSTED_ADVISOR = 'Check';
 enum STATUS {
     error = 'error',
     warning = 'warning',
@@ -108,9 +108,9 @@ export default {
 
         const state = reactive({
             loading: false,
+            cloudServiceTypes: computed(() => store.state.reference.cloudServiceType.items),
             trustedAdvisorId: computed<string>(() => {
-                const cloudServiceTypes = vm.$store.state.reference.cloudServiceType.items;
-                const trustedAdvisorId = findKey(cloudServiceTypes, { name: TRUSTED_ADVISER });
+                const trustedAdvisorId = findKey(state.cloudServiceTypes, { name: TRUSTED_ADVISOR });
                 return trustedAdvisorId || '';
             }),
             legends: computed(() => ([
