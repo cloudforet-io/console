@@ -131,6 +131,7 @@ export default {
         watch(() => props.serverProjectId, (after, before) => {
             if (!after) {
                 state.items = [];
+                state.loading = false;
             } else if (after !== before) listAdmin();
         }, { immediate: true });
 
