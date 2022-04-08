@@ -10,7 +10,6 @@ export const loadAll = async ({ dispatch }): Promise<void|Error> => {
         dispatch('region/load'),
         dispatch('secret/load'),
         dispatch('serviceAccount/load'),
-        dispatch('spotGroup/load'),
         dispatch('user/load'),
         dispatch('webhook/load'),
     ]);
