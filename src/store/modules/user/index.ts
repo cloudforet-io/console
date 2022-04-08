@@ -23,8 +23,6 @@ const state: UserState = {
     language: storedUserState.language || 'en',
     timezone: storedUserState.timezone,
     roles: storedUserState.roles,
-    powerSchedulerState: storedUserState.powerSchedulerState,
-    spotAutomationState: storedUserState.spotAutomationState,
 };
 
 export default {

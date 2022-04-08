@@ -8,7 +8,6 @@ import provider from './provider';
 import region from './region';
 import plugin from './plugin';
 import user from './user';
-import spotGroup from './spot-group';
 import protocol from './protocol';
 import webhook from './webhook';
 import * as actions from './actions';
@@ -26,7 +25,6 @@ export default {
         region,
         plugin,
         user,
-        spotGroup,
         protocol,
         webhook,
     },

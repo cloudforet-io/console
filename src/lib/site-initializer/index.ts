@@ -42,8 +42,6 @@ const initApiClient = async () => {
         '/secret/secret/update': (data) => { store.dispatch('reference/secret/sync', data); },
         '/identity/service-account/create': (data) => { store.dispatch('reference/serviceAccount/sync', data); },
         '/identity/service-account/update': (data) => { store.dispatch('reference/serviceAccount/sync', data); },
-        '/spot-automation/spot-group/create': (data) => { store.dispatch('reference/spotGroup/sync', data); },
-        '/spot-automation/spot-group/update': (data) => { store.dispatch('reference/spotGroup/sync', data); },
         '/identity/user/create': (data) => { store.dispatch('reference/user/sync', data); },
         '/identity/user/update': (data) => { store.dispatch('reference/user/sync', data); },
         '/monitoring/webhook/create': (data) => { store.dispatch('reference/webhook/sync', data); },

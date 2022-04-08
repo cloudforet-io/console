@@ -20,8 +20,6 @@ export interface UserState {
     language?: string;
     timezone?: string;
     roles?: Array<UserRole>;
-    powerSchedulerState?: boolean;
-    spotAutomationState?: boolean;
 }
 
 export interface SignInRequest {

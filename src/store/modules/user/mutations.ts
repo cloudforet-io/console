@@ -25,11 +25,3 @@ export const setTimezone = (state: UserState, timezone: string): void => {
 export const setRoles = (state: UserState, roles: Array<UserRole>): void => {
     state.roles = roles;
 };
-
-export const setPowerSchedulerState = (state: UserState, powerSchedulerState: boolean): void => {
-    state.powerSchedulerState = powerSchedulerState;
-};
-
-export const setSpotAutomationState = (state: UserState, spotAutomationState: boolean): void => {
-    state.spotAutomationState = spotAutomationState;
-};
