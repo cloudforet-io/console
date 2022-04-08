@@ -40,7 +40,7 @@
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="accountName"
-                                  class="block"
+                                  class="account-name-input block"
                                   :invalid="invalid"
                                   :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_NAME_PLACEHOLDER')"
                     />
@@ -465,11 +465,9 @@ export default {
             line-height: 150%;
             margin-bottom: 1.5rem;
         }
-        .p-field-group {
-            .p-text-input {
-                @screen lg {
-                    max-width: 50%;
-                }
+        .account-name-input {
+            @screen lg {
+                max-width: 50%;
             }
         }
         .radio-text {
