@@ -3,45 +3,7 @@ import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
-
-const regionMap = {
-    africa: {
-        continent_code: 'africa',
-        continent_label: 'Africa',
-        longitude: 21.621094,
-        latitude: 11.081385,
-    },
-    europe: {
-        continent_code: 'europe',
-        continent_label: 'Europe',
-        longitude: -6.362217,
-        latitude: 50.896104,
-    },
-    north_america: {
-        continent_code: 'north_america',
-        continent_label: 'North America',
-        longitude: 39.563353,
-        latitude: -99.316406,
-    },
-    south_america: {
-        continent_code: 'south_america',
-        continent_label: 'South America',
-        longitude: -69.6417454,
-        latitude: -13.6631791,
-    },
-    asia_pacific: {
-        continent_code: 'asia_pacific',
-        continent_label: 'Asia Pacific',
-        longitude: 103.183594,
-        latitude: 47.212106,
-    },
-    middle_east: {
-        continent_code: 'middle_east',
-        continent_label: 'Middle East',
-        longitude: 26.3842897,
-        latitude: 26.8448363,
-    },
-};
+import { RegionMap } from '@/services/cost-explorer/widgets/lib/config';
 
 let lastLoadedTime = 0;
 
@@ -66,7 +28,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             regions[regionInfo.region_code] = {
                 label: `${regionInfo.name} | ${regionInfo.region_code}`,
                 name: regionInfo.name,
-                continent: regionMap[regionInfo.tags.continent] || {},
+                continent: RegionMap[regionInfo.tags.continent] || {},
             };
         });
 
@@ -82,7 +44,7 @@ export const sync: Action<ReferenceState, any> = ({ state, commit }, regionInfo)
         [regionInfo.region_code]: {
             label: `${regionInfo.name} | ${regionInfo.region_code}`,
             name: regionInfo.name,
-            continent: regionMap[regionInfo.tags.continent] || {},
+            continent: RegionMap[regionInfo.tags.continent] || {},
         },
     };
     commit('setRegions', regions);

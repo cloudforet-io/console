@@ -49,7 +49,9 @@
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { cloneDeep } from 'lodash';
+import {
+    groupBy, sum,
+} from 'lodash';
 import { MapChart } from '@amcharts/amcharts4/maps';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -60,7 +62,7 @@ import { gray } from '@/styles/colors';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { continentData } from '@/services/cost-explorer/widgets/lib/config';
+import { RegionMap } from '@/services/cost-explorer/widgets/lib/config';
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
@@ -77,7 +79,7 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { getTooltipText } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 
 
-const CATEGORY_KEY = 'title';
+const CATEGORY_KEY = 'category';
 const VALUE_KEY = 'value';
 
 interface PieChartData {
@@ -87,14 +89,24 @@ interface PieChartData {
     value?: number;
 }
 
-interface DefaultContinentData {
+interface ChartData {
     continent_code: string;
     height: number;
     width: number;
     latitude: number;
     longitude: number;
-    pieData: PieChartData[];
+    pieData?: PieChartData[];
     title: string;
+}
+
+interface OriginData {
+    usd_cost: number;
+    provider: string;
+    region_code: string;
+}
+
+interface TableData extends Omit<OriginData, 'region_code'> {
+    region: string;
 }
 
 export default defineComponent<WidgetProps>({
@@ -143,7 +155,7 @@ export default defineComponent<WidgetProps>({
             regions: computed(() => store.state.reference.region.items),
             providers: computed(() => store.state.reference.provider.items),
             loading: true,
-            chartData: [] as DefaultContinentData[],
+            chartData: [] as ChartData[],
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
                 return {
@@ -172,7 +184,7 @@ export default defineComponent<WidgetProps>({
 
         const tableState = reactive({
             loading: false,
-            items: [],
+            items: [] as TableData[],
             fields: computed(() => [
                 { name: 'provider', label: 'Provider' },
                 { name: 'region', label: ' ' },
@@ -250,25 +262,48 @@ export default defineComponent<WidgetProps>({
             pieSeries.data = state.chartData;
         };
 
-
-        const setPieChartData = (chartData) => {
-            const _continentData = cloneDeep(continentData);
-            chartData.forEach((d) => {
-                const target = _continentData.find(continent => continent.continent_code === (state.regions[d.region_code]?.continent?.continent_code));
-                if (target) {
-                    target.pieData.push({
-                        category: `${state.providers[d.provider]?.label} ${state.regions[d.region_code]?.name}`,
-                        color: state.providers[d.provider]?.color || '',
-                        value: d.usd_cost,
-                        provider: d.provider,
-                    });
-                }
+        // return value: {asia_pacific: { aws: 3304.85581588513 }}
+        const getCostByProviderData = (originData: OriginData[]): Record<string, Record<string, number>> => {
+            const data = originData.map(d => ({
+                ...d,
+                continent_code: state.regions[d.region_code]?.continent?.continent_code,
+            }));
+            const continentGroupBy = groupBy(data, 'continent_code');
+            const result = {};
+            Object.entries(continentGroupBy).forEach(([continent, cItem]) => {
+                const providerGroupBy = groupBy(cItem, 'provider');
+                Object.entries(providerGroupBy).forEach(([provider, pItem]) => {
+                    const providerCost = sum(pItem.map(d => d.usd_cost));
+                    if (continent && continent !== 'undefined') {
+                        if (result[continent]) result[continent][provider] = providerCost;
+                        else result[continent] = { [provider]: providerCost };
+                    }
+                });
             });
-            return _continentData;
+            return result;
+        };
+
+
+        const setPieChartData = (originData: OriginData[]): ChartData[] => {
+            const costByProviderData = getCostByProviderData(originData);
+            return Object.keys(costByProviderData).map(continent => ({
+                continent_code: RegionMap[continent]?.continent_code,
+                longitude: RegionMap[continent]?.longitude,
+                latitude: RegionMap[continent]?.latitude,
+                width: 48,
+                height: 48,
+                title: RegionMap[continent]?.continent_label,
+                pieData: Object.entries(costByProviderData[continent]).map(([provider, cost]) => ({
+                    category: state.providers[provider]?.label || provider,
+                    provider,
+                    value: cost as number,
+                    color: state.providers[provider]?.color || '',
+                })),
+            }));
         };
 
         const costQueryHelper = new QueryHelper();
-        const fetchData = async () => {
+        const fetchData = async (): Promise<OriginData[]> => {
             costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
@@ -291,7 +326,7 @@ export default defineComponent<WidgetProps>({
             try {
                 state.loading = true;
                 tableState.loading = true;
-                const results = await fetchData();
+                const results: OriginData[] = await fetchData();
                 state.chartData = setPieChartData(results); // pie chart data (continent, latitude, etc.)
                 tableState.items = results.map(d => ({ // table data (usd_cost, region, provider)
                     usd_cost: d.usd_cost,
