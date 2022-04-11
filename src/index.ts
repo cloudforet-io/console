@@ -2,7 +2,7 @@ import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
-import bytes from 'bytes';
+import bytes, { Unit } from 'bytes';
 
 dayjs.extend(tz);
 
@@ -45,7 +45,21 @@ export const commaFormatter = (num) => {
     if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return num;
 };
-export const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
+export const byteFormatter = (num, option = {}, minUnit?: Unit) => {
+    const options: any = {
+        ...option,
+        unitSeparator: ' ',
+        decimalPlaces: 1
+    };
+    if (minUnit) {
+        const convertedNum = bytes(num, { unit: minUnit, unitSeparator: ' ' });
+        const digit = Number(convertedNum.split(' ')[0]);
+        if (digit < 1000) {
+            options.unit = minUnit;
+        }
+    }
+    return bytes(num, options);
+};
 
 /**
  * @param value
