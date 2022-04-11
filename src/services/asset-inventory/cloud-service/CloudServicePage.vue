@@ -207,8 +207,8 @@ export default {
                     ...cloudServiceApiQueryHelper.data,
                     ...(state.period && {
                         date_range: {
-                            start: state.period?.start,
-                            end: dayjs.utc(state.period?.end).add(1, 'day').format('YYYY-MM-DD'),
+                            start: dayjs.utc(state.period.start).format('YYYY-MM-DD'),
+                            end: dayjs.utc(state.period.end).add(1, 'day').format('YYYY-MM-DD'),
                         },
                     }),
                 });

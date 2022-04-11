@@ -130,7 +130,7 @@ export default defineComponent<Props>({
                 const period = props.period as Period;
                 const dateRange: Period = {};
                 if (period.start) dateRange.start = dayjs.utc(period.start).format('YYYY-MM-DD');
-                if (period.end) dateRange.end = dayjs.utc(period.end).format('YYYY-MM-DD');
+                if (period.end) dateRange.end = dayjs.utc(period.end).add(1, 'day').format('YYYY-MM-DD');
                 return dateRange;
             }),
         });

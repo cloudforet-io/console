@@ -199,6 +199,7 @@
 
 <script lang="ts">
 import { get, find } from 'lodash';
+import dayjs from 'dayjs';
 
 import {
     reactive, computed, getCurrentInstance, ComponentRenderProxy, watch,
@@ -414,6 +415,10 @@ export default {
             params: null as any,
         });
 
+        const overviewState = reactive({
+            period: queryStringToObject(vm.$route.query.period) as Period|undefined,
+        });
+
         const onTableHeightChange = (height) => {
             tableState.tableHeight = height;
             store.dispatch('settings/setItem', {
@@ -483,11 +488,18 @@ export default {
             return apiQuery.data;
         };
 
-        const cloudServiceListApi = SpaceConnector.client.inventory.cloudService.list;
         const getCloudServiceTableData = async (schema?): Promise<{items: any[]; totalCount: number}> => {
             typeOptionState.loading = true;
             try {
-                const res = await cloudServiceListApi({ query: getQuery(schema) });
+                const res = await SpaceConnector.client.inventory.cloudService.list({
+                    query: getQuery(schema),
+                    ...(overviewState.period && {
+                        date_range: {
+                            start: dayjs.utc(overviewState.period.start).format('YYYY-MM-DD'),
+                            end: dayjs.utc(overviewState.period.end).add(1, 'day').format('YYYY-MM-DD'),
+                        },
+                    }),
+                });
 
                 // filtering select index
                 typeOptionState.selectIndex = typeOptionState.selectIndex.filter(d => !!res.results[d]);
@@ -738,10 +750,6 @@ export default {
 
 
         /** Usage Overview */
-        const overviewState = reactive({
-            period: queryStringToObject(vm.$route.query.period) as Period|undefined,
-        });
-
         const handlePeriodUpdate = (period?: Period) => {
             overviewState.period = period;
             replaceUrlQuery('period', objectToQueryString(period));
