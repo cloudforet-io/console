@@ -86,9 +86,9 @@ interface TableData {
     trafficOutCost?: number;
     trafficOutSize?: number;
     httpReqCost?: number;
-    httpReqSize?: number;
+    httpReq?: number;
     httpsReqCost?: number;
-    httpsReqSize?: number;
+    httpsReq?: number;
 }
 interface CloudFrontChartData {
     category: string;
@@ -203,14 +203,12 @@ export default {
         const tableState = reactive({
             fields: computed<DataTableFieldType[]>(() => [
                 { name: 'groupBy', label: GROUP_BY_ITEM_MAP[state.groupBy].label },
-                { name: 'usd_cost', label: 'Cost (USD)' },
-                { name: 'usage_quantity', label: 'Usage Quantity' },
                 { name: 'trafficOutCost', label: 'Transfer-Out', textAlign: 'right' },
                 { name: 'trafficOutSize', label: ' ', type: 'size' },
                 { name: 'httpReqCost', label: 'Requests (HTTP)', textAlign: 'right' },
-                { name: 'httpReqSize', label: ' ', type: 'size' },
+                { name: 'httpReq', label: ' ', type: 'number' },
                 { name: 'httpsReqCost', label: 'Requests (HTTPS)', textAlign: 'right' },
-                { name: 'httpsReqSize', label: ' ', type: 'size' },
+                { name: 'httpsReq', label: ' ', type: 'number' },
             ]),
             items: computed<TableData[]>(() => {
                 const convertedTableData = getConvertedTableData();
@@ -221,9 +219,9 @@ export default {
                         trafficOutCost: convertedTableData[item]?.trafficOut?.usd_cost,
                         trafficOutSize: convertedTableData[item]?.trafficOut?.usage_quantity,
                         httpReqCost: convertedTableData[item]?.httpRequest?.usd_cost,
-                        httpReqSize: convertedTableData[item]?.httpRequest?.usage_quantity,
+                        httpReq: convertedTableData[item]?.httpRequest?.usage_quantity,
                         httpsReqCost: convertedTableData[item]?.httpsRequest?.usd_cost,
-                        httpsReqSize: convertedTableData[item]?.httpsRequest?.usage_quantity,
+                        httpsReq: convertedTableData[item]?.httpsRequest?.usage_quantity,
                     });
                 });
                 return tableItems;

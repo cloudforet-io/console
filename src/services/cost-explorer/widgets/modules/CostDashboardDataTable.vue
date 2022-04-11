@@ -39,6 +39,9 @@
                         <template v-if="type === 'size'">
                             {{ byteFormatter(value) }}
                         </template>
+                        <template v-else-if="type === 'number'">
+                            {{ numberFormatter(value) }}
+                        </template>
                         <template v-else>
                             {{ CURRENCY_SYMBOL[currency] }}{{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
                         </template>
@@ -81,7 +84,7 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { store } from '@/store';
-import { byteFormatter } from '@spaceone/console-core-lib';
+import { byteFormatter, numberFormatter } from '@spaceone/console-core-lib';
 
 
 // interface Item {
@@ -89,7 +92,7 @@ import { byteFormatter } from '@spaceone/console-core-lib';
 // }
 
 interface Field extends DataTableFieldType {
-    type?: 'cost'|'size';
+    type?: 'cost'|'size'|'number';
 }
 export default {
     name: 'CostDashboardDataTable',
@@ -248,6 +251,7 @@ export default {
             labelTextFormatter,
             currencyMoneyFormatter,
             byteFormatter,
+            numberFormatter,
             CURRENCY_SYMBOL,
         };
     },
