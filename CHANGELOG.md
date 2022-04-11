@@ -1,3 +1,10 @@
+# [1.1.0-beta.275](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.274...v1.1.0-beta.275) (2022-04-11)
+
+
+### Bug Fixes
+
+* fix default font properties for the pre tag ([#918](https://github.com/spaceone-dev/spaceone-design-system/issues/918)) ([74b28df](https://github.com/spaceone-dev/spaceone-design-system/commit/74b28df5a14988dad4e3588c2462cfcb873e36ae))
+
 # [1.1.0-beta.274](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.273...v1.1.0-beta.274) (2022-04-08)
 
 
