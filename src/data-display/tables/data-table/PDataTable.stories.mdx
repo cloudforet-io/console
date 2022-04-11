@@ -89,7 +89,9 @@ interface DataTableFieldType {
     sortable?: boolean;
     sortKey?: string;
     width?: string;
-    textAlign?: string;
+    textAlign?: DataTableCellTextAlign;
+    children?: DataTableFieldType[];
+    invisible?: boolean;
 }
 
 ```
@@ -102,12 +104,10 @@ interface DataTableFieldType {
 |sortKey|If you give the value to this property, the value of `sortBy` passed to the `changeSort` and `update:sortBy` events is replaced with this value when sorting based on the corresponding column. default is the column `name`.|
 |width|If you want to fix the cell width, give the value.|
 |textAlign|If you want to align text in the cell, give the value. <Description markdown={`${Object.values(DATA_TABLE_CELL_TEXT_ALIGN).map(d => `\`${d}\``).join(', ')} are available.`}/> |
+|children|If you want to make a header cell span over multiple columns, give child fields to this property.|
+|invisible|Whether to hide column or not.|
 
-
-
-
-
-
+<br/>
 
 <br/>
 
@@ -158,6 +158,58 @@ interface DataTableFieldType {
         }
     }
 }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Multiple Columns
+
+<Canvas>
+    <Story name="Multiple Columns">
+        {{
+            components: { PDataTable },
+            template: `
+        <div>
+            <p class="px-4 mb-4 font-bold font-lg">Non Invisible Case</p>
+            <p-data-table :fields="fields" :items="items" selectable col-copy />
+            <p class="px-4 my-4 font-bold font-lg">Invisible Case</p>
+            <p-data-table :fields="invisibleFields" :items="items" selectable col-copy />
+        </div>
+    `,
+            setup() {
+                return {
+                    fields: [
+                        { name: 'name', label: 'Name' },
+                        {
+                            name: 'info',
+                            label: 'Information',
+                            textAlign: 'center',
+                            children: [
+                                { name: 'phone', label: 'Phone' },
+                                { name: 'email', label: 'Email' },
+                            ]
+                        },
+                        { name: 'cost', label: 'Cost'},
+                    ],
+                    invisibleFields: [
+                        { name: 'name', label: 'Name' },
+                        {
+                            name: 'info',
+                            label: 'Information',
+                            textAlign: 'center',
+                            children: [
+                                { name: 'phone', label: 'Phone', invisible: true },
+                                { name: 'email', label: 'Email', invisible: true },
+                            ]
+                        },
+                        { name: 'cost', label: 'Cost'},
+                    ],
+                    items: getUsers(7, 7)
+                }
+            }
+        }}
     </Story>
 </Canvas>
 

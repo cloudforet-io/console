@@ -18,6 +18,8 @@ export interface DataTableFieldType {
     sortKey?: string;
     width?: string;
     textAlign?: DataTableCellTextAlign;
+    children?: DataTableFieldType[];
+    invisible?: boolean;
 }
 export type DataTableField = string | DataTableFieldType
 

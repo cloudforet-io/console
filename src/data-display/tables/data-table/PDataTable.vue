@@ -7,74 +7,80 @@
          }"
     >
         <div class="table-container">
-            <table ref="table">
+            <table>
                 <thead>
                     <slot name="head" v-bind="getDefaultSlotProps()">
-                        <tr v-if="showHeader" class="fade-in">
-                            <th v-if="selectable" class="all-select">
-                                <p-check-box v-if="multiSelect"
-                                             v-model="allState"
-                                             @change="onSelectAllToggle"
-                                />
-                            </th>
-                            <th v-for="(field, colIndex) in fieldsData"
-                                :key="`th-${contextKey}-${colIndex}`"
-                                :style="{
-                                    minWidth: field.width || undefined,
-                                    width: field.width || undefined,
-                                }"
-                                :class="{'fix-width': colCopy}"
-                                @click="onTheadClick(field, colIndex, $event)"
-                            >
-                                <slot :name="`th-${field.name}`"
-                                      v-bind="getHeadSlotProps(field, colIndex)"
+                        <template v-if="showHeader">
+                            <tr v-for="(fieldRow, fieldRowIdx) in tableFieldRows" :key="fieldRowIdx" class="fade-in">
+                                <th v-if="selectable && fieldRowIdx === 0" :rowspan="numOfFieldRows" class="all-select">
+                                    <p-check-box v-if="multiSelect"
+                                                 v-model="allState"
+                                                 @change="onSelectAllToggle"
+                                    />
+                                </th>
+                                <th v-for="(field, fieldColIndex) in fieldRow"
+                                    :key="`th-${contextKey}-${fieldColIndex}-${fieldRowIdx}`"
+                                    :rowspan="getFieldRowspan(field, fieldRowIdx)"
+                                    :colspan="getFieldColspan(field)"
+                                    :style="{
+                                        minWidth: field.width || undefined,
+                                        width: field.width || undefined,
+                                    }"
+                                    :class="{'fix-width': colCopy}"
+                                    @click="onTheadClick(field, fieldColIndex, $event)"
                                 >
-                                    <span class="th-contents"
-                                          :class="{
-                                              [field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
-                                              'has-icon': sortable && field.sortable || colCopy,
-                                          }"
+                                    <slot :name="`th-${field.name}`"
+                                          v-bind="getHeadSlotProps(field, fieldColIndex, fieldRowIdx)"
                                     >
-                                        <span class="th-text">
-                                            <slot :name="`th-${field.name}-format`"
-                                                  v-bind="getHeadSlotProps(field, colIndex)"
-                                            >
-                                                {{ field.label ? field.label : field.name }}
-                                            </slot>
-                                            <p-copy-button v-if="colCopy"
-                                                           copy-manually
-                                                           @copy="onClickColCopy(colIndex)"
-                                            />
-                                        </span>
+                                        <span class="th-contents"
+                                              :class="{
+                                                  [field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                                  'has-icon': sortable && field.sortable || colCopy,
+                                              }"
+                                        >
+                                            <span class="th-text">
+                                                <slot :name="`th-${field.name}-format`"
+                                                      v-bind="getHeadSlotProps(field, fieldColIndex, fieldRowIdx)"
+                                                >
+                                                    {{ field.label ? field.label : field.name }}
+                                                </slot>
+                                                <p-copy-button v-if="colCopy && isLeafField(field)"
+                                                               copy-manually
+                                                               @copy="onClickColCopy(field)"
+                                                />
+                                            </span>
 
-                                        <template v-if="sortable && field.sortable">
-                                            <p-i
-                                                v-if="sortable && (field.sortKey|| field.name) === sortBy"
-                                                :name="proxyState.sortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'"
-                                                class="sort-icon"
-                                            />
-                                            <p-i v-else
-                                                 name="ic_table_sort"
-                                                 class="sort-icon"
-                                            />
-                                        </template>
-                                    </span>
-                                </slot>
-                            </th>
-                        </tr>
-                        <tr v-else>
-                            <th :colspan="selectable ? fieldsData.length +1 : fieldsData.length" />
-                        </tr>
+                                            <template v-if="sortable && field.sortable">
+                                                <p-i
+                                                    v-if="sortable && (field.sortKey|| field.name) === sortBy"
+                                                    :name="proxyState.sortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'"
+                                                    class="sort-icon"
+                                                />
+                                                <p-i v-else
+                                                     name="ic_table_sort"
+                                                     class="sort-icon"
+                                                />
+                                            </template>
+                                        </span>
+                                    </slot>
+                                </th>
+                            </tr>
+                        </template>
+                        <template v-else>
+                            <tr>
+                                <th :colspan="selectable ? leafFields.length +1 : leafFields.length" />
+                            </tr>
+                        </template>
                     </slot>
                 </thead>
-                <tbody>
+                <tbody ref="tbodyRef">
                     <slot v-if="showNoData" name="no-data" v-bind="getDefaultSlotProps()">
                         <div class="no-data">
                             <slot name="no-data-format" v-bind="getDefaultSlotProps()">
                                 No Items
                             </slot>
                         </div>
-                        <tr :colspan="selectable ? fieldsData.length +1 : fieldsData.length" class="fake-row" />
+                        <tr :colspan="selectable ? leafFields.length +1 : leafFields.length" class="fake-row" />
                     </slot>
                     <slot name="body" :items="items" v-bind="getDefaultSlotProps()">
                         <tr v-for="(item, rowIndex) in items"
@@ -105,7 +111,7 @@
                                          @change="onChangeRadioSelect"
                                 />
                             </td>
-                            <td v-for="(field, colIndex) in fieldsData"
+                            <td v-for="(field, colIndex) in leafFields"
                                 :key="`td-${contextKey}-${rowIndex}-${colIndex}`"
                                 :class="{
                                     'has-width': !!field.width,
@@ -148,7 +154,7 @@ import {
 import { get, range } from 'lodash';
 import { copyAnyData } from '@/util/helpers';
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import { DataTableFieldType, DataTableProps } from '@/data-display/tables/data-table/type';
+import { DataTableField, DataTableFieldType, DataTableProps } from '@/data-display/tables/data-table/type';
 
 import PCheckBox from '@/inputs/checkbox/PCheckBox.vue';
 import PRadio from '@/inputs/radio/PRadio.vue';
@@ -156,6 +162,42 @@ import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
+
+interface TableField extends DataTableFieldType {
+    depth?: number;
+}
+
+const getChildFields = (field: DataTableFieldType): DataTableFieldType[]|undefined => field.children?.map(child => ({ sortable: true, ...child }));
+
+const getTableField = (field: string|DataTableFieldType): TableField => {
+    if (typeof field === 'string') return { name: field, label: field, sortable: true };
+
+    const children = getChildFields(field);
+    return { ...field, children, sortable: false };
+};
+
+const getTableFieldRows = (fields: TableField[], tableFieldRows: TableField[][] = []): TableField[][] => {
+    fields.forEach((tableField: TableField) => {
+        const row = tableFieldRows[tableField.depth ?? 0] ?? [];
+        if (!tableField.invisible) row.push(tableField);
+        if (row.length) tableFieldRows[tableField.depth ?? 0] = row;
+    });
+    return tableFieldRows;
+};
+
+const isLeafField = (field: DataTableFieldType): boolean => !field.children || field.children.length === 0;
+
+const getLeafFields = (fields: TableField[]): TableField[] => fields.filter(field => !field.children?.length);
+
+const getTableFields = (fields: DataTableField[], allFields: DataTableFieldType[] = [], depth = 0): TableField[] => {
+    fields.forEach((f) => {
+        const field = getTableField(f);
+        field.depth = depth;
+        allFields.push(field);
+        if (field.children?.length) getTableFields(field.children, allFields, depth + 1);
+    });
+    return allFields;
+};
 
 
 export default defineComponent<DataTableProps>({
@@ -267,13 +309,13 @@ export default defineComponent<DataTableProps>({
         });
 
         const state = reactive({
-            table: null as any,
+            tbodyRef: null as HTMLElement|null,
             allState: false,
-            fieldsData: computed<DataTableFieldType[]>(() => props.fields.map((value: string | DataTableFieldType) => {
-                if (typeof value === 'string') return { name: value, label: value, sortable: true };
-                return { sortable: true, ...value };
-            })),
-            copyTargetElement: computed<HTMLCollection>(() => state.table?.children[1]?.children || []),
+            allFields: computed<TableField[]>(() => getTableFields(props.fields)),
+            tableFieldRows: computed<TableField[][]>(() => getTableFieldRows(state.allFields)),
+            leafFields: computed<TableField[]>(() => getLeafFields(state.allFields)),
+            numOfFieldRows: computed<number>(() => state.tableFieldRows.length),
+            copyTargetElement: computed<HTMLCollection>(() => state.tbodyRef?.children || []),
             showLoading: true,
             showHeader: props.items && props.items.length > 0 && props.fields.length > 0,
             showNoData: computed(() => state.showHeader && (
@@ -281,6 +323,24 @@ export default defineComponent<DataTableProps>({
             )),
             contextKey: Math.floor(Math.random() * Date.now()),
         });
+
+
+        const getFieldRowspan = (field: DataTableFieldType, rowIndex): number => {
+            if (isLeafField(field)) return state.numOfFieldRows - rowIndex;
+            return 1;
+        };
+
+
+        const getFieldColspan = (field: DataTableFieldType, count = 0): number => {
+            if (isLeafField(field)) return count + 1;
+            let totalCount = 0;
+            if (field.children) {
+                field.children.forEach((child) => {
+                    totalCount += getFieldColspan(child, count);
+                });
+            }
+            return totalCount;
+        };
 
 
         const getValue = (item, field: DataTableFieldType) => {
@@ -291,11 +351,12 @@ export default defineComponent<DataTableProps>({
         };
 
         const getDefaultSlotProps = () => ({
-            fields: state.fieldsData,
+            fields: state.tableFieldRows[0] ?? [],
+            fieldRows: state.tableFieldRows,
         });
 
-        const getHeadSlotProps = (field, colIndex) => ({
-            field, index: colIndex, sortable: props.sortable, colIndex,
+        const getHeadSlotProps = (field, colIndex, rowIndex) => ({
+            field, index: colIndex, sortable: props.sortable, colIndex, rowIndex,
         });
 
         const getColSlotProps = (item, field, colIndex, rowIndex) => ({
@@ -369,9 +430,13 @@ export default defineComponent<DataTableProps>({
                 proxyState.selectIndex = [];
             }
         };
-        const onClickColCopy = (idx) => {
+        const onClickColCopy = (field: DataTableFieldType) => {
             let result = '';
             const arr: Element[] = Array.from(state.copyTargetElement);
+            let idx = state.leafFields.findIndex(d => d === field);
+            if (idx === -1) return;
+
+            if (props.selectable) idx += 1;
             arr.forEach((el) => {
                 const children = Array.from(el.children) as HTMLElement[];
                 children.forEach((td, colIdx) => {
@@ -426,6 +491,9 @@ export default defineComponent<DataTableProps>({
         return {
             proxyState,
             ...toRefs(state),
+            isLeafField,
+            getFieldRowspan,
+            getFieldColspan,
             getValue,
             getDefaultSlotProps,
             getHeadSlotProps,
