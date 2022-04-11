@@ -131,6 +131,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import dayjs from 'dayjs';
 import { get } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
 
@@ -386,7 +387,15 @@ export default {
         const listServerData = async () => {
             typeOptionState.loading = true;
             try {
-                const res = await SpaceConnector.client.inventory.server.list({ query: getQuery() });
+                const res = await SpaceConnector.client.inventory.server.list({
+                    query: getQuery(),
+                    ...(props.period && {
+                        date_range: {
+                            start: dayjs.utc(props.period.start).format('YYYY-MM-DD'),
+                            end: dayjs.utc(props.period.end).add(1, 'day').format('YYYY-MM-DD'),
+                        },
+                    }),
+                });
                 tableState.items = res.results;
                 typeOptionState.totalCount = res.total_count;
             } catch (e) {
