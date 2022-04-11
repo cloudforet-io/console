@@ -1,4 +1,4 @@
-import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
+import { DATA_TABLE_CELL_TEXT_ALIGN, DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
 
 export interface DataTableEventListeners {
     select?: (selectIndex: number[]) => void|Promise<void>;
@@ -9,15 +9,19 @@ export interface DataTableEventListeners {
     'update:sortDesc'?: (sortDesc: boolean) => void|Promise<void>;
 }
 
+export type DataTableCellTextAlign = typeof DATA_TABLE_CELL_TEXT_ALIGN[keyof typeof DATA_TABLE_CELL_TEXT_ALIGN]
+
 export interface DataTableFieldType {
     name: string;
     label?: string;
     sortable?: boolean;
     sortKey?: string;
     width?: string;
-    textAlign?: string;
+    textAlign?: DataTableCellTextAlign;
 }
 export type DataTableField = string | DataTableFieldType
+
+export type DataTableStyleType = typeof DATA_TABLE_STYLE_TYPE[keyof typeof DATA_TABLE_STYLE_TYPE]
 
 export interface DataTableProps {
     loading?: boolean;
@@ -32,7 +36,7 @@ export interface DataTableProps {
     multiSelect?: boolean;
     rowClickMultiSelectMode?: boolean;
     useCursorLoading?: boolean;
-    tableStyleType?: DATA_TABLE_STYLE_TYPE;
+    tableStyleType?: DataTableStyleType;
     striped?: boolean;
     bordered?: boolean|null|unknown;
     disableHover?: boolean;

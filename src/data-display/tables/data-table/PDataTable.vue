@@ -155,7 +155,7 @@ import PRadio from '@/inputs/radio/PRadio.vue';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';
-import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
+import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
 
 
 export default defineComponent<DataTableProps>({
@@ -437,7 +437,6 @@ export default defineComponent<DataTableProps>({
             onSelectAllToggle,
             onClickColCopy,
             onChangeRadioSelect,
-            DATA_TABLE_CELL_TEXT_ALIGN,
         };
     },
 });
