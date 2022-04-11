@@ -165,17 +165,17 @@ export default {
             fields: computed<Field[]>(() => [
                 { name: 'month', label: 'Month', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_1') },
                 {
-                    name: 'trafficOutCost', label: 'Transfer-Out', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
+                    name: 'trafficOutSize', label: 'Transfer-Out', textAlign: 'right', type: 'size', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
                 },
-                { name: 'trafficOutSize', label: ' ', type: 'size' },
+                { name: 'trafficOutCost', label: ' ' },
                 {
-                    name: 'trafficInCost', label: 'Transfer-In', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_3'),
+                    name: 'trafficInSize', label: 'Transfer-In', textAlign: 'right', type: 'size', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_3'),
                 },
-                { name: 'trafficInSize', label: ' ', type: 'size' },
+                { name: 'trafficInCost', label: ' ' },
                 {
-                    name: 'trafficEtcCost', label: 'etc.', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_4'),
+                    name: 'trafficEtcSize', label: 'etc.', type: 'size', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_4'),
                 },
-                { name: 'trafficEtcSize', label: ' ', type: 'size' },
+                { name: 'trafficEtcCost', label: ' ' },
             ]),
             tableItems: computed<TableData[]>(() => {
                 const months = range(6).map(i => i18nDayjs.value.utc(props.period.end)

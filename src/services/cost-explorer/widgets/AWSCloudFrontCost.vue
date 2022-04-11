@@ -205,12 +205,18 @@ export default {
         const tableState = reactive({
             fields: computed<DataTableFieldType[]>(() => [
                 { name: 'groupBy', label: GROUP_BY_ITEM_MAP[state.groupBy].label },
-                { name: 'trafficOutCost', label: 'Transfer-Out', textAlign: 'right' },
-                { name: 'trafficOutSize', label: ' ', type: 'size' },
-                { name: 'httpReqCost', label: 'Requests (HTTP)', textAlign: 'right' },
-                { name: 'httpReq', label: ' ', type: 'number' },
-                { name: 'httpsReqCost', label: 'Requests (HTTPS)', textAlign: 'right' },
-                { name: 'httpsReq', label: ' ', type: 'number' },
+                {
+                    name: 'trafficOutSize', label: 'Transfer-Out', type: 'size', textAlign: 'right',
+                },
+                { name: 'trafficOutCost', label: ' ' },
+                {
+                    name: 'httpReq', label: 'Requests (HTTP)', type: 'number', textAlign: 'right',
+                },
+                { name: 'httpReqCost', label: ' ' },
+                {
+                    name: 'httpsReq', label: 'Requests (HTTPS)', type: 'number', textAlign: 'right',
+                },
+                { name: 'httpsReqCost', label: ' ' },
             ]),
             items: computed<TableData[]>(() => {
                 const convertedTableData = getConvertedTableData();
