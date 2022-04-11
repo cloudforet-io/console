@@ -153,7 +153,7 @@ export default {
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         groupBy: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(props.period),
-                        filters: objectToQueryString(props.filters),
+                        filters: objectToQueryString({ ...props.filters, provider: ['aws'], product: ['AmazonCloudFront'] }),
                     },
                 };
             }),

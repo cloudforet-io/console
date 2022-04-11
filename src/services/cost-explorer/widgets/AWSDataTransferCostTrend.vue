@@ -129,13 +129,17 @@ export default {
             loading: false,
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
+                const _period = {
+                    start: dayjs.utc(props.period.end).subtract(5, 'month').format('YYYY-MM-01'),
+                    end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
+                };
                 return {
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     params: {},
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                        period: objectToQueryString(props.period),
-                        filters: objectToQueryString(props.filters),
+                        period: objectToQueryString(_period),
+                        filters: objectToQueryString({ ...props.filters, provider: ['aws'], product: ['AWSDataTransfer'] }),
                     },
                 };
             }),

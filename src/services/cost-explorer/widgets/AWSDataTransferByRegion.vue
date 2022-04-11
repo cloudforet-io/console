@@ -43,6 +43,7 @@
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
+import bytes from 'bytes';
 import { MapChart } from '@amcharts/amcharts4/maps';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
@@ -155,7 +156,7 @@ export default {
                         groupBy: arrayToQueryString([GROUP_BY.REGION]),
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         period: objectToQueryString(props.period),
-                        filters: objectToQueryString(props.filters),
+                        filters: objectToQueryString({ ...props.filters, provider: ['aws'], product: ['AWSDataTransfer'] }),
                     },
                 };
             }),
@@ -285,7 +286,15 @@ export default {
                     end: dayjs.utc(props.period?.end).format('YYYY-MM'),
                     ...costQueryHelper.apiQuery,
                 });
-                return results;
+                const convertedResults = results.map((d) => {
+                    let usageQuantity = d.usage_quantity;
+                    usageQuantity = bytes.parse(`${d.usage_quantity}GB`);
+                    return {
+                        ...d,
+                        usage_quantity: usageQuantity,
+                    };
+                });
+                return convertedResults;
             } catch (e) {
                 throw e;
             }
