@@ -87,10 +87,6 @@ import { store } from '@/store';
 import { byteFormatter, numberFormatter } from '@spaceone/console-core-lib';
 
 
-// interface Item {
-//     [key: string]: number | string;
-// }
-
 interface Field extends DataTableFieldType {
     type?: 'cost'|'size'|'number';
 }

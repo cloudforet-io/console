@@ -28,6 +28,7 @@
 </template>
 
 <script lang="ts">
+import bytes from 'bytes';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -239,7 +240,7 @@ export default {
             series.tooltip.label.fontSize = 14;
             series.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                    const usdCost = target.tooltipDataItem.dataContext[legend.name] ? Number(target.tooltipDataItem.dataContext[legend.name]) : undefined;
+                    const usdCost = target.tooltipDataItem.dataContext[legend.name];
                     const currencyMoney = currencyMoneyFormatter(usdCost, props.currency, undefined, true);
                     return getTooltipText('name', undefined, currencyMoney);
                 }
@@ -283,6 +284,7 @@ export default {
             });
 
             const valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+            if (state.items.every(d => d.usd_cost === 0)) valueAxis.min = 0;
             valueAxis.tooltip.disabled = true;
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.adapter.add('stroke', (stroke, target) => {
@@ -348,7 +350,17 @@ export default {
                     end: dayjs.utc(period.end).format('YYYY-MM'),
                     ...queryHelper.apiQuery,
                 });
-                return results;
+                const convertedResults = results.map((d) => {
+                    let usageQuantity = d.usage_quantity;
+                    if (d.usage_type === 'data-transfer.out') {
+                        usageQuantity = bytes.parse(`${d.usage_quantity}GB`);
+                    }
+                    return {
+                        ...d,
+                        usage_quantity: usageQuantity,
+                    };
+                });
+                return convertedResults;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];

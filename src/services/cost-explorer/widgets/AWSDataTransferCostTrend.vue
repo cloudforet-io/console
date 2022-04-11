@@ -27,6 +27,7 @@
 </template>
 
 <script lang="ts">
+import bytes from 'bytes';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -50,7 +51,7 @@ import {
     getTooltipText,
     getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
-import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
+import { byteFormatter, commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import {
     gray, green, red, yellow,
 } from '@/styles/colors';
@@ -61,7 +62,6 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { range } from 'lodash';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
@@ -218,9 +218,9 @@ export default {
 
             series.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                    const usdCost = target.tooltipDataItem.dataContext[legend.name] ? Number(target.tooltipDataItem.dataContext[legend.name]) : undefined;
-                    const currencyMoney = currencyMoneyFormatter(usdCost, props.currency, undefined, true);
-                    return getTooltipText('name', undefined, currencyMoney);
+                    const quantity = target.tooltipDataItem.dataContext[legend.name] ? Number(target.tooltipDataItem.dataContext[legend.name]) : undefined;
+                    const formattedQuantity = byteFormatter(quantity);
+                    return getTooltipText('name', undefined, formattedQuantity);
                 }
                 return tooltipText;
             });
@@ -331,7 +331,17 @@ export default {
                     end: dayjs.utc(period.end).format('YYYY-MM'),
                     ...queryHelper.apiQuery,
                 });
-                return results;
+                const convertedResults = results.map((d) => {
+                    const convertedUsageQuantity = {};
+                    Object.entries(d.usage_quantity).forEach(([date, quantity]) => {
+                        convertedUsageQuantity[date] = bytes.parse(`${quantity}GB`);
+                    });
+                    return {
+                        ...d,
+                        usage_quantity: convertedUsageQuantity,
+                    };
+                });
+                return convertedResults;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
@@ -349,7 +359,7 @@ export default {
                 start: dayjs.utc((period as Period).end).subtract(5, 'month').format('YYYY-MM'),
                 end: dayjs.utc((period as Period).end).format('YYYY-MM'),
             };
-            state.chartData = getXYChartData(state.items, GRANULARITY.MONTHLY, _period, GROUP_BY);
+            state.chartData = getXYChartData(state.items, GRANULARITY.MONTHLY, _period, GROUP_BY, 'usage_quantity');
             state.chart = drawChart(state.chartRef, state.chartData, state.legends);
         }, { immediate: true });
 

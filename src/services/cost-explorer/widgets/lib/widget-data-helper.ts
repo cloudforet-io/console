@@ -181,7 +181,9 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY)
  * @example [{ date: '2021-11-01', aws: 100, azure: 300 }, { date: '2021-11-02', aws: 300, azure: 100 }]
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary, LastMonthTotalSpend, BudgetSummaryChart
  */
-export const getXYChartData = (rawData: CostAnalyzeModel[], granularity: GRANULARITY, period: Period, groupBy?: GROUP_BY): XYChartData[] => {
+export const getXYChartData = (
+    rawData: CostAnalyzeModel[], granularity: GRANULARITY, period: Period, groupBy?: GROUP_BY, valueKey = 'usd_cost',
+): XYChartData[] => {
     const chartData: XYChartData[] = [];
     const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
     const dateFormat = DATE_FORMAT[timeUnit];
@@ -197,8 +199,8 @@ export const getXYChartData = (rawData: CostAnalyzeModel[], granularity: GRANULA
                     if (d.is_others) groupByName = 'Etc.';
                     else groupByName = `no_${groupBy}`;
                 }
-                if (d.usd_cost[_date]) chartDataByDate[groupByName] = d.usd_cost[_date];
-            } else if (d.usd_cost[_date]) chartDataByDate.totalCost = d.usd_cost[_date];
+                if (d[valueKey]?.[_date]) chartDataByDate[groupByName] = d[valueKey][_date];
+            } else if (d[valueKey]?.[_date]) chartDataByDate.totalCost = d[valueKey][_date];
         });
         chartData.push(chartDataByDate);
         now = now.add(1, timeUnit);
