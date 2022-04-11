@@ -41,11 +41,15 @@ i, span, div, input, textarea, article, main, ul, li {
   text-align: inherit;
 }
 
-textarea:focus, input:focus {
+textarea:focus:not(:focus-visible), input:focus:not(:focus-visible) {
   outline: none;
 }
 
-:focus {
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+input:focus {
   outline: none;
 }
 
@@ -85,9 +89,9 @@ summary {
 }
 
 .p-tooltip .tooltip-inner {
+    border-radius: 0;
     background: black;
     color: white;
-    border-radius: 0;
     padding: 5px 8px;
   }
 
@@ -165,16 +169,16 @@ summary {
   }
 
 .p-tooltip.popover .popover-inner {
-      background: #222532;
-      color: #222532;
+      border-radius: 0.25rem;
+      background: #232533;
+      color: #232533;
       padding: 24px;
-      border-radius: 5px;
       -webkit-box-shadow: 0 5px 30px rgba(0,0,0, 0.1);
               box-shadow: 0 5px 30px rgba(0,0,0, 0.1);
     }
 
 .p-tooltip.popover .popover-arrow {
-      border-color: #222532;
+      border-color: #232533;
     }
 
 .p-tooltip[aria-hidden='true'] {
