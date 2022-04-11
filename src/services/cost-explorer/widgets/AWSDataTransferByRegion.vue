@@ -176,6 +176,7 @@ export default {
                 const tableData: TableData = tableDataByRegion[d.region_code];
                 tableDataByRegion[d.region_code] = convertOrMergeToTableData(d, tableData);
             });
+            if (Object.keys(tableDataByRegion).length > 15) return Object.fromEntries(Object.entries(tableDataByRegion).slice(0, 15));
             return tableDataByRegion;
         };
 
