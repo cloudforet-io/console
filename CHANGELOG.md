@@ -1,3 +1,10 @@
+# [1.1.0-beta.276](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.275...v1.1.0-beta.276) (2022-04-11)
+
+
+### Features
+
+* add multiple header functionality in data table ([#919](https://github.com/spaceone-dev/spaceone-design-system/issues/919)) ([f94fe82](https://github.com/spaceone-dev/spaceone-design-system/commit/f94fe82ec3bd4e9801774cc8b9739f7b58a5496b))
+
 # [1.1.0-beta.275](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.274...v1.1.0-beta.275) (2022-04-11)
 
 
