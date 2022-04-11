@@ -31,7 +31,7 @@
                                 >
                                     <span class="th-contents"
                                           :class="{
-                                              [field.textAlign]: field.textAlign ? true : false,
+                                              [field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
                                               'has-icon': sortable && field.sortable || colCopy,
                                           }"
                                     >
@@ -109,7 +109,7 @@
                                 :key="`td-${contextKey}-${rowIndex}-${colIndex}`"
                                 :class="{
                                     'has-width': !!field.width,
-                                    [field.textAlign]: field.textAlign ? true : false,
+                                    [field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
                                 }"
                             >
                                 <slot name="col-format" v-bind="getColSlotProps(item, field, colIndex, rowIndex)">
@@ -155,7 +155,7 @@ import PRadio from '@/inputs/radio/PRadio.vue';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';
-import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
+import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
 
 
 export default defineComponent<DataTableProps>({
@@ -437,6 +437,7 @@ export default defineComponent<DataTableProps>({
             onSelectAllToggle,
             onClickColCopy,
             onChangeRadioSelect,
+            DATA_TABLE_CELL_TEXT_ALIGN,
         };
     },
 });
