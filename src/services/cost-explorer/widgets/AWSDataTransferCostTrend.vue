@@ -47,9 +47,7 @@ import {
 import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import {
-    getCurrencyAppliedChartData,
-    getTooltipText,
-    getXYChartData,
+    getTooltipText, getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import { byteFormatter, commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import {
@@ -218,8 +216,8 @@ export default {
 
             series.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                    const quantity = target.tooltipDataItem.dataContext[legend.name] ? Number(target.tooltipDataItem.dataContext[legend.name]) : undefined;
-                    const formattedQuantity = byteFormatter(quantity);
+                    const quantity = target.tooltipDataItem.dataContext[legend.name];
+                    const formattedQuantity = quantity ? byteFormatter(quantity) : quantity;
                     return getTooltipText('name', undefined, formattedQuantity);
                 }
                 return tooltipText;
@@ -252,7 +250,7 @@ export default {
             });
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
-            chart.data = getCurrencyAppliedChartData(chartData, props.currency, props.currencyRates);
+            chart.data = chartData;
 
             chart.dateFormatter.inputDateFormat = 'yyyy-MM';
             const dateAxis = chart.xAxes.push(new am4charts.DateAxis());

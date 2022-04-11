@@ -196,11 +196,13 @@ export const getXYChartData = (
             if (groupBy) {
                 let groupByName = d[groupBy];
                 if (!groupByName) {
-                    if (d.is_others) groupByName = 'Etc.';
+                    if (d.is_others) groupByName = 'aggregation';
                     else groupByName = `no_${groupBy}`;
                 }
-                if (d[valueKey]?.[_date]) chartDataByDate[groupByName] = d[valueKey][_date];
-            } else if (d[valueKey]?.[_date]) chartDataByDate.totalCost = d[valueKey][_date];
+                chartDataByDate[groupByName] = d[valueKey]?.[_date] ?? 0;
+            } else {
+                chartDataByDate.totalCost = d[valueKey]?.[_date] ?? 0;
+            }
         });
         chartData.push(chartDataByDate);
         now = now.add(1, timeUnit);

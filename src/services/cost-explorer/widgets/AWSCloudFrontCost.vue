@@ -55,6 +55,7 @@ import config from '@/lib/config';
 import { gray } from '@/styles/colors';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import {
+    getCurrencyAppliedChartData,
     getReferenceLabel, getTooltipText,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
@@ -240,8 +241,11 @@ export default {
             series.tooltip.label.fontSize = 14;
             series.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                    const usdCost = target.tooltipDataItem.dataContext[legend.name];
-                    const currencyMoney = currencyMoneyFormatter(usdCost, props.currency, undefined, true);
+                    const cost = Number(target.tooltipDataItem.dataContext[legend.name] ?? 0);
+                    let currencyMoney: string|number = cost;
+                    if (cost !== 0) {
+                        currencyMoney = currencyMoneyFormatter(cost, props.currency, undefined, true);
+                    }
                     return getTooltipText('name', undefined, currencyMoney);
                 }
                 return tooltipText;
@@ -306,7 +310,7 @@ export default {
             if (state.items.length) createChartLegend(chart);
 
             if (chartData.length) {
-                chart.data = chartData;
+                chart.data = getCurrencyAppliedChartData(chartData, props.currency, props.currencyRates);
             } else {
                 chart.data = [{ category: '' }];
                 valueAxis.min = 0;
@@ -370,6 +374,11 @@ export default {
         };
 
         /* Watcher */
+        watch(() => props.currency, (currency) => {
+            if (state.chart) {
+                state.chart.data = getCurrencyAppliedChartData(state.chartData, currency, props.currencyRates);
+            }
+        });
         watch([() => props.period, () => props.filters, () => state.chartRef], async ([period, filters, chartContext]) => {
             if (chartContext) {
                 state.items = await listData(period, filters);

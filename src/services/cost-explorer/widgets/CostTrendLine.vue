@@ -247,8 +247,8 @@ export default {
 
                 series.adapter.add('tooltipText', (tooltipText, target) => {
                     if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                        const usdCost = target.tooltipDataItem.dataContext[legend.name] ? Number(target.tooltipDataItem.dataContext[legend.name]) : undefined;
-                        const currencyMoney = currencyMoneyFormatter(usdCost, props.currency, undefined, true);
+                        const cost = Number(target.tooltipDataItem.dataContext[legend.name] ?? 0);
+                        const currencyMoney = currencyMoneyFormatter(cost, props.currency, undefined, true);
                         return getTooltipText('name', undefined, currencyMoney);
                     }
                     return tooltipText;
