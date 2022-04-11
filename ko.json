@@ -624,9 +624,9 @@
 				"SPC_USAGE_SUMMARY": "SPC 프로젝트별 예산 사용 현황 요약",
 				"SPENT": "사용함",
 				"TOOLTIP_AWS_DATA_COST_1": "최근월 기준 내림차순 정렬",
-				"TOOLTIP_AWS_DATA_COST_2": "AWS에서 인터넷으로 송신한 내역",
+				"TOOLTIP_AWS_DATA_COST_2": "AWS에서 인터넷으로 데이터를 송신한 내역",
 				"TOOLTIP_AWS_DATA_COST_3": "인터넷에서 AWS로 데이터를 수신한 내역",
-				"TOOLTIP_AWS_DATA_COST_4": "AWS Region 간 통신 내역",
+				"TOOLTIP_AWS_DATA_COST_4": "AWS Region 간 데이터 통신 내역",
 				"TOTAL_BUDGET_USAGE": "예산 총 사용량",
 				"TOTAL_COST": "총 비용",
 				"UPDATE_DASHBOARD": "대시보드 이름 변경"
