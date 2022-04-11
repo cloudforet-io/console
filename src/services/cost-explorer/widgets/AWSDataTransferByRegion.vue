@@ -88,9 +88,9 @@ interface TableData extends TrafficWidgetTableData {
 }
 
 const dataToTableFieldMap = {
-    'data-transfer.out': ['trafficOutCost', 'trafficOutSize'],
-    'data-transfer.in': ['trafficInCost', 'trafficInSize'],
-    'data-transfer.etc': ['trafficEtcCost', 'trafficEtcSize'],
+    'data-transfer.out': ['transferOutCost', 'transferOutSize'],
+    'data-transfer.in': ['transferInCost', 'transferInSize'],
+    'data-transfer.etc': ['transferEtcCost', 'transferEtcSize'],
 };
 
 export default {
@@ -184,12 +184,18 @@ export default {
             fields: computed<DataTableFieldType[]>(() => [
                 { name: 'provider', label: 'Region' },
                 { name: 'region', label: ' ' },
-                { name: 'trafficOutCost', label: 'Traffic Out', textAlign: 'right' },
-                { name: 'trafficOutSize', label: ' ', type: 'size' },
-                { name: 'trafficInCost', label: 'Traffic In', textAlign: 'right' },
-                { name: 'trafficInSize', label: ' ', type: 'size' },
-                { name: 'trafficEtcCost', label: 'etc.', textAlign: 'right' },
-                { name: 'trafficEtcSize', label: ' ', type: 'size' },
+                {
+                    name: 'transferOutSize', label: 'Transfer-Out', type: 'size', textAlign: 'right',
+                },
+                { name: 'transferOutCost', label: ' ' },
+                {
+                    name: 'transferInSize', label: 'Transfer-In', type: 'size', textAlign: 'right',
+                },
+                { name: 'transferInCost', label: ' ' },
+                {
+                    name: 'transferEtcSize', label: 'etc.', type: 'size', textAlign: 'right',
+                },
+                { name: 'transferEtcCost', label: ' ' },
             ]),
             thisPage: 1,
         });
@@ -275,9 +281,6 @@ export default {
                     group_by: ['usage_type', 'region_code'],
                     start: dayjs.utc(props.period?.start).format('YYYY-MM'),
                     end: dayjs.utc(props.period?.end).format('YYYY-MM'),
-                    page: {
-                        limit: 15,
-                    },
                     ...costQueryHelper.apiQuery,
                 });
                 return results;
