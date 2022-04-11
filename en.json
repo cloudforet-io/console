@@ -624,9 +624,9 @@
 				"SPC_USAGE_SUMMARY": "SPC Project-Wise Usage Summary",
 				"SPENT": "spent",
 				"TOOLTIP_AWS_DATA_COST_1": "In descending order of recent month.",
-				"TOOLTIP_AWS_DATA_COST_2": "",
-				"TOOLTIP_AWS_DATA_COST_3": "",
-				"TOOLTIP_AWS_DATA_COST_4": "",
+				"TOOLTIP_AWS_DATA_COST_2": "Transfer History from AWS to Internet",
+				"TOOLTIP_AWS_DATA_COST_3": "Transfer History from Internet to AWS",
+				"TOOLTIP_AWS_DATA_COST_4": "Communications Between AWS Regions",
 				"TOTAL_BUDGET_USAGE": "Budget Usage",
 				"TOTAL_COST": "Total Cost",
 				"UPDATE_DASHBOARD": "Update Dashboard"
