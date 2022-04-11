@@ -65,6 +65,7 @@ import { TrafficWidgetTableData } from '@/services/cost-explorer/widgets/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { i18n } from '@/translations';
 
 const valueName = 'value';
 
@@ -186,15 +187,15 @@ export default {
                 { name: 'provider', label: 'Region' },
                 { name: 'region', label: ' ' },
                 {
-                    name: 'transferOutSize', label: 'Transfer-Out', type: 'size', textAlign: 'right',
+                    name: 'transferOutSize', label: 'Transfer-Out', type: 'size', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
                 },
                 { name: 'transferOutCost', label: ' ' },
                 {
-                    name: 'transferInSize', label: 'Transfer-In', type: 'size', textAlign: 'right',
+                    name: 'transferInSize', label: 'Transfer-In', type: 'size', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_3'),
                 },
                 { name: 'transferInCost', label: ' ' },
                 {
-                    name: 'transferEtcSize', label: 'etc.', type: 'size', textAlign: 'right',
+                    name: 'transferEtcSize', label: 'etc.', type: 'size', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_4'),
                 },
                 { name: 'transferEtcCost', label: ' ' },
             ]),

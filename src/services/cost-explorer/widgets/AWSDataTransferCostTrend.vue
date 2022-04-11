@@ -163,7 +163,7 @@ export default {
                 },
             ] as Legend[],
             fields: computed<Field[]>(() => [
-                { name: 'month', label: 'Month', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_1') },
+                { name: 'month', label: 'Month' },
                 {
                     name: 'trafficOutSize', label: 'Transfer-Out', textAlign: 'right', type: 'size', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
                 },

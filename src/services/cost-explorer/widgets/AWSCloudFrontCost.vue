@@ -62,6 +62,7 @@ import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/Cos
 import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { i18n } from '@/translations';
 
 interface Data {
     project_id: string;
@@ -206,7 +207,7 @@ export default {
             fields: computed<DataTableFieldType[]>(() => [
                 { name: 'groupBy', label: GROUP_BY_ITEM_MAP[state.groupBy].label },
                 {
-                    name: 'trafficOutSize', label: 'Transfer-Out', type: 'size', textAlign: 'right',
+                    name: 'trafficOutSize', label: 'Transfer-Out', type: 'size', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
                 },
                 { name: 'trafficOutCost', label: ' ' },
                 {
