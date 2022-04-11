@@ -24,9 +24,7 @@
                             </p-collapsible-toggle>
                         </div>
                     </div>
-                    <pre v-else>
-                        {{ value ? value : '--' }}
-                    </pre>
+                    <pre v-else class="short-error-message">{{ value ? value : '--' }}</pre>
                 </template>
                 <template v-else-if="name === 'additional'">
                     <div class="error-location">
@@ -35,6 +33,11 @@
                             <span> {{ value.cloud_service_group ? `> ${value.cloud_service_group}` : '' }}</span>
                             <span> {{ value.cloud_service_type ? `> ${value.cloud_service_type}` : '' }}</span>
                         </template>
+                    </div>
+                </template>
+                <template v-else-if="name === 'additional.resource_id'">
+                    <div class="resource-id">
+                        {{ value ? value : '--' }}
                     </div>
                 </template>
                 <template v-else>
@@ -146,8 +149,7 @@ $maxText:    79ch;
     }
     .error-message {
         @apply flex items-end;
-        padding: 0.5rem 0.75rem;
-        margin: 0.75rem 0;
+        margin: 0.625rem 0;
         .content {
             width: $maxText;
             line-height: 1.225rem;
@@ -167,8 +169,15 @@ $maxText:    79ch;
             }
         }
     }
+    .short-error-message {
+        line-height: 1.225rem;
+    }
     .error-location {
         white-space: nowrap;
+    }
+    .resource-id {
+        @apply truncate;
+        width: 13.6875rem;
     }
 }
 
