@@ -207,17 +207,31 @@ export default {
             fields: computed<DataTableFieldType[]>(() => [
                 { name: 'groupBy', label: GROUP_BY_ITEM_MAP[state.groupBy].label },
                 {
-                    name: 'trafficOutSize', label: 'Transfer-Out', type: 'size', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
+                    name: 'trafficOut',
+                    label: 'Transfer-Out',
+                    tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
+                    children: [
+                        { name: 'trafficOutSize', type: 'size', invisible: true },
+                        { name: 'trafficOutCost', invisible: true },
+                    ],
                 },
-                { name: 'trafficOutCost', label: ' ' },
                 {
-                    name: 'httpReq', label: 'Requests (HTTP)', type: 'number', textAlign: 'right',
+                    name: 'http',
+                    label: 'Requests (HTTP)',
+                    children: [
+                        { name: 'httpReq', type: 'number', invisible: true },
+                        { name: 'httpReqCost', invisible: true },
+                    ],
                 },
-                { name: 'httpReqCost', label: ' ' },
                 {
-                    name: 'httpsReq', label: 'Requests (HTTPS)', type: 'number', textAlign: 'right',
+                    name: 'http',
+                    label: 'Requests (HTTPS)',
+                    children: [
+                        { name: 'httpsReq', type: 'number', invisible: true },
+                        { name: 'httpsReqCost', invisible: true },
+                    ],
                 },
-                { name: 'httpsReqCost', label: ' ' },
+
             ]),
             items: computed<TableData[]>(() => {
                 const convertedTableData = getConvertedTableData();

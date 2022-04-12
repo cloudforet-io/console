@@ -38,13 +38,11 @@ import {
 } from '@vue/composition-api';
 
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+
 import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 
-import {
-    ChartData, CostAnalyzeModel, Legend, TrafficWidgetTableData, WidgetProps,
-} from '@/services/cost-explorer/widgets/type';
-import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import {
     getTooltipText, getXYChartData,
@@ -62,7 +60,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { range } from 'lodash';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+
+import {
+    ChartData, CostAnalyzeModel, Legend, TrafficWidgetTableData, WidgetProps,
+} from '@/services/cost-explorer/widgets/type';
+import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { i18n } from '@/translations';
@@ -162,24 +164,41 @@ export default {
                 },
                 {
                     name: 'data-transfer.etc',
-                    label: 'etc.',
+                    label: 'Etc.',
                     color: TRANSFER_ETC_COLOR,
                 },
             ] as Legend[],
             fields: computed<Field[]>(() => [
                 { name: 'month', label: 'Month' },
                 {
-                    name: 'trafficOutSize', label: 'Transfer-Out', textAlign: 'right', type: 'size', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
+                    name: 'trafficOut',
+                    label: 'Transfer-Out',
+                    tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
+                    children: [
+                        { name: 'trafficOutSize', type: 'size', invisible: true },
+                        { name: 'trafficOutCost', invisible: true },
+                    ],
                 },
-                { name: 'trafficOutCost', label: ' ' },
                 {
-                    name: 'trafficInSize', label: 'Transfer-In', textAlign: 'right', type: 'size', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_3'),
+                    name: 'trafficIn',
+                    label: 'Transfer-In',
+                    tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_3'),
+                    children: [
+                        { name: 'trafficInSize', type: 'size', invisible: true },
+                        { name: 'trafficInCost', invisible: true },
+                    ],
                 },
-                { name: 'trafficInCost', label: ' ' },
                 {
-                    name: 'trafficEtcSize', label: 'etc.', type: 'size', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_4'),
+                    name: 'trafficEtc',
+                    label: 'Etc.',
+                    tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_4'),
+                    children: [
+                        { name: 'trafficEtcSize', type: 'size', invisible: true },
+                        { name: 'trafficEtcCost', invisible: true },
+                    ],
                 },
-                { name: 'trafficEtcCost', label: ' ' },
+
+
             ]),
             tableItems: computed<TableData[]>(() => {
                 const months = range(6).map(i => i18nDayjs.value.utc(props.period.end)

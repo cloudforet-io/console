@@ -188,17 +188,33 @@ export default {
                 { name: 'provider', label: 'Region' },
                 { name: 'region', label: ' ' },
                 {
-                    name: 'transferOutSize', label: 'Transfer-Out', type: 'size', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
+                    name: 'transferOut',
+                    label: 'Transfer-Out',
+                    tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
+                    children: [
+                        { name: 'transferOutSize', type: 'size', invisible: true },
+                        { name: 'transferOutCost', invisible: true },
+                    ],
                 },
-                { name: 'transferOutCost', label: ' ' },
                 {
-                    name: 'transferInSize', label: 'Transfer-In', type: 'size', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_3'),
+                    name: 'transferIn',
+                    label: 'Transfer-In',
+                    tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_3'),
+                    children: [
+                        { name: 'transferInSize', type: 'size', invisible: true },
+                        { name: 'transferInCost', invisible: true },
+                    ],
                 },
-                { name: 'transferInCost', label: ' ' },
                 {
-                    name: 'transferEtcSize', label: 'etc.', type: 'size', textAlign: 'right', tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_4'),
+                    name: 'transferEtc',
+                    label: 'Etc.',
+                    tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_4'),
+                    invisibleChildren: true,
+                    children: [
+                        { name: 'transferEtcSize', type: 'size', invisible: true },
+                        { name: 'transferEtcCost', invisible: true },
+                    ],
                 },
-                { name: 'transferEtcCost', label: ' ' },
             ]),
             thisPage: 1,
         });
