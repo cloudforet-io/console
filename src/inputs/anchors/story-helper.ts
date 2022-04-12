@@ -1,5 +1,6 @@
 import { ArgTypes } from '@storybook/addons';
 import VueRouter from 'vue-router';
+import { AnchorSize, IconPosition } from '@/inputs/anchors/type';
 
 export const getAnchorsArgTypes = (): ArgTypes => ({
     text: {
@@ -20,10 +21,50 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
-    showIcon: {
-        name: 'showIcon',
+    size: {
+        name: 'size',
+        type: { name: 'string' },
+        description: `Select anchor size. ${
+            [...Object.values(AnchorSize)].map(d => `\`${d}\``)} are available.`,
+        defaultValue: AnchorSize.md,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: AnchorSize.md,
+            },
+        },
+        control: {
+            type: 'select',
+            options: [...Object.values(AnchorSize)],
+        },
+    },
+    iconPosition: {
+        name: 'iconPosition',
+        type: { name: 'string' },
+        description: `Select icon position. ${
+            [...Object.values(IconPosition)].map(d => `\`${d}\``)} are available.`,
+        defaultValue: IconPosition.right,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: IconPosition.right,
+            },
+        },
+        control: {
+            type: 'select',
+            options: [...Object.values(IconPosition)],
+        },
+    },
+    iconVisible: {
+        name: 'iconVisible',
         type: { name: 'boolean' },
-        description: 'Indicator of visibility of icon which is visible only when target is blank.',
+        description: 'Whether or not the icon is displayed.',
         defaultValue: true,
         table: {
             type: {
@@ -36,6 +77,24 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'boolean',
+        },
+    },
+    iconName: {
+        name: 'iconName',
+        type: { name: 'string' },
+        description: 'The name of the icon to be displayed.',
+        defaultValue: 'ic_external-link',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'ic_external-link',
+            },
+        },
+        control: {
+            type: 'text',
         },
     },
     href: {
@@ -78,7 +137,7 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
         name: 'target',
         type: { name: 'string' },
         description: 'a tag target attribute',
-        defaultValue: '_blank',
+        defaultValue: '_self',
         table: {
             type: {
                 summary: 'string',
@@ -128,20 +187,6 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    leftExtraSlot: {
-        name: 'left-extra',
-        description: 'Slot for left side of text',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            defaultValue: {
-                summary: null,
-            },
-            category: 'slots',
-        },
-    },
     defaultSlot: {
         name: 'default',
         description: 'Slot for text',
@@ -155,19 +200,8 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
         },
-    },
-    iconSlot: {
-        name: 'icon',
-        description: 'Slot for icon',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            defaultValue: {
-                summary: null,
-            },
-            category: 'slots',
+        control: {
+            type: 'text',
         },
     },
 });

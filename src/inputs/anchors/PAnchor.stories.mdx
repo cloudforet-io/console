@@ -16,19 +16,20 @@ export const Template = (args, { argTypes }) => ({
     components: { PAnchor },
     router,
     template: `
-    <div class="grid grid-cols-1 gap-6">
+    <div class="flex justify-center">
         <p-anchor
             :text="text"
-            :show-icon="showIcon"
+            :size="size"
+            :icon-position="iconPosition"
+            :icon-visible="iconVisible"
+            :icon-name="iconName"
             :href="href"
             :to="to"
             :target="target"
             :disabled="disabled"
             :highlight="highlight"
         >
-            <template v-if="leftExtraSlot" #icon><div v-html="leftExtraSlot" /></template>
-            <div v-if="defaultSlot" v-html="defaultSlot"/>
-            <template v-if="iconSlot" #icon><div v-html="iconSlot" /></template>
+            <span v-if="defaultSlot" v-html="defaultSlot"/>
         </p-anchor>
     </div>
     `,
@@ -55,9 +56,9 @@ This component prevents the propagation of the click event by default.
             router,
             template: `
             <div class="grid gap-6">
-            <p-anchor href="https://www.google.com">This is <strong>default</strong> anchor with default slot.</p-anchor>
-            <p-anchor text="This is a default anchor with text props." href="https://www.google.com" />
-</div>
+                <p-anchor href="https://www.google.com" target="_self">This is <strong>default</strong> anchor with default slot.</p-anchor>
+                <p-anchor text="This is a default anchor with text props." href="https://www.google.com" />
+            </div>
     `,
         }}
     </Story>
@@ -66,7 +67,7 @@ This component prevents the propagation of the click event by default.
 <br/>
 <br/>
 
-## No Icon
+## Icon Position
 
 <Canvas>
     <Story name="No Icon">
@@ -74,7 +75,10 @@ This component prevents the propagation of the click event by default.
             components: { PAnchor },
             router,
             template: `
-            <p-anchor :show-icon="false" href="https://www.google.com">This is <strong>no-icon</strong> anchor.</p-anchor>
+                <div class="grid gap-6">
+                    <p-anchor icon-position="right" href="https://www.google.com" text="right"/>
+                    <p-anchor icon-position="left" href="https://www.google.com" text="left"/>
+                </div>
     `,
         }}
     </Story>

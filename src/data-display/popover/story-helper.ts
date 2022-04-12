@@ -80,7 +80,7 @@ export const getPopoverArgTypes = () => {
             },
         },
         contentRefSlot: {
-            name: 'contentRef',
+            name: 'content',
             description: 'Slot for content.',
             type: { name: 'string' },
             defaultValue: null,

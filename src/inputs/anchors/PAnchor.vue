@@ -1,29 +1,25 @@
 <template>
-    <router-link :to="to || {}" class="p-anchor" custom
-                 :class="{disabled, highlight}"
-    >
+    <router-link :to="to || {}" class="p-anchor" custom>
         <template #default="{href: toHref, navigate}">
-            <a class="p-anchor" :class="{disabled, highlight}"
-               :target="target"
-               :href="to ? (toHref || href ): href"
-               @click.stop="navigate"
-            >
-                <slot name="left-extra" v-bind="{...$props, href: to ? (toHref || href ): href}" />
-                <span class="text" :class="{disabled}">
-                    <slot v-bind="{...$props}">
-                        {{ text }}
-                    </slot>
-                </span>
-                <slot v-if="showIcon || (showIcon && target === '_blank')" name="icon"
-                      v-bind="{...$props, href: to ? (toHref || href ): href}"
+            <span>
+                <a class="p-anchor" :class="{disabled, highlight, [iconPosition]: true, [size]: true}"
+                   :target="disabled ? '_self' : (iconName==='ic_external-link' ? '_blank' : target)"
+                   :href="to ? (toHref || href ): href"
+                   @click.stop="navigate"
                 >
-                    <p-i name="ic_external-link"
-                         height="1em" width="1em"
+                    <span class="text" :class="{disabled}">
+                        <slot v-bind="{...$props}">
+                            {{ text }}
+                        </slot>
+                    </span>
+                    <p-i v-if="iconVisible"
+                         :name="iconName"
+                         height="1.1em" width="1.1em"
                          color="inherit"
-                         class="external-icon"
+                         class="icon"
                     />
-                </slot>
-            </a>
+                </a>
+            </span>
         </template>
     </router-link>
 </template>
@@ -32,11 +28,15 @@
 import PI from '@/foundation/icons/PI.vue';
 import { Location } from 'vue-router';
 import { defineComponent } from '@vue/composition-api';
+import { AnchorSize, IconPosition } from '@/inputs/anchors/type';
 
 
 interface Props {
   text?: string;
-  showIcon?: boolean;
+  size?: AnchorSize;
+  iconPosition?: IconPosition;
+  iconVisible?: boolean;
+  iconName?: string;
   href?: string;
   to?: Location;
   target?: string;
@@ -53,9 +53,27 @@ export default defineComponent<Props>({
             type: String,
             default: '',
         },
-        showIcon: {
+        size: {
+            type: String,
+            default: AnchorSize.md,
+            validator(type: AnchorSize) {
+                return Object.values(AnchorSize).includes(type);
+            },
+        },
+        iconPosition: {
+            type: String,
+            default: IconPosition.right,
+            validator(type: IconPosition) {
+                return Object.values(IconPosition).includes(type);
+            },
+        },
+        iconVisible: {
             type: Boolean,
             default: true,
+        },
+        iconName: {
+            type: String,
+            default: 'ic_external-link',
         },
         href: {
             type: String,
@@ -83,24 +101,55 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-anchor {
-    @apply cursor-pointer inline-block;
+    @apply cursor-pointer inline-flex items-end;
     vertical-align: middle;
     line-height: inherit;
+    font-size: 0.875rem;
     .text {
         font-weight: inherit;
         font-size: inherit;
         color: inherit;
         word-break: break-all;
     }
-    .external-icon {
-        margin-left: 2px;
+    .icon {
+        margin-left: 0.125rem;
+        margin-bottom: 0.1rem;
+    }
+    &.left {
+        @apply flex-row-reverse;
+        .icon {
+            margin-left: unset;
+            margin-right: 0.125rem;
+        }
     }
     &.disabled {
         @apply text-gray-400;
         cursor: not-allowed;
+        &.highlight {
+            @apply text-blue-300;
+        }
     }
     &:not(.disabled).highlight {
-        @apply text-secondary;
+        @apply text-blue-700;
+        &:hover {
+            @apply text-blue-800;
+        }
+        &:active {
+            @apply text-blue-700;
+        }
+    }
+
+    &.sm {
+        font-size: 0.75rem;
+        .icon {
+            margin-bottom: 0.125rem;
+        }
+    }
+    &.lg {
+        font-size: 1rem;
+        .icon {
+            margin-bottom: unset;
+        }
     }
 
     @media (hover: hover) {
@@ -114,9 +163,11 @@ export default defineComponent<Props>({
         }
     }
 
-    &:focus, &:active, &focus-within {
-        .text {
-            @apply underline;
+    &:not(.disabled) {
+        &:focus, &:active, &focus-within {
+            .text {
+                @apply underline;
+            }
         }
     }
 }
