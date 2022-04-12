@@ -114,6 +114,29 @@
                         </template>
                     </p-field-group>
                 </form>
+                <p-divider class="divider" />
+                <p-field-group label="Tags" class="tags-title">
+                    <div class="tag-help-msg">
+                        Add associated tags. <br>
+                        The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.
+                    </div>
+                </p-field-group>
+
+                <tags-input-group :tags.sync="formState.tags"
+                                  :show-validation="true"
+                                  :is-valid.sync="validationState.isTagsValid"
+                >
+                    <template #addButton="scope">
+                        <p-icon-text-button
+                            outline style-type="primary" :disabled="scope.disabled"
+                            name="ic_plus_bold"
+                            class="mb-4"
+                            @click="scope.addPair($event)"
+                        >
+                            {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_ADD') }}
+                        </p-icon-text-button>
+                    </template>
+                </tags-input-group>
             </p-box-tab>
         </template>
     </p-button-modal>
@@ -127,7 +150,15 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PSelectDropdown, PFieldGroup, PButton, PTextInput, PBoxTab, PSearchDropdown,
+    PButtonModal,
+    PSelectDropdown,
+    PFieldGroup,
+    PButton,
+    PTextInput,
+    PBoxTab,
+    PSearchDropdown,
+    PIconTextButton,
+    PDivider,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -143,6 +174,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MODAL_TYPE } from '@/services/administration/iam/user/store/type';
+import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 
 
 interface AuthType {
@@ -175,6 +207,9 @@ export default {
         PButton,
         PBoxTab,
         PSearchDropdown,
+        PIconTextButton,
+        PDivider,
+        TagsInputGroup,
     },
     directives: {
         focus: {
@@ -229,6 +264,7 @@ export default {
             domainRoleList: [] as any[],
             password: '',
             passwordCheck: '',
+            tags: {},
         });
         const validationState = reactive({
             isUserIdValid: undefined as undefined | boolean,
@@ -242,6 +278,8 @@ export default {
             passwordInvalidText: '' as TranslateResult | string,
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
+            //
+            isTagsValid: undefined as undefined | boolean,
         });
 
         /* Validation */
@@ -252,6 +290,7 @@ export default {
             formState.domainRole = '';
             formState.password = '';
             formState.passwordCheck = '';
+            formState.tags = {};
         };
         const setValidationState = () => {
             validationState.isUserIdValid = undefined;
@@ -351,7 +390,7 @@ export default {
 
         const confirm = async () => {
             await checkUserID();
-            if (!validationState.isUserIdValid) return;
+            if (!validationState.isUserIdValid || !validationState.isTagsValid) return;
             if (formState.activeTab === 'local') {
                 await checkPassword(formState.password);
                 if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
@@ -363,6 +402,7 @@ export default {
                 backend: authTypeMap[formState.activeTab]?.backend,
                 user_type: authTypeMap[formState.activeTab]?.user_type,
                 password: formState.password || '',
+                tags: formState.tags || {},
             };
             if (formState.domainRoleList.length > 0) {
                 emit('confirm', data, formState.domainRole);
@@ -537,6 +577,14 @@ export default {
     .user-id-check-button {
         margin-left: 0.5rem;
         min-height: 2rem;
+    }
+
+    .divider {
+        @apply my-6;
+    }
+    .tag-help-msg {
+        font-size: 0.875rem;
+        line-height: 150%;
     }
 }
 </style>

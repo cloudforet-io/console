@@ -75,6 +75,28 @@
                     </template>
                 </p-field-group>
             </form>
+            <p-divider class="divider" />
+            <p-field-group label="Tags" class="tags-title">
+                <div class="tag-help-msg">
+                    Add associated tags. <br>
+                    The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.
+                </div>
+            </p-field-group>
+            <tags-input-group :tags.sync="tags"
+                              :show-validation="true"
+                              :is-valid.sync="validationState.isTagsValid"
+            >
+                <template #addButton="scope">
+                    <p-icon-text-button
+                        outline style-type="primary" :disabled="scope.disabled"
+                        name="ic_plus_bold"
+                        class="mb-4"
+                        @click="scope.addPair($event)"
+                    >
+                        {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_ADD') }}
+                    </p-icon-text-button>
+                </template>
+            </tags-input-group>
         </template>
     </p-button-modal>
 </template>
@@ -87,7 +109,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PSelectDropdown, PFieldGroup, PTextInput,
+    PButtonModal, PSelectDropdown, PFieldGroup, PTextInput, PIconTextButton, PDivider,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -99,6 +121,7 @@ import {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MODAL_TYPE } from '@/services/administration/iam/user/store/type';
 import { User } from '@/services/administration/iam/user/type';
+import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 
 interface AuthType {
     label: string | null;
@@ -114,6 +137,9 @@ export default {
         PFieldGroup,
         PTextInput,
         PSelectDropdown,
+        PIconTextButton,
+        PDivider,
+        TagsInputGroup,
     },
     directives: {
         focus: {
@@ -174,6 +200,7 @@ export default {
             domainRoleList: [] as any[],
             password: '',
             passwordCheck: '',
+            tags: {},
         });
         const validationState = reactive({
             isEmailValid: undefined as undefined | boolean,
@@ -183,6 +210,8 @@ export default {
             passwordInvalidText: '' as TranslateResult | string,
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
+            //
+            isTagsValid: undefined as undefined | boolean,
         });
 
         const checkEmail = async () => {
@@ -222,7 +251,7 @@ export default {
 
         const confirm = async () => {
             await checkEmail();
-            if (!validationState.isEmailValid) return;
+            if (!validationState.isEmailValid || !validationState.isTagsValid) return;
             if (props.isAdmin && props.item.backend === 'LOCAL' && props.item.user_type !== 'API Only') {
                 if (state.password || state.passwordCheck) await checkPassword(state.password);
                 else {
@@ -239,6 +268,7 @@ export default {
                 backend: props.item.backend,
                 user_type: props.item.user_type,
                 password: state.password || '',
+                tags: state.tags || {},
             };
             if (state.domainRoleList.length > 0) {
                 emit('confirm', data, state.domainRole);
@@ -282,9 +312,10 @@ export default {
         };
 
         const setForm = async () => {
-            state.user_id = props.item.user_id;
-            state.name = props.item.name;
-            state.email = props.item.email;
+            state.user_id = props.item?.user_id || '';
+            state.name = props.item?.name || '';
+            state.email = props.item?.email || '';
+            state.tags = props.item?.tags || {};
             checkIsSameId();
             await setCurrentDomainId();
         };
@@ -319,6 +350,13 @@ export default {
         .text-input {
             width: 25rem;
         }
+    }
+    .divider {
+        @apply my-6;
+    }
+    .tag-help-msg {
+        font-size: 0.875rem;
+        line-height: 150%;
     }
 }
 </style>

@@ -16,7 +16,7 @@
                 <span>{{ $t('COMMON.COMPONENTS.TAGS.VALUE') }}</span>
             </div>
         </div>
-        <div :class="{'mt-8': !showHeader}">
+        <div>
             <div v-for="(d, idx) in items" :key="idx" class="tags-group">
                 <template v-if="validations[idx]">
                     <p-field-group :invalid-text="validations[idx].key.message"

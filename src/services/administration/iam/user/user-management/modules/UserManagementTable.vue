@@ -53,6 +53,18 @@
                     {{ value }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
                 </span>
             </template>
+            <template #col-tags-format="{value}">
+                <template v-if="!!Object.keys(value).length">
+                    <p-badge v-for="([key, value], idx) in Object.entries(value)" :key="`${key}-${value}-${idx}`"
+                             style-type="gray200" class="mr-2"
+                    >
+                        {{ key }}: {{ value }}
+                    </p-badge>
+                </template>
+                <template v-else>
+                    <span />
+                </template>
+            </template>
         </p-toolbox-table>
         <user-management-modal v-if="modalState.visible"
                                :visible="modalState.visible"
@@ -97,6 +109,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import {
+    PBadge,
     PIconTextButton,
     PSelectDropdown,
     PStatus, PToolboxTable,
@@ -118,6 +131,7 @@ export default {
         UserUpdateModal,
         PStatus,
         PSelectDropdown,
+        PBadge,
     },
     props: {
         tableHeight: {
@@ -143,6 +157,7 @@ export default {
                 { name: 'user_type', label: 'Access Control' },
                 { name: 'api_key_count', label: 'API Key' },
                 { name: 'role_name', label: 'Role' },
+                { name: 'tags', label: 'Tags' },
                 { name: 'backend', label: 'Auth Type' },
                 { name: 'last_accessed_at', label: 'Last Activity' },
                 { name: 'timezone', label: 'Timezone' },
@@ -224,7 +239,7 @@ export default {
             try {
                 const res = await SpaceConnector.client.identity.user.list({
                     query: userListApiQuery,
-                    only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at', 'api_key_count'],
+                    only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at', 'api_key_count', 'tags'],
                     include_role_binding: true,
                 });
                 state.users = res.results.map(d => ({
