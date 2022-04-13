@@ -61,8 +61,7 @@
                     <template #toggle-right="{node}">
                         <favorite-button v-if="node.data.item_type === 'PROJECT_GROUP'"
                                          :item-id="node.data.id"
-                                         favorite-type="projectGroup"
-                                         resource-type="identity.ProjectGroup"
+                                         favorite-type="identity.ProjectGroup"
                                          scale="0.75"
                                          read-only
                         />

@@ -15,10 +15,7 @@
             <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
             >
-                <favorites-widget class="hidden lg:block
-                                         col-span-12"
-                                  :project="project" :cloud-service="cloudService"
-                />
+                <favorites-widget class="hidden lg:block col-span-12" />
 
                 <daily-updates class="col-span-12 daily-updates"
                                :providers="providers"
@@ -37,7 +34,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
@@ -52,6 +49,7 @@ import FavoritesWidget from '@/services/dashboard/modules/FavoritesWidget.vue';
 import TrustedAdvisor from '@/services/dashboard/modules/TrustedAdvisor.vue';
 import PersonalHealthDashboard
     from '@/services/dashboard/modules/PersonalHealthDashboard.vue';
+import { store } from '@/store';
 
 
 export default {
@@ -70,12 +68,9 @@ export default {
         TopProjects,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            providers: computed(() => vm.$store.state.reference.provider.items),
-            project: computed(() => [...vm.$store.getters['favorite/projectGroup/sortedItems'], ...vm.$store.getters['favorite/project/sortedItems']]),
-            cloudService: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
-            timezone: computed(() => vm.$store.state.user.timezone || 'UTC'),
+            providers: computed(() => store.state.reference.provider.items),
+            timezone: computed(() => store.state.user.timezone || 'UTC'),
         });
 
         return {

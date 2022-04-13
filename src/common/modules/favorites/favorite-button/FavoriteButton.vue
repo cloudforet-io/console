@@ -6,31 +6,33 @@
          color="inherit"
          class="favorite-btn"
          :class="{active, 'read-only': readOnly}"
-         @click.prevent="onClickProjectFavorite"
+         @click.prevent="handleClickFavoriteButton"
     />
 </template>
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
 import { FavoriteButtonProps } from '@/common/modules/favorites/favorite-button/type';
+import { store } from '@/store';
+import { FavoriteItem } from '@/store/modules/favorite/type';
 
 export default {
     name: 'FavoriteButton',
     components: { PI },
     props: {
+        favoriteItems: {
+            type: Array,
+            default: () => ([]),
+        },
         itemId: {
             type: String,
             required: true,
         },
         favoriteType: {
-            type: String,
-            required: true,
-        },
-        resourceType: {
             type: String,
             required: true,
         },
@@ -44,27 +46,35 @@ export default {
         },
     },
     setup(props: FavoriteButtonProps) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            itemMap: computed(() => vm.$store.getters[`favorite/${props.favoriteType}/itemMap`]),
-            active: computed(() => !!state.itemMap[props.itemId]),
+            favoriteItemMap: computed<Record<string, FavoriteItem>>(() => {
+                const result: Record<string, FavoriteItem> = {};
+                props.favoriteItems.forEach((d) => {
+                    result[d.resourceId] = d;
+                });
+                return result;
+            }),
+            active: computed(() => !!state.favoriteItemMap[props.itemId]),
         });
 
-        const onClickProjectFavorite = async (event: MouseEvent) => {
+        const handleClickFavoriteButton = async (event: MouseEvent) => {
             event.stopPropagation();
             if (props.readOnly) return;
-            if (state.itemMap[props.itemId]) {
-                await vm.$store.dispatch(`favorite/${props.favoriteType}/removeItem`, { id: props.itemId });
+            if (state.favoriteItemMap[props.itemId]) {
+                await store.dispatch('favorite/removeItem', {
+                    resourceId: props.itemId,
+                    resourceType: props.favoriteType,
+                });
             } else {
-                await vm.$store.dispatch(`favorite/${props.favoriteType}/addItem`, {
-                    id: props.itemId,
-                    resourceType: props.resourceType,
+                await store.dispatch('favorite/addItem', {
+                    resourceId: props.itemId,
+                    resourceType: props.favoriteType,
                 });
             }
         };
         return {
             ...toRefs(state),
-            onClickProjectFavorite,
+            handleClickFavoriteButton,
         };
     },
 };

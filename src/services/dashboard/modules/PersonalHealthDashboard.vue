@@ -103,7 +103,7 @@ export default {
             providers: computed(() => store.state.reference.provider.items),
             timezone: computed(() => store.state.user.timezone),
             projects: computed(() => store.state.reference.project.items),
-            favoriteProjects: computed(() => store.state.favorite.project.items),
+            favoriteProjects: computed(() => store.state.favorite.projectItems),
             regions: computed(() => store.state.reference.region.items),
             data: [] as any[],
             fields: computed(() => [
@@ -155,7 +155,7 @@ export default {
             // LOAD REFERENCE STORE
             await Promise.allSettled([
                 store.dispatch('reference/project/load'),
-                store.dispatch('favorite/project/load'),
+                store.dispatch('favorite/load', 'identity.Project'),
                 store.dispatch('reference/region/load'),
             ]);
             await getData();

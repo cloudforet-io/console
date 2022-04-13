@@ -114,6 +114,7 @@ import { store } from '@/store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { FavoriteItem } from '@/store/modules/favorite/type';
 
 
 enum STATUS {
@@ -186,7 +187,7 @@ export default {
             loading: false,
             chart: null as null | any,
             providers: computed(() => store.state.reference.provider.items),
-            favoriteProjects: computed(() => store.state.favorite.project.items),
+            favoriteProjects: computed<FavoriteItem[]>(() => store.state.favorite.projectItems),
             projects: computed(() => store.state.reference.project.items),
             chartRef: null as HTMLElement | null,
             thisPage: 1,
@@ -363,7 +364,7 @@ export default {
                         projectName: state.projects[projectId]?.name,
                         tooltipText: state.projects[projectId]?.label,
                         counts,
-                        isFavorite: !!find(state.favoriteProjects, { id: projectId }),
+                        isFavorite: !!find(state.favoriteProjects, { resourceId: projectId }),
                     });
                 });
                 state.projectSummaryData = projectSummaryData.sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
@@ -380,7 +381,7 @@ export default {
         };
         const asyncInit = async () => {
             await Promise.allSettled([
-                store.dispatch('favorite/project/load'),
+                store.dispatch('favorite/load', 'identity.Project'),
                 // LOAD REFERENCE STORE
                 store.dispatch('reference/project/load'),
                 store.dispatch('reference/provider/load'),

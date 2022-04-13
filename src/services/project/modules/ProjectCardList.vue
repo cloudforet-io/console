@@ -22,8 +22,8 @@
                                 </div>
                                 <div class="favorite-wrapper">
                                     <favorite-button :item-id="item.project_id"
-                                                     favorite-type="project"
-                                                     resource-type="identity.Project"
+                                                     :favorite-items="favoriteItems"
+                                                     favorite-type="identity.Project"
                                                      scale="0.7"
                                     />
                                 </div>
@@ -204,6 +204,7 @@ export default {
                 { title: i18n.t('PROJECT.LANDING.DATABASE'), summaryType: SUMMARY_TYPE.DATABASE },
                 { title: i18n.t('PROJECT.LANDING.STORAGE'), summaryType: SUMMARY_TYPE.STORAGE },
             ]),
+            favoriteItems: computed(() => store.state.favorite.projectItems),
         });
 
         const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
@@ -354,7 +355,10 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('reference/provider/load');
+            await Promise.allSettled([
+                store.dispatch('reference/provider/load'),
+                store.dispatch('favorite/load', 'identity.Project'),
+            ]);
         })();
 
         return {

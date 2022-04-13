@@ -155,7 +155,6 @@ export default {
         const state = reactive({
             providers: computed(() => store.state.reference.provider.items),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
-            favoriteItems: computed(() => store.getters['favorite/cloudServiceType/sortedItems']),
             selectedProvider: computed(() => store.state.service.cloudService.selectedProvider),
             selectedCategories: computed(() => store.state.service.cloudService.selectedCategories),
             selectedRegions: computed(() => store.state.service.cloudService.selectedRegions),
@@ -247,7 +246,6 @@ export default {
                 store.dispatch('reference/provider/load'),
                 store.dispatch('reference/serviceAccount/load'),
                 store.dispatch('reference/cloudServiceType/load'),
-                store.dispatch('favorite/cloudServiceType/load'),
             ]);
 
             /* filter setting */

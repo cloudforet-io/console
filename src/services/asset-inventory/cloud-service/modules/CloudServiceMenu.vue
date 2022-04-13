@@ -118,7 +118,7 @@ export default {
     setup() {
         const state = reactive({
             providers: computed(() => store.state.reference.provider.items),
-            favoriteItems: computed(() => store.getters['favorite/cloudServiceType/sortedItems']),
+            favoriteItems: computed<FavoriteItem[]>(() => store.getters['favorite/cloudServiceTypeItems']),
             regionItems: [] as RegionItem[],
             categoryItems: [
                 { name: CATEGORY.COMPUTE, label: 'Compute' },
@@ -165,7 +165,7 @@ export default {
 
         /* event */
         const handleFavoriteDelete = (item: FavoriteItem) => {
-            store.dispatch('favorite/cloudServiceType/removeItem', item);
+            store.dispatch('favorite/removeItem', item);
         };
         const handleChangeProvider = (provider: string) => {
             store.commit('service/cloudService/setSelectedProvider', provider);
@@ -194,7 +194,11 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('reference/provider/load');
+            await Promise.allSettled([
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/cloudServiceType/load'),
+                store.dispatch('favorite/load', 'inventory.CloudServiceType'),
+            ]);
         })();
 
         return {

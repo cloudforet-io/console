@@ -4,11 +4,11 @@
             <p-breadcrumbs :routes="pageNavigation" />
             <div v-if="item" class="top-wrapper">
                 <p-page-title :title="item.name" child @goBack="$router.go(-1)" />
-                <div class="btns">
-                    <span class="favorite-btn-wrapper">
+                <div class="button-wrapper">
+                    <span class="favorite-button-wrapper">
                         <favorite-button :item-id="projectId"
-                                         favorite-type="project"
-                                         resource-type="identity.Project"
+                                         :favorite-items="favoriteItems"
+                                         favorite-type="identity.Project"
                         />
                     </span>
                     <p-icon-button name="ic_trashcan"
@@ -171,6 +171,7 @@ export default {
                 TRIGGERED: find(store.state.service.projectDetail.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
             })),
             maintenanceHappeningListRef: null as null|Vue,
+            favoriteItems: computed(() => store.state.favorite.projectItems),
         });
 
         /* api */
@@ -286,7 +287,7 @@ export default {
             singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
             await Promise.allSettled([
                 // getPageNavigation(),
-                store.dispatch('favorite/project/load'),
+                store.dispatch('favorite/load', 'identity.Project'),
                 store.dispatch('service/projectDetail/getAlertCounts'),
             ]);
         })();
@@ -322,9 +323,9 @@ export default {
 }
 .top-wrapper {
     @apply mb-8 flex flex-wrap items-center;
-    .btns {
+    .button-wrapper {
         @apply flex-shrink-0 flex items-center;
-        .favorite-btn-wrapper {
+        .favorite-button-wrapper {
             @apply inline-flex ml-2;
         }
         .p-icon-text-button {

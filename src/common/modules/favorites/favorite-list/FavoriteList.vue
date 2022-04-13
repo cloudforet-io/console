@@ -13,14 +13,14 @@
             </template>
         </i18n>
         <template v-else>
-            <div v-for="item in displayItems" :key="item.id" class="item"
-                 :class="{hovered: hoveredItem ? hoveredItem.id === item.id : false}"
-                 @click="onClickItem(item, $event)"
+            <div v-for="item in displayItems" :key="item.resourceId" class="item"
+                 :class="{hovered: hoveredItem ? hoveredItem.resourceId === item.resourceId : false}"
+                 @click="handleClickItem(item, $event)"
                  @mouseenter="hoveredItem = item"
                  @mouseleave="hoveredItem = null"
             >
                 <router-link :to="referenceRouter(
-                                 item.id, {
+                                 item.resourceId, {
                                      resource_type: item.resourceType,
                                  })"
                              class="item-link"
@@ -28,13 +28,13 @@
                     <span class="icon"><slot name="icon" :item="item" /></span>
                     <span class="name">{{ item.name }}</span>
                 </router-link>
-                <p-icon-button v-if="hoveredItem && hoveredItem.id === item.id" name="ic_delete"
+                <p-icon-button v-if="hoveredItem && hoveredItem.resourceId === item.resourceId" name="ic_delete"
                                size="sm"
                                class="delete-btn"
-                               @click.prevent.stop="onClickDelete(item)"
+                               @click.prevent.stop="handleClickDelete(item)"
                 />
             </div>
-            <summary v-if="items.length > LIMIT_COUNT" class="toggle-btn" @click.stop="onClickToggle">
+            <summary v-if="items.length > LIMIT_COUNT" class="toggle-btn" @click.stop="handleClickToggle">
                 {{ isExpanded ? $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_LESS') : $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
                 <p-i :name="isExpanded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                      height="1rem" width="1rem" color="inherit transparent"
@@ -76,7 +76,7 @@ export default {
     setup(props: FavoriteListProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            displayItems: computed(() => {
+            displayItems: computed<FavoriteItem[]>(() => {
                 if (state.isExpanded) return props.items;
                 return props.items.slice(0, LIMIT_COUNT);
             }),
@@ -84,15 +84,15 @@ export default {
             isExpanded: false,
         });
 
-        const onClickDelete = (item: FavoriteItem) => {
+        const handleClickDelete = (item: FavoriteItem) => {
             vm.$emit('delete', item);
         };
 
-        const onClickToggle = () => {
+        const handleClickToggle = () => {
             state.isExpanded = !state.isExpanded;
         };
 
-        const onClickItem = async (item, e) => {
+        const handleClickItem = async (item, e) => {
             if (props.beforeRoute) {
                 const res = props.beforeRoute(item, e);
                 if (res) await res;
@@ -102,9 +102,9 @@ export default {
 
         return {
             ...toRefs(state),
-            onClickDelete,
-            onClickToggle,
-            onClickItem,
+            handleClickDelete,
+            handleClickToggle,
+            handleClickItem,
             referenceRouter,
             LIMIT_COUNT,
         };

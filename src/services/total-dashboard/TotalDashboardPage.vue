@@ -43,9 +43,7 @@
                     <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
                     >
-                        <favorites-widget class="hidden lg:block col-span-12"
-                                          :project="project" :cloud-service="cloudService" :extra-params="extraParams"
-                        />
+                        <favorites-widget class="hidden lg:block col-span-12" :extra-params="extraParams" />
                         <daily-updates class="col-span-12 daily-updates"
                                        :providers="providers" :extra-params="extraParams"
                         />
@@ -84,6 +82,7 @@ import ServiceAccounts from '@/services/dashboard/modules/ServiceAccounts.vue';
 import CollectorProgress from '@/services/dashboard/modules/CollectingProgress.vue';
 import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
 
 interface ExtraParams {
     domain_id?: string;
@@ -118,8 +117,6 @@ export default {
                 return params;
             }),
             providers: computed(() => vm.$store.state.reference.provider.items),
-            project: computed(() => [...vm.$store.getters['favorite/projectGroup/sortedItems'], ...vm.$store.getters['favorite/project/sortedItems']]),
-            cloudService: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
             timezone: computed(() => vm.$store.state.user.timezone || 'UTC'),
         });
 
@@ -145,10 +142,7 @@ export default {
         /** Init */
         (async () => {
             await Promise.allSettled([
-                vm.$store.dispatch('reference/provider/load'),
-                vm.$store.dispatch('favorite/projectGroup/load'),
-                vm.$store.dispatch('favorite/project/load'),
-                vm.$store.dispatch('favorite/cloudServiceType/load'),
+                store.dispatch('reference/provider/load'),
                 getDomainList(),
             ]);
             switchDomain(state.domainList[0]);

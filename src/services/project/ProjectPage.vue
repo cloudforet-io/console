@@ -11,7 +11,7 @@
                         </sidebar-title>
                         <favorite-list :items="favoriteItems" :before-route="beforeFavoriteRoute" @delete="onFavoriteDelete">
                             <template #icon="{item}">
-                                <p-i :name="item.id.startsWith('project') ? 'ic_tree_project' : 'ic_tree_project-group'"
+                                <p-i :name="item.resourceType === 'identity.Project' ? 'ic_tree_project' : 'ic_tree_project-group'"
                                      width="1rem" height="1rem" color="inherit inherit"
                                 />
                             </template>
@@ -41,9 +41,10 @@
                     >
                         <template #extra>
                             <span class="favorite-btn-wrapper">
-                                <favorite-button v-if="storeState.groupId && !isPermissionDenied" :item-id="storeState.groupId"
-                                                 favorite-type="projectGroup"
-                                                 resource-type="identity.ProjectGroup"
+                                <favorite-button v-if="storeState.groupId && !isPermissionDenied"
+                                                 :favorite-items="favoriteItems"
+                                                 :item-id="storeState.groupId"
+                                                 favorite-type="identity.ProjectGroup"
                                 />
                             </span>
                             <div class="btns">
@@ -183,15 +184,17 @@ export default {
             parentGroups: computed(() => store.getters['service/project/parentGroups']),
             hasProjectGroup: computed(() => store.state.service.project.hasProjectGroup),
             projectCount: computed(() => store.state.service.project.projectCount),
+            projectFavorite: computed(() => store.getters['favorite/projectItems']),
             projectGroupFormVisible: computed(() => store.state.service.project.projectGroupFormVisible),
             projectGroupDeleteCheckModalVisible: computed(() => store.state.service.project.projectGroupDeleteCheckModalVisible),
+            projectGroupFavorite: computed(() => store.getters['favorite/projectGroupItems']),
         });
 
         const state = reactive({
             initGroupId: vm.$route.query.select_pg as string,
             favoriteItems: computed<FavoriteItem[]>(() => [
-                ...store.getters['favorite/projectGroup/sortedItems'],
-                ...store.getters['favorite/project/sortedItems'],
+                ...storeState.projectGroupFavorite,
+                ...storeState.projectFavorite,
             ]),
             settingMenu: computed(() => [
                 { name: 'edit', label: vm.$t('PROJECT.LANDING.ACTION_EDIT_GROUP_NAME'), type: 'item' },
@@ -206,7 +209,7 @@ export default {
             }),
             projectGroupFavorites: computed(() => {
                 const res = {};
-                store.state.favorite.projectGroup.items.forEach((d) => {
+                store.state.favorite.projectGroupItems.forEach((d) => {
                     res[d.id] = d;
                 });
                 return res;
@@ -220,15 +223,14 @@ export default {
 
         /* Favorite */
         const onFavoriteDelete = (item: FavoriteItem) => {
-            if (item.id.startsWith('project')) store.dispatch('favorite/project/removeItem', item);
-            else store.dispatch('favorite/projectGroup/removeItem', item);
+            store.dispatch('favorite/removeItem', item);
         };
 
         const beforeFavoriteRoute = async (item: FavoriteItem, e: MouseEvent) => {
             if (item.resourceType === 'identity.ProjectGroup') {
                 e.preventDefault();
-                if (storeState.groupId !== item.id) {
-                    await store.dispatch('service/project/selectNode', item.id);
+                if (storeState.groupId !== item.resourceId) {
+                    await store.dispatch('service/project/selectNode', item.resourceId);
                 }
             }
         };
@@ -312,8 +314,10 @@ export default {
         /* Init */
         (async () => {
             await Promise.allSettled([
-                store.dispatch('favorite/projectGroup/load'),
-                store.dispatch('favorite/project/load'),
+                store.dispatch('favorite/load', 'identity.Project'),
+                store.dispatch('favorite/load', 'identity.ProjectGroup'),
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
             ]);
         })();
 

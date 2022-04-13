@@ -9,17 +9,17 @@
         </p>
         <div class="list-wrapper">
             <div class="label-wrapper">
-                <label v-for="(item, k) in items" :key="k">{{ item.label }}</label>
+                <label v-for="(item, k) in Object.values(items)" :key="k">{{ item.label }}</label>
             </div>
             <div class="item-wrapper">
-                <div v-for="(item, k) in items" :key="k" :style="{width}">
+                <div v-for="(item, k) in Object.values(items)" :key="k" :style="{width}">
                     <div v-if="item.favorites.length === 0" class="no-data">
                         {{ $t('COMMON.WIDGETS.FAVORITES_WIDGET.NO_DATA') }}
                     </div>
                     <template v-else>
-                        <router-link v-for="d in item.favorites" :key="d.id"
+                        <router-link v-for="d in item.favorites" :key="d.resourceId"
                                      :to="referenceRouter(
-                                         d.id, {
+                                         d.resourceId, {
                                              resource_type: d.resourceType,
                                          })"
                                      class="item"
@@ -30,7 +30,7 @@
                 </div>
             </div>
         </div>
-        <summary v-if="showToggle" class="toggle-btn" @click="onClickToggle">
+        <summary v-if="showToggle" class="toggle-btn" @click="handleClickToggle">
             {{ isExpanded ? $t('COMMON.WIDGETS.FAVORITES_WIDGET.TOGGLE_LESS') : $t('COMMON.WIDGETS.FAVORITES_WIDGET.TOGGLE_MORE') }}
             <p-i :name="isExpanded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                  height="1rem" width="1rem" color="inherit transparent"
@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
@@ -49,39 +49,31 @@ import { PI } from '@spaceone/design-system';
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import { TranslateResult } from 'vue-i18n';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { i18n } from '@/translations';
+import { store } from '@/store';
+
 
 type Item = Record<string, {label: TranslateResult; favorites: FavoriteItem[]}>
-
-interface FavoritesWidgetProps {
-    project: FavoriteItem[];
-    cloudService: FavoriteItem[];
-}
 
 const LIMIT_COUNT = 5;
 export default {
     name: 'FavoritesWidget',
     components: { PI },
-    props: {
-        project: {
-            type: Array,
-            default: () => [],
-        },
-        cloudService: {
-            type: Array,
-            default: () => [],
-        },
-    },
-    setup(props: FavoritesWidgetProps) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+    setup() {
         const state = reactive({
+            projects: computed<FavoriteItem[]>(() => ([
+                ...store.getters['favorite/projectGroupItems'],
+                ...store.getters['favorite/projectItems'],
+            ])),
+            cloudServiceTypes: computed<FavoriteItem[]>(() => store.getters['favorite/cloudServiceTypeItems']),
             items: computed<Item>(() => ({
                 project: {
-                    label: vm.$t('COMMON.WIDGETS.FAVORITES_WIDGET.LABEL_PROJECT'),
-                    favorites: state.isExpanded ? props.project : props.project.slice(0, LIMIT_COUNT),
+                    label: i18n.t('COMMON.WIDGETS.FAVORITES_WIDGET.LABEL_PROJECT'),
+                    favorites: state.isExpanded ? state.projects : state.projects.slice(0, LIMIT_COUNT),
                 },
                 cloudService: {
-                    label: vm.$t('COMMON.WIDGETS.FAVORITES_WIDGET.LABEL_CLOUD_SERVICE'),
-                    favorites: state.isExpanded ? props.cloudService : props.cloudService.slice(0, LIMIT_COUNT),
+                    label: i18n.t('COMMON.WIDGETS.FAVORITES_WIDGET.LABEL_CLOUD_SERVICE'),
+                    favorites: state.isExpanded ? state.cloudServiceTypes : state.cloudServiceTypes.slice(0, LIMIT_COUNT),
                 },
             })),
             width: computed(() => {
@@ -89,16 +81,28 @@ export default {
                 return `${length ? 100 / length : 100}%`;
             }),
             isExpanded: false,
-            showToggle: computed(() => props.project.length > LIMIT_COUNT || props.cloudService.length > LIMIT_COUNT),
+            showToggle: computed(() => state.projects.length > LIMIT_COUNT || state.cloudServiceTypes.length > LIMIT_COUNT),
         });
 
-        const onClickToggle = () => {
+        const handleClickToggle = () => {
             state.isExpanded = !state.isExpanded;
         };
 
+        /* Init */
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/cloudServiceType/load'),
+                store.dispatch('favorite/load', 'identity.Project'),
+                store.dispatch('favorite/load', 'identity.ProjectGroup'),
+                store.dispatch('favorite/load', 'inventory.CloudServiceType'),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
-            onClickToggle,
+            handleClickToggle,
             LIMIT_COUNT,
             referenceRouter,
         };

@@ -1,14 +1,19 @@
-import project from './project';
-import projectGroup from './project-group';
-import cloudServiceType from './cloud-service-type';
+import { FavoriteState } from '@/store/modules/favorite/type';
+import * as getters from './getters';
+import * as mutations from './mutations';
 import * as actions from './actions';
+
+
+const state: Required<FavoriteState> = {
+    projectItems: [],
+    projectGroupItems: [],
+    cloudServiceTypeItems: [],
+};
 
 export default {
     namespaced: true,
-    modules: {
-        project,
-        projectGroup,
-        cloudServiceType,
-    },
+    state,
+    getters,
     actions,
+    mutations,
 };

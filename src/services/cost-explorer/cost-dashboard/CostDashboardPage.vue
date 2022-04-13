@@ -8,10 +8,6 @@
             />
             <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
             <div class="left-part">
-                <!--                <favorite-button :item-id="'item-id1'"-->
-                <!--                                 favorite-type="project"-->
-                <!--                                 reference-type="identity.Project"-->
-                <!--                />-->
                 <p-icon-button name="ic_edit-text"
                                class="edit-btn"
                                :outline="false"

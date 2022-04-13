@@ -1,6 +1,6 @@
 export interface FavoriteItem {
-    id: string;
     resourceType: string;
+    resourceId: string;
     name?: string;
     label?: string;
     icon?: string;
@@ -8,5 +8,7 @@ export interface FavoriteItem {
 
 
 export interface FavoriteState {
-    items: Array<FavoriteItem>;
+    projectItems: FavoriteItem[];
+    projectGroupItems: FavoriteItem[];
+    cloudServiceTypeItems: FavoriteItem[];
 }

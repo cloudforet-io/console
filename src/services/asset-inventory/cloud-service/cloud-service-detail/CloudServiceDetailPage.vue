@@ -18,8 +18,8 @@
             >
                 <div>{{ item.name }}</div>
                 <favorite-button :item-id="item.cloud_service_type_id || ''"
-                                 favorite-type="cloudServiceType"
-                                 resource-type="inventory.CloudServiceType"
+                                 :favorite-items="sidebarState.favoriteItems"
+                                 favorite-type="inventory.CloudServiceType"
                                  class="favorite-btn"
                                  scale="0.8"
                 />
@@ -255,6 +255,7 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
 import { Period } from '@/services/cost-explorer/type';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { FavoriteItem } from '@/store/modules/favorite/type';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -332,6 +333,7 @@ export default {
             selectedItem: undefined as CloudServiceTypeInfo|undefined,
             isServer: computed<boolean>(() => sidebarState.selectedItem?.resource_type === 'inventory.Server'),
             serverCloudServiceType: computed<string|undefined>(() => find(sidebarState.cloudServiceTypeList, { resource_type: 'inventory.Server' })?.name),
+            favoriteItems: computed<FavoriteItem[]>(() => store.state.favorite.cloudServiceTypeItems),
         });
 
         /** Main Table */
@@ -758,7 +760,10 @@ export default {
 
         /** ******* Page Init ******* */
         const initSidebar = async () => {
-            await listCloudServiceTypeData();
+            await Promise.allSettled([
+                listCloudServiceTypeData(),
+                store.dispatch('favorite/load', 'inventory.CloudServiceType'),
+            ]);
             sidebarState.selectedItem = find(sidebarState.cloudServiceTypeList, { name: props.name });
         };
 
@@ -777,7 +782,6 @@ export default {
 
         watch([() => props.group, () => props.name], async () => {
             await initSidebar();
-            await store.dispatch('favorite/cloudServiceType/load');
             if (!props.name) await routeFirstItem();
             tableState.schema = await getTableSchema();
             await fetchTableData();
