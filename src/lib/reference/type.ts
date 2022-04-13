@@ -1,17 +1,17 @@
 /* eslint-disable camelcase */
 
 /*
- * Some reference types are added for routing purposes.
+ * Some resource types are added for routing purposes.
  * These are used only on the front end, so be careful when binding to the api.
  */
 
-const referenceTypes = ['inventory.Server', 'identity.Project', 'identity.ProjectGroup',
+const resourceTypes = ['inventory.Server', 'identity.Project', 'identity.ProjectGroup',
     'inventory.Collector', 'identity.ServiceAccount', 'identity.Provider',
     'inventory.Region', 'inventory.CloudService', 'inventory.CloudServiceType',
     'secret.Secret'];
-export type ReferenceType = typeof referenceTypes[number]
+export type ResourceType = typeof resourceTypes[number]
 
-export const referenceTypeLabels = Object.freeze({
+export const resourceTypeLabels = Object.freeze({
     'inventory.Server': 'Server',
     'identity.Project': 'Project',
     'identity.ProjectGroup': 'Project Group',
@@ -26,6 +26,6 @@ export const referenceTypeLabels = Object.freeze({
 });
 
 export interface Reference {
-    resource_type: ReferenceType;
+    resource_type: ResourceType;
     reference_key?: string;
 }

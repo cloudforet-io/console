@@ -28,7 +28,7 @@
                 </template>
                 <template v-else-if="name === 'additional'">
                     <div class="error-location">
-                        <span> {{ value.resource_type ? referenceTypeLabels[value.resource_type] : '--' }}</span>
+                        <span> {{ value.resource_type ? resourceTypeLabels[value.resource_type] : '--' }}</span>
                         <template v-if="detailErrorLocationList.includes(value.resource_type)">
                             <span> {{ value.cloud_service_group ? `> ${value.cloud_service_group}` : '' }}</span>
                             <span> {{ value.cloud_service_type ? `> ${value.cloud_service_type}` : '' }}</span>
@@ -57,7 +57,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { JobTaskData, JobTaskError } from '@/services/asset-inventory/collector-history/collect-job/type';
-import { referenceTypeLabels } from '@/lib/reference/type';
+import { resourceTypeLabels } from '@/lib/reference/type';
 
 interface Props {
     selectedItem: JobTaskData;
@@ -124,7 +124,7 @@ export default {
         return {
             ...toRefs(state),
             detailErrorLocationList,
-            referenceTypeLabels,
+            resourceTypeLabels,
             handleUpdateErrorItemCollapsedState,
         };
     },

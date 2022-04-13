@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { concat } from 'lodash';
 import { Location } from 'vue-router';
-import { Reference, ReferenceType } from '@/lib/reference/type';
+import { Reference, ResourceType } from '@/lib/reference/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
@@ -90,7 +90,7 @@ const cloudServiceTypeLinkFormatter: LinkFormatter = (name, data, reference, que
     return location;
 };
 
-type RouterMap = Record<ReferenceType, { name: string; formatter: LinkFormatter}>
+type RouterMap = Record<ResourceType, { name: string; formatter: LinkFormatter}>
 
 const routerMap: RouterMap = {
     'inventory.Server':

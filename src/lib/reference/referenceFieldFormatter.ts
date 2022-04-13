@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { Reference, ReferenceType } from '@/lib/reference/type';
+import { Reference, ResourceType } from '@/lib/reference/type';
 import { DynamicFieldProps } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
@@ -9,7 +9,7 @@ interface FieldFormatter {
     (data: string, reference: Reference): Partial<DynamicFieldProps>;
 }
 
-type FormatterMap = Record<ReferenceType, FieldFormatter>
+type FormatterMap = Record<ResourceType, FieldFormatter>
 /**
  * getter - reference/fieldItems
  *
