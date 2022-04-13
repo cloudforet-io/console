@@ -12,7 +12,7 @@
         <div ref="contentRef" class="popper" :class="{ 'visible': isVisible }">
             <div class="popper-content-wrapper">
                 <slot name="content" />
-                <p-icon-button name="ic_delete" color="inherit"
+                <p-icon-button name="ic_delete" color="inherit" size="sm"
                                class="delete-icon" @click="handleClickDeleteIcon"
                 />
             </div>
