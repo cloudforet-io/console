@@ -1,3 +1,10 @@
+# [1.1.0-beta.277](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.276...v1.1.0-beta.277) (2022-04-13)
+
+
+### Bug Fixes
+
+* fix delete-icon size of popover component ([#921](https://github.com/spaceone-dev/spaceone-design-system/issues/921)) ([ae64613](https://github.com/spaceone-dev/spaceone-design-system/commit/ae6461376356934096a80d3236e7eb82d8a3581a))
+
 # [1.1.0-beta.276](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.275...v1.1.0-beta.276) (2022-04-11)
 
 
