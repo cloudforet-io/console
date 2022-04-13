@@ -2,18 +2,18 @@
     <section class="budget-detail-summary">
         <p-pane-layout class="summary-card">
             <span v-if="!loading" class="summary-title">
-                {{ budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL ?
-                    $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_BUDGETED_AMOUNT')
-                    : $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.LABEL_START_END_MONTH') }}
+                Amount Planning Type <span class="font-normal">(Period)</span>
             </span>
-            <div v-if="!loading">
+            <div v-if="!loading" class="flex justify-between">
                 <p v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL" class="summary-content">
-                    <b>{{ currencyMoneyFormatter(budgetData.limit, currency, currencyRates) }}</b>
-                    ({{ budgetData.start }} ~ {{ budgetData.end }})
+                    <b>Total Amount</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
                 </p>
                 <p v-else class="summary-content">
-                    {{ budgetData.start }} ~ {{ budgetData.end }}
+                    <b>Monthly Planning</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
                 </p>
+                <amount-planning-type-popover class="summary-content" :budget-data="budgetData">
+                    <span class="view-all">Details</span>
+                </amount-planning-type-popover>
             </div>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
@@ -34,14 +34,12 @@
             </span>
             <p v-if="!loading" class="summary-content cost-type">
                 <span class="cost-type-content">{{ processedCostTypeValue }}</span>
-                <span ref="buttonRef" class="view-all" @click="handleClickViewAll">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.VIEW_ALL') }}</span>
-                <budget-cost-type-balloon v-if="balloonVisible"
-                                          class="cost-type-balloon"
-                                          :balloon-width="balloonWidth"
-                                          :balloon-visible.sync="balloonVisible"
-                                          :cost-type-key="costTypeKey"
-                                          :cost-type-value="processedCostTypeValue"
-                />
+                <budget-cost-type-popover
+                    :cost-type-key="costTypeKey"
+                    :cost-type-value="processedCostTypeValue"
+                >
+                    <span class="view-all">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.VIEW_ALL') }}</span>
+                </budget-cost-type-popover>
             </p>
         </p-pane-layout>
     </section>
@@ -52,11 +50,15 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { PPaneLayout, PAnchor } from '@spaceone/design-system';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
-import { BUDGET_TIME_UNIT, BudgetData, CostType } from '@/services/cost-explorer/budget/type';
-import BudgetCostTypeBalloon
-    from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetCostTypeBalloon.vue';
+import {
+    BUDGET_TIME_UNIT, BudgetData, CostType,
+} from '@/services/cost-explorer/budget/type';
+import BudgetCostTypePopover
+    from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetCostTypePopover.vue';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { CURRENCY } from '@/store/modules/display/config';
+import AmountPlanningTypePopover
+    from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
 
 const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];
 const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
@@ -71,7 +73,8 @@ const costTypeMap = {
 export default {
     name: 'BudgetDetailInfo',
     components: {
-        BudgetCostTypeBalloon,
+        AmountPlanningTypePopover,
+        BudgetCostTypePopover,
         PPaneLayout,
         PAnchor,
     },
@@ -94,15 +97,11 @@ export default {
             costTypeValue: computed(() => (state.budgetData ? getValueOfCostType(state.budgetData?.cost_types, state.costTypeKey) : [])),
             processedCostTypeValue: computed(() => state.costTypeValue?.join(', ') || 'All'),
             buttonRef: null as HTMLElement | null,
-            balloonWidth: 0,
             balloonVisible: false,
             loading: computed(() => store.getters['service/budget/isBudgetLoading']),
         });
 
         const handleClickViewAll = () => {
-            const rect = state.buttonRef.getBoundingClientRect();
-            const width = rect.width;
-            state.balloonWidth = width;
             state.balloonVisible = true;
         };
 
@@ -160,13 +159,13 @@ export default {
                 font-size: 0.875rem;
                 line-height: 130%;
             }
-            .view-all {
-                @apply text-blue-700 cursor-pointer;
-                font-size: 0.875rem;
-                margin-left: 0.5rem;
-                flex-shrink: 0;
-            }
         }
+    }
+    .view-all {
+        @apply text-blue-700 cursor-pointer;
+        font-size: 0.875rem;
+        margin-left: 0.5rem;
+        flex-shrink: 0;
     }
 
     @screen tablet {

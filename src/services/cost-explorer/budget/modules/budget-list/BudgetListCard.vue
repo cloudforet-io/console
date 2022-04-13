@@ -40,7 +40,7 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
                             </p>
                             <div class="amount-used-wrapper" :class="progressStatus">
-                                <span class="cost">{{ currencyMoneyFormatter(cost, currency, currencyRates, false, 10000000000) }}</span>
+                                <span class="cost">{{ currencyMoneyFormatter(cost, currency, currencyRates) }}</span>
                                 <span class="percent">(<template v-if="percentage < 0">0.00</template>
                                     <template v-else>{{ percentage.toFixed(2) }}</template>%)</span>
                             </div>
@@ -50,7 +50,7 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
                             </p>
                             <div class="cost">
-                                {{ currencyMoneyFormatter(limit, currency, currencyRates, false, 10000000000) }}
+                                {{ currencyMoneyFormatter(limit, currency, currencyRates) }}
                             </div>
                         </div>
                     </div>

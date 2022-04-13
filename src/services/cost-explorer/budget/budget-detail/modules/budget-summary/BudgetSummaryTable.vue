@@ -1,28 +1,42 @@
 <template>
-    <p-data-table :fields="fields" :items="data"
-                  :skeleton-rows="3"
-                  :stripe="false"
-                  :selectable="false"
-                  :disable-copy="true"
-                  :disable-hover="true"
-                  class="budget-summary-table"
-    >
-        <template #col-format="{field, value, index}">
-            <span v-if="field.name && value.path === 'limit'">
-                {{ currencyMoneyFormatter(value[value.path], currency, currencyRates) }}
-            </span>
-            <span v-else-if="field.name && value.path === 'usd_cost'" class="text-blue-700">
-                <router-link :to="value.link" class="link-text">
-                    {{ currencyMoneyFormatter(value[value.path], currency, currencyRates) }}
-                </router-link>
-            </span>
-            <span v-else>{{ value[value.path] }}</span>
-        </template>
-    </p-data-table>
+    <fragment>
+        <p class="toggle">
+            Original Data
+            <p-collapsible-toggle :toggle-type="'switch'"
+                                  :is-collapsed.sync="showFormattedBudgetData" class="collapsible-toggle"
+            />
+        </p>
+        <p-data-table :fields="fields" :items="data"
+                      :skeleton-rows="3"
+                      :stripe="false"
+                      :selectable="false"
+                      :disable-copy="true"
+                      :disable-hover="true"
+                      class="budget-summary-table"
+        >
+            <template #col-format="{field, value, index}">
+                <span v-if="field.name && value.path === 'limit'">
+                    {{
+                        showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], currency, currencyRates)
+                        : currencyMoneyFormatter(value[value.path], currency, currencyRates, false, 1000000000)
+                    }}
+                </span>
+                <span v-else-if="field.name && value.path === 'usd_cost'" class="text-blue-700">
+                    <router-link :to="value.link" class="link-text">
+                        {{
+                            showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], currency, currencyRates)
+                            : currencyMoneyFormatter(value[value.path], currency, currencyRates, false, 1000000000)
+                        }}
+                    </router-link>
+                </span>
+                <span v-else>{{ value[value.path] }}</span>
+            </template>
+        </p-data-table>
+    </fragment>
 </template>
 
 <script lang="ts">
-import { PDataTable } from '@spaceone/design-system';
+import { PCollapsibleToggle, PDataTable } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import cloneDeep from 'lodash/cloneDeep';
 import { store } from '@/store';
@@ -79,6 +93,7 @@ export default {
     name: 'BudgetDetailSummaryTable',
     components: {
         PDataTable,
+        PCollapsibleToggle,
     },
     props: {
         currency: {
@@ -167,6 +182,7 @@ export default {
                 // textAlign: 'right',
             }))),
             loading: true,
+            showFormattedBudgetData: true,
         });
 
         const setTableItems = (name, path) => {
@@ -194,6 +210,13 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
+.toggle {
+    @apply font-bold flex items-center;
+    font-size: 0.875rem;
+    line-height: 125%;
+    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+}
 .budget-summary-table {
     td {
         .link-text {

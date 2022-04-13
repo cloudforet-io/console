@@ -1,0 +1,98 @@
+<template>
+    <p-popover class="popover" position="bottom-end">
+        <slot />
+        <template #content>
+            <div v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL" class="total-wrapper">
+                <p class="total-data">
+                    {{ currencyMoneyFormatter(budgetData.limit, currency, currencyRates, false, 1000000000) }}
+                </p>
+            </div>
+            <template v-else>
+                <div class="monthly-wrapper">
+                    <p v-for="{ date, limit } in budgetData.planned_limits" :key="date" class="monthly-data">
+                        <span>
+                            <span class="date">
+                                {{ dateFormatter(date) }}
+                            </span>
+                            <br>
+                            <span>{{ currencyMoneyFormatter(limit, currency, currencyRates, false, 1000000000) }}</span>
+                        </span>
+                    </p>
+                </div>
+            </template>
+        </template>
+    </p-popover>
+</template>
+
+<script lang="ts">
+import { PPopover } from '@spaceone/design-system';
+import { BUDGET_TIME_UNIT, BudgetData } from '@/services/cost-explorer/budget/type';
+import dayjs from 'dayjs';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { computed, reactive, toRefs } from '@vue/composition-api';
+import { store } from '@/store';
+
+export default {
+    name: 'AmountPlanningTypePopover',
+    components: {
+        PPopover,
+    },
+    props: {
+        budgetData: {
+            type: Object as () => BudgetData,
+            default: () => ({}),
+        },
+    },
+
+    setup() {
+        const state = reactive({
+            currency: computed(() => store.state.display.currency),
+            currencyRates: computed(() => store.state.display.currencyRates),
+        });
+        const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
+        return {
+            ...toRefs(state),
+            BUDGET_TIME_UNIT,
+            dateFormatter,
+            currencyMoneyFormatter,
+        };
+    },
+};
+</script>
+
+<style lang="postcss" scoped>
+.popover::v-deep {
+    .popper {
+        z-index: 1;
+        max-width: none;
+    }
+}
+.total-wrapper {
+    @apply flex items-center bg-gray-100;
+    min-width: 10.5rem;
+    min-height: 2.625rem;
+    padding-left: 0.75rem;
+}
+.monthly-wrapper {
+    @apply grid;
+    grid-template-columns: repeat(3, 144px);
+    grid-template-rows: repeat(4, 61px);
+
+    .monthly-data {
+        @apply flex items-center;
+        height: inherit;
+        line-height: 125%;
+        font-size: 0.875rem;
+        padding-left: 0.75rem;
+        .date {
+            @apply font-bold;
+            font-size: 0.75rem;
+        }
+    }
+}
+
+.monthly-wrapper > p:nth-child(6n+1), .monthly-wrapper > p:nth-child(6n+2),
+.monthly-wrapper > p:nth-child(6n+3) {
+    @apply bg-gray-100;
+}
+</style>
