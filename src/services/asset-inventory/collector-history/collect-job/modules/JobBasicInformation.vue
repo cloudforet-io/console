@@ -4,7 +4,7 @@
         <section class="items-container">
             <div class="item">
                 <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR') }}</label>
-                <p-anchor :to="collector.linkLocation" class="contents">
+                <p-anchor :to="collector.linkLocation" class="contents" size="sm">
                     {{ collector.label }}
                 </p-anchor>
             </div>

@@ -33,7 +33,6 @@
                     <span v-if="inputModel.scope === SCOPE.project">
                         (<p-anchor :to="referenceRouter(inputModel.project_id,{ resource_type: 'identity.Project' })"
                                    :text="projects[inputModel.project_id] ? projects[inputModel.project_id].label : inputModel.project_id"
-                                   :show-icon="true"
                                    highlight
                                    class="align-top"
                         />)
@@ -52,7 +51,6 @@
                 <p-anchor class="link-text"
                           :to="{ name: PROJECT_ROUTE._NAME }"
                           :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GO_CREATE_PROJECT')"
-                          :show-icon="true"
                           highlight
                 />
             </template>

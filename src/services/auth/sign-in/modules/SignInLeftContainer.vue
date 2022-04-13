@@ -15,7 +15,7 @@
             </p-badge>
             <span class="help-msg">{{ $t('COMMON.SIGN_IN.NEED_HELP') }}
                 <p-anchor :href="contactLink ? contactLink : 'mailto:support@spaceone.dev'" target="_blank"
-                          :show-icon="false" highlight
+                          :icon-visible="false" highlight
                 >
                     <span class="text-blue-700 ml-2">{{ $t('COMMON.SIGN_IN.CONTACT') }}</span>
                 </p-anchor>

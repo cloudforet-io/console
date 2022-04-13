@@ -36,7 +36,7 @@
             </span>
             <span v-else-if="typeof value !== 'string'" class="text-center">
                 <p-anchor :to="value ? getLink(item, field.name) : undefined"
-                          :show-icon="false"
+                          :icon-visible="false"
                 >
                     <template v-if="getIsRaised(item, field.name)">
                         <span class="cell-text raised">{{ currencyMoneyFormatter(value, currency, currencyRates, true) }}</span>

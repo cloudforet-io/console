@@ -15,7 +15,6 @@
             <div>
                 <p-anchor v-for="resource in availableResources" :key="resource.id" class="legend"
                           :href="resource.link"
-                          :show-icon="true"
                 >
                     <template #left-extra>
                         <span class="circle"

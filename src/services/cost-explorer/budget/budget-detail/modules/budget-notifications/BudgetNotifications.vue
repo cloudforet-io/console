@@ -226,7 +226,6 @@ export default {
                 margin-right: 0.5rem;
             }
             .link-text {
-                font-size: 0.875rem;
                 line-height: 160%;
             }
         }

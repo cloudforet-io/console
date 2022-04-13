@@ -12,7 +12,7 @@
                      @click="tabState.activeTab = data.name"
                 >
                     <p-anchor :href="summaryLinkFormatter(data.name).href"
-                              :show-icon="false" class="count" highlight
+                              :icon-visible="false" class="count" highlight
                     >
                         {{ data.count | summaryCount }}
                     </p-anchor>

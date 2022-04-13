@@ -5,7 +5,7 @@
             <template v-if="!loading && costQuerySetList.length">
                 <p-icon-button name="ic_refresh" @click="handleRefresh" />
                 <p-anchor :to="{ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME }"
-                          :show-icon="false"
+                          :icon-visible="false"
                 >
                     <p-icon-text-button style-type="primary1" name="ic_plus_bold">
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}

@@ -29,7 +29,8 @@
                      class="table-row"
                 >
                     <p-anchor :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
-                              :show-icon="false"
+                              :icon-visible="false"
+                              size="sm"
                               target="_self"
                               class="col-name"
                     >
@@ -297,9 +298,8 @@ export default {
             gap: 0.5rem;
 
             .col-name {
-                @apply col-span-3 truncate;
+                @apply col-span-3 truncate justify-end;
                 text-align: right;
-                font-size: 0.75rem;
 
                 .tablet-text {
                     display: none;

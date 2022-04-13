@@ -57,7 +57,7 @@
                 <template #col-title-format="{ value, item }">
                     <template v-if="value">
                         <p-anchor target="_self"
-                                  :show-icon="false"
+                                  :icon-visible="false"
                                   highlight
                                   :to="{
                                       name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,

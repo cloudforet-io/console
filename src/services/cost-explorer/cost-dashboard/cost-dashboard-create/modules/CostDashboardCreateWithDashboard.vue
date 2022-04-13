@@ -127,7 +127,6 @@ export default {
             }
             .p-anchor {
                 @apply text-center text-blue-700;
-                font-size: 0.875rem;
             }
         }
     }
