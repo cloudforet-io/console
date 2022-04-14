@@ -43,23 +43,35 @@ const filterMenuByRoute = (menuList: GNBMenu[], disabledMenu: string[], showBill
     return results;
 }, [] as GNBMenu[]);
 
-export const GNBMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): GNBMenu[] => {
+const getSubMenuList = (subMenu) => {
+    if (!subMenu) return [];
+    const result = subMenu.map((item) => {
+        const menu = { ...item, to: { name: menuRouterMap[item.id]?.name } };
+        if (menu.sub_menu) {
+            menu.subMenuList = getSubMenuList(menu.sub_menu);
+        }
+        return menu;
+    });
+    return result;
+};
+
+export const AllMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): GNBMenu[] => {
     const _isAdmin = rootGetters['user/isAdmin'];
     const _billingEnabledMenuList: string[] = config.get('BILLING_ENABLED') ?? [];
     const _showBilling = _billingEnabledMenuList.includes(rootState.domain.domainId);
     const _disabledMenu = config.get('DISABLED_MENU');
     const _menuList = state.menuList as Menu[];
 
-    const allMenuList: GNBMenu[] = _menuList.map(d => ({
+    const _allMenuList: GNBMenu[] = _menuList.map(d => ({
         label: d.label,
         id: d.id,
         to: { name: menuRouterMap[d.id].name },
-        subMenuList: d.sub_menu ? d.sub_menu.map(item => ({
-            ...item,
-            to: { name: menuRouterMap[item.id].name },
-        })) : [],
+        optional: d.optional,
+        subMenuList: getSubMenuList(d.sub_menu),
     }));
 
-
-    return filterMenuByRoute(allMenuList, _disabledMenu, _showBilling, _isAdmin, SpaceRouter.router);
+    return filterMenuByRoute(_allMenuList, _disabledMenu, _showBilling, _isAdmin, SpaceRouter.router);
 };
+
+
+export const GNBMenuList: Getter<DisplayState, any> = (state, getters): GNBMenu[] => getters.AllMenuList.filter(d => !d.optional);

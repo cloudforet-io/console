@@ -5,6 +5,7 @@ export interface Menu {
     id: string;
     label: string;
     sub_menu?: Menu[];
+    optional?: boolean;
 }
 
 export interface GNBMenu extends Menu {

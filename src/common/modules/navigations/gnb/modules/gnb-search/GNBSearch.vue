@@ -151,7 +151,7 @@ export default defineComponent<Props>({
             loading: true,
             // data
             allMenuList: computed<MenuData[]>(() => {
-                const menu = store.getters['display/GNBMenuList'];
+                const menu = store.getters['display/AllMenuList'];
                 return convertToConsoleMenuList(menu);
             }),
             filteredMenuList: [] as MenuData[],

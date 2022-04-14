@@ -3,6 +3,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 const assetInventoryRouter = {
     asset_inventory: {
@@ -16,9 +17,6 @@ const assetInventoryRouter = {
     },
     'asset_inventory.collector': {
         name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
-    },
-    'asset_inventory.collector_history': {
-        name: ASSET_INVENTORY_ROUTE.COLLECTOR_HISTORY._NAME,
     },
     'asset_inventory.service_account': {
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
@@ -62,12 +60,30 @@ const projectRouter = {
 
 };
 
-const administrationMenuRouter = {
+const administrationRouter = {
     administration: {
         name: ADMINISTRATION_ROUTE._NAME,
     },
     'administration.iam': {
         name: ADMINISTRATION_ROUTE.IAM._NAME,
+    },
+    'administration.user': {
+        name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
+    },
+};
+
+const myPageRouter = {
+    my_page: {
+        name: MY_PAGE_ROUTE._NAME,
+    },
+    'my_page.account_profile': {
+        name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
+    },
+    'my_page.api_key': {
+        name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME,
+    },
+    'my_page.notifications': {
+        name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME,
     },
 };
 
@@ -77,5 +93,6 @@ export const menuRouterMap = {
     ...alertManagerRouter,
     ...costExplorerRouter,
     ...projectRouter,
-    ...administrationMenuRouter,
+    ...administrationRouter,
+    ...myPageRouter,
 };
