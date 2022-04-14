@@ -82,7 +82,7 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
     iconName: {
         name: 'iconName',
         type: { name: 'string' },
-        description: 'The name of the icon to be displayed.',
+        description: 'The name of the icon to be displayed. Opens as a new tab only if you use the `ic_external-link` icon.',
         defaultValue: 'ic_external-link',
         table: {
             type: {
@@ -131,24 +131,6 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'object',
-        },
-    },
-    target: {
-        name: 'target',
-        type: { name: 'string' },
-        description: 'a tag target attribute',
-        defaultValue: '_self',
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: '"_blank"',
-            },
-        },
-        control: {
-            type: 'text',
         },
     },
     disabled: {

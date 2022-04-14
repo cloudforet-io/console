@@ -25,7 +25,6 @@ export const Template = (args, { argTypes }) => ({
             :icon-name="iconName"
             :href="href"
             :to="to"
-            :target="target"
             :disabled="disabled"
             :highlight="highlight"
         >
@@ -49,6 +48,8 @@ This component prevents the propagation of the click event by default.
 
 ## Basic Anchor
 
+Opens as a new tab only if you use the ic_external-link icon.
+
 <Canvas>
     <Story name="Basic">
         {{
@@ -56,8 +57,8 @@ This component prevents the propagation of the click event by default.
             router,
             template: `
             <div class="grid gap-6">
-                <p-anchor href="https://www.google.com" target="_self">This is <strong>default</strong> anchor with default slot.</p-anchor>
-                <p-anchor text="This is a default anchor with text props." href="https://www.google.com" />
+                <p-anchor href="https://www.google.com">This is <strong>default</strong> anchor with default slot.</p-anchor>
+                <p-anchor text="This is a default anchor with text props." :icon-visible="false" href="https://www.google.com" />
             </div>
     `,
         }}

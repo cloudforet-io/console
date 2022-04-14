@@ -3,7 +3,7 @@
         <template #default="{href: toHref, navigate}">
             <span>
                 <a class="p-anchor" :class="{disabled, highlight, [iconPosition]: true, [size]: true}"
-                   :target="disabled ? '_self' : (iconName==='ic_external-link' ? '_blank' : target)"
+                   :target="validateTarget()"
                    :href="to ? (toHref || href ): href"
                    @click.stop="navigate"
                 >
@@ -39,7 +39,7 @@ interface Props {
   iconName?: string;
   href?: string;
   to?: Location;
-  target?: string;
+  disabled?: boolean;
   highlight?: boolean;
 }
 
@@ -83,10 +83,6 @@ export default defineComponent<Props>({
             type: Object,
             default: undefined,
         },
-        target: {
-            type: String,
-            default: '_blank',
-        },
         disabled: {
             type: Boolean,
             default: false,
@@ -95,6 +91,19 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
+    },
+    setup(props: Props) {
+        const validateTarget = () => {
+            const {
+                disabled, iconName, iconVisible,
+            } = props;
+            if (disabled) return '_self';
+            if (iconName === 'ic_external-link' && iconVisible) return '_blank';
+            return '_self';
+        };
+        return {
+            validateTarget,
+        };
     },
 });
 </script>
