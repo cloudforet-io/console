@@ -1,16 +1,15 @@
-import { AlertStoreState } from '@/services/alert-manager/store/type';
-import * as getters from './getters';
-import * as actions from './actions';
-import * as mutations from './mutations';
-
-const state: AlertStoreState = {
-    alertData: null,
-};
+// import * as getters from './getters';
+// import * as actions from './actions';
+// import * as mutations from './mutations';
+import { Module } from 'vuex';
+import alert from './alert';
 
 export default {
     namespaced: true,
-    state: () => ({ ...state }),
-    getters,
-    actions,
-    mutations,
-};
+    modules: {
+        alert,
+    },
+    // getters,
+    // actions,
+    // mutations,
+} as Module<any, any>;

@@ -84,9 +84,6 @@ import AlertStatusUpdate
     from '@/services/alert-manager/alert/alert-detail/modules/AlertStatusUpdate.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { store } from '@/store';
-import alertStoreModule from '@/services/alert-manager/store';
-import { AlertStoreState } from '@/services/alert-manager/store/type';
-import { registerServiceStore } from '@/common/composables/register-service-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { NoResourceError } from '@/common/composables/error/error';
 
@@ -114,7 +111,6 @@ export default {
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        registerServiceStore<AlertStoreState>('alertManager/alert', alertStoreModule);
 
         const state = reactive({
             alertInfo: computed(() => store.state.service.alertManager.alert.alertData),

@@ -1,6 +1,6 @@
 import { AlertDataModel } from '@/services/alert-manager/type';
 
-export interface AlertStoreState {
+export interface AlertState {
 	alertData: Partial<AlertDataModel>|null;
 }
 
