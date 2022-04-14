@@ -1,3 +1,10 @@
+# [1.1.0-beta.279](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.278...v1.1.0-beta.279) (2022-04-14)
+
+
+### Bug Fixes
+
+* remove target property of anchor ([#923](https://github.com/spaceone-dev/spaceone-design-system/issues/923)) ([c360367](https://github.com/spaceone-dev/spaceone-design-system/commit/c360367c2cb2a13aa54ad578063e8aeeddd4f64c))
+
 # [1.1.0-beta.278](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.277...v1.1.0-beta.278) (2022-04-13)
 
 
