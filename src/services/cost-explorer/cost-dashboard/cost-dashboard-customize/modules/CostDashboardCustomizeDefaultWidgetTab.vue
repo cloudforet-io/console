@@ -95,7 +95,7 @@ export default {
                 if (state.layoutOfSpace) return state.widgetList.filter(widget => widget.options.layout === state.layoutOfSpace);
                 return [];
             }),
-            selectedWidget: computed<WidgetInfo>(() => store.state.service?.costDashboard?.originSelectedWidget),
+            selectedWidget: computed<WidgetInfo>(() => store.state.service.costExplorer.dashboard.originSelectedWidget),
             editableWidgetOptionList: computed<EDITABLE_WIDGET_OPTIONS_TYPE[]>(() => {
                 const optionList: EDITABLE_WIDGET_OPTIONS_TYPE[] = [];
                 if (state.selectedWidget?.options?.group_by) optionList.push(EDITABLE_WIDGET_OPTIONS.GROUP_BY);
@@ -107,7 +107,7 @@ export default {
             totalCount: 0,
             thisPage: 1,
             allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
-            layoutOfSpace: computed(() => store.state.service.costDashboard?.layoutOfSpace),
+            layoutOfSpace: computed(() => store.state.service.costExplorer.dashboard.layoutOfSpace),
         });
         const getWidgets = async () => {
             try {
@@ -121,8 +121,8 @@ export default {
         const getChartTypeImageFileName = (chartType: CHART_TYPE) => chartTypeItemMap[chartType].imageFileName;
 
         const selectWidget = (value: WidgetInfo) => {
-            store.commit('service/costDashboard/setOriginSelectedWidget', value);
-            store.commit('service/costDashboard/setEditedSelectedWidget', value);
+            store.commit('service/costExplorer/dashboard/setOriginSelectedWidget', value);
+            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', value);
         };
 
         (() => {

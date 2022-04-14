@@ -68,17 +68,17 @@ export default {
         const state = reactive({
             customizeModalVisible: false,
             editingCustomLayout: computed<CustomLayout[]>({
-                get() { return store.state.service.costDashboard.editedCustomLayout; },
+                get() { return store.state.service.costExplorer.dashboard.editedCustomLayout; },
                 set(val) {
-                    store.commit('service/costDashboard/setEditedCustomLayout', [...val]);
+                    store.commit('service/costExplorer/dashboard/setEditedCustomLayout', [...val]);
                 },
             }),
         });
 
         const handleClickAddWidget = () => {
             state.customizeModalVisible = true;
-            store.commit('service/costDashboard/setWidgetPosition', undefined);
-            store.commit('service/costDashboard/setLayoutOfSpace', undefined);
+            store.commit('service/costExplorer/dashboard/setWidgetPosition', undefined);
+            store.commit('service/costExplorer/dashboard/setLayoutOfSpace', undefined);
         };
 
         onUnmounted(() => {

@@ -1,7 +1,8 @@
 import { RouteConfig } from 'vue-router';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
-const CostManagementPage = () => import(/* webpackChunkName: "CostManagementPage" */ '@/services/cost-explorer/CostManagementPage.vue');
+const CostExplorerContainer = () => import(/* webpackChunkName: "CostExplorerContainer" */ '@/services/cost-explorer/CostExplorerContainer.vue');
+
 const CostDashboardCreatePage = () => import(/* webpackChunkName: "CostDashboardCreatePage" */ '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/CostDashboardCreatePage.vue');
 // eslint-disable-next-line max-len
 const CostDashboardCustomizePage = () => import(/* webpackChunkName: "CostDashboardCustomizePage" */'@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/CostDashboardCustomizePage.vue');
@@ -17,8 +18,7 @@ export default {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
     redirect: '/cost-explorer/dashboard',
-    meta: { label: 'Cost Explorer' },
-    component: CostManagementPage,
+    component: CostExplorerContainer,
     children: [
         {
             path: 'dashboard/create',
@@ -35,14 +35,14 @@ export default {
         {
             path: 'dashboard/:dashboardId?',
             name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
-            meta: { isVerticalLayout: true },
+            meta: { lnbVisible: true },
             props: true,
             component: CostDashboardPage,
         },
         {
             path: 'cost-analysis/:querySetId?',
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-            meta: { isVerticalLayout: true },
+            meta: { lnbVisible: true },
             props: true,
             component: CostAnalysisPage,
         },
@@ -53,7 +53,7 @@ export default {
                 {
                     path: '/',
                     name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-                    meta: { isVerticalLayout: true },
+                    meta: { lnbVisible: true },
                     component: BudgetPage,
                 },
                 {

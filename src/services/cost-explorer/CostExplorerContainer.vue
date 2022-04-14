@@ -1,10 +1,8 @@
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.isVerticalLayout"
-                              class="cost-management-page"
-        >
+        <vertical-page-layout v-if="$route.meta.lnbVisible">
             <template #sidebar>
-                <cost-management-menu />
+                <cost-explorer-l-n-b />
             </template>
             <template #default>
                 <router-view />
@@ -19,17 +17,23 @@
 <script lang="ts">
 import { store } from '@/store';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
-import CostManagementMenu from '@/services/cost-explorer/modules/CostManagementMenu.vue';
+import CostExplorerLNB from '@/services/cost-explorer/CostExplorerLNB.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+import { registerServiceStore } from '@/common/composables/register-service-store';
+import costExplorerStore from '@/services/cost-explorer/store';
+import { CostExplorerState } from '@/services/cost-explorer/store/type';
 
 export default {
-    name: 'CostManagementPage',
+    name: 'CostExplorerContainer',
     components: {
         GeneralPageLayout,
-        CostManagementMenu,
+        CostExplorerLNB,
         VerticalPageLayout,
     },
     setup() {
+        registerServiceStore<CostExplorerState>('costExplorer', costExplorerStore);
+
+        /* Init */
         (async () => {
             await store.dispatch('display/loadCurrencyRates');
         })();

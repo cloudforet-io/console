@@ -38,16 +38,16 @@ export default {
         const state = reactive({
             includesFilter: computed({
                 get() {
-                    return store.state.service?.costDashboard?.includesFilter ?? false;
+                    return store.state.service.costExplorer.dashboard.includesFilter ?? false;
                 },
                 set(value) {
-                    store.commit('service/costDashboard/setIncludesFilter', value);
+                    store.commit('service/costExplorer/dashboard/setIncludesFilter', value);
                 },
             }),
             defaultFilterModalVisible: false,
-            defaultFilter: computed(() => store.state.service?.costDashboard?.defaultFilter ?? {}),
-            isDashboardTemplate: computed(() => has(store.state.service?.costDashboard?.selectedTemplate, 'public_dashboard_id')
-                || has(store.state.service?.costDashboard?.selectedTemplate, 'user_dashboard_id')),
+            defaultFilter: computed(() => store.state.service.costExplorer.dashboard.defaultFilter ?? {}),
+            isDashboardTemplate: computed(() => has(store.state.service.costExplorer.dashboard.selectedTemplate, 'public_dashboard_id')
+                || has(store.state.service.costExplorer.dashboard.selectedTemplate, 'user_dashboard_id')),
         });
 
         const handleClickFilterButton = () => {

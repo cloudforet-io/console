@@ -71,7 +71,7 @@ export default {
             ]),
             selectedMoreMenuItem: '',
             dashboardIdFromRoute: computed<string|undefined>(() => vm.$route.params.dashboardId),
-            homeDashboardId: computed(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
+            homeDashboardId: computed<string|undefined>(() => store.getters['service/costExplorer/homeDashboardId']),
             publicDashboardList: computed<DashboardMenuItem[]>(() => props.publicDashboardItems?.map(d => ({
                 ...d,
                 dashboard_id: d.public_dashboard_id,
@@ -89,11 +89,7 @@ export default {
         const handleSelectMoreMenu = (item, selectedMoreMenuItem) => {
             state.selectedMoreMenuItem = selectedMoreMenuItem;
             if (state.selectedMoreMenuItem === 'setHome') {
-                store.dispatch('settings/setItem', {
-                    key: 'homeDashboard',
-                    value: item.dashboard_id,
-                    path: '/costDashboard',
-                });
+                store.dispatch('service/costExplorer/setHomeDashboard', item.dashboard_id);
             }
         };
 
@@ -105,11 +101,7 @@ export default {
         };
 
         const setInitialHomeDashboard = () => {
-            store.dispatch('settings/setItem', {
-                key: 'homeDashboard',
-                value: state.dashboardList[0]?.public_dashboard_id ?? state.dashboardList[0]?.user_dashboard_id,
-                path: '/costDashboard',
-            });
+            store.dispatch('service/costExplorer/setHomeDashboard', state.dashboardList[0]?.public_dashboard_id ?? state.dashboardList[0]?.user_dashboard_id);
         };
 
         (async () => {

@@ -76,7 +76,7 @@ export default {
         },
     },
     setup(props) {
-        registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
+        registerServiceStore<CostDashboardState>('costExplorer/dashboard', CostDashboardStoreModule);
         const routeState = reactive({
             route: [
                 { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
@@ -89,22 +89,22 @@ export default {
             loading: true,
             layout: [] as CustomLayout[],
             editingCustomLayout: computed<CustomLayout[]>({
-                get() { return store.state.service.costDashboard.editedCustomLayout; },
+                get() { return store.state.service.costExplorer.dashboard.editedCustomLayout; },
                 set(val) {
-                    store.commit('service/costDashboard/setEditedCustomLayout', [...val]);
+                    store.commit('service/costExplorer/dashboard/setEditedCustomLayout', [...val]);
                 },
             }),
             dashboardIdFromRoute: computed(() => props.dashboardId || SpaceRouter.router.currentRoute.params.dashboardId),
             dashboardData: {} as DashboardInfo,
             dashboardTitle: '',
-            selectedWidget: computed(() => store.state.service.costDashboard?.editedSelectedWidget),
-            selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => store.state.service?.costDashboard?.selectedTemplate),
-            defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboard?.defaultFilter),
+            selectedWidget: computed(() => store.state.service.costExplorer.dashboard.editedSelectedWidget),
+            selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => store.state.service.costExplorer.dashboard.selectedTemplate),
+            defaultFilter: computed<Record<string, string[]>>(() => store.state.service.costExplorer.dashboard.defaultFilter),
             period: {} as Period,
             periodType: '',
             filters: {} as CostQueryFilters,
-            widgetPosition: computed(() => store.state.service.costDashboard?.widgetPosition),
-            layoutOfSpace: computed(() => store.state.service.costDashboard?.layoutOfSpace),
+            widgetPosition: computed(() => store.state.service.costExplorer.dashboard.widgetPosition),
+            layoutOfSpace: computed(() => store.state.service.costExplorer.dashboard.layoutOfSpace),
         });
 
         const goToMainDashboardPage = () => {
@@ -142,13 +142,13 @@ export default {
                     state.editingCustomLayout[state.widgetPosition.row].splice(state.widgetPosition.col + 1, 0, state.selectedWidget);
                 } else {
                     state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget];
-                    store.commit('service/costDashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
+                    store.commit('service/costExplorer/dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
                 }
             } else if (state.editingCustomLayout?.length === 0) {
                 state.editingCustomLayout = [[state.selectedWidget]];
             } else {
                 state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget];
-                store.commit('service/costDashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
+                store.commit('service/costExplorer/dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
             }
         };
 
@@ -156,17 +156,17 @@ export default {
             if (!state.widgetPosition) return;
             state.editingCustomLayout[state.widgetPosition.row].splice(state.widgetPosition.col, 1);
             state.editingCustomLayout = state.editingCustomLayout.filter(row => row.length > 0);
-            store.commit('service/costDashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
-            store.commit('service/costDashboard/setWidgetPosition', undefined);
-            store.commit('service/costDashboard/setEditedSelectedWidget', {});
+            store.commit('service/costExplorer/dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
+            store.commit('service/costExplorer/dashboard/setWidgetPosition', undefined);
+            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', {});
         };
 
         const handleUpdateWidget = () => {
             if (!state.widgetPosition) return;
             state.editingCustomLayout[state.widgetPosition.row][state.widgetPosition.col] = state.selectedWidget;
-            store.commit('service/costDashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
-            store.commit('service/costDashboard/setWidgetPosition', undefined);
-            store.commit('service/costDashboard/setEditedSelectedWidget', {});
+            store.commit('service/costExplorer/dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
+            store.commit('service/costExplorer/dashboard/setWidgetPosition', undefined);
+            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', {});
         };
 
         const getDashboardData = async () => {

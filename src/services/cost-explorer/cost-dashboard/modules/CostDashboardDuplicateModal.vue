@@ -169,7 +169,7 @@ export default defineComponent<Props>({
         const handleConfirm = async () => {
             if (!isAllValid) return;
             const duplicatedDashboardId = visibility.value === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
-            await store.dispatch('service/costDashboard/setDashboardList');
+            await store.dispatch('service/costExplorer/dashboard/setDashboardList');
             if (duplicatedDashboardId) {
                 await SpaceRouter.router.push({
                     name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,

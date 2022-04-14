@@ -1,8 +1,7 @@
 import { CostDashboardState } from '@/services/cost-explorer/cost-dashboard/store/type';
 import {
     CustomLayout,
-    DASHBOARD_PRIVACY_TYPE, PublicDashboardInfo,
-    UserDashboardInfo,
+    DASHBOARD_PRIVACY_TYPE,
     WidgetInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import * as actions from './actions';
@@ -25,11 +24,6 @@ const state: CostDashboardState = {
     editedCustomLayout: [] as CustomLayout[],
     widgetPosition: undefined,
     layoutOfSpace: undefined,
-
-    // for dashboard
-    publicDashboardList: [] as PublicDashboardInfo[],
-    userDashboardList: [] as UserDashboardInfo[],
-    dashboardListLoading: true,
 };
 
 export default {

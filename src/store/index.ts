@@ -13,7 +13,7 @@ import error from './modules/error';
 
 Vue.use(Vuex);
 
-const store = new Vuex.Store({
+const store = new Vuex.Store<any>({
     modules: {
         user,
         settings,

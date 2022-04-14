@@ -67,7 +67,7 @@ export default {
                 const endIndex = state.thisPage * PAGE_SIZE;
                 return state.existingDashboardData.slice(startIndex, endIndex);
             }),
-            selectedTemplate: computed(() => store.state.service?.costDashboard?.selectedTemplate),
+            selectedTemplate: computed(() => store.state.service.costExplorer.dashboard.selectedTemplate),
             // pagination
             totalCount: 0,
             allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
@@ -76,8 +76,8 @@ export default {
         });
 
         const handleDashboardChange = (value: Partial<DashboardInfo>) => {
-            store.commit('service/costDashboard/setDashboardTemplate', value);
-            store.commit('service/costDashboard/setDefaultFilter', value.default_filter);
+            store.commit('service/costExplorer/dashboard/setDashboardTemplate', value);
+            store.commit('service/costExplorer/dashboard/setDefaultFilter', value.default_filter);
         };
 
         const listDashboard = async () => {

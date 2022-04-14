@@ -58,7 +58,7 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: props.visible,
-            selectedWidget: computed<WidgetInfo>(() => store.state.service.costDashboard?.editedSelectedWidget),
+            selectedWidget: computed<WidgetInfo>(() => store.state.service.costExplorer.dashboard.editedSelectedWidget),
             editableWidgetOptionList: computed(() => {
                 const optionList: EDITABLE_WIDGET_OPTIONS_TYPE[] = [];
                 if (state.selectedWidget?.options?.group_by) optionList.push(EDITABLE_WIDGET_OPTIONS.GROUP_BY);

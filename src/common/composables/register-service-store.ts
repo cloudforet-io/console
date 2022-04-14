@@ -18,23 +18,36 @@ function registerStore<T>(path: Path, storeModule: Module<T, any>, afterRegister
         store.registerModule<T>(path as string, storeModule);
         if (afterRegister) afterRegister();
     }
-}
 
-export function registerServiceStore<T>(_path: Path, storeModule: Module<T, any>, afterRegister?: AfterRegisterFunc) {
-    const path = getPath(_path);
-    const containerPath = path.slice(0, -1);
-    if (!store.hasModule(containerPath)) {
-        registerStore(containerPath, {
-            namespaced: true,
-        });
-        ErrorHandler.handleError('[Warn] \'Container Store\' not created. The store has been temporarily created and operated, so please check it.');
-    }
     onUnmounted(() => {
-        store.unregisterModule(path);
+        store.unregisterModule(path as string);
     });
 
     // for hot reloading
-    onMounted(() => { registerStore(path, storeModule, afterRegister); });
+    onMounted(() => {
+        if (!store.hasModule(path as string)) {
+            store.registerModule<T>(path as string, storeModule);
+            if (afterRegister) afterRegister();
+        }
+    });
+}
+
+const prepareParentModules = (path: string[]) => {
+    const eachPaths = path.slice(0, path.length - 1);
+    const parentPath: string[] = [];
+    eachPaths.forEach((p) => {
+        parentPath.push(p);
+        if (!store.hasModule(parentPath)) {
+            ErrorHandler.handleError(`[Warn] '${parentPath.join('/')}' module is not created. The store has been temporarily created and operated, so please check it.`);
+            registerStore(parentPath, { namespaced: true });
+        }
+    });
+};
+
+export function registerServiceStore<T>(_path: Path, storeModule: Module<T, any>, afterRegister?: AfterRegisterFunc) {
+    const path = getPath(_path);
+
+    prepareParentModules(path);
 
     registerStore(path, storeModule, afterRegister);
 }

@@ -74,7 +74,7 @@ export default {
             periodType: '',
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-            homeDashboardId: computed<string|undefined>(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
+            homeDashboardId: computed<string|undefined>(() => store.getters['service/costExplorer/homeDashboardId']),
             isPageMounted: false,
             // dashboard layout widget
             widgetList: undefined as HTMLElement[]|undefined,

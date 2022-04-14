@@ -36,15 +36,3 @@ export const setWidgetPosition: Mutation<CostDashboardState> = (state, position)
 export const setLayoutOfSpace: Mutation<CostDashboardState> = (state, layout) => {
     state.layoutOfSpace = layout;
 };
-
-export const setPublicDashboard: Mutation<CostDashboardState> = (state, dashboardList) => {
-    state.publicDashboardList = dashboardList;
-};
-
-export const setUserDashboard: Mutation<CostDashboardState> = (state, dashboardList) => {
-    state.userDashboardList = dashboardList;
-};
-
-export const setDashboardListLoading: Mutation<CostDashboardState> = (state, dashboardListLoading) => {
-    state.dashboardListLoading = dashboardListLoading;
-};

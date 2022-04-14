@@ -65,8 +65,8 @@ export default {
     setup(props: Props, { emit }) {
         const state = reactive({
             proxyVisible: props.visible,
-            widgetPosition: computed(() => store.state.service?.costDashboard?.widgetPosition),
-            isSelectedWidgetExist: computed(() => Object.keys(store.state.service?.costDashboard?.originSelectedWidget).length),
+            widgetPosition: computed(() => store.state.service.costExplorer.dashboard.widgetPosition),
+            isSelectedWidgetExist: computed(() => Object.keys(store.state.service.costExplorer.dashboard.originSelectedWidget).length),
         });
         const tabState = reactive({
             tabs: computed(() => ([
@@ -84,15 +84,15 @@ export default {
             emit('update:visible', visible);
         };
         const handleCancel = () => {
-            store.commit('service/costDashboard/setWidgetPosition', undefined);
-            store.commit('service/costDashboard/setLayoutOfSpace', undefined);
-            store.commit('service/costDashboard/setOriginSelectedWidget', {});
-            store.commit('service/costDashboard/setEditedSelectedWidget', {});
+            store.commit('service/costExplorer/dashboard/setWidgetPosition', undefined);
+            store.commit('service/costExplorer/dashboard/setLayoutOfSpace', undefined);
+            store.commit('service/costExplorer/dashboard/setOriginSelectedWidget', {});
+            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', {});
         };
 
         const handleChangeTab = () => {
-            store.commit('service/costDashboard/setOriginSelectedWidget', {});
-            store.commit('service/costDashboard/setEditedSelectedWidget', {});
+            store.commit('service/costExplorer/dashboard/setOriginSelectedWidget', {});
+            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', {});
         };
 
         watch(() => props.visible, (visible) => {

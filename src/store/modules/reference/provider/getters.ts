@@ -4,7 +4,7 @@ import { DynamicFieldProps } from '@spaceone/design-system/dist/src/data-display
 import { EnumOptions } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 import { Getter } from 'vuex';
 
-export const fieldItems: Getter<ReferenceState, {}> = (state: ReferenceState): Partial<DynamicFieldProps> => {
+export const fieldItems: Getter<Required<ReferenceState>, any> = (state): Partial<DynamicFieldProps> => {
     const options: EnumOptions = {};
     forEach(state.items, (d, k) => {
         options[k] = {

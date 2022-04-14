@@ -101,7 +101,7 @@ export default defineComponent<Props>({
 
         const handleConfirm = () => {
             updateDashboard();
-            store.dispatch('service/costDashboard/setDashboardList');
+            store.dispatch('service/costExplorer/setDashboardList');
             emit('update:visible', false);
             emit('confirm', name.value);
         };

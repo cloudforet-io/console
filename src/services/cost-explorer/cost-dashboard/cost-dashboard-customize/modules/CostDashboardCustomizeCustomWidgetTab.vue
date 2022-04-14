@@ -105,7 +105,7 @@ export default {
             totalCount: 0,
             widgetList: [] as WidgetInfo[],
             selectedItem: {} as WidgetInfo | CostQuerySetModel,
-            selectedWidget: computed<WidgetInfo>(() => store.state.service.costDashboard.originSelectedWidget),
+            selectedWidget: computed<WidgetInfo>(() => store.state.service.costExplorer.dashboard.originSelectedWidget),
             selectedQuery: {} as CostQuerySetModel,
             showPreview: computed<boolean>(() => !!Object.keys(state.selectedItem).length),
             allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
@@ -150,23 +150,23 @@ export default {
 
         /* Event */
         const handleSelectWidget = async (value: WidgetInfo) => {
-            store.commit('service/costDashboard/setOriginSelectedWidget', value);
-            store.commit('service/costDashboard/setEditedSelectedWidget', value);
+            store.commit('service/costExplorer/dashboard/setOriginSelectedWidget', value);
+            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', value);
             state.selectedQuery = {};
             state.selectedItem = value;
         };
         const handleClickRemoveWidget = async () => {
             await deleteCustomWidget();
-            store.commit('service/costDashboard/setOriginSelectedWidget', {});
-            store.commit('service/costDashboard/setEditedSelectedWidget', {});
+            store.commit('service/costExplorer/dashboard/setOriginSelectedWidget', {});
+            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', {});
             state.selectedItem = {};
             state.thisPage = 1;
             await listCustomWidget();
         };
         const handleCreateCustomWidget = async (createdCustomWidget: WidgetInfo) => {
             await listCustomWidget();
-            store.commit('service/costDashboard/setOriginSelectedWidget', createdCustomWidget);
-            store.commit('service/costDashboard/setEditedSelectedWidget', createdCustomWidget);
+            store.commit('service/costExplorer/dashboard/setOriginSelectedWidget', createdCustomWidget);
+            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', createdCustomWidget);
             state.selectedQuery = {};
             state.selectedItem = createdCustomWidget;
             state.thisPage = 1;
@@ -180,8 +180,8 @@ export default {
         watch(() => state.selectedQuery, (selectedQuery) => {
             if (Object.keys(selectedQuery).length) {
                 state.selectedItem = selectedQuery;
-                store.commit('service/costDashboard/setOriginSelectedWidget', {});
-                store.commit('service/costDashboard/setEditedSelectedWidget', {});
+                store.commit('service/costExplorer/dashboard/setOriginSelectedWidget', {});
+                store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', {});
             }
         }, { immediate: false });
 

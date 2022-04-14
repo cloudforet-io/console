@@ -60,9 +60,6 @@ import {
 } from '@/services/cost-explorer/cost-dashboard/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
-import { registerServiceStore } from '@/common/composables/register-service-store';
-import { CostDashboardState } from '@/services/cost-explorer/cost-dashboard/store/type';
-import CostDashboardStoreModule from '@/services/cost-explorer/cost-dashboard/store';
 
 interface ListItem {
     routeName?: string;
@@ -70,14 +67,13 @@ interface ListItem {
 }
 
 export default {
-    name: 'CostManagementMenu',
+    name: 'CostExplorerLNB',
     components: {
         CostDashboardList,
         SidebarTitle,
         PIconTextButton,
     },
     setup() {
-        registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             menuList: computed<ListItem[]>(() => [
@@ -91,15 +87,15 @@ export default {
                 },
             ]),
             currentRouteName: computed(() => vm.$route.name),
-            publicDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.publicDashboardList ?? []),
-            userDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costDashboard.userDashboardList ?? []),
+            publicDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costExplorer.publicDashboardList ?? []),
+            userDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costExplorer.userDashboardList ?? []),
             loading: true,
         });
 
         const listDashboard = async () => {
             try {
                 state.loading = true;
-                await store.dispatch('service/costDashboard/setDashboardList');
+                await store.dispatch('service/costExplorer/setDashboardList');
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {
@@ -123,6 +119,7 @@ export default {
             });
         };
 
+        /* Init */
         (async () => {
             await listDashboard();
         })();

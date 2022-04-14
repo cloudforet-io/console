@@ -19,7 +19,7 @@ export const getDashboardLayout = async (dashboard: DashboardInfo): Promise<Cust
     if (dashboard?.default_layout_id && dashboard.custom_layouts.length === 0) { // default dashboard
         layout = await fetchDefaultLayoutData(dashboard.default_layout_id);
     } else layout = dashboard.custom_layouts;
-    store.commit('service/costDashboard/setEditedCustomLayout', layout);
+    store.commit('service/costExplorer/dashboard/setEditedCustomLayout', layout);
     return layout;
 };
 

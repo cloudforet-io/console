@@ -2,7 +2,7 @@ import {
     CustomLayout,
     DashboardPrivacyType,
     DefaultLayout,
-    PublicDashboardInfo, UserDashboardInfo,
+    PublicDashboardInfo,
     WidgetInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
 
@@ -18,8 +18,4 @@ export interface CostDashboardState {
     editedCustomLayout?: CustomLayout[];
     widgetPosition?: { row?: number; col?: number };
     layoutOfSpace?: number;
-    //
-    publicDashboardList: PublicDashboardInfo[];
-    userDashboardList: UserDashboardInfo[];
-    dashboardListLoading: boolean;
 }

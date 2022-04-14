@@ -84,7 +84,7 @@ export default {
                 return defaultMenuItems.value;
             }),
             isAdmin: computed((() => store.getters['user/isAdmin'])),
-            homeDashboardId: computed<string|undefined>(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
+            homeDashboardId: computed<string|undefined>(() => store.getters['service/costExplorer/homeDashboardId']),
             duplicateModalVisible: false,
             dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(props.dashboard, 'public_dashboard_id') ? DASHBOARD_TYPE.PUBLIC : DASHBOARD_TYPE.USER)),
         });
@@ -110,7 +110,7 @@ export default {
                         public_dashboard_id: props.dashboardId,
                     });
                 }
-                await store.dispatch('service/costDashboard/setDashboardList');
+                await store.dispatch('service/costExplorer/setDashboardList');
                 await SpaceRouter.router.replace({ name: COST_EXPLORER_ROUTE._NAME });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, 'Failed to delete dashboard');
@@ -123,11 +123,7 @@ export default {
 
         const handleSelectMoreMenu = (item) => {
             if (item === MENU.SET_HOME && props.dashboardId) {
-                store.dispatch('settings/setItem', {
-                    key: 'homeDashboard',
-                    value: props.dashboardId,
-                    path: '/costDashboard',
-                });
+                store.dispatch('service/costExplorer/setHomeDashboard', props.dashboardId);
             } else if (item === MENU.DUPLICATE) {
                 state.duplicateModalVisible = true;
             } else if (item === MENU.DELETE) {

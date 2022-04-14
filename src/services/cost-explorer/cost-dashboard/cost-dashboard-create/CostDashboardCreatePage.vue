@@ -49,7 +49,7 @@ export default {
     },
 
     setup() {
-        registerServiceStore<CostDashboardState>('costDashboard', CostDashboardStoreModule);
+        registerServiceStore<CostDashboardState>('costExplorer/dashboard', CostDashboardStoreModule);
         const routeState = reactive({
             route: computed(() => [
                 { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
@@ -59,10 +59,10 @@ export default {
         });
 
         const state = reactive({
-            selectedTemplate: computed(() => store.state.service?.costDashboard?.selectedTemplate),
-            defaultFilter: computed<Record<string, string[]>>(() => store.state.service?.costDashboard?.defaultFilter),
-            includesFilter: computed<boolean>(() => store.state.service?.costDashboard?.includesFilter),
-            selectedPrivacy: computed<DashboardPrivacyType>(() => store.state.service?.costDashboard?.selectedDashboardPrivacy),
+            selectedTemplate: computed(() => store.state.service.costExplorer.dashboard.selectedTemplate),
+            defaultFilter: computed<Record<string, string[]>>(() => store.state.service.costExplorer.dashboard.defaultFilter),
+            includesFilter: computed<boolean>(() => store.state.service.costExplorer.dashboard.includesFilter),
+            selectedPrivacy: computed<DashboardPrivacyType>(() => store.state.service.costExplorer.dashboard.selectedDashboardPrivacy),
         });
 
         const getCustomLayouts = async () => {
@@ -113,7 +113,7 @@ export default {
         const handleClickCreate = async () => {
             const createdDashboardId = state.selectedPrivacy === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
             if (createdDashboardId) goToCustomizePage(createdDashboardId);
-            store.commit('service/costDashboard/setDashboardPrivacy', DASHBOARD_PRIVACY_TYPE.USER);
+            store.commit('service/costExplorer/dashboard/setDashboardPrivacy', DASHBOARD_PRIVACY_TYPE.USER);
         };
 
         return {
