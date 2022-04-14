@@ -114,12 +114,12 @@ import {
     PSelectDropdown,
     PStatus, PToolboxTable,
 } from '@spaceone/design-system';
-import UserCreateModal from '@/services/administration/iam/user/user-management/modules/user-management-modal/UserCreateModal.vue';
-import UserUpdateModal from '@/services/administration/iam/user/user-management/modules/user-management-modal/UserUpdateModal.vue';
+import UserCreateModal from '@/services/administration/iam/user/modules/user-management-modal/UserCreateModal.vue';
+import UserUpdateModal from '@/services/administration/iam/user/modules/user-management-modal/UserUpdateModal.vue';
 import UserManagementModal
-    from '@/services/administration/iam/user/user-management/modules/user-management-modal/UserManagementModal.vue';
+    from '@/services/administration/iam/user/modules/user-management-modal/UserManagementModal.vue';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { MODAL_TYPE } from '@/services/administration/iam/user/store/type';
+import { MODAL_TYPE } from '@/services/administration/store/user/type';
 
 export default {
     name: 'UserManagementTable',
@@ -211,7 +211,7 @@ export default {
             title: '',
             subTitle: '',
             themeColor: undefined as string | undefined,
-            isManagementModalVisible: computed(() => store.getters['service/user/isManagementModalVisible']),
+            isManagementModalVisible: computed(() => store.getters['service/administration/user/isManagementModalVisible']),
             visible: computed(() => modalState.isManagementModalVisible),
         });
         const userFormState = reactive({
@@ -220,8 +220,8 @@ export default {
             headerTitle: '',
             item: undefined,
             roleOfSelectedUser: '',
-            isCreateModalVisible: computed(() => store.getters['service/user/isCreateModalVisible']),
-            isUpdateModalVisible: computed(() => store.getters['service/user/isUpdateModalVisible']),
+            isCreateModalVisible: computed(() => store.getters['service/administration/user/isCreateModalVisible']),
+            isUpdateModalVisible: computed(() => store.getters['service/administration/user/isUpdateModalVisible']),
             isAdmin: computed(() => store.getters['user/isAdmin']).value,
         });
 
@@ -297,34 +297,34 @@ export default {
             userFormState.updateMode = false;
             userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.ADD_TITLE') as string;
             userFormState.item = undefined;
-            store.dispatch('service/user/showModal', MODAL_TYPE.CREATE);
+            store.dispatch('service/administration/user/showModal', MODAL_TYPE.CREATE);
         };
         const clickUpdate = () => {
             userFormState.updateMode = true;
             userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.UPDATE_TITLE') as string;
             userFormState.item = state.users[state.selectedIndex[0]];
-            store.dispatch('service/user/showModal', MODAL_TYPE.UPDATE);
+            store.dispatch('service/administration/user/showModal', MODAL_TYPE.UPDATE);
         };
         const clickDelete = () => {
             modalState.mode = 'delete';
             modalState.title = vm.$t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
             modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', state.selectedIndex.length);
             modalState.themeColor = 'alert';
-            store.dispatch('service/user/showModal', MODAL_TYPE.MANAGEMENT);
+            store.dispatch('service/administration/user/showModal', MODAL_TYPE.MANAGEMENT);
         };
         const clickEnable = () => {
             modalState.mode = 'enable';
             modalState.title = vm.$t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
             modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', state.selectedIndex.length);
             modalState.themeColor = 'safe';
-            store.dispatch('service/user/showModal', MODAL_TYPE.MANAGEMENT);
+            store.dispatch('service/administration/user/showModal', MODAL_TYPE.MANAGEMENT);
         };
         const clickDisable = () => {
             modalState.mode = 'disable';
             modalState.title = vm.$t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
             modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', state.selectedIndex.length);
             modalState.themeColor = 'alert';
-            store.dispatch('service/user/showModal', MODAL_TYPE.MANAGEMENT);
+            store.dispatch('service/administration/user/showModal', MODAL_TYPE.MANAGEMENT);
         };
 
         const handleSelectDropdown = (name) => {
@@ -417,8 +417,8 @@ export default {
         })();
 
         const saveSelectedValueToStore = (selectedIndex: number[]) => {
-            store.dispatch('service/user/selectIndex', selectedIndex);
-            store.dispatch('service/user/selectUsers', state.selectedUsers);
+            store.dispatch('service/administration/user/selectIndex', selectedIndex);
+            store.dispatch('service/administration/user/selectUsers', state.selectedUsers);
         };
 
         watch(() => state.selectedIndex, (after) => {

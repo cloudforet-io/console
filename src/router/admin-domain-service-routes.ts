@@ -2,7 +2,7 @@ import { RouteConfig } from 'vue-router';
 import authRoutes from '@/services/auth/routes';
 import { errorRoutes } from '@/router/error-routes';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import { userRoute } from '@/services/administration/routes';
+import administrationRoute from '@/services/administration/routes';
 
 const TotalDashboardPage = () => import(/* webpackChunkName: "TotalDashboardPage" */ '@/services/total-dashboard/TotalDashboardPage.vue');
 
@@ -22,26 +22,15 @@ export const adminDomainServiceRoutes: RouteConfig[] = [
     {
         path: '/',
         name: ROOT_DOMAIN_ROUTE._NAME,
-        meta: { label: 'root' },
         redirect: '/dashboard',
         component: { template: '<router-view />' },
         children: [
             {
                 path: 'dashboard',
                 name: ROOT_DOMAIN_ROUTE.DASHBOARD._NAME,
-                meta: { label: 'Dashboard' },
                 component: TotalDashboardPage,
             },
-            {
-                path: 'identity',
-                name: ROOT_DOMAIN_ROUTE.IDENTITY._NAME,
-                redirect: `identity/${userRoute.path}`,
-                meta: { label: 'Identity' },
-                component: { template: '<router-view />' },
-                children: [
-                    userRoute,
-                ],
-            },
+            administrationRoute,
         ] as RouteConfig[],
     },
     ...errorRoutes,

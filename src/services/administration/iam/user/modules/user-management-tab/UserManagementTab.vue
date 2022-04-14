@@ -83,11 +83,11 @@ import {
 
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
-import UserDetail from '@/services/administration/iam/user/user-management/modules/user-management-tab/UserDetail.vue';
-import UserAssignedRole from '@/services/administration/iam/user/user-management/modules/user-management-tab/UserAssignedRole.vue';
+import UserDetail from '@/services/administration/iam/user/modules/user-management-tab/UserDetail.vue';
+import UserAssignedRole from '@/services/administration/iam/user/modules/user-management-tab/UserAssignedRole.vue';
 import PTagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
-import UserNotifications from '@/services/administration/iam/user/user-management/modules/user-management-tab/UserNotifications.vue';
+import UserNotifications from '@/services/administration/iam/user/modules/user-management-tab/UserNotifications.vue';
 
 import { store } from '@/store';
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
@@ -126,9 +126,9 @@ export default {
                 { name: 'last_accessed_at', label: 'Last Activity' },
                 { name: 'timezone', label: 'Timezone' },
             ])),
-            selectedIndex: computed<number[]>(() => store.state.service.administration.iam.user.selectedIndex),
-            selectedUsers: computed<User[]>(() => store.state.service.administration.iam.user.selectedUsers),
-            isSelected: computed<boolean>(() => store.getters['service/user/isUserSelected']),
+            selectedIndex: computed<number[]>(() => store.state.service.administration.user.selectedIndex),
+            selectedUsers: computed<User[]>(() => store.state.service.administration.user.selectedUsers),
+            isSelected: computed<boolean>(() => store.getters['service/administration/user/isUserSelected']),
         });
 
         const singleItemTabState = reactive({

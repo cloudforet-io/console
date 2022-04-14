@@ -1,12 +1,12 @@
 // import * as getters from './getters';
 // import * as actions from './actions';
 // import * as mutations from './mutations';
-import alert from './alert';
+import user from './user';
 
 export default {
     namespaced: true,
     modules: {
-        alert,
+        user,
     },
     // getters,
     // actions,

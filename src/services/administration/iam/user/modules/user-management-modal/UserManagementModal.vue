@@ -87,11 +87,11 @@ export default {
                 { name: 'timezone', label: 'Timezone' },
             ])),
             visible: computed({
-                get() { return store.getters['service/user/isManagementModalVisible']; },
-                set(val) { store.commit('service/user/setVisibleManagementModal', val); },
+                get() { return store.getters['service/administration/user/isManagementModalVisible']; },
+                set(val) { store.commit('service/administration/user/setVisibleManagementModal', val); },
             }),
-            selectedIndex: computed<number[]>(() => store.state.service.administration.iam.user.selectedIndex),
-            selectedUsers: computed<User[]>(() => store.state.service.administration.iam.user.selectedUsers),
+            selectedIndex: computed<number[]>(() => store.state.service.administration.user.selectedIndex),
+            selectedUsers: computed<User[]>(() => store.state.service.administration.user.selectedUsers),
         });
 
         const clickDelete = () => {
@@ -127,7 +127,7 @@ export default {
         const deleteUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.delete(getUsersParam(items));
-                await store.dispatch('service/user/selectIndex', []);
+                await store.dispatch('service/administration/user/selectIndex', []);
                 showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', state.selectedIndex.length), '', root);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', state.selectedIndex.length));

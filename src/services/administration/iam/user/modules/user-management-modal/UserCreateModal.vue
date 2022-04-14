@@ -173,7 +173,7 @@ import { debounce } from 'lodash';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { MODAL_TYPE } from '@/services/administration/iam/user/store/type';
+import { MODAL_TYPE } from '@/services/administration/store/user/type';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 
 
@@ -235,8 +235,8 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             visible: computed({
-                get() { return store.getters['service/user/isCreateModalVisible']; },
-                set(val) { store.commit('service/user/setVisibleCreateModal', val); },
+                get() { return store.getters['service/administration/user/isCreateModalVisible']; },
+                set(val) { store.commit('service/administration/user/setVisibleCreateModal', val); },
             }),
             isSameId: false,
             // external user

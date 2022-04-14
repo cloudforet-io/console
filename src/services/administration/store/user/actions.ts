@@ -1,5 +1,5 @@
 import { Action } from 'vuex';
-import { MODAL_TYPE, UserStoreState } from '@/services/administration/iam/user/store/type';
+import { MODAL_TYPE, UserStoreState } from '@/services/administration/store/user/type';
 
 export const selectIndex: Action<UserStoreState, any> = ({ commit }, selectedIndex: number[]): void => {
     commit('setSelectedIndex', selectedIndex);

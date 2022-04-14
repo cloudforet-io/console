@@ -8,7 +8,7 @@ const UserAPIKeyPage = () => import(/* webpackChunkName: "UserAPIKeyPage" */ '@/
 const UserNotificationPage = () => import(/* webpackChunkName: "UserNotificationPage" */ '@/services/my-page/my-account/user-notification/UserNotificationPage.vue');
 const NotificationAddPage = () => import(/* webpackChunkName: "NotificationAddPage" */ '@/services/notification/notification-add/NotificationAddPage.vue');
 // eslint-disable-next-line max-len
-const ManageUserNotificationPage = () => import(/* webpackChunkName: "ManageUserNotificationPage" */ '@/services/administration/iam/user/user-management/manage-user-notification/ManageUserNotificationPage.vue');
+const ManageUserNotificationPage = () => import(/* webpackChunkName: "ManageUserNotificationPage" */ '@/services/administration/iam/user/manage-user-notification/ManageUserNotificationPage.vue');
 
 export default {
     path: 'my-page',

@@ -1,31 +1,29 @@
 import { RouteConfig } from 'vue-router';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
-const UserManagementPage = () => import(/* webpackChunkName: "UserManagementPage" */ '@/services/administration/iam/user/user-management/UserManagementPage.vue');
-const UserPage = () => import(/* webpackChunkName: "User" */ '@/services/administration/iam/user/UserPage.vue');
+const AdministrationContainer = () => import(/* webpackChunkName: "AdministrationContainer" */ '@/services/administration/AdministrationContainer.vue');
 
-export const userRoute = {
-    path: 'iam',
-    name: ADMINISTRATION_ROUTE.IAM._NAME,
-    meta: { label: 'IAM' },
-    redirect: '/administration/iam/user',
-    component: UserPage,
-    children: [
-        {
-            path: 'user',
-            name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
-            component: UserManagementPage,
-        },
-    ],
-} as RouteConfig;
+const UserPage = () => import(/* webpackChunkName: "UserPage" */ '@/services/administration/iam/user/UserPage.vue');
 
 export default {
     path: 'administration',
     name: ADMINISTRATION_ROUTE._NAME,
     redirect: '/administration/iam/user',
-    meta: { label: 'Administration' },
-    component: { template: '<router-view />' },
+    component: AdministrationContainer,
     children: [
-        userRoute,
+        {
+            path: 'iam',
+            name: ADMINISTRATION_ROUTE.IAM._NAME,
+            redirect: '/administration/iam/user',
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: 'user',
+                    name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
+                    meta: { lnbVisible: true },
+                    component: UserPage,
+                },
+            ],
+        },
     ],
 } as RouteConfig;
