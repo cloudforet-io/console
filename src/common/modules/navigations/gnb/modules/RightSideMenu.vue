@@ -4,6 +4,10 @@
                       :visible-suggestion="openedMenu === 'search'"
                       @update:visibleSuggestion="toggleMenu('search')"
         />
+        <g-n-b-recent-favorite v-click-outside="hideMenu"
+                               :visible-dropdown="openedMenu === 'recentFavorite'"
+                               @update:visibleDropdown="toggleMenu('recentFavorite')"
+        />
         <div v-if="!userState.isDomainOwner" class="menu-wrapper">
             <div class="menu-button notifications"
                  :class="{opened: openedMenu === 'notifications'}"
@@ -122,20 +126,23 @@ import {
     PI, PDivider, PButton,
 } from '@spaceone/design-system';
 
+import GNBNotifications from '@/common/modules/navigations/gnb/modules/gnb-notification/GNBNotifications.vue';
+import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
+import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
+
 import { store } from '@/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { languages } from '@/store/modules/user/config';
 import config from '@/lib/config';
-import GNBNotifications from '@/common/modules/navigations/gnb/modules/gnb-notification/GNBNotifications.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 import { SpaceRouter } from '@/router';
 
 export default {
     name: 'RightSideMenu',
     components: {
+        GNBRecentFavorite,
         GNBSearch,
         GNBNotifications,
         PDivider,
