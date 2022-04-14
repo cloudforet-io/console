@@ -126,8 +126,8 @@ export default {
                 { name: 'last_accessed_at', label: 'Last Activity' },
                 { name: 'timezone', label: 'Timezone' },
             ])),
-            selectedIndex: computed<number[]>(() => store.state.service.user.selectedIndex),
-            selectedUsers: computed<User[]>(() => store.state.service.user.selectedUsers),
+            selectedIndex: computed<number[]>(() => store.state.service.administration.iam.user.selectedIndex),
+            selectedUsers: computed<User[]>(() => store.state.service.administration.iam.user.selectedUsers),
             isSelected: computed<boolean>(() => store.getters['service/user/isUserSelected']),
         });
 

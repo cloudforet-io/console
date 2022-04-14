@@ -61,7 +61,7 @@ export default {
     setup(props, { root }) {
         const state = reactive({
             modalVisible: false,
-            status: computed(() => store.state.service.alert.alertData?.status_message),
+            status: computed(() => store.state.service.alertManager.alert.alertData?.status_message),
             statusInput: '',
             loading: true,
         });
@@ -72,7 +72,7 @@ export default {
             const isEmptyInput = state.statusInput.trim().length === 0;
             try {
                 state.loading = true;
-                await store.dispatch('service/alert/updateAlertData', {
+                await store.dispatch('service/alertManager/alert/updateAlertData', {
                     updateParams: {
                         status_message: state.statusInput,
                         reset_status_message: isEmptyInput,
@@ -93,7 +93,7 @@ export default {
         };
 
         (() => {
-            state.statusInput = store.state.service.alert.alertData?.status_message;
+            state.statusInput = store.state.service.alertManager.alert.alertData?.status_message;
         })();
 
         return {

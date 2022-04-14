@@ -114,10 +114,10 @@ export default {
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        registerServiceStore<AlertStoreState>('alert', alertStoreModule);
+        registerServiceStore<AlertStoreState>('alertManager/alert', alertStoreModule);
 
         const state = reactive({
-            alertInfo: computed(() => store.state.service.alert.alertData),
+            alertInfo: computed(() => store.state.service.alertManager.alert.alertData),
             loading: true,
             //
             alertTitleEditFormVisible: false,
@@ -166,7 +166,7 @@ export default {
         (async () => {
             state.loading = true;
             try {
-                await store.dispatch('service/alert/getAlertData', props.id);
+                await store.dispatch('service/alertManager/alert/getAlertData', props.id);
             } catch (e) {
                 ErrorHandler.handleError(new NoResourceError({ name: ALERT_MANAGER_ROUTE.ALERT._NAME }));
             } finally {

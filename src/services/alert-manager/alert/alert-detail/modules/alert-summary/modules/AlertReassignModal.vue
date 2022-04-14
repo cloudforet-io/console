@@ -87,7 +87,7 @@ export default {
 
         const reassignMember = async () => {
             try {
-                await store.dispatch('service/alert/updateAlertData', {
+                await store.dispatch('service/alertManager/alert/updateAlertData', {
                     updateParams: {
                         assignee: state.selectedUserID,
                     },

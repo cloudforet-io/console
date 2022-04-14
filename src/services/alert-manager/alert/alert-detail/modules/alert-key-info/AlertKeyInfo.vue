@@ -129,7 +129,7 @@ export default {
                 },
                 { name: 'reference.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
             ],
-            data: computed(() => store.state.service.alert.alertData) || {},
+            data: computed(() => store.state.service.alertManager.alert.alertData) || {},
             escalationPolicyName: '',
             loading: true,
             timezone: computed(() => store.state.user.timezone),

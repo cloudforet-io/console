@@ -42,7 +42,7 @@ export default {
         PPageTitle,
     },
     setup() {
-        registerServiceStore<UserStoreState>('user', UserStoreModule);
+        registerServiceStore<UserStoreState>('administration/user', UserStoreModule);
 
         const state = reactive({
             // selected

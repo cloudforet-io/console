@@ -63,7 +63,7 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
     };
     const updateAlert = async (editMode: EDIT_MODE) => {
         try {
-            await store.dispatch('service/alert/updateAlertData', {
+            await store.dispatch('service/alertManager/alert/updateAlertData', {
                 updateParams: getParams(editMode),
                 alertId: state.alertId,
             });

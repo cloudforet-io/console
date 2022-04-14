@@ -175,7 +175,7 @@ export default {
                 set(val) { store.commit('service/user/setVisibleUpdateModal', val); },
             }),
             isSameId: false,
-            selectedUsers: computed<User[]>(() => store.state.service.user.selectedUsers),
+            selectedUsers: computed<User[]>(() => store.state.service.administration.iam.user.selectedUsers),
             //
             authTypeList: [
                 {

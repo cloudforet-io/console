@@ -90,8 +90,8 @@ export default {
                 get() { return store.getters['service/user/isManagementModalVisible']; },
                 set(val) { store.commit('service/user/setVisibleManagementModal', val); },
             }),
-            selectedIndex: computed<number[]>(() => store.state.service.user.selectedIndex),
-            selectedUsers: computed<User[]>(() => store.state.service.user.selectedUsers),
+            selectedIndex: computed<number[]>(() => store.state.service.administration.iam.user.selectedIndex),
+            selectedUsers: computed<User[]>(() => store.state.service.administration.iam.user.selectedUsers),
         });
 
         const clickDelete = () => {

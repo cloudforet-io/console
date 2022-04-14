@@ -67,7 +67,7 @@ export default {
                 { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
                 { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
             ]),
-            data: computed(() => store.state.service.alert.alertData ?? {}),
+            data: computed(() => store.state.service.alertManager.alert.alertData ?? {}),
             escalationPolicyName: '',
             loading: true,
             timezone: computed(() => store.state.user.timezone),
@@ -77,7 +77,7 @@ export default {
         const additionalState = reactive({
             fields: computed(() => map(additionalState.data, (d, k) => ({ name: k, label: k }))),
             // eslint-disable-next-line camelcase
-            data: computed(() => store.state.service.alert.alertData?.additional_info) || {},
+            data: computed(() => store.state.service.alertManager.alert.alertData?.additional_info) || {},
             loading: true,
             isEmptyValue: computed(() => checkEmptyValue(additionalState.data)),
         });

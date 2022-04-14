@@ -86,7 +86,7 @@ export default {
         const updateAlertTitle = async () => {
             try {
                 state.loading = true;
-                await store.dispatch('service/alert/updateAlertData', {
+                await store.dispatch('service/alertManager/alert/updateAlertData', {
                     updateParams: {
                         title: state.alertTitleInput,
                     },

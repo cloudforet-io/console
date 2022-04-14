@@ -126,7 +126,7 @@ export default {
     },
     setup(props: PropsType, { root }) {
         const state = reactive({
-            alertInfo: computed(() => store.state.service.alert.alertData),
+            alertInfo: computed(() => store.state.service.alertManager.alert.alertData),
             alertState: computed(() => state.alertInfo?.state),
             alertUrgency: computed(() => state.alertInfo?.urgency),
             reassignModalVisible: false,
@@ -148,7 +148,7 @@ export default {
 
         const changeAlertState = async (alertState: ALERT_STATE) => {
             try {
-                await store.dispatch('service/alert/updateAlertData', {
+                await store.dispatch('service/alertManager/alert/updateAlertData', {
                     updateParams: {
                         state: alertState,
                     },
@@ -162,7 +162,7 @@ export default {
 
         const changeAlertUrgency = async (alertUrgency: ALERT_URGENCY) => {
             try {
-                await store.dispatch('service/alert/updateAlertData', {
+                await store.dispatch('service/alertManager/alert/updateAlertData', {
                     updateParams: {
                         urgency: alertUrgency,
                     },
