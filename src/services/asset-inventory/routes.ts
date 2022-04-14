@@ -19,8 +19,8 @@ const ServiceAccountPage = () => import(/* webpackChunkName: "ServiceAccountPage
 const ServiceAccountAddPage = () => import(/* webpackChunkName: "ServiceAccountAddPage" */ '@/services/asset-inventory/service-account/service-account-add/ServiceAccountAddPage.vue');
 const ServiceAccountSearchPage = () => import(/* webpackChunkName: "ServiceAccountSearchPage" */ '@/services/asset-inventory/service-account/service-account-search/ServiceAccountSearchPage.vue');
 
-const CollectorHistoryPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/services/asset-inventory/collector-history/CollectorHistoryPage.vue');
-const CollectJobPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/services/asset-inventory/collector-history/collect-job/CollectJobPage.vue');
+const CollectorHistoryPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/services/asset-inventory/collector/collector-history/CollectorHistoryPage.vue');
+const CollectJobPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/services/asset-inventory/collector/collector-history/collect-job/CollectJobPage.vue');
 
 export default {
     path: 'asset-inventory',
@@ -104,6 +104,25 @@ export default {
                         },
                     ],
                 },
+                {
+                    path: 'history',
+                    component: { template: '<keep-alive><router-view /></keep-alive>' },
+                    children: [
+                        {
+                            path: '/',
+                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+                            meta: { lnbVisible: true },
+                            component: CollectorHistoryPage,
+                        },
+                        {
+                            path: ':jobId',
+                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
+                            meta: { lnbVisible: true },
+                            props: true,
+                            component: CollectJobPage,
+                        },
+                    ],
+                },
             ],
         },
         {
@@ -134,23 +153,6 @@ export default {
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.NO_RESOURCE._NAME,
                     meta: { lnbVisible: true },
                     component: NoResourcePage,
-                },
-            ],
-        },
-        {
-            path: 'collector-history',
-            component: { template: '<keep-alive><router-view /></keep-alive>' },
-            children: [
-                {
-                    path: '/',
-                    name: ASSET_INVENTORY_ROUTE.COLLECTOR_HISTORY._NAME,
-                    component: CollectorHistoryPage,
-                },
-                {
-                    path: ':jobId',
-                    name: ASSET_INVENTORY_ROUTE.COLLECTOR_HISTORY.JOB._NAME,
-                    props: true,
-                    component: CollectJobPage,
                 },
             ],
         },

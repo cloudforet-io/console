@@ -74,7 +74,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
-import { JOB_TASK_STATUS } from '@/services/asset-inventory/collector-history/lib/config';
+import { JOB_TASK_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
 import { iso8601Formatter, durationFormatter } from '@spaceone/console-core-lib';
 import { green, primaryDark, red } from '@/styles/colors';
 import { store } from '@/store';

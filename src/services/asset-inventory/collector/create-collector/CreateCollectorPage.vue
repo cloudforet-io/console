@@ -1,5 +1,5 @@
 <template>
-    <general-page-layout class="collector-creator-container">
+    <div class="collector-creator-page">
         <div class="page-navigation">
             <p-breadcrumbs :routes="routes" />
         </div>
@@ -62,7 +62,7 @@
                 />
             </template>
         </p-progress-wizard>
-    </general-page-layout>
+    </div>
 </template>
 
 <script lang="ts">
@@ -78,7 +78,6 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 
 import ConfirmCredentials from '@/services/asset-inventory/collector/create-collector/modules/ConfirmCredentials.vue';
@@ -93,7 +92,6 @@ export default {
         PSelectDropdown,
         PTextInput,
         PFieldGroup,
-        GeneralPageLayout,
         ConfirmCredentials,
         PProgressWizard,
         TagsInputGroup,
@@ -291,7 +289,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.collector-creator-container {
+.collector-creator-page {
     .collector-input-wrapper {
         @apply flex border-r border-gray-200;
         width: 50%;

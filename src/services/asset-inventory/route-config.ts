@@ -16,15 +16,15 @@ export const ASSET_INVENTORY_ROUTE = Object.freeze({
             PLUGINS: { _NAME: 'collectorPlugins' },
             STEPS: { _NAME: 'collectorCreateSteps' },
         },
+        HISTORY: {
+            _NAME: 'collectorHistory',
+            JOB: { _NAME: 'collectorJobHistory' },
+        },
     },
     SERVICE_ACCOUNT: {
         _NAME: 'serviceAccount',
         SEARCH: { _NAME: 'serviceAccountSearch' },
         ADD: { _NAME: 'addServiceAccount' },
         NO_RESOURCE: { _NAME: 'noServiceAccount' },
-    },
-    COLLECTOR_HISTORY: {
-        _NAME: 'collectorHistory',
-        JOB: { _NAME: 'collectorJobHistory' },
     },
 });

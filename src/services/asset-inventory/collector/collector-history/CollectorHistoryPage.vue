@@ -1,5 +1,5 @@
 <template>
-    <general-page-layout class="collector-history-container">
+    <div class="collector-history-page">
         <div class="top-wrapper">
             <p-breadcrumbs :routes="route" class="flex-grow" />
             <!--            <handbook-button class="flex-shrink-0">-->
@@ -99,11 +99,10 @@
                 </p-icon-text-button>
             </template>
         </p-button-modal>
-    </general-page-layout>
+    </div>
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { capitalize } from 'lodash';
 
 import {
@@ -116,8 +115,7 @@ import {
 } from '@spaceone/design-system';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import PCollectorHistoryChart from '@/services/asset-inventory/collector-history/modules/CollectorHistoryChart.vue';
+import PCollectorHistoryChart from '@/services/asset-inventory/collector/collector-history/modules/CollectorHistoryChart.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -131,7 +129,7 @@ import { store } from '@/store';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { peacock, green, red } from '@/styles/colors';
-import { JOB_STATUS } from '@/services/asset-inventory/collector-history/lib/config';
+import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -174,7 +172,6 @@ export default {
         PProgressBar,
         PStatus,
         PCollectorHistoryChart,
-        GeneralPageLayout,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -300,7 +297,7 @@ export default {
         /* event */
         const onSelect = (item) => {
             vm.$router.push({
-                name: ASSET_INVENTORY_ROUTE.COLLECTOR_HISTORY.JOB._NAME,
+                name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
                 params: { jobId: item.job_id },
             }).catch(() => {});
         };
@@ -377,7 +374,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.collector-history-container {
+.collector-history-page {
     .top-wrapper {
         display: flex;
         justify-content: space-between;

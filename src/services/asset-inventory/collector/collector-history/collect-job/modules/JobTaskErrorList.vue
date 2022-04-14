@@ -56,7 +56,7 @@ import { PDataTable, PPanelTop, PCollapsibleToggle } from '@spaceone/design-syst
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { JobTaskData, JobTaskError } from '@/services/asset-inventory/collector-history/collect-job/type';
+import { JobTaskData, JobTaskError } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
 import { resourceTypeLabels } from '@/lib/reference/type';
 
 interface Props {

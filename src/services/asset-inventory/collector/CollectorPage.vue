@@ -1,5 +1,5 @@
 <template>
-    <general-page-layout class="collector-page">
+    <div class="collector-page">
         <div class="page-navigation">
             <p-breadcrumbs :routes="routes" />
         </div>
@@ -164,11 +164,10 @@
                 {{ value ? iso8601Formatter(value,timezone) : '' }}
             </template>
         </p-table-check-modal>
-    </general-page-layout>
+    </div>
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { Component } from 'vue/types/umd';
 import { TranslateResult } from 'vue-i18n';
 import {
@@ -197,7 +196,6 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-const GeneralPageLayout = (): Component => import('@/common/modules/page-layouts/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/common/modules/tags/tags-panel/TagsPanel.vue') as Component;
 const CollectorUpdateModal = (): Component => import('@/services/asset-inventory/collector/modules/CollectorUpdateModal.vue') as Component;
 const CollectDataModal = (): Component => import('@/services/asset-inventory/collector/modules/CollectDataModal.vue') as Component;
@@ -221,7 +219,6 @@ export default {
         PTableCheckModal,
         PBreadcrumbs,
         PEmpty,
-        GeneralPageLayout,
         CollectorUpdateModal,
         CollectDataModal,
         CollectorDetails,
@@ -372,7 +369,7 @@ export default {
                     plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
                     plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
                     detailLink: {
-                        name: ASSET_INVENTORY_ROUTE.COLLECTOR_HISTORY._NAME,
+                        name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
                         query: { filters: detailLinkQueryHelper.setFilters([{ k: 'collector_id', v: d.collector_id, o: '=' }]).rawQueryStrings },
                     },
                     ...d,

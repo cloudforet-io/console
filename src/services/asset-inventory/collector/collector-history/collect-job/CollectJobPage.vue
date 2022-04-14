@@ -1,5 +1,5 @@
 <template>
-    <general-page-layout>
+    <div>
         <p-breadcrumbs :routes="routeState.routes" />
         <p-page-title :title="jobId" child @goBack="$router.go(-1)" />
         <div class="top-wrapper">
@@ -15,7 +15,7 @@
             </template>
         </p-horizontal-layout>
         <job-task-details v-if="selectedItem" :selected-item="selectedItem" />
-    </general-page-layout>
+    </div>
 </template>
 
 <script lang="ts">
@@ -27,12 +27,11 @@ import {
     PHorizontalLayout, PPageTitle, PBreadcrumbs,
 } from '@spaceone/design-system';
 
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import JobStatusChart from '@/services/asset-inventory/collector-history/collect-job/modules/JobStatusChart.vue';
-import JobBasicInformation from '@/services/asset-inventory/collector-history/collect-job/modules/JobBasicInformation.vue';
-import JobTable from '@/services/asset-inventory/collector-history/collect-job/modules/JobTaskTable.vue';
-import JobTaskDetails from '@/services/asset-inventory/collector-history/collect-job/modules/JobTaskDetails.vue';
-import { JobTaskData } from '@/services/asset-inventory/collector-history/collect-job/type';
+import JobStatusChart from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobStatusChart.vue';
+import JobBasicInformation from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobBasicInformation.vue';
+import JobTable from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskTable.vue';
+import JobTaskDetails from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskDetails.vue';
+import { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
@@ -43,7 +42,6 @@ export default {
         JobTable,
         JobBasicInformation,
         JobStatusChart,
-        GeneralPageLayout,
         PPageTitle,
         PBreadcrumbs,
         PHorizontalLayout,
@@ -62,7 +60,7 @@ export default {
         const routeState = reactive({
             routes: [
                 { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
-                { name: 'Collector History', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR_HISTORY._NAME } },
+                { name: 'Collector History', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME } },
                 { name: 'Job Information' },
             ],
         });
