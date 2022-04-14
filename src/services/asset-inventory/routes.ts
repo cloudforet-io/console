@@ -1,11 +1,13 @@
 import { RouteConfig } from 'vue-router';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
+const AssetInventoryContainer = () => import(/* webpackChunkName: "AssetInventoryContainer" */ '@/services/asset-inventory/AssetInventoryContainer.vue');
+
 const CloudServiceDetailPage = () => import(/* webpackChunkName: "CloudServiceDetailPage" */ '@/services/asset-inventory/cloud-service/cloud-service-detail/CloudServiceDetailPage.vue');
 const CloudServiceSearch = () => import(/* webpackChunkName: "CloudServiceSearch" */ '@/services/asset-inventory/cloud-service/cloud-service-search/CloudServiceSearchPage.vue');
 const CloudServiceTypeSearch = () => import(/* webpackChunkName: "CloudServiceTypeSearch" */ '@/services/asset-inventory/cloud-service/cloud-service-type-search/CloudServiceTypeSearchPage.vue');
 
-const Server = () => import(/* webpackChunkName: "Server" */ '@/services/asset-inventory/server/ServerPage.vue');
+const ServerPage = () => import(/* webpackChunkName: "ServerPage" */ '@/services/asset-inventory/server/ServerPage.vue');
 const CloudServicePage = () => import(/* webpackChunkName: "CloudServicePage" */ '@/services/asset-inventory/cloud-service/CloudServicePage.vue');
 const NoResourcePage = () => import(/* webpackChunkName: "NoResourcePage" */ '@/common/pages/NoResourcePage.vue');
 
@@ -24,80 +26,74 @@ export default {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
     redirect: 'asset-inventory/cloud-service',
-    meta: { label: 'Asset Inventory' },
-    component: { template: '<router-view />' },
+    component: AssetInventoryContainer,
     children: [
-        {
-            path: 'server',
-            meta: { label: 'Server' },
-            name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
-            component: Server,
-        },
         {
             path: 'cloud-service',
             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
             redirect: '/asset-inventory/cloud-service',
-            meta: { label: 'Cloud Service' },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
+                    meta: { lnbVisible: true },
                     component: CloudServicePage,
                 },
                 {
                     path: 'search/:searchKey/:id',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME,
-                    meta: {
-                        label: 'search',
-                    },
                     props: true,
                     component: CloudServiceSearch,
                 },
                 {
                     path: 'type/search/:id',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
-                    meta: {
-                        label: 'search',
-                    },
                     props: true,
                     component: CloudServiceTypeSearch,
                 },
                 {
                     path: 'no-resource',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME,
+                    meta: { lnbVisible: true },
                     component: NoResourcePage,
                 },
                 {
                     path: ':provider/:group/:name?',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                    meta: { lnbVisible: true },
                     props: true,
-                    meta: { label: 'Cloud Service' },
                     component: CloudServiceDetailPage,
                 },
             ],
         },
         {
+            path: 'server',
+            name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
+            meta: { lnbVisible: true },
+            component: ServerPage,
+        },
+        {
             path: 'collector',
-            meta: { label: 'Collector' },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
+                    meta: { lnbVisible: true },
                     props: true,
                     component: CollectorPage,
                 },
                 {
                     path: 'create',
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
-                    meta: { label: 'Create Collector' },
                     redirect: '/create/plugins',
                     component: { template: '<router-view />' },
                     children: [
                         {
                             path: 'plugins',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE.PLUGINS._NAME,
+                            meta: { lnbVisible: true },
                             component: CollectorPluginPage,
                         },
                         {
@@ -112,43 +108,37 @@ export default {
         },
         {
             path: 'service-account',
-            meta: {
-                label: 'Service Account',
-            },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+                    meta: { lnbVisible: true },
                     props: true,
                     component: ServiceAccountPage,
                 },
                 {
                     path: 'search/:id',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.SEARCH._NAME,
-                    meta: {
-                        label: 'search',
-                    },
                     props: true,
                     component: ServiceAccountSearchPage,
                 },
                 {
                     path: 'add/:provider',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
-                    meta: { label: 'Add Service Account' },
                     props: true,
                     component: ServiceAccountAddPage,
                 },
                 {
                     path: 'no-resource',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.NO_RESOURCE._NAME,
+                    meta: { lnbVisible: true },
                     component: NoResourcePage,
                 },
             ],
         },
         {
             path: 'collector-history',
-            meta: { label: 'Collector History' },
             component: { template: '<keep-alive><router-view /></keep-alive>' },
             children: [
                 {
