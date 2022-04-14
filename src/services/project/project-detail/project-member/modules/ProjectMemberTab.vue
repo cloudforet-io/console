@@ -32,9 +32,7 @@
                 {{ memberTableState.users[value] ? memberTableState.users[value].name : value }}
             </template>
             <template #col-assigned-format="{ value }">
-                <p-anchor :to="projectLinkFormatter(value)"
-                          target="_blank"
-                >
+                <p-anchor :to="projectLinkFormatter(value)">
                     {{ value.name }}
                 </p-anchor>
             </template>

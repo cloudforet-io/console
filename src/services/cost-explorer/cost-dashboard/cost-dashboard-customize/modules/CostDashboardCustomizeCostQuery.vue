@@ -40,7 +40,7 @@
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_SAVED_QUERY_HELP_TEXT') }}
                     </p>
                     <p-anchor :to="{ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME }"
-                              :show-icon="false"
+                              :icon-visible="false"
                               class="btn-add-query"
                     >
                         <p-icon-text-button style-type="primary1" name="ic_plus_bold">

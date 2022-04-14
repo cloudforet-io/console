@@ -7,7 +7,7 @@
             <p class="desc">
                 <i18n path="IDENTITY.USER.HANDBOOK.DESC_1">
                     <template #document>
-                        <p-anchor :href="githubLink" target="_blank" class="link">
+                        <p-anchor :href="githubLink" class="link">
                             {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
                         </p-anchor>
                     </template>
@@ -73,7 +73,7 @@
             <p class="desc last">
                 <i18n path="IDENTITY.USER.HANDBOOK.DESC_3-3">
                     <template #document>
-                        <p-anchor :href="githubLink" target="_blank" class="link">
+                        <p-anchor :href="githubLink" class="link">
                             {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
                         </p-anchor>
                     </template>

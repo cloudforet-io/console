@@ -12,7 +12,6 @@
                 <p-anchor :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: projectId } }"
                           :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_ALERTS')"
                           :icon-visible="false"
-                          target="_self"
                           highlight
                 />
             </div>

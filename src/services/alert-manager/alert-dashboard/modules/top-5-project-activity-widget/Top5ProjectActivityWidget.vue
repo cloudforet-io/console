@@ -31,7 +31,6 @@
                     <p-anchor :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
                               :icon-visible="false"
                               size="sm"
-                              target="_self"
                               class="col-name"
                     >
                         <span v-tooltip.bottom="projectNameFormatter(projectId)" class="tablet:hidden">{{ projectNameFormatter(projectId) }}</span>

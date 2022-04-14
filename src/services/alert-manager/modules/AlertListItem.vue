@@ -6,7 +6,6 @@
                      width="1em" height="1em"
                 />
                 <p-anchor class="title"
-                          target="_self"
                           :icon-visible="false"
                           :to="{ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: item.alert_id } }"
                 >
@@ -26,7 +25,6 @@
                           class="project-link"
                           :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
                           :icon-visible="false"
-                          target="_self"
                 >
                     {{ projectNameFormatter(item.project_id) }}
                 </p-anchor>

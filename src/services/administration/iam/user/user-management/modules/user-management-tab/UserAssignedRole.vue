@@ -8,7 +8,7 @@
             :striped="false"
         >
             <template #col-project_group_info.project_group_id-format="{value}">
-                <p-anchor v-if="value" :href="getProjectLink(value, false)" target="_blank">
+                <p-anchor v-if="value" :href="getProjectLink(value, false)">
                     {{ projectGroups[value] ? projectGroups[value].label : value }}
                 </p-anchor>
                 <p v-if="!value">
@@ -16,7 +16,7 @@
                 </p>
             </template>
             <template #col-project_info.project_id-format="{value}">
-                <p-anchor v-if="value" :href="getProjectLink(value, true)" target="_blank">
+                <p-anchor v-if="value" :href="getProjectLink(value, true)">
                     {{ projects[value] ? projects[value].label : value }}
                 </p-anchor>
                 <p v-if="!value">

@@ -47,7 +47,7 @@
                         />
                         <p>{{ $t('IDENTITY.USER.API_KEY.SPACECTL_DESC') }}
                             <span class="text">
-                                <p-anchor :href="githubLink" target="_blank">
+                                <p-anchor :href="githubLink">
                                     {{ $t('IDENTITY.USER.API_KEY.VIEW_MORE') }}
                                 </p-anchor>
                             </span>

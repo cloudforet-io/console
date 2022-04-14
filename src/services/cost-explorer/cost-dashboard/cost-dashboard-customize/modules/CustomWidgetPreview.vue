@@ -24,7 +24,7 @@
         </template>
         <template #extra>
             <p-anchor :to="getViewQueryLink()"
-                      :show-icon="false"
+                      :icon-visible="false"
                       class="btn-view-query"
             >
                 <p-button style-type="primary1">
