@@ -1,43 +1,37 @@
 <template>
     <div class="gnb-favorite">
-        <p-data-loader :data="items"
+        <p-data-loader :data="[...projects, ...cloudServiceTypes]"
                        :loading="loading"
         >
             <div v-if="projects.length" class="content-wrapper">
                 <div class="title-wrapper">
                     <span class="text">PROJECT</span>
-                    <p-anchor size="sm"
+                    <p-anchor v-if="projects.length > 5"
+                              size="sm"
                               text="Show all"
                               highlight
                               icon-name="ic_arrow_right"
                               @click="handleClickShowAll"
                     />
                 </div>
-                <div>
-                    <p v-for="project in projects" :key="`favorite-${project.resourceId}`">
-                        {{ project.name }}
-                    </p>
-                </div>
+                <g-n-b-favorite-item-list :favorite-items="projects" />
             </div>
             <p-divider v-if="projects.length" />
             <div v-if="cloudServiceTypes.length" class="content-wrapper">
                 <div class="title-wrapper">
                     <span class="text">CLOUD SERVICE</span>
-                    <p-anchor size="sm"
+                    <p-anchor v-if="cloudServiceTypes.length > 5"
+                              size="sm"
                               text="Show all"
                               highlight
                               icon-name="ic_arrow_right"
                               @click="handleClickShowAll"
                     />
                 </div>
-                <div>
-                    <p v-for="cloudServiceType in cloudServiceTypes" :key="`favorite-${cloudServiceType.resourceId}`">
-                        {{ cloudServiceType.name }}
-                    </p>
-                </div>
+                <g-n-b-favorite-item-list :favorite-items="cloudServiceTypes" />
             </div>
             <template #no-data>
-                <div v-show="!items.length" class="no-data-wrapper">
+                <div class="no-data">
                     <img class="img" src="@/assets/images/illust_star.svg">
                     <p class="text">
                         Add frequently visited pages to your favorites
@@ -46,11 +40,13 @@
                     <div class="button-wrapper">
                         <p-button style-type="gray-border"
                                   size="sm"
+                                  @click="handleClickMenuButton('project')"
                         >
                             Project
                         </p-button>
                         <p-button style-type="gray-border"
                                   size="sm"
+                                  @click="handleClickMenuButton('cloudService')"
                         >
                             Cloud Service
                         </p-button>
@@ -67,21 +63,20 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import {
     PButton, PDataLoader, PDivider, PAnchor,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { FavoriteItem } from '@/store/modules/favorite/type';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { store } from '@/store';
+import { SpaceRouter } from '@/router';
+import GNBFavoriteItemList
+    from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBFavoriteItemList.vue';
 
-
-const getConvertedMenuItem = (items: FavoriteItem[]): MenuItem[] => items.map(d => ({
-    name: d.resourceId,
-    label: d.name,
-    type: 'item',
-}));
 
 export default {
     name: 'GNBFavorite',
     components: {
+        GNBFavoriteItemList,
         PButton,
         PDataLoader,
         PDivider,
@@ -91,20 +86,6 @@ export default {
     setup() {
         const state = reactive({
             loading: false,
-            items: computed<MenuItem[]>(() => {
-                const results: MenuItem[] = [];
-
-                if (state.projects.length) {
-                    results.push({ name: 'title', label: 'PROJECT', type: 'header' });
-                    results.push(...getConvertedMenuItem(state.projects));
-                }
-                if (state.cloudServiceTypes.length) {
-                    if (results.length !== 0) results.push({ type: 'divider' });
-                    results.push({ name: 'title', label: 'CLOUD SERVICE', type: 'header' });
-                    results.push(...getConvertedMenuItem(state.cloudServiceTypes));
-                }
-                return results;
-            }),
             projects: computed<FavoriteItem[]>(() => ([
                 ...store.getters['favorite/projectGroupItems'],
                 ...store.getters['favorite/projectItems'],
@@ -116,6 +97,17 @@ export default {
         /* Event */
         const handleClickShowAll = () => {
             state.showAll = true;
+        };
+        const handleClickMenuButton = (menu) => {
+            if (menu === 'project') {
+                SpaceRouter.router.replace({
+                    name: PROJECT_ROUTE._NAME,
+                });
+            } else if (menu === 'cloudService') {
+                SpaceRouter.router.replace({
+                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+                });
+            }
         };
 
         /* Init */
@@ -133,24 +125,30 @@ export default {
         return {
             ...toRefs(state),
             handleClickShowAll,
+            handleClickMenuButton,
         };
     },
 };
 </script>
 <style lang="postcss" scoped>
 .gnb-favorite {
+    padding: 1rem 1.25rem;
     .content-wrapper {
         .title-wrapper {
             @apply text-gray-500;
             display: flex;
             justify-content: space-between;
             font-size: 0.75rem;
+            padding-bottom: 0.5rem;
             .text {
                 font-weight: 700;
             }
         }
     }
-    .no-data-wrapper {
+    .p-divider {
+        margin: 1.25rem 0;
+    }
+    .no-data {
         text-align: center;
         padding: 3rem 3.25rem;
         .img {

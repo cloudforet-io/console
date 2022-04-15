@@ -1,6 +1,6 @@
 <template>
     <p-i v-show="readOnly ? active : true"
-         name="ic_bookmark"
+         :name="active ? 'ic_favorite--added': 'ic_favorite'"
          width="1rem" height="1rem"
          :scale="scale"
          color="inherit"
