@@ -9,10 +9,16 @@
                     <p-breadcrumbs :routes="routeState.route" />
                 </div>
                 <p-page-title :title="providers[selectedProvider] ? providers[selectedProvider].name : selectedProvider"
-                              use-total-count
-                              :total-count="totalCount"
                               class="page-title"
-                />
+                >
+                    <template #extra>
+                        <service-provider-dropdown class="provider-dropdown"
+                                                   :selected-provider="selectedProvider"
+                                                   :has-all="true"
+                                                   @update:selectedProvider="handleProviderSelect"
+                        />
+                    </template>
+                </p-page-title>
                 <p-divider class="cloud-service-divider" />
                 <cloud-service-toolbox :total-count="totalCount"
                                        :filters="filters"
@@ -21,9 +27,14 @@
                                        @update-toolbox="handleToolbox"
                 >
                     <template #period>
-                        <cloud-service-period-filter :period.sync="period"
-                                                     @delete-period="handleDeletePeriod"
-                        />
+                        <div class="flex justify-between">
+                            <cloud-service-period-filter :period.sync="period"
+                                                         @delete-period="handleDeletePeriod"
+                            />
+                            <div class="total-result-wrapper">
+                                <span class="total-result">Total Result</span><span class="total-result-value">{{ totalCount }}</span>
+                            </div>
+                        </div>
                     </template>
                 </cloud-service-toolbox>
                 <p-data-loader class="flex-grow" :data="items" :loading="loading">
@@ -106,6 +117,7 @@ import {
     makeReferenceValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
 
 
 export default {
@@ -116,6 +128,7 @@ export default {
         CloudServiceToolbox,
         PVerticalPageLayout,
         CloudServiceMenu,
+        ServiceProviderDropdown,
         PDivider,
         PIconTextButton,
         PPageTitle,
@@ -239,6 +252,9 @@ export default {
             await replaceUrlQuery('period', undefined);
             await listCloudServiceType();
         };
+        const handleProviderSelect = (selectedProvider: string) => {
+            store.commit('service/cloudService/setSelectedProvider', selectedProvider);
+        };
 
         /* Init */
         (async () => {
@@ -291,6 +307,7 @@ export default {
             assetUrlConverter,
             handleToolbox,
             handleDeletePeriod,
+            handleProviderSelect,
             ASSET_INVENTORY_ROUTE,
         };
     },
@@ -299,6 +316,26 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.p-page-title::v-deep {
+    overflow: unset;
+    .extra {
+        @apply justify-between items-center;
+    }
+    .provider-dropdown {
+        margin-left: 0.5rem;
+    }
+}
+.total-result-wrapper {
+    @apply text-sm flex flex-wrap gap-2;
+    line-height: 1.09375rem;
+    min-width: 5.875rem;
+    .total-result {
+        @apply text-gray-600;
+    }
+    .total-result-value {
+        @apply text-gray-800;
+    }
+}
 .page-wrapper {
     @apply flex flex-col w-full h-full;
 }

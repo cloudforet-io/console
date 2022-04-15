@@ -10,9 +10,16 @@
                         class="mr-1"
             /><span>{{ providerList[proxySelected].name }}</span>
         </span>
+        <span v-else-if="hasAll" class="text">
+            <p-lazy-img error-icon="ic_provider_other"
+                        width="1rem" height="1rem"
+                        class="mr-1"
+            /><span>All</span>
+        </span>
         <template #menu-item--format="{ item }">
             <div class="content-menu-item">
                 <p-lazy-img width="1rem" height="1rem"
+                            error-icon="ic_provider_other"
                             :src="item.icon"
                             class="mr-1"
                 /><span>{{ item.label }}</span>
@@ -42,6 +49,10 @@ export default {
             type: String,
             default: 'aws',
         },
+        hasAll: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -49,6 +60,7 @@ export default {
             providerList: computed(() => store.state.reference.provider.items),
             contextMenuItems: computed(() => [
                 { type: 'header', name: 'serviceProvider', label: 'Service Provider' },
+                ...(props.hasAll ? [{ name: 'all', label: 'All', icon: undefined }] : []),
                 ...Object.keys(state.providerList).map(k => ({
                     label: state.providerList[k].name,
                     name: k,
