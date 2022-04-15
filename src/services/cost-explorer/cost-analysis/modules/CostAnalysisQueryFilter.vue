@@ -85,9 +85,9 @@ export default {
     },
     setup() {
         const state = reactive({
-            granularity: computed(() => store.state.service.costAnalysis.granularity),
-            stack: computed(() => store.state.service.costAnalysis.stack),
-            period: computed<Period>(() => store.state.service.costAnalysis.period),
+            granularity: computed(() => store.state.service.costExplorer.costAnalysis.granularity),
+            stack: computed(() => store.state.service.costExplorer.costAnalysis.stack),
+            period: computed<Period>(() => store.state.service.costExplorer.costAnalysis.period),
             //
             granularityItems: computed<MenuItem[]>(() => ([
                 {
@@ -112,15 +112,15 @@ export default {
         /* event */
         const handleSelectGranularity = async (granularity: string) => {
             if (granularity !== state.granularity) {
-                await store.commit('service/costAnalysis/setPeriod', getInitialDates());
+                await store.commit('service/costExplorer/costAnalysis/setPeriod', getInitialDates());
             }
-            store.commit('service/costAnalysis/setGranularity', granularity);
+            store.commit('service/costExplorer/costAnalysis/setGranularity', granularity);
         };
         const handleToggleStack = async ({ value }) => {
-            store.commit('service/costAnalysis/setStack', value);
+            store.commit('service/costExplorer/costAnalysis/setStack', value);
         };
         const handleSelectedDates = (period) => {
-            store.commit('service/costAnalysis/setPeriod', period);
+            store.commit('service/costExplorer/costAnalysis/setPeriod', period);
         };
         const handleClickSetFilter = () => {
             state.setQueryModalVisible = true;

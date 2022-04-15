@@ -39,9 +39,6 @@ import BudgetSummary
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-summary/BudgetSummary.vue';
 import BudgetNotifications
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-notifications/BudgetNotifications.vue';
-import { registerServiceStore } from '@/common/composables/register-service-store';
-import BudgetStoreModule from '@/services/cost-explorer/budget/store';
-import { BudgetStoreState } from '@/services/cost-explorer/budget/store/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -67,11 +64,9 @@ export default {
         },
     },
     setup(props) {
-        registerServiceStore<BudgetStoreState>('budget', BudgetStoreModule);
-
         const state = reactive({
             loading: true,
-            budgetData: computed<BudgetData>(() => store.state.service.budget.budgetData),
+            budgetData: computed<BudgetData>(() => store.state.service.costExplorer.budget.budgetData),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
         });
@@ -103,8 +98,8 @@ export default {
             state.loading = true;
             try {
                 await Promise.allSettled([
-                    store.dispatch('service/budget/getBudgetData', props.budgetId),
-                    store.dispatch('service/budget/getBudgetUsageData', props.budgetId),
+                    store.dispatch('service/costExplorer/budget/getBudgetData', props.budgetId),
+                    store.dispatch('service/costExplorer/budget/getBudgetUsageData', props.budgetId),
                 ]);
             } catch (e) {
                 ErrorHandler.handleError(e);

@@ -102,7 +102,7 @@ export default {
 
         const saveQuery = async () => {
             try {
-                const updatedQuery = await store.dispatch('service/costAnalysis/saveQuery', formState.queryName);
+                const updatedQuery = await store.dispatch('service/costExplorer/costAnalysis/saveQuery', formState.queryName);
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', root);
                 emit('confirm', { updatedQuery, requestType: REQUEST_TYPE.SAVE });
             } catch (e) {
@@ -112,7 +112,7 @@ export default {
 
         const editQuery = async () => {
             try {
-                const updatedQuery = await store.dispatch('service/costAnalysis/editQuery', {
+                const updatedQuery = await store.dispatch('service/costExplorer/costAnalysis/editQuery', {
                     selectedQuery: props.selectedQuery, formState,
                 });
                 if (!updatedQuery) return;

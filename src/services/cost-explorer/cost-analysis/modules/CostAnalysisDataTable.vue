@@ -73,7 +73,7 @@ import {
     getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod,
 } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { GroupByItem } from '@/services/cost-explorer/cost-analysis/store/type';
+import { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { objectToQueryString, primitiveToQueryString, arrayToQueryString } from '@/lib/router-query-string';
@@ -126,13 +126,13 @@ export default {
             regions: computed(() => store.state.reference.region.items),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
             //
-            granularity: computed(() => store.state.service.costAnalysis.granularity),
-            stack: computed(() => store.state.service.costAnalysis.stack),
-            period: computed(() => store.state.service.costAnalysis.period),
-            filters: computed(() => store.state.service.costAnalysis.filters),
-            groupBy: computed(() => store.state.service.costAnalysis.groupBy),
+            granularity: computed(() => store.state.service.costExplorer.costAnalysis.granularity),
+            stack: computed(() => store.state.service.costExplorer.costAnalysis.stack),
+            period: computed(() => store.state.service.costExplorer.costAnalysis.period),
+            filters: computed(() => store.state.service.costExplorer.costAnalysis.filters),
+            groupBy: computed(() => store.state.service.costExplorer.costAnalysis.groupBy),
             //
-            groupByItems: computed<GroupByItem[]>(() => store.getters['service/costAnalysis/groupByItems']),
+            groupByItems: computed<GroupByItem[]>(() => store.getters['service/costExplorer/costAnalysis/groupByItems']),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             groupByStoreMap: computed<Record<string, ReferenceMap>>(() => ({

@@ -72,9 +72,9 @@ export default {
         const state = reactive({
             period: computed<Period>({
                 get() { return props.fixedPeriod; },
-                set(period) { store.commit('service/costAnalysis/setPeriod', period); },
+                set(period) { store.commit('service/costExplorer/costAnalysis/setPeriod', period); },
             }),
-            granularity: computed(() => store.state.service.costAnalysis.granularity),
+            granularity: computed(() => store.state.service.costExplorer.costAnalysis.granularity),
             periodItems: computed<PeriodItem[]>(() => ([
                 {
                     name: 'last7days',

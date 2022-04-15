@@ -1,6 +1,6 @@
 import { Action } from 'vuex';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { CostAnalysisStoreState } from '@/services/cost-explorer/cost-analysis/store/type';
+import { CostAnalysisStoreState } from '@/services/cost-explorer/store/cost-analysis/type';
 import { CostQuerySetModel, CostQuerySetOption } from '@/services/cost-explorer/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';

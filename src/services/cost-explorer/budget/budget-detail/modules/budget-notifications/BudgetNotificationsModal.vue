@@ -128,7 +128,7 @@ export default {
         const state = reactive({
             loading: true,
             proxyVisible: makeProxy('visible', props, emit),
-            conditions: cloneDeep(store.state.service.budget.budgetData.notifications) as Condition[],
+            conditions: cloneDeep(store.state.service.costExplorer.budget.budgetData.notifications) as Condition[],
             units: computed(() => ([
                 {
                     name: NOTIFICATION_UNIT.ACTUAL_COST,
@@ -150,7 +150,7 @@ export default {
                 },
             ])),
             thresholdPlaceholder: '',
-            budgetId: computed(() => store.state.service.budget.budgetData.budget_id),
+            budgetId: computed(() => store.state.service.costExplorer.budget.budgetData.budget_id),
         });
 
         const handleAddCondition = () => {
@@ -169,7 +169,7 @@ export default {
 
         const setBudgetAlert = async () => {
             try {
-                await store.dispatch('service/budget/updateBudgetNotifications', {
+                await store.dispatch('service/costExplorer/budget/updateBudgetNotifications', {
                     budgetId: state.budgetId,
                     notifications: state.conditions,
                 });

@@ -177,17 +177,17 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            granularity: computed(() => store.state.service.costAnalysis.granularity),
-            stack: computed(() => store.state.service.costAnalysis.stack),
-            period: computed(() => store.state.service.costAnalysis.period),
-            filters: computed(() => store.state.service.costAnalysis.filters),
-            selectedQueryId: computed(() => store.state.service.costAnalysis.selectedQueryId),
-            groupBy: computed(() => store.state.service.costAnalysis.groupBy),
-            primaryGroupBy: computed(() => store.state.service.costAnalysis.primaryGroupBy),
+            granularity: computed(() => store.state.service.costExplorer.costAnalysis.granularity),
+            stack: computed(() => store.state.service.costExplorer.costAnalysis.stack),
+            period: computed(() => store.state.service.costExplorer.costAnalysis.period),
+            filters: computed(() => store.state.service.costExplorer.costAnalysis.filters),
+            selectedQueryId: computed(() => store.state.service.costExplorer.costAnalysis.selectedQueryId),
+            groupBy: computed(() => store.state.service.costExplorer.costAnalysis.groupBy),
+            primaryGroupBy: computed(() => store.state.service.costExplorer.costAnalysis.primaryGroupBy),
             //
             noFilter: computed(() => isEmpty(state.filterItemsMap) || Object.values(state.filters).every(d => !d)),
-            groupByItems: computed(() => store.getters['service/costAnalysis/groupByItems']),
-            filterItemsMap: computed(() => store.getters['service/costAnalysis/filterItemsMap']),
+            groupByItems: computed(() => store.getters['service/costExplorer/costAnalysis/groupByItems']),
+            filterItemsMap: computed(() => store.getters['service/costExplorer/costAnalysis/filterItemsMap']),
             filterItems: computed(() => Object.values(FILTER_ITEM_MAP).map(item => ({
                 name: item.name, title: item.label,
             }))),
@@ -281,13 +281,13 @@ export default {
             }
         };
         const handlePrimaryGroupByItem = async (groupBy?: string) => {
-            store.commit('service/costAnalysis/setPrimaryGroupBy', groupBy);
+            store.commit('service/costExplorer/costAnalysis/setPrimaryGroupBy', groupBy);
         };
         const handleClickSelectFilter = () => {
             state.filterModalVisible = true;
         };
         const handleClearAllFilters = () => {
-            store.commit('service/costAnalysis/setFilters', {});
+            store.commit('service/costExplorer/costAnalysis/setFilters', {});
         };
         const handleDeleteFilterTag = (filterName: string, itemIdx: number) => {
             const _filters = cloneDeep(state.filters);
@@ -298,10 +298,10 @@ export default {
             } else {
                 _filters[filterName] = undefined;
             }
-            store.commit('service/costAnalysis/setFilters', _filters);
+            store.commit('service/costExplorer/costAnalysis/setFilters', _filters);
         };
         const handleConfirmFilterModal = (filters) => {
-            store.commit('service/costAnalysis/setFilters', filters);
+            store.commit('service/costExplorer/costAnalysis/setFilters', filters);
         };
 
         const handleChartRendered = () => {
@@ -310,9 +310,9 @@ export default {
 
         watch(() => state.groupByItems, (after, before) => {
             if (!after.length) {
-                store.commit('service/costAnalysis/setPrimaryGroupBy', undefined);
+                store.commit('service/costExplorer/costAnalysis/setPrimaryGroupBy', undefined);
             } else if ((!before.length && after.length) || !after.filter(d => d.name === state.primaryGroupBy).length) {
-                store.commit('service/costAnalysis/setPrimaryGroupBy', after[0].name);
+                store.commit('service/costExplorer/costAnalysis/setPrimaryGroupBy', after[0].name);
             }
         });
         watch([() => state.granularity, () => state.period, () => state.primaryGroupBy, () => state.filters], ([granularity, period, groupBy]) => {

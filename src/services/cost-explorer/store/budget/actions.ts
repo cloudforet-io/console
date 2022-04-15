@@ -1,7 +1,7 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { BudgetData, BudgetNotifications, BudgetUsageData } from '@/services/cost-explorer/budget/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { UpdateBudgetParams } from '@/services/cost-explorer/budget/store/type';
+import { UpdateBudgetParams } from '@/services/cost-explorer/store/budget/type';
 
 export const getBudgetData = async ({ commit }, budgetId: string): Promise<void|Error> => {
     try {

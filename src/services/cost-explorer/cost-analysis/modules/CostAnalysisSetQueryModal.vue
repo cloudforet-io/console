@@ -116,11 +116,11 @@ export default {
         });
 
         const handleFormConfirm = async () => {
-            if (store.state.service.costAnalysis.granularity !== state.granularity) {
-                await store.commit('service/costAnalysis/setPeriod', getInitialDates());
+            if (store.state.service.costExplorer.costAnalysis.granularity !== state.granularity) {
+                await store.commit('service/costExplorer/costAnalysis/setPeriod', getInitialDates());
             }
-            store.commit('service/costAnalysis/setGranularity', state.granularity);
-            store.commit('service/costAnalysis/setStack', state.stack);
+            store.commit('service/costExplorer/costAnalysis/setGranularity', state.granularity);
+            store.commit('service/costExplorer/costAnalysis/setStack', state.stack);
             store.commit('display/setCurrency', state.currency);
 
             state.proxyVisible = false;
@@ -137,8 +137,8 @@ export default {
 
         watch(() => state.proxyVisible, (after) => {
             if (after) {
-                state.granularity = store.state.service.costAnalysis.granularity;
-                state.stack = store.state.service.costAnalysis.stack;
+                state.granularity = store.state.service.costExplorer.costAnalysis.granularity;
+                state.stack = store.state.service.costExplorer.costAnalysis.stack;
                 state.currency = store.state.display.currency;
             }
         });

@@ -104,8 +104,6 @@ import CostDashboardUpdateModal
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import { gray } from '@/styles/colors';
 import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
-import { registerServiceStore } from '@/common/composables/register-service-store';
-import costDashboardStoreModule from '@/services/cost-explorer/cost-dashboard/store';
 
 const PUBLIC_ICON_COLOR = gray[500];
 
@@ -152,7 +150,6 @@ export default {
         });
     },
     setup(props) {
-        registerServiceStore('costExplorer/dashboard', costDashboardStoreModule);
         const state = reactive({
             dashboard: {} as DashboardInfo,
             loading: true,

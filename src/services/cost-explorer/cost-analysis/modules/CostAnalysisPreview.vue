@@ -40,8 +40,8 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
-            selectedQueryId: computed<string|undefined>(() => store.state.service.costAnalysis.selectedQueryId),
-            selectedQuerySet: computed<CostQuerySetModel|undefined>(() => store.getters['service/costAnalysis/selectedQuerySet']),
+            selectedQueryId: computed<string|undefined>(() => store.state.service.costExplorer.costAnalysis.selectedQueryId),
+            selectedQuerySet: computed<CostQuerySetModel|undefined>(() => store.getters['service/costExplorer/costAnalysis/selectedQuerySet']),
             title: computed<string>(() => state.selectedQuerySet?.name ?? 'Cost Analysis'),
             topContainerRef: null as null|HTMLElement,
             chartElements: [] as HTMLElement[],

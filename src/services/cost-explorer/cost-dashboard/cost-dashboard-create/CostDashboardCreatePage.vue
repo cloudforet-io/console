@@ -22,9 +22,6 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { i18n } from '@/translations';
 import CostDashboardCreateForm
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateForm.vue';
-import { registerServiceStore } from '@/common/composables/register-service-store';
-import CostDashboardStoreModule from '@/services/cost-explorer/cost-dashboard/store';
-import { CostDashboardState } from '@/services/cost-explorer/cost-dashboard/store/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     CustomLayout,
@@ -49,7 +46,6 @@ export default {
     },
 
     setup() {
-        registerServiceStore<CostDashboardState>('costExplorer/dashboard', CostDashboardStoreModule);
         const routeState = reactive({
             route: computed(() => [
                 { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },

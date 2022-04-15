@@ -132,9 +132,9 @@ export default {
                 { name: CATEGORY.MANAGEMENT, label: 'Management' },
             ],
             //
-            selectedProvider: computed(() => store.state.service.cloudService.selectedProvider),
-            selectedCategories: computed(() => store.state.service.cloudService.selectedCategories),
-            selectedRegions: computed(() => store.state.service.cloudService.selectedRegions),
+            selectedProvider: computed(() => store.state.service.assetInventory.cloudService.selectedProvider),
+            selectedCategories: computed(() => store.state.service.assetInventory.cloudService.selectedCategories),
+            selectedRegions: computed(() => store.state.service.assetInventory.cloudService.selectedRegions),
         });
 
         /* api */
@@ -168,7 +168,7 @@ export default {
             store.dispatch('favorite/removeItem', item);
         };
         const handleChangeProvider = (provider: string) => {
-            store.commit('service/cloudService/setSelectedProvider', provider);
+            store.commit('service/assetInventory/cloudService/setSelectedProvider', provider);
         };
         const handleChangeCategory = (category: CATEGORY) => {
             const _index = state.selectedCategories.findIndex(d => d === category);
@@ -176,7 +176,7 @@ export default {
 
             if (_index < 0) _selectedCategories.push(category);
             else _selectedCategories.splice(_index, 1);
-            store.commit('service/cloudService/setSelectedCategories', _selectedCategories);
+            store.commit('service/assetInventory/cloudService/setSelectedCategories', _selectedCategories);
         };
         const handleChangeRegion = (region: string) => {
             const _index = state.selectedRegions.findIndex(d => d === region);
@@ -184,7 +184,7 @@ export default {
 
             if (_index < 0) _selectedRegions.push(region);
             else _selectedRegions.splice(_index, 1);
-            store.commit('service/cloudService/setSelectedRegions', _selectedRegions);
+            store.commit('service/assetInventory/cloudService/setSelectedRegions', _selectedRegions);
         };
 
         /* Watcher */

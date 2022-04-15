@@ -154,8 +154,8 @@ export default {
         };
 
         const state = reactive({
-            budgetData: computed<BudgetData>(() => store.state.service.budget.budgetData),
-            budgetUsageData: computed<BudgetUsageData[]>(() => store.state.service.budget.budgetUsageData),
+            budgetData: computed<BudgetData>(() => store.state.service.costExplorer.budget.budgetData),
+            budgetUsageData: computed<BudgetUsageData[]>(() => store.state.service.costExplorer.budget.budgetUsageData),
             budgetTimeUnit: computed<BudgetTimeUnit>(() => state.budgetData?.time_unit),
             budgetPeriod: computed<Period>(() => ({
                 start: state.budgetData?.start,

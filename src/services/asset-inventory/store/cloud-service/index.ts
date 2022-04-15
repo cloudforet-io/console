@@ -1,4 +1,4 @@
-import { CloudServiceStoreState } from '@/services/asset-inventory/cloud-service/store/type';
+import { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';
 // import * as actions from './actions';
 import * as mutations from './mutations';
 // import * as getters from './getters';

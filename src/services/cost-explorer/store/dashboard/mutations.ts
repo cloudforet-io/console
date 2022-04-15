@@ -1,5 +1,5 @@
 import { Mutation } from 'vuex';
-import { CostDashboardState } from '@/services/cost-explorer/cost-dashboard/store/type';
+import { CostDashboardState } from '@/services/cost-explorer/store/dashboard/type';
 
 export const setDashboardTemplate: Mutation<CostDashboardState> = (state, template) => {
     state.selectedTemplate = template;

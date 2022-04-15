@@ -127,7 +127,7 @@ export default {
     setup(props, { root }) {
         const state = reactive({
             defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
-            costQueryList: computed<CostQuerySetModel[]>(() => store.state.service.costAnalysis.costQueryList),
+            costQueryList: computed<CostQuerySetModel[]>(() => store.state.service.costExplorer.costAnalysis.costQueryList),
             queryItemList: computed<MenuItem[]>(() => ([
                 { name: 'header', label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVED_QUERY'), type: 'header' },
                 { name: undefined, label: 'Cost Analysis', type: 'item' },
@@ -137,8 +137,8 @@ export default {
                     type: 'item',
                 })),
             ])),
-            selectedQueryId: computed<string|undefined>(() => store.state.service.costAnalysis.selectedQueryId),
-            selectedQuerySet: computed<CostQuerySetModel|undefined>(() => store.getters['service/costAnalysis/selectedQuerySet']),
+            selectedQueryId: computed<string|undefined>(() => store.state.service.costExplorer.costAnalysis.selectedQueryId),
+            selectedQuerySet: computed<CostQuerySetModel|undefined>(() => store.getters['service/costExplorer/costAnalysis/selectedQuerySet']),
             title: computed<string>(() => state.selectedQuerySet?.name ?? 'Cost Analysis'),
             itemIdForDeleteQuery: '',
             visiblePdfOverlay: false,
@@ -166,12 +166,12 @@ export default {
 
         /* Utils */
         const setSelectedQueryId = (queryId?: string) => {
-            store.commit('service/costAnalysis/setSelectedQueryId', queryId);
+            store.commit('service/costExplorer/costAnalysis/setSelectedQueryId', queryId);
         };
 
         const setQueryOptions = (options?: Partial<CostQuerySetOption>) => {
-            if (options) store.dispatch('service/costAnalysis/setQueryOptions', options);
-            else store.dispatch('service/costAnalysis/initCostAnalysisStoreState');
+            if (options) store.dispatch('service/costExplorer/costAnalysis/setQueryOptions', options);
+            else store.dispatch('service/costExplorer/costAnalysis/initCostAnalysisStoreState');
         };
 
         const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (state.costQueryList.find(item => item.cost_query_set_id === queryItemKey)) || {};
@@ -211,7 +211,7 @@ export default {
         const handleSaveQueryConfirm = ({ updatedQuery, requestType }: SaveQueryEmitParam) => {
             if (!updatedQuery) return;
 
-            store.dispatch('service/costAnalysis/listCostQueryList');
+            store.dispatch('service/costExplorer/costAnalysis/listCostQueryList');
 
             if (requestType === REQUEST_TYPE.EDIT && updatedQuery.cost_query_set_id !== state.selectedQueryId) {
                 return;
@@ -227,7 +227,7 @@ export default {
                 const {
                     granularity, stack, period,
                     groupBy, filters, primaryGroupBy,
-                } = store.state.service.costAnalysis;
+                } = store.state.service.costExplorer.costAnalysis;
                 await SpaceConnector.client.costAnalysis.costQuerySet.update({
                     cost_query_set_id: state.selectedQueryId,
                     options: {
@@ -239,7 +239,7 @@ export default {
                         filters,
                     },
                 });
-                await store.dispatch('service/costAnalysis/listCostQueryList');
+                await store.dispatch('service/costExplorer/costAnalysis/listCostQueryList');
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', root);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
@@ -250,7 +250,7 @@ export default {
             checkDeleteState.visible = false;
             try {
                 await SpaceConnector.client.costAnalysis.costQuerySet.delete({ cost_query_set_id: state.itemIdForDeleteQuery });
-                await store.dispatch('service/costAnalysis/listCostQueryList');
+                await store.dispatch('service/costExplorer/costAnalysis/listCostQueryList');
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '', root);
                 if (state.selectedQueryId === state.itemIdForDeleteQuery) {
                     await SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME });

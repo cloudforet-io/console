@@ -35,7 +35,7 @@ export default {
     setup() {
         const state = reactive({
             loading: true,
-            budgetLoading: computed(() => store.getters['service/budget/isBudgetLoading']),
+            budgetLoading: computed(() => store.getters['service/costExplorer/budget/isBudgetLoading']),
             fields: [
                 { name: 'resource_id', label: 'User ID' },
                 { name: 'resource_id', label: 'User Name' },
@@ -44,8 +44,8 @@ export default {
                 { name: 'labels', label: 'Label' },
             ] as unknown as DataTableField,
             data: [],
-            budgetTargetProjectId: computed(() => store.state.service.budget.budgetData?.project_id) || undefined,
-            budgetTargetProjectGroupId: computed(() => store.state.service.budget.budgetData?.project_group_id) || undefined,
+            budgetTargetProjectId: computed(() => store.state.service.costExplorer.budget.budgetData?.project_id) || undefined,
+            budgetTargetProjectGroupId: computed(() => store.state.service.costExplorer.budget.budgetData?.project_group_id) || undefined,
         });
 
         const apiQueryHelper = new ApiQueryHelper();

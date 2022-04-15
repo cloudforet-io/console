@@ -92,13 +92,13 @@ export default {
         const state = reactive({
             projects: computed(() => store.state.reference.project.items),
             projectGroups: computed(() => store.state.reference.projectGroup.items),
-            budgetData: computed<BudgetData>(() => store.state.service.budget.budgetData),
+            budgetData: computed<BudgetData>(() => store.state.service.costExplorer.budget.budgetData),
             costTypeKey: computed(() => (state.budgetData ? getKeyOfCostType(state.budgetData?.cost_types) : '')),
             costTypeValue: computed(() => (state.budgetData ? getValueOfCostType(state.budgetData?.cost_types, state.costTypeKey) : [])),
             processedCostTypeValue: computed(() => state.costTypeValue?.join(', ') || 'All'),
             buttonRef: null as HTMLElement | null,
             balloonVisible: false,
-            loading: computed(() => store.getters['service/budget/isBudgetLoading']),
+            loading: computed(() => store.getters['service/costExplorer/budget/isBudgetLoading']),
         });
 
         const handleClickViewAll = () => {

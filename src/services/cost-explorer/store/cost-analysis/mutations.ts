@@ -1,7 +1,7 @@
 import { Mutation } from 'vuex';
 import {
     CostAnalysisStoreState,
-} from '@/services/cost-explorer/cost-analysis/store/type';
+} from '@/services/cost-explorer/store/cost-analysis/type';
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { CostQueryFilters, CostQuerySetModel, Period } from '@/services/cost-explorer/type';
 

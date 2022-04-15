@@ -12,7 +12,7 @@
             </template>
             <template #default>
                 <section class="card-body">
-                    <template v-if="$store.getters['service/budget/isBudgetLoading']">
+                    <template v-if="$store.getters['service/costExplorer/budget/isBudgetLoading']">
                         <p-lottie name="thin-spinner" :size="2.5"
                                   auto class="spinner w-full flex justify-center"
                         />
@@ -122,11 +122,11 @@ export default {
     },
     setup() {
         const state = reactive({
-            hasBudgetAlert: computed(() => (store.state.service.budget.budgetData?.notifications.length > 0)),
-            notifications: computed(() => store.state.service.budget.budgetData?.notifications.map(d => ({ ...d, id: getUUID() }))),
+            hasBudgetAlert: computed(() => (store.state.service.costExplorer.budget.budgetData?.notifications.length > 0)),
+            notifications: computed(() => store.state.service.costExplorer.budget.budgetData?.notifications.map(d => ({ ...d, id: getUUID() }))),
             budgetNotificationsModalVisible: false,
-            budgetId: computed(() => store.state.service.budget.budgetData?.budget_id),
-            budgetTargetId: computed(() => store.state.service.budget.budgetData?.project_id) || undefined,
+            budgetId: computed(() => store.state.service.costExplorer.budget.budgetData?.budget_id),
+            budgetTargetId: computed(() => store.state.service.costExplorer.budget.budgetData?.project_id) || undefined,
         });
 
         const checkDeleteState = reactive({
@@ -140,7 +140,7 @@ export default {
         const handleDeleteForm = async () => {
             try {
                 checkDeleteState.loading = true;
-                await store.dispatch('service/budget/updateBudgetNotifications', {
+                await store.dispatch('service/costExplorer/budget/updateBudgetNotifications', {
                     budgetId: state.budgetId,
                     notifications: [],
                 });

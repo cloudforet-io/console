@@ -100,10 +100,7 @@ import {
     RouteQueryString,
 } from '@/lib/router-query-string';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { registerServiceStore } from '@/common/composables/register-service-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { CloudServiceStoreState } from '@/services/asset-inventory/cloud-service/store/type';
-import cloudServiceStoreModule from '@/services/asset-inventory/cloud-service/store';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { Period } from '@/services/cost-explorer/type';
@@ -136,8 +133,6 @@ export default {
         PDataLoader,
     },
     setup() {
-        registerServiceStore<CloudServiceStoreState>('cloudService', cloudServiceStoreModule);
-
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const handlers = {
@@ -168,9 +163,9 @@ export default {
         const state = reactive({
             providers: computed(() => store.state.reference.provider.items),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
-            selectedProvider: computed(() => store.state.service.cloudService.selectedProvider),
-            selectedCategories: computed(() => store.state.service.cloudService.selectedCategories),
-            selectedRegions: computed(() => store.state.service.cloudService.selectedRegions),
+            selectedProvider: computed(() => store.state.service.assetInventory.cloudService.selectedProvider),
+            selectedCategories: computed(() => store.state.service.assetInventory.cloudService.selectedCategories),
+            selectedRegions: computed(() => store.state.service.assetInventory.cloudService.selectedRegions),
             period: queryStringToObject(SpaceRouter.router.currentRoute.query?.period) as Period | undefined,
             //
             loading: true,
@@ -266,15 +261,15 @@ export default {
 
             /* filter setting */
             const currentQuery = SpaceRouter.router.currentRoute.query;
-            store.commit('service/cloudService/setSelectedRegions', queryStringToArray(currentQuery.region) || []);
-            store.commit('service/cloudService/setSelectedCategories', queryStringToArray(currentQuery.service) || []);
+            store.commit('service/assetInventory/cloudService/setSelectedRegions', queryStringToArray(currentQuery.region) || []);
+            store.commit('service/assetInventory/cloudService/setSelectedCategories', queryStringToArray(currentQuery.service) || []);
 
             // init provider
             let provider: RouteQueryString = currentQuery.provider;
             if (Array.isArray(provider)) provider = queryStringToString(provider[0]);
             else provider = queryStringToString(provider);
             if (!provider || !state.providers[provider]) provider = 'all';
-            store.commit('service/cloudService/setSelectedProvider', provider);
+            store.commit('service/assetInventory/cloudService/setSelectedProvider', provider);
 
             if (currentQuery.provider !== primitiveToQueryString(provider)) {
                 await replaceUrlQuery('provider', primitiveToQueryString(provider));

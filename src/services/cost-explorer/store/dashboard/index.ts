@@ -1,4 +1,4 @@
-import { CostDashboardState } from '@/services/cost-explorer/cost-dashboard/store/type';
+import { CostDashboardState } from '@/services/cost-explorer/store/dashboard/type';
 import {
     CustomLayout,
     DASHBOARD_PRIVACY_TYPE,

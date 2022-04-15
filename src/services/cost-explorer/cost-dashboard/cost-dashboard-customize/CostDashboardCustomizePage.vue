@@ -38,10 +38,6 @@ import {
 import {
     computed, onBeforeUnmount, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
-import { registerServiceStore } from '@/common/composables/register-service-store';
-import CostDashboardStoreModule
-    from '@/services/cost-explorer/cost-dashboard/store';
-import { CostDashboardState } from '@/services/cost-explorer/cost-dashboard/store/type';
 import {
     CustomLayout,
     DashboardInfo,
@@ -76,7 +72,6 @@ export default {
         },
     },
     setup(props) {
-        registerServiceStore<CostDashboardState>('costExplorer/dashboard', CostDashboardStoreModule);
         const routeState = reactive({
             route: [
                 { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },

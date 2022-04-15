@@ -22,7 +22,7 @@ import {
     PSelectButton,
 } from '@spaceone/design-system';
 
-import { GroupByItem } from '@/services/cost-explorer/cost-analysis/store/type';
+import { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
 import { store } from '@/store';
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 
@@ -40,7 +40,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            selectedGroupByItems: computed<GroupByItem[]>(() => store.getters['service/costAnalysis/groupByItems']),
+            selectedGroupByItems: computed<GroupByItem[]>(() => store.getters['service/costExplorer/costAnalysis/groupByItems']),
             allGroupByItems: Object.values(GROUP_BY_ITEM_MAP) as GroupByItem[],
         });
 
@@ -50,7 +50,7 @@ export default {
         /* event */
         const handleSelectGroupByItems = async (items: GroupByItem[]) => {
             const groupBy = items.map(d => d.name);
-            store.commit('service/costAnalysis/setGroupBy', groupBy);
+            store.commit('service/costExplorer/costAnalysis/setGroupBy', groupBy);
         };
 
         return {
