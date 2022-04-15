@@ -8,7 +8,7 @@
             <p-lazy-img width="1rem" height="1rem"
                         :src="providerList[proxySelected].icon"
                         class="mr-1"
-            /><span>{{ providerList[proxySelected].label }}</span>
+            /><span>{{ providerList[proxySelected].name }}</span>
         </span>
         <template #menu-item--format="{ item }">
             <div class="content-menu-item">
@@ -34,18 +34,18 @@ export default {
         PLazyImg,
     },
     model: {
-        prop: 'selected',
-        event: 'update:selected',
+        prop: 'selectedProvider',
+        event: 'update:selectedProvider',
     },
     props: {
-        selected: {
+        selectedProvider: {
             type: String,
             default: 'aws',
         },
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxySelected: useProxyValue('selected', props, emit),
+            proxySelected: useProxyValue('selectedProvider', props, emit),
             providerList: computed(() => store.state.reference.provider.items),
             contextMenuItems: computed(() => [
                 { type: 'header', name: 'serviceProvider', label: 'Service Provider' },
