@@ -20,14 +20,13 @@
             <favorite-button :item-id="item.resourceId"
                              :favorite-type="item.resourceType"
                              :favorite-items="favoriteItems"
+                             scale="0.65"
             />
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
-
 import {
     PI, PLazyImg,
 } from '@spaceone/design-system';
@@ -47,15 +46,6 @@ export default {
             default: () => ([]),
         },
     },
-    setup() {
-        const state = reactive({
-
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
 };
 </script>
 <style lang="postcss" scoped>
@@ -65,8 +55,12 @@ export default {
         justify-content: space-between;
         align-items: center;
         font-size: 0.875rem;
-        line-height: 1.25;
-        padding: 0.25rem 0;
+        line-height: 1.5;
+        padding: 0.25rem;
+        &:hover {
+            @apply bg-secondary-2;
+            cursor: pointer;
+        }
 
         .text {
             @apply truncate;
