@@ -220,6 +220,7 @@ export default {
     }
     .noti-channel {
         flex-grow: 1;
+        max-width: calc(100% - 22rem);
         .desc-wrapper {
             @apply inline-flex flex-wrap items-center;
             .desc {
@@ -230,6 +231,7 @@ export default {
             }
         }
         .budget-notifications-channel {
+            height: auto;
             margin-top: 0.5rem;
         }
     }
@@ -256,6 +258,7 @@ export default {
             width: 100%;
         }
         .noti-channel {
+            max-width: 100%;
             .sub-title {
                 padding-left: 1rem;
             }
