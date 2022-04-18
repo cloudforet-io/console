@@ -1,12 +1,23 @@
 import { FavoriteState, FavoriteItem } from '@/store/modules/favorite/type';
 
 
+/* Menu */
+export const addMenuItem = (state: FavoriteState, favoriteItem: FavoriteItem): void => {
+    state.menuItems.unshift(favoriteItem);
+};
+export const removeMenuItem = (state: FavoriteState, favoriteItem: Partial<FavoriteItem>): void => {
+    state.menuItems = state.menuItems.filter(d => d.itemId !== favoriteItem.itemId);
+};
+export const loadMenuItem = (state: FavoriteState, favoriteItems: FavoriteItem[]): void => {
+    state.menuItems = favoriteItems;
+};
+
 /* Project */
 export const addProjectItem = (state: FavoriteState, favoriteItem: FavoriteItem): void => {
     state.projectItems.unshift(favoriteItem);
 };
 export const removeProjectItem = (state: FavoriteState, favoriteItem: Partial<FavoriteItem>): void => {
-    state.projectItems = state.projectItems.filter(d => d.resourceId !== favoriteItem.resourceId);
+    state.projectItems = state.projectItems.filter(d => d.itemId !== favoriteItem.itemId);
 };
 export const loadProjectItem = (state: FavoriteState, favoriteItems: FavoriteItem[]): void => {
     state.projectItems = favoriteItems;
@@ -18,7 +29,7 @@ export const addProjectGroupItem = (state: FavoriteState, favoriteItem: Favorite
     state.projectGroupItems.unshift(favoriteItem);
 };
 export const removeProjectGroupItem = (state: FavoriteState, favoriteItem: Partial<FavoriteItem>): void => {
-    state.projectGroupItems = state.projectGroupItems.filter(d => d.resourceId !== favoriteItem.resourceId);
+    state.projectGroupItems = state.projectGroupItems.filter(d => d.itemId !== favoriteItem.itemId);
 };
 export const loadProjectGroupItem = (state: FavoriteState, favoriteItems: FavoriteItem[]): void => {
     state.projectGroupItems = favoriteItems;
@@ -30,7 +41,7 @@ export const addCloudServiceTypeItem = (state: FavoriteState, favoriteItem: Favo
     state.cloudServiceTypeItems.unshift(favoriteItem);
 };
 export const removeCloudServiceTypeItem = (state: FavoriteState, favoriteItem: Partial<FavoriteItem>): void => {
-    state.cloudServiceTypeItems = state.cloudServiceTypeItems.filter(d => d.resourceId !== favoriteItem.resourceId);
+    state.cloudServiceTypeItems = state.cloudServiceTypeItems.filter(d => d.itemId !== favoriteItem.itemId);
 };
 export const loadCloudServiceTypeItem = (state: FavoriteState, favoriteItems: FavoriteItem[]): void => {
     state.cloudServiceTypeItems = favoriteItems;

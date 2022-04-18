@@ -19,8 +19,8 @@
                     <template v-else>
                         <router-link v-for="d in item.favorites" :key="d.resourceId"
                                      :to="referenceRouter(
-                                         d.resourceId, {
-                                             resource_type: d.resourceType,
+                                         d.itemId, {
+                                             resource_type: getResourceType(d.favoriteType),
                                          })"
                                      class="item"
                         >
@@ -46,7 +46,7 @@ import {
 
 import { PI } from '@spaceone/design-system';
 
-import { FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 import { TranslateResult } from 'vue-i18n';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { i18n } from '@/translations';
@@ -84,6 +84,14 @@ export default {
             showToggle: computed(() => state.projects.length > LIMIT_COUNT || state.cloudServiceTypes.length > LIMIT_COUNT),
         });
 
+        /* Util */
+        const getResourceType = (favoriteType: FAVORITE_TYPE) => {
+            if (favoriteType === FAVORITE_TYPE.CLOUD_SERVICE) return 'inventory.CloudService';
+            if (favoriteType === FAVORITE_TYPE.PROJECT) return 'identity.Project';
+            if (favoriteType === FAVORITE_TYPE.PROJECT_GROUP) return 'identity.ProjectGroup';
+            return '';
+        };
+
         const handleClickToggle = () => {
             state.isExpanded = !state.isExpanded;
         };
@@ -94,15 +102,16 @@ export default {
                 store.dispatch('reference/project/load'),
                 store.dispatch('reference/projectGroup/load'),
                 store.dispatch('reference/cloudServiceType/load'),
-                store.dispatch('favorite/load', 'identity.Project'),
-                store.dispatch('favorite/load', 'identity.ProjectGroup'),
-                store.dispatch('favorite/load', 'inventory.CloudServiceType'),
+                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
+                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
+                store.dispatch('favorite/load', FAVORITE_TYPE.CLOUD_SERVICE),
             ]);
         })();
 
         return {
             ...toRefs(state),
             handleClickToggle,
+            getResourceType,
             LIMIT_COUNT,
             referenceRouter,
         };

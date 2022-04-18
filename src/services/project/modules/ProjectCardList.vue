@@ -23,7 +23,7 @@
                                 <div class="favorite-wrapper">
                                     <favorite-button :item-id="item.project_id"
                                                      :favorite-items="favoriteItems"
-                                                     favorite-type="identity.Project"
+                                                     :favorite-type="FAVORITE_TYPE.PROJECT"
                                                      scale="0.7"
                                     />
                                 </div>
@@ -150,6 +150,7 @@ import { i18n } from '@/translations';
 import bytes from 'bytes';
 import { SUMMARY_TYPE } from '@/services/project/type';
 import { arrayToQueryString } from '@/lib/router-query-string';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 interface CardSummary {
     [projectId: string]: {
@@ -357,7 +358,7 @@ export default {
         (async () => {
             await Promise.allSettled([
                 store.dispatch('reference/provider/load'),
-                store.dispatch('favorite/load', 'identity.Project'),
+                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
             ]);
         })();
 
@@ -376,6 +377,7 @@ export default {
             byteFormatter,
             getItemSummaryCount,
             SUMMARY_TYPE,
+            FAVORITE_TYPE,
         };
     },
 };

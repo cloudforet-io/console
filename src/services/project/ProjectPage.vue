@@ -11,7 +11,7 @@
                         </sidebar-title>
                         <favorite-list :items="favoriteItems" :before-route="beforeFavoriteRoute" @delete="onFavoriteDelete">
                             <template #icon="{item}">
-                                <p-i :name="item.resourceType === 'identity.Project' ? 'ic_tree_project' : 'ic_tree_project-group'"
+                                <p-i :name="item.favoriteType === FAVORITE_TYPE.PROJECT ? 'ic_tree_project' : 'ic_tree_project-group'"
                                      width="1rem" height="1rem" color="inherit inherit"
                                 />
                             </template>
@@ -44,7 +44,7 @@
                                 <favorite-button v-if="storeState.groupId && !isPermissionDenied"
                                                  :favorite-items="favoriteItems"
                                                  :item-id="storeState.groupId"
-                                                 favorite-type="identity.ProjectGroup"
+                                                 :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
                                 />
                             </span>
                             <div class="btns">
@@ -127,7 +127,7 @@ import {
 } from '@/services/project/type';
 import ProjectCardList from '@/services/project/modules/ProjectCardList.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
 import ProjectGroupMember from '@/services/project/project-detail/project-member/modules/ProjectGroupMember.vue';
 import { store } from '@/store';
@@ -227,10 +227,10 @@ export default {
         };
 
         const beforeFavoriteRoute = async (item: FavoriteItem, e: MouseEvent) => {
-            if (item.resourceType === 'identity.ProjectGroup') {
+            if (item.favoriteType === FAVORITE_TYPE.PROJECT_GROUP) {
                 e.preventDefault();
-                if (storeState.groupId !== item.resourceId) {
-                    await store.dispatch('service/project/selectNode', item.resourceId);
+                if (storeState.groupId !== item.itemId) {
+                    await store.dispatch('service/project/selectNode', item.itemId);
                 }
             }
         };
@@ -314,8 +314,8 @@ export default {
         /* Init */
         (async () => {
             await Promise.allSettled([
-                store.dispatch('favorite/load', 'identity.Project'),
-                store.dispatch('favorite/load', 'identity.ProjectGroup'),
+                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
+                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
                 store.dispatch('reference/project/load'),
                 store.dispatch('reference/projectGroup/load'),
             ]);
@@ -325,6 +325,7 @@ export default {
         return {
             storeState,
             ...toRefs(state),
+            FAVORITE_TYPE,
             onFavoriteDelete,
             beforeFavoriteRoute,
             onSelectSettingDropdown,

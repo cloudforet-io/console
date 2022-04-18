@@ -8,7 +8,7 @@
                     <span class="favorite-button-wrapper">
                         <favorite-button :item-id="projectId"
                                          :favorite-items="favoriteItems"
-                                         favorite-type="identity.Project"
+                                         :favorite-type="FAVORITE_TYPE.PROJECT"
                         />
                     </span>
                     <p-icon-button name="ic_trashcan"
@@ -122,6 +122,7 @@ import { ProjectDetailState } from '@/services/project/project-detail/store/type
 import ProjectDetailStoreModule from '@/services/project/project-detail/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { NoResourceError } from '@/common/composables/error/error';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 export default {
     name: 'ProjectDetailPage',
@@ -287,7 +288,7 @@ export default {
             singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
             await Promise.allSettled([
                 // getPageNavigation(),
-                store.dispatch('favorite/load', 'identity.Project'),
+                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 store.dispatch('service/projectDetail/getAlertCounts'),
             ]);
         })();
@@ -309,6 +310,7 @@ export default {
             onChangeTab,
             onCreateMaintenanceWindow,
             ALERT_STATE,
+            FAVORITE_TYPE,
             commaFormatter,
         };
     },

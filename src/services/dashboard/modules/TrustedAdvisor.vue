@@ -114,7 +114,7 @@ import { store } from '@/store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 
 
 enum STATUS {
@@ -381,7 +381,7 @@ export default {
         };
         const asyncInit = async () => {
             await Promise.allSettled([
-                store.dispatch('favorite/load', 'identity.Project'),
+                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 // LOAD REFERENCE STORE
                 store.dispatch('reference/project/load'),
                 store.dispatch('reference/provider/load'),

@@ -61,7 +61,7 @@
                     <template #toggle-right="{node}">
                         <favorite-button v-if="node.data.item_type === 'PROJECT_GROUP'"
                                          :item-id="node.data.id"
-                                         favorite-type="identity.ProjectGroup"
+                                         :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
                                          scale="0.75"
                                          read-only
                         />
@@ -111,6 +111,7 @@ import { store } from '@/store';
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 export default {
     name: 'ProjectTree',
@@ -421,6 +422,7 @@ export default {
             ...toRefs(state),
             toggleOptions,
             selectOptions,
+            FAVORITE_TYPE,
             dataSetter,
             dataGetter,
             getClassNames,

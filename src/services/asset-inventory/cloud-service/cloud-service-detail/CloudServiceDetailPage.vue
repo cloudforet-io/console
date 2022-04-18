@@ -19,7 +19,7 @@
                 <div>{{ item.name }}</div>
                 <favorite-button :item-id="item.cloud_service_type_id || ''"
                                  :favorite-items="sidebarState.favoriteItems"
-                                 favorite-type="inventory.CloudServiceType"
+                                 :favorite-type="FAVORITE_TYPE.CLOUD_SERVICE"
                                  class="favorite-btn"
                                  scale="0.8"
                 />
@@ -255,7 +255,7 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
 import { Period } from '@/services/cost-explorer/type';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -762,7 +762,7 @@ export default {
         const initSidebar = async () => {
             await Promise.allSettled([
                 listCloudServiceTypeData(),
-                store.dispatch('favorite/load', 'inventory.CloudServiceType'),
+                store.dispatch('favorite/load', FAVORITE_TYPE.CLOUD_SERVICE),
             ]);
             sidebarState.selectedItem = find(sidebarState.cloudServiceTypeList, { name: props.name });
         };
@@ -830,6 +830,7 @@ export default {
 
             /* Helper */
             assetUrlConverter,
+            FAVORITE_TYPE,
         };
     },
 };

@@ -94,7 +94,7 @@ import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { CATEGORY } from '@/services/asset-inventory/cloud-service/lib/config';
-import { FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -197,7 +197,7 @@ export default {
             await Promise.allSettled([
                 store.dispatch('reference/provider/load'),
                 store.dispatch('reference/cloudServiceType/load'),
-                store.dispatch('favorite/load', 'inventory.CloudServiceType'),
+                store.dispatch('favorite/load', FAVORITE_TYPE.CLOUD_SERVICE),
             ]);
         })();
 

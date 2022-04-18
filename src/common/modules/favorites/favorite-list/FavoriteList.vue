@@ -13,22 +13,22 @@
             </template>
         </i18n>
         <template v-else>
-            <div v-for="item in displayItems" :key="item.resourceId" class="item"
-                 :class="{hovered: hoveredItem ? hoveredItem.resourceId === item.resourceId : false}"
+            <div v-for="item in displayItems" :key="item.itemId" class="item"
+                 :class="{hovered: hoveredItem ? hoveredItem.itemId === item.itemId : false}"
                  @click="handleClickItem(item, $event)"
                  @mouseenter="hoveredItem = item"
                  @mouseleave="hoveredItem = null"
             >
                 <router-link :to="referenceRouter(
-                                 item.resourceId, {
-                                     resource_type: item.resourceType,
+                                 item.itemId, {
+                                     resource_type: getResourceType(item.favoriteType),
                                  })"
                              class="item-link"
                 >
                     <span class="icon"><slot name="icon" :item="item" /></span>
                     <span class="name">{{ item.name }}</span>
                 </router-link>
-                <p-icon-button v-if="hoveredItem && hoveredItem.resourceId === item.resourceId" name="ic_delete"
+                <p-icon-button v-if="hoveredItem && hoveredItem.itemId === item.itemId" name="ic_delete"
                                size="sm"
                                class="delete-btn"
                                @click.prevent.stop="handleClickDelete(item)"
@@ -51,7 +51,7 @@ import {
 
 import { PI, PIconButton } from '@spaceone/design-system';
 
-import { FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 import { FavoriteListProps } from '@/common/modules/favorites/favorite-list/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -84,6 +84,13 @@ export default {
             isExpanded: false,
         });
 
+        const getResourceType = (favoriteType: FAVORITE_TYPE) => {
+            if (favoriteType === FAVORITE_TYPE.CLOUD_SERVICE) return 'inventory.CloudService';
+            if (favoriteType === FAVORITE_TYPE.PROJECT) return 'identity.Project';
+            if (favoriteType === FAVORITE_TYPE.PROJECT_GROUP) return 'identity.ProjectGroup';
+            return '';
+        };
+
         const handleClickDelete = (item: FavoriteItem) => {
             vm.$emit('delete', item);
         };
@@ -105,6 +112,7 @@ export default {
             handleClickDelete,
             handleClickToggle,
             handleClickItem,
+            getResourceType,
             referenceRouter,
             LIMIT_COUNT,
         };

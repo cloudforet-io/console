@@ -1,8 +1,8 @@
 <template>
     <div class="gnb-favorite-item-list">
-        <div v-for="item in favoriteItems" :key="`favorite-${item.resourceId}`" class="item">
+        <div v-for="item in favoriteItems" :key="`favorite-${item.itemId}`" class="item">
             <div class="text">
-                <template v-if="item.resourceType === 'inventory.CloudServiceType'">
+                <template v-if="item.favoriteType === 'CLOUD_SERVICE'">
                     <p-lazy-img :src="item.icon || ''"
                                 width="1rem" height="1rem"
                                 class="ic-lazy-img"
@@ -10,15 +10,15 @@
                     {{ item.name }}
                 </template>
                 <template v-else>
-                    <p-i :name="item.resourceType === 'identity.Project' ? 'ic_tree_project' : 'ic_tree_project-group'"
+                    <p-i :name="item.favoriteType === 'PROJECT' ? 'ic_tree_project' : 'ic_tree_project-group'"
                          width="1rem" height="1rem"
                          class="icon"
                     />
                     {{ item.label }}
                 </template>
             </div>
-            <favorite-button :item-id="item.resourceId"
-                             :favorite-type="item.resourceType"
+            <favorite-button :item-id="item.itemId"
+                             :favorite-type="item.favoriteType"
                              :favorite-items="favoriteItems"
                              scale="0.65"
             />

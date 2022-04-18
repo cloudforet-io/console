@@ -50,7 +50,7 @@ export default {
             favoriteItemMap: computed<Record<string, FavoriteItem>>(() => {
                 const result: Record<string, FavoriteItem> = {};
                 props.favoriteItems.forEach((d) => {
-                    result[d.resourceId] = d;
+                    result[d.itemId] = d;
                 });
                 return result;
             }),
@@ -62,13 +62,13 @@ export default {
             if (props.readOnly) return;
             if (state.favoriteItemMap[props.itemId]) {
                 await store.dispatch('favorite/removeItem', {
-                    resourceId: props.itemId,
-                    resourceType: props.favoriteType,
+                    itemId: props.itemId,
+                    favoriteType: props.favoriteType,
                 });
             } else {
                 await store.dispatch('favorite/addItem', {
-                    resourceId: props.itemId,
-                    resourceType: props.favoriteType,
+                    itemId: props.itemId,
+                    favoriteType: props.favoriteType,
                 });
             }
         };

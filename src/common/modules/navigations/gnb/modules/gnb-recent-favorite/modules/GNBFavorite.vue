@@ -4,14 +4,14 @@
                        :data="[...projects, ...cloudServiceTypes]"
                        :loading="loading"
         >
-            <template v-for="type in Object.values(FAVORITE_TYPE)">
-                <div v-if="favoriteItemMap[type].length" :key="`favorite-${type}`" class="content-wrapper">
-                    <p-divider v-if="type === FAVORITE_TYPE.CLOUD_SERVICE_TYPE && projects.length"
+            <template v-for="[type, items] in Object.entries(favoriteItemMap)">
+                <div v-if="items.length" :key="`favorite-${type}`" class="content-wrapper">
+                    <p-divider v-if="type === FAVORITE_TYPE.CLOUD_SERVICE && projects.length"
                                class="my-5"
                     />
                     <div class="title-wrapper">
                         <span class="title-text">{{ type === FAVORITE_TYPE.PROJECT ? 'PROJECT' : 'CLOUD SERVICE' }}</span>
-                        <div v-if="favoriteItemMap[type].length > FAVORITE_LIMIT"
+                        <div v-if="items.length > FAVORITE_LIMIT"
                              class="show-all-button"
                              @click="handleClickShowAll(type)"
                         >
@@ -73,8 +73,7 @@ import GNBFavoriteItemList
 
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { FavoriteItem } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/type';
+import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
@@ -100,9 +99,9 @@ export default {
                 ...store.getters['favorite/projectItems'],
             ])),
             cloudServiceTypes: computed<FavoriteItem[]>(() => store.getters['favorite/cloudServiceTypeItems']),
-            favoriteItemMap: computed<Record<FAVORITE_TYPE, FavoriteItem[]>>(() => ({
+            favoriteItemMap: computed<Record<string, FavoriteItem[]>>(() => ({
                 [FAVORITE_TYPE.PROJECT]: state.projects,
-                [FAVORITE_TYPE.CLOUD_SERVICE_TYPE]: state.cloudServiceTypes,
+                [FAVORITE_TYPE.CLOUD_SERVICE]: state.cloudServiceTypes,
             })),
             showAll: false,
             showAllType: undefined as undefined|FAVORITE_TYPE,
@@ -118,7 +117,7 @@ export default {
                 SpaceRouter.router.replace({
                     name: PROJECT_ROUTE._NAME,
                 });
-            } else if (type === FAVORITE_TYPE.CLOUD_SERVICE_TYPE) {
+            } else if (type === FAVORITE_TYPE.CLOUD_SERVICE) {
                 SpaceRouter.router.replace({
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 });
@@ -136,9 +135,9 @@ export default {
                 store.dispatch('reference/project/load'),
                 store.dispatch('reference/projectGroup/load'),
                 store.dispatch('reference/cloudServiceType/load'),
-                store.dispatch('favorite/load', 'identity.Project'),
-                store.dispatch('favorite/load', 'identity.ProjectGroup'),
-                store.dispatch('favorite/load', 'inventory.CloudServiceType'),
+                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
+                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
+                store.dispatch('favorite/load', FAVORITE_TYPE.CLOUD_SERVICE),
             ]);
             state.loading = false;
         })();

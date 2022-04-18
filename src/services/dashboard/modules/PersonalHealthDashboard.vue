@@ -78,6 +78,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 
 const EVENT_PERIOD = 7;
@@ -155,7 +156,7 @@ export default {
             // LOAD REFERENCE STORE
             await Promise.allSettled([
                 store.dispatch('reference/project/load'),
-                store.dispatch('favorite/load', 'identity.Project'),
+                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 store.dispatch('reference/region/load'),
             ]);
             await getData();
