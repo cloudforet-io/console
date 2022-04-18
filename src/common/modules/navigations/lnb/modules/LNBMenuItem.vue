@@ -19,9 +19,9 @@
             <div v-if="item.type === 'divider' && showMenu" class="divider">
                 <p-divider />
             </div>
-            <div v-if="item.type === 'item' && showMenu">
-                <div class="menu-item" :class="[{'second-depth': hasTopTitle}, {'selected': selectedItem.id === item.id}]"
-                     @click="handleClick(item)"
+            <div v-if="item.type === 'item' && showMenu" @click="handleClick(item)">
+                <router-link class="menu-item" :class="[{'second-depth': hasTopTitle}, {'selected': selectedItem.id === item.id}]"
+                             :to="item.to"
                 >
                     <slot name="before-text" v-bind="{...$props, item, index: idx}" />
                     {{ item.label }}
@@ -29,7 +29,7 @@
                     <new-mark v-if="item.isNew" />
                     <beta-mark v-if="item.isBeta" />
                     <slot name="right-extra" v-bind="{...$props, item, index: idx}" />
-                </div>
+                </router-link>
             </div>
         </div>
     </div>

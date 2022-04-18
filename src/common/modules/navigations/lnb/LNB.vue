@@ -26,8 +26,8 @@
                      height="1rem" class="add-button"
                 />
             </div>
-            <template v-for="(menuData, idx) in SampleData.menuItems">
-                <l-n-b-menu-item :key="menuData[idx].id" :has-top-title="!!topTitle" :menu-data="menuData"
+            <template v-for="(menuData, idx) in menuSet">
+                <l-n-b-menu-item :key="menuData[idx].id" :has-top-title="topTitle.label" :menu-data="menuData"
                                  :selected-item="selectedItem"
                                  @click-menu="setSelectedItem"
                 >
@@ -103,7 +103,7 @@ export default {
             type: Object as () => TopTitle,
             default: () => ({}),
         },
-        menu: {
+        menuSet: {
             type: Array as () => LNBItemList[],
             default: () => [],
         },

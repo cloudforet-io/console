@@ -1,34 +1,37 @@
 <template>
-    <div>
-        <p class="font-lg font-bold mb-4">
-            Asset Inventory
-        </p>
-        <router-link to="/asset-inventory/cloud-service">
-            Cloud Service
-        </router-link> <br>
-        <router-link to="/asset-inventory/server">
-            Server
-        </router-link> <br>
-        <router-link to="/asset-inventory/collector">
-            Collector
-        </router-link> <br>
-        <router-link to="/asset-inventory/service-account">
-            Service Account
-        </router-link>
-    </div>
+    <l-n-b header="Asset Inventory" :menu-set="MenuSet" />
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import LNB from '@/common/modules/navigations/lnb/LNB.vue';
+import { LNBItem } from '@/common/modules/navigations/lnb/type';
 
+
+const MenuSet: LNBItem[][] = [
+    [
+        {
+            type: 'item', id: 'cloud-service', label: 'Cloud Service', to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
+        },
+        {
+            type: 'item', id: 'server', label: 'Server', to: { name: ASSET_INVENTORY_ROUTE.SERVER._NAME },
+        },
+        {
+            type: 'item', id: 'collector', label: 'Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME },
+        },
+        {
+            type: 'item', id: 'service-account', label: 'Service Account', to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
+        },
+    ],
+];
 
 export default defineComponent({
     name: 'AssetInventoryLNB',
-    components: {},
+    components: { LNB },
     setup() {
-        const state = reactive({});
         return {
-            ...toRefs(state),
+            MenuSet,
         };
     },
 });

@@ -1,78 +1,34 @@
 <template>
-    <aside class="sidebar-menu">
-        <div v-for="(item) in menuList" :key="item.label"
-             @click="showPage(item.routeName)"
-        >
-            <sidebar-title :title="item.label"
-                           :selected="selectedItem ? item.label === selectedItem.label : ''"
-                           style-type="link"
-            />
-        </div>
-    </aside>
+    <l-n-b header="Alert Manager" :menu-set="MenuSet" />
 </template>
 
 <script lang="ts">
-import { TranslateResult } from 'vue-i18n';
-
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
-import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
-
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-import { i18n } from '@/translations';
-import { SpaceRouter } from '@/router';
+import { LNBItem } from '@/common/modules/navigations/lnb/type';
+import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 
-
-interface MenuItem {
-    routeName: string;
-    label: TranslateResult;
-}
+const MenuSet: LNBItem[][] = [
+    [
+        {
+            type: 'item', id: 'dashboard', label: 'Dashboard', to: { name: ALERT_MANAGER_ROUTE.DASHBOARD._NAME },
+        },
+        {
+            type: 'item', id: 'alert', label: 'Alert', to: { name: ALERT_MANAGER_ROUTE.ALERT._NAME },
+        },
+        {
+            type: 'item', id: 'escalation-policy', label: 'Escalation Policy', to: { name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME },
+        },
+    ],
+];
 
 export default {
     name: 'AlertManagerLNB',
     components: {
-        SidebarTitle,
+        LNB,
     },
     setup() {
-        const state = reactive({
-            menuList: computed(() => [
-                {
-                    routeName: ALERT_MANAGER_ROUTE.DASHBOARD._NAME,
-                    label: i18n.t('MONITORING.ALERT.MAIN.DASHBOARD'),
-                },
-                {
-                    routeName: ALERT_MANAGER_ROUTE.ALERT._NAME,
-                    label: i18n.t('MONITORING.ALERT.MAIN.ALERT'),
-                },
-                {
-                    routeName: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
-                    label: i18n.t('MONITORING.ALERT.MAIN.ESCALATION_POLICY'),
-                },
-            ]) as unknown as MenuItem[],
-            selectedItem: {} as MenuItem,
-        });
-
-        const showPage = (routeName) => {
-            SpaceRouter.router.replace({ name: routeName }).catch(() => {});
-        };
-        const selectSidebarItem = (route) => {
-            if (route) state.selectedItem = state.menuList.find(d => d.routeName === route) as MenuItem;
-            else state.selectedItem = {} as MenuItem;
-        };
-
-        watch(() => SpaceRouter.router.currentRoute.name, (after) => {
-            selectSidebarItem(after);
-        });
-
-        (async () => {
-            selectSidebarItem(SpaceRouter.router.currentRoute.name);
-        })();
-
         return {
-            ...toRefs(state),
-            showPage,
+            MenuSet,
         };
     },
 };

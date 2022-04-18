@@ -8,7 +8,7 @@ export interface LNBItem {
     label: string;
     id: string;
     foldable?: boolean;
-    to: Location;
+    to?: Location;
     isNew?: boolean;
     isBeta?: boolean;
 }
