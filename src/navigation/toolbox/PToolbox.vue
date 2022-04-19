@@ -33,10 +33,11 @@
                 </div>
                 <div v-if="sortable" class="tool">
                     <p-select-dropdown class="dropdown-list"
-                                       :items="sortByMenu"
+                                       :items="sortByOptions"
+                                       :sort-by="sortBy"
                                        @select="onChangeSortBy"
                     >
-                        {{ proxyState.sortBy }}
+                        {{ selectedSortBy }}
                     </p-select-dropdown>
                 </div>
                 <div class="right-tool-group">
@@ -85,6 +86,9 @@ import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/type';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
+import { MenuItem } from '@/inputs/context-menu/type';
+import { groupBy } from 'lodash';
+import { useProxyValue } from '@/hooks/proxy-state';
 
 
 export default defineComponent<ToolboxProps>({
@@ -162,7 +166,7 @@ export default defineComponent<ToolboxProps>({
         },
         sortByOptions: {
             type: Array,
-            default: () => [],
+            default: () => [] as MenuItem[],
         },
         keyItemSets: {
             type: Array,
@@ -185,18 +189,18 @@ export default defineComponent<ToolboxProps>({
             default: 'UTC',
         },
     },
-    setup(props: ToolboxProps) {
+    setup(props: ToolboxProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const initPageSize = props.pageSizeOptions ? props.pageSizeOptions[0] || 24 : 24;
+
         const proxyState = reactive({
             thisPage: makeOptionalProxy<number>('thisPage', vm, 1),
             pageSize: makeOptionalProxy<number>('pageSize', vm, initPageSize),
-            sortBy: makeOptionalProxy<string>('sortBy', vm, props.sortByOptions ? (props.sortByOptions[0] || '') : ''),
+            sortBy: useProxyValue('sortBy', props, emit),
             searchText: makeOptionalProxy<string>('searchText', vm, ''),
             queryTags: makeOptionalProxy<QueryTag[]>('queryTags', vm, []),
         });
-
+        const sortByOptionsData = (props.sortable ? groupBy(props.sortByOptions, 'name') : undefined);
         const state = reactive({
             pageStart: computed(() => ((proxyState.thisPage - 1) * proxyState.pageSize) + 1),
             allPage: computed(() => Math.ceil((props.totalCount || 0) / proxyState.pageSize) || 1),
@@ -206,12 +210,7 @@ export default defineComponent<ToolboxProps>({
                     name: d, label: d, type: 'item',
                 }));
             }),
-            sortByMenu: computed(() => {
-                if (!Array.isArray(props.sortByOptions)) return [];
-                return props.sortByOptions.map(d => ({
-                    name: d, label: d, type: 'item',
-                }));
-            }),
+            selectedSortBy: computed(() => ((sortByOptionsData && props.sortable) ? sortByOptionsData[proxyState.sortBy][0]?.label : proxyState.sortBy)),
             tagRef: null as any,
         });
 
