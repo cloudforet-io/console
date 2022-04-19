@@ -1,13 +1,13 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
+import { CollectorReferenceMap, CollectorReferenceState } from '@/store/modules/reference/collector/type';
 
 let lastLoadedTime = 0;
 
-export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<CollectorReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -22,7 +22,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 only: ['collector_id', 'name', 'tags'],
             },
         }, { timeout: 3000 });
-        const collectors: ReferenceMap = {};
+        const collectors: CollectorReferenceMap = {};
 
         response.results.forEach((collectorInfo: any): void => {
             collectors[collectorInfo.collector_id] = {
@@ -38,8 +38,8 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ReferenceState, any> = ({ state, commit }, collectorInfo): void => {
-    const collectors = {
+export const sync: Action<CollectorReferenceState, any> = ({ state, commit }, collectorInfo): void => {
+    const collectors: CollectorReferenceMap = {
         ...state.items,
         [collectorInfo.collector_id]: {
             label: collectorInfo.name,

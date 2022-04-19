@@ -1,9 +1,9 @@
-import { ReferenceState } from '@/store/modules/reference/type';
+import { PluginReferenceState } from '@/store/modules/reference/plugin/type';
 import * as getters from './getters';
 import * as actions from './actions';
 import * as mutations from './mutations';
 
-const state: Required<ReferenceState> = {
+const state: PluginReferenceState = {
     items: {},
 };
 

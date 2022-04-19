@@ -10,8 +10,8 @@ export interface ReferenceItem<Data = Record<string, any>> {
     data?: Data;
 }
 
-export type ReferenceMap<ReferenceItem = Record<string, any>> = Record<string, ReferenceItem>;
+export type ReferenceMap<Item extends ReferenceItem = ReferenceItem> = Record<string, Item>;
 
 export interface ReferenceState<ReferenceMap = Record<string, any>> {
-    items?: ReferenceMap;
+    items: ReferenceMap;
 }

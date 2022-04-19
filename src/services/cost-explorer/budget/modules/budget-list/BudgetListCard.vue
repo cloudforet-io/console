@@ -86,8 +86,8 @@ import {
 } from '@spaceone/design-system';
 import BudgetUsageProgressBar from '@/services/cost-explorer/modules/BudgetUsageProgressBar.vue';
 import { store } from '@/store';
-import { ProjectResourceItem } from '@/store/modules/reference/project/type';
-import { ProjectGroupResourceItem } from '@/store/modules/reference/project-group/type';
+import { ProjectReferenceItem } from '@/store/modules/reference/project/type';
+import { ProjectGroupReferenceItem } from '@/store/modules/reference/project-group/type';
 import { ReferenceMap } from '@/store/modules/reference/type';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -141,12 +141,12 @@ export default {
                 const projects: string[] = [];
                 if (state.isProject) {
                     const projectId = props.budgetUsage.project_id as string;
-                    const project: ProjectResourceItem|undefined = store.state.reference.project.items[projectId];
+                    const project: ProjectReferenceItem|undefined = store.state.reference.project.items[projectId];
                     if (project?.data?.groupInfo.name) projects.push(project.data.groupInfo.name);
                     projects.push(project?.name ?? projectId);
                 } else {
                     const projectGroupId = props.budgetUsage.project_group_id as string;
-                    const projectGroup: ProjectGroupResourceItem|undefined = store.state.reference.projectGroup.items[projectGroupId];
+                    const projectGroup: ProjectGroupReferenceItem|undefined = store.state.reference.projectGroup.items[projectGroupId];
                     if (projectGroup?.data?.parentGroupInfo?.name) projects.push(projectGroup.data.parentGroupInfo.name);
                     projects.push(projectGroup?.name ?? projectGroupId);
                 }

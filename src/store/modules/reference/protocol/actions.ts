@@ -1,12 +1,12 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
+import { ProtocolReferenceMap, ProtocolReferenceState } from '@/store/modules/reference/protocol/type';
 
 let lastLoadedTime = 0;
 
-export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<ProtocolReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -21,7 +21,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 only: ['protocol_id', 'name'],
             },
         }, { timeout: 3000 });
-        const protocols: ReferenceMap = {};
+        const protocols: ProtocolReferenceMap = {};
 
         response.results.forEach((protocolInfo: any): void => {
             protocols[protocolInfo.protocol_id] = {
@@ -36,8 +36,8 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ReferenceState, any> = ({ state, commit }, protocolInfo): void => {
-    const protocols = {
+export const sync: Action<ProtocolReferenceState, any> = ({ state, commit }, protocolInfo): void => {
+    const protocols: ProtocolReferenceMap = {
         ...state.items,
         [protocolInfo.protocol_id]: {
             label: protocolInfo.name,

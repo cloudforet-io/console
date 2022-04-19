@@ -1,13 +1,13 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
 import { RegionMap } from '@/services/cost-explorer/widgets/lib/config';
+import { RegionReferenceMap, RegionReferenceState } from '@/store/modules/reference/region/type';
 
 let lastLoadedTime = 0;
 
-export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<RegionReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -22,13 +22,16 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 only: ['name', 'region_code', 'tags', 'provider'],
             },
         }, { timeout: 3000 });
-        const regions: ReferenceMap = {};
+        const regions: RegionReferenceMap = {};
 
         response.results.forEach((regionInfo: any): void => {
             regions[regionInfo.region_code] = {
                 label: `${regionInfo.name} | ${regionInfo.region_code}`,
                 name: regionInfo.name,
                 continent: RegionMap[regionInfo.tags.continent] || {},
+                data: {
+                    provider: regionInfo.provider,
+                },
             };
         });
 
@@ -38,13 +41,16 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ReferenceState, any> = ({ state, commit }, regionInfo): void => {
-    const regions = {
+export const sync: Action<RegionReferenceState, any> = ({ state, commit }, regionInfo): void => {
+    const regions: RegionReferenceMap = {
         ...state.items,
         [regionInfo.region_code]: {
             label: `${regionInfo.name} | ${regionInfo.region_code}`,
             name: regionInfo.name,
             continent: RegionMap[regionInfo.tags.continent] || {},
+            data: {
+                provider: regionInfo.provider,
+            },
         },
     };
     commit('setRegions', regions);

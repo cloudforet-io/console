@@ -1,12 +1,12 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
+import { ServiceAccountReferenceMap, ServiceAccountReferenceState } from '@/store/modules/reference/service-account/type';
 
 let lastLoadedTime = 0;
 
-export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<ServiceAccountReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -21,7 +21,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 only: ['service_account_id', 'name'],
             },
         }, { timeout: 3000 });
-        const serviceAccounts: ReferenceMap = {};
+        const serviceAccounts: ServiceAccountReferenceMap = {};
 
         response.results.forEach((serviceAccountInfo: any): void => {
             serviceAccounts[serviceAccountInfo.service_account_id] = {
@@ -36,8 +36,8 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ReferenceState, any> = ({ state, commit }, serviceAccountInfo): void => {
-    const serviceAccounts = {
+export const sync: Action<ServiceAccountReferenceState, any> = ({ state, commit }, serviceAccountInfo): void => {
+    const serviceAccounts: ServiceAccountReferenceMap = {
         ...state.items,
         [serviceAccountInfo.service_account_id]: {
             label: serviceAccountInfo.name,

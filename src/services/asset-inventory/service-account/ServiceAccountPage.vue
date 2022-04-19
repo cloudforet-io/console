@@ -1,140 +1,110 @@
 <template>
-    <p-vertical-page-layout>
-        <template #sidebar="{width}">
-            <div class="relative h-full">
-                <p class="sidebar-title">
-                    {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.PROVIDERS_TITLE') }}
-                </p>
-                <p-divider class="sidebar-divider" />
-                <p-radio v-for="provider in providerState.items"
-                         :key="provider.provider"
-                         v-model="selectedProvider"
-                         :value="provider.provider"
-                         class="provider-wrapper"
+    <div>
+        <div class="page-navigation">
+            <p-breadcrumbs :routes="route" />
+        </div>
+        <p-page-title :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: selectedProviderName})"
+                      class="page-title"
+        >
+            <template #extra>
+                <service-provider-dropdown v-model="selectedProvider" class="provider-dropdown" />
+                <div class="total-result-wrapper">
+                    <span class="total-result">Total Result</span><span class="total-result-value">{{ typeOptionState.totalCount }}</span>
+                </div>
+            </template>
+        </p-page-title>
+        <p-horizontal-layout>
+            <template #container="{ height }">
+                <p-dynamic-layout v-if="tableState.schema"
+                                  type="table"
+                                  :options="tableState.schema.options"
+                                  :data="tableState.items"
+                                  :fetch-options="fetchOptionState"
+                                  :type-options="typeOptionState"
+                                  :style="{height: `${height}px`}"
+                                  :field-handler="fieldHandler"
+                                  @fetch="fetchTableData"
+                                  @select="onSelect"
+                                  @export="exportServiceAccountData"
+                                  @click-settings="onClickSettings"
                 >
-                    <template #radio-left>
-                        <p-lazy-img :src="provider.icon || ''"
-                                    error-icon="ic_provider_other"
-                                    :alt="provider.provider"
-                                    width="1.5rem" height="1.5rem"
-                        />
-                        <span class="provider-name">{{ provider.label }}</span>
+                    <template #toolbox-left>
+                        <p-icon-text-button style-type="primary-dark"
+                                            name="ic_plus_bold"
+                                            class="mr-4"
+                                            @click="clickAddServiceAccount"
+                        >
+                            {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
+                        </p-icon-text-button>
+                        <p-select-dropdown class="left-toolbox-item"
+                                           :items="tableState.dropdown"
+                                           @select="onSelectDropdown"
+                        >
+                            {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ACTION') }}
+                        </p-select-dropdown>
                     </template>
-                    <template #icon="{ iconName }">
-                        <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
-                             :name="iconName"
-                        />
-                    </template>
-                </p-radio>
-            </div>
-        </template>
-        <template #default>
-            <div class="page-navigation">
-                <p-breadcrumbs :routes="route" />
-            </div>
-            <p-page-title :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: selectedProviderName})"
-                          class="page-title"
-            >
-                <template #extra>
-                    <service-provider-dropdown v-model="selectedProvider" class="provider-dropdown" />
-                    <div class="total-result-wrapper">
-                        <span class="total-result">Total Result</span><span class="total-result-value">{{ typeOptionState.totalCount }}</span>
-                    </div>
-                </template>
-            </p-page-title>
-            <p-horizontal-layout>
-                <template #container="{ height }">
-                    <p-dynamic-layout v-if="tableState.schema"
-                                      type="table"
-                                      :options="tableState.schema.options"
-                                      :data="tableState.items"
-                                      :fetch-options="fetchOptionState"
-                                      :type-options="typeOptionState"
-                                      :style="{height: `${height}px`}"
-                                      :field-handler="fieldHandler"
-                                      @fetch="fetchTableData"
-                                      @select="onSelect"
-                                      @export="exportServiceAccountData"
-                                      @click-settings="onClickSettings"
-                    >
-                        <template #toolbox-left>
-                            <p-icon-text-button style-type="primary-dark"
-                                                name="ic_plus_bold"
-                                                class="mr-4"
-                                                @click="clickAddServiceAccount"
-                            >
-                                {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
-                            </p-icon-text-button>
-                            <p-select-dropdown class="left-toolbox-item"
-                                               :items="tableState.dropdown"
-                                               @select="onSelectDropdown"
-                            >
-                                {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ACTION') }}
-                            </p-select-dropdown>
-                        </template>
-                    </p-dynamic-layout>
-                </template>
-            </p-horizontal-layout>
-            <p-tab v-if="typeOptionState.selectIndex.length === 1"
-                   :tabs="singleItemTabState.tabs"
-                   :active-tab.sync="singleItemTabState.activeTab"
-            >
-                <template #details>
-                    <service-account-details :selected-provider="selectedProvider"
-                                             :service-account-id="tableState.selectedAccountIds[0]"
-                    />
-                </template>
-                <template #tag>
-                    <tags-panel :resource-id="tableState.selectedAccountIds[0]"
-                                resource-type="identity.ServiceAccount"
-                                resource-key="service_account_id"
-                    />
-                </template>
-                <template #credentials>
-                    <service-account-credentials :service-account-id="tableState.selectedAccountIds[0]" />
-                </template>
-                <template #member>
-                    <service-account-member :service-accounts="tableState.selectedAccountIds" />
-                </template>
-            </p-tab>
-            <p-tab v-else-if="typeOptionState.selectIndex.length > 1"
-                   :tabs="multiItemTabState.tabs"
-                   :active-tab.sync="multiItemTabState.activeTab"
-            >
-                <template #data>
-                    <p-dynamic-layout v-if="tableState.multiSchema"
-                                      type="simple-table"
-                                      :options="tableState.multiSchema.options"
-                                      :type-options="{ colCopy: true, timezone: typeOptionState.timezone }"
-                                      :data="tableState.selectedItems"
-                                      :field-handler="fieldHandler"
-                                      class="selected-data-tab"
-                    />
-                </template>
-            </p-tab>
-            <div v-else class="empty-space">
-                <p-empty>{{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.NO_SELECTED_ACCOUNT') }}</p-empty>
-            </div>
-            <p-double-check-modal :visible.sync="doubleCheckModalState.visible"
-                                  :header-title="doubleCheckModalState.title"
-                                  :sub-title="doubleCheckModalState.subTitle"
-                                  :verification-text="doubleCheckModalState.verificationText"
-                                  :theme-color="doubleCheckModalState.themeColor"
-                                  size="sm"
-                                  @confirm="deleteServiceAccount"
-            />
-            <project-tree-modal :visible.sync="changeProjectState.visible"
-                                :project-id="changeProjectState.projectId"
-                                :loading="changeProjectState.loading"
-                                @confirm="changeProject"
-            />
-            <custom-field-modal v-model="tableState.visibleCustomFieldModal"
-                                resource-type="identity.ServiceAccount"
-                                :options="{provider: selectedProvider}"
-                                @complete="reloadTable"
-            />
-        </template>
-    </p-vertical-page-layout>
+                </p-dynamic-layout>
+            </template>
+        </p-horizontal-layout>
+        <p-tab v-if="typeOptionState.selectIndex.length === 1"
+               :tabs="singleItemTabState.tabs"
+               :active-tab.sync="singleItemTabState.activeTab"
+        >
+            <template #details>
+                <service-account-details :selected-provider="selectedProvider"
+                                         :service-account-id="tableState.selectedAccountIds[0]"
+                />
+            </template>
+            <template #tag>
+                <tags-panel :resource-id="tableState.selectedAccountIds[0]"
+                            resource-type="identity.ServiceAccount"
+                            resource-key="service_account_id"
+                />
+            </template>
+            <template #credentials>
+                <service-account-credentials :service-account-id="tableState.selectedAccountIds[0]" />
+            </template>
+            <template #member>
+                <service-account-member :service-accounts="tableState.selectedAccountIds" />
+            </template>
+        </p-tab>
+        <p-tab v-else-if="typeOptionState.selectIndex.length > 1"
+               :tabs="multiItemTabState.tabs"
+               :active-tab.sync="multiItemTabState.activeTab"
+        >
+            <template #data>
+                <p-dynamic-layout v-if="tableState.multiSchema"
+                                  type="simple-table"
+                                  :options="tableState.multiSchema.options"
+                                  :type-options="{ colCopy: true, timezone: typeOptionState.timezone }"
+                                  :data="tableState.selectedItems"
+                                  :field-handler="fieldHandler"
+                                  class="selected-data-tab"
+                />
+            </template>
+        </p-tab>
+        <div v-else class="empty-space">
+            <p-empty>{{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.NO_SELECTED_ACCOUNT') }}</p-empty>
+        </div>
+        <p-double-check-modal :visible.sync="doubleCheckModalState.visible"
+                              :header-title="doubleCheckModalState.title"
+                              :sub-title="doubleCheckModalState.subTitle"
+                              :verification-text="doubleCheckModalState.verificationText"
+                              :theme-color="doubleCheckModalState.themeColor"
+                              size="sm"
+                              @confirm="deleteServiceAccount"
+        />
+        <project-tree-modal :visible.sync="changeProjectState.visible"
+                            :project-id="changeProjectState.projectId"
+                            :loading="changeProjectState.loading"
+                            @confirm="changeProject"
+        />
+        <custom-field-modal v-model="tableState.visibleCustomFieldModal"
+                            resource-type="identity.ServiceAccount"
+                            :options="{provider: selectedProvider}"
+                            @complete="reloadTable"
+        />
+    </div>
 </template>
 <script lang="ts">
 /* external library */
@@ -147,8 +117,8 @@ import { TranslateResult } from 'vue-i18n';
 
 /* spaceone design system */
 import {
-    PRadio, PI, PDivider, PBreadcrumbs, PPageTitle, PHorizontalLayout, PIconTextButton,
-    PTab, PDynamicLayout, PEmpty, PDoubleCheckModal, PLazyImg, PSelectDropdown,
+    PBreadcrumbs, PPageTitle, PHorizontalLayout, PIconTextButton,
+    PTab, PDynamicLayout, PEmpty, PDoubleCheckModal, PSelectDropdown,
 } from '@spaceone/design-system';
 import {
     DynamicLayoutEventListener,
@@ -159,7 +129,6 @@ import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/ty
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 /* components */
-import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 import ProjectTreeModal from '@/common/modules/project/ProjectTreeModal.vue';
 import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
@@ -216,12 +185,7 @@ export default {
         PHorizontalLayout,
         PPageTitle,
         PBreadcrumbs,
-        PDivider,
-        PI,
-        PRadio,
-        PVerticalPageLayout,
         PTab,
-        PLazyImg,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;

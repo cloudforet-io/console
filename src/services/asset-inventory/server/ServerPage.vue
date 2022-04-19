@@ -1,10 +1,10 @@
 <template>
-    <general-page-layout>
+    <fragment>
         <div class="page-navigation">
             <p-breadcrumbs :routes="routeState.route" />
         </div>
         <server-main />
-    </general-page-layout>
+    </fragment>
 </template>
 
 <script lang="ts">
@@ -15,14 +15,12 @@ import {
 import { PBreadcrumbs } from '@spaceone/design-system';
 
 import ServerMain from '@/services/asset-inventory/server/modules/ServerMain.vue';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 export default {
     name: 'Server',
     components: {
         ServerMain,
-        GeneralPageLayout,
         PBreadcrumbs,
     },
     setup() {

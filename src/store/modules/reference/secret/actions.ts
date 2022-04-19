@@ -1,12 +1,12 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
+import { SecretReferenceMap, SecretReferenceState } from '@/store/modules/reference/secret/type';
 
 let lastLoadedTime = 0;
 
-export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<SecretReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -21,7 +21,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 only: ['secret_id', 'name'],
             },
         }, { timeout: 3000 });
-        const secrets: ReferenceMap = {};
+        const secrets: SecretReferenceMap = {};
 
         response.results.forEach((secretInfo: any): void => {
             secrets[secretInfo.secret_id] = {
@@ -36,8 +36,8 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ReferenceState, any> = ({ state, commit }, secretInfo): void => {
-    const secrets = {
+export const sync: Action<SecretReferenceState, any> = ({ state, commit }, secretInfo): void => {
+    const secrets: SecretReferenceMap = {
         ...state.items,
         [secretInfo.secret_id]: {
             label: secretInfo.name,

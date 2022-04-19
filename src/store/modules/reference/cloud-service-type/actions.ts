@@ -1,14 +1,13 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ReferenceState } from '@/store/modules/reference/type';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
-import { CloudServiceTypeResourceMap } from '@/store/modules/reference/cloud-service-type/type';
+import { CloudServiceTypeReferenceMap, CloudServiceTypeReferenceState } from '@/store/modules/reference/cloud-service-type/type';
 
 let lastLoadedTime = 0;
 
-export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<CloudServiceTypeReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -23,7 +22,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 only: ['cloud_service_type_id', 'name', 'group', 'provider', 'tags'],
             },
         }, { timeout: 3000 });
-        const cloudServiceTypes: CloudServiceTypeResourceMap = {};
+        const cloudServiceTypes: CloudServiceTypeReferenceMap = {};
 
         response.results.forEach((cloudServiceTypeInfo: any): void => {
             cloudServiceTypes[cloudServiceTypeInfo.cloud_service_type_id] = {
@@ -43,8 +42,8 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ReferenceState, any> = ({ state, commit }, cloudServiceTypeInfo): void => {
-    const cloudServiceTypes = {
+export const sync: Action<CloudServiceTypeReferenceState, any> = ({ state, commit }, cloudServiceTypeInfo): void => {
+    const cloudServiceTypes: CloudServiceTypeReferenceMap = {
         ...state.items,
         [cloudServiceTypeInfo.cloud_service_type_id]: {
             label: `${cloudServiceTypeInfo.group} > ${cloudServiceTypeInfo.name}`,

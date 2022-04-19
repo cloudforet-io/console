@@ -1,9 +1,9 @@
-import { ReferenceState } from '@/store/modules/reference/type';
+import { UserReferenceState } from '@/store/modules/reference/user/type';
 import * as getters from './getters';
 import * as actions from './actions';
 import * as mutations from './mutations';
 
-const state: Required<ReferenceState> = {
+const state: UserReferenceState = {
     items: {},
 };
 

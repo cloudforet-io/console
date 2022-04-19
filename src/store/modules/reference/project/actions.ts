@@ -1,13 +1,12 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ProjectResourceMap } from '@/store/modules/reference/project/type';
+import { ProjectReferenceMap, ProjectReferenceState } from '@/store/modules/reference/project/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
-import { ReferenceState } from '@/store/modules/reference/type';
 
 let lastLoadedTime = 0;
 
-export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<ProjectReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -22,7 +21,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 only: ['project_id', 'name', 'project_group_info'],
             },
         }, { timeout: 3000 });
-        const projects: ProjectResourceMap = {};
+        const projects: ProjectReferenceMap = {};
 
         response.results.forEach((projectInfo: any): void => {
             const groupInfo = projectInfo.project_group_info;
@@ -44,10 +43,10 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ReferenceState, any> = ({ state, commit }, projectInfo): void => {
+export const sync: Action<ProjectReferenceState, any> = ({ state, commit }, projectInfo): void => {
     const groupInfo = projectInfo.project_group_info;
 
-    const projects: ProjectResourceMap = {
+    const projects: ProjectReferenceMap = {
         ...state.items,
         [projectInfo.project_id]: {
             label: `${groupInfo.name} > ${projectInfo.name}`,

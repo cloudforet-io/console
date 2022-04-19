@@ -1,13 +1,12 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ProjectGroupResourceMap } from '@/store/modules/reference/project-group/type';
+import { ProjectGroupReferenceMap, ProjectGroupReferenceState } from '@/store/modules/reference/project-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
-import { ReferenceState } from '@/store/modules/reference/type';
 
 let lastLoadedTime = 0;
 
-export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<ProjectGroupReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -22,7 +21,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 only: ['project_group_id', 'name', 'parent_project_group_info'],
             },
         }, { timeout: 3000 });
-        const projectGroups: ProjectGroupResourceMap = {};
+        const projectGroups: ProjectGroupReferenceMap = {};
 
         response.results.forEach((projectGroupInfo: any): void => {
             const parentGroup = projectGroupInfo.parent_project_group_info;
@@ -45,9 +44,9 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ReferenceState, any> = ({ state, commit }, projectGroupInfo): void => {
+export const sync: Action<ProjectGroupReferenceState, any> = ({ state, commit }, projectGroupInfo): void => {
     const parentGroup = projectGroupInfo.parent_project_group_info;
-    const projectGroups = {
+    const projectGroups: ProjectGroupReferenceMap = {
         ...state.items,
         [projectGroupInfo.project_group_id]: {
             label: (parentGroup)

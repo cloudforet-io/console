@@ -1,9 +1,9 @@
-import { ReferenceState } from '@/store/modules/reference/type';
+import { ServiceAccountReferenceState } from '@/store/modules/reference/service-account/type';
 import * as getters from './getters';
 import * as actions from './actions';
 import * as mutations from './mutations';
 
-const state: Required<ReferenceState> = {
+const state: ServiceAccountReferenceState = {
     items: {},
 };
 

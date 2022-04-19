@@ -1,12 +1,12 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
+import { WebhookReferenceMap, WebhookReferenceState } from '@/store/modules/reference/webhook/type';
 
 let lastLoadedTime = 0;
 
-export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<WebhookReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -21,7 +21,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 only: ['webhook_id', 'name'],
             },
         }, { timeout: 3000 });
-        const webhooks: ReferenceMap = {};
+        const webhooks: WebhookReferenceMap = {};
 
         response.results.forEach((webhookInfo: any): void => {
             webhooks[webhookInfo.webhook_id] = {
@@ -36,8 +36,8 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ReferenceState, any> = ({ state, commit }, webhookInfo): void => {
-    const webhooks = {
+export const sync: Action<WebhookReferenceState, any> = ({ state, commit }, webhookInfo): void => {
+    const webhooks: WebhookReferenceMap = {
         ...state.items,
         [webhookInfo.webhook_id]: {
             label: webhookInfo.name,

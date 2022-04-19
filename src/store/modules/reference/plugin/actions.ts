@@ -1,13 +1,13 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { Action } from 'vuex';
+import { PluginReferenceMap, PluginReferenceState } from '@/store/modules/reference/plugin/type';
 
 let lastLoadedTime = 0;
 
-export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<PluginReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -23,7 +23,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             },
         }, { timeout: 3000 });
 
-        const plugins: ReferenceMap = {};
+        const plugins: PluginReferenceMap = {};
 
         const promises = repoResponse.results.map(async (repoInfo) => {
             const pluginResponse = await SpaceConnector.client.repository.plugin.list({
@@ -51,8 +51,8 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
     }
 };
 
-export const sync: Action<ReferenceState, any> = ({ state, commit }, pluginInfo): void => {
-    const plugins = {
+export const sync: Action<PluginReferenceState, any> = ({ state, commit }, pluginInfo): void => {
+    const plugins: PluginReferenceMap = {
         ...state.items,
         [pluginInfo.plugin_id]: {
             label: pluginInfo.tags.description || pluginInfo.name,
