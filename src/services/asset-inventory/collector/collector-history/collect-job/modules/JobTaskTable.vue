@@ -23,7 +23,9 @@
         <template #toolbox-top>
             <div class="status-wrapper">
                 <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
-                <p-select-button-group :buttons="statusList" :selected.sync="selectedStatus" />
+                <p-select-button-group class="select-button-group" :buttons="statusList" :selected.sync="selectedStatus"
+                                       theme="text"
+                />
             </div>
         </template>
         <template #col-service_account_id-format="{ value }">
@@ -319,6 +321,11 @@ export default {
             font-weight: bold;
             line-height: 1.5;
             padding-right: 1rem;
+        }
+        .select-button-group::v-deep {
+            .button-group {
+                display: flex;
+            }
         }
     }
 }

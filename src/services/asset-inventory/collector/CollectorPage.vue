@@ -10,7 +10,7 @@
         >
             <template #extra>
                 <router-link :to="{name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }">
-                    <p-button style-type="gray900" outline="true" font-weigth="bold">
+                    <p-button style-type="gray-border" outline="true" font-weigth="bold">
                         Collector History
                     </p-button>
                 </router-link>
@@ -100,7 +100,8 @@
             <template #data>
                 <p-data-table :fields="selectedDataFields"
                               :items="selectedItems"
-                              :sortable="false"
+                              :sortable="true"
+                              sort-by="name"
                               :selectable="false"
                               col-copy
                               class="selected-data-tab"
@@ -244,13 +245,13 @@ export default {
             timezone: computed(() => store.state.user.timezone),
             plugins: computed(() => store.state.reference.plugin.items),
             fields: computed(() => [
-                { name: 'name', label: 'Name' },
-                { name: 'state', label: 'State' },
-                { name: 'priority', label: 'Priority' },
-                { name: 'plugin_info.plugin_id', label: 'Plugin' },
-                { name: 'plugin_info.version', label: 'Version' },
+                { name: 'name', label: 'Name', sortable: true },
+                { name: 'state', label: 'State', sortable: true },
+                { name: 'priority', label: 'Priority', sortable: true },
+                { name: 'plugin_info.plugin_id', label: 'Plugin', sortable: true },
+                { name: 'plugin_info.version', label: 'Version', sortable: true },
                 { name: 'collector_history', label: 'Collector History' },
-                { name: 'last_collected_at', label: 'Last Collected' },
+                { name: 'last_collected_at', label: 'Last Collected', sortable: true },
             ]),
             excelFields: [
                 { key: 'name', name: 'Name' },
