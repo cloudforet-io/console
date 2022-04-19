@@ -7,6 +7,7 @@ export type SuggestionType = 'MENU'|'CLOUD_SERVICE'
 
 export interface SuggestionItem extends MenuItem {
     parents?: SuggestionItem[];
+    image?: string;
     icon?: string;
     defaultIcon?: string;
     provider?: string;

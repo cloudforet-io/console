@@ -15,9 +15,13 @@
             </div>
         </template>
         <template #item--format="{ item }">
-            <p-lazy-img v-if="item.icon || item.defaultIcon"
-                        :src="item.icon || ''"
-                        :error-icon="item.defaultIcon"
+            <p-i v-if="item.icon"
+                 :name="item.icon"
+                 width="1rem" height="1rem"
+                 class="mr-1"
+            />
+            <p-lazy-img v-if="item.image"
+                        :src="item.image || ''"
                         width="1rem" height="1rem"
                         class="ic-lazy-img"
             />
@@ -67,7 +71,7 @@ interface Props {
 }
 
 export default defineComponent<Props>({
-    name: 'GNBSearchSuggestionList',
+    name: 'GNBSuggestionList',
     components: {
         PContextMenu,
         PLazyImg,

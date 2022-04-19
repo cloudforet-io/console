@@ -1,7 +1,7 @@
-import { FavoriteItem } from '@/store/modules/favorite/type';
+import { FavoriteConfig } from '@/store/modules/favorite/type';
 
 export interface FavoriteButtonProps {
-    favoriteItems: FavoriteItem[];
+    favoriteItems: FavoriteConfig[];
     itemId: string;
     favoriteType: string;
     itemMap: any;

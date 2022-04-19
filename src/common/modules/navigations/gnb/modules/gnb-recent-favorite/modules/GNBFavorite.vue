@@ -4,26 +4,32 @@
                        :data="[...projects, ...cloudServiceTypes]"
                        :loading="loading"
         >
-            <template v-for="[type, items] in Object.entries(favoriteItemMap)">
-                <div v-if="items.length" :key="`favorite-${type}`" class="content-wrapper">
-                    <p-divider v-if="type === FAVORITE_TYPE.CLOUD_SERVICE && projects.length"
-                               class="my-5"
-                    />
-                    <div class="title-wrapper">
-                        <span class="title-text">{{ type === FAVORITE_TYPE.PROJECT ? 'PROJECT' : 'CLOUD SERVICE' }}</span>
-                        <div v-if="items.length > FAVORITE_LIMIT"
-                             class="show-all-button"
-                             @click="handleClickShowAll(type)"
-                        >
-                            <span class="text">Show all</span>
-                            <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                                 color="inherit"
-                            />
-                        </div>
-                    </div>
-                    <g-n-b-favorite-item-list :favorite-items="favoriteItemMap[type].slice(0, FAVORITE_LIMIT)" />
-                </div>
-            </template>
+            <g-n-b-suggestion-list :items="items"
+                                   @update:isFocused="$emit('update:isFocused', $event)"
+                                   @move-focus-end="$emit('move-focus-end')"
+                                   @close="$emit('close')"
+                                   @select="handleSelect"
+            />
+            <!--            <template v-for="[type, items] in Object.entries(favoriteItemMap)">-->
+            <!--                <div v-if="items.length" :key="`favorite-${type}`" class="content-wrapper">-->
+            <!--                    <p-divider v-if="type === FAVORITE_TYPE.CLOUD_SERVICE && projects.length"-->
+            <!--                               class="my-5"-->
+            <!--                    />-->
+            <!--                    <div class="title-wrapper">-->
+            <!--                        <span class="title-text">{{ type === FAVORITE_TYPE.PROJECT ? 'PROJECT' : 'CLOUD SERVICE' }}</span>-->
+            <!--                        <div v-if="items.length > FAVORITE_LIMIT"-->
+            <!--                             class="show-all-button"-->
+            <!--                             @click="handleClickShowAll(type)"-->
+            <!--                        >-->
+            <!--                            <span class="text">Show all</span>-->
+            <!--                            <p-i name="ic_arrow_right" width="1rem" height="1rem"-->
+            <!--                                 color="inherit"-->
+            <!--                            />-->
+            <!--                        </div>-->
+            <!--                    </div>-->
+            <!--                    <g-n-b-favorite-item-list :favorite-items="favoriteItemMap[type].slice(0, FAVORITE_LIMIT)" />-->
+            <!--                </div>-->
+            <!--            </template>-->
             <template #no-data>
                 <div class="no-data">
                     <img class="img" src="@/assets/images/illust_star.svg">
@@ -65,17 +71,19 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PButton, PDataLoader, PDivider, PI, PIconButton,
+    PButton, PDataLoader, PIconButton,
 } from '@spaceone/design-system';
 
 import GNBFavoriteItemList
     from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBFavoriteItemList.vue';
+import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 
 
 const FAVORITE_LIMIT = 10;
@@ -84,25 +92,43 @@ export default {
     name: 'GNBFavorite',
     components: {
         GNBFavoriteItemList,
+        GNBSuggestionList,
         PButton,
         PDataLoader,
-        PDivider,
-        PI,
         PIconButton,
     },
     props: {},
     setup() {
         const state = reactive({
             loading: true,
+            items: computed<SuggestionItem[]>(() => {
+                const results: SuggestionItem[] = [];
+                if (state.menuList.length) {
+                    results.push({ name: 'title', label: 'MENU', type: 'header' });
+                    results.push(...state.menuList as SuggestionItem[]);
+                }
+                if (state.projects.length) {
+                    if (results.length !== 0) results.push({ type: 'divider' });
+                    results.push({ name: 'title', label: 'PROJECT', type: 'header' });
+                    results.push(...state.projects as SuggestionItem[]);
+                }
+                if (state.cloudServiceTypes.length) {
+                    if (results.length !== 0) results.push({ type: 'divider' });
+                    results.push({ name: 'title', label: 'CLOUD SERVICE', type: 'header' });
+                    results.push(...state.cloudServiceTypes as SuggestionItem[]);
+                }
+                return results;
+            }),
+            menuList: computed<FavoriteItem[]>(() => store.getters['favorite/menuItems']),
             projects: computed<FavoriteItem[]>(() => ([
                 ...store.getters['favorite/projectGroupItems'],
                 ...store.getters['favorite/projectItems'],
             ])),
             cloudServiceTypes: computed<FavoriteItem[]>(() => store.getters['favorite/cloudServiceTypeItems']),
-            favoriteItemMap: computed<Record<string, FavoriteItem[]>>(() => ({
-                [FAVORITE_TYPE.PROJECT]: state.projects,
-                [FAVORITE_TYPE.CLOUD_SERVICE]: state.cloudServiceTypes,
-            })),
+            // favoriteItemMap: computed<Record<string, FavoriteItem[]>>(() => ({
+            //     [FAVORITE_TYPE.PROJECT]: state.projects,
+            //     [FAVORITE_TYPE.CLOUD_SERVICE]: state.cloudServiceTypes,
+            // })),
             showAll: false,
             showAllType: undefined as undefined|FAVORITE_TYPE,
         });
@@ -127,6 +153,9 @@ export default {
             state.showAll = false;
             state.showAllType = undefined;
         };
+        const handleSelect = () => {
+            console.log('select!');
+        };
 
         /* Init */
         (async () => {
@@ -135,6 +164,7 @@ export default {
                 store.dispatch('reference/project/load'),
                 store.dispatch('reference/projectGroup/load'),
                 store.dispatch('reference/cloudServiceType/load'),
+                store.dispatch('favorite/load', FAVORITE_TYPE.MENU),
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
                 store.dispatch('favorite/load', FAVORITE_TYPE.CLOUD_SERVICE),
@@ -149,13 +179,14 @@ export default {
             handleClickShowAll,
             handleClickMenuButton,
             handleGoBack,
+            handleSelect,
         };
     },
 };
 </script>
 <style lang="postcss" scoped>
 .gnb-favorite {
-    padding: 1rem;
+    padding: 1rem 0;
     .p-data-loader {
         height: 100%;
     }

@@ -4,14 +4,14 @@
         <p-data-loader :data="allSelectableItems"
                        :loading="loading"
         >
-            <g-n-b-search-suggestion-list :items="suggestionItems"
-                                          :input-text="inputText"
-                                          :is-focused="isFocused"
-                                          :focus-start-position="focusStartPosition"
-                                          @update:isFocused="$emit('update:isFocused', $event)"
-                                          @move-focus-end="$emit('move-focus-end')"
-                                          @close="$emit('close')"
-                                          @select="handleSelect"
+            <g-n-b-suggestion-list :items="suggestionItems"
+                                   :input-text="inputText"
+                                   :is-focused="isFocused"
+                                   :focus-start-position="focusStartPosition"
+                                   @update:isFocused="$emit('update:isFocused', $event)"
+                                   @move-focus-end="$emit('move-focus-end')"
+                                   @close="$emit('close')"
+                                   @select="handleSelect"
             />
             <template #no-data>
                 <div v-if="isRecent" class="no-data">
@@ -42,7 +42,7 @@ import {
     defineComponent, PropType,
     reactive, toRefs,
 } from '@vue/composition-api';
-import GNBSearchSuggestionList from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchSuggestionList.vue';
+import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 import { PDataLoader, PDivider } from '@spaceone/design-system';
 import {
     FocusStartPosition,
@@ -64,7 +64,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'GNBSearchDropdown',
     components: {
-        GNBSearchSuggestionList,
+        GNBSuggestionList,
         PDivider,
         PDataLoader,
     },

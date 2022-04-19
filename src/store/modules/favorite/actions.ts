@@ -1,5 +1,5 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FavoriteConfig } from '@/store/modules/favorite/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -23,50 +23,34 @@ const deleteFavorite = async (favoriteType: FAVORITE_TYPE, itemId: string) => {
         ErrorHandler.handleError(e);
     }
 };
-const getExistItem = (state, favoriteType, itemId): boolean => {
-    let items: FavoriteItem[] = [];
-    if (favoriteType === FAVORITE_TYPE.PROJECT) items = state.projectItems;
-    else if (favoriteType === FAVORITE_TYPE.PROJECT_GROUP) items = state.projectGroupItems;
-    else if (favoriteType === FAVORITE_TYPE.CLOUD_SERVICE) items = state.cloudServiceTypeItems;
-    else if (favoriteType === FAVORITE_TYPE.MENU) items = state.menuItems;
-    const existItem = items.find(item => item.itemId === itemId);
-    return !!existItem;
-};
 
-
-export const addItem = async ({ commit, state }, favoriteItem: FavoriteItem): Promise<void> => {
-    const favoriteType = favoriteItem.favoriteType;
-    const itemId = favoriteItem.itemId;
-    const isExists = getExistItem(state, favoriteType, itemId);
-    if (!isExists) {
-        await createFavorite(favoriteType, itemId);
-        if (favoriteType === FAVORITE_TYPE.PROJECT) {
-            commit('addProjectItem', favoriteItem);
-        } else if (favoriteType === FAVORITE_TYPE.PROJECT_GROUP) {
-            commit('addProjectGroupItem', favoriteItem);
-        } else if (favoriteType === FAVORITE_TYPE.CLOUD_SERVICE) {
-            commit('addCloudServiceTypeItem', favoriteItem);
-        } else if (favoriteType === FAVORITE_TYPE.MENU) {
-            commit('addMenuItem', favoriteItem);
-        }
+export const addItem = async ({ commit }, favorite: FavoriteConfig): Promise<void> => {
+    const favoriteType = favorite.favoriteType;
+    const itemId = favorite.itemId;
+    await createFavorite(favoriteType, itemId);
+    if (favoriteType === FAVORITE_TYPE.PROJECT) {
+        commit('addProjectItem', favorite);
+    } else if (favoriteType === FAVORITE_TYPE.PROJECT_GROUP) {
+        commit('addProjectGroupItem', favorite);
+    } else if (favoriteType === FAVORITE_TYPE.CLOUD_SERVICE) {
+        commit('addCloudServiceTypeItem', favorite);
+    } else if (favoriteType === FAVORITE_TYPE.MENU) {
+        commit('addMenuItem', favorite);
     }
 };
 
-export const removeItem = async ({ commit, state }, favoriteItem: FavoriteItem): Promise<void> => {
-    const favoriteType = favoriteItem.favoriteType;
-    const itemId = favoriteItem.itemId;
-    const isExists = getExistItem(state, favoriteType, itemId);
-    if (isExists) {
-        await deleteFavorite(favoriteType, itemId);
-        if (favoriteType === FAVORITE_TYPE.PROJECT) {
-            commit('removeProjectItem', favoriteItem);
-        } else if (favoriteType === FAVORITE_TYPE.PROJECT_GROUP) {
-            commit('removeProjectGroupItem', favoriteItem);
-        } else if (favoriteType === FAVORITE_TYPE.CLOUD_SERVICE) {
-            commit('removeCloudServiceTypeItem', favoriteItem);
-        } else if (favoriteType === FAVORITE_TYPE.MENU) {
-            commit('removeMenuItem', favoriteItem);
-        }
+export const removeItem = async ({ commit }, favorite: FavoriteConfig): Promise<void> => {
+    const favoriteType = favorite.favoriteType;
+    const itemId = favorite.itemId;
+    await deleteFavorite(favoriteType, itemId);
+    if (favoriteType === FAVORITE_TYPE.PROJECT) {
+        commit('removeProjectItem', favorite);
+    } else if (favoriteType === FAVORITE_TYPE.PROJECT_GROUP) {
+        commit('removeProjectGroupItem', favorite);
+    } else if (favoriteType === FAVORITE_TYPE.CLOUD_SERVICE) {
+        commit('removeCloudServiceTypeItem', favorite);
+    } else if (favoriteType === FAVORITE_TYPE.MENU) {
+        commit('removeMenuItem', favorite);
     }
 };
 
@@ -74,18 +58,18 @@ export const load = async ({ commit }, favoriteType: FAVORITE_TYPE): Promise<voi
     const { results } = await SpaceConnector.client.addOns.favorite.list({
         type: favoriteType,
     });
-    const favoriteItems: FavoriteItem[] = results.map(d => ({
+    const favorites: FavoriteConfig[] = results.map(d => ({
         favoriteType: d.data.type,
         itemId: d.data.id,
     }));
 
     if (favoriteType === FAVORITE_TYPE.PROJECT) {
-        commit('loadProjectItem', favoriteItems);
+        commit('loadProjectItem', favorites);
     } else if (favoriteType === FAVORITE_TYPE.PROJECT_GROUP) {
-        commit('loadProjectGroupItem', favoriteItems);
+        commit('loadProjectGroupItem', favorites);
     } else if (favoriteType === FAVORITE_TYPE.CLOUD_SERVICE) {
-        commit('loadCloudServiceTypeItem', favoriteItems);
+        commit('loadCloudServiceTypeItem', favorites);
     } else if (favoriteType === FAVORITE_TYPE.MENU) {
-        commit('loadMenuItem', favoriteItems);
+        commit('loadMenuItem', favorites);
     }
 };

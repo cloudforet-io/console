@@ -52,16 +52,7 @@ import { PI } from '@spaceone/design-system';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
-
-
-enum MENU_ICON {
-    dashboard = 'ic_dashboard',
-    project = 'ic_project',
-    'asset_inventory' = 'ic_inventory',
-    'cost_explorer' = 'ic_analytics',
-    'alert_manager' = 'ic_monitoring',
-    administration = 'ic_management'
-}
+import { MENU_ICON } from '@/common/modules/navigations/gnb/config';
 
 export default {
     name: 'SiteMap',

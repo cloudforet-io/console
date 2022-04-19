@@ -18,7 +18,7 @@ import {
 import { PI } from '@spaceone/design-system';
 import { FavoriteButtonProps } from '@/common/modules/favorites/favorite-button/type';
 import { store } from '@/store';
-import { FavoriteItem } from '@/store/modules/favorite/type';
+import { FavoriteConfig } from '@/store/modules/favorite/type';
 
 export default {
     name: 'FavoriteButton',
@@ -47,8 +47,8 @@ export default {
     },
     setup(props: FavoriteButtonProps) {
         const state = reactive({
-            favoriteItemMap: computed<Record<string, FavoriteItem>>(() => {
-                const result: Record<string, FavoriteItem> = {};
+            favoriteItemMap: computed<Record<string, FavoriteConfig>>(() => {
+                const result: Record<string, FavoriteConfig> = {};
                 props.favoriteItems.forEach((d) => {
                     result[d.itemId] = d;
                 });

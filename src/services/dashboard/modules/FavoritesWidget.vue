@@ -17,14 +17,14 @@
                         {{ $t('COMMON.WIDGETS.FAVORITES_WIDGET.NO_DATA') }}
                     </div>
                     <template v-else>
-                        <router-link v-for="d in item.favorites" :key="d.resourceId"
+                        <router-link v-for="d in item.favorites" :key="d.itemId"
                                      :to="referenceRouter(
                                          d.itemId, {
                                              resource_type: getResourceType(d.favoriteType),
                                          })"
                                      class="item"
                         >
-                            {{ d.name }}
+                            {{ d.label }}
                         </router-link>
                     </template>
                 </div>

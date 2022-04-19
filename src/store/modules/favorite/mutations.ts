@@ -1,48 +1,48 @@
-import { FavoriteState, FavoriteItem } from '@/store/modules/favorite/type';
+import { FavoriteState, FavoriteConfig } from '@/store/modules/favorite/type';
 
 
 /* Menu */
-export const addMenuItem = (state: FavoriteState, favoriteItem: FavoriteItem): void => {
-    state.menuItems.unshift(favoriteItem);
+export const addMenuItem = (state: FavoriteState, favorite: FavoriteConfig): void => {
+    state.menuItems.unshift(favorite);
 };
-export const removeMenuItem = (state: FavoriteState, favoriteItem: Partial<FavoriteItem>): void => {
-    state.menuItems = state.menuItems.filter(d => d.itemId !== favoriteItem.itemId);
+export const removeMenuItem = (state: FavoriteState, favorite: Partial<FavoriteConfig>): void => {
+    state.menuItems = state.menuItems.filter(d => d.itemId !== favorite.itemId);
 };
-export const loadMenuItem = (state: FavoriteState, favoriteItems: FavoriteItem[]): void => {
-    state.menuItems = favoriteItems;
+export const loadMenuItem = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
+    state.menuItems = favorite;
 };
 
 /* Project */
-export const addProjectItem = (state: FavoriteState, favoriteItem: FavoriteItem): void => {
-    state.projectItems.unshift(favoriteItem);
+export const addProjectItem = (state: FavoriteState, favorite: FavoriteConfig): void => {
+    state.projectItems.unshift(favorite);
 };
-export const removeProjectItem = (state: FavoriteState, favoriteItem: Partial<FavoriteItem>): void => {
-    state.projectItems = state.projectItems.filter(d => d.itemId !== favoriteItem.itemId);
+export const removeProjectItem = (state: FavoriteState, favorite: Partial<FavoriteConfig>): void => {
+    state.projectItems = state.projectItems.filter(d => d.itemId !== favorite.itemId);
 };
-export const loadProjectItem = (state: FavoriteState, favoriteItems: FavoriteItem[]): void => {
-    state.projectItems = favoriteItems;
+export const loadProjectItem = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
+    state.projectItems = favorite;
 };
 
 
 /* Project Group */
-export const addProjectGroupItem = (state: FavoriteState, favoriteItem: FavoriteItem): void => {
-    state.projectGroupItems.unshift(favoriteItem);
+export const addProjectGroupItem = (state: FavoriteState, favorite: FavoriteConfig): void => {
+    state.projectGroupItems.unshift(favorite);
 };
-export const removeProjectGroupItem = (state: FavoriteState, favoriteItem: Partial<FavoriteItem>): void => {
-    state.projectGroupItems = state.projectGroupItems.filter(d => d.itemId !== favoriteItem.itemId);
+export const removeProjectGroupItem = (state: FavoriteState, favorite: Partial<FavoriteConfig>): void => {
+    state.projectGroupItems = state.projectGroupItems.filter(d => d.itemId !== favorite.itemId);
 };
-export const loadProjectGroupItem = (state: FavoriteState, favoriteItems: FavoriteItem[]): void => {
-    state.projectGroupItems = favoriteItems;
+export const loadProjectGroupItem = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
+    state.projectGroupItems = favorite;
 };
 
 
 /* Cloud Service Type */
-export const addCloudServiceTypeItem = (state: FavoriteState, favoriteItem: FavoriteItem): void => {
-    state.cloudServiceTypeItems.unshift(favoriteItem);
+export const addCloudServiceTypeItem = (state: FavoriteState, favorite: FavoriteConfig): void => {
+    state.cloudServiceTypeItems.unshift(favorite);
 };
-export const removeCloudServiceTypeItem = (state: FavoriteState, favoriteItem: Partial<FavoriteItem>): void => {
-    state.cloudServiceTypeItems = state.cloudServiceTypeItems.filter(d => d.itemId !== favoriteItem.itemId);
+export const removeCloudServiceTypeItem = (state: FavoriteState, favorite: Partial<FavoriteConfig>): void => {
+    state.cloudServiceTypeItems = state.cloudServiceTypeItems.filter(d => d.itemId !== favorite.itemId);
 };
-export const loadCloudServiceTypeItem = (state: FavoriteState, favoriteItems: FavoriteItem[]): void => {
-    state.cloudServiceTypeItems = favoriteItems;
+export const loadCloudServiceTypeItem = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
+    state.cloudServiceTypeItems = favorite;
 };

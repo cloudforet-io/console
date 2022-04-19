@@ -26,7 +26,7 @@
                              class="item-link"
                 >
                     <span class="icon"><slot name="icon" :item="item" /></span>
-                    <span class="name">{{ item.name }}</span>
+                    <span class="name">{{ item.label }}</span>
                 </router-link>
                 <p-icon-button v-if="hoveredItem && hoveredItem.itemId === item.itemId" name="ic_delete"
                                size="sm"
