@@ -6,7 +6,7 @@
         <p-page-title :title="$t('PLUGIN.COLLECTOR.PLUGINS.TITLE')" use-total-count :total-count="totalCount"
                       child @goBack="$router.go(-1)"
         />
-        <p-divider class="mb-6" />
+        <p-divider class="divider" />
         <collector-plugins-toolbox class="collector-plugin-toolbox"
                                    @update-toolbox="handleToolbox"
         >
@@ -286,13 +286,11 @@ export default {
 .filter-tag::v-deep {
     @apply inline-flex items-center mb-2 mr-2;
 }
-.plugin-list {
-    max-width: 1280px;
-    margin: auto;
+.divider {
+    @apply mb-6;
 }
 .plugin-card-list {
     @apply flex flex-col flex-wrap gap-4;
-    max-width: 1280px;
     margin: auto;
 }
 .beta {
