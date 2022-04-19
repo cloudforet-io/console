@@ -173,7 +173,7 @@ const getTableField = (field: string|DataTableFieldType): TableField => {
     if (typeof field === 'string') return { name: field, label: field, sortable: true };
 
     const children = getChildFields(field);
-    return { ...field, children, sortable: false };
+    return { ...field, children, sortable: children?.length ? false : field.sortable };
 };
 
 const getTableFieldRows = (fields: TableField[], tableFieldRows: TableField[][] = []): TableField[][] => {
