@@ -1,3 +1,10 @@
+# [1.1.0-beta.280](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.279...v1.1.0-beta.280) (2022-04-19)
+
+
+### Features
+
+* apply MenuItem type to sortByOptions prop of PToolbox component ([#925](https://github.com/spaceone-dev/spaceone-design-system/issues/925)) ([8360659](https://github.com/spaceone-dev/spaceone-design-system/commit/8360659fb55f222cc08f66f5e6533af730368879))
+
 # [1.1.0-beta.279](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.278...v1.1.0-beta.279) (2022-04-14)
 
 
