@@ -19,6 +19,7 @@ export interface FavoriteItem extends FavoriteConfig {
     name?: string;
     label?: string;
     icon?: string;
+    provider?: string;
     parents?: ParentItem[];
 }
 

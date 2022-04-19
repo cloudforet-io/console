@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
@@ -20,7 +20,7 @@ import { FavoriteButtonProps } from '@/common/modules/favorites/favorite-button/
 import { store } from '@/store';
 import { FavoriteConfig } from '@/store/modules/favorite/type';
 
-export default {
+export default defineComponent<FavoriteButtonProps>({
     name: 'FavoriteButton',
     components: { PI },
     props: {
@@ -77,7 +77,7 @@ export default {
             handleClickFavoriteButton,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

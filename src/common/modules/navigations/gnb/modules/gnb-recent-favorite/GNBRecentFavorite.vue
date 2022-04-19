@@ -16,7 +16,7 @@
                 <g-n-b-recent />
             </template>
             <template #favorite>
-                <g-n-b-favorite />
+                <g-n-b-favorite @close="handleCloseDropdown" />
             </template>
         </p-tab>
     </div>
@@ -71,11 +71,15 @@ export default {
         const handleClickButton = () => {
             state.proxyVisibleDropdown = !state.proxyVisibleDropdown;
         };
+        const handleCloseDropdown = () => {
+            state.proxyVisibleDropdown = false;
+        };
 
         return {
             ...toRefs(state),
             handleClickOutside,
             handleClickButton,
+            handleCloseDropdown,
         };
     },
 };

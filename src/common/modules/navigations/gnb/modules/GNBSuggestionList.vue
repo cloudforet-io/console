@@ -15,11 +15,15 @@
             </div>
         </template>
         <template #item--format="{ item }">
-            <p-lazy-img v-if="item.icon"
+            <p-lazy-img v-if="item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE"
                         :src="item.icon || ''"
-                        :error-icon="item.icon"
                         width="1rem" height="1rem"
                         class="ic-lazy-img"
+            />
+            <p-i v-else
+                 :name="item.icon"
+                 width="1rem" height="1rem"
+                 class="mr-1"
             />
             <span>
                 <template v-if="item.parents">
@@ -40,6 +44,12 @@
                     <span :class="{'matched-character': matched}">{{ text }}</span>
                 </span>
             </span>
+            <favorite-button v-if="useFavorite"
+                             :item-id="item.name"
+                             :favorite-type="item.itemType"
+                             :favorite-items="favoriteItems"
+                             scale="0.65"
+            />
         </template>
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" />
@@ -53,25 +63,31 @@ import {
     defineComponent, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import { PContextMenu, PI, PLazyImg } from '@spaceone/design-system';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+
 import {
     focusStartPositions,
     FocusStartPosition,
-    SuggestionItem,
+    SuggestionItem, SUGGESTION_TYPE,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { store } from '@/store';
 
 
 interface Props {
     items: SuggestionItem[];
-    cloudServiceSuggestionItems: SuggestionItem[];
     inputText: string;
     isFocused: boolean;
     focusStartPosition: FocusStartPosition;
+    useFavorite: boolean;
 }
 
 export default defineComponent<Props>({
     name: 'GNBSuggestionList',
     components: {
+        FavoriteButton,
         PContextMenu,
         PLazyImg,
         PI,
@@ -96,6 +112,10 @@ export default defineComponent<Props>({
                 return focusStartPositions.includes(position);
             },
         },
+        useFavorite: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -113,6 +133,12 @@ export default defineComponent<Props>({
                 }
                 return new RegExp(regex, 'i');
             }),
+            favoriteItems: computed(() => [
+                ...store.state.favorite.menuItems,
+                ...store.state.favorite.projectItems,
+                ...store.state.favorite.projectGroupItems,
+                ...store.state.favorite.cloudServiceTypeItems,
+            ]),
         });
 
         const getFirstMatchedString = (str: string): string => {
@@ -168,8 +194,18 @@ export default defineComponent<Props>({
             }
         });
 
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('favorite/load', FAVORITE_TYPE.MENU),
+                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
+                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
+                store.dispatch('favorite/load', FAVORITE_TYPE.CLOUD_SERVICE),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
+            SUGGESTION_TYPE,
             getTextList,
             handleSelect,
         };

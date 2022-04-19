@@ -7,13 +7,13 @@ export const SUGGESTION_TYPE = Object.freeze({
     MENU: 'MENU',
     CLOUD_SERVICE: 'CLOUD_SERVICE',
     PROJECT: 'PROJECT',
+    PROJECT_GROUP: 'PROJECT_GROUP',
 } as const);
 export type SUGGESTION_TYPE = typeof SUGGESTION_TYPE[keyof typeof SUGGESTION_TYPE]
 
 export interface SuggestionItem extends MenuItem {
     itemType?: SUGGESTION_TYPE;
     parents?: SuggestionItem[];
-    image?: string;
     icon?: string;
     defaultIcon?: string;
     provider?: string;

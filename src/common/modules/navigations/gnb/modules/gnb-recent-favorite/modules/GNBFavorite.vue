@@ -1,59 +1,65 @@
 <template>
     <div class="gnb-favorite">
-        <g-n-b-suggestion-list v-if="loading || items.length"
-                               :items="showAll ? showAllItems : items"
-                               :loading="loading"
-                               @update:isFocused="$emit('update:isFocused', $event)"
-                               @move-focus-end="$emit('move-focus-end')"
-                               @close="$emit('close')"
-                               @select="handleSelect"
+        <p-data-loader :data="items"
+                       :loading="loading"
         >
-            <template #header-title="{ item }">
-                <template v-if="!showAll">
-                    <div class="context-header">
-                        {{ item.label }}
-                        <div v-if="getItemLength(item.itemType) > FAVORITE_LIMIT"
-                             class="show-all-button"
-                             @click="handleClickShowAll(item.itemType)"
-                        >
-                            <span class="text">Show all</span>
-                            <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                                 color="inherit"
-                            />
+            <g-n-b-suggestion-list v-if="loading || items.length"
+                                   :items="showAll ? showAllItems : items"
+                                   use-favorite
+                                   @update:isFocused="$emit('update:isFocused', $event)"
+                                   @move-focus-end="$emit('move-focus-end')"
+                                   @close="$emit('close')"
+                                   @select="handleSelect"
+            >
+                <template #header-title="{ item }">
+                    <template v-if="!showAll">
+                        <div class="context-header">
+                            {{ item.label }}
+                            <div v-if="getItemLength(item.itemType) > FAVORITE_LIMIT"
+                                 class="show-all-button"
+                                 @click="handleClickShowAll(item.itemType)"
+                            >
+                                <span class="text">Show all</span>
+                                <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                                     color="inherit"
+                                />
+                            </div>
                         </div>
-                    </div>
+                    </template>
+                    <template v-else>
+                        <div class="all-items-header">
+                            <p-icon-button name="ic_back" size="sm"
+                                           @click="handleGoBack"
+                            />
+                            <span class="title-text">{{ item.label }}</span>
+                        </div>
+                    </template>
                 </template>
-                <template v-else>
-                    <div class="all-items-header">
-                        <p-icon-button name="ic_back" size="sm"
-                                       @click="handleGoBack"
-                        />
-                        <span class="title-text">{{ item.label }}</span>
+            </g-n-b-suggestion-list>
+            <template #no-data>
+                <div class="no-data">
+                    <img class="img" src="@/assets/images/illust_star.svg">
+                    <p class="text">
+                        Add frequently visited pages to your favorites
+                        Favorite buttons can be found in following menus
+                    </p>
+                    <div class="button-wrapper">
+                        <p-button style-type="gray-border"
+                                  size="sm"
+                                  @click="handleClickMenuButton(FAVORITE_TYPE.PROJECT)"
+                        >
+                            Project
+                        </p-button>
+                        <p-button style-type="gray-border"
+                                  size="sm"
+                                  @click="handleClickMenuButton(FAVORITE_TYPE.CLOUD_SERVICE_TYPE)"
+                        >
+                            Cloud Service
+                        </p-button>
                     </div>
-                </template>
+                </div>
             </template>
-        </g-n-b-suggestion-list>
-        <div v-else class="no-data-wrapper">
-            <img class="img" src="@/assets/images/illust_star.svg">
-            <p class="text">
-                Add frequently visited pages to your favorites
-                Favorite buttons can be found in following menus
-            </p>
-            <div class="button-wrapper">
-                <p-button style-type="gray-border"
-                          size="sm"
-                          @click="handleClickMenuButton(FAVORITE_TYPE.PROJECT)"
-                >
-                    Project
-                </p-button>
-                <p-button style-type="gray-border"
-                          size="sm"
-                          @click="handleClickMenuButton(FAVORITE_TYPE.CLOUD_SERVICE_TYPE)"
-                >
-                    Cloud Service
-                </p-button>
-            </div>
-        </div>
+        </p-data-loader>
     </div>
 </template>
 
@@ -61,7 +67,7 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PButton, PI, PIconButton,
+    PButton, PI, PIconButton, PDataLoader,
 } from '@spaceone/design-system';
 
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
@@ -72,91 +78,100 @@ import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 import { SUGGESTION_TYPE, SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { menuRouterMap } from '@/lib/router/menu-router-map';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 
 const FAVORITE_LIMIT = 5;
+
+const convertFavoriteItemToSuggestionItem = (favoriteItems: FavoriteItem[]): SuggestionItem[] => favoriteItems.map(d => ({
+    name: d.name,
+    label: d.label,
+    itemType: d.favoriteType,
+    icon: d.icon,
+    provider: d.provider,
+    parents: d.parents,
+}));
 
 export default {
     name: 'GNBFavorite',
     components: {
         GNBSuggestionList,
+        PDataLoader,
         PButton,
         PI,
         PIconButton,
     },
     props: {},
-    setup() {
+    setup(props, { emit }) {
         const state = reactive({
             loading: true,
             items: computed<SuggestionItem[]>(() => {
                 const results: SuggestionItem[] = [];
-                if (state.menuList.length) {
+                if (state.menuFavoriteItems.length) {
                     results.push({
                         name: 'title', label: 'MENU', type: 'header', itemType: SUGGESTION_TYPE.MENU,
                     });
-                    results.push(...state.menuList.slice(0, FAVORITE_LIMIT) as SuggestionItem[]);
+                    results.push(...convertFavoriteItemToSuggestionItem(state.menuFavoriteItems.slice(0, FAVORITE_LIMIT)));
                 }
-                if (state.projects.length) {
+                if (state.projectFavoriteItems.length) {
                     if (results.length !== 0) results.push({ type: 'divider' });
                     results.push({
                         name: 'title', label: 'PROJECT', type: 'header', itemType: SUGGESTION_TYPE.PROJECT,
                     });
-                    results.push(...state.projects.slice(0, FAVORITE_LIMIT) as SuggestionItem[]);
+                    results.push(...convertFavoriteItemToSuggestionItem(state.projectFavoriteItems.slice(0, FAVORITE_LIMIT)));
                 }
-                if (state.cloudServiceTypes.length) {
+                if (state.cloudServiceTypeFavoriteItems.length) {
                     if (results.length !== 0) results.push({ type: 'divider' });
                     results.push({
                         name: 'title', label: 'CLOUD SERVICE', type: 'header', itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
                     });
-                    results.push(...state.cloudServiceTypes.slice(0, FAVORITE_LIMIT) as SuggestionItem[]);
+                    results.push(...convertFavoriteItemToSuggestionItem(state.cloudServiceTypeFavoriteItems.slice(0, FAVORITE_LIMIT)));
                 }
                 return results;
             }),
             showAllItems: computed<SuggestionItem[]>(() => {
-                let items: SuggestionItem[] = [];
+                let items: FavoriteItem[] = [];
                 let label = '';
                 if (state.showAllType === SUGGESTION_TYPE.MENU) {
-                    items = state.menuList;
+                    items = state.menuFavoriteItems;
                     label = 'All Menu';
                 }
                 if (state.showAllType === SUGGESTION_TYPE.PROJECT) {
-                    items = state.projects;
+                    items = state.projectFavoriteItems;
                     label = 'All Projects';
                 }
                 if (state.showAllType === SUGGESTION_TYPE.CLOUD_SERVICE) {
-                    items = state.cloudServiceTypes;
+                    items = state.cloudServiceTypeFavoriteItems;
                     label = 'All Cloud Services';
                 }
                 return [
                     {
                         name: 'title', type: 'header', label, itemType: state.showAllType,
                     },
-                    ...items,
+                    ...convertFavoriteItemToSuggestionItem(items),
                 ];
             }),
-            menuList: computed<FavoriteItem[]>(() => store.getters['favorite/menuItems']),
-            projects: computed<FavoriteItem[]>(() => ([
+            menuFavoriteItems: computed<FavoriteItem[]>(() => store.getters['favorite/menuItems']),
+            projectFavoriteItems: computed<FavoriteItem[]>(() => ([
                 ...store.getters['favorite/projectGroupItems'],
                 ...store.getters['favorite/projectItems'],
             ])),
-            cloudServiceTypes: computed<FavoriteItem[]>(() => store.getters['favorite/cloudServiceTypeItems']),
+            cloudServiceTypeFavoriteItems: computed<FavoriteItem[]>(() => store.getters['favorite/cloudServiceTypeItems']),
+            cloudServiceTypes: computed(() => store.state.reference.cloudServiceType.items),
             showAll: false,
             showAllType: undefined as undefined|SUGGESTION_TYPE,
         });
 
         /* Util */
         const getItemLength = (type: SUGGESTION_TYPE): number => {
-            if (type === SUGGESTION_TYPE.MENU) return state.menuList.length;
-            if (type === SUGGESTION_TYPE.PROJECT) return state.projects.length;
-            if (type === SUGGESTION_TYPE.CLOUD_SERVICE) return state.cloudServiceTypes.length;
+            if (type === SUGGESTION_TYPE.MENU) return state.menuFavoriteItems.length;
+            if (type === SUGGESTION_TYPE.PROJECT) return state.projectFavoriteItems.length;
+            if (type === SUGGESTION_TYPE.CLOUD_SERVICE) return state.cloudServiceTypeFavoriteItems.length;
             return 0;
         };
 
         /* Event */
-        const handleClickShowAll = (type: SUGGESTION_TYPE) => {
-            state.showAll = true;
-            state.showAllType = type;
-        };
         const handleClickMenuButton = (type: SUGGESTION_TYPE) => {
             if (type === SUGGESTION_TYPE.PROJECT) {
                 SpaceRouter.router.replace({
@@ -168,16 +183,48 @@ export default {
                 });
             }
         };
-        const handleGoBack = () => {
-            state.showAll = false;
-            state.showAllType = undefined;
-        };
-        const handleSelect = () => {
-            console.log('select!');
+        const handleClickShowAll = (type: SUGGESTION_TYPE) => {
+            state.showAll = true;
+            state.showAllType = type;
         };
         const handleShowAll = (type) => {
             state.showAll = true;
             state.showAllType = type;
+        };
+        const handleGoBack = () => {
+            state.showAll = false;
+            state.showAllType = undefined;
+        };
+        const handleSelect = (item: SuggestionItem) => {
+            const itemName = item.name as string;
+            if (item.itemType === SUGGESTION_TYPE.MENU) {
+                const menuRoute = menuRouterMap[itemName];
+                if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.name) return;
+                try {
+                    SpaceRouter.router.push({ name: menuRoute.name });
+                } catch (e) {}
+            } else if (item.itemType === SUGGESTION_TYPE.PROJECT) {
+                try {
+                    SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.Project' }));
+                } catch (e) {}
+            } else if (item.itemType === SUGGESTION_TYPE.PROJECT_GROUP) {
+                try {
+                    SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' }));
+                } catch (e) {}
+            } else if (item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE) {
+                const cloudServiceType = state.cloudServiceTypes[itemName];
+                try {
+                    SpaceRouter.router.push({
+                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        params: {
+                            provider: cloudServiceType.data.provider,
+                            group: cloudServiceType.data.group,
+                            name: cloudServiceType.name,
+                        },
+                    });
+                } catch (e) {}
+            }
+            emit('close');
         };
 
         /* Init */
@@ -238,7 +285,7 @@ export default {
             padding-bottom: 0.5rem;
         }
     }
-    .no-data-wrapper {
+    .no-data {
         text-align: center;
         padding: 3rem 3.25rem;
         .img {
