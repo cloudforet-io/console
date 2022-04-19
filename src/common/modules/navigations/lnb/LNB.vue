@@ -27,9 +27,8 @@
                 />
             </div>
             <template v-for="(menuData, idx) in menuSet">
-                <l-n-b-menu-item :key="menuData[idx].id" :has-top-title="topTitle.label" :menu-data="menuData"
-                                 :selected-item="selectedItem"
-                                 @click-menu="setSelectedItem"
+                <l-n-b-menu-item :key="`${idx}-${getUUID()}`" :has-top-title="!!topTitle.label" :menu-data="menuData"
+                                 :current-route="currentRoute"
                 >
                     <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                         <slot :name="slot" v-bind="scope" />
@@ -46,44 +45,13 @@ import {
     PDivider, PI, PLazyImg,
 } from '@spaceone/design-system';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { reactive, toRefs } from '@vue/composition-api';
 import {
-    BackLink, LNBItemList, LNBItem, TopTitle,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import {
+    BackLink, LNBItemList, TopTitle,
 } from '@/common/modules/navigations/lnb/type';
-
-const SampleData = {
-    menuItems: [
-        [
-            {
-                type: 'title', label: 'Public', id: 'public', foldable: false,
-            },
-            {
-                type: 'item',
-                id: 'monthlyCostSummary',
-                label: 'Monthly Cost Summary',
-                to: { name: 'route..' },
-            },
-            {
-                type: 'item', label: 'Budget Summary', id: 'budgetSummary', to: { name: 'route..' },
-            },
-            { type: 'divider' },
-        ],
-        [
-            {
-                type: 'title', label: 'My Dashboard', id: 'myDashboard', foldable: true,
-            },
-            {
-                type: 'item',
-                id: 'myProject',
-                label: 'My Project',
-                to: { name: 'route..' },
-            },
-            {
-                type: 'item', label: 'Megazone Cloud', id: 'megazone', to: { name: 'route..' },
-            },
-        ],
-    ],
-};
+import { getUUID } from '@/lib/component-util/getUUID';
 
 export default {
     name: 'LNB',
@@ -110,17 +78,14 @@ export default {
     },
 
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            selectedItem: {} as LNBItem,
+            currentRoute: computed(() => vm.$route.fullPath),
         });
-        const setSelectedItem = (item: LNBItem) => {
-            state.selectedItem = item;
-        };
         return {
             ...toRefs(state),
-            setSelectedItem,
-            SampleData,
             assetUrlConverter,
+            getUUID,
         };
     },
 };

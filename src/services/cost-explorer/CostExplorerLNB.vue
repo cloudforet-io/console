@@ -1,95 +1,64 @@
 <template>
     <aside class="sidebar-menu">
-        <!--        <sidebar-title :title="$t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES')" />-->
-        <div>
-            <sidebar-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" class="sidebar-title">
-                <template #extra>
-                    <p-icon-text-button style-type="gray-border" size="sm"
-                                        name="ic_plus_bold"
-                                        @click="handleClickCreate"
-                    >
-                        {{ $t('BILLING.COST_MANAGEMENT.MAIN.CREATE') }}
-                    </p-icon-text-button>
-                </template>
-            </sidebar-title>
-            <template v-if="publicDashboardList.length > 0">
-                <div v-if="!loading" class="dashboard-list">
-                    <p class="dashboard-type">
-                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.PUBLIC') }}
-                    </p>
-                    <ul>
-                        <cost-dashboard-list :public-dashboard-items="publicDashboardList" />
-                    </ul>
-                </div>
-            </template>
-            <template v-if="userDashboardList.length > 0">
-                <details v-if="!loading" class="dashboard-list" open>
-                    <summary class="dashboard-type">
-                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.MY_DASHBOARD') }}
-                    </summary>
-                    <cost-dashboard-list :user-dashboard-items="userDashboardList" :is-public="false" />
-                </details>
-            </template>
-        </div>
-        <div v-for="(item) in menuList" :key="item.label"
-             class="link-wrapper"
-             @click="showPage(item.routeName)"
-        >
-            <sidebar-title :title="item.label"
-                           style-type="link"
-                           :selected="currentRouteName === item.routeName"
-            />
-        </div>
+        <l-n-b header="Cost Explorer"
+               :top-title="{ label: 'Dashboard', visibleAddButton: true }"
+               :menu-set="menuSet"
+        />
     </aside>
 </template>
 
 <script lang="ts">
-import { TranslateResult } from 'vue-i18n';
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
-import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
-import { i18n } from '@/translations';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { SpaceRouter } from '@/router';
-import CostDashboardList from '@/services/cost-explorer/modules/CostDashboardList.vue';
-import { PIconTextButton } from '@spaceone/design-system';
 import {
     PublicDashboardInfo, UserDashboardInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-
-interface ListItem {
-    routeName?: string;
-    label?: TranslateResult;
-}
+import { LNBItem } from '@/common/modules/navigations/lnb/type';
+import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 
 export default {
     name: 'CostExplorerLNB',
     components: {
-        CostDashboardList,
-        SidebarTitle,
-        PIconTextButton,
+        LNB,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            menuList: computed<ListItem[]>(() => [
-                {
-                    routeName: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.COST_ANALYSIS'),
-                },
-                {
-                    routeName: COST_EXPLORER_ROUTE.BUDGET._NAME,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.BUDGET'),
-                },
-            ]),
-            currentRouteName: computed(() => vm.$route.name),
             publicDashboardList: computed<PublicDashboardInfo[]>(() => costExplorerStore.state.publicDashboardList ?? []),
             userDashboardList: computed<UserDashboardInfo[]>(() => costExplorerStore.state.userDashboardList ?? []),
             loading: true,
+            menuSet: computed<LNBItem[][]>(() => [
+                [
+                    {
+                        type: 'title', label: 'Public', id: 'public', foldable: false,
+                    },
+                    ...state.publicDashboardList.map((list: PublicDashboardInfo) => ({
+                        type: 'item', label: list.name, id: list.public_dashboard_id, to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.public_dashboard_id } },
+                    })),
+                ],
+                [
+                    {
+                        type: 'title', label: 'My Dashboard', id: 'my', foldable: true,
+                    },
+                    ...state.userDashboardList.map((list: UserDashboardInfo) => ({
+                        type: 'item', label: list.name, id: list.name, to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.user_dashboard_id } },
+                    })),
+                    { type: 'divider' },
+                ],
+                [
+                    {
+                        type: 'item', id: 'costAnalysis', label: 'Cost Analysis', to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
+                    },
+                    {
+                        type: 'item', id: 'budget', label: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
+                    },
+                ],
+            ]),
+            selectedMenu: {} as LNBItem,
         });
 
         const listDashboard = async () => {
@@ -100,16 +69,6 @@ export default {
                 ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
-            }
-        };
-
-
-        /* util */
-        const showPage = (routeName) => {
-            if (routeName !== state.currentRouteName) {
-                SpaceRouter.router.push({
-                    name: routeName,
-                });
             }
         };
 
@@ -127,36 +86,8 @@ export default {
 
         return {
             ...toRefs(state),
-            showPage,
             handleClickCreate,
         };
     },
 };
 </script>
-
-<style lang="postcss" scoped>
-.sidebar-title {
-    @apply flex justify-between;
-    padding-top: 1.5rem;
-    padding-right: 1rem;
-}
-.link-wrapper {
-    margin-top: 0.75rem;
-}
-.dashboard-list {
-    padding: 0 0.875rem;
-    font-size: 0.875rem;
-    & + .dashboard-list {
-        @apply mt-3;
-    }
-    .dashboard-type {
-        line-height: 2rem;
-    }
-}
-details {
-    summary {
-        @apply cursor-pointer;
-        display: list-item;
-    }
-}
-</style>

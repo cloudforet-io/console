@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-for="(item, idx) in menuData" :key="idx" class="menu-item-wrapper">
+        <div v-for="(item, idx) in menuData" :key="item.id" class="menu-item-wrapper">
             <div v-if="item.type === 'title'">
                 <p class="title-wrapper">
                     <span v-if="item.foldable" class="title foldable" @click="handleToggle">{{ item.label }}</span>
@@ -8,7 +8,7 @@
                     <slot name="title-right" v-bind="$props" />
                     <new-mark v-if="item.isNew" />
                     <beta-mark v-if="item.isBeta" />
-                    <span v-if="item.foldable" class="toggle-button">
+                    <span v-if="item.foldable" class="toggle-button" @click="handleToggle">
                         <p-i width="1rem" height="1rem"
                              :name="isFolded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                              color="inherit transparent"
@@ -19,8 +19,8 @@
             <div v-if="item.type === 'divider' && showMenu" class="divider">
                 <p-divider />
             </div>
-            <div v-if="item.type === 'item' && showMenu" @click="handleClick(item)">
-                <router-link class="menu-item" :class="[{'second-depth': hasTopTitle}, {'selected': selectedItem.id === item.id}]"
+            <div v-if="item.type === 'item' && showMenu">
+                <router-link class="menu-item" :class="[{'second-depth': hasTopTitle}, {'selected': checkSelectedMenu(item.to)}]"
                              :to="item.to"
                 >
                     <slot name="before-text" v-bind="{...$props, item, index: idx}" />
@@ -36,12 +36,15 @@
 </template>
 
 <script lang="ts">
-
 import NewMark from '@/common/components/marks/NewMark.vue';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import { PDivider, PI } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
-import { LNBItem } from '@/common/modules/navigations/lnb/type';
+import {
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import { LNBItemList } from '@/common/modules/navigations/lnb/type';
+import { RawLocation } from 'vue-router';
 
 export default {
     name: 'LNBMenuItem',
@@ -54,16 +57,17 @@ export default {
             default: false,
         },
         menuData: {
-            type: Array,
+            type: Array as () => LNBItemList,
             default: () => [],
         },
-        selectedItem: {
-            type: Object as () => LNBItem,
-            default: () => ({}),
+        currentRoute: {
+            type: String,
+            default: '',
         },
     },
 
-    setup(props, { emit }) {
+    setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             isFolded: false,
             isFoldableMenu: computed(() => props.menuData?.some(item => item.foldable)),
@@ -74,14 +78,12 @@ export default {
             state.isFolded = !state.isFolded;
         };
 
-        const handleClick = (item: LNBItem) => {
-            emit('click-menu', item);
-        };
+        const checkSelectedMenu = (selectedMenuRoute: RawLocation) => props.currentRoute.startsWith(vm.$router.resolve(selectedMenuRoute).route.fullPath);
 
         return {
             ...toRefs(state),
             handleToggle,
-            handleClick,
+            checkSelectedMenu,
         };
     },
 };
