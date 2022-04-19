@@ -104,12 +104,13 @@ import CostDashboardUpdateModal
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import { gray } from '@/styles/colors';
 import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const PUBLIC_ICON_COLOR = gray[500];
 
 const validateDashboardId = async (dashboardId): Promise<boolean> => {
-    await store.dispatch('service/costExplorer/setDashboardList');
-    const dashboardList = store.getters['service/costExplorer/dashboardList'];
+    await costExplorerStore.dispatch('setDashboardList');
+    const dashboardList = costExplorerStore.getters.dashboardList;
     const targetDashboard = dashboardList.find(item => item.dashboard_id === dashboardId);
     return !!targetDashboard;
 };
@@ -159,15 +160,15 @@ export default {
             filters: {} as CostQueryFilters,
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-            homeDashboardId: computed<string|undefined>(() => store.getters['service/costExplorer/homeDashboardId']),
+            homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
             visiblePdfDownload: false,
             previewItems: [] as Item[],
             pdfFileName: computed<string>(() => `${state.dashboard.name ?? 'Cost_Dashboard'}_${dayjs().format('YYYYMMDD')}`),
             dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(state.dashboard, 'public_dashboard_id') ? 'public' : 'user')),
             updateModalVisible: false,
             isAdmin: computed((() => store.getters['user/isAdmin'])),
-            dashboardList: computed(() => store.getters['service/costExplorer/dashboardList'] ?? []),
-            dashboardListLoading: computed(() => store.state.service.costExplorer.dashboardListLoading),
+            dashboardList: computed(() => costExplorerStore.getters.dashboardList ?? []),
+            dashboardListLoading: computed(() => costExplorerStore.state.dashboardListLoading),
         });
 
         const routeState = reactive({

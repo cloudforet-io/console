@@ -8,14 +8,14 @@ import { CostQueryFilterItemsMap, CostQuerySetModel } from '@/services/cost-expl
 import { store } from '@/store';
 
 
-export const filterItemsMap: Getter<CostAnalysisStoreState, any> = ({ filters }, getters, rootState): CostQueryFilterItemsMap => {
+export const filterItemsMap: Getter<CostAnalysisStoreState, any> = ({ filters }): CostQueryFilterItemsMap => {
     const itemsMap: CostQueryFilterItemsMap = {};
     const resourceItemsMap = {
-        project_id: rootState.reference.project.items,
+        project_id: store.state.reference.project.items,
         project_group_id: store.state.reference.projectGroup.items,
-        service_account_id: rootState.reference.serviceAccount.items,
-        provider: rootState.reference.provider.items,
-        region_code: rootState.reference.region.items,
+        service_account_id: store.state.reference.serviceAccount.items,
+        provider: store.state.reference.provider.items,
+        region_code: store.state.reference.region.items,
     };
 
     Object.entries(filters).forEach(([key, data]) => {

@@ -76,12 +76,12 @@ import {
 import { getUUID } from '@/lib/component-util/getUUID';
 import CostDashboardCustomizeWidgetModal
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetModal.vue';
-import { store } from '@/store';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import CostDashboardUpdateWidgetModal
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardUpdateWidgetModal.vue';
 import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { i18n } from '@/translations';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 type Row = string[]
 
@@ -170,15 +170,15 @@ export default {
         };
 
         const handleClickUpdate = (rowIdx, colIdx, widget: WidgetInfo) => {
-            store.commit('service/costExplorer/dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
-            store.commit('service/costExplorer/dashboard/setOriginSelectedWidget', widget);
-            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', widget);
+            costExplorerStore.commit('dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
+            costExplorerStore.commit('dashboard/setOriginSelectedWidget', widget);
+            costExplorerStore.commit('dashboard/setEditedSelectedWidget', widget);
             state.updateModalVisible = true;
         };
 
         const handleClickDelete = (rowIdx, colIdx, widget: WidgetInfo) => {
-            store.commit('service/costExplorer/dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
-            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', widget);
+            costExplorerStore.commit('dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
+            costExplorerStore.commit('dashboard/setEditedSelectedWidget', widget);
             checkDeleteState.visible = true;
         };
 
@@ -192,8 +192,8 @@ export default {
         };
 
         const handleClickAdd = (rowIdx, colIdx, layout) => {
-            store.commit('service/costExplorer/dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
-            store.commit('service/costExplorer/dashboard/setLayoutOfSpace', layout);
+            costExplorerStore.commit('dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
+            costExplorerStore.commit('dashboard/setLayoutOfSpace', layout);
             state.customizeModalVisible = true;
         };
 

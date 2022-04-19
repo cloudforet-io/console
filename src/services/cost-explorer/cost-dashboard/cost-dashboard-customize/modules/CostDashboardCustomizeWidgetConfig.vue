@@ -54,9 +54,9 @@ import { PFieldGroup, PSelectDropdown, PTextInput } from '@spaceone/design-syste
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 import { GRANULARITY_ITEM_MAP, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import { store } from '@/store';
 import { cloneDeep } from 'lodash';
 import { EDITABLE_WIDGET_OPTIONS } from '@/services/cost-explorer/cost-dashboard/type';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 
 export default {
@@ -136,19 +136,19 @@ export default {
         const handleName = (value) => {
             setForm('name', value);
             state.editedSelectedWidget.name = value;
-            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
+            costExplorerStore.commit('dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
         };
 
         const handleSelectGroupBy = (value) => {
             setForm('groupBy', value);
             state.editedSelectedWidget.options.group_by = value;
-            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
+            costExplorerStore.commit('dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
         };
 
         const handleSelectGranularity = (value) => {
             setForm('granularity', value);
             state.editedSelectedWidget.options.granularity = value;
-            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
+            costExplorerStore.commit('dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
         };
 
         const init = () => {

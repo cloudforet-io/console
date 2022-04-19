@@ -54,6 +54,7 @@ import CostDashboardCustomizeWidgetModal
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetModal.vue';
 import { CustomLayout } from '@/services/cost-explorer/cost-dashboard/type';
 import { getUUID } from '@/lib/component-util/getUUID';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 export default {
     name: 'CostDashboardCustomizeSidebar',
@@ -67,18 +68,18 @@ export default {
     setup() {
         const state = reactive({
             customizeModalVisible: false,
-            editingCustomLayout: computed<CustomLayout[]>({
-                get() { return store.state.service.costExplorer.dashboard.editedCustomLayout; },
+            editingCustomLayout: computed<CustomLayout[]|undefined>({
+                get() { return costExplorerStore.state.dashboard.editedCustomLayout; },
                 set(val) {
-                    store.commit('service/costExplorer/dashboard/setEditedCustomLayout', [...val]);
+                    costExplorerStore.commit('dashboard/setEditedCustomLayout', [...(val || [])]);
                 },
             }),
         });
 
         const handleClickAddWidget = () => {
             state.customizeModalVisible = true;
-            store.commit('service/costExplorer/dashboard/setWidgetPosition', undefined);
-            store.commit('service/costExplorer/dashboard/setLayoutOfSpace', undefined);
+            costExplorerStore.commit('dashboard/setWidgetPosition', undefined);
+            costExplorerStore.commit('dashboard/setLayoutOfSpace', undefined);
         };
 
         onUnmounted(() => {

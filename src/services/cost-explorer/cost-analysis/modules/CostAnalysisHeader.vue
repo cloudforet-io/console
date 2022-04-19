@@ -97,6 +97,7 @@ import { SpaceRouter } from '@/router';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import { CURRENCY } from '@/store/modules/display/config';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const SaveQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue');
 const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
@@ -127,7 +128,7 @@ export default {
     setup(props, { root }) {
         const state = reactive({
             defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
-            costQueryList: computed<CostQuerySetModel[]>(() => store.state.service.costExplorer.costAnalysis.costQueryList),
+            costQueryList: computed<CostQuerySetModel[]>(() => costExplorerStore.state.costAnalysis.costQueryList),
             queryItemList: computed<MenuItem[]>(() => ([
                 { name: 'header', label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVED_QUERY'), type: 'header' },
                 { name: undefined, label: 'Cost Analysis', type: 'item' },
@@ -137,8 +138,8 @@ export default {
                     type: 'item',
                 })),
             ])),
-            selectedQueryId: computed<string|undefined>(() => store.state.service.costExplorer.costAnalysis.selectedQueryId),
-            selectedQuerySet: computed<CostQuerySetModel|undefined>(() => store.getters['service/costExplorer/costAnalysis/selectedQuerySet']),
+            selectedQueryId: computed<string|undefined>(() => costExplorerStore.state.costAnalysis.selectedQueryId),
+            selectedQuerySet: computed<CostQuerySetModel|undefined>(() => costExplorerStore.getters['costAnalysis/selectedQuerySet']),
             title: computed<string>(() => state.selectedQuerySet?.name ?? 'Cost Analysis'),
             itemIdForDeleteQuery: '',
             visiblePdfOverlay: false,
@@ -166,12 +167,12 @@ export default {
 
         /* Utils */
         const setSelectedQueryId = (queryId?: string) => {
-            store.commit('service/costExplorer/costAnalysis/setSelectedQueryId', queryId);
+            costExplorerStore.commit('costAnalysis/setSelectedQueryId', queryId);
         };
 
         const setQueryOptions = (options?: Partial<CostQuerySetOption>) => {
-            if (options) store.dispatch('service/costExplorer/costAnalysis/setQueryOptions', options);
-            else store.dispatch('service/costExplorer/costAnalysis/initCostAnalysisStoreState');
+            if (options) costExplorerStore.dispatch('costAnalysis/setQueryOptions', options);
+            else costExplorerStore.dispatch('costAnalysis/initCostAnalysisStoreState');
         };
 
         const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (state.costQueryList.find(item => item.cost_query_set_id === queryItemKey)) || {};
@@ -211,7 +212,7 @@ export default {
         const handleSaveQueryConfirm = ({ updatedQuery, requestType }: SaveQueryEmitParam) => {
             if (!updatedQuery) return;
 
-            store.dispatch('service/costExplorer/costAnalysis/listCostQueryList');
+            costExplorerStore.dispatch('costAnalysis/listCostQueryList');
 
             if (requestType === REQUEST_TYPE.EDIT && updatedQuery.cost_query_set_id !== state.selectedQueryId) {
                 return;
@@ -227,7 +228,7 @@ export default {
                 const {
                     granularity, stack, period,
                     groupBy, filters, primaryGroupBy,
-                } = store.state.service.costExplorer.costAnalysis;
+                } = costExplorerStore.state.costAnalysis;
                 await SpaceConnector.client.costAnalysis.costQuerySet.update({
                     cost_query_set_id: state.selectedQueryId,
                     options: {
@@ -239,7 +240,7 @@ export default {
                         filters,
                     },
                 });
-                await store.dispatch('service/costExplorer/costAnalysis/listCostQueryList');
+                await costExplorerStore.dispatch('costAnalysis/listCostQueryList');
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', root);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
@@ -250,7 +251,7 @@ export default {
             checkDeleteState.visible = false;
             try {
                 await SpaceConnector.client.costAnalysis.costQuerySet.delete({ cost_query_set_id: state.itemIdForDeleteQuery });
-                await store.dispatch('service/costExplorer/costAnalysis/listCostQueryList');
+                await costExplorerStore.dispatch('costAnalysis/listCostQueryList');
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '', root);
                 if (state.selectedQueryId === state.itemIdForDeleteQuery) {
                     await SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME });

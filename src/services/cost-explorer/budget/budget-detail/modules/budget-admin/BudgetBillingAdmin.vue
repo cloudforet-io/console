@@ -24,7 +24,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import { store } from '@/store';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 export default {
     name: 'BudgetDetailBillingAdmin',
@@ -35,7 +35,7 @@ export default {
     setup() {
         const state = reactive({
             loading: true,
-            budgetLoading: computed(() => store.getters['service/costExplorer/budget/isBudgetLoading']),
+            budgetLoading: computed(() => costExplorerStore.getters['budget/isBudgetLoading']),
             fields: [
                 { name: 'resource_id', label: 'User ID' },
                 { name: 'resource_id', label: 'User Name' },
@@ -44,8 +44,8 @@ export default {
                 { name: 'labels', label: 'Label' },
             ] as unknown as DataTableField,
             data: [],
-            budgetTargetProjectId: computed(() => store.state.service.costExplorer.budget.budgetData?.project_id) || undefined,
-            budgetTargetProjectGroupId: computed(() => store.state.service.costExplorer.budget.budgetData?.project_group_id) || undefined,
+            budgetTargetProjectId: computed(() => costExplorerStore.state.budget.budgetData?.project_id) || undefined,
+            budgetTargetProjectGroupId: computed(() => costExplorerStore.state.budget.budgetData?.project_group_id) || undefined,
         });
 
         const apiQueryHelper = new ApiQueryHelper();

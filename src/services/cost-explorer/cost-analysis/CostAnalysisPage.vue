@@ -27,7 +27,6 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import {
     REQUEST_TYPE,
 } from '@/services/cost-explorer/cost-analysis/lib/config';
-import { store } from '@/store';
 import { SpaceRouter } from '@/router';
 import {
     arrayToQueryString,
@@ -42,6 +41,7 @@ import { CostAnalysisPageUrlQuery } from '@/services/cost-explorer/cost-analysis
 import { CostQuerySetModel, CostQuerySetOption } from '@/services/cost-explorer/type';
 import { Location } from 'vue-router';
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 export interface SaveQueryEmitParam {
     updatedQuery: CostQuerySetModel;
@@ -66,8 +66,8 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            costQueryList: computed<CostQuerySetModel[]>(() => store.state.service.costExplorer.costAnalysis.costQueryList),
-            selectedQueryId: computed<string|undefined>(() => store.state.service.costExplorer.costAnalysis.selectedQueryId),
+            costQueryList: computed<CostQuerySetModel[]>(() => costExplorerStore.state.costAnalysis.costQueryList),
+            selectedQueryId: computed<string|undefined>(() => costExplorerStore.state.costAnalysis.selectedQueryId),
         });
 
         const routeState = reactive({
@@ -79,12 +79,12 @@ export default {
 
         /* util */
         const setSelectedQueryId = (queryId?: string) => {
-            store.commit('service/costExplorer/costAnalysis/setSelectedQueryId', queryId);
+            costExplorerStore.commit('costAnalysis/setSelectedQueryId', queryId);
         };
 
         const setQueryOptions = (options?: Partial<CostQuerySetOption>) => {
-            if (options) store.dispatch('service/costExplorer/costAnalysis/setQueryOptions', options);
-            else store.dispatch('service/costExplorer/costAnalysis/initCostAnalysisStoreState');
+            if (options) costExplorerStore.dispatch('costAnalysis/setQueryOptions', options);
+            else costExplorerStore.dispatch('costAnalysis/initCostAnalysisStoreState');
         };
 
         const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): Partial<CostQuerySetOption> => ({
@@ -113,7 +113,7 @@ export default {
 
         let unregisterStoreWatch;
         const registerStoreWatch = () => {
-            unregisterStoreWatch = store.watch((_, getters) => getters['service/costExplorer/costAnalysis/currentQuerySetOptions'], (options) => {
+            unregisterStoreWatch = watch(() => costExplorerStore.getters['costAnalysis/currentQuerySetOptions'], (options) => {
                 if (props.querySetId) return;
 
                 const newQuery: CostAnalysisPageUrlQuery = {
@@ -141,7 +141,7 @@ export default {
         /* Page Init */
         (async () => {
             // list cost query sets
-            await store.dispatch('service/costExplorer/costAnalysis/listCostQueryList');
+            await costExplorerStore.dispatch('costAnalysis/listCostQueryList');
 
             // init states
             if (props.querySetId) {

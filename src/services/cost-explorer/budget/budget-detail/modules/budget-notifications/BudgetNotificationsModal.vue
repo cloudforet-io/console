@@ -82,9 +82,9 @@ import {
 import cloneDeep from 'lodash/cloneDeep';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { store } from '@/store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { i18n } from '@/translations';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const NOTIFICATION_UNIT = Object.freeze({
     PERCENT: 'PERCENT',
@@ -128,7 +128,7 @@ export default {
         const state = reactive({
             loading: true,
             proxyVisible: makeProxy('visible', props, emit),
-            conditions: cloneDeep(store.state.service.costExplorer.budget.budgetData.notifications) as Condition[],
+            conditions: cloneDeep(costExplorerStore.state.budget.budgetData?.notifications) as Condition[],
             units: computed(() => ([
                 {
                     name: NOTIFICATION_UNIT.ACTUAL_COST,
@@ -150,7 +150,7 @@ export default {
                 },
             ])),
             thresholdPlaceholder: '',
-            budgetId: computed(() => store.state.service.costExplorer.budget.budgetData.budget_id),
+            budgetId: computed(() => costExplorerStore.state.budget.budgetData?.budget_id),
         });
 
         const handleAddCondition = () => {
@@ -169,7 +169,7 @@ export default {
 
         const setBudgetAlert = async () => {
             try {
-                await store.dispatch('service/costExplorer/budget/updateBudgetNotifications', {
+                await costExplorerStore.dispatch('budget/updateBudgetNotifications', {
                     budgetId: state.budgetId,
                     notifications: state.conditions,
                 });

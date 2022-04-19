@@ -59,6 +59,7 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { CURRENCY } from '@/store/modules/display/config';
 import AmountPlanningTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];
 const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
@@ -92,13 +93,13 @@ export default {
         const state = reactive({
             projects: computed(() => store.state.reference.project.items),
             projectGroups: computed(() => store.state.reference.projectGroup.items),
-            budgetData: computed<BudgetData>(() => store.state.service.costExplorer.budget.budgetData),
+            budgetData: computed<Partial<BudgetData>|null>(() => costExplorerStore.state.budget.budgetData),
             costTypeKey: computed(() => (state.budgetData ? getKeyOfCostType(state.budgetData?.cost_types) : '')),
             costTypeValue: computed(() => (state.budgetData ? getValueOfCostType(state.budgetData?.cost_types, state.costTypeKey) : [])),
             processedCostTypeValue: computed(() => state.costTypeValue?.join(', ') || 'All'),
             buttonRef: null as HTMLElement | null,
             balloonVisible: false,
-            loading: computed(() => store.getters['service/costExplorer/budget/isBudgetLoading']),
+            loading: computed(() => costExplorerStore.getters['budget/isBudgetLoading']),
         });
 
         const handleClickViewAll = () => {

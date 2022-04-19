@@ -34,6 +34,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const MENU = Object.freeze({
     DUPLICATE: 'duplicate',
@@ -84,7 +85,7 @@ export default {
                 return defaultMenuItems.value;
             }),
             isAdmin: computed((() => store.getters['user/isAdmin'])),
-            homeDashboardId: computed<string|undefined>(() => store.getters['service/costExplorer/homeDashboardId']),
+            homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
             duplicateModalVisible: false,
             dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(props.dashboard, 'public_dashboard_id') ? DASHBOARD_TYPE.PUBLIC : DASHBOARD_TYPE.USER)),
         });
@@ -110,7 +111,7 @@ export default {
                         public_dashboard_id: props.dashboardId,
                     });
                 }
-                await store.dispatch('service/costExplorer/setDashboardList');
+                await costExplorerStore.dispatch('setDashboardList');
                 await SpaceRouter.router.replace({ name: COST_EXPLORER_ROUTE._NAME });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, 'Failed to delete dashboard');
@@ -123,7 +124,7 @@ export default {
 
         const handleSelectMoreMenu = (item) => {
             if (item === MENU.SET_HOME && props.dashboardId) {
-                store.dispatch('service/costExplorer/setHomeDashboard', props.dashboardId);
+                costExplorerStore.dispatch('setHomeDashboard', props.dashboardId);
             } else if (item === MENU.DUPLICATE) {
                 state.duplicateModalVisible = true;
             } else if (item === MENU.DELETE) {

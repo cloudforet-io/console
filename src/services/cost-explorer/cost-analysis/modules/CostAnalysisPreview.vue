@@ -22,11 +22,11 @@ import CostAnalysisQueryFilter from '@/services/cost-explorer/cost-analysis/modu
 import CostAnalysisGroupByFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilter.vue';
 
 import CostAnalysisDataTable from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisDataTable.vue';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 import { CostQuerySetModel } from '@/services/cost-explorer/type';
 import CostAnalysisHeader from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisHeader.vue';
 import { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 export default {
     name: 'CostAnalysisPreview',
@@ -40,8 +40,8 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
-            selectedQueryId: computed<string|undefined>(() => store.state.service.costExplorer.costAnalysis.selectedQueryId),
-            selectedQuerySet: computed<CostQuerySetModel|undefined>(() => store.getters['service/costExplorer/costAnalysis/selectedQuerySet']),
+            selectedQueryId: computed<string|undefined>(() => costExplorerStore.state.costAnalysis.selectedQueryId),
+            selectedQuerySet: computed<CostQuerySetModel|undefined>(() => costExplorerStore.getters['costAnalysis/selectedQuerySet']),
             title: computed<string>(() => state.selectedQuerySet?.name ?? 'Cost Analysis'),
             topContainerRef: null as null|HTMLElement,
             chartElements: [] as HTMLElement[],

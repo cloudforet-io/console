@@ -39,7 +39,6 @@
 import { PCollapsibleToggle, PDataTable } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import cloneDeep from 'lodash/cloneDeep';
-import { store } from '@/store';
 import {
     BUDGET_TIME_UNIT, BudgetData,
     BudgetTimeUnit,
@@ -56,6 +55,7 @@ import dayjs from 'dayjs';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { CURRENCY } from '@/store/modules/display/config';
 import { i18n } from '@/translations';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const defaultTableKey = [{ name: 'Actual Cost', path: 'usd_cost' }, { name: 'Current vs Budget.', path: 'ratio' }];
 const monthlyPlanningTableKey = { name: 'Budgeted', path: 'limit' };
@@ -154,8 +154,8 @@ export default {
         };
 
         const state = reactive({
-            budgetData: computed<BudgetData>(() => store.state.service.costExplorer.budget.budgetData),
-            budgetUsageData: computed<BudgetUsageData[]>(() => store.state.service.costExplorer.budget.budgetUsageData),
+            budgetData: computed<Partial<BudgetData>|null>(() => costExplorerStore.state.budget.budgetData),
+            budgetUsageData: computed<Partial<BudgetUsageData>|null>(() => costExplorerStore.state.budget.budgetUsageData),
             budgetTimeUnit: computed<BudgetTimeUnit>(() => state.budgetData?.time_unit),
             budgetPeriod: computed<Period>(() => ({
                 start: state.budgetData?.start,

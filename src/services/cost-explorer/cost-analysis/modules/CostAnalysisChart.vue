@@ -151,6 +151,7 @@ import {
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 import { store } from '@/store';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const SetFilterModal = () => import('@/services/cost-explorer/modules/SetFilterModal.vue');
 
@@ -177,17 +178,17 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            granularity: computed(() => store.state.service.costExplorer.costAnalysis.granularity),
-            stack: computed(() => store.state.service.costExplorer.costAnalysis.stack),
-            period: computed(() => store.state.service.costExplorer.costAnalysis.period),
-            filters: computed(() => store.state.service.costExplorer.costAnalysis.filters),
-            selectedQueryId: computed(() => store.state.service.costExplorer.costAnalysis.selectedQueryId),
-            groupBy: computed(() => store.state.service.costExplorer.costAnalysis.groupBy),
-            primaryGroupBy: computed(() => store.state.service.costExplorer.costAnalysis.primaryGroupBy),
+            granularity: computed(() => costExplorerStore.state.costAnalysis.granularity),
+            stack: computed(() => costExplorerStore.state.costAnalysis.stack),
+            period: computed(() => costExplorerStore.state.costAnalysis.period),
+            filters: computed(() => costExplorerStore.state.costAnalysis.filters),
+            selectedQueryId: computed(() => costExplorerStore.state.costAnalysis.selectedQueryId),
+            groupBy: computed(() => costExplorerStore.state.costAnalysis.groupBy),
+            primaryGroupBy: computed(() => costExplorerStore.state.costAnalysis.primaryGroupBy),
             //
             noFilter: computed(() => isEmpty(state.filterItemsMap) || Object.values(state.filters).every(d => !d)),
-            groupByItems: computed(() => store.getters['service/costExplorer/costAnalysis/groupByItems']),
-            filterItemsMap: computed(() => store.getters['service/costExplorer/costAnalysis/filterItemsMap']),
+            groupByItems: computed(() => costExplorerStore.getters['costAnalysis/groupByItems']),
+            filterItemsMap: computed(() => costExplorerStore.getters['costAnalysis/filterItemsMap']),
             filterItems: computed(() => Object.values(FILTER_ITEM_MAP).map(item => ({
                 name: item.name, title: item.label,
             }))),
@@ -281,13 +282,13 @@ export default {
             }
         };
         const handlePrimaryGroupByItem = async (groupBy?: string) => {
-            store.commit('service/costExplorer/costAnalysis/setPrimaryGroupBy', groupBy);
+            costExplorerStore.commit('costAnalysis/setPrimaryGroupBy', groupBy);
         };
         const handleClickSelectFilter = () => {
             state.filterModalVisible = true;
         };
         const handleClearAllFilters = () => {
-            store.commit('service/costExplorer/costAnalysis/setFilters', {});
+            costExplorerStore.commit('costAnalysis/setFilters', {});
         };
         const handleDeleteFilterTag = (filterName: string, itemIdx: number) => {
             const _filters = cloneDeep(state.filters);
@@ -298,10 +299,10 @@ export default {
             } else {
                 _filters[filterName] = undefined;
             }
-            store.commit('service/costExplorer/costAnalysis/setFilters', _filters);
+            costExplorerStore.commit('costAnalysis/setFilters', _filters);
         };
         const handleConfirmFilterModal = (filters) => {
-            store.commit('service/costExplorer/costAnalysis/setFilters', filters);
+            costExplorerStore.commit('costAnalysis/setFilters', filters);
         };
 
         const handleChartRendered = () => {
@@ -310,9 +311,9 @@ export default {
 
         watch(() => state.groupByItems, (after, before) => {
             if (!after.length) {
-                store.commit('service/costExplorer/costAnalysis/setPrimaryGroupBy', undefined);
+                costExplorerStore.commit('costAnalysis/setPrimaryGroupBy', undefined);
             } else if ((!before.length && after.length) || !after.filter(d => d.name === state.primaryGroupBy).length) {
-                store.commit('service/costExplorer/costAnalysis/setPrimaryGroupBy', after[0].name);
+                costExplorerStore.commit('costAnalysis/setPrimaryGroupBy', after[0].name);
             }
         });
         watch([() => state.granularity, () => state.period, () => state.primaryGroupBy, () => state.filters], ([granularity, period, groupBy]) => {

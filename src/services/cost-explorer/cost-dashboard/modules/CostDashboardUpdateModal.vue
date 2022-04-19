@@ -29,7 +29,7 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { useFormValidator } from '@/common/composables/form-validator';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { store } from '@/store';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 interface Props {
     visible: boolean;
@@ -101,7 +101,7 @@ export default defineComponent<Props>({
 
         const handleConfirm = () => {
             updateDashboard();
-            store.dispatch('service/costExplorer/setDashboardList');
+            costExplorerStore.dispatch('setDashboardList');
             emit('update:visible', false);
             emit('confirm', name.value);
         };

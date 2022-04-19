@@ -1,11 +1,11 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Action } from 'vuex';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { CostExplorerState } from '@/services/cost-explorer/store/type';
+import { store } from '@/store';
 
-export const setDashboardList: Action<CostExplorerState, any> = async ({ commit, rootState }): Promise<void> => {
-    const userId = rootState.user.userId;
+export const setDashboardList: Action<CostExplorerState, any> = async ({ commit }): Promise<void> => {
+    const userId = store.state.user.userId;
     try {
         commit('setDashboardListLoading', true);
         const publicDashboardList = await SpaceConnector.client.costAnalysis.publicDashboard.list();
@@ -23,10 +23,10 @@ export const setDashboardList: Action<CostExplorerState, any> = async ({ commit,
     }
 };
 
-export const setHomeDashboard: Action<CostExplorerState, any> = ({ dispatch }, homeDashboardId: string) => {
-    dispatch('settings/setItem', {
+export const setHomeDashboard: Action<CostExplorerState, any> = (cxt, homeDashboardId: string) => {
+    store.dispatch('settings/setItem', {
         key: 'homeDashboard',
         value: homeDashboardId,
         path: '/costExplorer',
-    }, { root: true });
+    });
 };

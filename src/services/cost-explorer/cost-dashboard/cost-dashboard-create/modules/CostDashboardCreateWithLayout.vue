@@ -48,8 +48,8 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { flattenDeep, startCase } from 'lodash';
 import { defaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import { DefaultLayout, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { store } from '@/store';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const getNamesOfWidgetList = (widgetList) => {
     const flattenWidgetList: WidgetInfo[] = flattenDeep(widgetList);
@@ -67,7 +67,7 @@ export default {
     setup() {
         const state = reactive({
             selectedLayout: {} as Record<string, DefaultLayout>,
-            selectedTemplate: computed(() => store.state.service.costExplorer.dashboard.selectedTemplate),
+            selectedTemplate: computed(() => costExplorerStore.state.dashboard.selectedTemplate),
             unfoldedIndices: [] as number[],
         });
 
@@ -83,8 +83,8 @@ export default {
         };
 
         const handleLayoutChange = (value: Record<string, DefaultLayout>) => {
-            store.commit('service/costExplorer/dashboard/setDashboardTemplate', value);
-            store.commit('service/costExplorer/dashboard/setDefaultFilter', {});
+            costExplorerStore.commit('dashboard/setDashboardTemplate', value);
+            costExplorerStore.commit('dashboard/setDefaultFilter', {});
         };
 
         return {

@@ -89,6 +89,7 @@ import { i18n } from '@/translations';
 import { ReferenceMap } from '@/store/modules/reference/type';
 // eslint-disable-next-line import/extensions,import/no-unresolved
 import { Table } from 'pdfmake/interfaces';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 interface PrintModeFieldSet {
     widths?: Table['widths'];
@@ -126,13 +127,13 @@ export default {
             regions: computed(() => store.state.reference.region.items),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
             //
-            granularity: computed(() => store.state.service.costExplorer.costAnalysis.granularity),
-            stack: computed(() => store.state.service.costExplorer.costAnalysis.stack),
-            period: computed(() => store.state.service.costExplorer.costAnalysis.period),
-            filters: computed(() => store.state.service.costExplorer.costAnalysis.filters),
-            groupBy: computed(() => store.state.service.costExplorer.costAnalysis.groupBy),
+            granularity: computed(() => costExplorerStore.state.costAnalysis.granularity),
+            stack: computed(() => costExplorerStore.state.costAnalysis.stack),
+            period: computed(() => costExplorerStore.state.costAnalysis.period),
+            filters: computed(() => costExplorerStore.state.costAnalysis.filters),
+            groupBy: computed(() => costExplorerStore.state.costAnalysis.groupBy),
             //
-            groupByItems: computed<GroupByItem[]>(() => store.getters['service/costExplorer/costAnalysis/groupByItems']),
+            groupByItems: computed<GroupByItem[]>(() => costExplorerStore.getters['costAnalysis/groupByItems']),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             groupByStoreMap: computed<Record<string, ReferenceMap>>(() => ({

@@ -45,6 +45,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import BudgetDeleteModal from '@/services/cost-explorer/budget/budget-detail/modules/BudgetDeleteModal.vue';
 import { BudgetData } from '@/services/cost-explorer/budget/type';
 import { SpaceRouter } from '@/router';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 export default {
     name: 'BudgetDetailPage',
@@ -66,7 +67,7 @@ export default {
     setup(props) {
         const state = reactive({
             loading: true,
-            budgetData: computed<BudgetData>(() => store.state.service.costExplorer.budget.budgetData),
+            budgetData: computed<Partial<BudgetData>|null>(() => costExplorerStore.state.budget.budgetData),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
         });
@@ -98,8 +99,8 @@ export default {
             state.loading = true;
             try {
                 await Promise.allSettled([
-                    store.dispatch('service/costExplorer/budget/getBudgetData', props.budgetId),
-                    store.dispatch('service/costExplorer/budget/getBudgetUsageData', props.budgetId),
+                    costExplorerStore.dispatch('budget/getBudgetData', props.budgetId),
+                    costExplorerStore.dispatch('budget/getBudgetUsageData', props.budgetId),
                 ]);
             } catch (e) {
                 ErrorHandler.handleError(e);

@@ -29,7 +29,7 @@ import {
     EDITABLE_WIDGET_OPTIONS_TYPE,
     WidgetInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
-import { store } from '@/store';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 interface Props {
     visible: boolean;
@@ -58,7 +58,7 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: props.visible,
-            selectedWidget: computed<WidgetInfo>(() => store.state.service.costExplorer.dashboard.editedSelectedWidget),
+            selectedWidget: computed<WidgetInfo|undefined>(() => costExplorerStore.state.dashboard.editedSelectedWidget),
             editableWidgetOptionList: computed(() => {
                 const optionList: EDITABLE_WIDGET_OPTIONS_TYPE[] = [];
                 if (state.selectedWidget?.options?.group_by) optionList.push(EDITABLE_WIDGET_OPTIONS.GROUP_BY);

@@ -35,9 +35,9 @@ import { Period } from '@/services/cost-explorer/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { i18n } from '@/translations';
-import { store } from '@/store';
 import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { TranslateResult } from 'vue-i18n';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 
 const today = dayjs.utc();
@@ -72,9 +72,9 @@ export default {
         const state = reactive({
             period: computed<Period>({
                 get() { return props.fixedPeriod; },
-                set(period) { store.commit('service/costExplorer/costAnalysis/setPeriod', period); },
+                set(period) { costExplorerStore.commit('costAnalysis/setPeriod', period); },
             }),
-            granularity: computed(() => store.state.service.costExplorer.costAnalysis.granularity),
+            granularity: computed(() => costExplorerStore.state.costAnalysis.granularity),
             periodItems: computed<PeriodItem[]>(() => ([
                 {
                     name: 'last7days',

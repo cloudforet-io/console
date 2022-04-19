@@ -56,10 +56,10 @@ import { SpaceRouter } from '@/router';
 import CostDashboardList from '@/services/cost-explorer/modules/CostDashboardList.vue';
 import { PIconTextButton } from '@spaceone/design-system';
 import {
-    DashboardMenuItem,
+    PublicDashboardInfo, UserDashboardInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { store } from '@/store';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 interface ListItem {
     routeName?: string;
@@ -87,15 +87,15 @@ export default {
                 },
             ]),
             currentRouteName: computed(() => vm.$route.name),
-            publicDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costExplorer.publicDashboardList ?? []),
-            userDashboardList: computed<DashboardMenuItem[]>(() => store.state.service.costExplorer.userDashboardList ?? []),
+            publicDashboardList: computed<PublicDashboardInfo[]>(() => costExplorerStore.state.publicDashboardList ?? []),
+            userDashboardList: computed<UserDashboardInfo[]>(() => costExplorerStore.state.userDashboardList ?? []),
             loading: true,
         });
 
         const listDashboard = async () => {
             try {
                 state.loading = true;
-                await store.dispatch('service/costExplorer/setDashboardList');
+                await costExplorerStore.dispatch('setDashboardList');
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {

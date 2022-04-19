@@ -1,5 +1,6 @@
 import { Getter } from 'vuex';
 import { CostExplorerState } from '@/services/cost-explorer/store/type';
+import { store } from '@/store';
 
 export const dashboardList: Getter<CostExplorerState, any> = (state) => {
     const publicList = state.publicDashboardList.map(d => ({
@@ -14,4 +15,4 @@ export const dashboardList: Getter<CostExplorerState, any> = (state) => {
 };
 
 
-export const homeDashboardId: Getter<CostExplorerState, any> = (state, getters, rootState, rootGetters): string|undefined => rootGetters['settings/getItem']('homeDashboard', '/costExplorer');
+export const homeDashboardId: Getter<CostExplorerState, any> = (): string|undefined => store.getters['settings/getItem']('homeDashboard', '/costExplorer');

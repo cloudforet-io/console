@@ -60,10 +60,10 @@ import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
 
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 import { Period } from '@/services/cost-explorer/type';
 import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const CostAnalysisSetQueryModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSetQueryModal.vue');
 
@@ -85,9 +85,9 @@ export default {
     },
     setup() {
         const state = reactive({
-            granularity: computed(() => store.state.service.costExplorer.costAnalysis.granularity),
-            stack: computed(() => store.state.service.costExplorer.costAnalysis.stack),
-            period: computed<Period>(() => store.state.service.costExplorer.costAnalysis.period),
+            granularity: computed(() => costExplorerStore.state.costAnalysis.granularity),
+            stack: computed(() => costExplorerStore.state.costAnalysis.stack),
+            period: computed<Period>(() => costExplorerStore.state.costAnalysis.period),
             //
             granularityItems: computed<MenuItem[]>(() => ([
                 {
@@ -112,15 +112,15 @@ export default {
         /* event */
         const handleSelectGranularity = async (granularity: string) => {
             if (granularity !== state.granularity) {
-                await store.commit('service/costExplorer/costAnalysis/setPeriod', getInitialDates());
+                await costExplorerStore.commit('costAnalysis/setPeriod', getInitialDates());
             }
-            store.commit('service/costExplorer/costAnalysis/setGranularity', granularity);
+            costExplorerStore.commit('costAnalysis/setGranularity', granularity);
         };
         const handleToggleStack = async ({ value }) => {
-            store.commit('service/costExplorer/costAnalysis/setStack', value);
+            costExplorerStore.commit('costAnalysis/setStack', value);
         };
         const handleSelectedDates = (period) => {
-            store.commit('service/costExplorer/costAnalysis/setPeriod', period);
+            costExplorerStore.commit('costAnalysis/setPeriod', period);
         };
         const handleClickSetFilter = () => {
             state.setQueryModalVisible = true;

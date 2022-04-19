@@ -1,7 +1,7 @@
 import { CustomLayout, DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { FILTER } from '@/services/cost-explorer/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { store } from '@/store';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 export const fetchDefaultLayoutData = async (layoutId: string) => {
     try {
@@ -19,7 +19,7 @@ export const getDashboardLayout = async (dashboard: DashboardInfo): Promise<Cust
     if (dashboard?.default_layout_id && dashboard.custom_layouts.length === 0) { // default dashboard
         layout = await fetchDefaultLayoutData(dashboard.default_layout_id);
     } else layout = dashboard.custom_layouts;
-    store.commit('service/costExplorer/dashboard/setEditedCustomLayout', layout);
+    costExplorerStore.commit('dashboard/setEditedCustomLayout', layout);
     return layout;
 };
 

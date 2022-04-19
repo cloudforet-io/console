@@ -20,7 +20,7 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 import CostExplorerLNB from '@/services/cost-explorer/CostExplorerLNB.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
-import costExplorerStore from '@/services/cost-explorer/store';
+import { costExplorerStore, costExplorerStoreModule } from '@/services/cost-explorer/store';
 import { CostExplorerState } from '@/services/cost-explorer/store/type';
 
 export default {
@@ -31,7 +31,7 @@ export default {
         VerticalPageLayout,
     },
     setup() {
-        registerServiceStore<CostExplorerState>('costExplorer', costExplorerStore);
+        registerServiceStore<CostExplorerState>('costExplorer', costExplorerStoreModule, costExplorerStore);
 
         /* Init */
         (async () => {

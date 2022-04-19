@@ -1,5 +1,6 @@
 import { PublicDashboardInfo, UserDashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { CostExplorerState } from './type';
+import { Module } from 'vuex';
+import { CostExplorerState, CostExplorerStore } from './type';
 import * as getters from './getters';
 import * as actions from './actions';
 import * as mutations from './mutations';
@@ -13,7 +14,7 @@ const state: CostExplorerState = {
     dashboardListLoading: true,
 };
 
-export default {
+export const costExplorerStoreModule: Module<CostExplorerState, any> = {
     namespaced: true,
     state: () => ({ ...state }),
     modules: {
@@ -25,3 +26,6 @@ export default {
     actions,
     mutations,
 };
+
+
+export const costExplorerStore: CostExplorerStore = {} as CostExplorerStore;

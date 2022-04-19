@@ -23,8 +23,8 @@ import {
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { has } from 'lodash';
-import { store } from '@/store';
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 export default {
     name: 'CostDashboardCreateDefaultFilter',
@@ -38,16 +38,16 @@ export default {
         const state = reactive({
             includesFilter: computed({
                 get() {
-                    return store.state.service.costExplorer.dashboard.includesFilter ?? false;
+                    return costExplorerStore.state.dashboard.includesFilter ?? false;
                 },
                 set(value) {
-                    store.commit('service/costExplorer/dashboard/setIncludesFilter', value);
+                    costExplorerStore.commit('dashboard/setIncludesFilter', value);
                 },
             }),
             defaultFilterModalVisible: false,
-            defaultFilter: computed(() => store.state.service.costExplorer.dashboard.defaultFilter ?? {}),
-            isDashboardTemplate: computed(() => has(store.state.service.costExplorer.dashboard.selectedTemplate, 'public_dashboard_id')
-                || has(store.state.service.costExplorer.dashboard.selectedTemplate, 'user_dashboard_id')),
+            defaultFilter: computed(() => costExplorerStore.state.dashboard.defaultFilter ?? {}),
+            isDashboardTemplate: computed(() => has(costExplorerStore.state.dashboard.selectedTemplate, 'public_dashboard_id')
+                || has(costExplorerStore.state.dashboard.selectedTemplate, 'user_dashboard_id')),
         });
 
         const handleClickFilterButton = () => {

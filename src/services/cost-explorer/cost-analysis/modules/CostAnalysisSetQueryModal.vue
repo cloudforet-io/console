@@ -65,6 +65,7 @@ import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { i18n } from '@/translations';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 
 export default {
@@ -116,11 +117,11 @@ export default {
         });
 
         const handleFormConfirm = async () => {
-            if (store.state.service.costExplorer.costAnalysis.granularity !== state.granularity) {
-                await store.commit('service/costExplorer/costAnalysis/setPeriod', getInitialDates());
+            if (costExplorerStore.state.costAnalysis.granularity !== state.granularity) {
+                await costExplorerStore.commit('costAnalysis/setPeriod', getInitialDates());
             }
-            store.commit('service/costExplorer/costAnalysis/setGranularity', state.granularity);
-            store.commit('service/costExplorer/costAnalysis/setStack', state.stack);
+            costExplorerStore.commit('costAnalysis/setGranularity', state.granularity);
+            costExplorerStore.commit('costAnalysis/setStack', state.stack);
             store.commit('display/setCurrency', state.currency);
 
             state.proxyVisible = false;
@@ -137,8 +138,8 @@ export default {
 
         watch(() => state.proxyVisible, (after) => {
             if (after) {
-                state.granularity = store.state.service.costExplorer.costAnalysis.granularity;
-                state.stack = store.state.service.costExplorer.costAnalysis.stack;
+                state.granularity = costExplorerStore.state.costAnalysis.granularity;
+                state.stack = costExplorerStore.state.costAnalysis.stack;
                 state.currency = store.state.display.currency;
             }
         });

@@ -5,6 +5,7 @@ import { CostQuerySetModel, CostQuerySetOption } from '@/services/cost-explorer/
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
 
 
 export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = ({ commit }): void => {
@@ -28,11 +29,11 @@ export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit },
     if (options.filters) commit('setFilters', options.filters);
 };
 
-export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ commit, rootState }): Promise<void|Error> => {
+export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ commit }): Promise<void|Error> => {
     try {
         const { results } = await SpaceConnector.client.costAnalysis.costQuerySet.list({
             query: {
-                filter: [{ k: 'user_id', v: rootState.user.userId, o: 'eq' }],
+                filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
             },
         });
         commit('setCostQueryList', results);

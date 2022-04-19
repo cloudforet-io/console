@@ -73,8 +73,8 @@ import CostDashboardCustomizeWidgetConfig
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
 import DefaultWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/DefaultWidgetPreview.vue';
-import { store } from '@/store';
 import { chartTypeItemMap } from '@/services/cost-explorer/cost-dashboard/lib/config';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const PAGE_SIZE = 6;
 
@@ -95,7 +95,7 @@ export default {
                 if (state.layoutOfSpace) return state.widgetList.filter(widget => widget.options.layout === state.layoutOfSpace);
                 return [];
             }),
-            selectedWidget: computed<WidgetInfo>(() => store.state.service.costExplorer.dashboard.originSelectedWidget),
+            selectedWidget: computed<WidgetInfo>(() => costExplorerStore.state.dashboard.originSelectedWidget),
             editableWidgetOptionList: computed<EDITABLE_WIDGET_OPTIONS_TYPE[]>(() => {
                 const optionList: EDITABLE_WIDGET_OPTIONS_TYPE[] = [];
                 if (state.selectedWidget?.options?.group_by) optionList.push(EDITABLE_WIDGET_OPTIONS.GROUP_BY);
@@ -107,7 +107,7 @@ export default {
             totalCount: 0,
             thisPage: 1,
             allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
-            layoutOfSpace: computed(() => store.state.service.costExplorer.dashboard.layoutOfSpace),
+            layoutOfSpace: computed(() => costExplorerStore.state.dashboard.layoutOfSpace),
         });
         const getWidgets = async () => {
             try {
@@ -121,8 +121,8 @@ export default {
         const getChartTypeImageFileName = (chartType: CHART_TYPE) => chartTypeItemMap[chartType].imageFileName;
 
         const selectWidget = (value: WidgetInfo) => {
-            store.commit('service/costExplorer/dashboard/setOriginSelectedWidget', value);
-            store.commit('service/costExplorer/dashboard/setEditedSelectedWidget', value);
+            costExplorerStore.commit('dashboard/setOriginSelectedWidget', value);
+            costExplorerStore.commit('dashboard/setEditedSelectedWidget', value);
         };
 
         (() => {

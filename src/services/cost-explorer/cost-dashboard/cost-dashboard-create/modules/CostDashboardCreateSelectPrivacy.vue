@@ -16,6 +16,7 @@ import { DASHBOARD_PRIVACY_TYPE, DashboardPrivacyType } from '@/services/cost-ex
 import { PRadio } from '@spaceone/design-system';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const privacyList = [
     {
@@ -42,7 +43,7 @@ export default {
         });
 
         const handleRadio = (value: DashboardPrivacyType) => {
-            store.commit('service/costExplorer/dashboard/setDashboardPrivacy', value);
+            costExplorerStore.commit('dashboard/setDashboardPrivacy', value);
         };
 
         return {

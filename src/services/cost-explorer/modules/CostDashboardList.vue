@@ -34,13 +34,13 @@ import {
 } from '@spaceone/design-system';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 import {
     DashboardMenuItem,
     PublicDashboardInfo,
     UserDashboardInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 
 export default {
@@ -71,7 +71,7 @@ export default {
             ]),
             selectedMoreMenuItem: '',
             dashboardIdFromRoute: computed<string|undefined>(() => vm.$route.params.dashboardId),
-            homeDashboardId: computed<string|undefined>(() => store.getters['service/costExplorer/homeDashboardId']),
+            homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
             publicDashboardList: computed<DashboardMenuItem[]>(() => props.publicDashboardItems?.map(d => ({
                 ...d,
                 dashboard_id: d.public_dashboard_id,
@@ -89,7 +89,7 @@ export default {
         const handleSelectMoreMenu = (item, selectedMoreMenuItem) => {
             state.selectedMoreMenuItem = selectedMoreMenuItem;
             if (state.selectedMoreMenuItem === 'setHome') {
-                store.dispatch('service/costExplorer/setHomeDashboard', item.dashboard_id);
+                costExplorerStore.dispatch('setHomeDashboard', item.dashboard_id);
             }
         };
 
@@ -101,7 +101,7 @@ export default {
         };
 
         const setInitialHomeDashboard = () => {
-            store.dispatch('service/costExplorer/setHomeDashboard', state.dashboardList[0]?.public_dashboard_id ?? state.dashboardList[0]?.user_dashboard_id);
+            costExplorerStore.dispatch('setHomeDashboard', state.dashboardList[0]?.public_dashboard_id ?? state.dashboardList[0]?.user_dashboard_id);
         };
 
         (async () => {

@@ -60,6 +60,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
 import { SpaceRouter } from '@/router';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 interface Props {
     visible: boolean;
@@ -169,7 +170,7 @@ export default defineComponent<Props>({
         const handleConfirm = async () => {
             if (!isAllValid) return;
             const duplicatedDashboardId = visibility.value === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
-            await store.dispatch('service/costExplorer/dashboard/setDashboardList');
+            await costExplorerStore.dispatch('dashboard/setDashboardList');
             if (duplicatedDashboardId) {
                 await SpaceRouter.router.push({
                     name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,

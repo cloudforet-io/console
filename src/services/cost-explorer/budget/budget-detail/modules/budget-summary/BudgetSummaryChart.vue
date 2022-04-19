@@ -20,12 +20,12 @@ import {
     gray, indigo, red,
 } from '@/styles/colors';
 import { XYChart } from '@amcharts/amcharts4/charts';
-import { store } from '@/store';
 import { getStackedChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import dayjs from 'dayjs';
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const categoryKey = 'date';
 const columnChartValueName = 'usd_cost';
@@ -41,8 +41,8 @@ export default {
             chartRef: null as HTMLElement | null,
             chart: null as XYChart | null,
             chartRegistry: {},
-            budgetUsageData: computed(() => store.state.service.costExplorer.budget.budgetUsageData),
-            budgetData: computed(() => store.state.service.costExplorer.budget.budgetData),
+            budgetUsageData: computed(() => costExplorerStore.state.budget.budgetUsageData),
+            budgetData: computed(() => costExplorerStore.state.budget.budgetData),
             limitProperty: computed(() => ((state.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL) ? 'total_limit' : 'limit')),
             chartData: [] as any,
             loading: true,

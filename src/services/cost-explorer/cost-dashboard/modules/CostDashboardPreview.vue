@@ -35,6 +35,7 @@ import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/Da
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 import CostDashboardFilter from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardFilter.vue';
 import CostDashboardPeriodSelectDropdown
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
@@ -74,7 +75,7 @@ export default {
             periodType: '',
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-            homeDashboardId: computed<string|undefined>(() => store.getters['service/costExplorer/homeDashboardId']),
+            homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
             isPageMounted: false,
             // dashboard layout widget
             widgetList: undefined as HTMLElement[]|undefined,

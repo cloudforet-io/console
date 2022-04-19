@@ -30,11 +30,12 @@ import {
     DashboardPrivacyType,
     PERIOD_TYPE, PeriodType,
 } from '@/services/cost-explorer/cost-dashboard/type';
-import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceRouter } from '@/router';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { fetchDefaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/helper';
+import { costExplorerStore } from '@/services/cost-explorer/store';
+import { Period } from '@/services/cost-explorer/type';
 
 export default {
     name: 'CostDashboardCreatePage',
@@ -54,16 +55,17 @@ export default {
             ]),
         });
 
+
         const state = reactive({
-            selectedTemplate: computed(() => store.state.service.costExplorer.dashboard.selectedTemplate),
-            defaultFilter: computed<Record<string, string[]>>(() => store.state.service.costExplorer.dashboard.defaultFilter),
-            includesFilter: computed<boolean>(() => store.state.service.costExplorer.dashboard.includesFilter),
-            selectedPrivacy: computed<DashboardPrivacyType>(() => store.state.service.costExplorer.dashboard.selectedDashboardPrivacy),
+            selectedTemplate: computed(() => costExplorerStore.state.dashboard.selectedTemplate),
+            defaultFilter: computed<Record<string, string[]>>(() => costExplorerStore.state.dashboard.defaultFilter),
+            includesFilter: computed<boolean>(() => costExplorerStore.state.dashboard.includesFilter),
+            selectedPrivacy: computed<DashboardPrivacyType>(() => costExplorerStore.state.dashboard.selectedDashboardPrivacy),
         });
 
         const getCustomLayouts = async () => {
             const hasDefaultId = Object.prototype.hasOwnProperty.call(state.selectedTemplate, 'default_layout_id');
-            if (hasDefaultId && (!state.selectedTemplate.custom_layouts || state.selectedTemplate.custom_layouts?.length === 0)) {
+            if (hasDefaultId && (!Array.isArray(state.selectedTemplate.custom_layouts) || state.selectedTemplate.custom_layouts.length === 0)) {
                 return await fetchDefaultLayoutData(state.selectedTemplate.default_layout_id as string) as CustomLayout[];
             }
             return state.selectedTemplate?.custom_layouts as CustomLayout[];
@@ -73,7 +75,7 @@ export default {
             name: 'Untitled Dashboard',
             custom_layouts: await getCustomLayouts(),
             period_type: state.selectedTemplate.period_type as PeriodType ?? PERIOD_TYPE.AUTO,
-            period: state.selectedTemplate.period ?? null,
+            period: state.selectedTemplate.period as Period,
             default_filter: state.includesFilter ? state.defaultFilter : {},
         });
 
@@ -109,7 +111,7 @@ export default {
         const handleClickCreate = async () => {
             const createdDashboardId = state.selectedPrivacy === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
             if (createdDashboardId) goToCustomizePage(createdDashboardId);
-            store.commit('service/costExplorer/dashboard/setDashboardPrivacy', DASHBOARD_PRIVACY_TYPE.USER);
+            costExplorerStore.commit('dashboard/setDashboardPrivacy', DASHBOARD_PRIVACY_TYPE.USER);
         };
 
         return {
