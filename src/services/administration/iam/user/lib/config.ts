@@ -43,6 +43,16 @@ export const userSearchHandlers = {
                 label: 'Timezone',
             },
         ],
+    }, {
+        title: 'Advanced',
+        items: [
+            {
+                name: 'tags',
+                label: 'Tags',
+                data_type: 'object',
+
+            },
+        ],
     }],
     valueHandlerMap: {
         user_id: makeDistinctValueHandler('identity.User', 'user_id'),
@@ -54,6 +64,7 @@ export const userSearchHandlers = {
         backend: makeDistinctValueHandler('identity.User', 'backend'),
         last_accessed_at: makeDistinctValueHandler('identity.User', 'last_accessed_at'),
         timezone: makeDistinctValueHandler('identity.User', 'timezone'),
+        tags: makeDistinctValueHandler('identity.User', 'tags'),
     },
 };
 
