@@ -15,13 +15,9 @@
             </div>
         </template>
         <template #item--format="{ item }">
-            <p-i v-if="item.icon"
-                 :name="item.icon"
-                 width="1rem" height="1rem"
-                 class="mr-1"
-            />
-            <p-lazy-img v-if="item.image"
-                        :src="item.image || ''"
+            <p-lazy-img v-if="item.icon"
+                        :src="item.icon || ''"
+                        :error-icon="item.icon"
                         width="1rem" height="1rem"
                         class="ic-lazy-img"
             />
@@ -44,6 +40,9 @@
                     <span :class="{'matched-character': matched}">{{ text }}</span>
                 </span>
             </span>
+        </template>
+        <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+            <slot :name="slot" v-bind="scope" />
         </template>
     </p-context-menu>
 </template>

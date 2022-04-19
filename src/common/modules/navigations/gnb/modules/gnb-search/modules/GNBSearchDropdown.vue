@@ -46,8 +46,7 @@ import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSugge
 import { PDataLoader, PDivider } from '@spaceone/design-system';
 import {
     FocusStartPosition,
-    SuggestionType,
-    SuggestionItem,
+    SuggestionItem, SUGGESTION_TYPE,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import { i18n } from '@/translations';
 
@@ -117,7 +116,7 @@ export default defineComponent<Props>({
             allSelectableItems: computed<any[]>(() => props.menuItems.concat(props.cloudServiceTypeItems)),
         });
 
-        const emitSelect = (index: number, listType: SuggestionType) => {
+        const emitSelect = (index: number, listType: SUGGESTION_TYPE) => {
             emit('select', index, listType);
         };
 
