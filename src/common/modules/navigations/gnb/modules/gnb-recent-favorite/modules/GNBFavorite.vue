@@ -200,29 +200,21 @@ export default {
             if (item.itemType === SUGGESTION_TYPE.MENU) {
                 const menuRoute = menuRouterMap[itemName];
                 if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.name) return;
-                try {
-                    SpaceRouter.router.push({ name: menuRoute.name });
-                } catch (e) {}
+                SpaceRouter.router.push({ name: menuRoute.name }).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT) {
-                try {
-                    SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.Project' }));
-                } catch (e) {}
+                SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT_GROUP) {
-                try {
-                    SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' }));
-                } catch (e) {}
+                SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE) {
                 const cloudServiceType = state.cloudServiceTypes[itemName];
-                try {
-                    SpaceRouter.router.push({
-                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                        params: {
-                            provider: cloudServiceType.data.provider,
-                            group: cloudServiceType.data.group,
-                            name: cloudServiceType.name,
-                        },
-                    });
-                } catch (e) {}
+                SpaceRouter.router.push({
+                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                    params: {
+                        provider: cloudServiceType.data.provider,
+                        group: cloudServiceType.data.group,
+                        name: cloudServiceType.name,
+                    },
+                }).catch(() => {});
             }
             emit('close');
         };

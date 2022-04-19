@@ -311,6 +311,12 @@ export default {
             }
         });
 
+        watch(() => vm.$route.query, async (after, before) => {
+            if (after?.select_pg !== before?.select_pg) {
+                await store.dispatch('service/project/selectNode', after.select_pg);
+            }
+        });
+
         /* Init */
         (async () => {
             await Promise.allSettled([

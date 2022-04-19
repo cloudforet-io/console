@@ -143,11 +143,16 @@ export default {
         PBadge,
         PDataLoader,
     },
+    props: {
+        id: {
+            type: String,
+            default: undefined,
+        },
+    },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         registerServiceStore<ProjectDetailState>('projectDetail', ProjectDetailStoreModule);
-        store.commit('service/projectDetail/setProjectId', vm.$route.params.id);
 
         const state = reactive({
             loading: true,
@@ -297,6 +302,12 @@ export default {
             const exactRoute = vm.$route.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
             singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
         });
+
+        watch(() => props.id, (after, before) => {
+            if (after !== before) {
+                store.commit('service/projectDetail/setProjectId', after);
+            }
+        }, { immediate: true });
 
 
         return {
