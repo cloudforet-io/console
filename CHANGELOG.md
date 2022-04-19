@@ -1,3 +1,10 @@
+# [1.1.0-beta.281](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.280...v1.1.0-beta.281) (2022-04-19)
+
+
+### Bug Fixes
+
+*  fix sortable props in PDataTable ([#926](https://github.com/spaceone-dev/spaceone-design-system/issues/926)) ([20a80bf](https://github.com/spaceone-dev/spaceone-design-system/commit/20a80bfa78f50e97f8cb691a8aac4e2fc9284f47))
+
 # [1.1.0-beta.280](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.279...v1.1.0-beta.280) (2022-04-19)
 
 
