@@ -7,7 +7,15 @@
                       use-total-count use-selected-count
                       :selected-count="selectedItems.length"
                       :total-count="totalCount"
-        />
+        >
+            <template #extra>
+                <router-link :to="{name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }">
+                    <p-button style-type="gray900" outline="true" font-weigth="bold">
+                        Collector History
+                    </p-button>
+                </router-link>
+            </template>
+        </p-page-title>
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-query-search-table :fields="fields"
@@ -176,7 +184,7 @@ import {
 
 import {
     PHorizontalLayout, PSelectDropdown, PLazyImg, PPageTitle, PDataTable, PQuerySearchTable,
-    PTab, PTableCheckModal, PIconTextButton, PStatus, PBreadcrumbs, PI, PEmpty,
+    PTab, PTableCheckModal, PIconTextButton, PStatus, PBreadcrumbs, PI, PEmpty, PButton,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
@@ -219,6 +227,7 @@ export default {
         PTableCheckModal,
         PBreadcrumbs,
         PEmpty,
+        PButton,
         CollectorUpdateModal,
         CollectDataModal,
         CollectorDetails,

@@ -1,77 +1,44 @@
 <template>
-    <p-vertical-page-layout>
-        <template #sidebar="{width}">
-            <div :style="{width: width}">
+    <div class="collector-plugins-page">
+        <div class="page-navigation">
+            <p-breadcrumbs :routes="routes" />
+        </div>
+        <p-page-title :title="$t('PLUGIN.COLLECTOR.PLUGINS.TITLE')" use-total-count :total-count="totalCount"
+                      child @goBack="$router.go(-1)"
+        />
+        <p-divider class="mb-6" />
+        <collector-plugins-toolbox class="collector-plugin-toolbox"
+                                   @update-toolbox="handleToolbox"
+        >
+            <template #filters>
                 <plugin-filter :repositories="repositories"
                                :selected-repo-id.sync="selectedRepositoryId"
                                :resource-type-search-tags.sync="resourceTypeSearchTags"
-                               @search="onSearch"
-                               @delete="onSearch('')"
+                               @search="handleToolbox"
+                               @delete="handleToolbox('')"
                 />
-            </div>
-        </template>
-        <template #default>
-            <div class="page-navigation">
-                <p-breadcrumbs :routes="routes" />
-            </div>
-            <p-toolbox-grid-layout class="plugin-list"
-                                   :items="loading ? [] : plugins"
-                                   :this-page.sync="thisPage"
-                                   :page-size.sync="pageSize"
-                                   :loading="loading"
-                                   :card-class="cardClass"
-                                   :card-height="cardHeight"
-                                   :card-min-width="cardMinWidth"
-                                   :fix-column="fixColumn"
-                                   :column-gap="columnGap"
-                                   @changePageNumber="getPlugins"
-                                   @changePageSize="getPlugins"
-                                   @clickRefresh="getPlugins"
+            </template>
+        </collector-plugins-toolbox>
+        <p v-if="resourceTypeSearchTags.length > 0" class="mb-4">
+            <p-badge v-for="(tag, idx) in resourceTypeSearchTags" :key="idx"
+                     style-type="primary"
+                     :outline="true"
+                     class="filter-tag"
             >
-                <template #toolbox-left>
-                    <p-page-title :title="$t('PLUGIN.COLLECTOR.PLUGINS.TITLE')" use-total-count :total-count="totalCount"
-                                  child @goBack="$router.go(-1)"
-                    />
-                </template>
-                <template #page-size>
-                    <p-select-dropdown v-model="sortBy" :items="sortMenu" @select="getPlugins" />
-                </template>
-                <template #toolbox-bottom>
-                    <p v-if="resourceTypeSearchTags.length > 0" class="mb-4">
-                        <p-badge v-for="(tag, idx) in resourceTypeSearchTags" :key="idx"
-                                 style-type="primary"
-                                 :outline="true"
-                                 class="filter-tag"
-                        >
-                            <span>{{ tag }}</span>
-                            <p-i name="ic_delete" width="1rem"
-                                 height="1rem" color="inherit"
-                                 class="cursor-pointer"
-                                 @click="onDeleteResourceSearchTag(idx)"
-                            />
-                        </p-badge>
-                    </p>
-                    <p v-if="keyword" class="mb-2 text-sm">
-                        {{ totalCount }} plugins for <strong>[{{ keyword }}]</strong>
-                    </p>
-                </template>
-                <template #loading>
-                    <div>
-                        <div v-for="s in skeletons" :key="s" class="flex w-full mb-4">
-                            <p-skeleton width="4rem" height="4rem" class="flex-shrink-0 mr-4" />
-                            <div class="w-full">
-                                <p-skeleton width="40%" height="1.5rem" class="mt-2 mb-2" />
-                                <p-skeleton height="1rem" width="90%" />
-                            </div>
-                        </div>
-                    </div>
-                </template>
-                <template #no-data>
-                    <p-empty v-if="!loading" class="w-full h-full">
-                        No Data
-                    </p-empty>
-                </template>
-                <template #card="{item}">
+                <span>{{ tag }}</span>
+                <p-i name="ic_delete" width="1rem"
+                     height="1rem" color="inherit"
+                     class="cursor-pointer"
+                     @click="handleDeleteResourceSearchTag(idx)"
+                />
+            </p-badge>
+        </p>
+        <p v-if="keyword" class="mb-2 text-sm">
+            {{ totalCount }} plugins for <strong>[{{ keyword }}]</strong>
+        </p>
+        <p-data-loader :data="plugins" :loading="loading">
+            <ul class="plugin-card-list">
+                <li v-for="item in plugins" :key="item.name">
                     <p-card-item :icon="item.icon"
                                  :title="item.name"
                                  :contents="item.tags.description"
@@ -82,7 +49,7 @@
                         <template #extra>
                             <div class="card-bottom">
                                 <div v-if="item.labels">
-                                    <p-badge v-for="(label, idx) in item.labels" :key="idx" style-type="gray"
+                                    <p-badge v-for="(label, idx) in item.labels" :key="`${label}-${idx}`" style-type="gray"
                                              :outline="true"
                                              class="mr-2 mb-2"
                                     >
@@ -92,7 +59,7 @@
                                 <div class="btns">
                                     <p-icon-text-button style-type="primary-dark"
                                                         name="ic_plus_bold"
-                                                        @click="onPluginCreate(item)"
+                                                        @click="handlePluginCreate(item)"
                                     >
                                         {{ $t('PLUGIN.COLLECTOR.PLUGINS.CREATE') }}
                                     </p-icon-text-button>
@@ -100,10 +67,10 @@
                             </div>
                         </template>
                     </p-card-item>
-                </template>
-            </p-toolbox-grid-layout>
-        </template>
-    </p-vertical-page-layout>
+                </li>
+            </ul>
+        </p-data-loader>
+    </div>
 </template>
 
 <script lang="ts">
@@ -114,12 +81,11 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToolboxGridLayout, PPageTitle, PSelectDropdown, PCardItem, PBreadcrumbs,
-    PIconTextButton, PEmpty, PSkeleton, PBadge, PI,
+    PPageTitle, PCardItem, PBreadcrumbs,
+    PIconTextButton, PBadge, PI, PDivider, PDataLoader,
 } from '@spaceone/design-system';
 
 import PluginFilter from '@/services/asset-inventory/collector/collector-plugins/modules/PluginFilter.vue';
-import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -128,6 +94,8 @@ import { TimeStamp } from '@/models';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import CollectorPluginsToolbox from '@/services/asset-inventory/collector/collector-plugins/modules/CollectorPluginsToolbox.vue';
+import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 
 
 enum PLUGIN_STATE {
@@ -169,18 +137,16 @@ interface RepositoryModel {
 export default {
     name: 'CollectorPluginPage',
     components: {
-        PVerticalPageLayout,
         PBreadcrumbs,
-        PSkeleton,
-        PEmpty,
         PCardItem,
-        PSelectDropdown,
         PPageTitle,
-        PToolboxGridLayout,
         PBadge,
         PI,
         PluginFilter,
         PIconTextButton,
+        PDivider,
+        PDataLoader,
+        CollectorPluginsToolbox,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -271,14 +237,15 @@ export default {
             }
         };
 
-        const onPluginCreate = (item) => {
+        const handlePluginCreate = (item) => {
             vm.$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE.STEPS._NAME, params: { pluginId: item.plugin_id } });
         };
-        const onSearch = (val) => {
-            state.keyword = val;
+        const handleToolbox = (options: ToolboxOptions) => {
+            state.keyword = options.searchText ? options.searchText : '';
+            state.sortBy = options.sortBy ? options.sortBy : 'name';
             getPlugins();
         };
-        const onDeleteResourceSearchTag = (idx) => {
+        const handleDeleteResourceSearchTag = (idx) => {
             state.resourceTypeSearchTags.splice(idx, 1);
         };
 
@@ -306,9 +273,9 @@ export default {
             ...toRefs(routeState),
             skeletons: range(5),
             getPlugins,
-            onPluginCreate,
-            onSearch,
-            onDeleteResourceSearchTag,
+            handlePluginCreate,
+            handleToolbox,
+            handleDeleteResourceSearchTag,
             isBeta: item => get(item, 'tags.beta', ''),
         };
     },
@@ -320,6 +287,11 @@ export default {
     @apply inline-flex items-center mb-2 mr-2;
 }
 .plugin-list {
+    max-width: 1280px;
+    margin: auto;
+}
+.plugin-card-list {
+    @apply flex flex-col flex-wrap gap-4;
     max-width: 1280px;
     margin: auto;
 }
