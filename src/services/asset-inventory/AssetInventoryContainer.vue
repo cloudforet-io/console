@@ -20,7 +20,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import { AssetInventoryState } from '@/services/asset-inventory/store/type';
-import assetInventoryStore from '@/services/asset-inventory/store';
+import { assetInventoryStoreModule, assetInventoryStore } from '@/services/asset-inventory/store';
 import AssetInventoryLNB from '@/services/asset-inventory/AssetInventoryLNB.vue';
 
 
@@ -32,7 +32,7 @@ export default defineComponent({
         VerticalPageLayout,
     },
     setup() {
-        registerServiceStore<AssetInventoryState>('assetInventory', assetInventoryStore);
+        registerServiceStore<AssetInventoryState>('assetInventory', assetInventoryStoreModule, assetInventoryStore);
         const state = reactive({});
         return {
             ...toRefs(state),

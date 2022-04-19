@@ -120,6 +120,7 @@ import UserManagementModal
     from '@/services/administration/iam/user/modules/user-management-modal/UserManagementModal.vue';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { MODAL_TYPE } from '@/services/administration/store/user/type';
+import { administrationStore } from '@/services/administration/store';
 
 export default {
     name: 'UserManagementTable',
@@ -211,7 +212,7 @@ export default {
             title: '',
             subTitle: '',
             themeColor: undefined as string | undefined,
-            isManagementModalVisible: computed(() => store.getters['service/administration/user/isManagementModalVisible']),
+            isManagementModalVisible: computed(() => administrationStore.getters['user/isManagementModalVisible']),
             visible: computed(() => modalState.isManagementModalVisible),
         });
         const userFormState = reactive({
@@ -220,8 +221,8 @@ export default {
             headerTitle: '',
             item: undefined,
             roleOfSelectedUser: '',
-            isCreateModalVisible: computed(() => store.getters['service/administration/user/isCreateModalVisible']),
-            isUpdateModalVisible: computed(() => store.getters['service/administration/user/isUpdateModalVisible']),
+            isCreateModalVisible: computed(() => administrationStore.getters['user/isCreateModalVisible']),
+            isUpdateModalVisible: computed(() => administrationStore.getters['user/isUpdateModalVisible']),
             isAdmin: computed(() => store.getters['user/isAdmin']).value,
         });
 
@@ -297,34 +298,34 @@ export default {
             userFormState.updateMode = false;
             userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.ADD_TITLE') as string;
             userFormState.item = undefined;
-            store.dispatch('service/administration/user/showModal', MODAL_TYPE.CREATE);
+            administrationStore.dispatch('user/showModal', MODAL_TYPE.CREATE);
         };
         const clickUpdate = () => {
             userFormState.updateMode = true;
             userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.UPDATE_TITLE') as string;
             userFormState.item = state.users[state.selectedIndex[0]];
-            store.dispatch('service/administration/user/showModal', MODAL_TYPE.UPDATE);
+            administrationStore.dispatch('user/showModal', MODAL_TYPE.UPDATE);
         };
         const clickDelete = () => {
             modalState.mode = 'delete';
             modalState.title = vm.$t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
             modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', state.selectedIndex.length);
             modalState.themeColor = 'alert';
-            store.dispatch('service/administration/user/showModal', MODAL_TYPE.MANAGEMENT);
+            administrationStore.dispatch('user/showModal', MODAL_TYPE.MANAGEMENT);
         };
         const clickEnable = () => {
             modalState.mode = 'enable';
             modalState.title = vm.$t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
             modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', state.selectedIndex.length);
             modalState.themeColor = 'safe';
-            store.dispatch('service/administration/user/showModal', MODAL_TYPE.MANAGEMENT);
+            administrationStore.dispatch('user/showModal', MODAL_TYPE.MANAGEMENT);
         };
         const clickDisable = () => {
             modalState.mode = 'disable';
             modalState.title = vm.$t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
             modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', state.selectedIndex.length);
             modalState.themeColor = 'alert';
-            store.dispatch('service/administration/user/showModal', MODAL_TYPE.MANAGEMENT);
+            administrationStore.dispatch('user/showModal', MODAL_TYPE.MANAGEMENT);
         };
 
         const handleSelectDropdown = (name) => {
@@ -417,8 +418,8 @@ export default {
         })();
 
         const saveSelectedValueToStore = (selectedIndex: number[]) => {
-            store.dispatch('service/administration/user/selectIndex', selectedIndex);
-            store.dispatch('service/administration/user/selectUsers', state.selectedUsers);
+            administrationStore.dispatch('user/selectIndex', selectedIndex);
+            administrationStore.dispatch('user/selectUsers', state.selectedUsers);
         };
 
         watch(() => state.selectedIndex, (after) => {

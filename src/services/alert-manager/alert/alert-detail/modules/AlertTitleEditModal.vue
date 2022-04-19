@@ -34,8 +34,8 @@ import {
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
-import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { alertManagerStore } from '@/services/alert-manager/store';
 
 
 export default {
@@ -86,7 +86,7 @@ export default {
         const updateAlertTitle = async () => {
             try {
                 state.loading = true;
-                await store.dispatch('service/alertManager/alert/updateAlertData', {
+                await alertManagerStore.dispatch('alert/updateAlertData', {
                     updateParams: {
                         title: state.alertTitleInput,
                     },

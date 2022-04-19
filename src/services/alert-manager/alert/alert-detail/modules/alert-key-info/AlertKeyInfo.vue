@@ -78,6 +78,7 @@ import AlertInfoDescription
 import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/alert-manager/lib/config';
 import AlertTriggeredBy from '@/services/alert-manager/alert/modules/AlertTriggeredBy.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { alertManagerStore } from '@/services/alert-manager/store';
 
 interface Props {
     id: string;
@@ -129,7 +130,7 @@ export default {
                 },
                 { name: 'reference.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
             ],
-            data: computed(() => store.state.service.alertManager.alert.alertData) || {},
+            data: computed(() => alertManagerStore.state.alert.alertData) || {},
             escalationPolicyName: '',
             loading: true,
             timezone: computed(() => store.state.user.timezone),

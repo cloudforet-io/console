@@ -115,6 +115,7 @@ import {
 } from '@spaceone/console-core-lib/component-util/query-search';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
+import { assetInventoryStore } from '@/services/asset-inventory/store';
 
 
 export default {
@@ -163,9 +164,9 @@ export default {
         const state = reactive({
             providers: computed(() => store.state.reference.provider.items),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
-            selectedProvider: computed(() => store.state.service.assetInventory.cloudService.selectedProvider),
-            selectedCategories: computed(() => store.state.service.assetInventory.cloudService.selectedCategories),
-            selectedRegions: computed(() => store.state.service.assetInventory.cloudService.selectedRegions),
+            selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
+            selectedCategories: computed(() => assetInventoryStore.state.cloudService.selectedCategories),
+            selectedRegions: computed(() => assetInventoryStore.state.cloudService.selectedRegions),
             period: queryStringToObject(SpaceRouter.router.currentRoute.query?.period) as Period | undefined,
             //
             loading: true,
@@ -261,15 +262,15 @@ export default {
 
             /* filter setting */
             const currentQuery = SpaceRouter.router.currentRoute.query;
-            store.commit('service/assetInventory/cloudService/setSelectedRegions', queryStringToArray(currentQuery.region) || []);
-            store.commit('service/assetInventory/cloudService/setSelectedCategories', queryStringToArray(currentQuery.service) || []);
+            assetInventoryStore.commit('cloudService/setSelectedRegions', queryStringToArray(currentQuery.region) || []);
+            assetInventoryStore.commit('cloudService/setSelectedCategories', queryStringToArray(currentQuery.service) || []);
 
             // init provider
             let provider: RouteQueryString = currentQuery.provider;
             if (Array.isArray(provider)) provider = queryStringToString(provider[0]);
             else provider = queryStringToString(provider);
             if (!provider || !state.providers[provider]) provider = 'all';
-            store.commit('service/assetInventory/cloudService/setSelectedProvider', provider);
+            assetInventoryStore.commit('cloudService/setSelectedProvider', provider);
 
             if (currentQuery.provider !== primitiveToQueryString(provider)) {
                 await replaceUrlQuery('provider', primitiveToQueryString(provider));

@@ -39,6 +39,7 @@ import { i18n } from '@/translations';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { map } from 'lodash';
 import { store } from '@/store';
+import { alertManagerStore } from '@/services/alert-manager/store';
 
 interface Props {
     id: string;
@@ -67,7 +68,7 @@ export default {
                 { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
                 { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
             ]),
-            data: computed(() => store.state.service.alertManager.alert.alertData ?? {}),
+            data: computed(() => alertManagerStore.state.alert.alertData ?? {}),
             escalationPolicyName: '',
             loading: true,
             timezone: computed(() => store.state.user.timezone),
@@ -77,7 +78,7 @@ export default {
         const additionalState = reactive({
             fields: computed(() => map(additionalState.data, (d, k) => ({ name: k, label: k }))),
             // eslint-disable-next-line camelcase
-            data: computed(() => store.state.service.alertManager.alert.alertData?.additional_info) || {},
+            data: computed(() => alertManagerStore.state.alert.alertData?.additional_info) || {},
             loading: true,
             isEmptyValue: computed(() => checkEmptyValue(additionalState.data)),
         });

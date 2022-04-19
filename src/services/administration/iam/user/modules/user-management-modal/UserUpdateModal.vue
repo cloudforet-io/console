@@ -122,6 +122,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MODAL_TYPE } from '@/services/administration/store/user/type';
 import { User } from '@/services/administration/iam/user/type';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
+import { administrationStore } from '@/services/administration/store';
 
 interface AuthType {
     label: string | null;
@@ -171,11 +172,11 @@ export default {
 
         const state = reactive({
             visible: computed({
-                get() { return store.getters['service/administration/user/isUpdateModalVisible']; },
-                set(val) { store.commit('service/administration/user/setVisibleUpdateModal', val); },
+                get() { return administrationStore.getters['user/isUpdateModalVisible']; },
+                set(val) { administrationStore.commit('user/setVisibleUpdateModal', val); },
             }),
             isSameId: false,
-            selectedUsers: computed<User[]>(() => store.state.service.administration.user.selectedUsers),
+            selectedUsers: computed<User[]>(() => administrationStore.state.user.selectedUsers),
             //
             authTypeList: [
                 {

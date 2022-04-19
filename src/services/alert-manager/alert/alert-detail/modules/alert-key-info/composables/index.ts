@@ -5,8 +5,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { EDIT_MODE } from '@/services/alert-manager/lib/config';
 import { cloneDeep } from 'lodash';
-import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { alertManagerStore } from '@/services/alert-manager/store';
 
 interface AlertDetailItemState {
 	isEditMode: boolean;
@@ -63,7 +63,7 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
     };
     const updateAlert = async (editMode: EDIT_MODE) => {
         try {
-            await store.dispatch('service/alertManager/alert/updateAlertData', {
+            await alertManagerStore.dispatch('alert/updateAlertData', {
                 updateParams: getParams(editMode),
                 alertId: state.alertId,
             });

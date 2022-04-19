@@ -83,9 +83,9 @@ import { i18n } from '@/translations';
 import AlertStatusUpdate
     from '@/services/alert-manager/alert/alert-detail/modules/AlertStatusUpdate.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { NoResourceError } from '@/common/composables/error/error';
+import { alertManagerStore } from '@/services/alert-manager/store';
 
 export default {
     name: 'AlertDetailPage',
@@ -113,7 +113,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            alertInfo: computed(() => store.state.service.alertManager.alert.alertData),
+            alertInfo: computed(() => alertManagerStore.state.alert.alertData),
             loading: true,
             //
             alertTitleEditFormVisible: false,
@@ -162,7 +162,7 @@ export default {
         (async () => {
             state.loading = true;
             try {
-                await store.dispatch('service/alertManager/alert/getAlertData', props.id);
+                await alertManagerStore.dispatch('alert/getAlertData', props.id);
             } catch (e) {
                 ErrorHandler.handleError(new NoResourceError({ name: ALERT_MANAGER_ROUTE.ALERT._NAME }));
             } finally {

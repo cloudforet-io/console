@@ -175,6 +175,7 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MODAL_TYPE } from '@/services/administration/store/user/type';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
+import { administrationStore } from '@/services/administration/store';
 
 
 interface AuthType {
@@ -235,8 +236,8 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             visible: computed({
-                get() { return store.getters['service/administration/user/isCreateModalVisible']; },
-                set(val) { store.commit('service/administration/user/setVisibleCreateModal', val); },
+                get() { return administrationStore.getters['user/isCreateModalVisible']; },
+                set(val) { administrationStore.commit('user/setVisibleCreateModal', val); },
             }),
             isSameId: false,
             // external user

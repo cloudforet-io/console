@@ -97,6 +97,7 @@ import { CATEGORY } from '@/services/asset-inventory/cloud-service/lib/config';
 import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { assetInventoryStore } from '@/services/asset-inventory/store';
 
 
 interface RegionItem {
@@ -132,9 +133,9 @@ export default {
                 { name: CATEGORY.MANAGEMENT, label: 'Management' },
             ],
             //
-            selectedProvider: computed(() => store.state.service.assetInventory.cloudService.selectedProvider),
-            selectedCategories: computed(() => store.state.service.assetInventory.cloudService.selectedCategories),
-            selectedRegions: computed(() => store.state.service.assetInventory.cloudService.selectedRegions),
+            selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
+            selectedCategories: computed(() => assetInventoryStore.state.cloudService.selectedCategories),
+            selectedRegions: computed(() => assetInventoryStore.state.cloudService.selectedRegions),
         });
 
         /* api */
@@ -168,7 +169,7 @@ export default {
             store.dispatch('favorite/removeItem', item);
         };
         const handleChangeProvider = (provider: string) => {
-            store.commit('service/assetInventory/cloudService/setSelectedProvider', provider);
+            assetInventoryStore.commit('cloudService/setSelectedProvider', provider);
         };
         const handleChangeCategory = (category: CATEGORY) => {
             const _index = state.selectedCategories.findIndex(d => d === category);
@@ -176,7 +177,7 @@ export default {
 
             if (_index < 0) _selectedCategories.push(category);
             else _selectedCategories.splice(_index, 1);
-            store.commit('service/assetInventory/cloudService/setSelectedCategories', _selectedCategories);
+            assetInventoryStore.commit('cloudService/setSelectedCategories', _selectedCategories);
         };
         const handleChangeRegion = (region: string) => {
             const _index = state.selectedRegions.findIndex(d => d === region);
@@ -184,7 +185,7 @@ export default {
 
             if (_index < 0) _selectedRegions.push(region);
             else _selectedRegions.splice(_index, 1);
-            store.commit('service/assetInventory/cloudService/setSelectedRegions', _selectedRegions);
+            assetInventoryStore.commit('cloudService/setSelectedRegions', _selectedRegions);
         };
 
         /* Watcher */

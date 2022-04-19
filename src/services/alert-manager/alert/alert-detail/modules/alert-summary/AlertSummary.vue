@@ -75,8 +75,8 @@ import { ALERT_STATE, ALERT_URGENCY } from '@/services/alert-manager/lib/config'
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
-import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { alertManagerStore } from '@/services/alert-manager/store';
 
 
 interface HeaderState {
@@ -126,7 +126,7 @@ export default {
     },
     setup(props: PropsType, { root }) {
         const state = reactive({
-            alertInfo: computed(() => store.state.service.alertManager.alert.alertData),
+            alertInfo: computed(() => alertManagerStore.state.alert.alertData),
             alertState: computed(() => state.alertInfo?.state),
             alertUrgency: computed(() => state.alertInfo?.urgency),
             reassignModalVisible: false,
@@ -148,7 +148,7 @@ export default {
 
         const changeAlertState = async (alertState: ALERT_STATE) => {
             try {
-                await store.dispatch('service/alertManager/alert/updateAlertData', {
+                await alertManagerStore.dispatch('alert/updateAlertData', {
                     updateParams: {
                         state: alertState,
                     },
@@ -162,7 +162,7 @@ export default {
 
         const changeAlertUrgency = async (alertUrgency: ALERT_URGENCY) => {
             try {
-                await store.dispatch('service/alertManager/alert/updateAlertData', {
+                await alertManagerStore.dispatch('alert/updateAlertData', {
                     updateParams: {
                         urgency: alertUrgency,
                     },

@@ -93,6 +93,7 @@ import { store } from '@/store';
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import { i18n } from '@/translations';
 import { User } from '@/services/administration/iam/user/type';
+import { administrationStore } from '@/services/administration/store';
 
 export default {
     name: 'UserManagementTab',
@@ -126,9 +127,9 @@ export default {
                 { name: 'last_accessed_at', label: 'Last Activity' },
                 { name: 'timezone', label: 'Timezone' },
             ])),
-            selectedIndex: computed<number[]>(() => store.state.service.administration.user.selectedIndex),
-            selectedUsers: computed<User[]>(() => store.state.service.administration.user.selectedUsers),
-            isSelected: computed<boolean>(() => store.getters['service/administration/user/isUserSelected']),
+            selectedIndex: computed<number[]>(() => administrationStore.state.user.selectedIndex),
+            selectedUsers: computed<User[]>(() => administrationStore.state.user.selectedUsers),
+            isSelected: computed<boolean>(() => administrationStore.getters['user/isUserSelected']),
         });
 
         const singleItemTabState = reactive({

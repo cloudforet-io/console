@@ -18,7 +18,7 @@
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
-import administrationStoreModule from '@/services/administration/store';
+import { administrationStore, administrationStoreModule } from '@/services/administration/store';
 import AdministrationLNB from '@/services/administration/AdministrationLNB.vue';
 
 
@@ -30,7 +30,7 @@ export default {
         GeneralPageLayout,
     },
     setup() {
-        registerServiceStore<any>('administration', administrationStoreModule);
+        registerServiceStore<any>('administration', administrationStoreModule, administrationStore);
         return {};
     },
 };

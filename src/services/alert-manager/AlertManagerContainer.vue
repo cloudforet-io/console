@@ -19,7 +19,7 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import AlertManagerLNB from '@/services/alert-manager/AlertManagerLNB.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
-import alertStoreModule from '@/services/alert-manager/store';
+import { alertManagerStoreModule, alertManagerStore } from '@/services/alert-manager/store';
 
 
 export default {
@@ -30,7 +30,7 @@ export default {
         GeneralPageLayout,
     },
     setup() {
-        registerServiceStore<any>('alertManager', alertStoreModule);
+        registerServiceStore<any>('alertManager', alertManagerStoreModule, alertManagerStore);
         return {};
     },
 };

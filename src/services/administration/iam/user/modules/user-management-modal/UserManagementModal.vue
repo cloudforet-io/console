@@ -45,8 +45,8 @@ import { userStateFormatter } from '@/services/administration/iam/user/lib/helpe
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { map } from 'lodash';
-import { store } from '@/store';
 import { User } from '@/services/administration/iam/user/type';
+import { administrationStore } from '@/services/administration/store';
 
 export default {
     name: 'UserManagementModal',
@@ -87,11 +87,11 @@ export default {
                 { name: 'timezone', label: 'Timezone' },
             ])),
             visible: computed({
-                get() { return store.getters['service/administration/user/isManagementModalVisible']; },
-                set(val) { store.commit('service/administration/user/setVisibleManagementModal', val); },
+                get() { return administrationStore.getters['user/isManagementModalVisible']; },
+                set(val) { administrationStore.commit('user/setVisibleManagementModal', val); },
             }),
-            selectedIndex: computed<number[]>(() => store.state.service.administration.user.selectedIndex),
-            selectedUsers: computed<User[]>(() => store.state.service.administration.user.selectedUsers),
+            selectedIndex: computed<number[]>(() => administrationStore.state.user.selectedIndex),
+            selectedUsers: computed<User[]>(() => administrationStore.state.user.selectedUsers),
         });
 
         const clickDelete = () => {
@@ -127,7 +127,7 @@ export default {
         const deleteUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.delete(getUsersParam(items));
-                await store.dispatch('service/administration/user/selectIndex', []);
+                await administrationStore.dispatch('user/selectIndex', []);
                 showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', state.selectedIndex.length), '', root);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', state.selectedIndex.length));

@@ -46,6 +46,7 @@ import { store } from '@/store';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { ProjectMember } from '@/services/alert-manager/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { alertManagerStore } from '@/services/alert-manager/store';
 
 
 export default {
@@ -87,7 +88,7 @@ export default {
 
         const reassignMember = async () => {
             try {
-                await store.dispatch('service/alertManager/alert/updateAlertData', {
+                await alertManagerStore.dispatch('alert/updateAlertData', {
                     updateParams: {
                         assignee: state.selectedUserID,
                     },

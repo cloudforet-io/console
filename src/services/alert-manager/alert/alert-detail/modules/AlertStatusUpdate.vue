@@ -36,8 +36,8 @@ import {
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
-import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { alertManagerStore } from '@/services/alert-manager/store';
 
 export default {
     name: 'AlertStatusUpdate',
@@ -61,7 +61,7 @@ export default {
     setup(props, { root }) {
         const state = reactive({
             modalVisible: false,
-            status: computed(() => store.state.service.alertManager.alert.alertData?.status_message),
+            status: computed(() => alertManagerStore.state.alert.alertData?.status_message),
             statusInput: '',
             loading: true,
         });
@@ -72,7 +72,7 @@ export default {
             const isEmptyInput = state.statusInput.trim().length === 0;
             try {
                 state.loading = true;
-                await store.dispatch('service/alertManager/alert/updateAlertData', {
+                await alertManagerStore.dispatch('alert/updateAlertData', {
                     updateParams: {
                         status_message: state.statusInput,
                         reset_status_message: isEmptyInput,
@@ -93,7 +93,7 @@ export default {
         };
 
         (() => {
-            state.statusInput = store.state.service.alertManager.alert.alertData?.status_message;
+            state.statusInput = alertManagerStore.state.alert.alertData?.status_message ?? '';
         })();
 
         return {
