@@ -4,7 +4,12 @@ export interface ReferenceItem<Data = Record<string, any>> {
     color?: string;
     icon?: string;
     linkTemplate?: string;
-    continent?: string;
+    continent?: {
+        continent_code?: string;
+        continent_label?: string;
+        latitude?: number;
+        longitude?: number;
+    };
     latitude?: string;
     longitude?: string;
     data?: Data;

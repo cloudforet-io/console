@@ -1,13 +1,13 @@
 import { Mutation } from 'vuex';
 import { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';
-import { CATEGORY } from '@/services/asset-inventory/cloud-service/lib/config';
+import { CloudServiceCategory } from '@/services/asset-inventory/cloud-service/type';
 
 
 export const setSelectedProvider: Mutation<CloudServiceStoreState> = (state, provider: string) => {
     state.selectedProvider = provider;
 };
 
-export const setSelectedCategories: Mutation<CloudServiceStoreState> = (state, categories: CATEGORY[]) => {
+export const setSelectedCategories: Mutation<CloudServiceStoreState> = (state, categories: CloudServiceCategory[]) => {
     state.selectedCategories = categories;
 };
 

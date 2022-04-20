@@ -1,7 +1,7 @@
-import { CATEGORY } from '@/services/asset-inventory/cloud-service/lib/config';
+import { CloudServiceCategory } from '@/services/asset-inventory/cloud-service/type';
 
 export interface CloudServiceStoreState {
     selectedProvider: string;
-    selectedCategories: CATEGORY[];
+    selectedCategories: CloudServiceCategory[];
     selectedRegions: string[];
 }

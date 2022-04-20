@@ -93,11 +93,12 @@ import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { CATEGORY } from '@/services/asset-inventory/cloud-service/lib/config';
+import { CLOUD_SERVICE_CATEGORY } from '@/services/asset-inventory/cloud-service/lib/config';
 import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
+import { CloudServiceCategory } from '@/services/asset-inventory/cloud-service/type';
 
 
 interface RegionItem {
@@ -122,15 +123,15 @@ export default {
             favoriteItems: computed<FavoriteItem[]>(() => store.getters['favorite/cloudServiceTypeItems']),
             regionItems: [] as RegionItem[],
             categoryItems: [
-                { name: CATEGORY.COMPUTE, label: 'Compute' },
-                { name: CATEGORY.CONTAINER, label: 'Container' },
-                { name: CATEGORY.DATABASE, label: 'Database' },
-                { name: CATEGORY.NETWORKING, label: 'Networking' },
-                { name: CATEGORY.STORAGE, label: 'Storage' },
-                { name: CATEGORY.SECURITY, label: 'Security' },
-                { name: CATEGORY.ANALYTICS, label: 'Analytics' },
-                { name: CATEGORY.APPLICATION_INTEGRATION, label: 'Application Integration' },
-                { name: CATEGORY.MANAGEMENT, label: 'Management' },
+                { name: CLOUD_SERVICE_CATEGORY.COMPUTE, label: 'Compute' },
+                { name: CLOUD_SERVICE_CATEGORY.CONTAINER, label: 'Container' },
+                { name: CLOUD_SERVICE_CATEGORY.DATABASE, label: 'Database' },
+                { name: CLOUD_SERVICE_CATEGORY.NETWORKING, label: 'Networking' },
+                { name: CLOUD_SERVICE_CATEGORY.STORAGE, label: 'Storage' },
+                { name: CLOUD_SERVICE_CATEGORY.SECURITY, label: 'Security' },
+                { name: CLOUD_SERVICE_CATEGORY.ANALYTICS, label: 'Analytics' },
+                { name: CLOUD_SERVICE_CATEGORY.APPLICATION_INTEGRATION, label: 'Application Integration' },
+                { name: CLOUD_SERVICE_CATEGORY.MANAGEMENT, label: 'Management' },
             ],
             //
             selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
@@ -171,7 +172,7 @@ export default {
         const handleChangeProvider = (provider: string) => {
             assetInventoryStore.commit('cloudService/setSelectedProvider', provider);
         };
-        const handleChangeCategory = (category: CATEGORY) => {
+        const handleChangeCategory = (category: CloudServiceCategory) => {
             const _index = state.selectedCategories.findIndex(d => d === category);
             const _selectedCategories = [...state.selectedCategories];
 
