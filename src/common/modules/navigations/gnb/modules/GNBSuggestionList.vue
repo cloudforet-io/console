@@ -27,16 +27,14 @@
             />
             <span>
                 <template v-if="item.parents">
-                    <template v-for="parent in item.parents">
+                    <span v-for="(parent, pIdx) in item.parents" :key="`parents-${pIdx}`">
                         <span v-for="({text, matched}, i) in getTextList(parent.label)"
                               :key="`parent-label-${text}-${i}`"
                         >
                             <span :class="{'matched-character': matched}">{{ text }}</span>
                         </span>
-                        <p-i :key="item.name + parent.name + 'arrow'" name="ic_breadcrumb_arrow" width="1rem"
-                             height="1rem"
-                        />
-                    </template>
+                        <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem" />
+                    </span>
                 </template>
                 <span v-for="({text, matched}, i) in getTextList(item.label)"
                       :key="`label-${text}-${i}`"

@@ -12,7 +12,7 @@
         <span v-else
               class="menu-button"
         >
-            <p-i v-if="proxyVisibleSuggestion"
+            <p-i v-if="dataState.proxyVisibleSuggestion"
                  name="ic_delete--bold"
                  height="1.5rem" width="1.5rem"
                  color="inherit"
@@ -28,11 +28,11 @@
         <g-n-b-search-dropdown v-show="proxyVisibleSuggestion"
                                :input-text="trimmedInputText"
                                :loading="loading"
-                               :menu-items="menuSuggestions"
-                               :cloud-service-type-items="cloudServiceTypeSuggestions"
+                               :menu-items="dataState.menuSuggestions"
+                               :cloud-service-type-items="dataState.cloudServiceTypeSuggestions"
                                :focus-start-position="focusStartPosition"
                                :is-focused.sync="isFocusOnSuggestion"
-                               :is-recent="showRecent"
+                               :is-recent="dataState.showRecent"
                                @move-focus-end="handleMoveFocusEnd"
                                @close="hideSuggestion"
                                @select="handleSelect"
@@ -54,7 +54,7 @@
 
 <script lang="ts">
 import axios, { CancelTokenSource } from 'axios';
-import { flatten, throttle } from 'lodash';
+import { throttle } from 'lodash';
 import vClickOutside from 'v-click-outside';
 
 import {
@@ -68,8 +68,7 @@ import { laptop } from '@spaceone/design-system/src/styles/screens';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { GNBMenu } from '@/store/modules/display/type';
-
+import { RECENT_TYPE, RecentItem } from '@/store/modules/recent/type';
 
 import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
 import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchDropdown.vue';
@@ -83,6 +82,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { menuRouterMap } from '@/lib/router/menu-router-map';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { MENU_ICON } from '@/common/modules/navigations/gnb/config';
+import { getAllMenuList } from '@/lib/helper/menu-helper';
 
 
 interface CloudServiceTypeData {
@@ -101,22 +102,11 @@ interface MenuData {
 
 const LAPTOP_WINDOW_SIZE = laptop.max;
 
-// convert gnb data structure to console menu.
-// in suggestion items, each item must have reference of parents, not children(sub menu).
-const convertToConsoleMenuList = (menu: GNBMenu[]): MenuData[] => flatten(menu.map(({ id, label, subMenuList }) => {
-    if (subMenuList?.length) {
-        return subMenuList.map(item => ({
-            id: item.id,
-            label: item.label,
-            parents: [{ id, label }],
-        } as MenuData));
-    }
-    return [{ id, label }] as MenuData[];
-}));
-
 interface Props {
     visibleSuggestion: boolean;
 }
+
+const RECENT_LIMIT = 5;
 
 export default defineComponent<Props>({
     name: 'GNBSearch',
@@ -145,30 +135,34 @@ export default defineComponent<Props>({
                 if (state.inputText) return state.inputText.trim();
                 return '';
             }),
-            showRecent: computed(() => !state.inputText.length),
             isOverLaptopSize: window.innerWidth > LAPTOP_WINDOW_SIZE,
             loading: true,
             // data
             allMenuList: computed<MenuData[]>(() => {
-                const menu = store.getters['display/AllMenuList'];
-                return convertToConsoleMenuList(menu);
+                const menu = store.state.display.menuList;
+                return getAllMenuList(menu);
             }),
+        });
+
+        const dataState = reactive({
+            showRecent: computed(() => !state.inputText.length),
             filteredMenuList: [] as MenuData[],
             cloudServiceTypeList: [] as CloudServiceTypeData[],
-            recentMenuList: [] as MenuData[],
-            recentCloudServiceList: [] as CloudServiceTypeData[],
-            // suggestion items
+            recentMenuList: computed<RecentItem[]>(() => store.getters['recent/menuItems']),
+            recentCloudServiceList: computed<RecentItem[]>(() => store.getters['recent/cloudServiceItems']),
             menuSuggestions: computed<SuggestionItem[]>(() => {
-                const menuList = state.showRecent ? state.recentMenuList : state.filteredMenuList;
-                return menuList.map(d => ({
+                if (dataState.showRecent) return dataState.recentMenuList;
+                return dataState.filteredMenuList.map(d => ({
                     name: d.id,
                     label: d.label,
                     parents: d.parents ? d.parents.map(p => ({ name: p.id, label: p.label })) : undefined,
+                    icon: MENU_ICON[d.id.split('.')[0]],
                 }));
             }),
             cloudServiceTypeSuggestions: computed<SuggestionItem[]>(() => {
-                const cloudServiceTypeList = state.showRecent ? state.recentCloudServiceList : state.cloudServiceTypeList;
-                return cloudServiceTypeList.map(d => ({
+                if (dataState.showRecent) return dataState.recentCloudServiceList;
+                return dataState.cloudServiceTypeList.map(d => ({
+                    itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
                     name: d.id,
                     label: d.name,
                     icon: d.icon,
@@ -209,47 +203,6 @@ export default defineComponent<Props>({
 
 
         /* API */
-        const listRecentTokens: Partial<Record<SUGGESTION_TYPE, CancelTokenSource|undefined>> = {
-            MENU: undefined,
-            CLOUD_SERVICE: undefined,
-        };
-        const listRecent = async (type) => {
-            if (listRecentTokens[type]) {
-                listRecentTokens[type].cancel('Next request has been called.');
-                listRecentTokens[type] = undefined;
-            }
-
-            listRecentTokens[type] = axios.CancelToken.source();
-            try {
-                const { results } = await SpaceConnector.client.addOns.recent.list({
-                    type,
-                    limit: 5,
-                }, {
-                    cancelToken: listRecentTokens[type].token,
-                });
-                listRecentTokens[type] = undefined;
-
-                if (type === 'MENU') state.recentMenuList = results.map(d => d.data);
-                if (type === 'CLOUD_SERVICE') state.recentCloudServiceList = results.map(d => d.data);
-            } catch (e) {
-                if (!axios.isCancel(e.axiosError)) {
-                    ErrorHandler.handleError(e);
-                }
-            }
-        };
-
-        const createRecent = async (type: SUGGESTION_TYPE, item: MenuData|CloudServiceTypeData) => {
-            try {
-                await SpaceConnector.client.addOns.recent.create({
-                    type,
-                    id: item.id,
-                    data: item,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-
         let resourceToken: CancelTokenSource | undefined;
         const getCloudServiceResources = async (inputText) => {
             if (resourceToken) {
@@ -285,7 +238,6 @@ export default defineComponent<Props>({
             if (!state.proxyVisibleSuggestion) {
                 state.loading = true;
                 state.proxyVisibleSuggestion = true;
-                await Promise.allSettled([listRecent('MENU'), listRecent('CLOUD_SERVICE')]);
                 state.loading = false;
             }
         };
@@ -296,8 +248,8 @@ export default defineComponent<Props>({
                 state.inputText = '';
                 state.isFocusOnInput = false;
                 state.isFocusOnSuggestion = false;
-                state.cloudServiceTypeList = [];
-                state.filteredMenuList = [];
+                dataState.cloudServiceTypeList = [];
+                dataState.filteredMenuList = [];
             }
         };
 
@@ -316,14 +268,14 @@ export default defineComponent<Props>({
         const handleUpdateInput = async () => {
             if (state.trimmedInputText) {
                 const results = await getCloudServiceResources(state.trimmedInputText);
-                state.cloudServiceTypeList = results.map(d => d.data);
-                state.filteredMenuList = filterMenuItemsBySearchTerm(state.allMenuList, state.trimmedInputText);
+                dataState.cloudServiceTypeList = results.map(d => d.data);
+                dataState.filteredMenuList = filterMenuItemsBySearchTerm(state.allMenuList, state.trimmedInputText);
             }
         };
 
         const handleSelect = (index: number, type: SUGGESTION_TYPE) => {
             if (type === 'MENU') {
-                const menu: MenuData = state.showRecent ? state.recentMenuList[index] : state.filteredMenuList[index];
+                const menu: MenuData = dataState.showRecent ? dataState.recentMenuList[index] : dataState.filteredMenuList[index];
                 if (!menu) return;
 
                 const menuRoute = menuRouterMap[menu.id];
@@ -333,10 +285,13 @@ export default defineComponent<Props>({
                     SpaceRouter.router.push({
                         name: menuRoute.name,
                     });
-                    createRecent(type, menu);
+                    store.dispatch('recent/addItem', {
+                        itemType: type,
+                        itemId: menu.id,
+                    });
                 } catch (e) {}
             } else {
-                const cloudServiceType = state.showRecent ? state.recentCloudServiceList[index] : state.cloudServiceTypeList[index];
+                const cloudServiceType = dataState.showRecent ? dataState.recentCloudServiceList[index] : dataState.cloudServiceTypeList[index];
                 if (!cloudServiceType) return;
 
                 try {
@@ -348,7 +303,10 @@ export default defineComponent<Props>({
                             name: cloudServiceType.name,
                         },
                     });
-                    createRecent(type, cloudServiceType);
+                    store.dispatch('recent/addItem', {
+                        itemType: type,
+                        itemId: cloudServiceType.id,
+                    });
                 } catch (e) {}
             }
             hideSuggestion();
@@ -369,8 +327,21 @@ export default defineComponent<Props>({
             window.removeEventListener('resize', onWindowResize);
         });
 
+        (async () => {
+            await Promise.allSettled([
+                // store.dispatch('reference/project/load'),
+                // store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/cloudServiceType/load'),
+                store.dispatch('recent/load', { itemType: RECENT_TYPE.MENU, limit: RECENT_LIMIT }),
+                store.dispatch('recent/load', { itemType: RECENT_TYPE.CLOUD_SERVICE, limit: RECENT_LIMIT }),
+                // store.dispatch('recent/load', RECENT_TYPE.PROJECT),
+                // store.dispatch('recent/load', RECENT_TYPE.PROJECT_GROUP),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
+            dataState,
             showSuggestion,
             hideSuggestion,
             moveFocusToSuggestion,

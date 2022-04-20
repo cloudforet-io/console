@@ -11,16 +11,16 @@ export interface FavoriteConfig {
     itemId: string;
 }
 
-interface ParentItem {
-    name: string;
-    label: string;
+interface Parent {
+    name?: string;
+    label?: string;
 }
 export interface FavoriteItem extends FavoriteConfig {
     name?: string;
     label?: string;
     icon?: string;
     provider?: string;
-    parents?: ParentItem[];
+    parents?: Parent[];
 }
 
 
