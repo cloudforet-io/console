@@ -11,16 +11,13 @@ export interface RecentConfig {
     itemId: string;
 }
 
-interface Parent {
-    name?: string;
-    label?: string;
-}
+
 export interface RecentItem extends RecentConfig {
     name?: string;
     label?: string;
     icon?: string;
     provider?: string;
-    parents?: Parent[];
+    parents?: { name?: string; label?: string }[];
 }
 
 

@@ -4,7 +4,7 @@
                        :loading="loading"
         >
             <g-n-b-suggestion-list v-if="loading || items.length"
-                                   :items="showAll ? showAllItems : items"
+                                   :items="showAll ? allItems : items"
                                    use-favorite
                                    @update:isFocused="$emit('update:isFocused', $event)"
                                    @move-focus-end="$emit('move-focus-end')"
@@ -52,7 +52,7 @@
                         </p-button>
                         <p-button style-type="gray-border"
                                   size="sm"
-                                  @click="handleClickMenuButton(FAVORITE_TYPE.CLOUD_SERVICE_TYPE)"
+                                  @click="handleClickMenuButton(FAVORITE_TYPE.CLOUD_SERVICE)"
                         >
                             Cloud Service
                         </p-button>
@@ -80,18 +80,16 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { menuRouterMap } from '@/lib/router/menu-router-map';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+import {
+    convertCloudServiceConfigToReferenceData,
+    convertMenuConfigToReferenceData, convertProjectConfigToReferenceData, convertProjectGroupConfigToReferenceData,
+} from '@/lib/helper/config-data-helper';
+import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 
 
 const FAVORITE_LIMIT = 5;
-
-const convertFavoriteItemToSuggestionItem = (favoriteItems: FavoriteItem[]): SuggestionItem[] => favoriteItems.map(d => ({
-    name: d.name,
-    label: d.label,
-    itemType: d.favoriteType,
-    icon: d.icon,
-    provider: d.provider,
-    parents: d.parents,
-}));
 
 export default {
     name: 'GNBFavorite',
@@ -106,68 +104,79 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             loading: true,
+            showAll: false,
+            showAllType: undefined as undefined|SUGGESTION_TYPE,
             items: computed<SuggestionItem[]>(() => {
                 const results: SuggestionItem[] = [];
-                if (state.menuFavoriteItems.length) {
+                if (state.favoriteMenuItems) {
                     results.push({
                         name: 'title', label: 'MENU', type: 'header', itemType: SUGGESTION_TYPE.MENU,
                     });
-                    results.push(...convertFavoriteItemToSuggestionItem(state.menuFavoriteItems.slice(0, FAVORITE_LIMIT)));
+                    results.push(...state.favoriteMenuItems.slice(0, FAVORITE_LIMIT));
                 }
-                if (state.projectFavoriteItems.length) {
+                if (state.favoriteProjects.length) {
                     if (results.length !== 0) results.push({ type: 'divider' });
                     results.push({
                         name: 'title', label: 'PROJECT', type: 'header', itemType: SUGGESTION_TYPE.PROJECT,
                     });
-                    results.push(...convertFavoriteItemToSuggestionItem(state.projectFavoriteItems.slice(0, FAVORITE_LIMIT)));
+                    results.push(...state.favoriteProjects.slice(0, FAVORITE_LIMIT));
                 }
-                if (state.cloudServiceTypeFavoriteItems.length) {
+                if (state.favoriteCloudServiceItems.length) {
                     if (results.length !== 0) results.push({ type: 'divider' });
                     results.push({
                         name: 'title', label: 'CLOUD SERVICE', type: 'header', itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
                     });
-                    results.push(...convertFavoriteItemToSuggestionItem(state.cloudServiceTypeFavoriteItems.slice(0, FAVORITE_LIMIT)));
+                    results.push(...state.favoriteCloudServiceItems.slice(0, FAVORITE_LIMIT));
                 }
                 return results;
             }),
-            showAllItems: computed<SuggestionItem[]>(() => {
+            allItems: computed<SuggestionItem[]>(() => {
                 let items: FavoriteItem[] = [];
                 let label = '';
                 if (state.showAllType === SUGGESTION_TYPE.MENU) {
-                    items = state.menuFavoriteItems;
+                    items = state.favoriteMenuItems;
                     label = 'All Menu';
                 }
                 if (state.showAllType === SUGGESTION_TYPE.PROJECT) {
-                    items = state.projectFavoriteItems;
+                    items = state.favoriteProjects;
                     label = 'All Projects';
                 }
                 if (state.showAllType === SUGGESTION_TYPE.CLOUD_SERVICE) {
-                    items = state.cloudServiceTypeFavoriteItems;
+                    items = state.favoriteCloudServiceItems;
                     label = 'All Cloud Services';
                 }
                 return [
                     {
                         name: 'title', type: 'header', label, itemType: state.showAllType,
                     },
-                    ...convertFavoriteItemToSuggestionItem(items),
+                    ...items,
                 ];
             }),
-            menuFavoriteItems: computed<FavoriteItem[]>(() => store.getters['favorite/menuItems']),
-            projectFavoriteItems: computed<FavoriteItem[]>(() => ([
-                ...store.getters['favorite/projectGroupItems'],
-                ...store.getters['favorite/projectItems'],
-            ])),
-            cloudServiceTypeFavoriteItems: computed<FavoriteItem[]>(() => store.getters['favorite/cloudServiceTypeItems']),
-            cloudServiceTypes: computed(() => store.state.reference.cloudServiceType.items),
-            showAll: false,
-            showAllType: undefined as undefined|SUGGESTION_TYPE,
+            //
+            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.state.reference.cloudServiceType.items),
+            projects: computed<ProjectReferenceMap>(() => store.state.reference.project.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.state.reference.projectGroup.items),
+            //
+            favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
+                store.state.favorite.menuItems,
+                store.state.display.menuList,
+            )),
+            favoriteCloudServiceItems: computed<FavoriteItem[]>(() => convertCloudServiceConfigToReferenceData(
+                store.state.favorite.cloudServiceItems,
+                state.cloudServiceTypes,
+            )),
+            favoriteProjects: computed<FavoriteItem[]>(() => {
+                const favoriteProjectItems = convertProjectConfigToReferenceData(store.state.favorite.projectItems, state.projects);
+                const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(store.state.favorite.projectGroupItems, state.projectGroups);
+                return [...favoriteProjectGroupItems, ...favoriteProjectItems];
+            }),
         });
 
         /* Util */
         const getItemLength = (type: SUGGESTION_TYPE): number => {
-            if (type === SUGGESTION_TYPE.MENU) return state.menuFavoriteItems.length;
-            if (type === SUGGESTION_TYPE.PROJECT) return state.projectFavoriteItems.length;
-            if (type === SUGGESTION_TYPE.CLOUD_SERVICE) return state.cloudServiceTypeFavoriteItems.length;
+            if (type === SUGGESTION_TYPE.MENU) return state.favoriteMenuItems.length;
+            if (type === SUGGESTION_TYPE.PROJECT) return state.favoriteProjects.length;
+            if (type === SUGGESTION_TYPE.CLOUD_SERVICE) return state.favoriteCloudServiceItems.length;
             return 0;
         };
 

@@ -135,7 +135,7 @@ export default defineComponent<Props>({
                 ...store.state.favorite.menuItems,
                 ...store.state.favorite.projectItems,
                 ...store.state.favorite.projectGroupItems,
-                ...store.state.favorite.cloudServiceTypeItems,
+                ...store.state.favorite.cloudServiceItems,
             ]),
         });
 

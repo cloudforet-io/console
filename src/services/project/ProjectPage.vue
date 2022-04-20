@@ -11,7 +11,7 @@
                         </sidebar-title>
                         <favorite-list :items="favoriteItems" :before-route="beforeFavoriteRoute" @delete="onFavoriteDelete">
                             <template #icon="{item}">
-                                <p-i :name="item.favoriteType === FAVORITE_TYPE.PROJECT ? 'ic_tree_project' : 'ic_tree_project-group'"
+                                <p-i :name="item.itemType === FAVORITE_TYPE.PROJECT ? 'ic_tree_project' : 'ic_tree_project-group'"
                                      width="1rem" height="1rem" color="inherit inherit"
                                 />
                             </template>
@@ -137,6 +137,10 @@ import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.
 import ProjectGroupDeleteCheckModal from '@/services/project/modules/ProjectGroupDeleteCheckModal.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import {
+    convertProjectConfigToReferenceData,
+    convertProjectGroupConfigToReferenceData,
+} from '@/lib/helper/config-data-helper';
 
 
 export default {
@@ -184,17 +188,19 @@ export default {
             parentGroups: computed(() => store.getters['service/project/parentGroups']),
             hasProjectGroup: computed(() => store.state.service.project.hasProjectGroup),
             projectCount: computed(() => store.state.service.project.projectCount),
-            projectFavorite: computed(() => store.getters['favorite/projectItems']),
+            projects: computed(() => store.state.reference.project.items),
+            favoriteProjects: computed(() => store.state.favorite.projectItems),
+            projectGroups: computed(() => store.state.reference.projectGroup.items),
             projectGroupFormVisible: computed(() => store.state.service.project.projectGroupFormVisible),
             projectGroupDeleteCheckModalVisible: computed(() => store.state.service.project.projectGroupDeleteCheckModalVisible),
-            projectGroupFavorite: computed(() => store.getters['favorite/projectGroupItems']),
+            favoriteProjectGroups: computed(() => store.state.favorite.projectGroupItems),
         });
 
         const state = reactive({
             initGroupId: vm.$route.query.select_pg as string,
             favoriteItems: computed<FavoriteItem[]>(() => [
-                ...storeState.projectGroupFavorite,
-                ...storeState.projectFavorite,
+                ...convertProjectGroupConfigToReferenceData(storeState.favoriteProjectGroups, storeState.projectGroups),
+                ...convertProjectConfigToReferenceData(storeState.favoriteProjects, storeState.projects),
             ]),
             settingMenu: computed(() => [
                 { name: 'edit', label: vm.$t('PROJECT.LANDING.ACTION_EDIT_GROUP_NAME'), type: 'item' },
@@ -206,13 +212,6 @@ export default {
                     result.push({ name: storeState.groupName, data: storeState.selectedNodeData });
                 }
                 return [{ name: vm.$t('MENU.PROJECT.PROJECT'), data: null }, ...result];
-            }),
-            projectGroupFavorites: computed(() => {
-                const res = {};
-                store.state.favorite.projectGroupItems.forEach((d) => {
-                    res[d.id] = d;
-                });
-                return res;
             }),
             groupMemberCount: 0 as number|undefined,
             groupMemberPageVisible: false,
@@ -227,7 +226,7 @@ export default {
         };
 
         const beforeFavoriteRoute = async (item: FavoriteItem, e: MouseEvent) => {
-            if (item.favoriteType === FAVORITE_TYPE.PROJECT_GROUP) {
+            if (item.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
                 e.preventDefault();
                 if (storeState.groupId !== item.itemId) {
                     await store.dispatch('service/project/selectNode', item.itemId);

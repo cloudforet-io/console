@@ -8,7 +8,7 @@ const state: Required<FavoriteState> = {
     menuItems: [],
     projectItems: [],
     projectGroupItems: [],
-    cloudServiceTypeItems: [],
+    cloudServiceItems: [],
 };
 
 export default {

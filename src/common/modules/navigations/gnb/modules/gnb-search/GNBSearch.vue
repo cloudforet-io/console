@@ -32,7 +32,7 @@
                                :cloud-service-type-items="dataState.cloudServiceTypeSuggestions"
                                :focus-start-position="focusStartPosition"
                                :is-focused.sync="isFocusOnSuggestion"
-                               :is-recent="dataState.showRecent"
+                               :is-recent="showRecent"
                                @move-focus-end="handleMoveFocusEnd"
                                @close="hideSuggestion"
                                @select="handleSelect"
@@ -84,6 +84,12 @@ import { menuRouterMap } from '@/lib/router/menu-router-map';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { MENU_ICON } from '@/common/modules/navigations/gnb/config';
 import { getAllMenuList } from '@/lib/helper/menu-helper';
+import {
+    convertCloudServiceConfigToReferenceData,
+    convertMenuConfigToReferenceData,
+} from '@/lib/helper/config-data-helper';
+import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
+import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 
 
 interface CloudServiceTypeData {
@@ -137,21 +143,19 @@ export default defineComponent<Props>({
             }),
             isOverLaptopSize: window.innerWidth > LAPTOP_WINDOW_SIZE,
             loading: true,
-            // data
-            allMenuList: computed<MenuData[]>(() => {
-                const menu = store.state.display.menuList;
-                return getAllMenuList(menu);
-            }),
+            showRecent: computed(() => !state.inputText.length),
         });
 
         const dataState = reactive({
-            showRecent: computed(() => !state.inputText.length),
+            // menu
+            allMenuList: computed<MenuData[]>(() => getAllMenuList(store.state.display.menuList)),
             filteredMenuList: [] as MenuData[],
-            cloudServiceTypeList: [] as CloudServiceTypeData[],
-            recentMenuList: computed<RecentItem[]>(() => store.getters['recent/menuItems']),
-            recentCloudServiceList: computed<RecentItem[]>(() => store.getters['recent/cloudServiceItems']),
+            recentMenuItems: computed<RecentItem[]>(() => convertMenuConfigToReferenceData(
+                store.state.recent.menuItems,
+                store.state.display.menuList,
+            )),
             menuSuggestions: computed<SuggestionItem[]>(() => {
-                if (dataState.showRecent) return dataState.recentMenuList;
+                if (state.showRecent) return dataState.recentMenuItems;
                 return dataState.filteredMenuList.map(d => ({
                     name: d.id,
                     label: d.label,
@@ -159,8 +163,15 @@ export default defineComponent<Props>({
                     icon: MENU_ICON[d.id.split('.')[0]],
                 }));
             }),
+            // cloud service
+            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.state.reference.cloudServiceType.items),
+            cloudServiceTypeList: [] as CloudServiceTypeData[],
+            recentCloudServiceItems: computed<RecentItem[]>(() => convertCloudServiceConfigToReferenceData(
+                store.state.recent.cloudServiceItems,
+                dataState.cloudServiceTypes,
+            )),
             cloudServiceTypeSuggestions: computed<SuggestionItem[]>(() => {
-                if (dataState.showRecent) return dataState.recentCloudServiceList;
+                if (state.showRecent) return dataState.recentCloudServiceItems;
                 return dataState.cloudServiceTypeList.map(d => ({
                     itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
                     name: d.id,
@@ -173,22 +184,8 @@ export default defineComponent<Props>({
             }),
         });
 
-        const getSearchRegex = (inputText?: string) => {
-            let regex = '';
-            if (inputText) {
-                // remove spaces in the search term
-                const text = state.inputText.replace(/\s/g, '');
-                for (let i = 0; i < text.length; i++) {
-                    regex += text[i];
-                    // add space regex after every single character to find matching keywords ignoring spaces
-                    if (i < text.length - 1) regex += '\\s*';
-                }
-            }
-            return new RegExp(regex, 'i');
-        };
-
         const filterMenuItemsBySearchTerm = (menu: MenuData[], searchTerm?: string): MenuData[] => {
-            const regex = getSearchRegex(searchTerm);
+            const regex = getTextHighlightRegex(searchTerm);
 
             return menu.map(d => ({
                 id: d.id,
@@ -269,16 +266,16 @@ export default defineComponent<Props>({
             if (state.trimmedInputText) {
                 const results = await getCloudServiceResources(state.trimmedInputText);
                 dataState.cloudServiceTypeList = results.map(d => d.data);
-                dataState.filteredMenuList = filterMenuItemsBySearchTerm(state.allMenuList, state.trimmedInputText);
+                dataState.filteredMenuList = filterMenuItemsBySearchTerm(dataState.allMenuList, state.trimmedInputText);
             }
         };
 
         const handleSelect = (index: number, type: SUGGESTION_TYPE) => {
             if (type === 'MENU') {
-                const menu: MenuData = dataState.showRecent ? dataState.recentMenuList[index] : dataState.filteredMenuList[index];
-                if (!menu) return;
+                const menuId = state.showRecent ? dataState.recentMenuItems[index]?.itemId : dataState.filteredMenuList[index]?.id;
+                if (!menuId) return;
 
-                const menuRoute = menuRouterMap[menu.id];
+                const menuRoute = menuRouterMap[menuId];
                 if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.name) return;
 
                 try {
@@ -287,25 +284,26 @@ export default defineComponent<Props>({
                     });
                     store.dispatch('recent/addItem', {
                         itemType: type,
-                        itemId: menu.id,
+                        itemId: menuId,
                     });
                 } catch (e) {}
             } else {
-                const cloudServiceType = dataState.showRecent ? dataState.recentCloudServiceList[index] : dataState.cloudServiceTypeList[index];
-                if (!cloudServiceType) return;
+                const cloudServiceTypeId = state.showRecent ? dataState.recentCloudServiceItems[index]?.itemId : dataState.cloudServiceTypeList[index]?.id;
+                if (!cloudServiceTypeId) return;
 
+                const cloudServiceType = dataState.cloudServiceTypes[cloudServiceTypeId];
                 try {
                     SpaceRouter.router.push({
                         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
-                            provider: cloudServiceType.provider,
-                            group: cloudServiceType.group,
+                            provider: cloudServiceType.data.provider,
+                            group: cloudServiceType.data.group,
                             name: cloudServiceType.name,
                         },
                     });
                     store.dispatch('recent/addItem', {
                         itemType: type,
-                        itemId: cloudServiceType.id,
+                        itemId: cloudServiceTypeId,
                     });
                 } catch (e) {}
             }

@@ -333,7 +333,7 @@ export default {
             selectedItem: undefined as CloudServiceTypeInfo|undefined,
             isServer: computed<boolean>(() => sidebarState.selectedItem?.resource_type === 'inventory.Server'),
             serverCloudServiceType: computed<string|undefined>(() => find(sidebarState.cloudServiceTypeList, { resource_type: 'inventory.Server' })?.name),
-            favoriteItems: computed<FavoriteItem[]>(() => store.state.favorite.cloudServiceTypeItems),
+            favoriteItems: computed<FavoriteItem[]>(() => store.state.favorite.cloudServiceItems),
         });
 
         /** Main Table */

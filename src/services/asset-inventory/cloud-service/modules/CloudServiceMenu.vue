@@ -99,6 +99,7 @@ import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
 import { CloudServiceCategory } from '@/services/asset-inventory/cloud-service/type';
+import { convertCloudServiceConfigToReferenceData } from '@/lib/helper/config-data-helper';
 
 
 interface RegionItem {
@@ -120,7 +121,11 @@ export default {
     setup() {
         const state = reactive({
             providers: computed(() => store.state.reference.provider.items),
-            favoriteItems: computed<FavoriteItem[]>(() => store.getters['favorite/cloudServiceTypeItems']),
+            cloudServiceTypes: computed(() => store.state.reference.cloudServiceType.items),
+            favoriteItems: computed<FavoriteItem[]>(() => convertCloudServiceConfigToReferenceData(
+                store.state.favorite.cloudServiceItems,
+                state.cloudServiceTypes,
+            )),
             regionItems: [] as RegionItem[],
             categoryItems: [
                 { name: CLOUD_SERVICE_CATEGORY.COMPUTE, label: 'Compute' },

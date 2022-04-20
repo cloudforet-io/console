@@ -21,7 +21,7 @@
             >
                 <router-link :to="referenceRouter(
                                  item.itemId, {
-                                     resource_type: getResourceType(item.favoriteType),
+                                     resource_type: getResourceType(item.itemType),
                                  })"
                              class="item-link"
                 >
@@ -84,10 +84,10 @@ export default {
             isExpanded: false,
         });
 
-        const getResourceType = (favoriteType: FAVORITE_TYPE) => {
-            if (favoriteType === FAVORITE_TYPE.CLOUD_SERVICE) return 'inventory.CloudService';
-            if (favoriteType === FAVORITE_TYPE.PROJECT) return 'identity.Project';
-            if (favoriteType === FAVORITE_TYPE.PROJECT_GROUP) return 'identity.ProjectGroup';
+        const getResourceType = (type: FAVORITE_TYPE) => {
+            if (type === FAVORITE_TYPE.CLOUD_SERVICE) return 'inventory.CloudService';
+            if (type === FAVORITE_TYPE.PROJECT) return 'identity.Project';
+            if (type === FAVORITE_TYPE.PROJECT_GROUP) return 'identity.ProjectGroup';
             return '';
         };
 

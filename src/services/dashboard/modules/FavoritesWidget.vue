@@ -20,7 +20,7 @@
                         <router-link v-for="d in item.favorites" :key="d.itemId"
                                      :to="referenceRouter(
                                          d.itemId, {
-                                             resource_type: getResourceType(d.favoriteType),
+                                             resource_type: getResourceType(d.itemType),
                                          })"
                                      class="item"
                         >
@@ -51,6 +51,13 @@ import { TranslateResult } from 'vue-i18n';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import {
+    convertCloudServiceConfigToReferenceData,
+    convertProjectConfigToReferenceData, convertProjectGroupConfigToReferenceData,
+} from '@/lib/helper/config-data-helper';
 
 
 type Item = Record<string, {label: TranslateResult; favorites: FavoriteItem[]}>
@@ -61,19 +68,23 @@ export default {
     components: { PI },
     setup() {
         const state = reactive({
-            projects: computed<FavoriteItem[]>(() => ([
-                ...store.getters['favorite/projectGroupItems'],
-                ...store.getters['favorite/projectItems'],
-            ])),
-            cloudServiceTypes: computed<FavoriteItem[]>(() => store.getters['favorite/cloudServiceTypeItems']),
+            projects: computed<ProjectReferenceMap>(() => store.state.reference.project.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.state.reference.projectGroup.items),
+            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.state.reference.cloudServiceType.items),
+            favoriteProjects: computed<FavoriteItem[]>(() => {
+                const favoriteProjectItems = convertProjectConfigToReferenceData(store.state.favorite.projectItems, state.projects);
+                const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(store.state.favorite.projectGroupItems, state.projectGroups);
+                return [...favoriteProjectGroupItems, ...favoriteProjectItems];
+            }),
+            favoriteCloudServiceItems: computed<FavoriteItem[]>(() => convertCloudServiceConfigToReferenceData(store.state.favorite.cloudServiceItems, state.cloudServiceTypes)),
             items: computed<Item>(() => ({
                 project: {
                     label: i18n.t('COMMON.WIDGETS.FAVORITES_WIDGET.LABEL_PROJECT'),
-                    favorites: state.isExpanded ? state.projects : state.projects.slice(0, LIMIT_COUNT),
+                    favorites: state.isExpanded ? state.favoriteProjects : state.favoriteProjects.slice(0, LIMIT_COUNT),
                 },
                 cloudService: {
                     label: i18n.t('COMMON.WIDGETS.FAVORITES_WIDGET.LABEL_CLOUD_SERVICE'),
-                    favorites: state.isExpanded ? state.cloudServiceTypes : state.cloudServiceTypes.slice(0, LIMIT_COUNT),
+                    favorites: state.isExpanded ? state.favoriteCloudServiceItems : state.favoriteCloudServiceItems.slice(0, LIMIT_COUNT),
                 },
             })),
             width: computed(() => {
@@ -81,14 +92,14 @@ export default {
                 return `${length ? 100 / length : 100}%`;
             }),
             isExpanded: false,
-            showToggle: computed(() => state.projects.length > LIMIT_COUNT || state.cloudServiceTypes.length > LIMIT_COUNT),
+            showToggle: computed(() => state.favoriteProjects.length > LIMIT_COUNT || state.favoriteCloudServiceItems.length > LIMIT_COUNT),
         });
 
         /* Util */
-        const getResourceType = (favoriteType: FAVORITE_TYPE) => {
-            if (favoriteType === FAVORITE_TYPE.CLOUD_SERVICE) return 'inventory.CloudService';
-            if (favoriteType === FAVORITE_TYPE.PROJECT) return 'identity.Project';
-            if (favoriteType === FAVORITE_TYPE.PROJECT_GROUP) return 'identity.ProjectGroup';
+        const getResourceType = (type: FAVORITE_TYPE) => {
+            if (type === FAVORITE_TYPE.CLOUD_SERVICE) return 'inventory.CloudServiceType';
+            if (type === FAVORITE_TYPE.PROJECT) return 'identity.Project';
+            if (type === FAVORITE_TYPE.PROJECT_GROUP) return 'identity.ProjectGroup';
             return '';
         };
 

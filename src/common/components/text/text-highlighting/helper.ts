@@ -1,4 +1,4 @@
-export const getTextHighlightRegex = (term: string) => {
+export const getTextHighlightRegex = (term?: string) => {
     let regex = '';
     if (term) {
         // remove spaces in the search term

@@ -7,20 +7,17 @@ export const FAVORITE_TYPE = Object.freeze({
 export type FAVORITE_TYPE = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE]
 
 export interface FavoriteConfig {
-    favoriteType: FAVORITE_TYPE;
+    itemType: FAVORITE_TYPE;
     itemId: string;
 }
 
-interface Parent {
-    name?: string;
-    label?: string;
-}
+
 export interface FavoriteItem extends FavoriteConfig {
     name?: string;
     label?: string;
     icon?: string;
     provider?: string;
-    parents?: Parent[];
+    parents?: { name?: string; label?: string }[];
 }
 
 
@@ -28,5 +25,5 @@ export interface FavoriteState {
     menuItems: FavoriteConfig[];
     projectItems: FavoriteConfig[];
     projectGroupItems: FavoriteConfig[];
-    cloudServiceTypeItems: FavoriteConfig[];
+    cloudServiceItems: FavoriteConfig[];
 }

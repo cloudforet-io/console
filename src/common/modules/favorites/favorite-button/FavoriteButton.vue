@@ -63,12 +63,12 @@ export default defineComponent<FavoriteButtonProps>({
             if (state.favoriteItemMap[props.itemId]) {
                 await store.dispatch('favorite/removeItem', {
                     itemId: props.itemId,
-                    favoriteType: props.favoriteType,
+                    itemType: props.favoriteType,
                 });
             } else {
                 await store.dispatch('favorite/addItem', {
                     itemId: props.itemId,
-                    favoriteType: props.favoriteType,
+                    itemType: props.favoriteType,
                 });
             }
         };

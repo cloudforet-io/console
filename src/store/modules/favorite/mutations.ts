@@ -37,12 +37,12 @@ export const loadProjectGroupItem = (state: FavoriteState, favorite: FavoriteCon
 
 
 /* Cloud Service Type */
-export const addCloudServiceTypeItem = (state: FavoriteState, favorite: FavoriteConfig): void => {
-    state.cloudServiceTypeItems.unshift(favorite);
+export const addCloudServiceItem = (state: FavoriteState, favorite: FavoriteConfig): void => {
+    state.cloudServiceItems.unshift(favorite);
 };
-export const removeCloudServiceTypeItem = (state: FavoriteState, favorite: Partial<FavoriteConfig>): void => {
-    state.cloudServiceTypeItems = state.cloudServiceTypeItems.filter(d => d.itemId !== favorite.itemId);
+export const removeCloudServiceItem = (state: FavoriteState, favorite: Partial<FavoriteConfig>): void => {
+    state.cloudServiceItems = state.cloudServiceItems.filter(d => d.itemId !== favorite.itemId);
 };
-export const loadCloudServiceTypeItem = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
-    state.cloudServiceTypeItems = favorite;
+export const loadCloudServiceItem = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
+    state.cloudServiceItems = favorite;
 };
