@@ -1,6 +1,7 @@
 <template>
     <div>
         <slot name="period" />
+        <slot name="filter" />
         <p-toolbox filters-visible
                    exportable
                    search-type="query"

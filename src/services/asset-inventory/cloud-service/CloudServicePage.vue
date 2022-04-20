@@ -32,6 +32,14 @@
                         </div>
                     </div>
                 </template>
+                <template #filter>
+                    <p-icon-text-button name="ic_setting" style-type="gray900" size="sm"
+                                        outline
+                                        @click="handleClickSet"
+                    >
+                        Set
+                    </p-icon-text-button>
+                </template>
             </cloud-service-toolbox>
             <p-data-loader class="flex-grow" :data="items" :loading="loading">
                 <div class="cloud-service-type-wrapper">
@@ -58,6 +66,9 @@
                     </div>
                 </template>
             </p-data-loader>
+            <cloud-service-filter-modal :visible.sync="visibleSetFilterModal"
+                                        :provider="selectedProvider"
+            />
         </div>
     </div>
 </template>
@@ -109,11 +120,13 @@ import {
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
+import CloudServiceFilterModal from '@/services/asset-inventory/cloud-service/modules/CloudServiceFilterModal.vue';
 
 
 export default {
     name: 'CloudServicePage',
     components: {
+        CloudServiceFilterModal,
         CloudServicePeriodFilter,
         CloudServiceListCard,
         CloudServiceToolbox,
@@ -177,6 +190,7 @@ export default {
                 return [...filters, ...queryFilters];
             }),
             queryFilters: queryHelper.filters,
+            visibleSetFilterModal: false,
         });
 
         const routeState = reactive({
@@ -242,6 +256,9 @@ export default {
         const handleProviderSelect = (selectedProvider: string) => {
             store.commit('service/cloudService/setSelectedProvider', selectedProvider);
         };
+        const handleClickSet = () => {
+            state.visibleSetFilterModal = true;
+        };
 
         /* Init */
         (async () => {
@@ -295,6 +312,7 @@ export default {
             handleToolbox,
             handleDeletePeriod,
             handleProviderSelect,
+            handleClickSet,
             ASSET_INVENTORY_ROUTE,
         };
     },

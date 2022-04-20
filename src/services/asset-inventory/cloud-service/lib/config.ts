@@ -12,3 +12,9 @@ export const CLOUD_SERVICE_CATEGORY = Object.freeze({
     APPLICATION_INTEGRATION: 'Application Integration',
     MANAGEMENT: 'Management',
 } as const);
+
+
+export const CLOUD_SERVICE_FILTER_KEY = Object.freeze({
+    SERVICE_CATEGORY: 'category',
+    REGION: 'region_code',
+} as const);
