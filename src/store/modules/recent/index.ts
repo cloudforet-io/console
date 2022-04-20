@@ -5,6 +5,7 @@ import * as actions from './actions';
 
 
 const state: Required<RecentState> = {
+    allItems: [],
     menuItems: [],
     projectItems: [],
     projectGroupItems: [],

@@ -33,20 +33,26 @@ interface RecentLoadPayload {
     limit?: number;
 }
 export const load: Action<RecentState, any> = async ({ commit }, payload: RecentLoadPayload): Promise<void|Error> => {
-    const itemType = payload.itemType;
+    const itemType = payload?.itemType;
     const { results } = await SpaceConnector.client.addOns.recent.list({
         type: itemType,
-        limit: payload.limit,
+        limit: payload?.limit,
     });
     const recents: RecentConfig[] = results.map(d => ({
         itemType: d.data.type,
         itemId: d.data.id,
+        updatedAt: d.updated_at,
     }));
-    const recentCommitsByItemType = {
-        [RECENT_TYPE.PROJECT]: 'loadProjectItem',
-        [RECENT_TYPE.PROJECT_GROUP]: 'loadProjectGroupItem',
-        [RECENT_TYPE.CLOUD_SERVICE]: 'loadCloudServiceItem',
-        [RECENT_TYPE.MENU]: 'loadMenuItem',
-    };
-    commit(recentCommitsByItemType[itemType], recents);
+
+    if (itemType) {
+        const recentCommitsByItemType = {
+            [RECENT_TYPE.PROJECT]: 'loadProjectItem',
+            [RECENT_TYPE.PROJECT_GROUP]: 'loadProjectGroupItem',
+            [RECENT_TYPE.CLOUD_SERVICE]: 'loadCloudServiceItem',
+            [RECENT_TYPE.MENU]: 'loadMenuItem',
+        };
+        commit(recentCommitsByItemType[itemType], recents);
+    } else {
+        commit('loadAllItem', recents);
+    }
 };

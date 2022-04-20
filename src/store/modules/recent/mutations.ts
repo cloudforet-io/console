@@ -33,3 +33,9 @@ export const addCloudServiceItem = (state: RecentState, recent: RecentConfig): v
 export const loadCloudServiceItem = (state: RecentState, recent: RecentConfig[]): void => {
     state.cloudServiceItems = recent;
 };
+
+
+/* All Type */
+export const loadAllItem = (state: RecentState, recent: RecentConfig[]): void => {
+    state.allItems = recent;
+};

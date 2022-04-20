@@ -2,6 +2,7 @@
     <div class="gnb-favorite">
         <p-data-loader :data="items"
                        :loading="loading"
+                       :class="{ loading: loading }"
         >
             <g-n-b-suggestion-list v-if="loading || items.length"
                                    :items="showAll ? allItems : items"
@@ -260,6 +261,11 @@ export default {
 <style lang="postcss" scoped>
 .gnb-favorite {
     padding: 1rem 0;
+    .p-data-loader {
+        &.loading {
+            height: 15rem;
+        }
+    }
     .gnb-search-suggestion-list::v-deep {
         .context-header {
             display: flex;

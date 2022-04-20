@@ -9,6 +9,7 @@ export type RECENT_TYPE = typeof RECENT_TYPE[keyof typeof RECENT_TYPE]
 export interface RecentConfig {
     itemType: RECENT_TYPE;
     itemId: string;
+    updatedAt?: string;
 }
 
 
@@ -22,6 +23,7 @@ export interface RecentItem extends RecentConfig {
 
 
 export interface RecentState {
+    allItems: RecentItem[];
     menuItems: RecentItem[];
     projectItems: RecentItem[];
     projectGroupItems: RecentItem[];

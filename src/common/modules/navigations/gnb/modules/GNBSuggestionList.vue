@@ -15,39 +15,43 @@
             </div>
         </template>
         <template #item--format="{ item }">
-            <p-lazy-img v-if="item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE"
-                        :src="item.icon || ''"
-                        width="1rem" height="1rem"
-                        class="ic-lazy-img"
-            />
-            <p-i v-else
-                 :name="item.icon"
-                 width="1rem" height="1rem"
-                 class="mr-1"
-            />
-            <span>
-                <template v-if="item.parents">
-                    <span v-for="(parent, pIdx) in item.parents" :key="`parents-${pIdx}`">
-                        <span v-for="({text, matched}, i) in getTextList(parent.label)"
-                              :key="`parent-label-${text}-${i}`"
+            <div class="suggestion-item">
+                <div class="left-part">
+                    <p-lazy-img v-if="item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE"
+                                :src="item.icon || ''"
+                                width="1rem" height="1rem"
+                                class="ic-lazy-img"
+                    />
+                    <p-i v-else
+                         :name="item.icon"
+                         width="1rem" height="1rem"
+                         class="mr-1"
+                    />
+                    <span>
+                        <template v-if="item.parents">
+                            <span v-for="(parent, pIdx) in item.parents" :key="`parents-${pIdx}`">
+                                <span v-for="({text, matched}, i) in getTextList(parent.label)"
+                                      :key="`parent-label-${text}-${i}`"
+                                >
+                                    <span :class="{'matched-character': matched}">{{ text }}</span>
+                                </span>
+                                <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem" />
+                            </span>
+                        </template>
+                        <span v-for="({text, matched}, i) in getTextList(item.label)"
+                              :key="`label-${text}-${i}`"
                         >
                             <span :class="{'matched-character': matched}">{{ text }}</span>
                         </span>
-                        <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem" />
                     </span>
-                </template>
-                <span v-for="({text, matched}, i) in getTextList(item.label)"
-                      :key="`label-${text}-${i}`"
-                >
-                    <span :class="{'matched-character': matched}">{{ text }}</span>
-                </span>
-            </span>
-            <favorite-button v-if="useFavorite"
-                             :item-id="item.name"
-                             :favorite-type="item.itemType"
-                             :favorite-items="favoriteItems"
-                             scale="0.65"
-            />
+                </div>
+                <favorite-button v-if="useFavorite"
+                                 :item-id="item.name"
+                                 :favorite-type="item.itemType"
+                                 :favorite-items="favoriteItems"
+                                 scale="0.65"
+                />
+            </div>
         </template>
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <slot :name="slot" v-bind="scope" />
@@ -224,6 +228,17 @@ export default defineComponent<Props>({
             margin-bottom: 0.25rem;
             padding-left: 0.5rem;
             padding-right: 0.5rem;
+        }
+
+        .suggestion-item {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+            .left-part {
+                display: flex;
+                align-items: center;
+            }
         }
 
         .context-item {
