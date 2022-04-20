@@ -67,7 +67,7 @@
                 </template>
             </p-data-loader>
             <cloud-service-filter-modal :visible.sync="visibleSetFilterModal"
-                                        :provider="selectedProvider"
+                                        @confirm="handleConfirmSetFilter"
             />
         </div>
     </div>
@@ -167,10 +167,9 @@ export default {
         const queryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
             providers: computed(() => store.state.reference.provider.items),
-            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
             selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
-            selectedCategories: computed(() => assetInventoryStore.state.cloudService.selectedCategories),
-            selectedRegions: computed(() => assetInventoryStore.state.cloudService.selectedRegions),
+            selectedCategories: computed<string[]>(() => assetInventoryStore.getters['cloudService/selectedCategories']),
+            selectedRegions: computed<string[]>(() => assetInventoryStore.getters['cloudService/selectedRegions']),
             period: queryStringToObject(SpaceRouter.router.currentRoute.query?.period) as Period | undefined,
             //
             loading: true,
@@ -254,19 +253,19 @@ export default {
             await listCloudServiceType();
         };
         const handleProviderSelect = (selectedProvider: string) => {
-            store.commit('service/cloudService/setSelectedProvider', selectedProvider);
+            assetInventoryStore.commit('cloudService/setSelectedProvider', selectedProvider);
         };
         const handleClickSet = () => {
             state.visibleSetFilterModal = true;
         };
+        const handleConfirmSetFilter = () => {
+            listCloudServiceType();
+        };
 
         /* Init */
         (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
-                store.dispatch('reference/serviceAccount/load'),
-                store.dispatch('reference/cloudServiceType/load'),
-            ]);
+            /* load references */
+            await store.dispatch('reference/provider/load');
 
             /* filter setting */
             const currentQuery = SpaceRouter.router.currentRoute.query;
@@ -294,13 +293,11 @@ export default {
         watch(() => state.selectedCategories, async (after, before) => {
             if (after.length !== before.length) {
                 await replaceUrlQuery('service', arrayToQueryString(state.selectedCategories));
-                await listCloudServiceType();
             }
         });
         watch(() => state.selectedRegions, async (after, before) => {
             if (after.length !== before.length) {
                 await replaceUrlQuery('region', arrayToQueryString(state.selectedRegions));
-                await listCloudServiceType();
             }
         });
 
@@ -313,6 +310,7 @@ export default {
             handleDeletePeriod,
             handleProviderSelect,
             handleClickSet,
+            handleConfirmSetFilter,
             ASSET_INVENTORY_ROUTE,
         };
     },

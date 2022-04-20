@@ -15,6 +15,6 @@ export const CLOUD_SERVICE_CATEGORY = Object.freeze({
 
 
 export const CLOUD_SERVICE_FILTER_KEY = Object.freeze({
-    SERVICE_CATEGORY: 'category',
+    SERVICE_CATEGORY: 'labels',
     REGION: 'region_code',
 } as const);

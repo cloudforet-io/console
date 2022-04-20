@@ -86,9 +86,8 @@ export default {
     setup(props: Props, { emit }) {
         const state = reactive({
             providers: computed(() => store.state.reference.provider.items),
-            selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
-            selectedCategories: computed(() => assetInventoryStore.state.cloudService.selectedCategories),
-            selectedRegions: computed(() => assetInventoryStore.state.cloudService.selectedRegions),
+            selectedCategories: computed(() => assetInventoryStore.getters['cloudService/selectedCategories']),
+            selectedRegions: computed(() => assetInventoryStore.getters['cloudService/selectedRegions']),
             keyItemSets: props.handlers.keyItemSets,
             valueHandlerMap: props.handlers.valueHandlerMap,
             cloudServiceFilters: computed(() => props.filters.filter((f: any) => f.k && ![

@@ -21,7 +21,7 @@
                         <template #default="{name, isCollapsed}">
                             <cloud-service-filter-item v-if="!isCollapsed"
                                                        :type="name"
-                                                       :selected.sync="proxyFilters[name]"
+                                                       :selected.sync="filters[name]"
                                                        :provider="provider"
                             />
                         </template>
@@ -74,6 +74,7 @@ import CloudServiceFilterItem from '@/services/asset-inventory/cloud-service/mod
 import { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { assetInventoryStore } from '@/services/asset-inventory/store';
 
 
 interface FilterItem {
@@ -81,7 +82,6 @@ interface FilterItem {
     title: string;
 }
 
-type CloudServiceFilterMap = Partial<Record<CloudServiceFilterKey, string[]>>
 type CloudServiceFilterItemsMap = Partial<Record<CloudServiceFilterKey, FilterItem[]>>
 
 const FILTER_LABELS: Record<CloudServiceFilterKey, string> = {
@@ -96,7 +96,6 @@ const FILTER_ITEMS: FilterItem[] = [
 
 interface Props {
     visible: boolean;
-    filters: CloudServiceFilterMap;
 }
 
 export default defineComponent<Props>({
@@ -112,27 +111,20 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
-        filters: {
-            type: Object,
-            default: () => ({}),
-        },
-        provider: {
-            type: String,
-            default: '',
-        },
     },
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
+            provider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
             referenceItemsMap: computed(() => ({
                 provider: store.state.reference.provider.items as ProviderReferenceMap,
                 region_code: store.state.reference.region.items as RegionReferenceMap,
             })),
-            proxyFilters: useProxyValue('filters', props, emit),
+            filters: assetInventoryStore.state.cloudService.additionalFilters,
             selectedItemsMap: computed<CloudServiceFilterItemsMap>(() => {
                 const itemsMap: CloudServiceFilterItemsMap = {};
 
-                Object.entries<string[]>(state.proxyFilters).forEach(([key, data]) => {
+                Object.entries<string[]>(state.filters).forEach(([key, data]) => {
                     const items = state.referenceItemsMap[key];
                     if (items) {
                         itemsMap[key] = data?.map((d) => {
@@ -155,18 +147,19 @@ export default defineComponent<Props>({
         /* util */
         const init = () => {
             const _unfoldedIndices: number[] = [];
+            const originFilters = assetInventoryStore.state.cloudService.additionalFilters;
             FILTER_ITEMS.forEach((item, idx) => {
-                if (props.filters[item.name]?.length) {
+                if (originFilters[item.name]?.length) {
                     _unfoldedIndices.push(idx);
                 }
             });
             state.unfoldedIndices = _unfoldedIndices;
-            state.proxyFilters = { ...props.filters };
+            state.filters = { ...originFilters };
         };
 
         /* event */
         const handleDeleteTag = (filterName: string, itemIdx: number) => {
-            const filters = { ...state.proxyFilters };
+            const filters = { ...state.filters };
             const filterItems = [...filters[filterName]];
             filterItems.splice(itemIdx, 1);
             if (filterItems.length) {
@@ -174,28 +167,29 @@ export default defineComponent<Props>({
             } else {
                 filters[filterName] = undefined;
             }
-            state.proxyFilters = filters;
+            state.filters = filters;
         };
         const handleFormConfirm = () => {
-            emit('confirm', state.proxyFilters);
+            assetInventoryStore.dispatch('cloudService/setAdditionalFilters', state.filters);
+            emit('confirm');
             state.proxyVisible = false;
         };
         const handleClearAll = () => {
-            state.proxyFilters = {};
+            state.filters = {};
             state.unfoldedIndices = [];
         };
 
         watch(() => state.unfoldedIndices, (after, before) => {
             if (after.length < before.length) {
-                const filters = { ...state.proxyFilters };
+                const filters = { ...state.filters };
                 const deletedIndex: number = before.filter(idx => !after.includes(idx))[0];
                 const deletedFilterName = FILTER_ITEMS[deletedIndex].name;
                 filters[deletedFilterName] = undefined;
-                state.proxyFilters = filters;
+                state.filters = filters;
             }
         });
-        watch(() => props.visible, (after) => {
-            if (after) init();
+        watch(() => props.visible, (visible) => {
+            if (visible) init();
         });
 
         // LOAD REFERENCE STORE

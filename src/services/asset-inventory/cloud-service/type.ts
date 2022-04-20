@@ -6,3 +6,5 @@ export type CloudServicePageUrlQuery = Partial<Record<CLOUD_SERVICE_PAGE_URL_QUE
 export type CloudServiceFilterKey = typeof CLOUD_SERVICE_FILTER_KEY[keyof typeof CLOUD_SERVICE_FILTER_KEY];
 
 export type CloudServiceCategory = typeof CLOUD_SERVICE_CATEGORY[keyof typeof CLOUD_SERVICE_CATEGORY]
+
+export type CloudServiceFilterMap = Partial<Record<CloudServiceFilterKey, string[]>>
