@@ -2,7 +2,7 @@
     <p-button-modal
         v-if="visible"
         class="cloud-service-filter-modal"
-        header-title="Set Filter"
+        :header-title="$t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.SET_FILTER')"
         :visible.sync="proxyVisible"
         :footer-reset-button-visible="true"
         @confirm="handleFormConfirm"
@@ -30,7 +30,7 @@
                 <div class="right-select-filter-section">
                     <div class="selected-filter-section">
                         <div class="title">
-                            Selected filter ({{ selectedItemsLength }})
+                            {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.SELECTED_FILTER') }} ({{ selectedItemsLength }})
                         </div>
                         <div v-if="selectedItemsLength" class="selected-tags-wrapper">
                             <template v-for="([filterName, items], idx) in Object.entries(selectedItemsMap)">
@@ -42,15 +42,15 @@
                             </template>
                         </div>
                         <div v-else class="no-item-wrapper">
-                            <p>No selected filters</p>
-                            <p>Select filters from the list.</p>
+                            <p>{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.NO_FILTER_HELP_TEXT1') }}</p>
+                            <p>{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.NO_FILTER_HELP_TEXT2') }}</p>
                         </div>
                     </div>
                 </div>
             </div>
         </template>
         <template #reset-button>
-            Clear All
+            {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.CLEAR_ALL') }}
         </template>
     </p-button-modal>
 </template>
@@ -76,22 +76,27 @@ import { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
 
+import { i18n } from '@/translations';
+import VueI18n from 'vue-i18n';
+
+import TranslateResult = VueI18n.TranslateResult;
+
 
 interface FilterItem {
     name: string;
-    title: string;
+    title: TranslateResult;
 }
 
 type CloudServiceFilterItemsMap = Partial<Record<CloudServiceFilterKey, FilterItem[]>>
 
-const FILTER_LABELS: Record<CloudServiceFilterKey, string> = {
-    [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: 'Service Category',
-    [CLOUD_SERVICE_FILTER_KEY.REGION]: 'Region',
+const FILTER_LABELS: Record<CloudServiceFilterKey, TranslateResult> = {
+    [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.SERVICE_CATEGORY'),
+    [CLOUD_SERVICE_FILTER_KEY.REGION]: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.REGION'),
 };
 
 const FILTER_ITEMS: FilterItem[] = [
-    { name: CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY, title: 'Service Category' },
-    { name: CLOUD_SERVICE_FILTER_KEY.REGION, title: 'Region' },
+    { name: CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY, title: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.SERVICE_CATEGORY') },
+    { name: CLOUD_SERVICE_FILTER_KEY.REGION, title: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.REGION') },
 ];
 
 interface Props {

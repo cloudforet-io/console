@@ -4,7 +4,7 @@
         <template #content>
             <div class="content-wrapper">
                 <div class="header">
-                    <span class="header-title">Cost Type</span>
+                    <span class="header-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }}</span>
                     <span>{{ costTypeMap[costTypeKey] }}</span>
                 </div>
                 <hr class="divider">

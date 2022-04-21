@@ -33,6 +33,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { PSelectDropdown, PLazyImg } from '@spaceone/design-system';
 import { store } from '@/store';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { i18n } from '@/translations';
 
 export default {
     name: 'ServiceProviderDropdown',
@@ -59,7 +60,7 @@ export default {
             proxySelected: useProxyValue('selectedProvider', props, emit),
             providerList: computed(() => store.state.reference.provider.items),
             contextMenuItems: computed(() => [
-                { type: 'header', name: 'serviceProvider', label: 'Service Provider' },
+                { type: 'header', name: 'serviceProvider', label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') },
                 ...(props.hasAll ? [{ name: 'all', label: 'All', icon: undefined }] : []),
                 ...Object.keys(state.providerList).map(k => ({
                     label: state.providerList[k].name,

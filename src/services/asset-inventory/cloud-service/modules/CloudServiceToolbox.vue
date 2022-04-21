@@ -17,7 +17,7 @@
                 </p-icon-text-button>
             </div>
             <div class="total-result-wrapper">
-                <span class="total-result">Total Result</span><span class="total-result-value">{{ totalCount }}</span>
+                <span class="total-result">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.TOTAL_RESULT') }}</span><span class="total-result-value">{{ totalCount }}</span>
             </div>
         </div>
         <p-toolbox filters-visible

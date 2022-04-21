@@ -2,7 +2,7 @@
     <p-button-modal class="user-update-form-modal"
                     :header-title="headerTitle"
                     :scrollable="true"
-                    size="sm"
+                    size="md"
                     :fade="true"
                     :backdrop="true"
                     :visible.sync="visible"
@@ -76,10 +76,10 @@
                 </p-field-group>
             </form>
             <p-divider class="divider" />
-            <p-field-group label="Tags" class="tags-title">
+            <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')" class="tags-title">
                 <div class="tag-help-msg">
-                    Add associated tags. <br>
-                    The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.
+                    {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT1') }} <br>
+                    {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT2') }}
                 </div>
             </p-field-group>
             <tags-input-group :tags.sync="tags"

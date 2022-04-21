@@ -15,7 +15,7 @@
                 <div class="no-data">
                     <img class="img" src="@/assets/images/illust_spaceship_3.svg">
                     <p class="text">
-                        Recently visited page list will appear here
+                        {{ $t('COMMON.GNB.RECENT.RECENT_HELP_TEXT') }}
                     </p>
                 </div>
             </template>

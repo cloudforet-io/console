@@ -25,6 +25,7 @@
                                    @update-search-filters="handleSearchFiltersUpdate"
                                    @update-pagination="handlePaginationUpdate"
             />
+
             <p-data-loader class="flex-grow" :data="items" :loading="loading">
                 <div class="cloud-service-type-wrapper">
                     <cloud-service-list-card v-for="(item, idx) in items" :key="`${item.provider}-${item.cloud_service_group}-${idx}`"

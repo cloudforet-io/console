@@ -20,7 +20,7 @@
                                  class="show-all-button"
                                  @click="handleClickShowAll(item.itemType)"
                             >
-                                <span class="text">Show all</span>
+                                <span class="text">{{ $t('COMMON.GNB.FAVORITES.SHOW_ALL') }}</span>
                                 <p-i name="ic_arrow_right" width="1rem" height="1rem"
                                      color="inherit"
                                 />
@@ -41,21 +41,20 @@
                 <div class="no-data">
                     <img class="img" src="@/assets/images/illust_star.svg">
                     <p class="text">
-                        Add frequently visited pages to your favorites
-                        Favorite buttons can be found in following menus
+                        {{ $t('COMMON.GNB.FAVORITES.FAVORITES_HELP_TEXT') }}
                     </p>
                     <div class="button-wrapper">
                         <p-button style-type="gray-border"
                                   size="sm"
                                   @click="handleClickMenuButton(FAVORITE_TYPE.PROJECT)"
                         >
-                            Project
+                            {{ $t('COMMON.GNB.FAVORITES.GO_TO_PROJECT') }}
                         </p-button>
                         <p-button style-type="gray-border"
                                   size="sm"
                                   @click="handleClickMenuButton(FAVORITE_TYPE.CLOUD_SERVICE)"
                         >
-                            Cloud Service
+                            {{ $t('COMMON.GNB.FAVORITES.GO_TO_CLOUD_SERVICE') }}
                         </p-button>
                     </div>
                 </div>
@@ -88,7 +87,8 @@ import {
 import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-
+import { i18n } from '@/translations';
+import { TranslateResult } from 'vue-i18n';
 
 const FAVORITE_LIMIT = 5;
 
@@ -111,21 +111,21 @@ export default {
                 const results: SuggestionItem[] = [];
                 if (state.favoriteMenuItems) {
                     results.push({
-                        name: 'title', label: 'MENU', type: 'header', itemType: SUGGESTION_TYPE.MENU,
+                        name: 'title', label: i18n.t('COMMON.GNB.FAVORITES.MENU'), type: 'header', itemType: SUGGESTION_TYPE.MENU,
                     });
                     results.push(...state.favoriteMenuItems.slice(0, FAVORITE_LIMIT));
                 }
                 if (state.favoriteProjects.length) {
                     if (results.length !== 0) results.push({ type: 'divider' });
                     results.push({
-                        name: 'title', label: 'PROJECT', type: 'header', itemType: SUGGESTION_TYPE.PROJECT,
+                        name: 'title', label: i18n.t('MENU.PROJECT.PROJECT'), type: 'header', itemType: SUGGESTION_TYPE.PROJECT,
                     });
                     results.push(...state.favoriteProjects.slice(0, FAVORITE_LIMIT));
                 }
                 if (state.favoriteCloudServiceItems.length) {
                     if (results.length !== 0) results.push({ type: 'divider' });
                     results.push({
-                        name: 'title', label: 'CLOUD SERVICE', type: 'header', itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
+                        name: 'title', label: i18n.t('MENU.INVENTORY.CLOUD_SERVICE'), type: 'header', itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
                     });
                     results.push(...state.favoriteCloudServiceItems.slice(0, FAVORITE_LIMIT));
                 }
@@ -133,18 +133,18 @@ export default {
             }),
             allItems: computed<SuggestionItem[]>(() => {
                 let items: FavoriteItem[] = [];
-                let label = '';
+                let label: TranslateResult = '';
                 if (state.showAllType === SUGGESTION_TYPE.MENU) {
                     items = state.favoriteMenuItems;
-                    label = 'All Menu';
+                    label = i18n.t('COMMON.GNB.FAVORITES.ALL_MENU');
                 }
                 if (state.showAllType === SUGGESTION_TYPE.PROJECT) {
                     items = state.favoriteProjects;
-                    label = 'All Projects';
+                    label = i18n.t('COMMON.GNB.FAVORITES.ALL_PROJECTS');
                 }
                 if (state.showAllType === SUGGESTION_TYPE.CLOUD_SERVICE) {
                     items = state.favoriteCloudServiceItems;
-                    label = 'All Cloud Services';
+                    label = i18n.t('COMMON.GNB.FAVORITES.ALL_CLOUD_SERVICES');
                 }
                 return [
                     {

@@ -35,6 +35,7 @@ import GNBFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-fav
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { i18n } from '@/translations';
 
 
 export default {
@@ -58,8 +59,8 @@ export default {
         const state = reactive({
             proxyVisibleDropdown: useProxyValue('visibleDropdown', props, emit),
             tabs: computed(() => ([
-                { label: 'Recent Visits', name: 'recent', keepAlive: true },
-                { label: 'Favorites', name: 'favorite', keepAlive: true },
+                { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
+                { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'recent',
         });
@@ -109,6 +110,7 @@ export default {
         display: flex;
         flex-direction: column;
         width: 27.5rem;
+        min-height: auto;
         top: 100%;
         right: 0;
         box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);

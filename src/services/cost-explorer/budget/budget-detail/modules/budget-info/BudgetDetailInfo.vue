@@ -2,17 +2,17 @@
     <section class="budget-detail-summary">
         <p-pane-layout class="summary-card">
             <span v-if="!loading" class="summary-title">
-                Amount Planning Type <span class="font-normal">(Period)</span>
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.AMOUNT_PLANNING_TYPE') }} <span class="font-normal">({{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.PERIOD') }})</span>
             </span>
             <div v-if="!loading" class="flex justify-between">
                 <p v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL" class="summary-content">
-                    <b>Total Amount</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_AMOUNT') }}</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
                 </p>
                 <p v-else class="summary-content">
-                    <b>Monthly Planning</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
                 </p>
                 <amount-planning-type-popover class="summary-content" :budget-data="budgetData">
-                    <span class="view-all">Details</span>
+                    <span class="view-all">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DETAILS') }}</span>
                 </amount-planning-type-popover>
             </div>
         </p-pane-layout>
