@@ -56,6 +56,7 @@ import {
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 
 
@@ -69,7 +70,7 @@ export default {
     },
     props: {
     },
-    setup() {
+    setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             visible: false,
@@ -143,6 +144,7 @@ export default {
                         answer2: state.selectedAnswer2,
                     },
                 });
+                showSuccessMessage('소중한 의견 감사합니다.', '', root);
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {
