@@ -30,7 +30,6 @@ export default {
     children: [
         {
             path: 'cloud-service',
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
             redirect: '/asset-inventory/cloud-service',
             component: { template: '<router-view />' },
             children: [

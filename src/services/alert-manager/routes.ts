@@ -22,7 +22,6 @@ export default {
         },
         {
             path: 'alert',
-            name: ALERT_MANAGER_ROUTE.ALERT._NAME,
             component: { template: '<router-view />' },
             children: [
                 {

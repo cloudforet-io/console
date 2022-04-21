@@ -36,7 +36,6 @@ export default {
                 },
                 {
                     path: 'notification',
-                    name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME,
                     component: { template: '<router-view />' },
                     children: [
                         {
