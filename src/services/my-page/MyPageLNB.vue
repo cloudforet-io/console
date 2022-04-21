@@ -35,6 +35,7 @@ import { store } from '@/store';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 import { LNBItem } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
+import { MENU_ID } from '@/lib/router/type';
 
 interface SidebarItemType {
     label?: TranslateResult;
@@ -47,16 +48,16 @@ interface SidebarItemType {
 const MenuSet: LNBItem[][] = [
     [
         {
-            type: 'title', label: 'My Account', id: 'my-account', foldable: false,
+            type: 'title', label: 'My Account', id: MENU_ID.MY_PAGE_ACCOUNT, foldable: false,
         },
         {
-            type: 'item', label: 'Account & Profile', id: 'account-profile', to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME },
+            type: 'item', label: 'Account & Profile', id: MENU_ID.MY_PAGE_ACCOUNT_PROFILE, to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME },
         },
         {
-            type: 'item', label: 'Access with API & CLI', id: 'access-api-cli', to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME },
+            type: 'item', label: 'Access with API & CLI', id: MENU_ID.MY_PAGE_API_KEY, to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME },
         },
         {
-            type: 'item', label: 'Notifications Channel', id: 'notification-channel', to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME }, isBeta: true,
+            type: 'item', label: 'Notifications Channel', id: MENU_ID.MY_PAGE_NOTIFICATIONS, to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME }, isBeta: true,
         },
     ],
 ];

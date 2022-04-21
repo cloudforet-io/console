@@ -4,91 +4,95 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import { MENU_ID, MenuRouter } from '@/lib/router/type';
 
 const assetInventoryRouter = {
-    asset_inventory: {
+    [MENU_ID.ASSET_INVENTORY]: {
         name: ASSET_INVENTORY_ROUTE._NAME,
     },
-    'asset_inventory.cloud_service': {
+    [MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE]: {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
     },
-    'asset_inventory.server': {
+    [MENU_ID.ASSET_INVENTORY_SERVER]: {
         name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
     },
-    'asset_inventory.collector': {
+    [MENU_ID.ASSET_INVENTORY_COLLECTOR]: {
         name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
     },
-    'asset_inventory.service_account': {
+    [MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT]: {
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
     },
 };
 
 const alertManagerRouter = {
-    alert_manager: {
+    [MENU_ID.ALERT_MANAGER]: {
         name: ALERT_MANAGER_ROUTE._NAME,
     },
-    'alert_manager.dashboard': {
+    [MENU_ID.ALERT_MANAGER_DASHBOARD]: {
         name: ALERT_MANAGER_ROUTE.DASHBOARD._NAME,
     },
-    'alert_manager.alert': {
+    [MENU_ID.ALERT_MANAGER_ALERT]: {
         name: ALERT_MANAGER_ROUTE.ALERT._NAME,
     },
-    'alert_manager.escalation_policy': {
+    [MENU_ID.ALERT_MANAGER_ESCALATION_POLICY]: {
         name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
     },
 };
 
 const costExplorerRouter = {
-    cost_explorer: {
+    [MENU_ID.COST_EXPLORER]: {
         name: COST_EXPLORER_ROUTE._NAME,
     },
-    'cost_explorer.dashboard': {
+    [MENU_ID.COST_EXPLORER_DASHBOARD]: {
         name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
     },
-    'cost_explorer.cost_analysis': {
+    [MENU_ID.COST_EXPLORER_COST_ANALYSIS]: {
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
     },
-    'cost_explorer.budget': {
+    [MENU_ID.COST_EXPLORER_BUDGET]: {
         name: COST_EXPLORER_ROUTE.BUDGET._NAME,
     },
 };
 
 const projectRouter = {
-    project: {
+    [MENU_ID.PROJECT]: {
         name: PROJECT_ROUTE._NAME,
     },
 
 };
 
 const administrationRouter = {
-    administration: {
+    [MENU_ID.ADMINISTRATION]: {
         name: ADMINISTRATION_ROUTE._NAME,
     },
-    'administration.iam': {
+    [MENU_ID.ADMINISTRATION_IAM]: {
         name: ADMINISTRATION_ROUTE.IAM._NAME,
     },
-    'administration.user': {
+    [MENU_ID.ADMINISTRATION_USER]: {
         name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
     },
 };
 
 const myPageRouter = {
-    my_page: {
+    [MENU_ID.MY_PAGE]: {
         name: MY_PAGE_ROUTE._NAME,
     },
-    'my_page.account_profile': {
+    [MENU_ID.MY_PAGE_ACCOUNT]: {
         name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
     },
-    'my_page.api_key': {
+    [MENU_ID.MY_PAGE_ACCOUNT_PROFILE]: {
+        name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
+    },
+    [MENU_ID.MY_PAGE_API_KEY]: {
         name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME,
     },
-    'my_page.notifications': {
+    [MENU_ID.MY_PAGE_NOTIFICATIONS]: {
         name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME,
     },
 };
 
 
-export const menuRouterMap = {
+export const menuRouterMap: MenuRouter = {
     ...assetInventoryRouter,
     ...alertManagerRouter,
     ...costExplorerRouter,

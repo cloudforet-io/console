@@ -102,8 +102,8 @@ export default {
         line-height: 125%;
     }
     .menu-wrapper {
-        padding-left: 1.25rem;
-        padding-right: 1.25rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
     }
     .divider {
         margin-bottom: 1.25rem;

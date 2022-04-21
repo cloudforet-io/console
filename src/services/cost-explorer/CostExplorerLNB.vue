@@ -20,6 +20,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import { LNBItem } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
+import { MENU_ID } from '@/lib/router/type';
 
 export default {
     name: 'CostExplorerLNB',
@@ -37,7 +38,11 @@ export default {
                         type: 'title', label: 'Public', id: 'public', foldable: false,
                     },
                     ...state.publicDashboardList.map((list: PublicDashboardInfo) => ({
-                        type: 'item', label: list.name, id: list.public_dashboard_id, to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.public_dashboard_id } },
+                        type: 'item',
+                        label: list.name,
+                        id: list.public_dashboard_id,
+                        to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.public_dashboard_id } },
+                        hideFavorite: true,
                     })),
                 ],
                 [
@@ -45,16 +50,20 @@ export default {
                         type: 'title', label: 'My Dashboard', id: 'my', foldable: true,
                     },
                     ...state.userDashboardList.map((list: UserDashboardInfo) => ({
-                        type: 'item', label: list.name, id: list.name, to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.user_dashboard_id } },
+                        type: 'item',
+                        label: list.name,
+                        id: list.name,
+                        to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.user_dashboard_id } },
+                        hideFavorite: true,
                     })),
                     { type: 'divider' },
                 ],
                 [
                     {
-                        type: 'item', id: 'costAnalysis', label: 'Cost Analysis', to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
+                        type: 'item', id: MENU_ID.COST_EXPLORER_COST_ANALYSIS, label: 'Cost Analysis', to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
                     },
                     {
-                        type: 'item', id: 'budget', label: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
+                        type: 'item', id: MENU_ID.COST_EXPLORER_BUDGET, label: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
                     },
                 ],
             ]),

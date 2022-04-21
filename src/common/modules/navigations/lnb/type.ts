@@ -1,4 +1,5 @@
 import { Location } from 'vue-router';
+import { MenuIdType } from '@/lib/router/type';
 
 export const MENU_ITEM_TYPE = ['title', 'item', 'divider'];
 type MenuItemType = typeof MENU_ITEM_TYPE[number]
@@ -6,11 +7,12 @@ type MenuItemType = typeof MENU_ITEM_TYPE[number]
 export interface LNBItem {
     type: MenuItemType;
     label: string;
-    id: string;
+    id: MenuIdType;
     foldable?: boolean;
     to?: Location;
     isNew?: boolean;
     isBeta?: boolean;
+    hideFavorite?: boolean;
 }
 
 export type LNBItemList = LNBItem[];
