@@ -7,10 +7,12 @@ import * as getters from './getters';
 
 const state: CloudServiceStoreState = {
     selectedProvider: 'all',
+    period: undefined,
     additionalFilters: {
         [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: [],
         [CLOUD_SERVICE_FILTER_KEY.REGION]: [],
     },
+    searchFilters: [],
 };
 
 export default {

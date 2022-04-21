@@ -1,7 +1,25 @@
 <template>
     <div>
-        <slot name="period" />
-        <slot name="filter" />
+        <div class="toolbox-top-wrapper">
+            <span class="title">Filter</span>
+            <div v-if="period" class="period-wrapper">
+                <cloud-service-period-filter :period="period"
+                                             @update:period="handleUpdatePeriod"
+                />
+                <p-divider vertical />
+            </div>
+            <div class="filter-wrapper">
+                <p-icon-text-button name="ic_setting" style-type="gray900" size="sm"
+                                    outline
+                                    @click="handleClickSet"
+                >
+                    Set
+                </p-icon-text-button>
+            </div>
+            <div class="total-result-wrapper">
+                <span class="total-result">Total Result</span><span class="total-result-value">{{ totalCount }}</span>
+            </div>
+        </div>
         <p-toolbox filters-visible
                    exportable
                    search-type="query"
@@ -13,26 +31,34 @@
                    @refresh="handleChange()"
                    @export="handleExport"
         />
+        <cloud-service-filter-modal :visible.sync="visibleSetFilterModal"
+                                    @confirm="handleConfirmSetFilter"
+        />
     </div>
 </template>
 
 <script lang="ts">
+// package
 import {
-    computed, reactive, toRefs,
+    computed, defineComponent, PropType, reactive, toRefs,
 } from '@vue/composition-api';
 
+// design system
 import {
+    PDivider, PIconTextButton,
     PToolbox,
 } from '@spaceone/design-system';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 
+// core lib
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 
+// global
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import { ExcelDataField } from '@/store/modules/file/type';
@@ -42,13 +68,20 @@ import {
     dynamicFieldsToExcelDataFields,
 } from '@/lib/component-util/dynamic-layout';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { assetInventoryStore } from '@/services/asset-inventory/store';
 
+// service
+import { assetInventoryStore } from '@/services/asset-inventory/store';
+import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
+import CloudServiceFilterModal from '@/services/asset-inventory/cloud-service/modules/CloudServiceFilterModal.vue';
+import { Period } from '@/services/asset-inventory/cloud-service/type';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+
+interface Handlers { keyItemSets?: KeyItemSet[]; valueHandlerMap?: ValueHandlerMap }
 
 interface Props {
     totalCount: number;
-    filters: QueryStoreFilter[];
-    handlers: { keyItemSets: KeyItemSet[]; valueHandlerMap: ValueHandlerMap };
+    handlers: Handlers;
+    period?: Period;
     queryTags: QueryTag[];
 }
 
@@ -59,47 +92,49 @@ const CLOUD_SERVICE_RESOURCES_EXCEL_FIELDS = [
     { key: 'count', name: 'Count' },
 ];
 
-export default {
+export default defineComponent<Props>({
     name: 'CloudServiceToolbox',
     components: {
+        CloudServicePeriodFilter,
+        CloudServiceFilterModal,
         PToolbox,
+        PDivider,
+        PIconTextButton: PIconTextButton as any,
     },
     props: {
         totalCount: {
             type: Number,
             default: 0,
         },
-        filters: {
-            type: Array,
-            default: () => ([]),
-        },
         handlers: {
-            type: Object,
+            type: Object as PropType<Handlers>,
             default: () => ({}),
         },
-        /* sync */
-        queryTags: {
-            type: Array,
+        period: {
+            type: Object as PropType<Period|undefined>,
+            default: undefined,
+        },
+        tagFilters: {
+            type: Array as PropType<QueryStoreFilter[]>,
             default: () => ([]),
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props, { emit }) {
+        const searchQueryHelper = new QueryHelper();
         const state = reactive({
             providers: computed(() => store.state.reference.provider.items),
+            selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
             selectedCategories: computed(() => assetInventoryStore.getters['cloudService/selectedCategories']),
-            selectedRegions: computed(() => assetInventoryStore.getters['cloudService/selectedRegions']),
-            keyItemSets: props.handlers.keyItemSets,
-            valueHandlerMap: props.handlers.valueHandlerMap,
-            cloudServiceFilters: computed(() => props.filters.filter((f: any) => f.k && ![
+            allFilters: computed<QueryStoreFilter[]>(() => assetInventoryStore.getters['cloudService/allFilters']),
+            keyItemSets: computed(() => props.handlers.keyItemSets),
+            valueHandlerMap: computed(() => props.handlers.valueHandlerMap),
+            queryTags: computed(() => searchQueryHelper.queryTags),
+            cloudServiceFilters: computed(() => state.allFilters.filter((f: any) => f.k && ![
                 'labels',
                 'service_code',
             ].includes(f.k))),
+            visibleSetFilterModal: false,
         });
-
-        /* event */
-        const handleChange = async (options: ToolboxOptions = {}) => {
-            emit('update-toolbox', options);
-        };
 
         /* excel */
         const cloudServiceResourcesApiQueryHelper = new ApiQueryHelper()
@@ -217,6 +252,27 @@ export default {
             });
             return excelPayloadList;
         };
+
+        /* Event Handlers */
+        const handleChange = (options: ToolboxOptions = {}) => {
+            if (options.queryTags !== undefined) {
+                searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
+                assetInventoryStore.dispatch('cloudService/setSearchFilters', searchQueryHelper.filters);
+                emit('update-search-filters');
+            } else {
+                emit('update-pagination', options);
+            }
+        };
+        const handleUpdatePeriod = (period) => {
+            assetInventoryStore.dispatch('cloudService/setPeriod', period);
+            emit('update-period', period);
+        };
+        const handleClickSet = () => {
+            state.visibleSetFilterModal = true;
+        };
+        const handleConfirmSetFilter = () => {
+            emit('update-additional-filters');
+        };
         const handleExport = async () => {
             try {
                 await store.dispatch('display/startLoading', { loadingMessage: i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD') });
@@ -234,16 +290,57 @@ export default {
             }
         };
 
-        // LOAD REFERENCE STORE
+        /* Init */
         (async () => {
+            // LOAD REFERENCE STORE
             await store.dispatch('reference/provider/load');
         })();
 
         return {
             ...toRefs(state),
+            handleUpdatePeriod,
+            handleClickSet,
+            handleConfirmSetFilter,
             handleChange,
             handleExport,
         };
     },
-};
+});
 </script>
+
+<style lang="postcss" scoped>
+.toolbox-top-wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.125rem;
+}
+.title {
+    @apply text-gray-600;
+    font-size: 0.875rem;
+    margin-right: 0.5rem;
+}
+.period-wrapper {
+    display: inline-flex;
+    flex-shrink: 0;
+    margin-right: 1rem;
+    > .p-divider {
+        margin-left: 0.5rem;
+    }
+}
+.filter-wrapper {
+    flex-grow: 1;
+    flex-shrink: 0;
+}
+.total-result-wrapper {
+    @apply text-sm flex flex-wrap gap-2;
+    flex-shrink: 0;
+    line-height: 1.09375rem;
+    min-width: 5.875rem;
+    .total-result {
+        @apply text-gray-600;
+    }
+    .total-result-value {
+        @apply text-gray-800;
+    }
+}
+</style>

@@ -8,3 +8,8 @@ export type CloudServiceFilterKey = typeof CLOUD_SERVICE_FILTER_KEY[keyof typeof
 export type CloudServiceCategory = typeof CLOUD_SERVICE_CATEGORY[keyof typeof CLOUD_SERVICE_CATEGORY]
 
 export type CloudServiceFilterMap = Partial<Record<CloudServiceFilterKey, string[]>>
+
+export interface Period {
+    start?: string;
+    end?: string;
+}

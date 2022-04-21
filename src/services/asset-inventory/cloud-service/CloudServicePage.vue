@@ -17,35 +17,19 @@
             </p-page-title>
             <p-divider class="cloud-service-divider" />
             <cloud-service-toolbox :total-count="totalCount"
-                                   :filters="filters"
+                                   :period="period"
+                                   :filters="allFilters"
                                    :handlers="handlers"
-                                   :query-tags.sync="queryTags"
-                                   @update-toolbox="handleToolbox"
-            >
-                <template #period>
-                    <div class="flex justify-between">
-                        <cloud-service-period-filter :period.sync="period"
-                                                     @delete-period="handleDeletePeriod"
-                        />
-                        <div class="total-result-wrapper">
-                            <span class="total-result">Total Result</span><span class="total-result-value">{{ totalCount }}</span>
-                        </div>
-                    </div>
-                </template>
-                <template #filter>
-                    <p-icon-text-button name="ic_setting" style-type="gray900" size="sm"
-                                        outline
-                                        @click="handleClickSet"
-                    >
-                        Set
-                    </p-icon-text-button>
-                </template>
-            </cloud-service-toolbox>
+                                   @update-period="handlePeriodUpdate"
+                                   @update-additional-filters="handleAdditionalFiltersUpdate"
+                                   @update-search-filters="handleSearchFiltersUpdate"
+                                   @update-pagination="handlePaginationUpdate"
+            />
             <p-data-loader class="flex-grow" :data="items" :loading="loading">
                 <div class="cloud-service-type-wrapper">
                     <cloud-service-list-card v-for="(item, idx) in items" :key="`${item.provider}-${item.cloud_service_group}-${idx}`"
                                              :item="item"
-                                             :query-filters="queryFilters"
+                                             :query-filters="allFilters"
                                              :selected-regions="selectedRegions"
                                              :period="period"
                     />
@@ -66,9 +50,6 @@
                     </div>
                 </template>
             </p-data-loader>
-            <cloud-service-filter-modal :visible.sync="visibleSetFilterModal"
-                                        @confirm="handleConfirmSetFilter"
-            />
         </div>
     </div>
 </template>
@@ -77,7 +58,7 @@
 import axios, { CancelTokenSource } from 'axios';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -93,25 +74,21 @@ import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/compon
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 
-import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import {
-    arrayToQueryString,
+    arrayToQueryString, objectToQueryString,
     primitiveToQueryString,
     queryStringToArray,
     queryStringToObject,
     queryStringToString,
     replaceUrlQuery,
-    RouteQueryString,
 } from '@/lib/router-query-string';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { Period } from '@/services/cost-explorer/type';
 import CloudServiceListCard
     from '@/services/asset-inventory/cloud-service/modules/cloud-service-list/CloudServiceListCard.vue';
 import dayjs from 'dayjs';
-import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 import {
     makeDistinctValueHandler,
@@ -120,14 +97,12 @@ import {
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
-import CloudServiceFilterModal from '@/services/asset-inventory/cloud-service/modules/CloudServiceFilterModal.vue';
+import { Period } from '@/services/asset-inventory/cloud-service/type';
 
 
 export default {
     name: 'CloudServicePage',
     components: {
-        CloudServiceFilterModal,
-        CloudServicePeriodFilter,
         CloudServiceListCard,
         CloudServiceToolbox,
         ServiceProviderDropdown,
@@ -138,8 +113,6 @@ export default {
         PDataLoader,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const handlers = {
             keyItemSets: [{
                 title: 'Properties',
@@ -164,32 +137,18 @@ export default {
             } as ValueHandlerMap,
         };
 
-        const queryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
             providers: computed(() => store.state.reference.provider.items),
             selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
+            period: computed(() => assetInventoryStore.state.cloudService.period),
+            searchFilters: computed(() => assetInventoryStore.state.cloudService.searchFilters),
             selectedCategories: computed<string[]>(() => assetInventoryStore.getters['cloudService/selectedCategories']),
             selectedRegions: computed<string[]>(() => assetInventoryStore.getters['cloudService/selectedRegions']),
-            period: queryStringToObject(SpaceRouter.router.currentRoute.query?.period) as Period | undefined,
+            allFilters: computed<QueryStoreFilter[]>(() => assetInventoryStore.getters['cloudService/allFilters']),
             //
             loading: true,
             items: undefined as any,
-            queryTags: queryHelper.queryTags as QueryTag[],
             totalCount: 0,
-            filters: computed<QueryStoreFilter[]>(() => {
-                const filters: QueryStoreFilter[] = [];
-                if (state.selectedProvider !== 'all') {
-                    filters.push({ k: 'provider', v: state.selectedProvider, o: '=' });
-                } if (state.selectedRegions.length) {
-                    filters.push({ k: 'region_code', v: state.selectedRegions, o: '=' });
-                } if (state.selectedCategories.length) {
-                    filters.push({ k: 'labels', v: state.selectedCategories, o: '=' });
-                }
-                const queryFilters: QueryStoreFilter[] = queryHelper.setFiltersAsQueryTag(state.queryTags).filters;
-                return [...filters, ...queryFilters];
-            }),
-            queryFilters: queryHelper.filters,
-            visibleSetFilterModal: false,
         });
 
         const routeState = reactive({
@@ -212,7 +171,7 @@ export default {
             listCloudServiceRequest = axios.CancelToken.source();
             try {
                 state.loading = true;
-                cloudServiceApiQueryHelper.setFilters(state.filters)
+                cloudServiceApiQueryHelper.setFilters(state.allFilters)
                     .setMultiSort([{ key: 'is_primary', desc: true }, { key: 'name', desc: false }]);
                 const res = await SpaceConnector.client.inventory.cloudServiceType.analyze({
                     labels: state.selectedCategories,
@@ -240,25 +199,29 @@ export default {
         };
 
         /* event */
-        const handleToolbox = async (options: ToolboxOptions) => {
-            setApiQueryWithToolboxOptions(cloudServiceApiQueryHelper, options, { queryTags: true });
-            if (options.queryTags !== undefined) {
-                state.queryTags = options.queryTags;
-                await replaceUrlQuery('filters', cloudServiceApiQueryHelper.rawQueryStrings);
-            }
-            await listCloudServiceType();
-        };
-        const handleDeletePeriod = async () => {
-            await replaceUrlQuery('period', undefined);
-            await listCloudServiceType();
-        };
+        // service provider dropdown events
         const handleProviderSelect = (selectedProvider: string) => {
             assetInventoryStore.commit('cloudService/setSelectedProvider', selectedProvider);
+            replaceUrlQuery('provider', primitiveToQueryString(selectedProvider));
+            listCloudServiceType();
         };
-        const handleClickSet = () => {
-            state.visibleSetFilterModal = true;
+        // cloud service toolbox events
+        const handlePeriodUpdate = () => {
+            listCloudServiceType();
+            replaceUrlQuery('period', objectToQueryString(state.period));
         };
-        const handleConfirmSetFilter = () => {
+        const handleAdditionalFiltersUpdate = async () => {
+            listCloudServiceType();
+            await replaceUrlQuery('region', arrayToQueryString(state.selectedRegions));
+            await replaceUrlQuery('service', arrayToQueryString(state.selectedCategories));
+        };
+        const searchQueryHelper = new QueryHelper();
+        const handleSearchFiltersUpdate = () => {
+            listCloudServiceType();
+            replaceUrlQuery('filters', searchQueryHelper.setFilters(state.searchFilters).rawQueryStrings);
+        };
+        const handlePaginationUpdate = (options: ToolboxOptions) => {
+            setApiQueryWithToolboxOptions(cloudServiceApiQueryHelper, options, { queryTags: true });
             listCloudServiceType();
         };
 
@@ -267,50 +230,46 @@ export default {
             /* load references */
             await store.dispatch('reference/provider/load');
 
-            /* filter setting */
             const currentQuery = SpaceRouter.router.currentRoute.query;
-            assetInventoryStore.commit('cloudService/setSelectedRegions', queryStringToArray(currentQuery.region) || []);
-            assetInventoryStore.commit('cloudService/setSelectedCategories', queryStringToArray(currentQuery.service) || []);
 
-            // init provider
-            let provider: RouteQueryString = currentQuery.provider;
-            if (Array.isArray(provider)) provider = queryStringToString(provider[0]);
-            else provider = queryStringToString(provider);
+            /* init additional filters */
+            const region = queryStringToArray(currentQuery.region) ?? [];
+            const service = queryStringToArray(currentQuery.service) ?? [];
+            assetInventoryStore.commit('cloudService/setSelectedRegions', region);
+            assetInventoryStore.commit('cloudService/setSelectedCategories', service);
+            await replaceUrlQuery('region', arrayToQueryString(region));
+            await replaceUrlQuery('service', arrayToQueryString(service));
+
+            /* init provider */
+            let provider = queryStringToString(currentQuery.provider);
             if (!provider || !state.providers[provider]) provider = 'all';
             assetInventoryStore.commit('cloudService/setSelectedProvider', provider);
+            await replaceUrlQuery('provider', primitiveToQueryString(provider));
 
-            if (currentQuery.provider !== primitiveToQueryString(provider)) {
-                await replaceUrlQuery('provider', primitiveToQueryString(provider));
-            }
+            /* init period */
+            const period = queryStringToObject<Period>(currentQuery.period);
+            assetInventoryStore.dispatch('cloudService/setPeriod', period);
+            await replaceUrlQuery('period', objectToQueryString(period));
+
+            /* init search filters */
+            searchQueryHelper.setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters);
+            assetInventoryStore.dispatch('cloudService/setSearchFilters', searchQueryHelper.filters);
+            await replaceUrlQuery('filters', searchQueryHelper.rawQueryStrings);
+
+            /* list data */
             await listCloudServiceType();
         })();
-
-        /* Watcher */
-        watch(() => state.selectedProvider, async () => {
-            await replaceUrlQuery('provider', primitiveToQueryString(state.selectedProvider));
-            await listCloudServiceType();
-        });
-        watch(() => state.selectedCategories, async (after, before) => {
-            if (after.length !== before.length) {
-                await replaceUrlQuery('service', arrayToQueryString(state.selectedCategories));
-            }
-        });
-        watch(() => state.selectedRegions, async (after, before) => {
-            if (after.length !== before.length) {
-                await replaceUrlQuery('region', arrayToQueryString(state.selectedRegions));
-            }
-        });
 
         return {
             ...toRefs(state),
             routeState,
             handlers,
             assetUrlConverter,
-            handleToolbox,
-            handleDeletePeriod,
             handleProviderSelect,
-            handleClickSet,
-            handleConfirmSetFilter,
+            handlePeriodUpdate,
+            handleAdditionalFiltersUpdate,
+            handleSearchFiltersUpdate,
+            handlePaginationUpdate,
             ASSET_INVENTORY_ROUTE,
         };
     },
@@ -328,17 +287,7 @@ export default {
         margin-left: 0.5rem;
     }
 }
-.total-result-wrapper {
-    @apply text-sm flex flex-wrap gap-2;
-    line-height: 1.09375rem;
-    min-width: 5.875rem;
-    .total-result {
-        @apply text-gray-600;
-    }
-    .total-result-value {
-        @apply text-gray-800;
-    }
-}
+
 .page-wrapper {
     @apply flex flex-col w-full h-full;
 }

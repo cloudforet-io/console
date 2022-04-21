@@ -117,8 +117,10 @@ export const queryStringToNumber = (queryString: RouteQueryString): number|undef
  * @description convert url query string to string or undefined.
  */
 export const queryStringToString = (queryString: RouteQueryString): string|undefined => {
-    if (typeof queryString === 'string') {
-        return JSON.parse(queryString) || undefined;
+    let value = queryString;
+    if (Array.isArray(value)) value = value[0];
+    if (typeof value === 'string') {
+        return JSON.parse(value) || undefined;
     }
 
     return undefined;
