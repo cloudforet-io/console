@@ -326,19 +326,17 @@ export default {
             chart.cursor.behavior = 'none';
         };
         const getLocation = (type) => {
-            const query: Location['query'] = {
-                provider: primitiveToQueryString('all'),
-            };
+            const query: Location['query'] = {};
+            query.provider = primitiveToQueryString('all');
             if (type !== 'all') {
-                query.service = CLOUD_SERVICE_LABEL[type];
+                query.service = primitiveToQueryString(CLOUD_SERVICE_LABEL[type]);
             }
-            if (type === DATA_TYPE.storage) query.primary = 'false';
 
             // set filters
             queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
 
             const location: Location = {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,
                     ...query,

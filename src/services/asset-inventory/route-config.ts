@@ -3,7 +3,7 @@ export const ASSET_INVENTORY_ROUTE = Object.freeze({
     SERVER: { _NAME: 'server' },
     CLOUD_SERVICE: {
         _NAME: 'cloudService',
-        TYPE: { _NAME: 'cloudServiceMain' },
+        // TYPE: { _NAME: 'cloudServiceMain' },
         SEARCH: { _NAME: 'cloudServiceSearch' },
         TYPE_SEARCH: { _NAME: 'cloudServiceTypeSearch' },
         NO_RESOURCE: { _NAME: 'noCloudService' },

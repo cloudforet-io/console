@@ -36,7 +36,7 @@ export default {
             children: [
                 {
                     path: '/',
-                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
+                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                     meta: { lnbVisible: true },
                     component: CloudServicePage,
                 },

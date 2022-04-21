@@ -103,6 +103,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { primitiveToQueryString } from '@/lib/router-query-string';
 
 
 enum CLOUD_SERVICE_LABEL {
@@ -253,13 +254,10 @@ export default {
         const queryHelper = new QueryHelper();
         const getLocation = (type, projectId) => {
             const query: Location['query'] = {};
-
-            query.provider = 'all';
-            query.service = CLOUD_SERVICE_LABEL[type];
-            if (type === 'storage') query.primary = 'false';
+            query.service = primitiveToQueryString(CLOUD_SERVICE_LABEL[type]);
 
             const location: Location = {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 query: {
                     filters: queryHelper.setFilters([
                         { k: 'project_id', v: projectId, o: '=' },

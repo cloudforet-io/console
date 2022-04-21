@@ -56,6 +56,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { primitiveToQueryString } from '@/lib/router-query-string';
 
 enum DATA_TYPE {
     compute = 'compute',
@@ -101,10 +102,9 @@ export default {
         const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
         const getLocation = (type, provider, serviceAccountId) => {
             const query: Location['query'] = {
-                provider,
-                service: CLOUD_SERVICE_LABEL[type],
+                provider: primitiveToQueryString(provider),
+                service: primitiveToQueryString(CLOUD_SERVICE_LABEL[type]),
             };
-            if (type === DATA_TYPE.storage) query.primary = 'false';
 
             // set filters
             queryHelper.setFilters([
@@ -113,7 +113,7 @@ export default {
             ]);
 
             const location: Location = {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,
                     ...query,

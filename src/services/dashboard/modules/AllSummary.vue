@@ -122,6 +122,7 @@ import { store } from '@/store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { primitiveToQueryString } from '@/lib/router-query-string';
 
 
 /* enum */
@@ -335,13 +336,11 @@ export default {
         };
         const getLocation = (type) => {
             const query: Location['query'] = {
-                provider: 'all',
-                service: CLOUD_SERVICE_LABEL[type],
+                service: primitiveToQueryString(CLOUD_SERVICE_LABEL[type]),
             };
-            if (type === DATA_TYPE.storage) query.primary = 'false';
 
             const location: Location = {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,
                     ...query,

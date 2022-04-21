@@ -232,7 +232,7 @@ export default {
             }
 
             return {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 params: {},
                 query: {
                     filters: queryHelper.setFilters(filters).rawQueryStrings,

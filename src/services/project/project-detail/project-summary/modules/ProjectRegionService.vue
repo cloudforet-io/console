@@ -63,6 +63,7 @@ import { Location } from 'vue-router';
 import config from '@/lib/config';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { primitiveToQueryString } from '@/lib/router-query-string';
 
 
 interface Data {
@@ -180,16 +181,16 @@ export default {
 
         const getLocation = (provider, region) => {
             const query: Location['query'] = {
-                provider,
-                region,
+                provider: primitiveToQueryString(provider),
+                region: primitiveToQueryString(region),
             };
-            if (props.label !== 'All') query.service = props.label;
+            if (props.label !== 'All') query.service = primitiveToQueryString(props.label);
 
             // set filters
             queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
 
             const location: Location = {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,
                     ...query,
