@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 import { GTag } from '@/lib/gtag';
 import config from '@/lib/config';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
@@ -60,6 +61,14 @@ export class SpaceRouter {
                     nextLocation = { name: ERROR_ROUTE._NAME };
                 } else if (!hasPermission && to.name !== AUTH_ROUTE.SIGN_OUT._NAME) {
                     if (to.name !== MY_PAGE_ROUTE.MY_ACCOUNT._NAME) nextLocation = { name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME };
+                } else {
+                    const recent = getRecentConfig(to);
+                    if (recent) {
+                        await SpaceRouter.router.app.$store.dispatch('recent/addItem', {
+                            itemType: recent.itemType,
+                            itemId: recent.itemId,
+                        });
+                    }
                 }
             } else if (!to.meta?.excludeAuth) {
                 const res = await SpaceConnector.refreshAccessToken(false);

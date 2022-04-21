@@ -282,10 +282,6 @@ export default defineComponent<Props>({
                     SpaceRouter.router.push({
                         name: menuRoute.name,
                     });
-                    store.dispatch('recent/addItem', {
-                        itemType: type,
-                        itemId: menuId,
-                    });
                 } catch (e) {}
             } else {
                 const cloudServiceTypeId = state.showRecent ? dataState.recentCloudServiceItems[index]?.itemId : dataState.cloudServiceTypeList[index]?.id;
@@ -300,10 +296,6 @@ export default defineComponent<Props>({
                             group: cloudServiceType.data.group,
                             name: cloudServiceType.name,
                         },
-                    });
-                    store.dispatch('recent/addItem', {
-                        itemType: type,
-                        itemId: cloudServiceTypeId,
                     });
                 } catch (e) {}
             }
