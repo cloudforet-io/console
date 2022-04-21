@@ -61,14 +61,6 @@ export class SpaceRouter {
                     nextLocation = { name: ERROR_ROUTE._NAME };
                 } else if (!hasPermission && to.name !== AUTH_ROUTE.SIGN_OUT._NAME) {
                     if (to.name !== MY_PAGE_ROUTE.MY_ACCOUNT._NAME) nextLocation = { name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME };
-                } else {
-                    const recent = getRecentConfig(to);
-                    if (recent) {
-                        await SpaceRouter.router.app.$store.dispatch('recent/addItem', {
-                            itemType: recent.itemType,
-                            itemId: recent.itemId,
-                        });
-                    }
                 }
             } else if (!to.meta?.excludeAuth) {
                 const res = await SpaceConnector.refreshAccessToken(false);
@@ -80,6 +72,13 @@ export class SpaceRouter {
 
         SpaceRouter.router.afterEach((to) => {
             if (config.get('GTAG_ID') !== 'DISABLED') GTag.setPageView(to);
+            const recent = getRecentConfig(to);
+            if (recent) {
+                SpaceRouter.router.app.$store.dispatch('recent/addItem', {
+                    itemType: recent.itemType,
+                    itemId: recent.itemId,
+                });
+            }
         });
 
         return SpaceRouter.router;
