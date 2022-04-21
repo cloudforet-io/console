@@ -1,5 +1,5 @@
 <template>
-    <div class="gnb-recent-favorite" @click.stop="$emit('click')">
+    <div class="gnb-recent-favorite" @click.stop>
         <span class="menu-button">
             <p-i class="menu-icon"
                  name="ic_recent_and_favorite"
