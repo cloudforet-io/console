@@ -4,8 +4,7 @@
                        :loading="loading"
                        :class="{ loading: loading }"
         >
-            <g-n-b-suggestion-list v-if="loading || items.length"
-                                   :items="showAll ? allItems : items"
+            <g-n-b-suggestion-list :items="showAll ? allItems : items"
                                    use-favorite
                                    @update:isFocused="$emit('update:isFocused', $event)"
                                    @move-focus-end="$emit('move-focus-end')"

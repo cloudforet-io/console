@@ -13,7 +13,9 @@
                :active-tab.sync="activeTab"
         >
             <template #recent>
-                <g-n-b-recent @close="handleCloseDropdown" />
+                <g-n-b-recent :visible="proxyVisibleDropdown && activeTab === 'recent'"
+                              @close="handleCloseDropdown"
+                />
             </template>
             <template #favorite>
                 <g-n-b-favorite @close="handleCloseDropdown" />

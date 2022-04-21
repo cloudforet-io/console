@@ -4,7 +4,7 @@ import { FAVORITE_TYPE, FavoriteConfig, FavoriteItem } from '@/store/modules/fav
 import { RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import { CloudServiceTypeReferenceItem, CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import { Menu } from '@/store/modules/display/type';
 import { MENU_ICON } from '@/common/modules/navigations/gnb/config';
 
@@ -36,60 +36,72 @@ export const convertMenuConfigToReferenceData = (config: ConfigData[], menuList:
     return results;
 };
 
-export const convertProjectConfigToReferenceData = (config: ConfigData[], projectReference: ProjectReferenceMap): ReferenceData[] => config.map((d) => {
-    const resource: ProjectReferenceItem = projectReference[d.itemId];
-    const result: ReferenceData = {
-        ...d,
-        name: d.itemId,
-        label: resource?.name || d.itemId,
-        icon: 'ic_tree_project',
-        updatedAt: d?.updatedAt,
-    };
-    if (resource?.data?.groupInfo?.id) {
-        return {
-            ...result,
-            parents: [{
-                name: resource?.data?.groupInfo?.id,
-                label: resource?.data?.groupInfo?.name,
-            }],
-        };
-    }
-    return result;
-});
+export const convertProjectConfigToReferenceData = (config: ConfigData[], projectReference: ProjectReferenceMap): ReferenceData[] => {
+    const results: ReferenceData[] = [];
+    config.forEach((d) => {
+        const resource: ProjectReferenceItem = projectReference[d.itemId];
+        if (resource) {
+            const result: ReferenceData = {
+                ...d,
+                name: d.itemId,
+                label: resource?.name || d.itemId,
+                icon: 'ic_tree_project',
+                updatedAt: d?.updatedAt,
+            };
+            if (resource?.data?.groupInfo?.id) {
+                result.parents = [{
+                    name: resource?.data?.groupInfo?.id,
+                    label: resource?.data?.groupInfo?.name,
+                }];
+            }
+            results.push(result);
+        }
+    });
+    return results;
+};
 
-export const convertProjectGroupConfigToReferenceData = (config: ConfigData[], projectGroupReference: ProjectGroupReferenceMap): ReferenceData[] => config.map((d) => {
-    const resource: ProjectGroupReferenceItem = projectGroupReference[d.itemId];
-    const result: ReferenceData = {
-        ...d,
-        name: d.itemId,
-        label: resource?.name || d.itemId,
-        icon: 'ic_tree_project-group',
-        updatedAt: d?.updatedAt,
-    };
-    if (resource?.data?.parentGroupInfo?.id) {
-        return {
-            ...result,
-            parents: [{
-                name: resource?.data?.parentGroupInfo?.id,
-                label: resource?.data?.parentGroupInfo?.name,
-            }],
-        };
-    }
-    return result;
-});
+export const convertProjectGroupConfigToReferenceData = (config: ConfigData[], projectGroupReference: ProjectGroupReferenceMap): ReferenceData[] => {
+    const results: ReferenceData[] = [];
+    config.forEach((d) => {
+        const resource: ProjectGroupReferenceItem = projectGroupReference[d.itemId];
+        if (resource) {
+            const result: ReferenceData = {
+                ...d,
+                name: d.itemId,
+                label: resource?.name || d.itemId,
+                icon: 'ic_tree_project-group',
+                updatedAt: d?.updatedAt,
+            };
+            if (resource?.data?.parentGroupInfo?.id) {
+                result.parents = [{
+                    name: resource?.data?.parentGroupInfo?.id,
+                    label: resource?.data?.parentGroupInfo?.name,
+                }];
+            }
+            results.push(result);
+        }
+    });
+    return results;
+};
 
-export const convertCloudServiceConfigToReferenceData = (config: ConfigData[], cloudServiceReference: CloudServiceTypeReferenceMap) => config.map((d) => {
-    const resource: CloudServiceTypeReferenceItem = cloudServiceReference[d.itemId];
-    return {
-        ...d,
-        name: d.itemId,
-        label: resource?.name || d.itemId,
-        icon: resource?.icon,
-        provider: resource?.data?.provider,
-        parents: [{
-            name: resource?.data?.group,
-            label: resource?.data?.group,
-        }],
-        updatedAt: d?.updatedAt,
-    };
-});
+export const convertCloudServiceConfigToReferenceData = (config: ConfigData[], cloudServiceReference: CloudServiceTypeReferenceMap) => {
+    const results: ReferenceData[] = [];
+    config.forEach((d) => {
+        const resource = Object.values(cloudServiceReference).find(c => c.data.cloudServiceTypeKey === d.itemId);
+        if (resource) {
+            results.push({
+                ...d,
+                name: d.itemId,
+                label: resource?.name || d.itemId,
+                icon: resource?.icon,
+                provider: resource?.data?.provider,
+                parents: [{
+                    name: resource?.data?.group,
+                    label: resource?.data?.group,
+                }],
+                updatedAt: d?.updatedAt,
+            });
+        }
+    });
+    return results;
+};

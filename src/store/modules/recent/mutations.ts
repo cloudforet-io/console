@@ -3,6 +3,10 @@ import { RecentConfig, RecentState } from '@/store/modules/recent/type';
 
 /* Menu */
 export const addMenuItem = (state: RecentState, recent: RecentConfig): void => {
+    const exist = state.menuItems.find(d => d.itemId === recent.itemId);
+    if (exist) {
+        state.menuItems = state.menuItems.filter(d => d.itemId !== recent.itemId);
+    }
     state.menuItems.unshift(recent);
 };
 export const loadMenuItem = (state: RecentState, recent: RecentConfig[]): void => {
@@ -11,6 +15,10 @@ export const loadMenuItem = (state: RecentState, recent: RecentConfig[]): void =
 
 /* Project */
 export const addProjectItem = (state: RecentState, recent: RecentConfig): void => {
+    const exist = state.projectItems.find(d => d.itemId === recent.itemId);
+    if (exist) {
+        state.projectItems = state.projectItems.filter(d => d.itemId !== recent.itemId);
+    }
     state.projectItems.unshift(recent);
 };
 export const loadProjectItem = (state: RecentState, recent: RecentConfig[]): void => {
@@ -20,6 +28,10 @@ export const loadProjectItem = (state: RecentState, recent: RecentConfig[]): voi
 
 /* Project Group */
 export const addProjectGroupItem = (state: RecentState, recent: RecentConfig): void => {
+    const exist = state.projectGroupItems.find(d => d.itemId === recent.itemId);
+    if (exist) {
+        state.projectGroupItems = state.projectGroupItems.filter(d => d.itemId !== recent.itemId);
+    }
     state.projectGroupItems.unshift(recent);
 };
 export const loadProjectGroupItem = (state: RecentState, recent: RecentConfig[]): void => {
@@ -28,6 +40,10 @@ export const loadProjectGroupItem = (state: RecentState, recent: RecentConfig[])
 
 /* Cloud Service Type */
 export const addCloudServiceItem = (state: RecentState, recent: RecentConfig): void => {
+    const exist = state.cloudServiceItems.find(d => d.itemId === recent.itemId);
+    if (exist) {
+        state.cloudServiceItems = state.cloudServiceItems.filter(d => d.itemId !== recent.itemId);
+    }
     state.cloudServiceItems.unshift(recent);
 };
 export const loadCloudServiceItem = (state: RecentState, recent: RecentConfig[]): void => {

@@ -2,9 +2,9 @@
     <div class="gnb-recent">
         <p-data-loader :data="items"
                        :loading="loading"
+                       :class="{ loading: loading && !items.length }"
         >
-            <g-n-b-suggestion-list v-if="loading || items.length"
-                                   :items="items"
+            <g-n-b-suggestion-list :items="items"
                                    use-favorite
                                    @update:isFocused="$emit('update:isFocused', $event)"
                                    @move-focus-end="$emit('move-focus-end')"
@@ -26,7 +26,9 @@
 <script lang="ts">
 import { sortBy } from 'lodash';
 
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import { PDataLoader } from '@spaceone/design-system';
 
@@ -58,7 +60,12 @@ export default {
         GNBSuggestionList,
         PDataLoader,
     },
-    props: {},
+    props: {
+        visible: {
+            type: Boolean,
+            default: false,
+        },
+    },
     setup(props, { emit }) {
         const storeState = reactive({
             menuItems: computed<Menu[]>(() => store.state.display.menuList),
@@ -112,15 +119,21 @@ export default {
 
         /* Init */
         (async () => {
-            state.loading = true;
             await Promise.allSettled([
                 store.dispatch('reference/project/load'),
                 store.dispatch('reference/projectGroup/load'),
                 store.dispatch('reference/cloudServiceType/load'),
-                store.dispatch('recent/load', { limit: RECENT_LIMIT }),
             ]);
-            state.loading = false;
         })();
+
+        /* Watcher */
+        watch(() => props.visible, async (visible) => {
+            if (visible) {
+                state.loading = true;
+                await store.dispatch('recent/load', { limit: RECENT_LIMIT });
+                state.loading = false;
+            }
+        });
 
         return {
             ...toRefs(state),
@@ -132,6 +145,11 @@ export default {
 <style lang="postcss" scoped>
 .gnb-recent {
     padding: 1rem 0;
+    .p-data-loader {
+        &.loading {
+            height: 13rem;
+        }
+    }
     .no-data {
         text-align: center;
         padding: 3rem 3.25rem;
