@@ -320,6 +320,7 @@
 				"ALT_S_UPDATE_BUDGET": "Successfully Updated Budget",
 				"DETAIL": {
 					"ACTUAL_COST": "Actual Cost",
+					"AMOUNT_PLANNING_TYPE": "Amount Planning Type",
 					"BUDGETED": "Budgeted",
 					"BUDGET_NOTIFICATIONS": "Budget Notifications",
 					"BUDGET_NOTIFICATIONS_DESC": "Set budget notifications if you want to send notifications when the cost exceeds the budget",
@@ -330,6 +331,7 @@
 					"BUDGET_SUMMARY": "Budget Summary",
 					"CONDITION": "Condition",
 					"COST_TYPE": "Cost Type",
+					"DETAILS": "Details",
 					"FIELD": {
 						"ACTUAL_COST": "Actual Cost",
 						"BUDGET_SPENT": "Budget Spent",
@@ -352,10 +354,13 @@
 						"UNIT": "Unit",
 						"WARNING": "Warning"
 					},
+					"MONTHLY_PLANNING": "Monthly Planning",
 					"NOTIFICATIONS_CHANNEL": "Notifications Channel",
+					"PERIOD": "Period",
 					"SET": "Set",
 					"SET_NOTIFICATION_CHANNEL": "Set Notifications Channel",
 					"TARGET": "Target",
+					"TOTAL_AMOUNT": "Total Amount",
 					"TOTAL_BUDGETED_AMOUNT": "Total Budgeted Amount (Period)",
 					"VIEW_ALL": "View All"
 				},
@@ -735,6 +740,17 @@
 				"ROLE_DOMAIN_ADMIN": "Domain Admin",
 				"ROLE_ROOT_ADMIN": "Root Admin"
 			},
+			"FAVORITES": {
+				"ALL_CLOUD_SERVICES": "All Cloud Services",
+				"ALL_MENU": "All Menu",
+				"ALL_PROJECTS": "All Projects",
+				"FAVORITES": "Favorites",
+				"FAVORITES_HELP_TEXT": "Add frequently visited pages to your favorites.",
+				"GO_TO_CLOUD_SERVICE": "Go to Cloud Service",
+				"GO_TO_PROJECT": "Go to Project",
+				"MENU": "MENU",
+				"SHOW_ALL": "Show all"
+			},
 			"NOTIFICATION": {
 				"ALT_E_LIST_NOTIFICATION": "Failed to List Notifications",
 				"NO_NOTIFICATION": "No Notifications",
@@ -743,6 +759,10 @@
 				"TITLE": "Notifications",
 				"TODAY": "Today",
 				"YESTERDAY": "Yesterday"
+			},
+			"RECENT": {
+				"RECENT": "Recent Visits",
+				"RECENT_HELP_TEXT": "Recently visited page list will appear here."
 			},
 			"SEARCH": {
 				"CLOUD_SERVICE": "CLOUD SERVICE",
@@ -1123,6 +1143,8 @@
 				"PASSWORD_INVALID": "Password must be 5 ~ 12 characters long.",
 				"REQUIRED_FIELD": "Required field",
 				"TAGS": "Tags",
+				"TAGS_HELP_TEXT1": "Add associated tags.",
+				"TAGS_HELP_TEXT2": "The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.",
 				"TIMEZONE": "Time Zone",
 				"TIMEZONE_INVALID": "The time zone is set incorrectly.",
 				"TOO_MANY_RESULTS": "Too many search results. Try a different keyword.",
@@ -1294,6 +1316,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "Add Service Account",
+				"ALL": "All",
 				"ALT_E_CHECK_MODAL": "Failed to {action}",
 				"ALT_S_CHECK_MODAL": "Success to {action}",
 				"AUTO_PERIOD": "Auto (Overall period)",
@@ -1302,14 +1325,26 @@
 				"EMPTY_CLOUD_SERVICE": "Please, register Service Account first to collect cloud service resouces. ",
 				"FAVORITES": "Favorites",
 				"FILTERED_BY_DATE": "Filtered by Date",
+				"MODAL": {
+					"CLEAR_ALL": "Clear All",
+					"FILTER_HELP": "Selected filter",
+					"NO_FILTER_HELP_TEXT1": "No selected filters.",
+					"NO_FILTER_HELP_TEXT2": "Select filters from the list.",
+					"REGION": "Region",
+					"SELECTED_FILTER": "Selected filter",
+					"SERVICE_CATEGORY": "Service Category",
+					"SET_FILTER": "Set Filter"
+				},
 				"NO_REGION": "No Region",
 				"REGION": "Regions",
 				"SERVICE_CATEGORY": "Service Categories",
 				"SERVICE_PROVIDER": "Service Providers",
+				"SET": "Set",
 				"SHOW_ALL": "Show all",
 				"SHOW_CHARTS": "Show Charts",
 				"SHOW_MAJOR": "Show Major Services ",
 				"TITLE": "{provider} Cloud Service",
+				"TOTAL_RESULT": "Total Result",
 				"USAGE_OVERVIEW": "Usage Overview"
 			},
 			"PAGE": {

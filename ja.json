@@ -320,6 +320,7 @@
 				"ALT_S_UPDATE_BUDGET": "予算が正常に更新されました",
 				"DETAIL": {
 					"ACTUAL_COST": "費用",
+					"AMOUNT_PLANNING_TYPE": "",
 					"BUDGETED": "予算",
 					"BUDGET_NOTIFICATIONS": "予算に関するお知らせ",
 					"BUDGET_NOTIFICATIONS_DESC": "費用が予算の一定金額を超えた場合、自動通知されるように通知基準を設定できます。",
@@ -330,6 +331,7 @@
 					"BUDGET_SUMMARY": "予算概要",
 					"CONDITION": "条件",
 					"COST_TYPE": "コストタイプ",
+					"DETAILS": "",
 					"FIELD": {
 						"ACTUAL_COST": "費用",
 						"BUDGET_SPENT": "予算使用率",
@@ -352,10 +354,13 @@
 						"UNIT": "ユニット",
 						"WARNING": "警告"
 					},
+					"MONTHLY_PLANNING": "",
 					"NOTIFICATIONS_CHANNEL": "通知チャネル",
+					"PERIOD": "",
 					"SET": "設定",
 					"SET_NOTIFICATION_CHANNEL": "通知チャネルの設定",
 					"TARGET": "ターゲット",
+					"TOTAL_AMOUNT": "",
 					"TOTAL_BUDGETED_AMOUNT": "総予算(期間）合計",
 					"VIEW_ALL": "すべて表示"
 				},
@@ -735,6 +740,17 @@
 				"ROLE_DOMAIN_ADMIN": "ドメイン管理者",
 				"ROLE_ROOT_ADMIN": "ルート管理者"
 			},
+			"FAVORITES": {
+				"ALL_CLOUD_SERVICES": "",
+				"ALL_MENU": "",
+				"ALL_PROJECTS": "",
+				"FAVORITES": "",
+				"FAVORITES_HELP_TEXT": "",
+				"GO_TO_CLOUD_SERVICE": "",
+				"GO_TO_PROJECT": "",
+				"MENU": "",
+				"SHOW_ALL": ""
+			},
 			"NOTIFICATION": {
 				"ALT_E_LIST_NOTIFICATION": "通知の一覧表示に失敗",
 				"NO_NOTIFICATION": "通知がありません。",
@@ -743,6 +759,10 @@
 				"TITLE": "通知",
 				"TODAY": "今日",
 				"YESTERDAY": "昨日"
+			},
+			"RECENT": {
+				"RECENT": "",
+				"RECENT_HELP_TEXT": ""
 			},
 			"SEARCH": {
 				"CLOUD_SERVICE": "クラウドサービス",
@@ -1123,6 +1143,8 @@
 				"PASSWORD_INVALID": "パスワードは、5〜12文字で入力してください。",
 				"REQUIRED_FIELD": "該当する情報を入力してください。",
 				"TAGS": "タグ",
+				"TAGS_HELP_TEXT1": "",
+				"TAGS_HELP_TEXT2": "",
 				"TIMEZONE": "タイムゾーン",
 				"TIMEZONE_INVALID": "タイムゾーンが正しく設定されました。",
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。 別のキーワードを使用してください",
@@ -1294,6 +1316,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "サービスアカウントの追加",
+				"ALL": "",
 				"ALT_E_CHECK_MODAL": "{action}失敗",
 				"ALT_S_CHECK_MODAL": "{action}完了",
 				"AUTO_PERIOD": "自動（全期間）",
@@ -1302,14 +1325,26 @@
 				"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
 				"FAVORITES": "お気に入り",
 				"FILTERED_BY_DATE": "日付で絞り込み",
+				"MODAL": {
+					"CLEAR_ALL": "",
+					"FILTER_HELP": "",
+					"NO_FILTER_HELP_TEXT1": "",
+					"NO_FILTER_HELP_TEXT2": "",
+					"REGION": "",
+					"SELECTED_FILTER": "",
+					"SERVICE_CATEGORY": "",
+					"SET_FILTER": ""
+				},
 				"NO_REGION": "リージョンがありません。",
 				"REGION": "リージョン",
 				"SERVICE_CATEGORY": "サービスカテゴリー",
 				"SERVICE_PROVIDER": "サービスプロバイダー",
+				"SET": "",
 				"SHOW_ALL": "すべて表示",
 				"SHOW_CHARTS": "チャートの表示",
 				"SHOW_MAJOR": "主なサービスを見る",
 				"TITLE": "{provider} クラウドサービス",
+				"TOTAL_RESULT": "",
 				"USAGE_OVERVIEW": "利用概要"
 			},
 			"PAGE": {
