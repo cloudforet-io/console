@@ -1,3 +1,10 @@
+# [1.1.0-beta.282](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.281...v1.1.0-beta.282) (2022-04-21)
+
+
+### Features
+
+* remove filter label in query search tags and update style ([#927](https://github.com/spaceone-dev/spaceone-design-system/issues/927)) ([8fc8741](https://github.com/spaceone-dev/spaceone-design-system/commit/8fc87414f242b5804f27c72a9ae0535ac20fec8b))
+
 # [1.1.0-beta.281](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.280...v1.1.0-beta.281) (2022-04-19)
 
 
