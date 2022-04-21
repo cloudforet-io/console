@@ -13,7 +13,7 @@
                 <div class="left-select-filter-section">
                     <p-collapsible-list
                         class="collapsible-list-section"
-                        :items="FILTER_ITEMS"
+                        :items="filterItems"
                         toggle-type="switch"
                         :multi-unfoldable="true"
                         :unfolded-indices.sync="unfoldedIndices"
@@ -22,7 +22,6 @@
                             <cloud-service-filter-search-dropdown v-if="!isCollapsed"
                                                                   :type="name"
                                                                   :selected.sync="filters[name]"
-                                                                  :provider="provider"
                             />
                         </template>
                     </p-collapsible-list>
@@ -37,7 +36,7 @@
                                 <p-tag v-for="(item, itemIdx) in items" :key="`selected-tag-${idx}-${item.name}`"
                                        @delete="handleDeleteTag(filterName, itemIdx)"
                                 >
-                                    <b>{{ FILTER_LABELS[filterName] }}: </b>{{ item.label }}
+                                    <b>{{ filterLabels[filterName] }}: </b>{{ item.label }}
                                 </p-tag>
                             </template>
                         </div>
@@ -57,7 +56,7 @@
 
 <script lang="ts">
 import { sum } from 'lodash';
-
+import { TranslateResult } from 'vue-i18n';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -66,38 +65,31 @@ import {
     PButtonModal, PCollapsibleList, PTag,
 } from '@spaceone/design-system';
 
-import { ReferenceItem } from '@/store/modules/reference/type';
+import { i18n } from '@/translations';
 import { store } from '@/store';
-import { CloudServiceFilterKey } from '@/services/asset-inventory/cloud-service/type';
-import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
-import CloudServiceFilterSearchDropdown from '@/services/asset-inventory/cloud-service/modules/CloudServiceFilterSearchDropdown.vue';
 import { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { CloudServiceFilterKey, CloudServiceFilterMap } from '@/services/asset-inventory/cloud-service/type';
+import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
+import CloudServiceFilterSearchDropdown from '@/services/asset-inventory/cloud-service/modules/CloudServiceFilterSearchDropdown.vue';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
-
-import { i18n } from '@/translations';
-import VueI18n from 'vue-i18n';
-
-import TranslateResult = VueI18n.TranslateResult;
-
+import {
+    getRegionFilterMenuItem,
+    RegionMenuItem,
+} from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
 
 interface FilterItem {
     name: string;
     title: TranslateResult;
 }
 
-type CloudServiceFilterItemsMap = Partial<Record<CloudServiceFilterKey, FilterItem[]>>
-
-const FILTER_LABELS: Record<CloudServiceFilterKey, TranslateResult> = {
-    [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.SERVICE_CATEGORY'),
-    [CLOUD_SERVICE_FILTER_KEY.REGION]: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.REGION'),
-};
-
-const FILTER_ITEMS: FilterItem[] = [
-    { name: CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY, title: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.SERVICE_CATEGORY') },
-    { name: CLOUD_SERVICE_FILTER_KEY.REGION, title: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.REGION') },
-];
+interface CategoryMenuItem { name: string; label: string }
+type CloudServiceFilterItemsMap = {
+    [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: CategoryMenuItem[];
+    [CLOUD_SERVICE_FILTER_KEY.REGION]: RegionMenuItem[];
+}
 
 interface Props {
     visible: boolean;
@@ -120,29 +112,28 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
-            provider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
-            referenceItemsMap: computed(() => ({
-                provider: store.state.reference.provider.items as ProviderReferenceMap,
-                region_code: store.state.reference.region.items as RegionReferenceMap,
+            filterLabels: computed<Record<CloudServiceFilterKey, TranslateResult>>(() => ({
+                [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.SERVICE_CATEGORY'),
+                [CLOUD_SERVICE_FILTER_KEY.REGION]: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.REGION'),
             })),
-            filters: assetInventoryStore.state.cloudService.additionalFilters,
-            selectedItemsMap: computed<CloudServiceFilterItemsMap>(() => {
-                const itemsMap: CloudServiceFilterItemsMap = {};
-
-                Object.entries<string[]>(state.filters).forEach(([key, data]) => {
-                    const items = state.referenceItemsMap[key];
-                    if (items) {
-                        itemsMap[key] = data?.map((d) => {
-                            const item: ReferenceItem = items[d];
-                            const label = key === 'region_code' ? item?.name : item?.label;
-                            return { name: d, label: label ?? d };
-                        });
-                    } else itemsMap[key] = data?.map(d => ({ name: d, label: d }));
-                });
-                return itemsMap;
-            }),
+            filterItems: computed<FilterItem[]>(() => [
+                { name: CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY, title: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.SERVICE_CATEGORY') },
+                { name: CLOUD_SERVICE_FILTER_KEY.REGION, title: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.REGION') },
+            ]),
+            // references
+            providers: computed<ProviderReferenceMap>(() => store.state.reference.provider.items),
+            regions: computed<RegionReferenceMap>(() => store.state.reference.region.items),
+            // asset inventory store data
+            provider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
+            categoryFilters: computed<CategoryMenuItem[]>(() => state.filters[CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]?.map(d => ({ name: d, label: d }))),
+            regionFilters: computed<RegionMenuItem[]>(() => state.filters[CLOUD_SERVICE_FILTER_KEY.REGION]?.map(d => getRegionFilterMenuItem(d, state.regions, state.providers))),
+            filters: assetInventoryStore.state.cloudService.additionalFilters as CloudServiceFilterMap,
+            selectedItemsMap: computed<CloudServiceFilterItemsMap>(() => ({
+                [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: state.categoryFilters,
+                [CLOUD_SERVICE_FILTER_KEY.REGION]: state.regionFilters,
+            })),
             selectedItemsLength: computed<number>(() => {
-                const selectedValues = Object.values(state.selectedItemsMap);
+                const selectedValues = Object.values(state.selectedItemsMap as CloudServiceFilterItemsMap);
                 return sum(selectedValues.map(v => v?.length || 0));
             }),
             unfoldedIndices: [] as number[],
@@ -153,7 +144,7 @@ export default defineComponent<Props>({
         const init = () => {
             const _unfoldedIndices: number[] = [];
             const originFilters = assetInventoryStore.state.cloudService.additionalFilters;
-            FILTER_ITEMS.forEach((item, idx) => {
+            state.filterItems.forEach((item, idx) => {
                 if (originFilters[item.name]?.length) {
                     _unfoldedIndices.push(idx);
                 }
@@ -188,13 +179,22 @@ export default defineComponent<Props>({
             if (after.length < before.length) {
                 const filters = { ...state.filters };
                 const deletedIndex: number = before.filter(idx => !after.includes(idx))[0];
-                const deletedFilterName = FILTER_ITEMS[deletedIndex].name;
+                const deletedFilterName = state.filterItems[deletedIndex].name;
                 filters[deletedFilterName] = undefined;
                 state.filters = filters;
             }
         });
         watch(() => props.visible, (visible) => {
             if (visible) init();
+        });
+        watch(() => state.provider, (provider) => {
+            if (provider === 'all') return;
+            const regionFilters = state.filters[CLOUD_SERVICE_FILTER_KEY.REGION] ?? [];
+            assetInventoryStore.dispatch('cloudService/setSelectedRegions', regionFilters.filter((r) => {
+                const region = state.regions[r];
+                if (!region) return false;
+                return region.data.provider === provider;
+            }));
         });
 
         // LOAD REFERENCE STORE
@@ -210,8 +210,6 @@ export default defineComponent<Props>({
             handleFormConfirm,
             handleClearAll,
             handleDeleteTag,
-            FILTER_LABELS,
-            FILTER_ITEMS,
         };
     },
 });

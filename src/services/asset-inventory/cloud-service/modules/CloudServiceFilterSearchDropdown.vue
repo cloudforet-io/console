@@ -24,7 +24,7 @@
                         />
                     </div>
                     <text-highlighting class="region-code"
-                                       :text="item.continent"
+                                       :text="item.continentLabel"
                                        :term="searchTerm"
                                        style-type="secondary"
                     />
@@ -52,6 +52,8 @@ import { SortedRegionReferenceItem } from '@/store/modules/reference/region/type
 import { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
+import { getRegionFilterMenuItem, RegionMenuItem } from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
+import { assetInventoryStore } from '@/services/asset-inventory/store';
 
 const categoryItems = [
     { name: CLOUD_SERVICE_CATEGORY.COMPUTE, label: CLOUD_SERVICE_CATEGORY.COMPUTE },
@@ -65,14 +67,6 @@ const categoryItems = [
     { name: CLOUD_SERVICE_CATEGORY.MANAGEMENT, label: CLOUD_SERVICE_CATEGORY.MANAGEMENT },
 ];
 
-interface RegionMenuItem extends SearchDropdownMenuItem {
-    name: string;
-    label: string;
-    regionName: string;
-    provider: string;
-    color: string;
-    continent: string;
-}
 
 interface AutocompleteResult<Data> {
     name: string;
@@ -88,7 +82,6 @@ type RegionAutocompleteResult = AutocompleteResult<{
 interface Props {
     type: string;
     selected: string[];
-    provider: string;
 }
 
 export default defineComponent<Props>({
@@ -106,10 +99,6 @@ export default defineComponent<Props>({
             type: Array,
             default: () => ([]),
         },
-        provider: {
-            type: String,
-            default: 'all',
-        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -119,20 +108,14 @@ export default defineComponent<Props>({
                 label: state.menuItems.find(d => d.name === selectedName)?.label || selectedName,
             }))),
             providers: computed<ProviderReferenceMap>(() => store.state.reference.provider.items),
-            sortedRegions: computed<SortedRegionReferenceItem[]>(() => store.getters['reference/region/regionsSortedByProvider']),
-            regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map((d) => {
-                const continentLabel = d.continent?.continent_label;
-                const provider = state.providers[d.data.provider];
-                return {
-                    name: d.id,
-                    label: `${provider?.label} ${d.name} ${continentLabel}`,
-                    regionName: d.name,
-                    provider: d.data.provider,
-                    color: provider?.color,
-                    continentLabel,
-                };
-            })),
-            menuItems: computed(() => {
+            selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
+            sortedRegions: computed<SortedRegionReferenceItem[]>(() => {
+                const regions: SortedRegionReferenceItem[] = store.getters['reference/region/regionsSortedByProvider'];
+                if (state.selectedProvider === 'all') return regions;
+                return regions.filter(r => r.data.provider === state.selectedProvider);
+            }),
+            regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map(d => getRegionFilterMenuItem(d.id, store.state.reference.region.items, state.providers))),
+            menuItems: computed<SearchDropdownMenuItem[]|RegionMenuItem[]>(() => {
                 if (props.type === CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY) {
                     return categoryItems;
                 } if (props.type === CLOUD_SERVICE_FILTER_KEY.REGION) {

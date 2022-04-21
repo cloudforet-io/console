@@ -32,9 +32,7 @@
                    @refresh="handleChange()"
                    @export="handleExport"
         />
-        <cloud-service-filter-modal :visible.sync="visibleSetFilterModal"
-                                    @confirm="handleConfirmSetFilter"
-        />
+        <cloud-service-filter-modal :visible.sync="visibleSetFilterModal" />
     </div>
 </template>
 
@@ -263,20 +261,15 @@ export default defineComponent<Props>({
             if (options.queryTags !== undefined) {
                 searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
                 assetInventoryStore.dispatch('cloudService/setSearchFilters', searchQueryHelper.filters);
-                emit('update-search-filters');
             } else {
                 emit('update-pagination', options);
             }
         };
         const handleUpdatePeriod = (period) => {
             assetInventoryStore.dispatch('cloudService/setPeriod', period);
-            emit('update-period');
         };
         const handleClickSet = () => {
             state.visibleSetFilterModal = true;
-        };
-        const handleConfirmSetFilter = () => {
-            emit('update-additional-filters');
         };
         const handleExport = async () => {
             try {
@@ -305,7 +298,6 @@ export default defineComponent<Props>({
             ...toRefs(state),
             handleUpdatePeriod,
             handleClickSet,
-            handleConfirmSetFilter,
             handleChange,
             handleExport,
             keyItemSets: props.handlers?.keyItemSets ?? [],

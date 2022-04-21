@@ -12,19 +12,26 @@ export interface ConvertQueryStringToValue<T = any> {
 }
 
 /**
- * @param key?
+ * @param keyOrQuery?
  * @param value?
  * @description replace url query. if no key is given, it replace empty query.
  */
-export const replaceUrlQuery = async (key?: string, value?: RouteQueryString) => {
-    let query: Location['query'];
+export const replaceUrlQuery = async (keyOrQuery?: string|Record<string, RouteQueryString>, value?: RouteQueryString) => {
+    let query: Record<string, RouteQueryString> = {};
 
-    if (key) {
+    if (typeof keyOrQuery === 'string') {
+        const key = keyOrQuery;
         query = { ...SpaceRouter.router.currentRoute.query };
         if ((value === null || value === undefined) && query[key]) delete query[key];
         else query[key] = value;
-    } else {
-        query = {};
+    } else if (typeof keyOrQuery === 'object') {
+        const queryKeys = Object.keys(keyOrQuery);
+        query = { ...SpaceRouter.router.currentRoute.query };
+        queryKeys.forEach((key) => {
+            const queryValue = keyOrQuery[key] as RouteQueryString;
+            if ((queryValue === null || queryValue === undefined) && query[key]) delete query[key];
+            else query[key] = queryValue;
+        });
     }
 
     try {

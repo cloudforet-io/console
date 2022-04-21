@@ -1,5 +1,5 @@
-export const CLOUD_SERVICE_PAGE_URL_QUERY_KEY = ['provider', 'service', 'region'] as const;
-export type CLOUD_SERVICE_PAGE_URL_QUERY_KEY = typeof CLOUD_SERVICE_PAGE_URL_QUERY_KEY[number];
+export const CLOUD_SERVICE_PAGE_URL_QUERY_KEY = ['provider', 'service', 'region', 'period', 'filters'] as const;
+
 
 export const CLOUD_SERVICE_CATEGORY = Object.freeze({
     COMPUTE: 'Compute',
