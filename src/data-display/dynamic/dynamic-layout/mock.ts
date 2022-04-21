@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import { getQueryTags as getToolboxQueryTags } from '@/navigation/toolbox/mock';
+
 export default {
     list: {
         options: {
@@ -849,3 +851,5 @@ Right aligned columns
         data: {},
     },
 };
+
+export const getQueryTags = () => getToolboxQueryTags();

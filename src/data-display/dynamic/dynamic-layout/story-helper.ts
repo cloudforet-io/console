@@ -1,4 +1,4 @@
-import mock from '@/data-display/dynamic/dynamic-layout/mock';
+import mock, { getQueryTags } from '@/data-display/dynamic/dynamic-layout/mock';
 import { ArgTypes } from '@storybook/addons';
 
 export const getDynamicLayoutArgTypes = (): ArgTypes => ({
@@ -436,7 +436,7 @@ export const getDynamicLayoutArgTypes = (): ArgTypes => ({
     queryTags: {
         name: 'queryTags',
         type: { name: 'array' },
-        defaultValue: [],
+        defaultValue: getQueryTags(),
         table: {
             type: {
                 summary: 'array',

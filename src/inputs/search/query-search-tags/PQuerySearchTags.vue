@@ -2,14 +2,13 @@
     <div v-if="_tags.length > 0" class="p-query-search-tags">
         <div class="tags-container">
             <div class="left-wrapper">
-                <span class="filter">{{ $t('COMPONENT.QUERY_SEARCH_TAGS.FILTER') }}: </span>
-                <p-badge v-if="!readOnly" class="delete-btn" outline
-                         style-type="gray900"
-                         @click="deleteAllTags"
+                <p-button v-if="!readOnly" class="delete-btn" :outline="true"
+                          size="sm" font-weight="normal"
+                          style-type="gray-border"
+                          @click="deleteAllTags"
                 >
                     {{ $t('COMPONENT.QUERY_SEARCH_TAGS.CLEAR_ALL') }}
-                </p-badge>
-                <div v-if="!readOnly" class="divider" />
+                </p-button>
             </div>
             <div class="tags-wrapper">
                 <p-tag v-for="(tag, idx) in _tags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
@@ -43,30 +42,32 @@
 
 <script lang="ts">
 import PTag from '@/data-display/tags/PTag.vue';
-import PBadge from '@/data-display/badges/PBadge.vue';
 import {
     QuerySearchTagsFunctions,
     QuerySearchTagsProps,
-    QueryTag,
+    QueryTag, QueryTagConverter, QueryTagValidator,
 } from '@/inputs/search/query-search-tags/type';
 import {
-    computed, defineComponent, ref, watch,
+    computed, defineComponent, PropType, ref, watch,
 } from '@vue/composition-api';
 import { QueryItem } from '@/inputs/search/query-search/type';
 import PI from '@/foundation/icons/PI.vue';
 import { VTooltip } from 'v-tooltip';
 import { defaultConverter, defaultValidator } from '@/inputs/search/query-search-tags/helper';
 import { i18n } from '@/translations';
+import PButton from '@/inputs/buttons/button/PButton.vue';
 
 
-export default defineComponent({
+export default defineComponent<QuerySearchTagsProps>({
     name: 'PQuerySearchTags',
     directives: { tooltip: VTooltip },
     i18n,
-    components: { PI, PTag, PBadge },
+    components: {
+        PButton, PI, PTag,
+    },
     props: {
         tags: {
-            type: Array,
+            type: Array as PropType<QueryTag[]>,
             required: true,
         },
         timezone: {
@@ -74,11 +75,11 @@ export default defineComponent({
             default: 'UTC',
         },
         validator: {
-            type: Function,
+            type: Function as PropType<QueryTagValidator|undefined>,
             default: undefined,
         },
         converter: {
-            type: Function,
+            type: Function as PropType<QueryTagConverter|undefined>,
             default: undefined,
         },
         readOnly: {
@@ -86,7 +87,7 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props: QuerySearchTagsProps, { emit }) {
+    setup(props, { emit }) {
         const timezone = computed(() => props.timezone);
         const validator = computed(() => props.validator || defaultValidator);
         const converter = computed(() => props.converter || defaultConverter);
@@ -150,21 +151,10 @@ export default defineComponent({
         @apply flex-shrink-0 inline-flex;
         align-items: center;
     }
-    .filter {
-        @apply mr-4 rounded-xs;
-        font-size: 0.75rem;
-    }
     .delete-btn {
-        @apply rounded;
+        @apply mr-2;
         flex: 0 0 auto;
-        padding: 0.125rem 0.5rem;
-        height: auto;
-        cursor: pointer;
-    }
-    .divider {
-        @apply inline-block my-0 mx-4 text-gray-200;
-        height: 1rem;
-        border-left-width: 1px;
+        font-size: 0.875rem;
     }
     .tags-wrapper {
         flex-grow: 1;

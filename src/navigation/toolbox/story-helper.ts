@@ -1,6 +1,6 @@
 import { ArgTypes } from '@storybook/addons';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
-import { getKeyItemSets, getValueHandlerMap } from '@/navigation/toolbox/mock';
+import { getKeyItemSets, getQueryTags, getValueHandlerMap } from '@/navigation/toolbox/mock';
 
 export const getToolboxArgTypes = (): ArgTypes => ({
     paginationVisible: {
@@ -316,7 +316,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
         name: 'queryTags',
         type: { name: 'array' },
         description: 'Query search tags. Follow the QuerySearchTags component spec. sync props.',
-        defaultValue: [],
+        defaultValue: getQueryTags(),
         table: {
             type: {
                 summary: 'array',
