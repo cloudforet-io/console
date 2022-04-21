@@ -243,9 +243,18 @@ export default {
         const getIsRaised = (item: CostAnalyzeModel, fieldName: string) => {
             const currDate = fieldName.split('.')[1]; // usd_cost.2022-01-04
             const prevDate = dayjs.utc(currDate).subtract(1, state.timeUnit).format(state.dateFormat);
-            const currValue = item.usd_cost[currDate] ?? 0;
-            const prevValue = item.usd_cost[prevDate] ?? 0;
-            if (prevValue && currValue - prevValue > 0) return ((currValue - prevValue) / prevValue) * 100 > 50;
+            const currValue = item.usd_cost[currDate];
+            const prevValue = item.usd_cost[prevDate];
+
+            if (prevValue === undefined || currValue === undefined) return false;
+            if (currValue < prevValue) return false;
+            if (currValue > 0) {
+                if (prevValue < 0) return true;
+                if (currValue - prevValue > 0) return ((currValue - prevValue) / currValue) * 100 > 50;
+            }
+            if (currValue < 0 && currValue > prevValue) {
+                return currValue * 2 > prevValue;
+            }
             return false;
         };
         const _getStackedTableData = (rawData: CostAnalyzeModel[], granularity, period): CostAnalyzeModel[] => {
