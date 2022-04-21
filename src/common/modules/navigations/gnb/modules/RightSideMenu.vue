@@ -4,7 +4,8 @@
                       :visible-suggestion="openedMenu === 'search'"
                       @update:visibleSuggestion="toggleMenu('search')"
         />
-        <g-n-b-recent-favorite v-click-outside="hideMenu"
+        <g-n-b-recent-favorite v-if="!userState.isDomainOwner"
+                               v-click-outside="hideMenu"
                                :visible-dropdown="openedMenu === 'recentFavorite'"
                                @update:visibleDropdown="toggleMenu('recentFavorite')"
         />

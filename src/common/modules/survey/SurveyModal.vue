@@ -56,6 +56,7 @@ import {
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
 
 
 const SURVEY_KEY = '1.9.6';
@@ -73,6 +74,7 @@ export default {
         const state = reactive({
             visible: false,
             userId: computed(() => vm.$store.state.user.userId),
+            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             answerItems1: computed(() => [
                 {
                     name: 1,
@@ -149,7 +151,9 @@ export default {
         };
 
         (async () => {
-            await listSurveyConfig();
+            if (!state.isDomainOwner) {
+                await listSurveyConfig();
+            }
         })();
 
         return {

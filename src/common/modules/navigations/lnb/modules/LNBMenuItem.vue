@@ -29,7 +29,7 @@
                     <slot name="right-extra" v-bind="{...$props, item, index: idx}" />
                 </router-link>
                 <favorite-button
-                    v-if="!item.hideFavorite"
+                    v-if="!item.hideFavorite && !isDomainOwner"
                     :item-id="item.id"
                     :favorite-type="FAVORITE_TYPE.MENU"
                     :favorite-items="favoriteItems"
@@ -82,6 +82,7 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             isFolded: false,
             isFoldableMenu: computed(() => props.menuData?.some(item => item.foldable)),
             showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu

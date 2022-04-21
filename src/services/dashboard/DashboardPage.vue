@@ -15,7 +15,7 @@
             <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
             >
-                <favorites-widget class="hidden lg:block col-span-12" />
+                <favorites-widget v-if="!isDomainOwner" class="hidden lg:block col-span-12" />
 
                 <daily-updates class="col-span-12 daily-updates"
                                :providers="providers"
@@ -69,6 +69,7 @@ export default {
     },
     setup() {
         const state = reactive({
+            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             providers: computed(() => store.state.reference.provider.items),
             timezone: computed(() => store.state.user.timezone || 'UTC'),
         });
