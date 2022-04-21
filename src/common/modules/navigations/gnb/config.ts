@@ -5,4 +5,5 @@ export const MENU_ICON = Object.freeze({
     cost_explorer: 'ic_analytics',
     alert_manager: 'ic_monitoring',
     administration: 'ic_management',
+    my_page: 'ic_identity',
 });
