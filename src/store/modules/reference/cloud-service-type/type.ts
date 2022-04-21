@@ -3,6 +3,7 @@ import { ReferenceItem, ReferenceMap, ReferenceState } from '@/store/modules/ref
 export interface CloudServiceTypeResourceItemData {
     provider?: string;
     group?: string;
+    cloudServiceTypeKey?: string;
 }
 
 export type CloudServiceTypeReferenceItem = Required<Pick<ReferenceItem<CloudServiceTypeResourceItemData>, 'label'|'name'|'icon'|'data'>>

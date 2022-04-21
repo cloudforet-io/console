@@ -17,7 +17,7 @@
                  @click="onClickSidebarItem(item)"
             >
                 <div>{{ item.name }}</div>
-                <favorite-button :item-id="item.cloud_service_type_id || ''"
+                <favorite-button :item-id="item.cloud_service_type_key || ''"
                                  :favorite-items="sidebarState.favoriteItems"
                                  :favorite-type="FAVORITE_TYPE.CLOUD_SERVICE"
                                  class="favorite-btn"
@@ -567,7 +567,7 @@ export default {
         };
 
         const cloudServiceTypeQuery = new ApiQueryHelper()
-            .setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'is_primary', 'resource_type')
+            .setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'is_primary', 'resource_type', 'cloud_service_type_key')
             .setMultiSort([{ key: 'is_primary', desc: true }, { key: 'name', desc: false }]);
 
 

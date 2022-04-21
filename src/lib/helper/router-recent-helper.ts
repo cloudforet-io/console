@@ -7,8 +7,11 @@ import { PROJECT_ROUTE } from '@/services/project/route-config';
 export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     /* ClOUD SERVICE */
     if (to.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME) {
-        // todo
-        // return { itemType: RECENT_TYPE.CLOUD_SERVICE, itemId:  }
+        const provider = to?.params?.provider;
+        const group = to?.params?.group;
+        const name = to?.params?.name;
+        if (!provider || !group || !name) return undefined;
+        return { itemType: RECENT_TYPE.CLOUD_SERVICE, itemId: `${provider}.${group}.${name}` };
     }
 
     /* PROJECT GROUP */

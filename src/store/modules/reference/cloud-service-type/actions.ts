@@ -19,7 +19,7 @@ export const load: Action<CloudServiceTypeReferenceState, any> = async ({ state,
     try {
         const response = await SpaceConnector.client.inventory.cloudServiceType.list({
             query: {
-                only: ['cloud_service_type_id', 'name', 'group', 'provider', 'tags'],
+                only: ['cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'cloud_service_type_key'],
             },
         }, { timeout: 3000 });
         const cloudServiceTypes: CloudServiceTypeReferenceMap = {};
@@ -32,6 +32,7 @@ export const load: Action<CloudServiceTypeReferenceState, any> = async ({ state,
                 data: {
                     provider: cloudServiceTypeInfo.provider,
                     group: cloudServiceTypeInfo.group,
+                    cloudServiceTypeKey: cloudServiceTypeInfo.cloud_service_type_key,
                 },
             };
         });

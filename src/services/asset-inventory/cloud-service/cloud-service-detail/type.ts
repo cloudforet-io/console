@@ -2,6 +2,7 @@ import { Tags } from '@/models';
 
 export interface CloudServiceTypeInfo {
     cloud_service_type_id: string;
+    cloud_service_type_key: string;
     name: string;
     provider: string;
     group: string;
