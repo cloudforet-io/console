@@ -7,7 +7,7 @@ import config from '@/lib/config';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { ERROR_ROUTE } from '@/router/error-routes';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+// import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
@@ -54,13 +54,15 @@ export class SpaceRouter {
 
             if (isTokenAlive) {
                 const isAdmin = SpaceRouter.router.app.$store.getters['user/isAdmin'];
-                const hasPermission = SpaceRouter.router.app.$store.getters['user/hasPermission'];
+                // const hasPermission = SpaceRouter.router.app.$store.getters['user/hasPermission'];
+                //
+                // if (!hasPermission && to.name !== AUTH_ROUTE.SIGN_OUT._NAME && to.name !== MY_PAGE_ROUTE.MY_ACCOUNT._NAME) {
+                //     if (to.name !== MY_PAGE_ROUTE.MY_ACCOUNT._NAME) nextLocation = { name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME };
+                // }
                 if (to.meta?.isSignInPage) {
                     nextLocation = { name: DASHBOARD_ROUTE._NAME };
                 } else if (to.meta?.isDomainOwnerOnly && !isAdmin) {
                     nextLocation = { name: ERROR_ROUTE._NAME };
-                } else if (!hasPermission && to.name !== AUTH_ROUTE.SIGN_OUT._NAME) {
-                    if (to.name !== MY_PAGE_ROUTE.MY_ACCOUNT._NAME) nextLocation = { name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME };
                 }
             } else if (!to.meta?.excludeAuth) {
                 const res = await SpaceConnector.refreshAccessToken(false);
