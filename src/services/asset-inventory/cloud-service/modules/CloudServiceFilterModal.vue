@@ -19,10 +19,10 @@
                         :unfolded-indices.sync="unfoldedIndices"
                     >
                         <template #default="{name, isCollapsed}">
-                            <cloud-service-filter-item v-if="!isCollapsed"
-                                                       :type="name"
-                                                       :selected.sync="filters[name]"
-                                                       :provider="provider"
+                            <cloud-service-filter-search-dropdown v-if="!isCollapsed"
+                                                                  :type="name"
+                                                                  :selected.sync="filters[name]"
+                                                                  :provider="provider"
                             />
                         </template>
                     </p-collapsible-list>
@@ -70,7 +70,7 @@ import { ReferenceItem } from '@/store/modules/reference/type';
 import { store } from '@/store';
 import { CloudServiceFilterKey } from '@/services/asset-inventory/cloud-service/type';
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
-import CloudServiceFilterItem from '@/services/asset-inventory/cloud-service/modules/CloudServiceFilterItem.vue';
+import CloudServiceFilterSearchDropdown from '@/services/asset-inventory/cloud-service/modules/CloudServiceFilterSearchDropdown.vue';
 import { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -106,7 +106,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'CloudServiceFilterModal',
     components: {
-        CloudServiceFilterItem,
+        CloudServiceFilterSearchDropdown,
         PButtonModal,
         PCollapsibleList,
         PTag,

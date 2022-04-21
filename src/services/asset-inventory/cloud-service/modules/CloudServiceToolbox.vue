@@ -9,6 +9,7 @@
                 <p-divider vertical />
             </div>
             <div class="filter-wrapper">
+                <span class="filters-count">{{ selectedFiltersCount }}</span>
                 <p-icon-text-button name="ic_setting" style-type="gray900" size="sm"
                                     outline
                                     @click="handleClickSet"
@@ -73,7 +74,6 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
 import CloudServiceFilterModal from '@/services/asset-inventory/cloud-service/modules/CloudServiceFilterModal.vue';
-import { Period } from '@/services/asset-inventory/cloud-service/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 
 interface Handlers { keyItemSets?: KeyItemSet[]; valueHandlerMap?: ValueHandlerMap }
@@ -81,7 +81,6 @@ interface Handlers { keyItemSets?: KeyItemSet[]; valueHandlerMap?: ValueHandlerM
 interface Props {
     totalCount: number;
     handlers: Handlers;
-    period?: Period;
     queryTags: QueryTag[];
 }
 
@@ -110,30 +109,36 @@ export default defineComponent<Props>({
             type: Object as PropType<Handlers>,
             default: () => ({}),
         },
-        period: {
-            type: Object as PropType<Period|undefined>,
-            default: undefined,
-        },
         tagFilters: {
             type: Array as PropType<QueryStoreFilter[]>,
             default: () => ([]),
         },
     },
     setup(props, { emit }) {
-        const searchQueryHelper = new QueryHelper();
+        const searchQueryHelper = new QueryHelper().setKeyItemSets(props.handlers.keyItemSets ?? []);
         const state = reactive({
             providers: computed(() => store.state.reference.provider.items),
             selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
+            period: computed(() => assetInventoryStore.state.cloudService.period),
             selectedCategories: computed(() => assetInventoryStore.getters['cloudService/selectedCategories']),
+            selectedRegions: computed(() => assetInventoryStore.getters['cloudService/selectedRegions']),
             allFilters: computed<QueryStoreFilter[]>(() => assetInventoryStore.getters['cloudService/allFilters']),
-            keyItemSets: computed(() => props.handlers.keyItemSets),
-            valueHandlerMap: computed(() => props.handlers.valueHandlerMap),
-            queryTags: computed(() => searchQueryHelper.queryTags),
+            queryTags: computed(() => searchQueryHelper.setFilters(assetInventoryStore.state.cloudService.searchFilters).queryTags),
             cloudServiceFilters: computed(() => state.allFilters.filter((f: any) => f.k && ![
                 'labels',
                 'service_code',
             ].includes(f.k))),
             visibleSetFilterModal: false,
+            selectedFiltersCount: computed<string>(() => {
+                const countLabels: string[] = [];
+                if (state.selectedCategories.length) {
+                    countLabels.push(`${state.selectedCategories.length} Service Categories`);
+                }
+                if (state.selectedRegions.length) {
+                    countLabels.push(`${state.selectedRegions.length} Regions`);
+                }
+                return countLabels.join(', ');
+            }),
         });
 
         /* excel */
@@ -265,7 +270,7 @@ export default defineComponent<Props>({
         };
         const handleUpdatePeriod = (period) => {
             assetInventoryStore.dispatch('cloudService/setPeriod', period);
-            emit('update-period', period);
+            emit('update-period');
         };
         const handleClickSet = () => {
             state.visibleSetFilterModal = true;
@@ -303,6 +308,8 @@ export default defineComponent<Props>({
             handleConfirmSetFilter,
             handleChange,
             handleExport,
+            keyItemSets: props.handlers?.keyItemSets ?? [],
+            valueHandlerMap: props.handlers?.valueHandlerMap ?? {},
         };
     },
 });
@@ -330,6 +337,12 @@ export default defineComponent<Props>({
 .filter-wrapper {
     flex-grow: 1;
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    .filters-count {
+        margin-right: 0.5rem;
+        font-size: 0.875rem;
+    }
 }
 .total-result-wrapper {
     @apply text-sm flex flex-wrap gap-2;

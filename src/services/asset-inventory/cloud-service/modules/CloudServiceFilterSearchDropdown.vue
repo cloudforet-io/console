@@ -92,7 +92,7 @@ interface Props {
 }
 
 export default defineComponent<Props>({
-    name: 'CloudServiceFilterItem',
+    name: 'CloudServiceFilterSearchDropdown',
     components: {
         TextHighlighting,
         PSearchDropdown,

@@ -17,8 +17,6 @@
             </p-page-title>
             <p-divider class="cloud-service-divider" />
             <cloud-service-toolbox :total-count="totalCount"
-                                   :period="period"
-                                   :filters="allFilters"
                                    :handlers="handlers"
                                    @update-period="handlePeriodUpdate"
                                    @update-additional-filters="handleAdditionalFiltersUpdate"
@@ -227,7 +225,7 @@ export default {
         };
 
         /* Init */
-        (async () => {
+        const init = async () => {
             /* load references */
             await store.dispatch('reference/provider/load');
 
@@ -259,6 +257,10 @@ export default {
 
             /* list data */
             await listCloudServiceType();
+        };
+
+        (async () => {
+            await init();
         })();
 
         return {
