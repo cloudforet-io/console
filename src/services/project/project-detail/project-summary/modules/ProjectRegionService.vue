@@ -63,7 +63,7 @@ import { Location } from 'vue-router';
 import config from '@/lib/config';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { primitiveToQueryString } from '@/lib/router-query-string';
+import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 
 interface Data {
@@ -179,15 +179,15 @@ export default {
             state.chart = chart;
         };
 
-        const getLocation = (provider, region) => {
+        const getLocation = (provider: string, region: string, projectId: string, label: string) => {
             const query: Location['query'] = {
                 provider: primitiveToQueryString(provider),
-                region: primitiveToQueryString(region),
+                region: arrayToQueryString([region]),
             };
-            if (props.label !== 'All') query.service = primitiveToQueryString(props.label);
+            if (label !== 'All') query.service = arrayToQueryString([label]);
 
             // set filters
-            queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
+            queryHelper.setFilters([{ k: 'project_id', o: '=', v: projectId }]);
 
             const location: Location = {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
@@ -219,7 +219,7 @@ export default {
                     count: d.label === 'Storage' ? byteFormatter(d.total) : d.total,
                     providerColor: state.providers[d.provider]?.color,
                     color: colors[idx] || gray[400],
-                    to: getLocation(d.provider, d.region_code),
+                    to: getLocation(d.provider, d.region_code, props.projectId, props.label),
                 }));
                 state.data = data;
             } catch (e) {

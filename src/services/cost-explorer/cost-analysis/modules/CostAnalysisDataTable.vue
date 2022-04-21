@@ -178,7 +178,7 @@ export default {
             const queryHelper = new QueryHelper();
             const query: Location['query'] = {};
             if (item.region_code) {
-                query.region = item.region_code;
+                query.region = arrayToQueryString([item.region_code]);
             } else if (state.filters.region_code?.length) {
                 query.region = arrayToQueryString(state.filters.region_code);
             }

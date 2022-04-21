@@ -55,7 +55,7 @@
                                              class="summary-row"
                                 >
                                     <div class="text-group">
-                                        <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
+                                        <span class="provider" :style="{ color: getColor(data) }">{{ data.label }}</span>
                                         <span class="type">{{ data.type }}</span>
                                     </div>
                                     <span class="count">{{ data.count }}</span>
@@ -114,7 +114,7 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { primitiveToQueryString } from '@/lib/router-query-string';
+import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { gray, primary1, primary2 } from '@/styles/colors';
 import { store } from '@/store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
@@ -325,11 +325,11 @@ export default {
             chart.cursor.lineY.strokeOpacity = 0;
             chart.cursor.behavior = 'none';
         };
-        const getLocation = (type) => {
+        const getLocation = (type: string) => {
             const query: Location['query'] = {};
             query.provider = primitiveToQueryString('all');
             if (type !== 'all') {
-                query.service = primitiveToQueryString(CLOUD_SERVICE_LABEL[type]);
+                query.service = arrayToQueryString([CLOUD_SERVICE_LABEL[type]]);
             }
 
             // set filters
@@ -343,6 +343,11 @@ export default {
                 },
             };
             return location;
+        };
+        const getColor = (data?: SummaryData) => {
+            const label = data?.label as string;
+            if (!label) return '';
+            return colorState[label.toLowerCase()];
         };
 
         /* api */
@@ -570,6 +575,7 @@ export default {
             commaFormatter,
             numberFormatter,
             getLocation,
+            getColor,
         };
     },
 };
