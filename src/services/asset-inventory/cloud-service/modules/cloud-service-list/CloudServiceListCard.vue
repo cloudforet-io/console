@@ -26,14 +26,15 @@
                         :key="`${cloudServiceType}-${idx}`"
                         :to="getCloudServiceDetailLink({ ...item, cloudServiceTypeName: cloudServiceType.cloud_service_type })"
                         class="service-type-item"
-                        :style="{ width: `${90 /slicedResources.length}%` }"
+                        :style="{ width: `${90 / slicedResources.length}%` }"
                     >
-                        <span class="service-type-name">{{ cloudServiceType.cloud_service_type }} &nbsp;</span>
+                        <span class="service-type-name">{{ cloudServiceType.cloud_service_type }}</span>
                         <span class="service-type-count">{{ cloudServiceType.count }}</span>
                     </router-link>
                     <p-divider
                         v-if="item.resources.length > 1 && idx === 0"
                         :key="idx"
+                        class="service-type-divider"
                         :vertical="true"
                     />
                 </template>
@@ -157,6 +158,7 @@ export default {
 
         .card-title-wrapper {
             min-height: 5.5rem;
+            height: 100%;
             padding: 1rem 1rem 0.5rem;
         }
 
@@ -194,9 +196,12 @@ export default {
                     max-width: 80%;
                     font-weight: 400;
                     line-height: 1.25;
+                    display: inline-block;
+                    height: calc(100% + 0.5rem);
                 }
                 .service-type-count {
                     @apply text-gray-800;
+                    margin-left: 0.5rem;
                     font-weight: 400;
                     font-size: 0.875rem;
                     line-height: 1.25;
@@ -205,10 +210,10 @@ export default {
                 &:hover {
                     .service-type-name {
                         @apply text-blue-600 underline;
+                        text-underline-position: under;
                     }
-
                     .service-type-count {
-                        @apply text-blue-600 underline;
+                        @apply text-blue-600;
                     }
                 }
             }
