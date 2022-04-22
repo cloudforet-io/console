@@ -14,3 +14,9 @@ export interface CloudServiceTypeInfo {
     labels: string[];
     tags: Tags;
 }
+
+export interface CloudServiceDetailPageParams {
+    provider: string;
+    group: string;
+    name?: string;
+}
