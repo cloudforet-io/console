@@ -55,7 +55,7 @@ const getSubMenuList = (subMenu) => {
     return result;
 };
 
-export const AllMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): GNBMenu[] => {
+export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): GNBMenu[] => {
     const _isAdmin = rootGetters['user/isAdmin'];
     const _billingEnabledMenuList: string[] = config.get('BILLING_ENABLED') ?? [];
     const _showBilling = _billingEnabledMenuList.includes(rootState.domain.domainId);
@@ -74,4 +74,4 @@ export const AllMenuList: Getter<DisplayState, any> = (state, getters, rootState
 };
 
 
-export const GNBMenuList: Getter<DisplayState, any> = (state, getters): GNBMenu[] => getters.AllMenuList.filter(d => !d.optional);
+export const GNBMenuList: Getter<DisplayState, any> = (state, getters): GNBMenu[] => getters.allMenuList.filter(d => !d.optional);

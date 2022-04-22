@@ -130,7 +130,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
@@ -173,7 +172,6 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
-import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -308,7 +306,7 @@ export default {
             pageLimit: store.getters['settings/getItem']('pageLimit', STORAGE_PREFIX) || DEFAULT_PAGE_SIZE,
             sortDesc: true,
             sortBy: 'created_at',
-            queryTags: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).queryTags as QueryTag[],
+            queryTags: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).queryTags,
         });
         const checkTableModalState = reactive({
             visible: false,

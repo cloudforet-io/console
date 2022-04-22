@@ -11,7 +11,7 @@ export const showErrorMessage = (errorTitle, error) => {
     if (error.message) errorMsg = error.message;
     else if (error.response) { errorMsg = error.response.data.error.message; } else { errorMsg = error; }
     if (Vue) {
-        Vue.notify({
+        (Vue as any).notify({
             group: 'toastTopCenter',
             type: 'alert',
             title: errorTitle,
@@ -31,7 +31,7 @@ export const showErrorMessage = (errorTitle, error) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const showSuccessMessage = (successTitle, successMessage, root?) => {
     if (Vue) {
-        Vue.notify({
+        (Vue as any).notify({
             group: 'toastTopCenter',
             type: 'success',
             title: successTitle,
@@ -45,7 +45,7 @@ export const showSuccessMessage = (successTitle, successMessage, root?) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const showLoadingMessage = (loadingTitle, loadingMessage, root?) => {
     if (Vue) {
-        Vue.notify({
+        (Vue as any).notify({
             group: 'toastTopCenter',
             type: 'loading',
             title: loadingTitle,
@@ -59,7 +59,7 @@ export const showLoadingMessage = (loadingTitle, loadingMessage, root?) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const hideLoadingMessage = (root?) => {
     if (Vue) {
-        Vue.notify({
+        (Vue as any).notify({
             group: 'toastTopCenter',
             clean: true,
         });

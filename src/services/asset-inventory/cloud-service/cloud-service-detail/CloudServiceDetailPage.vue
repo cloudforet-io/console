@@ -212,7 +212,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { TranslateResult } from 'vue-i18n';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
@@ -303,7 +302,7 @@ export default {
             pageLimit: store.getters['settings/getItem']('pageLimit', STORAGE_PREFIX) || DEFAULT_PAGE_SIZE,
             sortDesc: true,
             sortBy: 'created_at',
-            queryTags: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).queryTags as QueryTag[],
+            queryTags: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).queryTags,
         });
 
         const typeOptionState = reactive({
