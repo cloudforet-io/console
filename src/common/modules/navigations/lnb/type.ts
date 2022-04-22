@@ -6,8 +6,8 @@ type MenuItemType = typeof MENU_ITEM_TYPE[number]
 
 export interface LNBItem {
     type: MenuItemType;
-    label: string;
-    id: MenuIdType;
+    label?: string;
+    id?: MenuIdType;
     foldable?: boolean;
     to?: Location;
     isNew?: boolean;
@@ -26,4 +26,5 @@ export interface TopTitle {
     icon?: string;
     label: string;
     visibleAddButton?: boolean;
+    addButtonLink?: Location;
 }

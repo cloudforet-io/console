@@ -9,12 +9,12 @@ import {
     defineComponent,
 } from '@vue/composition-api';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import { LNBItem } from '@/common/modules/navigations/lnb/type';
+import { LNBItemList } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import { MENU_ID } from '@/lib/router/type';
 
 
-const MenuSet: LNBItem[][] = [
+const MenuSet: LNBItemList[] = [
     [
         {
             type: 'title', label: 'IAM', id: MENU_ID.ADMINISTRATION_IAM, foldable: false,

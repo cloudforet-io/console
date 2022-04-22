@@ -19,24 +19,32 @@
             <div v-if="item.type === 'divider' && showMenu" class="divider">
                 <p-divider />
             </div>
-            <div v-if="item.type === 'item' && showMenu" class="menu-item" :class="[{'second-depth': hasTopTitle}, {'selected': checkSelectedMenu(item.to)}]">
-                <router-link :to="item.to">
-                    <slot name="before-text" v-bind="{...$props, item, index: idx}" />
+            <router-link
+                v-if="item.type === 'item' && showMenu" class="menu-item"
+                :class="[{'second-depth': hasTopTitle}, {'selected': checkSelectedMenu(item.to)}]"
+                :to="item.to"
+                @click.native="$event.stopImmediatePropagation()"
+                @mouseenter.native="hoveredItem = item.id"
+                @mouseleave.native="hoveredItem = ''"
+            >
+                <slot name="before-text" v-bind="{...$props, item, index: idx}" />
+                <p class="inline-flex">
                     {{ item.label }}
                     <slot name="after-text" v-bind="{...$props, item, index: idx}" />
                     <new-mark v-if="item.isNew" />
                     <beta-mark v-if="item.isBeta" />
-                    <slot name="right-extra" v-bind="{...$props, item, index: idx}" />
-                </router-link>
+                </p>
+                <slot name="right-extra" v-bind="{...$props, item, index: idx}" />
                 <favorite-button
-                    v-if="!item.hideFavorite && !isDomainOwner"
+                    v-if="showFavorite(item.id)
+                        && !item.hideFavorite && !isDomainOwner"
                     :item-id="item.id"
                     :favorite-type="FAVORITE_TYPE.MENU"
                     :favorite-items="favoriteItems"
-                    scale="0.75"
+                    scale="0.8"
                     class="favorite-button"
                 />
-            </div>
+            </router-link>
         </div>
     </div>
 </template>
@@ -87,6 +95,8 @@ export default {
             isFoldableMenu: computed(() => props.menuData?.some(item => item.foldable)),
             showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
             favoriteItems: computed<FavoriteItem[]>(() => store.state.favorite.menuItems),
+            hoveredItem: '',
+
         });
 
         const handleToggle = () => {
@@ -95,6 +105,11 @@ export default {
 
         const checkSelectedMenu = (selectedMenuRoute: RawLocation) => props.currentRoute.startsWith(vm.$router.resolve(selectedMenuRoute).route.fullPath);
 
+        const showFavorite = (itemId: string) => {
+            const isExistedFavorite = state.favoriteItems?.some((i: FavoriteItem) => i.itemId === itemId);
+            const isHovered = state.hoveredItem && state.hoveredItem === itemId;
+            return isExistedFavorite || isHovered;
+        };
 
         (async () => {
             await store.dispatch('favorite/load', FAVORITE_TYPE.MENU);
@@ -105,6 +120,7 @@ export default {
             handleToggle,
             checkSelectedMenu,
             FAVORITE_TYPE,
+            showFavorite,
         };
     },
 };

@@ -1,7 +1,9 @@
 <template>
     <aside class="sidebar-menu">
         <l-n-b header="Cost Explorer"
-               :top-title="{ label: 'Dashboard', visibleAddButton: true }"
+               :top-title="{ label: 'Dashboard', visibleAddButton: true,
+                             addButtonLink: { name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME}
+               }"
                :menu-set="menuSet"
         />
     </aside>
@@ -18,7 +20,7 @@ import {
 } from '@/services/cost-explorer/cost-dashboard/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { LNBItem } from '@/common/modules/navigations/lnb/type';
+import { LNBItem, LNBItemList } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import { MENU_ID } from '@/lib/router/type';
 
@@ -32,7 +34,7 @@ export default {
             publicDashboardList: computed<PublicDashboardInfo[]>(() => costExplorerStore.state.publicDashboardList ?? []),
             userDashboardList: computed<UserDashboardInfo[]>(() => costExplorerStore.state.userDashboardList ?? []),
             loading: true,
-            menuSet: computed<LNBItem[][]>(() => [
+            menuSet: computed<LNBItemList[]>(() => [
                 [
                     {
                         type: 'title', label: 'Public', id: 'public', foldable: false,
@@ -96,6 +98,7 @@ export default {
         return {
             ...toRefs(state),
             handleClickCreate,
+            COST_EXPLORER_ROUTE,
         };
     },
 };

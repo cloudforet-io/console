@@ -33,7 +33,7 @@ import {
 import { PDivider, PI } from '@spaceone/design-system';
 import { store } from '@/store';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
-import { LNBItem } from '@/common/modules/navigations/lnb/type';
+import { LNBItemList } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import { MENU_ID } from '@/lib/router/type';
 
@@ -45,7 +45,7 @@ interface SidebarItemType {
     beta?: boolean;
 }
 
-const MenuSet: LNBItem[][] = [
+const MenuSet: LNBItemList[] = [
     [
         {
             type: 'title', label: 'My Account', id: MENU_ID.MY_PAGE_ACCOUNT, foldable: false,

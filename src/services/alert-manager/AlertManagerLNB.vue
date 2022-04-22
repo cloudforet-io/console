@@ -4,11 +4,11 @@
 
 <script lang="ts">
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-import { LNBItem } from '@/common/modules/navigations/lnb/type';
+import { LNBItemList } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import { MENU_ID } from '@/lib/router/type';
 
-const MenuSet: LNBItem[][] = [
+const MenuSet: LNBItemList[] = [
     [
         {
             type: 'item', id: MENU_ID.ALERT_MANAGER_DASHBOARD, label: 'Dashboard', to: { name: ALERT_MANAGER_ROUTE.DASHBOARD._NAME },

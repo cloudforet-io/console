@@ -5,12 +5,14 @@
         </div>
         <p-divider class="divider" />
         <div class="menu-wrapper">
-            <div v-if="backLink.label" class="back-link">
+            <router-link v-if="backLink.label" class="back-link"
+                         :to="backLink.to"
+            >
                 <p-i name="ic_arrow_left" width="1rem" height="1rem"
                      color="inherit transparent"
                 />
                 {{ backLink.label }}
-            </div>
+            </router-link>
             <slot />
             <div v-if="topTitle" class="top-title">
                 <div class="icon-label-wrapper">
@@ -22,9 +24,11 @@
                     />
                     <span :class="{'icon-label': topTitle.icon}" class="label">{{ topTitle.label }}</span>
                 </div>
-                <p-i v-if="topTitle.visibleAddButton" name="ic_plus" width="1rem"
-                     height="1rem" class="add-button"
-                />
+                <router-link v-if="topTitle.visibleAddButton" :to="topTitle.addButtonLink">
+                    <p-i name="ic_plus" width="1rem"
+                         height="1rem" class="add-button"
+                    />
+                </router-link>
             </div>
             <template v-for="(menuData, idx) in menuSet">
                 <l-n-b-menu-item :key="`${idx}-${getUUID()}`" :has-top-title="!!topTitle.label" :menu-data="menuData"
@@ -106,13 +110,14 @@ export default {
         padding-right: 0.75rem;
     }
     .divider {
-        margin-bottom: 1.25rem;
+        margin-bottom: 0.5rem;
     }
     .back-link {
         @apply flex text-gray-500;
         font-size: 0.75rem;
         line-height: 125%;
-        padding-left: 0.875rem;
+        margin-top: 1.25rem;
+        height: 1.75rem;
         &:hover {
             @apply text-gray-800 cursor-pointer;
             text-decoration: underline;

@@ -16,7 +16,9 @@ import {
 } from '@vue/composition-api';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
-import { BackLink, LNBItem, TopTitle } from '@/common/modules/navigations/lnb/type';
+import {
+    BackLink, LNBItem, LNBItemList, TopTitle,
+} from '@/common/modules/navigations/lnb/type';
 import { MENU_ID } from '@/lib/router/type';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
 import {
@@ -46,39 +48,41 @@ export default defineComponent({
             }),
             cloudServiceTypeList: computed<CloudServiceTypeInfo[]>(() => assetInventoryStore.state.cloudServiceDetail.cloudServiceTypeList),
             selectedItem: computed(() => assetInventoryStore.state.cloudServiceDetail.selectedItem),
-            cloudServiceDetailMenuSet: computed<LNBItem[]>(() => {
-                const results: LNBItem[] = state.cloudServiceTypeList.map(d => ({
-                    type: 'item', label: d.name, id: d.name, to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
-                }));
-
+            cloudServiceDetailMenuItems: computed<LNBItem[]>(() => {
+                const results: LNBItem[] = state.cloudServiceTypeList.map(d => (
+                    {
+                        type: 'item', label: d.name, id: d.name, to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
+                    }
+                ));
                 return results;
             }),
-            menuSet: computed<LNBItem[][]>(() => {
-                const menuItems: LNBItem[][] = [];
+            menuSet: computed<LNBItemList[]>(() => {
+                const _menuSet: LNBItemList[] = [];
+                const menuItems: LNBItem[] = [];
                 if (state.isCloudServiceDetailPage) {
-                    menuItems.push(state.cloudServiceDetailMenuSet);
-                    // QUESTION: why divider requires id and label?
-                    menuItems.push([{ type: 'divider', label: 'divider', id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE }]);
+                    menuItems.push(...state.cloudServiceDetailMenuItems);
+                    menuItems.push({ type: 'divider' });
                 } else {
-                    menuItems.push([
+                    menuItems.push(
                         {
                             type: 'item', id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE, label: 'Cloud Service', to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
                         },
-                    ]);
+                    );
                 }
 
                 menuItems.push(
-                    [{
+                    {
                         type: 'item', id: MENU_ID.ASSET_INVENTORY_SERVER, label: 'Server', to: { name: ASSET_INVENTORY_ROUTE.SERVER._NAME },
-                    }],
-                    [{
+                    },
+                    {
                         type: 'item', id: MENU_ID.ASSET_INVENTORY_COLLECTOR, label: 'Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME },
-                    }],
-                    [{
+                    },
+                    {
                         type: 'item', id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT, label: 'Service Account', to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
-                    }],
+                    },
                 );
-                return menuItems;
+                _menuSet.push(menuItems);
+                return _menuSet;
             }),
         });
 
