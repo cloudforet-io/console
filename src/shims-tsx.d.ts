@@ -5,6 +5,5 @@ declare global {
     // interface IntrinsicElements {
     //   [elem: string]: any;
     // }
-    // ㅋㅋ
   }
 }
