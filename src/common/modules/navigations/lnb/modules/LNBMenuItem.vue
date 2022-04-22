@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="lnb-menu-list">
         <div v-for="(item, idx) in menuData" :key="item.id" class="lnb-menu-item">
             <div v-if="item.type === 'title'">
                 <p class="title-wrapper">
@@ -28,12 +28,12 @@
                 @mouseleave.native="hoveredItem = ''"
             >
                 <slot name="before-text" v-bind="{...$props, item, index: idx}" />
-                <p class="inline-flex">
-                    {{ item.label }}
+                <div class="text-wrapper">
+                    <span class="text">{{ item.label }}</span>
                     <slot name="after-text" v-bind="{...$props, item, index: idx}" />
                     <new-mark v-if="item.isNew" />
                     <beta-mark v-if="item.isBeta" />
-                </p>
+                </div>
                 <slot name="right-extra" v-bind="{...$props, item, index: idx}" />
                 <favorite-button
                     v-if="showFavorite(item.id)
@@ -127,6 +127,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.lnb-menu-list {
+    margin-bottom: 1.25rem;
+}
 .lnb-menu-item {
     .title-wrapper {
         @apply text-gray-400 font-bold inline-block;
@@ -149,7 +152,7 @@ export default {
         }
     }
     .menu-item {
-        @apply flex items-center justify-between truncate;
+        @apply border border-transparent inline-flex items-center w-full h-full justify-between;
         height: 2rem;
         font-size: 0.875rem;
         line-height: 125%;
@@ -157,24 +160,31 @@ export default {
         box-sizing: border-box;
         padding-left: 0.5rem;
         padding-right: 0.5rem;
+        outline: 0;
 
         &.second-depth {
             padding-left: 1.25rem;
         }
-
+        &:focus, &:focus-within, &:active {
+            @apply bg-white border-secondary1;
+            box-shadow: 0 0 0 2px rgba(theme('colors.secondary1'), 0.2);
+        }
         &.selected {
             @apply bg-blue-200;
         }
-
         &:hover {
             @apply bg-blue-100 cursor-pointer;
         }
-
-        &:focus, &:active {
-            box-shadow: 0 0 0 2px rgba(theme('colors.secondary1'), 0.2);
+        .text-wrapper {
+            @apply inline-flex overflow-hidden whitespace-no-wrap;
+            .text {
+                @apply overflow-hidden whitespace-no-wrap;
+                text-overflow: ellipsis;
+            }
         }
         .favorite-button {
             flex-shrink: 0;
+            margin-left: 0.25rem;
         }
     }
     .divider {

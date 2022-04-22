@@ -108,6 +108,7 @@ export default {
     .menu-wrapper {
         padding-left: 0.75rem;
         padding-right: 0.75rem;
+        padding-bottom: 2rem;
     }
     .divider {
         margin-bottom: 0.5rem;
