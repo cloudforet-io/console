@@ -4,7 +4,9 @@
             <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TITLE') }}</span>
         </div>
         <p-balloon-tab v-model="activeTab" size="sm" style-type="primary"
-                       :tabs="tabs" tail
+                       :tabs="tabs"
+                       tail
+                       @change="handleChangeTab"
         >
             <template #tab="{name}">
                 <div class="box" :class="{selected: name === activeTab}">
@@ -13,80 +15,80 @@
                     <span class="count"> {{ name === 'storage' ? byteFormatter(count[name]).split(' ')[0] : commaFormatter(count[name]) }}</span>
                 </div>
             </template>
-            <div class="bottom-part">
-                <div class="content-wrapper grid grid-cols-12 gap-2">
-                    <div class="chart-wrapper col-span-12 lg:col-span-7">
-                        <div class="sub-title">
-                            <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
-                            <span v-if="activeTab === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
-                        </div>
-                        <div class="toggle-button-group">
-                            <p-button v-for="(d, idx) in dateTypes"
-                                      :key="idx"
-                                      :class="{'selected': selectedDateType === d.name}"
-                                      @click="onClickDateTypeButton(d.name)"
+        </p-balloon-tab>
+        <div class="bottom-part">
+            <div class="content-wrapper">
+                <div class="chart-wrapper">
+                    <div class="sub-title">
+                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
+                        <span v-if="activeTab === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
+                    </div>
+                    <div class="toggle-button-group">
+                        <p-button v-for="(d, idx) in dateTypes"
+                                  :key="idx"
+                                  :class="{'selected': selectedDateType === d.name}"
+                                  @click="handleChangeDateType(d.name)"
+                        >
+                            {{ d.label }}
+                        </p-button>
+                    </div>
+                    <p-data-loader :loading="chartState.loading">
+                        <template #loader>
+                            <p-skeleton width="100%" height="100%" />
+                        </template>
+                        <div ref="chartRef" class="chart" />
+                    </p-data-loader>
+                </div>
+                <div class="summary-wrapper">
+                    <div class="sub-title">
+                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataMap[activeTab].label }) }}
+                    </div>
+                    <template v-if="!loading && summaryData.length > 0">
+                        <div class="summary-content-wrapper">
+                            <router-link :to="getLocation(activeTab)"
+                                         class="summary-row"
                             >
-                                {{ d.label }}
-                            </p-button>
-                        </div>
-                        <p-data-loader :loading="chartState.loading">
-                            <template #loader>
-                                <p-skeleton width="100%" height="100%" />
-                            </template>
-                            <div ref="chartRef" class="chart" />
-                        </p-data-loader>
-                    </div>
-                    <div class="col-span-12 md:col-span-4 lg:col-span-2 summary-wrapper">
-                        <div class="sub-title">
-                            {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataMap[activeTab].label }) }}
-                        </div>
-                        <template v-if="!loading && summaryData.length > 0">
-                            <div class="summary-content-wrapper">
-                                <router-link :to="getLocation(activeTab)"
-                                             class="summary-row"
-                                >
-                                    <div class="text-group">
-                                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
-                                    </div>
-                                    <span class="count">{{ activeTab === 'storage' ? byteFormatter(count[activeTab]) : commaFormatter(count[activeTab]) }}</span>
-                                </router-link>
-                                <router-link v-for="(data, idx) of summaryData" :key="idx"
-                                             :to="data.to"
-                                             class="summary-row"
-                                >
-                                    <div class="text-group">
-                                        <span class="provider" :style="{ color: getColor(data) }">{{ data.label }}</span>
-                                        <span class="type">{{ data.type }}</span>
-                                    </div>
-                                    <span class="count">{{ data.count }}</span>
-                                </router-link>
-                            </div>
-                        </template>
-                        <template v-else-if="!loading">
-                            <div class="summary-content-wrapper no-data-wrapper grid">
-                                <div class="m-auto">
-                                    <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
-                                    <p class="text">
-                                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: dataMap[activeTab].label }) }}
-                                    </p>
+                                <div class="text-group">
+                                    <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
                                 </div>
-                            </div>
-                        </template>
-                        <template v-else>
-                            <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
-                                <p-skeleton class="flex-grow" />
-                            </div>
-                        </template>
-                    </div>
-                    <div class="col-span-12 md:col-span-5 lg:col-span-3 region-service-wrapper">
-                        <div class="sub-title">
-                            <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE_TITLE') }}</span>
+                                <span class="count">{{ activeTab === 'storage' ? byteFormatter(count[activeTab]) : commaFormatter(count[activeTab]) }}</span>
+                            </router-link>
+                            <router-link v-for="(data, idx) of summaryData" :key="idx"
+                                         :to="data.to"
+                                         class="summary-row"
+                            >
+                                <div class="text-group">
+                                    <span class="provider" :style="{ color: getColor(data) }">{{ data.label }}</span>
+                                    <span class="type">{{ data.type }}</span>
+                                </div>
+                                <span class="count">{{ data.count }}</span>
+                            </router-link>
                         </div>
-                        <project-region-service :project-id="projectId" :label="selectedLabel" :count="count[activeTab]" />
+                    </template>
+                    <template v-else-if="!loading">
+                        <div class="summary-content-wrapper no-data-wrapper">
+                            <div class="m-auto">
+                                <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
+                                <p class="text">
+                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: dataMap[activeTab].label }) }}
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
+                            <p-skeleton class="flex-grow" />
+                        </div>
+                    </template>
+                </div>
+                <div class="region-service-wrapper">
+                    <div class="sub-title">
+                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE_TITLE') }}</span>
                     </div>
+                    <project-region-service :project-id="projectId" :label="selectedLabel" :count="count[activeTab]" />
                 </div>
             </div>
-        </p-balloon-tab>
+        </div>
     </div>
 </template>
 
@@ -94,7 +96,7 @@
 import {
     forEach, orderBy, range,
 } from 'lodash';
-import bytes from 'bytes';
+import { Unit } from 'bytes';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -102,8 +104,7 @@ import { TranslateResult } from 'vue-i18n';
 import { Location } from 'vue-router';
 
 import {
-    reactive, toRefs, watch, computed,
-    onUnmounted, ComponentRenderProxy, getCurrentInstance,
+    reactive, toRefs, watch, computed, onUnmounted,
 } from '@vue/composition-api';
 
 import ProjectRegionService from '@/services/project/project-detail/project-summary/modules/ProjectRegionService.vue';
@@ -111,51 +112,28 @@ import {
     PDataLoader, PSkeleton, PButton, PBalloonTab,
 } from '@spaceone/design-system';
 
+import { byteFormatter, commaFormatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import {
+    CLOUD_SERVICE_LABEL, DATE_TYPE, SERVICE_CATEGORY, SERVICE_CATEGORY_TYPE,
+} from '@/services/project/project-detail/project-summary/modules/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray, primary1, primary2 } from '@/styles/colors';
 import { store } from '@/store';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { i18n } from '@/translations';
 import config from '@/lib/config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-/* enum */
-enum DATE_TYPE {
-    daily = 'DAILY',
-    monthly = 'MONTHLY',
-}
-enum DATA_TYPE {
-    compute = 'compute',
-    container = 'container',
-    database = 'database',
-    networking = 'networking',
-    storage = 'storage',
-    security = 'security',
-    analytics = 'analytics',
-    all = 'all',
-}
-enum CLOUD_SERVICE_LABEL {
-    compute = 'Compute',
-    container = 'Container',
-    database = 'Database',
-    networking = 'Networking',
-    storage = 'Storage',
-    security = 'Security',
-    analytics = 'Analytics',
-    all = 'All',
-}
-
-/* type */
-type Unit = 'b' | 'gb' | 'kb' | 'mb' | 'pb' | 'tb' | 'B' | 'GB' | 'KB' | 'MB' | 'PB' | 'TB';
 interface ChartData {
     date: string;
     count: number;
 }
 interface Data {
-    type: keyof typeof DATA_TYPE;
+    type: SERVICE_CATEGORY_TYPE;
     label: TranslateResult;
 }
 interface SummaryData {
@@ -185,26 +163,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
-
-        const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
-        const numberFormatter = (num) => {
-            if (Math.abs(num) < 10000) {
-                return Math.round(num * 10) / 10;
-            }
-            const options = {
-                notation: 'compact',
-                signDisplay: 'auto',
-                maximumFractionDigits: 1,
-            };
-            return Intl.NumberFormat('en', options).format(num);
-        };
-        const commaFormatter = (num) => {
-            if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            return num;
-        };
-
         const state = reactive({
             loading: true,
             chart: null,
@@ -212,12 +171,11 @@ export default {
             skeletons: range(4),
             providers: computed(() => store.state.reference.provider.items),
             //
-            selectedIndex: 0,
             selectedLabel: computed(() => CLOUD_SERVICE_LABEL[state.activeTab]),
-            selectedDateType: DATE_TYPE.daily,
+            selectedDateType: DATE_TYPE.DAILY,
             dateTypes: computed(() => ([
-                { name: DATE_TYPE.daily, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DAY') },
-                { name: DATE_TYPE.monthly, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.MONTH') },
+                { name: DATE_TYPE.DAILY, label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.DAY') },
+                { name: DATE_TYPE.MONTHLY, label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.MONTH') },
             ])),
             //
             count: {
@@ -232,17 +190,17 @@ export default {
             },
             storageSuffix: 'TB' as Unit,
             storageTrendSuffix: 'TB' as Unit,
-            tabs: Object.values(DATA_TYPE),
-            activeTab: DATA_TYPE.compute,
+            tabs: Object.values(SERVICE_CATEGORY),
+            activeTab: SERVICE_CATEGORY.COMPUTE,
             dataMap: computed(() => ({
-                [DATA_TYPE.compute]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE') },
-                [DATA_TYPE.container]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.CONTAINER') },
-                [DATA_TYPE.database]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE') },
-                [DATA_TYPE.networking]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.NETWORKING') },
-                [DATA_TYPE.storage]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE') },
-                [DATA_TYPE.security]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.SECURITY') },
-                [DATA_TYPE.analytics]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.ANALYTICS') },
-                [DATA_TYPE.all]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.ALL') },
+                [SERVICE_CATEGORY.COMPUTE]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE') },
+                [SERVICE_CATEGORY.CONTAINER]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.CONTAINER') },
+                [SERVICE_CATEGORY.DATABASE]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE') },
+                [SERVICE_CATEGORY.NETWORKING]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.NETWORKING') },
+                [SERVICE_CATEGORY.STORAGE]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE') },
+                [SERVICE_CATEGORY.SECURITY]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.SECURITY') },
+                [SERVICE_CATEGORY.ANALYTICS]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.ANALYTICS') },
+                [SERVICE_CATEGORY.ALL]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.ALL') },
             })),
             summaryData: [] as SummaryData[],
         });
@@ -257,7 +215,7 @@ export default {
             azure: computed(() => state.providers.azure.color),
         });
 
-        /* util */
+        /* Util */
         const disposeChart = () => {
             if (chartState.registry[state.chartRef]) {
                 chartState.registry[state.chartRef].dispose();
@@ -328,7 +286,7 @@ export default {
         const getLocation = (type: string) => {
             const query: Location['query'] = {};
             query.provider = primitiveToQueryString('all');
-            if (type !== 'all') {
+            if (type !== SERVICE_CATEGORY.ALL) {
                 query.service = arrayToQueryString([CLOUD_SERVICE_LABEL[type]]);
             }
 
@@ -350,7 +308,7 @@ export default {
             return colorState[label.toLowerCase()];
         };
 
-        /* api */
+        /* Api */
         const getCount = async (type) => {
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
@@ -358,7 +316,7 @@ export default {
                     labels: [CLOUD_SERVICE_LABEL[type]],
                 });
                 const count = res.results[0]?.total || 0;
-                if (type === DATA_TYPE.storage) {
+                if (type === SERVICE_CATEGORY.STORAGE) {
                     state.storageSuffix = byteFormatter(count).split(' ')[1];
                 }
                 state.count[type] = count;
@@ -367,33 +325,33 @@ export default {
             }
         };
         const getTrend = async (type) => {
-            const utcToday = dayjs().utc();
-            const dateRange = state.selectedDateType === DATE_TYPE.monthly ? MONTH_COUNT : DAY_COUNT;
-            const dateUnit = state.selectedDateType === DATE_TYPE.monthly ? 'month' : 'day';
-            const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
+            const utcToday = dayjs.utc();
+            const dateRange = state.selectedDateType === DATE_TYPE.MONTHLY ? MONTH_COUNT : DAY_COUNT;
+            const dateUnit = state.selectedDateType === DATE_TYPE.MONTHLY ? 'month' : 'day';
+            const dateFormat = state.selectedDateType === DATE_TYPE.MONTHLY ? 'MMM' : 'MM/DD';
 
             try {
                 const param: any = {
                     granularity: state.selectedDateType,
                     project_id: props.projectId,
                 };
-                if (type !== DATA_TYPE.all) param.label = CLOUD_SERVICE_LABEL[type];
+                if (type !== SERVICE_CATEGORY.ALL) param.label = CLOUD_SERVICE_LABEL[type];
                 const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary(param);
                 const data = res.results;
 
-                if (type === DATA_TYPE.storage) {
+                if (type === SERVICE_CATEGORY.STORAGE) {
                     const smallestCount = Math.min(...data.map(d => d.total));
                     const formattedSize = byteFormatter(smallestCount);
                     if (formattedSize) state.storageTrendSuffix = formattedSize.split(' ')[1] as Unit;
                 }
                 const chartData = data.map((d) => {
                     let count = d.total;
-                    if (type === DATA_TYPE.storage) {
+                    if (type === SERVICE_CATEGORY.STORAGE) {
                         const formattedSize = byteFormatter(d.total, { unit: state.storageTrendSuffix });
                         if (formattedSize) count = formattedSize.split(' ')[0];
                     }
                     return {
-                        date: dayjs(d.date),
+                        date: dayjs.utc(d.date),
                         count,
                     };
                 });
@@ -408,7 +366,7 @@ export default {
                 chartState.data = orderedData.map((d, idx) => {
                     let bulletText = '';
                     if (idx % 3 === 1) bulletText = d.count;
-                    if (state.selectedDateType === DATE_TYPE.monthly && (d.date.format('M') === '1' || d.date.format('M') === '12')) {
+                    if (state.selectedDateType === DATE_TYPE.MONTHLY && (d.date.format('M') === '1' || d.date.format('M') === '12')) {
                         return {
                             date: d.date.format('MMM, YY'),
                             count: d.count,
@@ -436,20 +394,20 @@ export default {
                     },
                 },
             };
-            if (type !== DATA_TYPE.all) defaultParam.labels = [CLOUD_SERVICE_LABEL[type]];
+            if (type !== SERVICE_CATEGORY.ALL) defaultParam.labels = [CLOUD_SERVICE_LABEL[type]];
             defaultParam.query.filter = {
                 key: 'project_id',
                 operator: 'eq',
                 value: props.projectId,
             };
 
-            if (type === DATA_TYPE.compute) {
+            if (type === SERVICE_CATEGORY.COMPUTE) {
                 param = {
                     ...defaultParam,
                     resource_type: 'inventory.Server',
                     is_primary: true,
                 };
-            } else if (type === DATA_TYPE.storage) {
+            } else if (type === SERVICE_CATEGORY.STORAGE) {
                 param = {
                     ...defaultParam,
                     is_major: true,
@@ -495,7 +453,7 @@ export default {
                         provider: d.provider,
                         label: state.providers[d.provider]?.label,
                         type: d.display_name || d.cloud_service_group,
-                        count: type === DATA_TYPE.storage ? byteFormatter(d.size) : commaFormatter(d.count),
+                        count: type === SERVICE_CATEGORY.STORAGE ? byteFormatter(d.size) : commaFormatter(d.count),
                         to: {
                             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                             params: {
@@ -518,20 +476,23 @@ export default {
             }
         };
 
-        /* event */
-        const onClickBox = (idx) => {
-            if (idx !== state.selectedIndex) disposeChart();
-            state.selectedIndex = idx;
+        /* Event */
+        const handleChangeTab = async (type) => {
+            await Promise.all([getSummaryInfo(type), getTrend(type)]);
+            drawChart();
         };
-        const onClickDateTypeButton = (type) => {
-            state.selectedDateType = type;
+        const handleChangeDateType = async (dateType) => {
+            state.selectedDateType = dateType;
+            await getTrend(state.activeTab);
+            drawChart();
         };
 
+        /* Init */
         const init = async () => {
-            await Promise.all([Object.keys(DATA_TYPE).forEach(d => getCount(d))]);
+            await Promise.allSettled(Object.values(SERVICE_CATEGORY).map(d => getCount(d)));
         };
         const chartInit = async () => {
-            await getTrend(DATA_TYPE.compute);
+            await getTrend(SERVICE_CATEGORY.COMPUTE);
             setTimeout(() => {
                 chartState.loading = false;
             }, 300);
@@ -539,22 +500,15 @@ export default {
         init();
         chartInit();
 
+        /* Watcher */
         watch(() => state.providers, (providers) => {
-            if (providers) getSummaryInfo(DATA_TYPE.compute);
+            if (providers) getSummaryInfo(SERVICE_CATEGORY.COMPUTE);
         }, { immediate: true });
         watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
             if (!loading && chartContext) {
                 drawChart();
             }
         }, { immediate: true });
-        watch(() => state.activeTab, async (type) => {
-            await Promise.all([getSummaryInfo(type), getTrend(type)]);
-            drawChart();
-        }, { immediate: false });
-        watch(() => state.selectedDateType, async () => {
-            await getTrend(state.activeTab);
-            drawChart();
-        }, { immediate: false });
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
@@ -568,12 +522,10 @@ export default {
         return {
             ...toRefs(state),
             chartState,
-            colorState,
-            onClickBox,
-            onClickDateTypeButton,
+            handleChangeTab,
+            handleChangeDateType,
             byteFormatter,
             commaFormatter,
-            numberFormatter,
             getLocation,
             getColor,
         };
@@ -624,8 +576,9 @@ export default {
     margin-top: 0.625rem;
 
     .content-wrapper {
-        @apply bg-white border border-gray-200 rounded-md;
+        @apply bg-white border border-gray-200 rounded-md grid-cols-12 gap-2;
         position: relative;
+        display: grid;
         height: auto;
         padding: 1rem;
 
@@ -634,7 +587,12 @@ export default {
         }
 
         .chart-wrapper {
+            @apply col-span-12;
             position: relative;
+
+            @screen lg {
+                @apply col-span-7;
+            }
             .toggle-button-group {
                 position: absolute;
                 right: 0.5rem;
@@ -658,6 +616,15 @@ export default {
             }
         }
         .summary-wrapper {
+            @apply col-span-12;
+
+            @screen md {
+                @apply col-span-4;
+            }
+
+            @screen lg {
+                @apply col-span-2;
+            }
             .sub-title {
                 padding-left: 0.5rem;
             }
@@ -671,6 +638,7 @@ export default {
                 }
 
                 &.no-data-wrapper {
+                    display: grid;
                     .empty-image {
                         margin: 0 auto 0.5rem auto;
                     }
@@ -728,6 +696,15 @@ export default {
             }
         }
         .region-service-wrapper {
+            @apply col-span-12;
+
+            @screen md {
+                @apply col-span-5;
+            }
+
+            @screen lg {
+                @apply col-span-3;
+            }
             .sub-title {
                 padding-left: 0.5rem;
             }

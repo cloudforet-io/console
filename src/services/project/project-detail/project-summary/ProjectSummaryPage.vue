@@ -39,6 +39,7 @@ import ProjectAlertWidget from '@/services/project/project-detail/project-summar
 
 import { store } from '@/store';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -70,12 +71,12 @@ export default {
         /* api */
         const getProjectAlertConfig = async () => {
             try {
-                await SpaceConnector.client.monitoring.projectAlertConfig.get({
+                const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list({
                     project_id: props.id,
                 });
-                state.hasAlertConfig = true;
+                state.hasAlertConfig = !!results.length;
             } catch (e) {
-                state.hasAlertConfig = false;
+                ErrorHandler.handleError(e);
             }
         };
 

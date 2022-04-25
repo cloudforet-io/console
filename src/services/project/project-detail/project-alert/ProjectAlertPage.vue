@@ -21,8 +21,6 @@
 </template>
 
 <script lang="ts">
-import { isEmpty } from 'lodash';
-
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, onActivated, reactive, toRefs, watch,
@@ -70,10 +68,10 @@ export default {
         const getProjectAlertConfig = async () => {
             try {
                 state.loading = true;
-                const res = await SpaceConnector.client.monitoring.projectAlertConfig.get({
+                const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list({
                     project_id: props.id,
                 });
-                if (!isEmpty(res)) state.isActivated = true;
+                state.isActivated = !!results.length;
             } catch (e) {
                 state.isActivated = false;
                 ErrorHandler.handleError(e);
