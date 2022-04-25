@@ -51,7 +51,11 @@ export default defineComponent({
             cloudServiceDetailMenuItems: computed<LNBItem[]>(() => {
                 const results: LNBItem[] = state.cloudServiceTypeList.map(d => (
                     {
-                        type: 'item', label: d.name, id: d.name, to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
+                        type: 'item',
+                        label: d.name,
+                        id: d.name,
+                        to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
+                        isSecondDepth: true,
                     }
                 ));
                 return results;

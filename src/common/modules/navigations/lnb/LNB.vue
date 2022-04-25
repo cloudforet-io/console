@@ -30,15 +30,13 @@
                     />
                 </router-link>
             </div>
-            <template v-for="(menuData, idx) in menuSet">
-                <l-n-b-menu-item :key="`${idx}-${getUUID()}`" :has-top-title="!!topTitle.label" :menu-data="menuData"
-                                 :current-route="currentRoute"
-                >
-                    <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                        <slot :name="slot" v-bind="scope" />
-                    </template>
-                </l-n-b-menu-item>
-            </template>
+            <l-n-b-menu-item v-for="(menuData, idx) in menuSet" :key="`${idx}-${getUUID()}`" :menu-data="menuData"
+                             :current-route="currentRoute"
+            >
+                <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                    <slot :name="slot" v-bind="scope" />
+                </template>
+            </l-n-b-menu-item>
         </div>
     </nav>
 </template>
@@ -84,8 +82,9 @@ export default {
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            currentRoute: computed(() => vm.$route.fullPath),
+            currentRoute: computed(() => ({ name: vm.$route.name, params: vm.$route.params })),
         });
+
         return {
             ...toRefs(state),
             assetUrlConverter,

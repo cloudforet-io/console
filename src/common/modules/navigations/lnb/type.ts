@@ -13,6 +13,7 @@ export interface LNBItem {
     isNew?: boolean;
     isBeta?: boolean;
     hideFavorite?: boolean;
+    isSecondDepth?: boolean;
 }
 
 export type LNBItemList = LNBItem[];

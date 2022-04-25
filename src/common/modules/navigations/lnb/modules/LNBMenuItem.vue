@@ -21,7 +21,7 @@
             </div>
             <router-link
                 v-if="item.type === 'item' && showMenu" class="menu-item"
-                :class="[{'second-depth': hasTopTitle}, {'selected': checkSelectedMenu(item.to)}]"
+                :class="[{'second-depth': item.isSecondDepth}, {'selected': checkSelectedMenu(item.to)}]"
                 :to="item.to"
                 @click.native="$event.stopImmediatePropagation()"
                 @mouseenter.native="hoveredItem = item.id"
@@ -53,16 +53,21 @@ import NewMark from '@/common/components/marks/NewMark.vue';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import { PDivider, PI } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, defineComponent, PropType, reactive, toRefs,
 } from '@vue/composition-api';
 import { LNBItemList } from '@/common/modules/navigations/lnb/type';
-import { RawLocation } from 'vue-router';
+import { Location } from 'vue-router';
+import { isEqual } from 'lodash';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { store } from '@/store';
 
-export default {
+interface Props {
+    menuData: LNBItemList;
+    currentRoute: Location|undefined;
+}
+
+export default defineComponent<Props>({
     name: 'LNBMenuItem',
     components: {
         FavoriteButton,
@@ -72,22 +77,17 @@ export default {
         PDivider,
     },
     props: {
-        hasTopTitle: {
-            type: Boolean,
-            default: false,
-        },
         menuData: {
             type: Array as () => LNBItemList,
             default: () => [],
         },
         currentRoute: {
-            type: String,
-            default: '',
+            type: Object as PropType<Location|undefined>,
+            default: undefined,
         },
     },
 
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             isFolded: false,
@@ -101,7 +101,13 @@ export default {
             state.isFolded = !state.isFolded;
         };
 
-        const checkSelectedMenu = (selectedMenuRoute: RawLocation) => props.currentRoute.startsWith(vm.$router.resolve(selectedMenuRoute).route.fullPath);
+        const checkSelectedMenu = (selectedMenuRoute: Location) => {
+            const currentRoute = props.currentRoute;
+            if (currentRoute?.name !== selectedMenuRoute.name) return false;
+            if (selectedMenuRoute.params) {
+                return isEqual(currentRoute?.params, selectedMenuRoute.params);
+            } return true;
+        };
 
         const getIsHovered = (itemId: string) => state.hoveredItem && state.hoveredItem === itemId;
 
@@ -113,7 +119,7 @@ export default {
             getIsHovered,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
