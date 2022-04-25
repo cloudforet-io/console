@@ -4,7 +4,7 @@
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
             <project-alert-widget v-if="hasAlertConfig" class="col-span-12" :project-id="id" />
             <project-billing class="col-span-12" :project-id="id" />
-            <project-personal-health-dashboard class="col-span-12" :providers="providers" :project-id="id" />
+            <project-personal-health-dashboard class="col-span-12" :project-id="id" />
             <project-service-accounts class="col-span-12 service-accounts-table" :project-id="id" />
         </div>
         <div class="col-span-12 lg:col-span-3 grid grid-cols-12 right-part">
@@ -16,7 +16,6 @@
                             :project-id="id"
             />
             <project-trusted-advisor class="col-span-12 trusted-advisor"
-                                     :providers="providers"
                                      :project-id="id"
             />
         </div>
@@ -25,7 +24,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    reactive, toRefs,
 } from '@vue/composition-api';
 
 import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
@@ -61,10 +60,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
-            providers: computed(() => vm.$store.state.reference.provider.items),
             hasAlertConfig: false,
         });
 

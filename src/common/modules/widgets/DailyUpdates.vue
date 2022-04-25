@@ -1,5 +1,5 @@
 <template>
-    <widget-layout ref="widgetRef" class="daily-updates" overflow="auto">
+    <widget-layout class="daily-updates" overflow="auto">
         <template #title>
             <div class="top">
                 <p class="title">
@@ -21,7 +21,7 @@
                 </div>
             </div>
 
-            <div v-else-if="data.length === 0 && alertData.length === 0"
+            <div v-else-if="data.length === 0 && warningData.length === 0"
                  class="w-full h-full flex items-center"
             >
                 <div class="no-data-wrapper">
@@ -33,8 +33,8 @@
             </div>
 
             <div v-else class="card-wrapper">
-                <div v-if="alertData.length > 0" class="daily-update-card-alert">
-                    <div v-for="(item, index) in alertData" :key="index"
+                <div v-if="warningData.length > 0" class="daily-update-card-alert">
+                    <div v-for="(item, index) in warningData" :key="index"
                          class="daily-update-card"
                     >
                         <div>
@@ -71,16 +71,16 @@
                                     class="rounded flex-shrink-0 service-img"
                         />
                     </div>
-                    <p v-if="item.created_count || item.deleted_count" class="daily-service">
-                        {{ item.title }}<br> <span class="text-sm font-bold">{{ item.total_count || 0 }}</span>
+                    <p v-if="item.createdCount || item.deletedCount" class="daily-service">
+                        {{ item.title }}<br> <span class="text-sm font-bold">{{ item.totalCount || 0 }}</span>
                     </p>
-                    <router-link v-if="item.created_count" :to="item.createdHref" class="daily-created-count">
+                    <router-link v-if="item.createdCount" :to="item.href" class="daily-created-count">
                         {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
-                        <span class="text-blue-600 font-bold text-sm">{{ item.created_count || 0 }}</span>
+                        <span class="text-blue-600 font-bold text-sm">{{ item.createdCount || 0 }}</span>
                     </router-link>
-                    <router-link v-if="item.deleted_count" :to="item.deletedHref" class="daily-deleted-count">
+                    <router-link v-if="item.deletedCount" :to="item.href" class="daily-deleted-count">
                         {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
-                        <span class="text-red-500 font-bold text-sm"> {{ item.deleted_count || 0 }}</span>
+                        <span class="text-red-500 font-bold text-sm"> {{ item.deletedCount || 0 }}</span>
                     </router-link>
                 </div>
             </div>
@@ -89,12 +89,11 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { find, range } from 'lodash';
 import dayjs from 'dayjs';
 
 import {
-    reactive, toRefs, UnwrapRef,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { PLazyImg, PSkeleton, PI } from '@spaceone/design-system';
 
@@ -106,22 +105,11 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { store } from '@/store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { Location } from 'vue-router';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 
 
-interface CloudService {
-    cloud_service_group: string;
-    cloud_service_type: string;
-    total_count: number;
-    provider: string;
-    icon: string;
-    created_count: number;
-    deleted_count: number;
-    create_warning: boolean;
-    delete_warning: boolean;
-    display_name?: string;
-}
-
-interface Server {
+interface CloudServiceData {
     cloud_service_group: string;
     cloud_service_type: string;
     total_count: number;
@@ -134,31 +122,15 @@ interface Server {
     display_name?: string;
 }
 
-interface Data {
-    group: string;
-    type: string;
-    isServer?: boolean;
-    count: number;
+interface Item {
+    title: string;
+    isWarning?: boolean;
     icon?: string;
-    provider?: string;
-    defaultIcon?: string;
-    create_warning?: boolean;
-    delete_warning?: boolean;
+    totalCount: number;
+    createdCount: number;
+    deletedCount: number;
+    href?: Location;
 }
-
-interface State {
-    serverData: Server[];
-    cloudServiceData: CloudService[];
-    data: any;
-    loading: boolean;
-    widgetRef: any;
-    dailyUpdates: boolean;
-    alertData: any;
-    skeletons: number[];
-}
-
-const getCreatedAtFilters = () => `filters=created_at:=${dayjs().format('YYYY-MM-DD')}`;
-const getDeletedAtFilters = () => `filters=deleted_at:=${dayjs().format('YYYY-MM-DD')}&filters=state:=DELETED`;
 
 export default {
     name: 'DailyUpdates',
@@ -169,68 +141,74 @@ export default {
         PSkeleton,
     },
     props: {
-        providers: {
-            type: Object,
-            default: () => ({}),
-        },
         projectId: {
             type: String,
             default: undefined,
         },
     },
     setup(props) {
-        const state: UnwrapRef<State> = reactive({
-            serverData: [],
-            cloudServiceData: [],
-            data: [],
-            alertData: [],
+        const queryHelper = new QueryHelper();
+        const state = reactive({
+            providers: computed(() => store.state.reference.provider.items),
+            serverData: [] as CloudServiceData[],
+            cloudServiceData: [] as CloudServiceData[],
+            data: [] as Item[],
+            warningData: [] as Item[],
             loading: true,
-            widgetRef: null,
-            dailyUpdates: false,
             skeletons: range(4),
         });
 
-        const serverAPI = SpaceConnector.client.statistics.topic.dailyUpdateServer;
-
-        const getServerData = async (): Promise<void> => {
+        /* API */
+        const listServerData = async (): Promise<void> => {
             try {
                 const params: any = {
                     timezone: store.state.user.timezone,
                 };
                 if (props.projectId) params.project_id = props.projectId;
-                const res = await serverAPI(params);
-                state.serverData = res.results;
+                const { results } = await SpaceConnector.client.statistics.topic.dailyUpdateServer(params);
+                state.serverData = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.serverData = [];
             }
         };
-
-        const cloudServiceAPI = SpaceConnector.client.statistics.topic.dailyUpdateCloudService;
-
-        const getCloudServiceData = async (): Promise<void> => {
+        const listCloudServiceData = async (): Promise<void> => {
             try {
                 const params: any = {
                     timezone: store.state.user.timezone,
                 };
                 if (props.projectId) params.project_id = props.projectId;
-                const res = await cloudServiceAPI(params);
-                state.cloudServiceData = res.results;
+                const { results } = await SpaceConnector.client.statistics.topic.dailyUpdateCloudService(params);
+                state.cloudServiceData = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.cloudServiceData = [];
             }
         };
 
-        const queryHelper = new QueryHelper();
+        /* Util */
+        const getConvertedCloudServiceData = (rawData: CloudServiceData[]): Item[] => {
+            const results: Item[] = [];
+            rawData.forEach((d) => {
+                const filters: QueryStoreFilter[] = [];
+                if (d.created_count) {
+                    filters.push({ k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' });
+                } else {
+                    filters.push({ k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' });
+                    filters.push({ k: 'state', v: 'DELETED', o: '=' });
+                }
+                if (props.projectId) {
+                    filters.push({ k: 'project_id', v: props.projectId, o: '=' });
+                }
 
-        const setProjectDashboardData = async () => {
-            state.data = [
-                ...state.serverData.map(d => ({
+                const result: Item = {
                     title: d.display_name ?? d.cloud_service_group,
-                    isServer: true,
-                    icon: d.icon || props.providers[d.provider]?.icon,
-                    createdHref: {
+                    icon: d.icon || state.providers[d.provider]?.icon,
+                    isWarning: d.create_warning || d.delete_warning,
+                    totalCount: d.total_count,
+                    createdCount: d.created_count,
+                    deletedCount: d.deleted_count,
+                    href: {
                         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
@@ -238,174 +216,48 @@ export default {
                             name: d.cloud_service_type,
                         },
                         query: {
-                            filters: queryHelper.setFilters([
-                                // { k: 'provider', v: d.provider, o: '=' },
-                                { k: 'project_id', v: props.projectId, o: '=' },
-                                { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
-                            ]).rawQueryStrings,
+                            filters: queryHelper.setFilters(filters).rawQueryStrings,
                         },
                     },
-                    deletedHref: {
-                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                        params: {
-                            provider: d.provider,
-                            group: d.cloud_service_group,
-                            name: d.cloud_service_type,
-                        },
-                        query: {
-                            filters: queryHelper.setFilters([
-                                // { k: 'provider', v: d.provider, o: '=' },
-                                { k: 'project_id', v: props.projectId, o: '=' },
-                                { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
-                                { k: 'state', v: 'DELETED', o: '=' },
-                            ]).rawQueryStrings,
-                        },
-                    },
-                    ...d,
-                })),
-                ...state.cloudServiceData.map(d => ({
-                    title: d.display_name ?? d.cloud_service_group,
-                    icon: d.icon || props.providers[d.provider]?.icon,
-                    createdHref: {
-                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                        params: {
-                            provider: d.provider,
-                            group: d.cloud_service_group,
-                            name: d.cloud_service_type,
-                        },
-                        query: {
-                            filters: queryHelper.setFilters([
-                                { k: 'project_id', v: props.projectId, o: '=' },
-                                { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
-                            ]).rawQueryStrings,
-                        },
-                    },
-                    deletedHref: {
-                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                        params: {
-                            provider: d.provider,
-                            group: d.cloud_service_group,
-                            name: d.cloud_service_type,
-                        },
-                        query: {
-                            filters: queryHelper.setFilters([
-                                { k: 'project_id', v: props.projectId, o: '=' },
-                                { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
-                                { k: 'state', v: 'DELETED', o: '=' },
-                            ]).rawQueryStrings,
-                        },
-                    },
-                    ...d,
-                })),
-            ];
-            return state.data;
+                };
+                results.push(result);
+            });
+            return results;
         };
-
-        const setDashboardData = async () => {
-            state.data = [
-                ...state.serverData.map(d => ({
-                    title: d.display_name ?? d.cloud_service_group,
-                    isServer: true,
-                    icon: d.icon || props.providers[d.provider]?.icon,
-                    createdHref: {
-                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                        params: {
-                            provider: d.provider,
-                            group: d.cloud_service_group,
-                            name: d.cloud_service_type,
-                        },
-                        query: {
-                            filters: queryHelper.setFilters([
-                                // { k: 'provider', v: d.provider, o: '=' },
-                                { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
-                            ]).rawQueryStrings,
-                        },
-                    },
-                    deletedHref: {
-                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                        params: {
-                            provider: d.provider,
-                            group: d.cloud_service_group,
-                            name: d.cloud_service_type,
-                        },
-                        query: {
-                            filters: queryHelper.setFilters([
-                                // { k: 'provider', v: d.provider, o: '=' },
-                                { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
-                                { k: 'state', v: 'DELETED', o: '=' },
-                            ]).rawQueryStrings,
-                        },
-                    },
-                    ...d,
-                })),
-                ...state.cloudServiceData.map(d => ({
-                    title: d.display_name ?? d.cloud_service_group,
-                    icon: d.icon || props.providers[d.provider]?.icon,
-                    createdHref: {
-                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                        params: {
-                            provider: d.provider,
-                            group: d.cloud_service_group,
-                            name: d.cloud_service_type,
-                        },
-                        query: {
-                            filters: queryHelper.setFilters([
-                                { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
-                            ]).rawQueryStrings,
-                        },
-                    },
-                    deletedHref: {
-                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                        params: {
-                            provider: d.provider,
-                            group: d.cloud_service_group,
-                            name: d.cloud_service_type,
-                        },
-                        query: {
-                            filters: queryHelper.setFilters([
-                                { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
-                                { k: 'state', v: 'DELETED', o: '=' },
-                            ]).rawQueryStrings,
-                        },
-                    },
-                    ...d,
-                })),
-            ];
-            return state.data;
-        };
-
-        const getAlertData = (dataForFilter) => {
-            const alertData = [] as any[];
-            find(dataForFilter, (d) => {
-                if (d.create_warning || d.delete_warning) {
-                    alertData.push(d);
+        const getWarningData = (data: Item[]) => {
+            const warningData: Item[] = [];
+            find(data, (d) => {
+                if (d.isWarning) {
+                    warningData.push(d);
                 }
             });
-            state.alertData = alertData;
-            state.data = state.data.filter(x => !state.alertData.includes(x));
+            state.warningData = warningData;
+            state.data = state.data.filter(x => !state.warningData.includes(x));
         };
 
-
-        const getData = async (): Promise<void> => {
+        /* Init */
+        const init = async (): Promise<void> => {
             state.loading = true;
-            await Promise.all([getServerData(), getCloudServiceData()]);
-            if (props.projectId) {
-                const dataForFilter = await setProjectDashboardData() as any[];
-                getAlertData(dataForFilter);
-            } else {
-                const dataForFilter = await setDashboardData() as any[];
-                getAlertData(dataForFilter);
-            }
+            await Promise.all([listServerData(), listCloudServiceData()]);
+            const data = [
+                ...getConvertedCloudServiceData(state.serverData),
+                ...getConvertedCloudServiceData(state.cloudServiceData),
+            ];
+            state.data = data;
+            getWarningData(data);
             state.loading = false;
         };
+        init();
 
-
-        getData();
+        (async () => {
+            await Promise.allSettled([
+                // LOAD REFERENCE STORE
+                store.dispatch('reference/provider/load'),
+            ]);
+        })();
 
         return {
             ...toRefs(state),
-            getCreatedAtFilters,
-            getDeletedAtFilters,
             assetUrlConverter,
         };
     },

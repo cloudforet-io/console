@@ -62,13 +62,13 @@
                     <p-icon-button class="text"
                                    name="ic_arrow_left"
                                    color="inherit transparent"
-                                   @click="onClickDateButton('prev')"
+                                   @click="handleClickDateButton('prev')"
                     />
                     <p-icon-button class="text"
                                    name="ic_arrow_right"
                                    color="inherit transparent"
                                    :disabled="tableState.nextButtonDisabled"
-                                   @click="onClickDateButton('next')"
+                                   @click="handleClickDateButton('next')"
                     />
                 </div>
                 <p-data-table
@@ -108,9 +108,10 @@ import { orderBy, range } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
+import { XYChart } from '@amcharts/amcharts4/charts';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -175,7 +176,7 @@ export default {
         const queryHelper = new QueryHelper();
         const state = reactive({
             loading: false,
-            chart: null,
+            chart: null as XYChart | null,
             chartRef: null as any, // HTMLElement | null,
             skeletons: range(4),
             dateTypes: computed(() => ([
@@ -519,8 +520,8 @@ export default {
             }
         };
 
-        /* event */
-        const onClickDateButton = (type) => {
+        /* Event */
+        const handleClickDateButton = (type) => {
             let dateUnit = 'month';
             if (state.selectedDateType === DATE_TYPE.daily) dateUnit = 'day';
             if (type === 'prev') {
@@ -531,11 +532,12 @@ export default {
             getTableData();
         };
 
-        const init = async () => {
-            await Promise.all([getTrend(), getTableData(), getCount()]);
-        };
-        init();
+        /* Init */
+        (async () => {
+            await Promise.allSettled([getTrend(), getTableData(), getCount()]);
+        })();
 
+        /* Watcher */
         watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
             if (!loading && chartContext) {
                 drawChart();
@@ -546,12 +548,16 @@ export default {
             drawChart();
         }, { immediate: false });
 
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
+        });
+
         return {
             ...toRefs(state),
             tableState,
             summaryState,
             chartState,
-            onClickDateButton,
+            handleClickDateButton,
         };
     },
 };

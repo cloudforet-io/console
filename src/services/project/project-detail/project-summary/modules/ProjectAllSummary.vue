@@ -100,6 +100,7 @@ import { Unit } from 'bytes';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
+import { XYChart } from '@amcharts/amcharts4/charts';
 import { TranslateResult } from 'vue-i18n';
 import { Location } from 'vue-router';
 
@@ -166,7 +167,7 @@ export default {
         const queryHelper = new QueryHelper();
         const state = reactive({
             loading: true,
-            chart: null,
+            chart: null as XYChart | null,
             chartRef: null as HTMLElement | null,
             skeletons: range(4),
             providers: computed(() => store.state.reference.provider.items),
