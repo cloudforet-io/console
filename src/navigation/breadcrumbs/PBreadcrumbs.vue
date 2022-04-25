@@ -7,7 +7,10 @@
                     :to="getLocation(route)"
                 >
                     <span v-if="idx !== routes.length - 1" class="inline-block link">{{ route.name }}</span>
-                    <span v-else class="inline-block current-page">{{ route.name }}</span>
+                    <span v-else class="inline-block current-page">
+                        {{ route.name }}
+                        <p-copy-button v-if="copiable" :value="route.name" />
+                    </span>
                     <span v-if="idx < routes.length - 1">
                         <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem"
                              class="arrow-icon" color="inherit white"
@@ -20,7 +23,10 @@
                     <span v-if="idx !== routes.length - 1" class="inline-block link"
                           @click="$emit('click', route, idx)"
                     >{{ route.name }}</span>
-                    <span v-else class="inline-block current-page">{{ route.name }}</span>
+                    <span v-else class="inline-block current-page">
+                        {{ route.name }}
+                        <p-copy-button v-if="copiable" :value="route.name" />
+                    </span>
                     <span v-if="idx < routes.length - 1">
                         <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem"
                              class="arrow-icon" color="inherit white"
@@ -29,7 +35,7 @@
                 </div>
             </span>
             <span v-if="routes.length >= 5 && idx === 2 && !state.isShown">
-                <span class="inline-block link hidden-underline" @click="showHidden">...</span>
+                <span class="inline-block link" @click="showHidden">...</span>
                 <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem"
                      class="arrow-icon" color="inherit white"
                 />
@@ -39,9 +45,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from '@vue/composition-api';
+import { defineComponent, PropType, reactive } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
 import { Location } from 'vue-router';
+import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 
 interface Route {
     name: string;
@@ -51,20 +58,26 @@ interface Route {
 
 interface Props {
     routes: Route[];
+    copiable?: boolean;
 }
 
 export default defineComponent<Props>({
     name: 'PBreadcrumbs',
     components: {
+        PCopyButton,
         PI,
     },
     props: {
         routes: {
-            type: Array,
+            type: Array as PropType<Route[]>,
             default: () => [],
         },
+        copiable: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: Props) {
+    setup(props) {
         const state = reactive({
             isShown: false,
         });
@@ -92,29 +105,27 @@ export default defineComponent<Props>({
     margin-bottom: 0.5rem;
 
     .link {
-        @apply text-xs text-gray-900 cursor-pointer;
-        opacity: 0.5;
+        @apply text-xs text-gray-700 cursor-pointer;
 
         &:hover {
-            opacity: 1;
+            @apply text-gray-900 underline;
         }
     }
 
     .current-page {
         @apply text-xs text-gray-900 cursor-default;
-        opacity: 0.5;
+        display: inline-flex;
+        align-items: center;
+        > .p-copy-button {
+            font-size: inherit;
+            margin-left: 0.25rem;
+        }
     }
 
     .arrow-icon {
-        @apply text-gray-300;
-        margin-left: 0.25rem;
-        margin-right: 0.25rem;
-    }
-
-    .hidden-underline {
-        &:hover {
-            text-decoration: underline;
-        }
+        @apply text-gray-500;
+        margin-left: 0.375rem;
+        margin-right: 0.375rem;
     }
 }
 </style>

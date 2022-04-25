@@ -31,6 +31,24 @@ export const getBreadcrumbsArgTypes = (): ArgTypes => ({
             type: 'object',
         },
     },
+    copiable: {
+        name: 'copiable',
+        type: { name: 'boolean' },
+        description: 'Whether copying is possible or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     /* events */
     onClick: {
         name: 'click',

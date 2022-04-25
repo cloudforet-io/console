@@ -19,6 +19,7 @@ export const Template = (args, { argTypes }) => ({
     <div class="h-full w-full overflow p-8">
         <p-breadcrumbs
             :routes="routes"
+            :copiable="copiable"
             @click="onClick"
         ></p-breadcrumbs>
     </div>
@@ -116,6 +117,42 @@ export const Template = (args, { argTypes }) => ({
 
 <br/>
 <br/>
+
+## Copiable
+
+<Canvas>
+    <Story name="Copiable">
+        {{
+            components: { PBreadcrumbs },
+            template: `
+    <div class="h-full w-full overflow p-8">
+    <p-breadcrumbs :routes="[
+                        { name: 'Page1', to: {name: 'Page1'} },
+                        { name: 'Page2', to: {name: 'Page2'} },
+                        { name: 'Page3' },
+                    ]"
+                   copiable
+    />
+    <br/>
+    <p-breadcrumbs :routes="[
+                        { name: 'Page1', path: '/page1' },
+                        { name: 'Page2' },
+                        { name: 'Page3' },
+                        { name: 'Page4' },
+                        { name: 'Page5' },
+                        { name: 'Page6' },
+                    ]"
+                   copiable
+    />
+    </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Playground
 
