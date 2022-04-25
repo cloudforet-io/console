@@ -242,7 +242,7 @@ export default {
                 [DATA_TYPE.storage]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE') },
                 [DATA_TYPE.security]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.SECURITY') },
                 [DATA_TYPE.analytics]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.ANALYTICS') },
-                [DATA_TYPE.all]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.CLOUD_SERVICE') },
+                [DATA_TYPE.all]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.ALL') },
             })),
             summaryData: [] as SummaryData[],
         });
