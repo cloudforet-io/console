@@ -1,3 +1,10 @@
+# [1.1.0-beta.283](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.282...v1.1.0-beta.283) (2022-04-25)
+
+
+### Features
+
+* add copy button with copiable prop & update style in CopyButton ([#929](https://github.com/spaceone-dev/spaceone-design-system/issues/929)) ([b8e2fb4](https://github.com/spaceone-dev/spaceone-design-system/commit/b8e2fb4d67374bdaf7db92947c766c098645867f))
+
 # [1.1.0-beta.282](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.281...v1.1.0-beta.282) (2022-04-21)
 
 
