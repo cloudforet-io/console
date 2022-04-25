@@ -1,7 +1,7 @@
 <template>
     <fragment>
         <p class="toggle">
-            Original Data
+            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.ORIGINAL_DATA') }}
             <p-collapsible-toggle :toggle-type="'switch'"
                                   :is-collapsed.sync="showFormattedBudgetData" class="collapsible-toggle"
             />

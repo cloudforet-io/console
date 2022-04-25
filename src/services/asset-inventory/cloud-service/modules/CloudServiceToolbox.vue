@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="toolbox-top-wrapper">
-            <span class="title">Filter</span>
+            <span class="title">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTER') }}</span>
             <div v-if="period" class="period-wrapper">
                 <cloud-service-period-filter :period="period"
                                              @update:period="handleUpdatePeriod"
@@ -14,7 +14,7 @@
                                     outline
                                     @click="handleClickSet"
                 >
-                    Set
+                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SET') }}
                 </p-icon-text-button>
             </div>
             <div class="total-result-wrapper">
