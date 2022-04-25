@@ -1324,7 +1324,7 @@
 				"CHECK_MODAL_DELETE_TITLE": "クラウドサービス削除",
 				"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
 				"FAVORITES": "お気に入り",
-				"FILTER": "",
+				"FILTER": "フィルター",
 				"FILTERED_BY_DATE": "日付で絞り込み",
 				"MODAL": {
 					"CLEAR_ALL": "",
