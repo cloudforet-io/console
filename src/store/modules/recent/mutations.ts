@@ -9,7 +9,7 @@ export const addMenuItem = (state: RecentState, recent: RecentConfig): void => {
     }
     state.menuItems.unshift(recent);
 };
-export const loadMenuItem = (state: RecentState, recent: RecentConfig[]): void => {
+export const setMenuItems = (state: RecentState, recent: RecentConfig[]): void => {
     state.menuItems = recent;
 };
 
@@ -21,7 +21,7 @@ export const addProjectItem = (state: RecentState, recent: RecentConfig): void =
     }
     state.projectItems.unshift(recent);
 };
-export const loadProjectItem = (state: RecentState, recent: RecentConfig[]): void => {
+export const setProjectItems = (state: RecentState, recent: RecentConfig[]): void => {
     state.projectItems = recent;
 };
 
@@ -34,7 +34,7 @@ export const addProjectGroupItem = (state: RecentState, recent: RecentConfig): v
     }
     state.projectGroupItems.unshift(recent);
 };
-export const loadProjectGroupItem = (state: RecentState, recent: RecentConfig[]): void => {
+export const setProjectGroupItems = (state: RecentState, recent: RecentConfig[]): void => {
     state.projectGroupItems = recent;
 };
 
@@ -46,7 +46,7 @@ export const addCloudServiceItem = (state: RecentState, recent: RecentConfig): v
     }
     state.cloudServiceItems.unshift(recent);
 };
-export const loadCloudServiceItem = (state: RecentState, recent: RecentConfig[]): void => {
+export const setCloudServiceItems = (state: RecentState, recent: RecentConfig[]): void => {
     state.cloudServiceItems = recent;
 };
 

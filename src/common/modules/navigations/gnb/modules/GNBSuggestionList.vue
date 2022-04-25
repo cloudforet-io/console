@@ -48,7 +48,6 @@
                 <favorite-button v-if="useFavorite"
                                  :item-id="item.name"
                                  :favorite-type="item.itemType"
-                                 :favorite-items="favoriteItems"
                                  scale="0.65"
                 />
             </div>
@@ -74,8 +73,6 @@ import {
     FocusStartPosition,
     SuggestionItem, SUGGESTION_TYPE,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import { store } from '@/store';
 
 
 interface Props {
@@ -135,12 +132,6 @@ export default defineComponent<Props>({
                 }
                 return new RegExp(regex, 'i');
             }),
-            favoriteItems: computed(() => [
-                ...store.state.favorite.menuItems,
-                ...store.state.favorite.projectItems,
-                ...store.state.favorite.projectGroupItems,
-                ...store.state.favorite.cloudServiceItems,
-            ]),
         });
 
         const getFirstMatchedString = (str: string): string => {
@@ -195,15 +186,6 @@ export default defineComponent<Props>({
                 state.contextMenuRef.focus(-1);
             }
         });
-
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('favorite/load', FAVORITE_TYPE.MENU),
-                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
-                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
-                store.dispatch('favorite/load', FAVORITE_TYPE.CLOUD_SERVICE),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

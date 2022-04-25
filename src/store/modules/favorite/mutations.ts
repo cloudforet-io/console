@@ -1,48 +1,52 @@
-import { FavoriteState, FavoriteConfig } from '@/store/modules/favorite/type';
+import { FavoriteState, FavoriteConfig, FavoriteHasLoaded } from '@/store/modules/favorite/type';
+import { Mutation } from 'vuex';
 
+export const setIsLoading: Mutation<FavoriteState> = (state, isLoading: FavoriteHasLoaded): void => {
+    state.isLoading = isLoading;
+};
 
 /* Menu */
 export const addMenuItem = (state: FavoriteState, favorite: FavoriteConfig): void => {
-    state.menuItems.unshift(favorite);
+    if (state.menuItems) state.menuItems.unshift(favorite);
 };
 export const removeMenuItem = (state: FavoriteState, favorite: Partial<FavoriteConfig>): void => {
-    state.menuItems = state.menuItems.filter(d => d.itemId !== favorite.itemId);
+    state.menuItems = state.menuItems?.filter(d => d.itemId !== favorite.itemId) ?? null;
 };
-export const loadMenuItem = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
+export const setMenuItems = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
     state.menuItems = favorite;
 };
 
 /* Project */
 export const addProjectItem = (state: FavoriteState, favorite: FavoriteConfig): void => {
-    state.projectItems.unshift(favorite);
+    if (state.projectItems) state.projectItems.unshift(favorite);
 };
 export const removeProjectItem = (state: FavoriteState, favorite: Partial<FavoriteConfig>): void => {
-    state.projectItems = state.projectItems.filter(d => d.itemId !== favorite.itemId);
+    state.projectItems = state.projectItems?.filter(d => d.itemId !== favorite.itemId) ?? null;
 };
-export const loadProjectItem = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
+export const setProjectItems = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
     state.projectItems = favorite;
 };
 
 
 /* Project Group */
 export const addProjectGroupItem = (state: FavoriteState, favorite: FavoriteConfig): void => {
-    state.projectGroupItems.unshift(favorite);
+    if (state.projectGroupItems) state.projectGroupItems.unshift(favorite);
 };
 export const removeProjectGroupItem = (state: FavoriteState, favorite: Partial<FavoriteConfig>): void => {
-    state.projectGroupItems = state.projectGroupItems.filter(d => d.itemId !== favorite.itemId);
+    state.projectGroupItems = state.projectGroupItems?.filter(d => d.itemId !== favorite.itemId) ?? null;
 };
-export const loadProjectGroupItem = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
+export const setProjectGroupItems = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
     state.projectGroupItems = favorite;
 };
 
 
 /* Cloud Service Type */
 export const addCloudServiceItem = (state: FavoriteState, favorite: FavoriteConfig): void => {
-    state.cloudServiceItems.unshift(favorite);
+    if (state.cloudServiceItems) state.cloudServiceItems.unshift(favorite);
 };
 export const removeCloudServiceItem = (state: FavoriteState, favorite: Partial<FavoriteConfig>): void => {
-    state.cloudServiceItems = state.cloudServiceItems.filter(d => d.itemId !== favorite.itemId);
+    state.cloudServiceItems = state.cloudServiceItems?.filter(d => d.itemId !== favorite.itemId) ?? null;
 };
-export const loadCloudServiceItem = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
+export const setCloudServiceItems = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
     state.cloudServiceItems = favorite;
 };

@@ -36,11 +36,10 @@
                 </div>
                 <slot name="right-extra" v-bind="{...$props, item, index: idx}" />
                 <favorite-button
-                    v-if="showFavorite(item.id)
-                        && !item.hideFavorite && !isDomainOwner"
+                    v-if="!item.hideFavorite && !isDomainOwner"
                     :item-id="item.id"
                     :favorite-type="FAVORITE_TYPE.MENU"
-                    :favorite-items="favoriteItems"
+                    :visible-active-case-only="!getIsHovered(item.id)"
                     scale="0.8"
                     class="favorite-button"
                 />
@@ -59,7 +58,7 @@ import {
 } from '@vue/composition-api';
 import { LNBItemList } from '@/common/modules/navigations/lnb/type';
 import { RawLocation } from 'vue-router';
-import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { store } from '@/store';
 
@@ -94,7 +93,6 @@ export default {
             isFolded: false,
             isFoldableMenu: computed(() => props.menuData?.some(item => item.foldable)),
             showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
-            favoriteItems: computed<FavoriteItem[]>(() => store.state.favorite.menuItems),
             hoveredItem: '',
 
         });
@@ -105,22 +103,14 @@ export default {
 
         const checkSelectedMenu = (selectedMenuRoute: RawLocation) => props.currentRoute.startsWith(vm.$router.resolve(selectedMenuRoute).route.fullPath);
 
-        const showFavorite = (itemId: string) => {
-            const isExistedFavorite = state.favoriteItems?.some((i: FavoriteItem) => i.itemId === itemId);
-            const isHovered = state.hoveredItem && state.hoveredItem === itemId;
-            return isExistedFavorite || isHovered;
-        };
-
-        (async () => {
-            await store.dispatch('favorite/load', FAVORITE_TYPE.MENU);
-        })();
+        const getIsHovered = (itemId: string) => state.hoveredItem && state.hoveredItem === itemId;
 
         return {
             ...toRefs(state),
             handleToggle,
             checkSelectedMenu,
             FAVORITE_TYPE,
-            showFavorite,
+            getIsHovered,
         };
     },
 };

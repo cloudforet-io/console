@@ -72,7 +72,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import dayjs from 'dayjs';
 
 import {

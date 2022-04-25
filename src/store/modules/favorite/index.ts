@@ -1,14 +1,20 @@
-import { FavoriteState } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FavoriteState } from '@/store/modules/favorite/type';
 import * as getters from './getters';
 import * as mutations from './mutations';
 import * as actions from './actions';
 
 
-const state: Required<FavoriteState> = {
-    menuItems: [],
-    projectItems: [],
-    projectGroupItems: [],
-    cloudServiceItems: [],
+const state: FavoriteState = {
+    menuItems: null,
+    projectItems: null,
+    projectGroupItems: null,
+    cloudServiceItems: null,
+    isLoading: {
+        [FAVORITE_TYPE.MENU]: false,
+        [FAVORITE_TYPE.CLOUD_SERVICE]: false,
+        [FAVORITE_TYPE.PROJECT]: false,
+        [FAVORITE_TYPE.PROJECT_GROUP]: false,
+    },
 };
 
 export default {

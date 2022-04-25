@@ -1,5 +1,5 @@
 <template>
-    <p-i v-show="readOnly ? active : true"
+    <p-i v-show="(visibleActiveCaseOnly || readOnly) ? active : true"
          :name="active ? 'ic_favorite--added': 'ic_favorite'"
          width="1rem" height="1rem"
          :scale="scale"
@@ -12,22 +12,25 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
 import { FavoriteButtonProps } from '@/common/modules/favorites/favorite-button/type';
 import { store } from '@/store';
-import { FavoriteConfig } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FavoriteConfig } from '@/store/modules/favorite/type';
+
+const FAVORITE_TYPE_TO_STATE_NAME = {
+    [FAVORITE_TYPE.MENU]: 'menuItems',
+    [FAVORITE_TYPE.PROJECT]: 'projectItems',
+    [FAVORITE_TYPE.PROJECT_GROUP]: 'projectGroupItems',
+    [FAVORITE_TYPE.CLOUD_SERVICE]: 'cloudServiceItems',
+};
 
 export default defineComponent<FavoriteButtonProps>({
     name: 'FavoriteButton',
     components: { PI },
     props: {
-        favoriteItems: {
-            type: Array,
-            default: () => ([]),
-        },
         itemId: {
             type: String,
             required: true,
@@ -44,14 +47,27 @@ export default defineComponent<FavoriteButtonProps>({
             type: Boolean,
             default: false,
         },
+        visibleActiveCaseOnly: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: FavoriteButtonProps) {
         const state = reactive({
+            isLoading: computed(() => store.state.favorite.isLoading[props.favoriteType]),
+            hasLoaded: computed(() => Array.isArray(state.favoriteItems)),
+            favoriteItems: computed<FavoriteConfig[]|null>(() => {
+                const stateName = FAVORITE_TYPE_TO_STATE_NAME[props.favoriteType];
+                if (!stateName) return [];
+                return store.state.favorite[stateName];
+            }),
             favoriteItemMap: computed<Record<string, FavoriteConfig>>(() => {
                 const result: Record<string, FavoriteConfig> = {};
-                props.favoriteItems.forEach((d) => {
-                    result[d.itemId] = d;
-                });
+                if (Array.isArray(state.favoriteItems)) {
+                    state.favoriteItems.forEach((d) => {
+                        result[d.itemId] = d;
+                    });
+                }
                 return result;
             }),
             active: computed(() => !!state.favoriteItemMap[props.itemId]),
@@ -72,6 +88,18 @@ export default defineComponent<FavoriteButtonProps>({
                 });
             }
         };
+
+        const stopWatch = watch([() => state.hasLoaded, () => state.isLoading], async ([hasLoaded, isLoading]) => {
+            if (hasLoaded) {
+                if (stopWatch) stopWatch();
+                return;
+            }
+
+            if (!isLoading) {
+                await store.dispatch('favorite/load', props.favoriteType);
+            }
+        }, { immediate: true });
+
         return {
             ...toRefs(state),
             handleClickFavoriteButton,

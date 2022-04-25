@@ -15,23 +15,29 @@ const createRecent = async (itemType: RECENT_TYPE, itemId: string) => {
     }
 };
 
+const addCommitsByItemType = {
+    [RECENT_TYPE.PROJECT]: 'addProjectItem',
+    [RECENT_TYPE.PROJECT_GROUP]: 'addProjectGroupItem',
+    [RECENT_TYPE.CLOUD_SERVICE]: 'addCloudServiceItem',
+    [RECENT_TYPE.MENU]: 'addMenuItem',
+};
 export const addItem: Action<RecentState, any> = async ({ commit }, recent: RecentConfig): Promise<void> => {
     const itemType = recent.itemType;
     const itemId = recent.itemId;
     await createRecent(itemType, itemId);
-    const recentCommitsByItemType = {
-        [RECENT_TYPE.PROJECT]: 'addProjectItem',
-        [RECENT_TYPE.PROJECT_GROUP]: 'addProjectGroupItem',
-        [RECENT_TYPE.CLOUD_SERVICE]: 'addCloudServiceItem',
-        [RECENT_TYPE.MENU]: 'addMenuItem',
-    };
-    commit(recentCommitsByItemType[itemType], recent);
+    commit(addCommitsByItemType[itemType], recent);
 };
 
 interface RecentLoadPayload {
     itemType: RECENT_TYPE;
     limit?: number;
 }
+const setCommitsByItemType = {
+    [RECENT_TYPE.PROJECT]: 'setProjectItems',
+    [RECENT_TYPE.PROJECT_GROUP]: 'setProjectGroupItems',
+    [RECENT_TYPE.CLOUD_SERVICE]: 'setCloudServiceItems',
+    [RECENT_TYPE.MENU]: 'setMenuItems',
+};
 export const load: Action<RecentState, any> = async ({ commit }, payload: RecentLoadPayload): Promise<void|Error> => {
     const itemType = payload?.itemType;
     const { results } = await SpaceConnector.client.addOns.recent.list({
@@ -45,13 +51,7 @@ export const load: Action<RecentState, any> = async ({ commit }, payload: Recent
     }));
 
     if (itemType) {
-        const recentCommitsByItemType = {
-            [RECENT_TYPE.PROJECT]: 'loadProjectItem',
-            [RECENT_TYPE.PROJECT_GROUP]: 'loadProjectGroupItem',
-            [RECENT_TYPE.CLOUD_SERVICE]: 'loadCloudServiceItem',
-            [RECENT_TYPE.MENU]: 'loadMenuItem',
-        };
-        commit(recentCommitsByItemType[itemType], recents);
+        commit(setCommitsByItemType[itemType], recents);
     } else {
         commit('loadAllItem', recents);
     }

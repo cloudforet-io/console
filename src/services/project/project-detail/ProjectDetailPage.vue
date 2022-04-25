@@ -7,7 +7,6 @@
                 <div class="button-wrapper">
                     <span class="favorite-button-wrapper">
                         <favorite-button :item-id="projectId"
-                                         :favorite-items="favoriteItems"
                                          :favorite-type="FAVORITE_TYPE.PROJECT"
                         />
                     </span>
@@ -178,7 +177,6 @@ export default {
                 TRIGGERED: find(store.state.service.projectDetail.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
             })),
             maintenanceHappeningListRef: null as null|Vue,
-            favoriteItems: computed(() => store.state.favorite.projectItems),
         });
 
         /* api */
@@ -299,7 +297,6 @@ export default {
             singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
             await Promise.allSettled([
                 // getPageNavigation(),
-                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 store.dispatch('service/projectDetail/getAlertCounts'),
             ]);
         })();

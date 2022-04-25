@@ -20,10 +20,17 @@ export interface FavoriteItem extends FavoriteConfig {
     parents?: { name?: string; label?: string }[];
 }
 
+export interface FavoriteHasLoaded {
+    [FAVORITE_TYPE.MENU]: boolean;
+    [FAVORITE_TYPE.CLOUD_SERVICE]: boolean;
+    [FAVORITE_TYPE.PROJECT]: boolean;
+    [FAVORITE_TYPE.PROJECT_GROUP]: boolean;
+}
 
 export interface FavoriteState {
-    menuItems: FavoriteConfig[];
-    projectItems: FavoriteConfig[];
-    projectGroupItems: FavoriteConfig[];
-    cloudServiceItems: FavoriteConfig[];
+    menuItems: FavoriteConfig[]|null;
+    projectItems: FavoriteConfig[]|null;
+    projectGroupItems: FavoriteConfig[]|null;
+    cloudServiceItems: FavoriteConfig[]|null;
+    isLoading: FavoriteHasLoaded;
 }
