@@ -320,7 +320,7 @@
 				"ALT_S_UPDATE_BUDGET": "예산 수정 성공",
 				"DETAIL": {
 					"ACTUAL_COST": "실 사용액",
-					"AMOUNT_PLANNING_TYPE": "",
+					"AMOUNT_PLANNING_TYPE": "예산 설정 타입",
 					"BUDGETED": "예산",
 					"BUDGET_NOTIFICATIONS": "예산 사용 알림 설정",
 					"BUDGET_NOTIFICATIONS_DESC": "비용이 예산의 일정 금액을 초과할 경우, 자동 알림을 받을 수 있도록 알림 기준을 설정하세요.",
@@ -354,13 +354,14 @@
 						"UNIT": "기준",
 						"WARNING": "경고"
 					},
-					"MONTHLY_PLANNING": "월별 예산 설정",
+					"MONTHLY_PLANNING": "월별 예산 계획",
 					"NOTIFICATIONS_CHANNEL": "알림 채널",
+					"ORIGINAL_DATA": "원본 데이터",
 					"PERIOD": "기간",
 					"SET": "설정",
 					"SET_NOTIFICATION_CHANNEL": "알림 채널 설정",
 					"TARGET": "타겟",
-					"TOTAL_AMOUNT": "총 예산 설정",
+					"TOTAL_AMOUNT": "총 예산 계획",
 					"TOTAL_BUDGETED_AMOUNT": "전체 예산 금액(기간)",
 					"VIEW_ALL": "전체보기"
 				},
@@ -745,9 +746,9 @@
 				"ALL_MENU": "모든 메뉴",
 				"ALL_PROJECTS": "모든 프로젝트",
 				"FAVORITES": "즐겨찾기",
-				"FAVORITES_HELP_TEXT": "",
-				"GO_TO_CLOUD_SERVICE": "",
-				"GO_TO_PROJECT": "",
+				"FAVORITES_HELP_TEXT": "자주 방문하는 페이지를 즐겨찾기에 저장하세요.",
+				"GO_TO_CLOUD_SERVICE": "클라우드 서비스",
+				"GO_TO_PROJECT": "프로젝트",
 				"MENU": "메뉴",
 				"SHOW_ALL": "모두 보기"
 			},
@@ -762,7 +763,7 @@
 			},
 			"RECENT": {
 				"RECENT": "최근 방문",
-				"RECENT_HELP_TEXT": ""
+				"RECENT_HELP_TEXT": "최근 방문 기록이 이곳에 표시됩니다."
 			},
 			"SEARCH": {
 				"CLOUD_SERVICE": "클라우드 서비스",
@@ -1143,8 +1144,8 @@
 				"PASSWORD_INVALID": "비밀번호는 5 ~ 12 자로 입력해주세요.",
 				"REQUIRED_FIELD": "해당 정보를 입력해주세요.",
 				"TAGS": "태그",
-				"TAGS_HELP_TEXT1": "",
-				"TAGS_HELP_TEXT2": "",
+				"TAGS_HELP_TEXT1": "태그를 추가하여 리소스를 관리하세요.",
+				"TAGS_HELP_TEXT2": "키는 문자, 숫자 및 밑줄만 포함할 수 있습니다.",
 				"TIMEZONE": "타임존",
 				"TIMEZONE_INVALID": "타임존이 잘못 설정되었습니다.",
 				"TOO_MANY_RESULTS": "검색결과가 너무 많습니다. 다른 검색어로 검색해보세요.",
@@ -1324,16 +1325,17 @@
 				"CHECK_MODAL_DELETE_TITLE": "클라우드 서비스 삭제",
 				"EMPTY_CLOUD_SERVICE": "클라우드 서비스를 이용하려면 서비스 계정을 추가해주세요. ",
 				"FAVORITES": "즐겨찾기",
+				"FILTER": "필터",
 				"FILTERED_BY_DATE": "날짜 필터",
 				"MODAL": {
-					"CLEAR_ALL": "",
-					"FILTER_HELP": "",
-					"NO_FILTER_HELP_TEXT1": "",
-					"NO_FILTER_HELP_TEXT2": "",
-					"REGION": "",
-					"SELECTED_FILTER": "",
-					"SERVICE_CATEGORY": "",
-					"SET_FILTER": ""
+					"CLEAR_ALL": "전체 삭제",
+					"FILTER_HELP": "적용된 필터",
+					"NO_FILTER_HELP_TEXT1": "선택한 필터가 없음",
+					"NO_FILTER_HELP_TEXT2": "리스트에 있는 필터를 선택 하세요.",
+					"REGION": "리전",
+					"SELECTED_FILTER": "적용된 필터",
+					"SERVICE_CATEGORY": "서비스 분류",
+					"SET_FILTER": "필터 설정"
 				},
 				"NO_REGION": "리전이 없습니다.",
 				"REGION": "지역",
@@ -1344,7 +1346,7 @@
 				"SHOW_CHARTS": "차트 보기",
 				"SHOW_MAJOR": "주요 서비스 보기 ",
 				"TITLE": "{provider} 클라우드 서비스 ",
-				"TOTAL_RESULT": "",
+				"TOTAL_RESULT": "검색 결과",
 				"USAGE_OVERVIEW": "이용 현황"
 			},
 			"PAGE": {

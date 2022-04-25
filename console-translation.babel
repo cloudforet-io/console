@@ -5621,15 +5621,15 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
@@ -5852,15 +5852,15 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
@@ -6261,20 +6261,41 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
                                             <concept_node>
                                                 <name>NOTIFICATIONS_CHANNEL</name>
+                                                <definition_loaded>false</definition_loaded>
+                                                <description/>
+                                                <comment/>
+                                                <default_text/>
+                                                <translations>
+                                                    <translation>
+                                                        <language>en-US</language>
+                                                        <approved>true</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ja-JP</language>
+                                                        <approved>true</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ko-KR</language>
+                                                        <approved>true</approved>
+                                                    </translation>
+                                                </translations>
+                                            </concept_node>
+                                            <concept_node>
+                                                <name>ORIGINAL_DATA</name>
                                                 <definition_loaded>false</definition_loaded>
                                                 <description/>
                                                 <comment/>
@@ -6303,15 +6324,15 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
@@ -6387,15 +6408,15 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
@@ -9257,11 +9278,11 @@
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -9278,11 +9299,11 @@
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -9299,11 +9320,11 @@
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -11334,11 +11355,11 @@
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -11351,15 +11372,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -11372,15 +11393,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -11393,15 +11414,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -13074,15 +13095,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -13095,15 +13116,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -13116,15 +13137,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -13137,15 +13158,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -13158,15 +13179,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -13179,15 +13200,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -13200,15 +13221,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -13221,15 +13242,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -13242,15 +13263,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -13424,11 +13445,11 @@
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -13445,11 +13466,11 @@
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -20373,11 +20394,11 @@
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -20394,11 +20415,11 @@
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -23829,6 +23850,27 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
+                                        <name>FILTER</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
                                         <name>FILTERED_BY_DATE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -23861,15 +23903,15 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
@@ -23882,15 +23924,15 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
@@ -23903,15 +23945,15 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
@@ -23924,15 +23966,15 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
@@ -23945,15 +23987,15 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
@@ -23966,15 +24008,15 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
@@ -23987,15 +24029,15 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
@@ -24008,15 +24050,15 @@
                                                 <translations>
                                                     <translation>
                                                         <language>en-US</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ja-JP</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                     <translation>
                                                         <language>ko-KR</language>
-                                                        <approved>false</approved>
+                                                        <approved>true</approved>
                                                     </translation>
                                                 </translations>
                                             </concept_node>
@@ -24119,11 +24161,11 @@
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -24224,11 +24266,11 @@
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>

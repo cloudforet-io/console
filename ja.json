@@ -356,6 +356,7 @@
 					},
 					"MONTHLY_PLANNING": "",
 					"NOTIFICATIONS_CHANNEL": "通知チャネル",
+					"ORIGINAL_DATA": "",
 					"PERIOD": "",
 					"SET": "設定",
 					"SET_NOTIFICATION_CHANNEL": "通知チャネルの設定",
@@ -1324,6 +1325,7 @@
 				"CHECK_MODAL_DELETE_TITLE": "クラウドサービス削除",
 				"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
 				"FAVORITES": "お気に入り",
+				"FILTER": "",
 				"FILTERED_BY_DATE": "日付で絞り込み",
 				"MODAL": {
 					"CLEAR_ALL": "",

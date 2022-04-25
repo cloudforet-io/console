@@ -356,6 +356,7 @@
 					},
 					"MONTHLY_PLANNING": "Monthly Planning",
 					"NOTIFICATIONS_CHANNEL": "Notifications Channel",
+					"ORIGINAL_DATA": "Original Data",
 					"PERIOD": "Period",
 					"SET": "Set",
 					"SET_NOTIFICATION_CHANNEL": "Set Notifications Channel",
@@ -1324,6 +1325,7 @@
 				"CHECK_MODAL_DELETE_TITLE": "Delete Cloud Service",
 				"EMPTY_CLOUD_SERVICE": "Please, register Service Account first to collect cloud service resouces. ",
 				"FAVORITES": "Favorites",
+				"FILTER": "Filter",
 				"FILTERED_BY_DATE": "Filtered by Date",
 				"MODAL": {
 					"CLEAR_ALL": "Clear All",
