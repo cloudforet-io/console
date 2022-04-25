@@ -1317,7 +1317,6 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "서비스 계정 추가",
-				"ALL": "",
 				"ALT_E_CHECK_MODAL": "{action} 실패",
 				"ALT_S_CHECK_MODAL": "{action} 완료",
 				"AUTO_PERIOD": "자동 (전체 기간)",

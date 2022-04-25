@@ -1317,7 +1317,6 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "サービスアカウントの追加",
-				"ALL": "",
 				"ALT_E_CHECK_MODAL": "{action}失敗",
 				"ALT_S_CHECK_MODAL": "{action}完了",
 				"AUTO_PERIOD": "自動（全期間）",

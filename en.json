@@ -1317,7 +1317,6 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "Add Service Account",
-				"ALL": "All",
 				"ALT_E_CHECK_MODAL": "Failed to {action}",
 				"ALT_S_CHECK_MODAL": "Success to {action}",
 				"AUTO_PERIOD": "Auto (Overall period)",
