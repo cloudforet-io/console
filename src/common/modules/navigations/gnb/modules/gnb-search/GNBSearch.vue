@@ -268,11 +268,11 @@ export default defineComponent<Props>({
                 const menuId = state.showRecent ? dataState.recentMenuItems[index]?.itemId : dataState.filteredMenuList[index]?.id;
                 if (!menuId) return;
 
-                const menuRoute: MenuInfo = MENU_INFO_MAP[menuId];
-                if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.to.name) return;
+                const menuInfo: MenuInfo = MENU_INFO_MAP[menuId];
+                if (!menuInfo || SpaceRouter.router.currentRoute.name === menuInfo.to.name) return;
 
                 try {
-                    SpaceRouter.router.push(menuRoute.to);
+                    SpaceRouter.router.push(menuInfo.to);
                 } catch (e) {}
             } else {
                 const cloudServiceTypeId = state.showRecent ? dataState.recentCloudServiceItems[index]?.itemId : dataState.cloudServiceTypeList[index]?.id;
