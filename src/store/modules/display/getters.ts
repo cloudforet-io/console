@@ -9,7 +9,9 @@ import VueRouter from 'vue-router';
 import config from '@/lib/config';
 import { SpaceRouter } from '@/router';
 import { menuRouterMap } from '@/lib/menu/menu-router-map';
-import { Menu, MENU_INFO, MENU_LIST } from '@/lib/menu/config';
+import {
+    Menu, MENU_ID, MENU_INFO, MENU_LIST,
+} from '@/lib/menu/config';
 
 export const hasUncheckedNotifications: Getter<DisplayState, any> = (state): boolean => state.uncheckedNotificationCount > 0;
 
@@ -26,7 +28,11 @@ export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarP
 
 const filterMenuByRoute = (menuList: GNBMenu[], disabledMenu: string[], showBilling: boolean, isAdmin: boolean, router: VueRouter): GNBMenu[] => menuList.reduce((results, _menu) => {
     if (!showBilling) {
-        const idx = results.findIndex(item => item.id === 'cost_explorer');
+        const idx = results.findIndex(item => item.id === MENU_ID.COST_EXPLORER);
+        if (idx > -1) results.splice(idx, 1);
+    }
+    if (!isAdmin) {
+        const idx = results.findIndex(item => item.id === MENU_ID.ADMINISTRATION);
         if (idx > -1) results.splice(idx, 1);
     }
     if (disabledMenu.includes(_menu.id) && !isAdmin) return results;
