@@ -14,7 +14,7 @@
                 {{ backLink.label }}
             </router-link>
             <slot />
-            <div v-if="topTitle" class="top-title">
+            <div v-if="topTitle.label" class="top-title">
                 <div class="icon-label-wrapper">
                     <p-lazy-img
                         v-if="topTitle.icon"
@@ -32,6 +32,7 @@
             </div>
             <l-n-b-menu-item v-for="(menuData, idx) in menuSet" :key="`${idx}-${getUUID()}`" :menu-data="menuData"
                              :current-route="currentRoute"
+                             class="item-wrapper"
             >
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                     <slot :name="slot" v-bind="scope" />
@@ -117,7 +118,6 @@ export default {
         font-size: 0.75rem;
         line-height: 125%;
         margin-top: 1.25rem;
-        height: 1.75rem;
         &:hover {
             @apply text-gray-800 cursor-pointer;
             text-decoration: underline;
@@ -127,7 +127,7 @@ export default {
         @apply text-gray-800 font-bold flex justify-between items-center;
         font-size: 0.75rem;
         line-height: 125%;
-        margin-bottom: 0.75rem;
+        margin-top: 1.25rem;
         .icon-label-wrapper {
             @apply flex items-center;
             .icon {
@@ -143,6 +143,9 @@ export default {
         .add-button {
             @apply cursor-pointer;
         }
+    }
+    .item-wrapper {
+        margin-top: 1.25rem;
     }
 }
 </style>

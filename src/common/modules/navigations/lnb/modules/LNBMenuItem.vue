@@ -132,6 +132,7 @@ export default defineComponent<Props>({
         font-size: 0.75rem;
         line-height: 125%;
         margin-bottom: 0.5rem;
+        padding-left: 0.5rem;
 
         .title {
             &.foldable {
