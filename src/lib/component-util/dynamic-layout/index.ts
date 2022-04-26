@@ -51,7 +51,7 @@ export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema
             }
 
             return {
-                label: d.name, name: d.key, dataType: d.data_type, operators,
+                label: d.name, name: d.key, dataType: d.data_type, operators, reference: d.reference,
             };
         }),
     }));
