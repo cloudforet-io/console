@@ -7,6 +7,8 @@ export interface GNBMenu extends Menu {
     to: Location;
     icon?: string;
     subMenuList?: GNBMenu[];
+    isNew?: boolean;
+    isBeta?: boolean;
 }
 
 export interface DisplayState {

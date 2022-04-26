@@ -79,8 +79,6 @@ import {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { menuRouterMap } from '@/lib/menu/menu-router-map';
-
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { getAllSuggestionMenuList, SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
 import {
@@ -89,6 +87,8 @@ import {
 } from '@/lib/helper/config-data-helper';
 import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
 import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import { MenuInfo } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 
 interface CloudServiceTypeData {
@@ -268,13 +268,11 @@ export default defineComponent<Props>({
                 const menuId = state.showRecent ? dataState.recentMenuItems[index]?.itemId : dataState.filteredMenuList[index]?.id;
                 if (!menuId) return;
 
-                const menuRoute = menuRouterMap[menuId];
-                if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.name) return;
+                const menuRoute: MenuInfo = MENU_INFO_MAP[menuId];
+                if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.to.name) return;
 
                 try {
-                    SpaceRouter.router.push({
-                        name: menuRoute.name,
-                    });
+                    SpaceRouter.router.push(menuRoute.to);
                 } catch (e) {}
             } else {
                 const cloudServiceTypeId = state.showRecent ? dataState.recentCloudServiceItems[index]?.itemId : dataState.cloudServiceTypeList[index]?.id;

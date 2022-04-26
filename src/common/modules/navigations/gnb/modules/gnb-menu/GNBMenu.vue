@@ -30,7 +30,7 @@
             >
                 <g-n-b-sub-menu v-for="(subMenu, index) in subMenuList"
                                 :key="index"
-                                :show="subMenu.show"
+                                :show="!subMenu.optional"
                                 :label="subMenu.label"
                                 :to="subMenu.to"
                                 :is-beta="subMenu.isBeta"
@@ -45,6 +45,8 @@
 import vClickOutside from 'v-click-outside';
 import { PI } from '@spaceone/design-system';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
+import { PropType } from '@vue/composition-api';
+import { GNBMenu } from '@/store/modules/display/type';
 
 export default {
     name: 'GNBMenu',
@@ -85,7 +87,7 @@ export default {
             default: false,
         },
         subMenuList: {
-            type: Array,
+            type: Array as PropType<GNBMenu[]>,
             default: () => [],
         },
     },
