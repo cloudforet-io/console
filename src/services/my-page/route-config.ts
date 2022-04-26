@@ -1,11 +1,13 @@
+import { MENU_ID } from '@/lib/router/type';
+
 export const MY_PAGE_ROUTE = Object.freeze({
-    _NAME: 'my-page',
+    _NAME: MENU_ID.MY_PAGE,
     MY_ACCOUNT: {
-        _NAME: 'userAccount',
-        ACCOUNT: { _NAME: 'userProfile' },
-        API_KEY: { _NAME: 'userAPIKey' },
+        _NAME: MENU_ID.MY_PAGE_ACCOUNT,
+        ACCOUNT: { _NAME: MENU_ID.MY_PAGE_ACCOUNT_PROFILE },
+        API_KEY: { _NAME: MENU_ID.MY_PAGE_API_KEY },
         NOTIFICATION: {
-            _NAME: 'userNotification',
+            _NAME: MENU_ID.MY_PAGE_NOTIFICATIONS,
             ADD: { _NAME: 'addNotification' },
             MANAGE: { _NAME: 'manageNotification' },
         },

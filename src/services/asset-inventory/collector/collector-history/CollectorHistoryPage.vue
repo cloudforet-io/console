@@ -254,6 +254,7 @@ export default {
         const routeState = reactive({
             route: [
                 { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
+                { name: 'Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME } },
                 { name: 'Collector History' },
             ],
         });

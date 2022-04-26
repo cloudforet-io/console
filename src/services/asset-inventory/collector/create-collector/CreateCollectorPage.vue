@@ -1,7 +1,7 @@
 <template>
     <div class="collector-creator-page">
         <div class="page-navigation">
-            <p-breadcrumbs :routes="routes" />
+            <p-breadcrumbs :routes="routes" copiable />
         </div>
         <p-page-title :title="$t('PLUGIN.COLLECTOR.CREATE.TITLE')" child @goBack="onClickBackButton" />
         <p-progress-wizard :tabs="tabState.tabs"
@@ -153,7 +153,8 @@ export default {
             routes: computed(() => ([
                 { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
                 { name: 'Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME } },
-                { name: 'Create Collector' },
+                { name: 'Create Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME } },
+                { name: state.pluginId },
             ])),
         });
         const tabState = reactive({

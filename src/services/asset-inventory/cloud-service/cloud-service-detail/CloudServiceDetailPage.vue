@@ -171,7 +171,7 @@
 </template>
 
 <script lang="ts">
-import { get } from 'lodash';
+import { get, upperCase } from 'lodash';
 import dayjs from 'dayjs';
 
 import {
@@ -284,7 +284,10 @@ export default {
             route: computed(() => ([
                 { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
                 { name: 'Cloud Service', to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME } },
-                { name: `${props.group}`, to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { provider: props.provider, group: props.group, name: props.name } } },
+                {
+                    name: `[${upperCase(props.provider)}] ${props.group}`,
+                    to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { provider: props.provider, group: props.group, name: props.name } },
+                },
                 { name: `${props.name}` },
             ])),
         });

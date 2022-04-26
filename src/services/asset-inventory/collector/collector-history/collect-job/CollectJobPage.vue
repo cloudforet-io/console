@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-breadcrumbs :routes="routeState.routes" />
+        <p-breadcrumbs :routes="routeState.routes" copiable />
         <p-page-title :title="jobId" child @goBack="$router.go(-1)" />
         <div class="top-wrapper">
             <job-status-chart :job-id="jobId" />
@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, onActivated,
+    reactive, toRefs, onActivated, computed,
 } from '@vue/composition-api';
 
 import {
@@ -52,17 +52,18 @@ export default {
             required: true,
         },
     },
-    setup() {
+    setup(props) {
         const state = reactive({
             selectedItem: null as null|JobTaskData,
         });
 
         const routeState = reactive({
-            routes: [
+            routes: computed(() => [
                 { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
-                { name: 'Collector History', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME } },
-                { name: 'Job Information' },
-            ],
+                { name: 'Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME } },
+                { name: 'History', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME } },
+                { name: props.jobId },
+            ]),
         });
 
         onActivated(() => {

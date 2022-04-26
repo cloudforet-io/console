@@ -1,9 +1,13 @@
 <template>
     <div v-if="!loading" class="alert-detail-page">
-        <p-breadcrumbs :routes="routeState.route" />
+        <p-breadcrumbs :routes="routeState.route" copiable />
         <p-page-title :title="alertInfo.title" child class="page-title"
                       @goBack="$router.go(-1)"
         >
+            <template #title>
+                <span>{{ alertInfo.title }}</span>
+                <span class="alert-number">#{{ alertInfo.alert_number }}</span>
+            </template>
             <template #extra>
                 <span class="title-btn">
                     <p-icon-button name="ic_trashcan"
@@ -120,11 +124,11 @@ export default {
         });
 
         const routeState = reactive({
-            route: computed(() => [
+            route: [
                 { name: 'Alert Manager', to: { name: ALERT_MANAGER_ROUTE._NAME } },
                 { name: 'Alert', to: { name: ALERT_MANAGER_ROUTE.ALERT._NAME } },
-                { name: `${props.id} #${state.alertInfo?.alert_number}` },
-            ]),
+                { name: props.id },
+            ],
         });
 
         const checkDeleteState = reactive({
@@ -192,6 +196,12 @@ export default {
         flex-wrap: wrap;
         max-width: 100%;
         padding-right: 0.5rem;
+        .alert-number {
+            @apply text-gray-700;
+            font-weight: 400;
+            font-size: 1.5rem;
+            margin-left: 0.25rem;
+        }
     }
     .extra {
         justify-content: flex-start;

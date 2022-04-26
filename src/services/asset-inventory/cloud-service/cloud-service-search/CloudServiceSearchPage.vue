@@ -2,7 +2,6 @@
     <div />
 </template>
 <script lang="ts">
-/* eslint-disable camelcase */
 import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { locationQueryToString } from '@/lib/router-query-string';

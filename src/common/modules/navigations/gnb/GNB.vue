@@ -46,7 +46,6 @@ import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 import { GNBMenu as GNBMenuType } from '@/store/modules/display/type';
 import { store } from '@/store';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const ALLOWED_MENUS_FOR_ALL_USERS = ['support', 'account', 'notifications'];
 
@@ -74,7 +73,6 @@ export default {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;
             }),
-            loading: true,
         });
 
         /* event */
@@ -89,19 +87,6 @@ export default {
                 state.showSiteMap = false;
             }
         };
-
-        const init = async () => {
-            try {
-                state.loading = true;
-                await store.dispatch('display/setMenuList');
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        (() => init())();
 
         return {
             ...toRefs(state),

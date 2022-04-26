@@ -1,6 +1,6 @@
 <template>
     <div class="cost-dashboard-page">
-        <p-breadcrumbs :routes="routeState.route" />
+        <p-breadcrumbs :routes="routeState.route" :copiable="!!dashboardId" />
         <div v-if="dashboardList.length" class="top-wrapper">
             <p-i v-if="dashboardType === DASHBOARD_TYPE.PUBLIC" name="ic_public" width="1rem"
                  height="1rem" :color="PUBLIC_ICON_COLOR"
@@ -175,7 +175,7 @@ export default {
             route: computed(() => [
                 { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
                 { name: 'Dashboard', to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME } },
-                { name: state.dashboard.name || props.dashboardId },
+                { name: props.dashboardId },
             ]),
         });
 

@@ -27,6 +27,7 @@
 </template>
 
 <script lang="ts">
+import { startCase } from 'lodash';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
@@ -57,8 +58,8 @@ export default {
 
         const routeState = reactive({
             route: computed(() => ([
-                { name: state.resourceRoute.meta.label, path: state.resourceRoute.path },
-                { name: state.serviceRoute.meta.label, path: state.serviceRoute.path },
+                { name: startCase(state.resourceRoute.path.split('/').pop()), path: state.resourceRoute.path },
+                { name: startCase(state.serviceRoute.path.split('/').pop()), path: state.serviceRoute.path },
                 { name: 'No Resources' },
             ])),
         });

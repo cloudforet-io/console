@@ -81,7 +81,7 @@ const myPageRouter = {
         name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
     },
     [MENU_ID.MY_PAGE_ACCOUNT_PROFILE]: {
-        name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
+        name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME,
     },
     [MENU_ID.MY_PAGE_API_KEY]: {
         name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME,

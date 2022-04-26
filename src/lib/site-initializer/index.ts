@@ -68,6 +68,10 @@ const initDomain = async (): Promise<string|undefined> => {
     }
 };
 
+const initMenu = async () => {
+    await store.dispatch('display/setMenuList');
+};
+
 const initGtag = () => {
     if (config.get('GTAG_ID') === 'DISABLED') return;
     GTag.init();
@@ -115,6 +119,7 @@ const init = async () => {
     const domainName = await initDomain();
 
     if (domainName) {
+        await initMenu();
         initRouter(domainName);
         initI18n(store);
         initDayjs();

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-breadcrumbs :routes="routeState.route" />
+        <p-breadcrumbs :routes="routeState.route" copiable />
         <section class="page-title-wrapper">
             <p-page-title v-if="!loading" child :title="budgetData.name"
                           @goBack="$router.go(-1)"
@@ -75,7 +75,7 @@ export default {
             route: computed(() => ([
                 { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
                 { name: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME } },
-                { name: state.budgetData?.name, to: { name: '' } },
+                { name: props.budgetId },
             ])),
         });
 

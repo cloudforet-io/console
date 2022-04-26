@@ -1,7 +1,7 @@
 <template>
     <div class="cost-dashboard-customize-page">
         <nav>
-            <p-breadcrumbs :routes="routeState.route" />
+            <p-breadcrumbs :routes="routeState.route" copiable />
         </nav>
         <section class="header">
             <p-icon-button
@@ -74,11 +74,12 @@ export default {
     },
     setup(props) {
         const routeState = reactive({
-            route: [
+            route: computed(() => [
                 { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
                 { name: 'Dashboard', to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME } },
-                { name: 'Customize Dashboard' },
-            ],
+                { name: 'Customize' },
+                { name: props.dashboardId },
+            ]),
         });
 
         const state = reactive({

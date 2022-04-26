@@ -67,7 +67,7 @@ export default {
     .page-contents {
         max-width: 1920px;
         flex-grow: 1;
-        padding: 2rem 1.5rem;
+        padding: 1.5rem 1.5rem 2rem 1.5rem;
     }
 
     .fnb {

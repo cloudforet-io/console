@@ -1,5 +1,5 @@
 <template>
-    <section class="account-wrapper">
+    <section>
         <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE')" />
         <p-pane-layout class="form-wrapper">
@@ -304,13 +304,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.account-wrapper {
-    @apply mx-auto;
-    max-width: 53rem;
-}
 .form-wrapper {
     padding: 2rem;
-    max-width: 53rem;
 }
 .form-title {
     font-size: 1.375rem;
@@ -345,7 +340,6 @@ export default {
 
 .save-button {
     display: flex;
-    justify-content: flex-end;
     margin-top: 2rem;
 }
 
