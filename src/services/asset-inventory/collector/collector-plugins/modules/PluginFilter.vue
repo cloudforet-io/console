@@ -5,31 +5,32 @@
             <span v-for="repo in repositories" :key="repo.repository_id"
                   class="filter" :class="{selected: proxySelectedRepoId === repo.repository_id}"
                   @click.stop="handleClickRepoText(repo.repository_id)"
-            >
-                <p-radio v-model="proxySelectedRepoId" :value="repo.repository_id" />
-                {{ repo.name }}
-            </span>
+            ><p-radio v-model="proxySelectedRepoId" :value="repo.repository_id" />{{ repo.name }}</span>
         </div>
-        <p-divider class="divider" :vertical="true" />
-        <div class="cols">
-            <span class="header ml-2">{{ $t('PLUGIN.COLLECTOR.PLUGINS.RESOURCE_TYPE_LABEL') }}</span>
-            <span v-for="(checked, resource) in resourceOptions" :key="resource"
-                  class="filter" :class="{selected: checked}"
-                  @click.stop="handleClickResourceText(resource)"
-            >
-                <p-check-box :selected="resourceOptions[resource]" :value="true" @change="handleClickResourceText(resource)" />
-                {{ resource }}
-            </span>
-        </div>
+        <!--        <p-divider class="divider" :vertical="true" />-->
+        <!--        <div class="cols">-->
+        <!--            <span class="header ml-2">{{ $t('PLUGIN.COLLECTOR.PLUGINS.RESOURCE_TYPE_LABEL') }}</span>-->
+        <!--            <span v-for="(checked, resource) in resourceOptions" :key="resource"-->
+        <!--                  class="filter" :class="{selected: checked}"-->
+        <!--                  @click.stop="handleClickResourceText(resource)"-->
+        <!--            >-->
+        <!--                <p-check-box :selected="resourceOptions[resource]" :value="true" @change="handleClickResourceText(resource)" />-->
+        <!--                {{ resource }}-->
+        <!--            </span>-->
+        <!--        </div>-->
     </div>
 </template>
 
 <script lang="ts">
 import {
-    toRefs, reactive, computed,
+    toRefs, reactive,
+    // computed,
 } from '@vue/composition-api';
 
-import { PRadio, PCheckBox, PDivider } from '@spaceone/design-system';
+import {
+    PRadio,
+    // PCheckBox, PDivider
+} from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
 
@@ -37,8 +38,8 @@ export default {
     name: 'PluginFilter',
     components: {
         PRadio,
-        PCheckBox,
-        PDivider,
+        // PCheckBox,
+        // PDivider,
     },
     props: {
         repositories: {
@@ -58,28 +59,28 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             proxySelectedRepoId: makeProxy('selectedRepoId', props, emit),
-            resourceOptions: computed(() => ({
-                Server: props.resourceTypeSearchTags.includes('Server'),
-                'Cloud Service': props.resourceTypeSearchTags.includes('Cloud Service'),
-            })),
+            // resourceOptions: computed(() => ({
+            //     Server: props.resourceTypeSearchTags.includes('Server'),
+            //     'Cloud Service': props.resourceTypeSearchTags.includes('Cloud Service'),
+            // })),
         });
 
         const handleClickRepoText = (val) => {
             state.proxySelectedRepoId = val;
         };
-        const handleClickResourceText = (val) => {
-            const idx = props.resourceTypeSearchTags.indexOf(val);
-            if (idx > -1) {
-                props.resourceTypeSearchTags.splice(idx, 1);
-            } else {
-                props.resourceTypeSearchTags.push(val);
-            }
-        };
+        // const handleClickResourceText = (val) => {
+        //     const idx = props.resourceTypeSearchTags.indexOf(val);
+        //     if (idx > -1) {
+        //         props.resourceTypeSearchTags.splice(idx, 1);
+        //     } else {
+        //         props.resourceTypeSearchTags.push(val);
+        //     }
+        // };
 
         return {
             ...toRefs(state),
             handleClickRepoText,
-            handleClickResourceText,
+            // handleClickResourceText,
         };
     },
 };
@@ -104,7 +105,9 @@ export default {
             @apply text-secondary;
         }
         .p-radio {
+            display: inline-block;
             margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
         }
     }
     .divider {
