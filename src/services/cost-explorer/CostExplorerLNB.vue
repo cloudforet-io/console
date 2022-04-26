@@ -64,7 +64,7 @@ export default {
                     ...state.userDashboardList.map((list: UserDashboardInfo) => ({
                         type: 'item',
                         label: list.name,
-                        id: list.name,
+                        id: list.user_dashboard_id,
                         to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.user_dashboard_id } },
                         hideFavorite: true,
                         isSecondDepth: true,
