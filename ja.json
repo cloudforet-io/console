@@ -320,7 +320,7 @@
 				"ALT_S_UPDATE_BUDGET": "予算が正常に更新されました",
 				"DETAIL": {
 					"ACTUAL_COST": "費用",
-					"AMOUNT_PLANNING_TYPE": "",
+					"AMOUNT_PLANNING_TYPE": "予算設定タイプ",
 					"BUDGETED": "予算",
 					"BUDGET_NOTIFICATIONS": "予算に関するお知らせ",
 					"BUDGET_NOTIFICATIONS_DESC": "費用が予算の一定金額を超えた場合、自動通知されるように通知基準を設定できます。",
@@ -331,7 +331,7 @@
 					"BUDGET_SUMMARY": "予算概要",
 					"CONDITION": "条件",
 					"COST_TYPE": "コストタイプ",
-					"DETAILS": "",
+					"DETAILS": "詳細情報",
 					"FIELD": {
 						"ACTUAL_COST": "費用",
 						"BUDGET_SPENT": "予算使用率",
@@ -354,14 +354,14 @@
 						"UNIT": "ユニット",
 						"WARNING": "警告"
 					},
-					"MONTHLY_PLANNING": "",
+					"MONTHLY_PLANNING": "月別予算計画",
 					"NOTIFICATIONS_CHANNEL": "通知チャネル",
-					"ORIGINAL_DATA": "",
-					"PERIOD": "",
+					"ORIGINAL_DATA": "原本データー",
+					"PERIOD": "期間",
 					"SET": "設定",
 					"SET_NOTIFICATION_CHANNEL": "通知チャネルの設定",
 					"TARGET": "ターゲット",
-					"TOTAL_AMOUNT": "",
+					"TOTAL_AMOUNT": "総予算計画",
 					"TOTAL_BUDGETED_AMOUNT": "総予算(期間）合計",
 					"VIEW_ALL": "すべて表示"
 				},
@@ -742,15 +742,15 @@
 				"ROLE_ROOT_ADMIN": "ルート管理者"
 			},
 			"FAVORITES": {
-				"ALL_CLOUD_SERVICES": "",
-				"ALL_MENU": "",
-				"ALL_PROJECTS": "",
-				"FAVORITES": "",
-				"FAVORITES_HELP_TEXT": "",
-				"GO_TO_CLOUD_SERVICE": "",
-				"GO_TO_PROJECT": "",
-				"MENU": "",
-				"SHOW_ALL": ""
+				"ALL_CLOUD_SERVICES": "すべてのクラウドサービス",
+				"ALL_MENU": "すべてのメニュー",
+				"ALL_PROJECTS": "すべてのプロジェクト",
+				"FAVORITES": "お気に入り",
+				"FAVORITES_HELP_TEXT": "よく利用されるページをお気に入りに追加してください",
+				"GO_TO_CLOUD_SERVICE": "クラウドサービス",
+				"GO_TO_PROJECT": "プロジェクト",
+				"MENU": "メニュー",
+				"SHOW_ALL": "すべて表示"
 			},
 			"NOTIFICATION": {
 				"ALT_E_LIST_NOTIFICATION": "通知の一覧表示に失敗",
@@ -762,8 +762,8 @@
 				"YESTERDAY": "昨日"
 			},
 			"RECENT": {
-				"RECENT": "",
-				"RECENT_HELP_TEXT": ""
+				"RECENT": "最近のアクセス",
+				"RECENT_HELP_TEXT": "最近アクセスした記録がここに表示されます"
 			},
 			"SEARCH": {
 				"CLOUD_SERVICE": "クラウドサービス",
@@ -1144,8 +1144,8 @@
 				"PASSWORD_INVALID": "パスワードは、5〜12文字で入力してください。",
 				"REQUIRED_FIELD": "該当する情報を入力してください。",
 				"TAGS": "タグ",
-				"TAGS_HELP_TEXT1": "",
-				"TAGS_HELP_TEXT2": "",
+				"TAGS_HELP_TEXT1": "タグを追加してリソースを管理してください",
+				"TAGS_HELP_TEXT2": "Keyは下線、文字、数字のみ使用可能です",
 				"TIMEZONE": "タイムゾーン",
 				"TIMEZONE_INVALID": "タイムゾーンが正しく設定されました。",
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。 別のキーワードを使用してください",
@@ -1327,25 +1327,25 @@
 				"FILTER": "フィルター",
 				"FILTERED_BY_DATE": "日付で絞り込み",
 				"MODAL": {
-					"CLEAR_ALL": "",
-					"FILTER_HELP": "",
-					"NO_FILTER_HELP_TEXT1": "",
-					"NO_FILTER_HELP_TEXT2": "",
-					"REGION": "",
-					"SELECTED_FILTER": "",
-					"SERVICE_CATEGORY": "",
-					"SET_FILTER": ""
+					"CLEAR_ALL": "すべて削除",
+					"FILTER_HELP": "適用されたフィルター",
+					"NO_FILTER_HELP_TEXT1": "選択されたフィルターがない",
+					"NO_FILTER_HELP_TEXT2": "リストにあるフィルターを選択してください",
+					"REGION": "リージョン",
+					"SELECTED_FILTER": "適用されたフィルター",
+					"SERVICE_CATEGORY": "サービス分類",
+					"SET_FILTER": "フィルター設定"
 				},
 				"NO_REGION": "リージョンがありません。",
 				"REGION": "リージョン",
 				"SERVICE_CATEGORY": "サービスカテゴリー",
 				"SERVICE_PROVIDER": "サービスプロバイダー",
-				"SET": "",
+				"SET": "設定",
 				"SHOW_ALL": "すべて表示",
 				"SHOW_CHARTS": "チャートの表示",
 				"SHOW_MAJOR": "主なサービスを見る",
 				"TITLE": "{provider} クラウドサービス",
-				"TOTAL_RESULT": "",
+				"TOTAL_RESULT": "検索結果",
 				"USAGE_OVERVIEW": "利用概要"
 			},
 			"PAGE": {
