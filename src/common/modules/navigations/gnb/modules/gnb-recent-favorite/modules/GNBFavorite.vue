@@ -77,7 +77,7 @@ import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 import { SUGGESTION_TYPE, SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { menuRouterMap } from '@/lib/router/menu-router-map';
+import { menuRouterMap } from '@/lib/menu/menu-router-map';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import {
     convertCloudServiceConfigToReferenceData,
@@ -159,7 +159,7 @@ export default {
             //
             favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
                 store.state.favorite.menuItems,
-                store.state.display.menuList,
+                store.getters['display/allGnbMenuList'],
             )),
             favoriteCloudServiceItems: computed<FavoriteItem[]>(() => convertCloudServiceConfigToReferenceData(
                 store.state.favorite.cloudServiceItems,

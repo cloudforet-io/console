@@ -1,6 +1,6 @@
 import { RECENT_TYPE, RecentConfig } from '@/store/modules/recent/type';
 import { Route } from 'vue-router';
-import { menuRouterMap } from '@/lib/router/menu-router-map';
+import { menuRouterMap } from '@/lib/menu/menu-router-map';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 

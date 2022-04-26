@@ -192,13 +192,3 @@ export const loadCurrencyRates: Action<DisplayState, any> = async ({
     commit('setCurrencyRates', rates);
     storeCurrencyRates(rates, dispatch);
 };
-
-export const setMenuList: Action<DisplayState, any> = async ({ commit }) => {
-    try {
-        const { menu } = await SpaceConnector.client.addOns.menu.list();
-        commit('setMenuList', menu);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        commit('setMenuList', []);
-    }
-};

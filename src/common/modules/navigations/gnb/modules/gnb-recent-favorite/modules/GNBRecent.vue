@@ -35,7 +35,7 @@ import { PDataLoader } from '@spaceone/design-system';
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 import { SUGGESTION_TYPE, SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import { menuRouterMap } from '@/lib/router/menu-router-map';
+import { menuRouterMap } from '@/lib/menu/menu-router-map';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { RECENT_TYPE, RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import {
@@ -44,7 +44,7 @@ import {
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
-import { Menu } from '@/store/modules/display/type';
+import { GNBMenu } from '@/store/modules/display/type';
 import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
@@ -68,7 +68,7 @@ export default {
     },
     setup(props, { emit }) {
         const storeState = reactive({
-            menuItems: computed<Menu[]>(() => store.state.display.menuList),
+            menuItems: computed<GNBMenu[]>(() => store.getters['display/allGnbMenuList']),
             projects: computed<ProjectReferenceMap>(() => store.state.reference.project.items),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.state.reference.projectGroup.items),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.state.reference.cloudServiceType.items),

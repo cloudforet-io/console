@@ -79,11 +79,10 @@ import {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { menuRouterMap } from '@/lib/router/menu-router-map';
+import { menuRouterMap } from '@/lib/menu/menu-router-map';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { MENU_ICON } from '@/common/modules/navigations/gnb/config';
-import { getAllMenuList } from '@/lib/helper/menu-helper';
+import { getAllSuggestionMenuList, SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
 import {
     convertCloudServiceConfigToReferenceData,
     convertMenuConfigToReferenceData,
@@ -98,12 +97,6 @@ interface CloudServiceTypeData {
     group: string;
     name: string;
     icon: string;
-}
-
-interface MenuData {
-    id: string;
-    label: string;
-    parents?: MenuData[];
 }
 
 const LAPTOP_WINDOW_SIZE = laptop.max;
@@ -148,11 +141,11 @@ export default defineComponent<Props>({
 
         const dataState = reactive({
             // menu
-            allMenuList: computed<MenuData[]>(() => getAllMenuList(store.state.display.menuList)),
-            filteredMenuList: [] as MenuData[],
+            allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allGnbMenuList'])),
+            filteredMenuList: [] as SuggestionMenu[],
             recentMenuItems: computed<RecentItem[]>(() => convertMenuConfigToReferenceData(
                 store.state.recent.menuItems,
-                store.state.display.menuList,
+                store.getters['display/allGnbMenuList'],
             )),
             menuSuggestions: computed<SuggestionItem[]>(() => {
                 if (state.showRecent) return dataState.recentMenuItems;
@@ -160,7 +153,7 @@ export default defineComponent<Props>({
                     name: d.id,
                     label: d.label,
                     parents: d.parents ? d.parents.map(p => ({ name: p.id, label: p.label })) : undefined,
-                    icon: MENU_ICON[d.id.split('.')[0]],
+                    icon: d.icon,
                 }));
             }),
             // cloud service
@@ -184,7 +177,7 @@ export default defineComponent<Props>({
             }),
         });
 
-        const filterMenuItemsBySearchTerm = (menu: MenuData[], searchTerm?: string): MenuData[] => {
+        const filterMenuItemsBySearchTerm = (menu: SuggestionMenu[], searchTerm?: string): SuggestionMenu[] => {
             const regex = getTextHighlightRegex(searchTerm);
 
             return menu.map(d => ({

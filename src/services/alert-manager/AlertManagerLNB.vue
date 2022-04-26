@@ -6,7 +6,7 @@
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { LNBItemList } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
-import { MENU_ID } from '@/lib/router/type';
+import { MENU_ID } from '@/lib/menu/config';
 
 const MenuSet: LNBItemList[] = [
     [

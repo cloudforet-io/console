@@ -13,7 +13,7 @@
                 <template v-if="menu.show !== false">
                     <router-link :to="menu.to">
                         <li class="menu" @click="hideMenu">
-                            <p-i :name="MENU_ICON[menu.id]"
+                            <p-i :name="menu.icon"
                                  color="inherit inherit"
                                  height="1.5rem" width="1.5rem"
                             /> {{ menu.label }}
@@ -44,7 +44,7 @@
 import vClickOutside from 'v-click-outside';
 
 import {
-    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
+    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy, PropType,
 } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
@@ -52,7 +52,7 @@ import { PI } from '@spaceone/design-system';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
-import { MENU_ICON } from '@/common/modules/navigations/gnb/config';
+import { GNBMenu } from '@/store/modules/display/type';
 
 export default {
     name: 'SiteMap',
@@ -74,14 +74,14 @@ export default {
             default: false,
         },
         menuList: {
-            type: Array,
+            type: Array as PropType<GNBMenu[]>,
             default: () => ([]),
         },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            siteMapMenuList: computed(() => ([
+            siteMapMenuList: computed<GNBMenu[]>(() => ([
                 {
                     id: DASHBOARD_ROUTE._NAME,
                     label: vm.$t('MENU.DASHBOARD.DASHBOARD'),
@@ -103,7 +103,6 @@ export default {
 
         return {
             ...toRefs(state),
-            MENU_ICON,
             hideMenu,
             toggleMenu,
         };

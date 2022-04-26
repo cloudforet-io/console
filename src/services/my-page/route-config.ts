@@ -1,4 +1,4 @@
-import { MENU_ID } from '@/lib/router/type';
+import { MENU_ID } from '@/lib/menu/config';
 
 export const MY_PAGE_ROUTE = Object.freeze({
     _NAME: MENU_ID.MY_PAGE,

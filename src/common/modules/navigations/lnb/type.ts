@@ -1,5 +1,5 @@
 import { Location } from 'vue-router';
-import { MenuIdType } from '@/lib/router/type';
+import { MenuIdType } from '@/lib/menu/config';
 
 export const MENU_ITEM_TYPE = ['title', 'item', 'divider'];
 type MenuItemType = typeof MENU_ITEM_TYPE[number]
