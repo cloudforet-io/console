@@ -33,6 +33,7 @@ export interface KeyItem {
     name: any;
     dataType?: KeyDataType;
     operators?: OperatorType[];
+    reference?: string;
 }
 
 export interface QueryItem {

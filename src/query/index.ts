@@ -25,7 +25,14 @@ dayjs.extend(utc);
 dayjs.extend(tz);
 
 interface QueryTag extends Tag, QueryItem {}
-const filterToQueryTag = (filter: { k?: string; v: QueryStoreFilterValue; o?: RawQueryOperator }, keyMap: Record<string, KeyItem>): QueryTag | null => {
+type ReferenceMap = Record<string, { label: string; name: string }>;
+type ReferenceStore = Record<string, ReferenceMap>;
+
+const filterToQueryTag = (
+    filter: { k?: string; v: QueryStoreFilterValue; o?: RawQueryOperator },
+    keyMap: Record<string, KeyItem>,
+    referenceStore: ComputedRef<Object> | undefined
+): QueryTag | null => {
     if (filter.k === undefined || filter.k === null) {
         /* no key case */
         if (filter.v === null || filter.v === undefined) return null;
@@ -50,9 +57,13 @@ const filterToQueryTag = (filter: { k?: string; v: QueryStoreFilterValue; o?: Ra
         };
     }
     /* general case */
+    const reference = keyMap[filter.k]?.reference;
+    const referenceStoreValue = referenceStore?.value;
+    const selectedReferenceStore = (reference && referenceStoreValue) ? ((referenceStoreValue[reference]) ?? undefined) : undefined;
+    const label = (selectedReferenceStore) ? selectedReferenceStore[filter.v.toString()]?.label : filter.v.toString();
     return {
         key: keyMap[filter.k] || { label: filter.k, name: filter.k },
-        value: { label: filter.v.toString(), name: filter.v },
+        value: { label, name: filter.v },
         operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string] || filter.o || '' as OperatorType
     };
 };
@@ -98,14 +109,17 @@ const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') 
 export class QueryHelper {
     private static timezone: ComputedRef<string> | undefined;
 
+    private static referenceStore: ComputedRef<ReferenceStore> | undefined;
+
     private _keyMap: Record<string, KeyItem> = {};
 
     private _filters: QueryStoreFilter[] = [];
 
     private _orFilters: QueryStoreFilter[] = [];
 
-    static init(timezone: ComputedRef<string>) {
+    static init(timezone: ComputedRef<string>, referenceStore?: ComputedRef<ReferenceStore>) {
         QueryHelper.timezone = timezone;
+        QueryHelper.referenceStore = referenceStore;
     }
 
     setKeyItemSets(keyItemSets: KeyItemSet[]): this {
@@ -218,11 +232,11 @@ export class QueryHelper {
         this._filters.forEach((f) => {
             if (Array.isArray(f.v)) {
                 f.v.forEach((v) => {
-                    const tag = filterToQueryTag({ k: f.k, v, o: f.o }, this._keyMap);
+                    const tag = filterToQueryTag({ k: f.k, v, o: f.o }, this._keyMap, QueryHelper.referenceStore);
                     if (tag) res.push(tag);
                 });
             } else {
-                const tag = filterToQueryTag(f as any, this._keyMap);
+                const tag = filterToQueryTag(f as any, this._keyMap, QueryHelper.referenceStore);
                 if (tag) res.push(tag);
             }
         });
