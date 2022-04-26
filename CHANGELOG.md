@@ -1,3 +1,10 @@
+# [1.1.0-beta.284](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.283...v1.1.0-beta.284) (2022-04-26)
+
+
+### Bug Fixes
+
+* update lang pack ([#930](https://github.com/spaceone-dev/spaceone-design-system/issues/930)) ([aeb2b2c](https://github.com/spaceone-dev/spaceone-design-system/commit/aeb2b2cc728d24ac08db863d9208c973c271a159))
+
 # [1.1.0-beta.283](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.282...v1.1.0-beta.283) (2022-04-25)
 
 
