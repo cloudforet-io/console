@@ -27,7 +27,7 @@ import {
 } from '@/services/cost-explorer/cost-dashboard/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { LNBItem, LNBItemList } from '@/common/modules/navigations/lnb/type';
+import { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import { MENU_ID } from '@/lib/menu/config';
 import { PI } from '@spaceone/design-system';
@@ -43,7 +43,7 @@ export default {
             publicDashboardList: computed<PublicDashboardInfo[]>(() => costExplorerStore.state.publicDashboardList ?? []),
             userDashboardList: computed<UserDashboardInfo[]>(() => costExplorerStore.state.userDashboardList ?? []),
             loading: true,
-            menuSet: computed<LNBItemList[]>(() => [
+            menuSet: computed<LNBMenu[]>(() => [
                 [
                     {
                         type: 'title', label: 'Public', id: 'public', foldable: false,
@@ -70,15 +70,13 @@ export default {
                         isSecondDepth: true,
                     })),
                 ],
-                [
-                    { type: 'divider' },
-                    {
-                        type: 'item', id: MENU_ID.COST_EXPLORER_COST_ANALYSIS, label: 'Cost Analysis', to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
-                    },
-                    {
-                        type: 'item', id: MENU_ID.COST_EXPLORER_BUDGET, label: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
-                    },
-                ],
+                { type: 'divider' },
+                {
+                    type: 'item', id: MENU_ID.COST_EXPLORER_COST_ANALYSIS, label: 'Cost Analysis', to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
+                },
+                {
+                    type: 'item', id: MENU_ID.COST_EXPLORER_BUDGET, label: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
+                },
             ]),
             selectedMenu: {} as LNBItem,
             homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),

@@ -17,7 +17,7 @@ import {
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import {
-    BackLink, LNBItem, LNBItemList, TopTitle,
+    BackLink, LNBItem, LNBMenu, TopTitle,
 } from '@/common/modules/navigations/lnb/type';
 import { MENU_ID } from '@/lib/menu/config';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
@@ -60,12 +60,10 @@ export default defineComponent({
                 ));
                 return results;
             }),
-            menuSet: computed<LNBItemList[]>(() => {
-                const _menuSet: LNBItemList[] = [];
-                const menuItems: LNBItem[] = [];
+            menuSet: computed<LNBMenu[]>(() => {
+                const menuItems: LNBMenu[] = [];
                 if (state.isCloudServiceDetailPage) {
-                    menuItems.push(...state.cloudServiceDetailMenuItems);
-                    menuItems.push({ type: 'divider' });
+                    menuItems.push([...state.cloudServiceDetailMenuItems, { type: 'divider' }]);
                 } else {
                     menuItems.push(
                         {
@@ -85,8 +83,7 @@ export default defineComponent({
                         type: 'item', id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT, label: 'Service Account', to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
                     },
                 );
-                _menuSet.push(menuItems);
-                return _menuSet;
+                return menuItems;
             }),
         });
 

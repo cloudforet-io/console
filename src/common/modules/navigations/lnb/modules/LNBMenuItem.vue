@@ -1,27 +1,25 @@
 <template>
     <div class="lnb-menu-list">
-        <div v-for="(item, idx) in menuData" :key="item.id" class="lnb-menu-item">
-            <div v-if="item.type === 'title'">
-                <p class="title-wrapper">
-                    <span v-if="item.foldable" class="title foldable" @click="handleToggle">{{ item.label }}</span>
-                    <span v-else class="title">{{ item.label }}</span>
-                    <slot name="title-right" v-bind="$props" />
-                    <new-mark v-if="item.isNew" />
-                    <beta-mark v-if="item.isBeta" />
-                    <span v-if="item.foldable" class="toggle-button" @click="handleToggle">
-                        <p-i width="1rem" height="1rem"
-                             :name="isFolded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                             color="inherit transparent"
-                        />
-                    </span>
-                </p>
-            </div>
-            <div v-if="item.type === 'divider' && showMenu" class="divider">
+        <div v-for="(item, idx) in processedMenuData" :key="item.id" class="lnb-menu-item">
+            <p v-if="item.type === MENU_ITEM_TYPE.TITLE" class="title-wrapper">
+                <span v-if="item.foldable" class="title foldable" @click="handleToggle">{{ item.label }}</span>
+                <span v-else class="title">{{ item.label }}</span>
+                <slot name="title-right" v-bind="$props" />
+                <new-mark v-if="item.isNew" />
+                <beta-mark v-if="item.isBeta" />
+                <span v-if="item.foldable" class="toggle-button" @click="handleToggle">
+                    <p-i width="1rem" height="1rem"
+                         :name="isFolded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                         color="inherit transparent"
+                    />
+                </span>
+            </p>
+            <div v-if="item.type === MENU_ITEM_TYPE.DIVIDER && showMenu" class="divider">
                 <p-divider />
             </div>
             <router-link
-                v-if="item.type === 'item' && showMenu" class="menu-item"
-                :class="[{'second-depth': item.isSecondDepth}, {'selected': checkSelectedMenu(item.to)}]"
+                v-if="item.type === MENU_ITEM_TYPE.ITEM && showMenu" class="menu-item"
+                :class="[{'second-depth': depth === 2}, {'selected': checkSelectedMenu(item.to)}]"
                 :to="item.to"
                 @click.native="$event.stopImmediatePropagation()"
                 @mouseenter.native="hoveredItem = item.id"
@@ -55,7 +53,7 @@ import { PDivider, PI } from '@spaceone/design-system';
 import {
     computed, defineComponent, PropType, reactive, toRefs,
 } from '@vue/composition-api';
-import { LNBItemList } from '@/common/modules/navigations/lnb/type';
+import { LNBMenu, MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 import { Location } from 'vue-router';
 import { isEqual } from 'lodash';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -63,7 +61,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { store } from '@/store';
 
 interface Props {
-    menuData: LNBItemList;
+    menuData: LNBMenu;
     currentRoute: Location|undefined;
 }
 
@@ -78,23 +76,26 @@ export default defineComponent<Props>({
     },
     props: {
         menuData: {
-            type: Array as () => LNBItemList,
-            default: () => [],
+            type: [Object, Array] as PropType<LNBMenu>,
         },
         currentRoute: {
             type: Object as PropType<Location|undefined>,
             default: undefined,
+        },
+        depth: {
+            type: Number,
+            default: 1,
         },
     },
 
     setup(props) {
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            processedMenuData: computed(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
             isFolded: false,
-            isFoldableMenu: computed(() => props.menuData?.some(item => item.foldable)),
+            isFoldableMenu: computed(() => state.processedMenuData?.some(item => item.foldable)),
             showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
             hoveredItem: '',
-
         });
 
         const handleToggle = () => {
@@ -116,6 +117,7 @@ export default defineComponent<Props>({
             handleToggle,
             checkSelectedMenu,
             FAVORITE_TYPE,
+            MENU_ITEM_TYPE,
             getIsHovered,
         };
     },
@@ -123,17 +125,13 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss" scoped>
-.lnb-menu-list {
-    margin-bottom: 1.25rem;
-}
 .lnb-menu-item {
     .title-wrapper {
-        @apply text-gray-400 font-bold inline-block;
+        @apply text-gray-400 font-bold inline-flex items-center;
         font-size: 0.75rem;
         line-height: 125%;
-        margin-bottom: 0.5rem;
         padding-left: 0.5rem;
-
+        height: 2rem;
         .title {
             &.foldable {
                 &:hover {
@@ -150,7 +148,6 @@ export default defineComponent<Props>({
     }
     .menu-item {
         @apply border border-transparent inline-flex items-center w-full h-full justify-between;
-        height: 2rem;
         font-size: 0.875rem;
         line-height: 125%;
         border-radius: 4px;
@@ -158,6 +155,7 @@ export default defineComponent<Props>({
         padding-left: 0.5rem;
         padding-right: 0.5rem;
         outline: 0;
+        height: 2rem;
 
         &.second-depth {
             padding-left: 1.25rem;
@@ -187,6 +185,7 @@ export default defineComponent<Props>({
     .divider {
         margin-top: 1.25rem;
         margin-bottom: 1.25rem;
+        height: 0;
     }
 }
 </style>
