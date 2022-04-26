@@ -130,7 +130,7 @@ export default {
         padding-left: 0.5rem;
         .icon-label-wrapper {
             @apply flex items-center;
-            height: 2.5rem;
+            height: 2rem;
             .icon {
                 @apply rounded flex-shrink-0;
                 margin-right: 0.375rem;
