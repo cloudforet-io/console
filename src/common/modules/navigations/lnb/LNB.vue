@@ -32,7 +32,7 @@
             </div>
             <l-n-b-menu-item v-for="(menuData, idx) in menuSet" :key="`${idx}-${getUUID()}`" :menu-data="menuData"
                              :current-route="currentRoute"
-                             class="item-wrapper"
+                             :depth="Array.isArray(menuData) ? 2 : 1"
             >
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                     <slot :name="slot" v-bind="scope" />
@@ -52,7 +52,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import {
-    BackLink, LNBItemList, TopTitle,
+    BackLink, LNBMenu, TopTitle,
 } from '@/common/modules/navigations/lnb/type';
 import { getUUID } from '@/lib/component-util/getUUID';
 
@@ -75,7 +75,7 @@ export default {
             default: () => ({}),
         },
         menuSet: {
-            type: Array as () => LNBItemList[],
+            type: Array as () => LNBMenu[],
             default: () => [],
         },
     },
@@ -111,13 +111,14 @@ export default {
         padding-bottom: 2rem;
     }
     .divider {
-        margin-bottom: 0.5rem;
+        margin-bottom: 1.25rem;
     }
     .back-link {
         @apply flex text-gray-500;
         font-size: 0.75rem;
         line-height: 125%;
         margin-top: 1.25rem;
+        height: 1.75rem;
         &:hover {
             @apply text-gray-800 cursor-pointer;
             text-decoration: underline;
@@ -126,10 +127,10 @@ export default {
     .top-title {
         @apply text-gray-800 font-bold flex justify-between items-center;
         font-size: 0.75rem;
-        line-height: 125%;
-        margin-top: 1.25rem;
+        padding-left: 0.5rem;
         .icon-label-wrapper {
             @apply flex items-center;
+            height: 2.5rem;
             .icon {
                 @apply rounded flex-shrink-0;
                 margin-right: 0.375rem;
@@ -142,10 +143,8 @@ export default {
         }
         .add-button {
             @apply cursor-pointer;
+            height: 2rem;
         }
-    }
-    .item-wrapper {
-        margin-top: 1.25rem;
     }
 }
 </style>

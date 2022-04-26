@@ -1,8 +1,12 @@
 import { Location } from 'vue-router';
 import { MenuIdType } from '@/lib/menu/config';
 
-export const MENU_ITEM_TYPE = ['title', 'item', 'divider'];
-type MenuItemType = typeof MENU_ITEM_TYPE[number]
+export const MENU_ITEM_TYPE = Object.freeze({
+    TITLE: 'title',
+    ITEM: 'item',
+    DIVIDER: 'divider',
+} as const);
+type MenuItemType = typeof MENU_ITEM_TYPE[keyof typeof MENU_ITEM_TYPE];
 
 export interface LNBItem {
     type: MenuItemType;
@@ -16,7 +20,7 @@ export interface LNBItem {
     isSecondDepth?: boolean;
 }
 
-export type LNBItemList = LNBItem[];
+export type LNBMenu = LNBItem[]|LNBItem;
 
 export interface BackLink {
     label: string;

@@ -33,7 +33,7 @@ import {
 import { PDivider, PI } from '@spaceone/design-system';
 import { store } from '@/store';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
-import { LNBItemList } from '@/common/modules/navigations/lnb/type';
+import { LNBMenu } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -45,21 +45,19 @@ interface SidebarItemType {
     beta?: boolean;
 }
 
-const MenuSet: LNBItemList[] = [
-    [
-        {
-            type: 'title', label: 'My Account', id: MENU_ID.MY_PAGE_ACCOUNT, foldable: false,
-        },
-        {
-            type: 'item', label: 'Account & Profile', id: MENU_ID.MY_PAGE_ACCOUNT_PROFILE, to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME },
-        },
-        {
-            type: 'item', label: 'Access with API & CLI', id: MENU_ID.MY_PAGE_API_KEY, to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME },
-        },
-        {
-            type: 'item', label: 'Notifications Channel', id: MENU_ID.MY_PAGE_NOTIFICATIONS, to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME }, isBeta: true,
-        },
-    ],
+const MenuSet: LNBMenu[] = [
+    {
+        type: 'title', label: 'My Account', id: MENU_ID.MY_PAGE_ACCOUNT, foldable: false,
+    },
+    {
+        type: 'item', label: 'Account & Profile', id: MENU_ID.MY_PAGE_ACCOUNT_PROFILE, to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME },
+    },
+    {
+        type: 'item', label: 'Access with API & CLI', id: MENU_ID.MY_PAGE_API_KEY, to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME },
+    },
+    {
+        type: 'item', label: 'Notifications Channel', id: MENU_ID.MY_PAGE_NOTIFICATIONS, to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME }, isBeta: true,
+    },
 ];
 
 
