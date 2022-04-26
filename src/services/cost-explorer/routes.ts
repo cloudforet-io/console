@@ -78,6 +78,7 @@ export default {
                     path: ':budgetId',
                     name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                     props: true,
+                    meta: { lnbVisible: true },
                     component: BudgetDetailPage,
                 },
             ],
