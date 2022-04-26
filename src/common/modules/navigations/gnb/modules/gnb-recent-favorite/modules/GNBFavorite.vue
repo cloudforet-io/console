@@ -44,13 +44,13 @@
                     </p>
                     <div class="button-wrapper">
                         <p-button style-type="gray-border"
-                                  size="sm"
+                                  size="md"
                                   @click="handleClickMenuButton(FAVORITE_TYPE.PROJECT)"
                         >
                             {{ $t('COMMON.GNB.FAVORITES.GO_TO_PROJECT') }}
                         </p-button>
                         <p-button style-type="gray-border"
-                                  size="sm"
+                                  size="md"
                                   @click="handleClickMenuButton(FAVORITE_TYPE.CLOUD_SERVICE)"
                         >
                             {{ $t('COMMON.GNB.FAVORITES.GO_TO_CLOUD_SERVICE') }}
@@ -192,6 +192,7 @@ export default {
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 });
             }
+            emit('close');
         };
         const handleClickShowAll = (type: SUGGESTION_TYPE) => {
             state.showAll = true;
@@ -208,21 +209,21 @@ export default {
         const handleSelect = (item: SuggestionItem) => {
             const itemName = item.name as string;
             if (item.itemType === SUGGESTION_TYPE.MENU) {
-                const menuRoute: MenuInfo = MENU_INFO_MAP[itemName];
-                if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.to.name) return;
-                SpaceRouter.router.push(menuRoute.to).catch(() => {});
+                const menuInfo: MenuInfo = MENU_INFO_MAP[itemName];
+                if (!menuInfo || SpaceRouter.router.currentRoute.name === menuInfo.to.name) return;
+                SpaceRouter.router.push(menuInfo.to).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT) {
                 SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT_GROUP) {
                 SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE) {
-                const cloudServiceType = state.cloudServiceTypes[itemName];
+                const itemInfo: string[] = itemName.split('.');
                 SpaceRouter.router.push({
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                     params: {
-                        provider: cloudServiceType.data.provider,
-                        group: cloudServiceType.data.group,
-                        name: cloudServiceType.name,
+                        provider: itemInfo[0],
+                        group: itemInfo[1],
+                        name: itemInfo[2],
                     },
                 }).catch(() => {});
             }
@@ -305,7 +306,13 @@ export default {
             padding-top: 1.5rem;
         }
         .button-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
             padding-top: 1rem;
+            .p-button {
+                width: 10.5rem;
+            }
         }
     }
 }

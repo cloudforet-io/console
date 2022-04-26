@@ -51,9 +51,10 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
-const RECENT_LIMIT = 15;
+const RECENT_LIMIT = 30;
 
 export default {
     name: 'GNBRecent',
@@ -105,15 +106,23 @@ export default {
         const handleSelect = (item: SuggestionItem) => {
             const itemName = item.name as string;
             if (item.itemType === SUGGESTION_TYPE.MENU) {
-                const menuRoute: MenuInfo = MENU_INFO_MAP[itemName];
-                if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.to.name) return;
-                SpaceRouter.router.push(menuRoute.to).catch(() => {});
+                const menuInfo: MenuInfo = MENU_INFO_MAP[itemName];
+                if (!menuInfo || SpaceRouter.router.currentRoute.name === menuInfo.to.name) return;
+                SpaceRouter.router.push(menuInfo.to).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT) {
                 SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT_GROUP) {
                 SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE) {
-                SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'inventory.CloudServiceType' })).catch(() => {});
+                const itemInfo: string[] = itemName.split('.');
+                SpaceRouter.router.push({
+                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                    params: {
+                        provider: itemInfo[0],
+                        group: itemInfo[1],
+                        name: itemInfo[2],
+                    },
+                }).catch(() => {});
             }
             emit('close');
         };

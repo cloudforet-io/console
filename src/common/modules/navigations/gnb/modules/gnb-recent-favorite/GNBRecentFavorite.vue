@@ -116,6 +116,8 @@ export default {
         top: 100%;
         right: 0;
         box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
+        margin-top: -0.5rem;
+        margin-right: -0.5rem;
         .tab-pane {
             padding-bottom: 0;
         }

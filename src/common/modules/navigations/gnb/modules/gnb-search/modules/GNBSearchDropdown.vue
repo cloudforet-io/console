@@ -203,6 +203,7 @@ export default defineComponent<Props>({
 @screen laptop {
     .gnb-search-dropdown {
         margin-top: -0.5rem;
+        margin-right: -0.5rem;
     }
 }
 
