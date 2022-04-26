@@ -29,7 +29,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import { LNBItem, LNBItemList } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
-import { MENU_ID } from '@/lib/router/type';
+import { MENU_ID } from '@/lib/menu/config';
 import { PI } from '@spaceone/design-system';
 
 export default {

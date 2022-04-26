@@ -1,18 +1,12 @@
 import { CURRENCY, SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { Location } from 'vue-router';
-
-export interface Menu {
-    id: string;
-    label: string;
-    sub_menu?: Menu[];
-    optional?: boolean;
-}
+import { Menu } from '@/lib/menu/config';
 
 export interface GNBMenu extends Menu {
-    subMenuList?: GNBMenu[];
+    label: string;
     to: Location;
-    show?: boolean;
-    isNew?: boolean;
+    icon?: string;
+    subMenuList?: GNBMenu[];
 }
 
 export interface DisplayState {
@@ -24,7 +18,6 @@ export interface DisplayState {
     isSignInFailed: boolean;
     currency: CURRENCY;
     currencyRates: CurrencyRates;
-    menuList: Menu[];
 }
 
 export type CurrencyRates = {

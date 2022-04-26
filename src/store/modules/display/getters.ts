@@ -1,12 +1,15 @@
 import {
-    DisplayState, GNBMenu, Menu, SidebarProps,
+    DisplayState, GNBMenu, SidebarProps,
 } from '@/store/modules/display/type';
 import { Getter } from 'vuex';
-import { CURRENCY_SYMBOL, SIDEBAR_TYPE } from '@/store/modules/display/config';
+import {
+    CURRENCY_SYMBOL, SIDEBAR_TYPE,
+} from '@/store/modules/display/config';
 import VueRouter from 'vue-router';
 import config from '@/lib/config';
 import { SpaceRouter } from '@/router';
-import { menuRouterMap } from '@/lib/router/menu-router-map';
+import { menuRouterMap } from '@/lib/menu/menu-router-map';
+import { Menu, MENU_INFO, MENU_LIST } from '@/lib/menu/config';
 
 export const hasUncheckedNotifications: Getter<DisplayState, any> = (state): boolean => state.uncheckedNotificationCount > 0;
 
@@ -43,35 +46,26 @@ const filterMenuByRoute = (menuList: GNBMenu[], disabledMenu: string[], showBill
     return results;
 }, [] as GNBMenu[]);
 
-const getSubMenuList = (subMenu) => {
-    if (!subMenu) return [];
-    const result = subMenu.map((item) => {
-        const menu = { ...item, to: { name: menuRouterMap[item.id]?.name } };
-        if (menu.sub_menu) {
-            menu.subMenuList = getSubMenuList(menu.sub_menu);
-        }
-        return menu;
-    });
-    return result;
-};
+const getGnbMenuList = (menuList: Menu[]): GNBMenu[] => menuList.map((d) => {
+    const menuInfo = MENU_INFO[d.id];
+    return {
+        ...d,
+        label: menuInfo.label,
+        icon: menuInfo.icon,
+        to: { name: menuRouterMap[d.id].name },
+        subMenuList: d.subMenuList ? getGnbMenuList(d.subMenuList) : [],
+    } as GNBMenu;
+});
 
-export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): GNBMenu[] => {
+export const allGnbMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): GNBMenu[] => {
     const _isAdmin = rootGetters['user/isAdmin'];
     const _billingEnabledMenuList: string[] = config.get('BILLING_ENABLED') ?? [];
     const _showBilling = _billingEnabledMenuList.includes(rootState.domain.domainId);
     const _disabledMenu = config.get('DISABLED_MENU');
-    const _menuList = state.menuList as Menu[];
 
-    const _allMenuList: GNBMenu[] = _menuList.map(d => ({
-        label: d.label,
-        id: d.id,
-        to: { name: menuRouterMap[d.id].name },
-        optional: d.optional,
-        subMenuList: getSubMenuList(d.sub_menu),
-    }));
+    const _allMenuList: GNBMenu[] = getGnbMenuList(MENU_LIST);
 
     return filterMenuByRoute(_allMenuList, _disabledMenu, _showBilling, _isAdmin, SpaceRouter.router);
 };
 
-
-export const GNBMenuList: Getter<DisplayState, any> = (state, getters): GNBMenu[] => getters.allMenuList.filter(d => !d.optional);
+export const GNBMenuList: Getter<DisplayState, any> = (state, getters): GNBMenu[] => getters.allGnbMenuList.filter(d => !d.optional);

@@ -4,7 +4,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
-import { MENU_ID, MenuRouter } from '@/lib/router/type';
+import { MenuRouter, MENU_ID } from '@/lib/menu/config';
 
 const assetInventoryRouter = {
     [MENU_ID.ASSET_INVENTORY]: {

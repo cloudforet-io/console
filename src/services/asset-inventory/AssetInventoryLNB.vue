@@ -19,7 +19,7 @@ import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import {
     BackLink, LNBItem, LNBItemList, TopTitle,
 } from '@/common/modules/navigations/lnb/type';
-import { MENU_ID } from '@/lib/router/type';
+import { MENU_ID } from '@/lib/menu/config';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
 import {
     CloudServiceDetailPageParams,

@@ -1,12 +1,11 @@
 import { find } from 'lodash';
-import { getAllMenuList } from '@/lib/helper/menu-helper';
+import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 import { FAVORITE_TYPE, FavoriteConfig, FavoriteItem } from '@/store/modules/favorite/type';
 import { RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import { Menu } from '@/store/modules/display/type';
-import { MENU_ICON } from '@/common/modules/navigations/gnb/config';
+import { GNBMenu } from '@/store/modules/display/type';
 
 
 interface ConfigData extends FavoriteConfig, RecentConfig {
@@ -16,8 +15,8 @@ interface ReferenceData extends FavoriteItem, RecentItem {
     [key: string]: any;
 }
 
-export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menuList: Menu[]): ReferenceData[] => {
-    const allMenuList = getAllMenuList(menuList);
+export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menuList: GNBMenu[]): ReferenceData[] => {
+    const allMenuList = getAllSuggestionMenuList(menuList);
     const results: ReferenceData[] = [];
     if (config) {
         config.forEach((d) => {
@@ -28,7 +27,7 @@ export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menu
                     itemId: menu.id,
                     name: menu.id,
                     label: menu.label,
-                    icon: MENU_ICON[menu.parents?.[0]?.id ?? menu.id],
+                    icon: menu.parents?.[0]?.icon ?? menu.icon,
                     parents: menu?.parents,
                     updatedAt: d?.updatedAt,
                 });
