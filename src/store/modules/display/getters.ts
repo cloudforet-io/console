@@ -8,10 +8,11 @@ import {
 import VueRouter from 'vue-router';
 import config from '@/lib/config';
 import { SpaceRouter } from '@/router';
-import { menuRouterMap } from '@/lib/menu/menu-router-map';
 import {
-    Menu, MENU_ID, MENU_INFO, MENU_LIST,
+    Menu, MENU_ID, MenuInfo,
 } from '@/lib/menu/config';
+import { MENU_LIST } from '@/lib/menu/menu-architecture';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 export const hasUncheckedNotifications: Getter<DisplayState, any> = (state): boolean => state.uncheckedNotificationCount > 0;
 
@@ -53,16 +54,17 @@ const filterMenuByRoute = (menuList: GNBMenu[], disabledMenu: string[], showBill
 }, [] as GNBMenu[]);
 
 const getGnbMenuList = (menuList: Menu[]): GNBMenu[] => menuList.map((d) => {
-    const menuInfo = MENU_INFO[d.id];
+    const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
     return {
         ...d,
         label: menuInfo.label,
         icon: menuInfo.icon,
-        to: { name: menuRouterMap[d.id].name },
+        isNew: menuInfo.isNew,
+        isBeta: menuInfo.isBeta,
+        to: menuInfo.to,
         subMenuList: d.subMenuList ? getGnbMenuList(d.subMenuList) : [],
     } as GNBMenu;
 });
-
 export const allGnbMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): GNBMenu[] => {
     const _isAdmin = rootGetters['user/isAdmin'];
     const _billingEnabledMenuList: string[] = config.get('BILLING_ENABLED') ?? [];

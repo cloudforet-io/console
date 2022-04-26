@@ -1,5 +1,5 @@
 import { Location } from 'vue-router';
-import { MenuIdType } from '@/lib/menu/config';
+import { MenuId } from '@/lib/menu/config';
 
 export const MENU_ITEM_TYPE = Object.freeze({
     TITLE: 'title',
@@ -11,7 +11,7 @@ type MenuItemType = typeof MENU_ITEM_TYPE[keyof typeof MENU_ITEM_TYPE];
 export interface LNBItem {
     type: MenuItemType;
     label?: string;
-    id?: MenuIdType;
+    id?: MenuId;
     foldable?: boolean;
     to?: Location;
     isNew?: boolean;

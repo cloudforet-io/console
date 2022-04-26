@@ -1,24 +1,15 @@
 <template>
-    <l-n-b header="Alert Manager" :menu-set="MenuSet" />
+    <l-n-b :header="header" :menu-set="menuSet" />
 </template>
 
 <script lang="ts">
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { LNBMenu } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import { MENU_ID } from '@/lib/menu/config';
+import { computed } from '@vue/composition-api';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-const MenuSet: LNBMenu[] = [
-    {
-        type: 'item', id: MENU_ID.ALERT_MANAGER_DASHBOARD, label: 'Dashboard', to: { name: ALERT_MANAGER_ROUTE.DASHBOARD._NAME },
-    },
-    {
-        type: 'item', id: MENU_ID.ALERT_MANAGER_ALERT, label: 'Alert', to: { name: ALERT_MANAGER_ROUTE.ALERT._NAME },
-    },
-    {
-        type: 'item', id: MENU_ID.ALERT_MANAGER_ESCALATION_POLICY, label: 'Escalation Policy', to: { name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME },
-    },
-];
+const lnbMenuIds = [MENU_ID.ALERT_MANAGER_DASHBOARD, MENU_ID.ALERT_MANAGER_ALERT, MENU_ID.ALERT_MANAGER_ESCALATION_POLICY];
 
 export default {
     name: 'AlertManagerLNB',
@@ -27,7 +18,13 @@ export default {
     },
     setup() {
         return {
-            MenuSet,
+            header: computed(() => MENU_INFO_MAP[MENU_ID.ALERT_MANAGER_DASHBOARD].label),
+            menuSet: computed<LNBMenu[]>(() => lnbMenuIds.map((id) => {
+                const menuInfo = MENU_INFO_MAP[id];
+                return ({
+                    type: 'item', id, label: menuInfo.label, to: menuInfo.to,
+                });
+            })),
         };
     },
 };

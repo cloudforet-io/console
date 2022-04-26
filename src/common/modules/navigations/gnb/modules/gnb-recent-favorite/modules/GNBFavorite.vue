@@ -77,7 +77,6 @@ import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 import { SUGGESTION_TYPE, SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { menuRouterMap } from '@/lib/menu/menu-router-map';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import {
     convertCloudServiceConfigToReferenceData,
@@ -88,6 +87,8 @@ import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import { i18n } from '@/translations';
 import { TranslateResult } from 'vue-i18n';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { MenuInfo } from '@/lib/menu/config';
 
 const FAVORITE_LIMIT = 5;
 
@@ -207,9 +208,9 @@ export default {
         const handleSelect = (item: SuggestionItem) => {
             const itemName = item.name as string;
             if (item.itemType === SUGGESTION_TYPE.MENU) {
-                const menuRoute = menuRouterMap[itemName];
-                if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.name) return;
-                SpaceRouter.router.push({ name: menuRoute.name }).catch(() => {});
+                const menuRoute: MenuInfo = MENU_INFO_MAP[itemName];
+                if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.to.name) return;
+                SpaceRouter.router.push(menuRoute.to).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT) {
                 SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT_GROUP) {

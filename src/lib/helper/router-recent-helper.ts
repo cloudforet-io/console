@@ -1,8 +1,8 @@
 import { RECENT_TYPE, RecentConfig } from '@/store/modules/recent/type';
 import { Route } from 'vue-router';
-import { menuRouterMap } from '@/lib/menu/menu-router-map';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     /* ClOUD SERVICE */
@@ -29,7 +29,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     }
 
     /* MENU */
-    const menu = Object.entries(menuRouterMap).find(([, v]) => v.name === to.name);
+    const menu = Object.entries(MENU_INFO_MAP).find(([, v]) => v.to.name === to.name);
     if (menu) {
         return { itemType: RECENT_TYPE.MENU, itemId: menu[0] };
     }

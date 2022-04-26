@@ -35,7 +35,6 @@ import { PDataLoader } from '@spaceone/design-system';
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 import { SUGGESTION_TYPE, SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import { menuRouterMap } from '@/lib/menu/menu-router-map';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { RECENT_TYPE, RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import {
@@ -50,6 +49,8 @@ import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { MenuInfo } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 
 const RECENT_LIMIT = 15;
@@ -104,9 +105,9 @@ export default {
         const handleSelect = (item: SuggestionItem) => {
             const itemName = item.name as string;
             if (item.itemType === SUGGESTION_TYPE.MENU) {
-                const menuRoute = menuRouterMap[itemName];
-                if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.name) return;
-                SpaceRouter.router.push({ name: menuRoute.name }).catch(() => {});
+                const menuRoute: MenuInfo = MENU_INFO_MAP[itemName];
+                if (!menuRoute || SpaceRouter.router.currentRoute.name === menuRoute.to.name) return;
+                SpaceRouter.router.push(menuRoute.to).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT) {
                 SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT_GROUP) {
