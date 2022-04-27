@@ -5,7 +5,7 @@
             <!--            <handbook-button class="flex-shrink-0">-->
             <!--            </handbook-button>-->
         </div>
-        <p-page-title :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')" />
+        <p-page-title :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')" child @goBack="$router.go(-1)" />
         <p-collector-history-chart @click-date="onClickDate" />
         <div class="collector-history-table">
             <div class="status-wrapper">
