@@ -1,3 +1,10 @@
+# [1.1.0-beta.285](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.284...v1.1.0-beta.285) (2022-04-27)
+
+
+### Bug Fixes
+
+* fix default input bug in PJsonSchemaForm ([#931](https://github.com/spaceone-dev/spaceone-design-system/issues/931)) ([16f91e1](https://github.com/spaceone-dev/spaceone-design-system/commit/16f91e1e94fd1026b762f1e6d404bfca3b49cd5a))
+
 # [1.1.0-beta.284](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.283...v1.1.0-beta.284) (2022-04-26)
 
 
