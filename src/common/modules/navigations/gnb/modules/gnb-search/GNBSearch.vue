@@ -270,9 +270,7 @@ export default defineComponent<Props>({
                 if (!menuId) return;
 
                 const menuInfo: MenuInfo = MENU_INFO_MAP[menuId];
-                if (!menuInfo || SpaceRouter.router.currentRoute.name === menuInfo.to.name) return;
-
-                SpaceRouter.router.push(menuInfo.to).catch(() => {});
+                if (!menuInfo || SpaceRouter.router.currentRoute.name !== menuInfo.to.name) SpaceRouter.router.push(menuInfo.to).catch(() => {});
             } else {
                 const cloudServiceTypeId = state.showRecent ? dataState.recentCloudServiceItems[index]?.itemId : dataState.cloudServiceTypeList[index]?.id;
                 if (!cloudServiceTypeId) return;
