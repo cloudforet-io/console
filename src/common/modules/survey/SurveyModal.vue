@@ -7,6 +7,7 @@
                     :visible.sync="visible"
                     hide-header-close-button
                     hide-footer-close-button
+                    :disabled="!selectedAnswer1 || !selectedAnswer2"
                     @confirm="handleConfirm"
     >
         <template #body>
@@ -52,7 +53,7 @@
 <script lang="ts">
 import { PButtonModal, PSelectCard } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -71,10 +72,10 @@ export default {
     props: {
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             visible: false,
-            userId: computed(() => vm.$store.state.user.userId),
+            isSessionExpired: computed(() => store.state.user.isSessionExpired),
+            userId: computed(() => store.state.user.userId),
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             answerItems1: computed(() => [
                 {
@@ -132,9 +133,7 @@ export default {
                 ErrorHandler.handleError(e);
             }
         };
-
-        /* Event */
-        const handleConfirm = async () => {
+        const createSurveyConfig = async () => {
             try {
                 await SpaceConnector.client.config.userConfig.create({
                     user_id: state.userId,
@@ -147,16 +146,20 @@ export default {
                 showSuccessMessage('소중한 의견 감사합니다.', '', root);
             } catch (e) {
                 ErrorHandler.handleError(e);
-            } finally {
-                state.visible = false;
             }
         };
 
-        (async () => {
-            if (!state.isDomainOwner) {
-                await listSurveyConfig();
+        /* Event */
+        const handleConfirm = async () => {
+            await createSurveyConfig();
+            state.visible = false;
+        };
+
+        watch(() => state.isSessionExpired, (isSessionExpired) => {
+            if (!isSessionExpired && !state.isDomainOwner) {
+                listSurveyConfig();
             }
-        })();
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
