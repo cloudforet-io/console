@@ -182,6 +182,7 @@ export default defineComponent<Props>({
                 id: d.id,
                 label: d.label,
                 parents: d.parents ? d.parents : undefined,
+                icon: d.parents?.[0]?.icon ?? d.icon,
             })).filter((d) => {
                 if (regex.test(d.label as string)) return true;
                 if (d.parents && d.parents.some(p => regex.test(p.label as string))) return true;
