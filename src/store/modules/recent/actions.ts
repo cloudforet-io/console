@@ -6,7 +6,7 @@ import { Action } from 'vuex';
 
 const createRecent = async (itemType: RECENT_TYPE, itemId: string) => {
     try {
-        await SpaceConnector.client.addOns.recent.create({
+        await SpaceConnector.client.addOns.recent.visit.create({
             type: itemType,
             id: itemId,
         });
@@ -40,7 +40,7 @@ const setCommitsByItemType = {
 };
 export const load: Action<RecentState, any> = async ({ commit }, payload: RecentLoadPayload): Promise<void|Error> => {
     const itemType = payload?.itemType;
-    const { results } = await SpaceConnector.client.addOns.recent.list({
+    const { results } = await SpaceConnector.client.addOns.recent.visit.list({
         type: itemType,
         limit: payload?.limit,
     });
