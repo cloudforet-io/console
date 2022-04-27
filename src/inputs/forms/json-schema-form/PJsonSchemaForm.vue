@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { flatMap, sortBy, isEmpty } from 'lodash';
+import { flatMap, sortBy } from 'lodash';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -99,7 +99,9 @@ export default {
 
         watch(() => props.schema, async (schema) => {
             if (schema && schema.properties) {
-                if (!props.model || isEmpty(props.model)) setDefaultInputModel(schema);
+                if (!props.model || Object.values(props.model).every(d => d === undefined)) {
+                    setDefaultInputModel(schema);
+                }
                 generateUiSchema(schema);
             }
         }, { immediate: true });
