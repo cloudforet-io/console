@@ -1,6 +1,8 @@
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lnbVisible">
+        <vertical-page-layout v-if="$route.meta.lnbVisible"
+                              :breadcrumbs="breadcrumbs"
+        >
             <template #sidebar>
                 <administration-l-n-b />
             </template>
@@ -8,7 +10,9 @@
                 <router-view />
             </template>
         </vertical-page-layout>
-        <general-page-layout v-else>
+        <general-page-layout v-else
+                             :breadcrumbs="breadcrumbs"
+        >
             <router-view />
         </general-page-layout>
     </fragment>
@@ -20,6 +24,8 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import { administrationStore, administrationStoreModule } from '@/services/administration/store';
 import AdministrationLNB from '@/services/administration/AdministrationLNB.vue';
+import { ComponentRenderProxy, computed, getCurrentInstance } from '@vue/composition-api';
+import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 
 
 export default {
@@ -31,7 +37,11 @@ export default {
     },
     setup() {
         registerServiceStore<any>('administration', administrationStoreModule, administrationStore);
-        return {};
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const { breadcrumbs } = useBreadcrumbs(computed(() => vm.$route));
+        return {
+            breadcrumbs,
+        };
     },
 };
 </script>

@@ -82,6 +82,7 @@ import { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/admi
 import { PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 export default {
     name: 'NotificationChannelList',
@@ -147,7 +148,7 @@ export default {
             const enrichedProtocolList: EnrichedProtocolItem[] = await Promise.all(protocolResp.map(async d => ({
                 label: computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
                 link: {
-                    name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
+                    name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
                     params: {
                         protocol: d.name.replace(/(\s*)/g, ''),
                         protocolId: d.protocol_id,

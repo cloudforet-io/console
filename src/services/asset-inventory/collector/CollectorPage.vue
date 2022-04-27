@@ -1,8 +1,5 @@
 <template>
     <div class="collector-page">
-        <div class="page-navigation">
-            <p-breadcrumbs :routes="routes" />
-        </div>
         <p-page-title :title="$t('PLUGIN.COLLECTOR.MAIN.TITLE')"
                       use-total-count use-selected-count
                       :selected-count="selectedItems.length"
@@ -34,7 +31,7 @@
                                       @export="exportCollectorDataToExcel"
                 >
                     <template #toolbox-left>
-                        <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE.PLUGINS._NAME }">
+                        <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }">
                             <p-icon-text-button style-type="primary-dark"
                                                 name="ic_plus_bold"
                             >
@@ -185,7 +182,7 @@ import {
 
 import {
     PHorizontalLayout, PSelectDropdown, PLazyImg, PPageTitle, PDataTable, PQuerySearchTable,
-    PTab, PTableCheckModal, PIconTextButton, PStatus, PBreadcrumbs, PI, PEmpty, PButton,
+    PTab, PTableCheckModal, PIconTextButton, PStatus, PI, PEmpty, PButton,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
@@ -226,7 +223,6 @@ export default {
         PStatus,
         PTab,
         PTableCheckModal,
-        PBreadcrumbs,
         PEmpty,
         PButton,
         CollectorUpdateModal,
@@ -312,12 +308,6 @@ export default {
             ]),
             updateModalVisible: false,
             collectDataModalVisible: false,
-        });
-        const routeState = reactive({
-            routes: computed(() => ([
-                { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
-                { name: 'Collector' },
-            ])),
         });
         const checkModalState = reactive({
             visible: false,
@@ -512,7 +502,6 @@ export default {
 
         return {
             ...toRefs(state),
-            ...toRefs(routeState),
             multiTabState,
             singleTabState,
             checkModalState,

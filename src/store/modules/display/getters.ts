@@ -61,7 +61,7 @@ const getGnbMenuList = (menuList: Menu[]): GNBMenu[] => menuList.map((d) => {
         icon: menuInfo.icon,
         isNew: menuInfo.isNew,
         isBeta: menuInfo.isBeta,
-        to: menuInfo.to,
+        to: { name: d.id },
         subMenuList: d.subMenuList ? getGnbMenuList(d.subMenuList) : [],
     } as GNBMenu;
 });

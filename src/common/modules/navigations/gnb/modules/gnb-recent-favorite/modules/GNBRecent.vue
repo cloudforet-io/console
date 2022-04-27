@@ -107,8 +107,8 @@ export default {
             const itemName = item.name as string;
             if (item.itemType === SUGGESTION_TYPE.MENU) {
                 const menuInfo: MenuInfo = MENU_INFO_MAP[itemName];
-                if (menuInfo && SpaceRouter.router.currentRoute.name !== menuInfo.to.name) {
-                    SpaceRouter.router.push(menuInfo.to).catch(() => {});
+                if (menuInfo && SpaceRouter.router.currentRoute.name !== itemName) {
+                    SpaceRouter.router.push({ name: itemName }).catch(() => {});
                 }
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT) {
                 SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});

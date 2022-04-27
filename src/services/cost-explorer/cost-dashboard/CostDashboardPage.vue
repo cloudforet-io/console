@@ -1,6 +1,5 @@
 <template>
     <div class="cost-dashboard-page">
-        <p-breadcrumbs :routes="routeState.route" :copiable="!!dashboardId" />
         <div v-if="dashboardList.length" class="top-wrapper">
             <p-i v-if="dashboardType === DASHBOARD_TYPE.PUBLIC" name="ic_public" width="1rem"
                  height="1rem" :color="PUBLIC_ICON_COLOR"
@@ -80,7 +79,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    PBreadcrumbs, PI, PIconButton, PIconTextButton, PPageTitle,
+    PI, PIconButton, PIconTextButton, PPageTitle,
 } from '@spaceone/design-system';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -126,7 +125,6 @@ export default {
         CostDashboardMoreMenu,
         DashboardLayouts,
         CostDashboardFilter,
-        PBreadcrumbs,
         PPageTitle,
         PIconButton,
         PIconTextButton,
@@ -169,14 +167,6 @@ export default {
             isAdmin: computed((() => store.getters['user/isAdmin'])),
             dashboardList: computed(() => costExplorerStore.getters.dashboardList ?? []),
             dashboardListLoading: computed(() => costExplorerStore.state.dashboardListLoading),
-        });
-
-        const routeState = reactive({
-            route: computed(() => [
-                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
-                { name: 'Dashboard', to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME } },
-                { name: props.dashboardId },
-            ]),
         });
 
         /* event */
@@ -266,7 +256,6 @@ export default {
 
         return {
             ...toRefs(state),
-            routeState,
             handleClickEditDashboard,
             handleUpdateConfirm,
             handleClickPdfDownload,

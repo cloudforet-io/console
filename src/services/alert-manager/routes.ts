@@ -1,5 +1,7 @@
 import { RouteConfig } from 'vue-router';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+import { getMenuLabel } from '@/lib/menu/menu-info';
+import { MENU_ID } from '@/lib/menu/config';
 
 const AlertManagerContainer = () => import(/* webpackChunkName: "AlertManagerContainer" */ '@/services/alert-manager/AlertManagerContainer.vue');
 
@@ -8,43 +10,46 @@ const AlertPage = () => import(/* webpackChunkName: "AlertPage" */ '@/services/a
 const EscalationPolicyPage = () => import(/* webpackChunkName: "EscalationPolicyPage" */ '@/services/alert-manager/escalation-policy/EscalationPolicyPage.vue');
 const AlertDetailPage = () => import(/* webpackChunkName: "AlertDetailPage" */ '@/services/alert-manager/alert/alert-detail/AlertDetailPage.vue');
 
-export default {
+const alertManagerRoutes: RouteConfig = {
     path: 'alert-manager',
     name: ALERT_MANAGER_ROUTE._NAME,
+    meta: { label: getMenuLabel(MENU_ID.ALERT_MANAGER) },
     redirect: '/alert-manager/dashboard',
     component: AlertManagerContainer,
     children: [
         {
             path: 'dashboard',
             name: ALERT_MANAGER_ROUTE.DASHBOARD._NAME,
-            meta: { lnbVisible: true },
-            component: AlertDashboardPage,
+            meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.ALERT_MANAGER_DASHBOARD) },
+            component: AlertDashboardPage as any,
         },
         {
             path: 'alert',
+            meta: { label: getMenuLabel(MENU_ID.ALERT_MANAGER_ALERT) },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
                     name: ALERT_MANAGER_ROUTE.ALERT._NAME,
                     meta: { lnbVisible: true },
-                    component: AlertPage,
+                    component: AlertPage as any,
                 },
                 {
                     path: ':id?',
                     name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
-                    meta: { lnbVisible: true },
+                    meta: { lnbVisible: true, label: ({ params }) => params.id, copiable: true },
                     props: true,
-                    component: AlertDetailPage,
+                    component: AlertDetailPage as any,
                 },
             ],
         },
         {
             path: 'escalation-policy',
             name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
-            meta: { lnbVisible: true },
-            component: EscalationPolicyPage,
+            meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.ALERT_MANAGER_ESCALATION_POLICY) },
+            component: EscalationPolicyPage as any,
         },
     ],
 
-} as RouteConfig;
+};
+export default alertManagerRoutes;

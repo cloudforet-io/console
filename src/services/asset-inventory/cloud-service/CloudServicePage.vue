@@ -1,9 +1,6 @@
 <template>
     <div>
         <div class="page-wrapper">
-            <div class="page-navigation">
-                <p-breadcrumbs :routes="routeState.route" />
-            </div>
             <p-page-title :title="providers[selectedProvider] ? providers[selectedProvider].name : selectedProvider"
                           class="page-title"
             >
@@ -58,7 +55,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PDataLoader, PDivider, PIconTextButton, PPageTitle,
+    PDataLoader, PDivider, PIconTextButton, PPageTitle,
 } from '@spaceone/design-system';
 
 import CloudServiceToolbox from '@/services/asset-inventory/cloud-service/modules/CloudServiceToolbox.vue';
@@ -109,7 +106,6 @@ export default {
         PDivider,
         PIconTextButton,
         PPageTitle,
-        PBreadcrumbs,
         PDataLoader,
     },
     setup() {
@@ -160,13 +156,6 @@ export default {
                 period: objectToQueryString(state.period),
                 filters: searchQueryHelper.setFilters(state.searchFilters).rawQueryStrings,
             })),
-        });
-
-        const routeState = reactive({
-            route: [
-                { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
-                { name: 'Cloud Service' },
-            ],
         });
 
         /* api */
@@ -257,7 +246,6 @@ export default {
 
         return {
             ...toRefs(state),
-            routeState,
             handlers,
             assetUrlConverter,
             handleProviderSelect,

@@ -1,6 +1,5 @@
 <template>
     <div class="escalation-policy-page">
-        <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="pageTitle"
                       use-total-count
                       use-selected-count
@@ -60,13 +59,12 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
     reactive, toRefs, ComponentRenderProxy, getCurrentInstance, computed,
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle, PIconTextButton, PSelectDropdown, PToolbox,
+    PPageTitle, PIconTextButton, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
 import EscalationPolicyFormModal from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -85,7 +83,6 @@ import { store } from '@/store';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 
 export default {
@@ -94,7 +91,6 @@ export default {
         EscalationPolicyFormModal,
         DeleteModal,
         EscalationPolicyDataTable,
-        PBreadcrumbs,
         PPageTitle,
         PIconTextButton,
         PSelectDropdown,
@@ -160,12 +156,6 @@ export default {
             deleteModalVisible: false,
             formModalVisible: false,
             formMode: undefined,
-        });
-        const routeState = reactive({
-            route: computed(() => [
-                { name: 'Alert Manager', to: { name: ALERT_MANAGER_ROUTE._NAME } },
-                { name: 'Escalation Policy' },
-            ]),
         });
 
         /* api */
@@ -248,7 +238,6 @@ export default {
         return {
             ...toRefs(state),
             ACTION,
-            routeState,
             tableState,
             handlers,
             onSelectAction,

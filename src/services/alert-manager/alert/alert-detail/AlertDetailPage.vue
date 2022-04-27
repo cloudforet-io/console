@@ -1,6 +1,5 @@
 <template>
     <div v-if="!loading" class="alert-detail-page">
-        <p-breadcrumbs :routes="routeState.route" copiable />
         <p-page-title :title="alertInfo.title" child class="page-title"
                       @goBack="$router.go(-1)"
         >
@@ -68,7 +67,7 @@
 </template>
 
 <script lang="ts">
-import { PBreadcrumbs, PIconButton, PPageTitle } from '@spaceone/design-system';
+import { PIconButton, PPageTitle } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
@@ -103,7 +102,6 @@ export default {
         AlertKeyInfo,
         AlertSummary,
         DeleteModal,
-        PBreadcrumbs,
         PPageTitle,
         PIconButton,
     },
@@ -121,14 +119,6 @@ export default {
             loading: true,
             //
             alertTitleEditFormVisible: false,
-        });
-
-        const routeState = reactive({
-            route: [
-                { name: 'Alert Manager', to: { name: ALERT_MANAGER_ROUTE._NAME } },
-                { name: 'Alert', to: { name: ALERT_MANAGER_ROUTE.ALERT._NAME } },
-                { name: props.id },
-            ],
         });
 
         const checkDeleteState = reactive({
@@ -176,7 +166,6 @@ export default {
 
         return {
             ...toRefs(state),
-            routeState,
             checkDeleteState,
             openAlertDeleteForm,
             alertDeleteConfirm,

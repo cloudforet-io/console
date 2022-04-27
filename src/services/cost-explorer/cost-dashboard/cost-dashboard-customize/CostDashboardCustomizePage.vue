@@ -1,8 +1,5 @@
 <template>
     <div class="cost-dashboard-customize-page">
-        <nav>
-            <p-breadcrumbs :routes="routeState.route" copiable />
-        </nav>
         <section class="header">
             <p-icon-button
                 name="ic_back"
@@ -33,7 +30,7 @@
 
 <script lang="ts">
 import {
-    PBreadcrumbs, PButton, PTextInput, PIconButton,
+    PButton, PTextInput, PIconButton,
 } from '@spaceone/design-system';
 import {
     computed, onBeforeUnmount, onMounted, reactive, toRefs,
@@ -61,7 +58,6 @@ export default {
     components: {
         CostDashboardCustomizeSidebar,
         DashboardLayouts,
-        PBreadcrumbs,
         PButton,
         PIconButton,
         PTextInput,
@@ -73,15 +69,6 @@ export default {
         },
     },
     setup(props) {
-        const routeState = reactive({
-            route: computed(() => [
-                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
-                { name: 'Dashboard', to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME } },
-                { name: 'Customize' },
-                { name: props.dashboardId },
-            ]),
-        });
-
         const state = reactive({
             loading: true,
             layout: [] as CustomLayout[],
@@ -237,7 +224,6 @@ export default {
         });
 
         return {
-            routeState,
             ...toRefs(state),
             handleClickCancel,
             handleClickSave,

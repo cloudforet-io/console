@@ -1,5 +1,7 @@
+import { MENU_ID } from '@/lib/menu/config';
+
 export const PROJECT_ROUTE = Object.freeze({
-    _NAME: 'projectMain',
+    _NAME: MENU_ID.PROJECT,
     DETAIL: {
         _NAME: 'projectDetail',
         TAB: {

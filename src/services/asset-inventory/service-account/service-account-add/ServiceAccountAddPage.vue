@@ -1,19 +1,5 @@
 <template>
     <div>
-        <div class="flex">
-            <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
-            <info-button v-if="description" :visible="!!description"
-                         class="flex-shrink-0"
-            >
-                <template #contents>
-                    <p-markdown :markdown="description.options.markdown"
-                                :data="description.options.markdown"
-                                :language="$store.state.user.language"
-                                class="!p-0"
-                    />
-                </template>
-            </info-button>
-        </div>
         <p-page-title class="mb-6"
                       child
                       @goBack="handleGoBack"
@@ -26,6 +12,19 @@
                     />
                     {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE') }}
                 </div>
+            </template>
+            <template #extra>
+                <info-button v-if="description" :visible="!!description"
+                             class="flex-shrink-0"
+                >
+                    <template #contents>
+                        <p-markdown :markdown="description.options.markdown"
+                                    :data="description.options.markdown"
+                                    :language="$store.state.user.language"
+                                    class="!p-0"
+                        />
+                    </template>
+                </info-button>
             </template>
         </p-page-title>
 
@@ -146,7 +145,7 @@ import {
 
 import {
     PPageTitle, PJsonSchemaForm, PTab, PFieldGroup, PLazyImg,
-    PBreadcrumbs, PPaneLayout, PIconTextButton, PRadio, PMarkdown, PTextEditor, PButton, PTextInput,
+    PPaneLayout, PIconTextButton, PRadio, PMarkdown, PTextEditor, PButton, PTextInput,
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
@@ -162,7 +161,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
 export default {
@@ -176,7 +174,6 @@ export default {
         PTextEditor,
         PMarkdown,
         PPageTitle,
-        PBreadcrumbs,
         PFieldGroup,
         PPaneLayout,
         PIconTextButton,
@@ -257,14 +254,6 @@ export default {
                 if (state.hasCredentialKey && state.enableCredentialInput) return formState.isAccountNameValid && isAccountModelValid && formState.isCredentialModelValid;
                 return formState.isAccountNameValid && isAccountModelValid;
             }),
-        });
-
-        const routeState = reactive({
-            routes: computed(() => ([
-                { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
-                { name: 'Service Account', to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } },
-                { name: 'Add Service Account' },
-            ])),
         });
 
         const getProvider = async () => {
@@ -420,7 +409,6 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(formState),
-            routeState,
             tabState,
             handleSave,
             handleGoBack,

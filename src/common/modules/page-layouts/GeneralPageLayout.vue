@@ -1,6 +1,7 @@
 <template>
     <div class="general-page-layout">
-        <div class="page-contents">
+        <p-breadcrumbs v-if="breadcrumbs.length" :routes="breadcrumbs" :copiable="copiable" />
+        <div class="page-contents" :class="{'without-breadcrumbs': !breadcrumbs.length}">
             <slot />
         </div>
         <div class="fnb">
@@ -9,14 +10,28 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import FNB from '@/common/modules/navigations/FNB.vue';
+import { computed, PropType } from '@vue/composition-api';
+import { Breadcrumb } from '@/common/modules/page-layouts/type';
+import { PBreadcrumbs } from '@spaceone/design-system';
 
 export default {
     name: 'GeneralPageLayout',
-    components: { FNB },
-    setup() {
-        return {};
+    components: { PBreadcrumbs, FNB },
+    props: {
+        breadcrumbs: {
+            type: Array as PropType<Breadcrumb[]>,
+            default: () => [],
+        },
+    },
+    setup(props) {
+        return {
+            copiable: computed(() => {
+                const last = props.breadcrumbs?.[props.breadcrumbs?.length - 1];
+                return last?.copiable;
+            }),
+        };
     },
 };
 </script>
@@ -29,10 +44,16 @@ export default {
     overflow: auto;
     justify-content: stretch;
 
+    > .p-breadcrumbs {
+        padding: 1.5rem 1.5rem 0.625rem 1.5rem;
+    }
     .page-contents {
         width: 100%;
         flex-grow: 1;
-        padding: 1.5rem 1.5rem 2rem 1.5rem;
+        padding: 0 1.5rem 2rem 1.5rem;
+        &.without-breadcrumbs {
+            padding: 1.5rem 1.5rem 2rem 1.5rem;
+        }
     }
     .fnb {
         width: 100%;

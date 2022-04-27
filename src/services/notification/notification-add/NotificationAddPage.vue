@@ -1,6 +1,6 @@
 <template>
-    <div class="add-noti-wrapper">
-        <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
+    <component :is="projectId ? GeneralPageLayout : 'div'">
+        <p-breadcrumbs v-if="routeState.routes.length" class="flex-grow" :routes="routeState.routes" />
         <p-page-title child :title="pageTitle" class="page-title"
                       @goBack="$router.go(-1)"
         />
@@ -48,7 +48,7 @@
                 {{ $t('COMMON.TAGS.SAVE') }}
             </p-button>
         </div>
-    </div>
+    </component>
 </template>
 
 <script lang="ts">
@@ -65,7 +65,7 @@ import VueI18n from 'vue-i18n';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -111,16 +111,11 @@ export default {
 
 
         const routeState = reactive({
-            userRoutes: computed(() => [
-                { name: 'My Page', to: { name: MY_PAGE_ROUTE._NAME } },
-                { name: 'Notifications Channel', to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME } },
-                { name: 'Add Notifications Channel' },
-            ]),
             projectRoutes: computed(() => [
                 { name: 'Project', path: `/project/${state.projectId}` },
                 { name: 'Add Notifications Channel' },
             ]),
-            routes: computed(() => (state.projectId ? routeState.projectRoutes : routeState.userRoutes)),
+            routes: computed(() => (state.projectId ? routeState.projectRoutes : [])),
         });
 
         const createUserChannel = async () => {
@@ -204,6 +199,7 @@ export default {
             onChangeData,
             onChangeSchedule,
             onChangeTopic,
+            GeneralPageLayout,
         };
     },
 };

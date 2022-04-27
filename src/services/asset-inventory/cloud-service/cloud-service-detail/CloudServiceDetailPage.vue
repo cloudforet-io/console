@@ -1,8 +1,5 @@
 <template>
     <div>
-        <div class="page-navigation">
-            <p-breadcrumbs :routes="routeState.route" />
-        </div>
         <server-main v-show="sidebarState.selectedItem && sidebarState.isServer"
                      :is-cloud-service="true"
                      :disabled="!sidebarState.selectedItem || !sidebarState.isServer"
@@ -154,7 +151,7 @@
 </template>
 
 <script lang="ts">
-import { get, upperCase } from 'lodash';
+import { get } from 'lodash';
 import dayjs from 'dayjs';
 
 import {
@@ -163,7 +160,7 @@ import {
 
 import {
     PHorizontalLayout, PTab, PDynamicLayout,
-    PPageTitle, PBreadcrumbs, PEmpty, PTableCheckModal, PButton,
+    PPageTitle, PEmpty, PTableCheckModal, PButton,
 } from '@spaceone/design-system';
 import {
     DynamicLayoutEventListener,
@@ -195,7 +192,6 @@ import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/in
 import { TranslateResult } from 'vue-i18n';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import CloudServiceUsageOverview
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverview.vue';
@@ -229,7 +225,6 @@ export default {
         PDynamicLayout,
         PTableCheckModal,
         PHorizontalLayout,
-        PBreadcrumbs,
         PPageTitle,
         PTab,
         TagsPanel,
@@ -254,19 +249,6 @@ export default {
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
-
-        /* Breadcrumb */
-        const routeState = reactive({
-            route: computed(() => ([
-                { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
-                { name: 'Cloud Service', to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME } },
-                {
-                    name: `[${upperCase(props.provider)}] ${props.group}`,
-                    to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { provider: props.provider, group: props.group, name: props.name } },
-                },
-                { name: `${props.name}` },
-            ])),
-        });
 
         /* Sidebar */
         const sidebarState = reactive({
@@ -564,8 +546,6 @@ export default {
         }, { immediate: true });
 
         return {
-            /* Breadcrumb */
-            routeState,
             /* Sidebar */
             sidebarState,
             /* Main Table */

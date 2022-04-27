@@ -8,8 +8,8 @@ export const MY_PAGE_ROUTE = Object.freeze({
         API_KEY: { _NAME: MENU_ID.MY_PAGE_API_KEY },
         NOTIFICATION: {
             _NAME: MENU_ID.MY_PAGE_NOTIFICATIONS,
-            ADD: { _NAME: 'addNotification' },
-            MANAGE: { _NAME: 'manageNotification' },
+            ADD: { _NAME: `${MENU_ID.MY_PAGE_NOTIFICATIONS}.add` },
+            MANAGE: { _NAME: `${MENU_ID.MY_PAGE_NOTIFICATIONS}.manage` },
         },
     },
 });

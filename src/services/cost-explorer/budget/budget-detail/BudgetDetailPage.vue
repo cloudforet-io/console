@@ -1,6 +1,5 @@
 <template>
     <div>
-        <p-breadcrumbs :routes="routeState.route" copiable />
         <section class="page-title-wrapper">
             <p-page-title v-if="!loading" child :title="budgetData.name"
                           @goBack="$router.go(-1)"
@@ -31,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import { PBreadcrumbs, PPageTitle, PIconButton } from '@spaceone/design-system';
+import { PPageTitle, PIconButton } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import BudgetDetailInfo
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetDetailInfo.vue';
@@ -51,7 +50,6 @@ export default {
     name: 'BudgetDetailPage',
     components: {
         BudgetDeleteModal,
-        PBreadcrumbs,
         PPageTitle,
         PIconButton,
         BudgetDetailInfo,
@@ -70,13 +68,6 @@ export default {
             budgetData: computed<Partial<BudgetData>|null>(() => costExplorerStore.state.budget.budgetData),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-        });
-        const routeState = reactive({
-            route: computed(() => ([
-                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
-                { name: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME } },
-                { name: props.budgetId },
-            ])),
         });
 
         const checkDeleteState = reactive({
@@ -111,7 +102,6 @@ export default {
 
         return {
             ...toRefs(state),
-            routeState,
             checkDeleteState,
             handleClickDelete,
             handleUpdateDelete,

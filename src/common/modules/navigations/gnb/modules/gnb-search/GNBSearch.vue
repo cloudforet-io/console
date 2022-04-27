@@ -297,8 +297,8 @@ export default defineComponent<Props>({
                 if (!menuId) return;
 
                 const menuInfo: MenuInfo = MENU_INFO_MAP[menuId];
-                if (menuInfo && SpaceRouter.router.currentRoute.name !== menuInfo.to.name) {
-                    SpaceRouter.router.push(menuInfo.to).catch(() => {});
+                if (menuInfo && SpaceRouter.router.currentRoute.name !== menuId) {
+                    SpaceRouter.router.push({ name: menuId }).catch(() => {});
                 }
             } else {
                 let cloudServiceTypekey;

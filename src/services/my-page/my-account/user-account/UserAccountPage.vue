@@ -1,6 +1,5 @@
 <template>
     <section>
-        <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE')" />
         <p-pane-layout class="form-wrapper">
             <p class="form-title">
@@ -101,7 +100,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPaneLayout, PButton, PBreadcrumbs, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle, PSearchDropdown,
+    PPaneLayout, PButton, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle, PSearchDropdown,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
@@ -113,14 +112,12 @@ import { store } from '@/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 
 export default {
     name: 'UserAccountPage',
     components: {
         PPageTitle,
-        PBreadcrumbs,
         PButton,
         PSelectDropdown,
         PTextInput,
@@ -175,13 +172,6 @@ export default {
                 return '';
             }),
             showValidation: false,
-        });
-        const routeState = reactive({
-            route: [
-                { name: 'My Page', to: { name: MY_PAGE_ROUTE._NAME } },
-                { name: 'My Account', to: { name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME } },
-                { name: 'Account & Profile' },
-            ],
         });
 
         const checkEmail = async () => {
@@ -293,7 +283,6 @@ export default {
 
         return {
             ...toRefs(state),
-            routeState,
             validationState,
             formState,
             onClickProfileConfirm,

@@ -1,5 +1,3 @@
-import { Location } from 'vue-router';
-
 export const MENU_ID = Object.freeze({
     PROJECT: 'project',
     ASSET_INVENTORY: 'asset_inventory',
@@ -36,7 +34,6 @@ export interface Menu {
 export interface MenuInfo {
     label: string;
     translationId: string;
-    to: Location;
     icon?: string;
     isNew?: boolean;
     isBeta?: boolean;
