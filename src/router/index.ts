@@ -74,10 +74,10 @@ export class SpaceRouter {
 
         SpaceRouter.router.afterEach((to) => {
             if (config.get('GTAG_ID') !== 'DISABLED') GTag.setPageView(to);
-            const recent = getRecentConfig(to);
-            if (recent) {
-                const isDomainOwner = SpaceRouter.router.app.$store.getters['user/isDomainOwner'];
-                if (!isDomainOwner) {
+            const isDomainOwner = SpaceRouter.router.app.$store.getters['user/isDomainOwner'];
+            if (!isDomainOwner) {
+                const recent = getRecentConfig(to);
+                if (recent) {
                     SpaceRouter.router.app.$store.dispatch('recent/addItem', {
                         itemType: recent.itemType,
                         itemId: recent.itemId,
