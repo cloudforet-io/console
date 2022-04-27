@@ -62,9 +62,13 @@ export default {
 
 <style lang="postcss" scoped>
 .popover::v-deep {
+    z-index: 99;
+    overflow: auto;
     .popper {
-        z-index: 1;
+        z-index: 99;
+        overflow: auto;
         max-width: none;
+        max-height: none;
     }
 }
 .total-wrapper {
@@ -76,11 +80,11 @@ export default {
 .monthly-wrapper {
     @apply grid;
     grid-template-columns: repeat(3, 144px);
-    grid-template-rows: repeat(4, 61px);
+    grid-template-rows: auto;
 
     .monthly-data {
         @apply flex items-center;
-        height: inherit;
+        height: 4rem;
         line-height: 125%;
         font-size: 0.875rem;
         padding-left: 0.75rem;
@@ -89,10 +93,24 @@ export default {
             font-size: 0.75rem;
         }
     }
+
+    @screen mobile {
+        grid-template-columns: repeat(2, 144px);
+    }
 }
 
 .monthly-wrapper > p:nth-child(6n+1), .monthly-wrapper > p:nth-child(6n+2),
 .monthly-wrapper > p:nth-child(6n+3) {
     @apply bg-gray-100;
 }
+
+@screen mobile {
+    .monthly-wrapper > p:nth-child(6n+1), .monthly-wrapper > p:nth-child(6n+2), .monthly-wrapper > p:nth-child(6n+3) {
+        @apply bg-white;
+    }
+    .monthly-wrapper > p:nth-child(4n+1), .monthly-wrapper > p:nth-child(4n+2) {
+        @apply bg-gray-100;
+    }
+}
+
 </style>
