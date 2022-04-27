@@ -46,8 +46,9 @@ const initApiClient = async () => {
         '/identity/user/update': (data) => { store.dispatch('reference/user/sync', data); },
         '/monitoring/webhook/create': (data) => { store.dispatch('reference/webhook/sync', data); },
         '/monitoring/webhook/update': (data) => { store.dispatch('reference/webhook/sync', data); },
-
     });
+    const isTokenAlive = SpaceConnector.isTokenAlive;
+    store.dispatch('user/setIsSessionExpired', !isTokenAlive);
 };
 
 const initDomain = async (): Promise<string|undefined> => {
