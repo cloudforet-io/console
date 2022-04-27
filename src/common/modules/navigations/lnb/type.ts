@@ -1,5 +1,6 @@
 import { Location } from 'vue-router';
 import { MenuId } from '@/lib/menu/config';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 export const MENU_ITEM_TYPE = Object.freeze({
     TITLE: 'title',
@@ -17,7 +18,7 @@ export interface LNBItem {
     isNew?: boolean;
     isBeta?: boolean;
     hideFavorite?: boolean;
-    isSecondDepth?: boolean;
+    favoriteType?: FAVORITE_TYPE;
 }
 
 export type LNBMenu = LNBItem[]|LNBItem;

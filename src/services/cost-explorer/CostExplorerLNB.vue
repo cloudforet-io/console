@@ -54,7 +54,6 @@ export default {
                         id: list.public_dashboard_id,
                         to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.public_dashboard_id } },
                         hideFavorite: true,
-                        isSecondDepth: true,
                     })),
                 ],
                 [
@@ -67,7 +66,6 @@ export default {
                         id: list.user_dashboard_id,
                         to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.user_dashboard_id } },
                         hideFavorite: true,
-                        isSecondDepth: true,
                     })),
                 ],
                 { type: 'divider' },

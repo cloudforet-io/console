@@ -36,7 +36,7 @@
                 <favorite-button
                     v-if="!item.hideFavorite && !isDomainOwner"
                     :item-id="item.id"
-                    :favorite-type="FAVORITE_TYPE.MENU"
+                    :favorite-type="item.favoriteType ? item.favoriteType : FAVORITE_TYPE.MENU"
                     :visible-active-case-only="!getIsHovered(item.id)"
                     scale="0.8"
                     class="favorite-button"

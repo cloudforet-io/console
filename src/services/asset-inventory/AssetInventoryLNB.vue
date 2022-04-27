@@ -25,6 +25,7 @@ import {
     CloudServiceDetailPageParams,
     CloudServiceTypeInfo,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 
 export default defineComponent({
@@ -53,9 +54,9 @@ export default defineComponent({
                     {
                         type: 'item',
                         label: d.name,
-                        id: d.name,
+                        id: d.cloud_service_type_key,
                         to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
-                        isSecondDepth: true,
+                        favoriteType: FAVORITE_TYPE.CLOUD_SERVICE,
                     }
                 ));
                 return results;
@@ -114,6 +115,7 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
+            FAVORITE_TYPE,
         };
     },
 });
