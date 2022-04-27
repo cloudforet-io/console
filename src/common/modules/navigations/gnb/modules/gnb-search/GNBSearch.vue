@@ -89,6 +89,7 @@ import { getTextHighlightRegex } from '@/common/components/text/text-highlightin
 import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import { MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 
 interface CloudServiceTypeData {
@@ -271,24 +272,23 @@ export default defineComponent<Props>({
                 const menuInfo: MenuInfo = MENU_INFO_MAP[menuId];
                 if (!menuInfo || SpaceRouter.router.currentRoute.name === menuInfo.to.name) return;
 
-                try {
-                    SpaceRouter.router.push(menuInfo.to);
-                } catch (e) {}
+                SpaceRouter.router.push(menuInfo.to).catch(() => {});
             } else {
                 const cloudServiceTypeId = state.showRecent ? dataState.recentCloudServiceItems[index]?.itemId : dataState.cloudServiceTypeList[index]?.id;
                 if (!cloudServiceTypeId) return;
-
-                const cloudServiceType = dataState.cloudServiceTypes[cloudServiceTypeId];
-                try {
+                if (state.showRecent) {
+                    const itemInfo: string[] = cloudServiceTypeId.split('.');
                     SpaceRouter.router.push({
                         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
-                            provider: cloudServiceType.data.provider,
-                            group: cloudServiceType.data.group,
-                            name: cloudServiceType.name,
+                            provider: itemInfo[0],
+                            group: itemInfo[1],
+                            name: itemInfo[2],
                         },
-                    });
-                } catch (e) {}
+                    }).catch(() => {});
+                } else {
+                    SpaceRouter.router.push(referenceRouter(cloudServiceTypeId, { resource_type: 'inventory.CloudServiceType' })).catch(() => {});
+                }
             }
             hideSuggestion();
         };
