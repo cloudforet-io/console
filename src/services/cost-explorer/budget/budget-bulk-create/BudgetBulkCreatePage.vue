@@ -2,7 +2,6 @@
     <div>
         <div class="flex flex-wrap justify-between">
             <div>
-                <p-breadcrumbs :routes="routeState.route" />
                 <p-page-title title="Create Bulk Budget" />
             </div>
             <handbook-button type="billing/cost-analysis/budget/bulk-create" />
@@ -31,7 +30,7 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 
-import { PBreadcrumbs, PButton, PPageTitle } from '@spaceone/design-system';
+import { PButton, PPageTitle } from '@spaceone/design-system';
 
 import BudgetBulkCreateTemplateDownload
     from '@/services/cost-explorer/budget/budget-bulk-create/modules/BudgetBulkCreateTemplateDownload.vue';
@@ -40,13 +39,11 @@ import BudgetBulkCreateFileUpload
 import BudgetBulkCreateModal
     from '@/services/cost-explorer/budget/budget-bulk-create/modules/BudgetBulkCreateModal.vue';
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
 export default {
     name: 'BudgetBulkCreatePage',
     components: {
         HandbookButton,
-        PBreadcrumbs,
         PPageTitle,
         BudgetBulkCreateFileUpload,
         BudgetBulkCreateTemplateDownload,
@@ -54,14 +51,6 @@ export default {
         BudgetBulkCreateModal,
     },
     setup() {
-        const routeState = reactive({
-            route: [
-                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
-                { name: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME } },
-                { name: 'Create Bulk Budget' },
-            ],
-        });
-
         const state = reactive({
             createModalVisible: false,
         });
@@ -71,7 +60,6 @@ export default {
         };
 
         return {
-            routeState,
             ...toRefs(state),
             handleClickPreviewAndCreate,
         };

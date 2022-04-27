@@ -1,6 +1,8 @@
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lnbVisible">
+        <vertical-page-layout v-if="$route.meta.lnbVisible"
+                              :breadcrumbs="breadcrumbs"
+        >
             <template #sidebar>
                 <cost-explorer-l-n-b />
             </template>
@@ -8,7 +10,9 @@
                 <router-view />
             </template>
         </vertical-page-layout>
-        <general-page-layout v-else>
+        <general-page-layout v-else
+                             :breadcrumbs="breadcrumbs"
+        >
             <router-view />
         </general-page-layout>
     </fragment>
@@ -22,6 +26,8 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import { costExplorerStore, costExplorerStoreModule } from '@/services/cost-explorer/store';
 import { CostExplorerState } from '@/services/cost-explorer/store/type';
+import { ComponentRenderProxy, computed, getCurrentInstance } from '@vue/composition-api';
+import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 
 export default {
     name: 'CostExplorerContainer',
@@ -32,13 +38,17 @@ export default {
     },
     setup() {
         registerServiceStore<CostExplorerState>('costExplorer', costExplorerStoreModule, costExplorerStore);
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const { breadcrumbs } = useBreadcrumbs(computed(() => vm.$route));
 
         /* Init */
         (async () => {
             await store.dispatch('display/loadCurrencyRates');
         })();
 
-        return {};
+        return {
+            breadcrumbs,
+        };
     },
 };
 </script>

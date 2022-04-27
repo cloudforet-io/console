@@ -1,30 +1,30 @@
+import { MENU_ID } from '@/lib/menu/config';
+
 export const ASSET_INVENTORY_ROUTE = Object.freeze({
-    _NAME: 'inventory',
-    SERVER: { _NAME: 'server' },
+    _NAME: MENU_ID.ASSET_INVENTORY,
+    SERVER: { _NAME: MENU_ID.ASSET_INVENTORY_SERVER },
     CLOUD_SERVICE: {
-        _NAME: 'cloudService',
-        // TYPE: { _NAME: 'cloudServiceMain' },
-        SEARCH: { _NAME: 'cloudServiceSearch' },
-        TYPE_SEARCH: { _NAME: 'cloudServiceTypeSearch' },
-        NO_RESOURCE: { _NAME: 'noCloudService' },
-        DETAIL: { _NAME: 'cloudServiceDetail' },
+        _NAME: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE,
+        SEARCH: { _NAME: `${MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE}.search` },
+        TYPE_SEARCH: { _NAME: `${MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE}.type_search` },
+        NO_RESOURCE: { _NAME: `${MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE}.no_resource` },
+        DETAIL: { _NAME: `${MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE}.detail` },
     },
     COLLECTOR: {
-        _NAME: 'collectorMain',
+        _NAME: MENU_ID.ASSET_INVENTORY_COLLECTOR,
         CREATE: {
-            _NAME: 'createCollector',
-            PLUGINS: { _NAME: 'collectorPlugins' },
-            STEPS: { _NAME: 'collectorCreateSteps' },
+            _NAME: `${MENU_ID.ASSET_INVENTORY_COLLECTOR}.create`,
+            STEPS: { _NAME: `${MENU_ID.ASSET_INVENTORY_COLLECTOR}.create.steps` },
         },
         HISTORY: {
-            _NAME: 'collectorHistory',
-            JOB: { _NAME: 'collectorJobHistory' },
+            _NAME: `${MENU_ID.ASSET_INVENTORY_COLLECTOR}.history`,
+            JOB: { _NAME: `${MENU_ID.ASSET_INVENTORY_COLLECTOR}.history.job` },
         },
     },
     SERVICE_ACCOUNT: {
-        _NAME: 'serviceAccount',
-        SEARCH: { _NAME: 'serviceAccountSearch' },
-        ADD: { _NAME: 'addServiceAccount' },
-        NO_RESOURCE: { _NAME: 'noServiceAccount' },
+        _NAME: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT,
+        SEARCH: { _NAME: `${MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT}.search` },
+        ADD: { _NAME: `${MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT}.add` },
+        NO_RESOURCE: { _NAME: `${MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT}.no_resource` },
     },
 });

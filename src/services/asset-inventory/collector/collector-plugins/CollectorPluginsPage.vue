@@ -1,8 +1,5 @@
 <template>
     <div class="collector-plugins-page">
-        <div class="page-navigation">
-            <p-breadcrumbs :routes="routes" />
-        </div>
         <p-page-title :title="$t('PLUGIN.COLLECTOR.PLUGINS.TITLE')" use-total-count :total-count="totalCount"
                       child @goBack="$router.go(-1)"
         />
@@ -81,7 +78,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPageTitle, PCardItem, PBreadcrumbs,
+    PPageTitle, PCardItem,
     PIconTextButton, PBadge, PI, PDivider, PDataLoader,
 } from '@spaceone/design-system';
 
@@ -137,7 +134,6 @@ interface RepositoryModel {
 export default {
     name: 'CollectorPluginPage',
     components: {
-        PBreadcrumbs,
         PCardItem,
         PPageTitle,
         PBadge,
@@ -173,14 +169,6 @@ export default {
             repositories: [] as unknown as RepositoryModel[],
             selectedRepositoryId: undefined as unknown as string,
         });
-        const routeState = reactive({
-            routes: computed(() => ([
-                { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
-                { name: 'Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME } },
-                { name: 'Create Collector' },
-            ])),
-        });
-
 
         const pluginApiQuery = new ApiQueryHelper();
         const getPlugins = async () => {
@@ -270,7 +258,6 @@ export default {
 
         return {
             ...toRefs(state),
-            ...toRefs(routeState),
             skeletons: range(5),
             getPlugins,
             handlePluginCreate,

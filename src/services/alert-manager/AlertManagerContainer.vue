@@ -1,6 +1,8 @@
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lnbVisible">
+        <vertical-page-layout v-if="$route.meta.lnbVisible"
+                              :breadcrumbs="breadcrumbs"
+        >
             <template #sidebar>
                 <alert-manager-l-n-b />
             </template>
@@ -8,7 +10,9 @@
                 <router-view />
             </template>
         </vertical-page-layout>
-        <general-page-layout v-else>
+        <general-page-layout v-else
+                             :breadcrumbs="breadcrumbs"
+        >
             <router-view />
         </general-page-layout>
     </fragment>
@@ -20,6 +24,8 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import AlertManagerLNB from '@/services/alert-manager/AlertManagerLNB.vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import { alertManagerStoreModule, alertManagerStore } from '@/services/alert-manager/store';
+import { ComponentRenderProxy, computed, getCurrentInstance } from '@vue/composition-api';
+import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 
 
 export default {
@@ -31,7 +37,11 @@ export default {
     },
     setup() {
         registerServiceStore<any>('alertManager', alertManagerStoreModule, alertManagerStore);
-        return {};
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const { breadcrumbs } = useBreadcrumbs(computed(() => vm.$route));
+        return {
+            breadcrumbs,
+        };
     },
 };
 </script>

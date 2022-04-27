@@ -1,7 +1,6 @@
 <template>
     <div class="cost-dashboard-create-page">
         <nav>
-            <p-breadcrumbs :routes="routeState.route" />
             <p-page-title :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.CREATE_DASHBOARD')" child @goBack="$router.go(-1)" />
         </nav>
         <cost-dashboard-create-form />
@@ -17,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { PBreadcrumbs, PButton, PPageTitle } from '@spaceone/design-system';
+import { PButton, PPageTitle } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { i18n } from '@/translations';
 import CostDashboardCreateForm
@@ -41,21 +40,11 @@ export default {
     name: 'CostDashboardCreatePage',
     components: {
         CostDashboardCreateForm,
-        PBreadcrumbs,
         PPageTitle,
         PButton,
     },
 
     setup() {
-        const routeState = reactive({
-            route: computed(() => [
-                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
-                { name: 'Dashboard', to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME } },
-                { name: 'Create Dashboard' },
-            ]),
-        });
-
-
         const state = reactive({
             selectedTemplate: computed(() => costExplorerStore.state.dashboard.selectedTemplate),
             defaultFilter: computed<Record<string, string[]>>(() => costExplorerStore.state.dashboard.defaultFilter),
@@ -115,7 +104,6 @@ export default {
         };
 
         return {
-            routeState,
             ...toRefs(state),
             handleClickCreate,
         };

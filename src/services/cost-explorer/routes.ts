@@ -1,5 +1,7 @@
 import { RouteConfig } from 'vue-router';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { getMenuLabel } from '@/lib/menu/menu-info';
+import { MENU_ID } from '@/lib/menu/config';
 
 const CostExplorerContainer = () => import(/* webpackChunkName: "CostExplorerContainer" */ '@/services/cost-explorer/CostExplorerContainer.vue');
 
@@ -14,74 +16,102 @@ const BudgetBulkCreatePage = () => import(/* webpackChunkName: "BudgetBulkCreate
 const BudgetUpdatePage = () => import(/* webpackChunkName: "BudgetUpdatePage" */ '@/services/cost-explorer/budget/budget-update/BudgetUpdatePage.vue');
 const BudgetDetailPage = () => import(/* webpackChunkName: "BudgetDetailPage" */ '@/services/cost-explorer/budget/budget-detail/BudgetDetailPage.vue');
 
-export default {
+const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
+    meta: { label: getMenuLabel(MENU_ID.COST_EXPLORER) },
     redirect: '/cost-explorer/dashboard',
     component: CostExplorerContainer,
     children: [
         {
-            path: 'dashboard/create',
-            name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME,
-            props: true,
-            component: CostDashboardCreatePage,
+            path: 'dashboard',
+            meta: { label: getMenuLabel(MENU_ID.COST_EXPLORER_DASHBOARD) },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: 'create',
+                    name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME,
+                    meta: { label: 'Create Dashboard' },
+                    props: true,
+                    component: CostDashboardCreatePage as any,
+                },
+                {
+                    path: 'customize',
+                    meta: { label: 'Customize' },
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: ':dashboardId',
+                            name: COST_EXPLORER_ROUTE.DASHBOARD.CUSTOMIZE._NAME,
+                            meta: { label: ({ params }) => params.dashboardId, copiable: true },
+                            props: true,
+                            component: CostDashboardCustomizePage as any,
+                        },
+                    ],
+                },
+                {
+                    path: ':dashboardId?',
+                    name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
+                    meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
+                    props: true,
+                    component: CostDashboardPage as any,
+                },
+            ],
         },
         {
-            path: 'dashboard/customize/:dashboardId',
-            name: COST_EXPLORER_ROUTE.DASHBOARD.CUSTOMIZE._NAME,
-            props: true,
-            component: CostDashboardCustomizePage,
-        },
-        {
-            path: 'dashboard/:dashboardId?',
-            name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
-            meta: { lnbVisible: true },
-            props: true,
-            component: CostDashboardPage,
-        },
-        {
-            path: 'cost-analysis/:querySetId?',
-            name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-            meta: { lnbVisible: true },
-            props: true,
-            component: CostAnalysisPage,
+            path: 'cost-analysis',
+            meta: { label: getMenuLabel(MENU_ID.COST_EXPLORER_COST_ANALYSIS) },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: ':querySetId?',
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                    meta: { lnbVisible: true, label: ({ params }) => params.querySetId, copiable: true },
+                    props: true,
+                    component: CostAnalysisPage as any,
+                },
+            ],
         },
         {
             path: 'budget',
+            meta: { label: getMenuLabel(MENU_ID.COST_EXPLORER_BUDGET) },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
                     name: COST_EXPLORER_ROUTE.BUDGET._NAME,
                     meta: { lnbVisible: true },
-                    component: BudgetPage,
+                    component: BudgetPage as any,
                 },
                 {
                     path: 'create',
                     name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
-                    props: true,
-                    component: BudgetCreatePage,
+                    meta: { label: 'Create Budget' },
+                    component: BudgetCreatePage as any,
                 },
                 {
                     path: 'bulk-create',
                     name: COST_EXPLORER_ROUTE.BUDGET.BULK_CREATE._NAME,
-                    props: true,
-                    component: BudgetBulkCreatePage,
+                    meta: { label: 'Create Bulk Budget' },
+                    component: BudgetBulkCreatePage as any,
                 },
                 {
                     path: 'update/:budgetId',
                     name: COST_EXPLORER_ROUTE.BUDGET.UPDATE._NAME,
+                    meta: { label: 'Update Budget' },
                     props: true,
-                    component: BudgetUpdatePage,
+                    component: BudgetUpdatePage as any,
                 },
                 {
                     path: ':budgetId',
                     name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                     props: true,
-                    meta: { lnbVisible: true },
-                    component: BudgetDetailPage,
+                    meta: { lnbVisible: true, label: ({ params }) => params.budgetId, copiable: true },
+                    component: BudgetDetailPage as any,
                 },
             ],
         },
     ],
-} as RouteConfig;
+};
+
+export default costExplorerRoutes;

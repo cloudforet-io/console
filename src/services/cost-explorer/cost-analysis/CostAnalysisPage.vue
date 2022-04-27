@@ -1,6 +1,5 @@
 <template>
     <div class="cost-analysis-page">
-        <p-breadcrumbs :routes="routeState.route" />
         <cost-analysis-header />
         <cost-analysis-query-filter />
         <cost-analysis-group-by-filter />
@@ -14,16 +13,11 @@ import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import {
-    PBreadcrumbs,
-} from '@spaceone/design-system';
-
 import CostAnalysisChart from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChart.vue';
 import CostAnalysisQueryFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFilter.vue';
 import CostAnalysisGroupByFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilter.vue';
 import CostAnalysisDataTable from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisDataTable.vue';
 
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import {
     REQUEST_TYPE,
 } from '@/services/cost-explorer/cost-analysis/lib/config';
@@ -56,7 +50,6 @@ export default {
         CostAnalysisGroupByFilter,
         CostAnalysisChart,
         CostAnalysisQueryFilter,
-        PBreadcrumbs,
     },
     props: {
         querySetId: {
@@ -68,13 +61,6 @@ export default {
         const state = reactive({
             costQueryList: computed<CostQuerySetModel[]>(() => costExplorerStore.state.costAnalysis.costQueryList),
             selectedQueryId: computed<string|undefined>(() => costExplorerStore.state.costAnalysis.selectedQueryId),
-        });
-
-        const routeState = reactive({
-            route: [
-                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
-                { name: 'Cost Analysis' },
-            ],
         });
 
         /* util */
@@ -163,7 +149,6 @@ export default {
 
         return {
             ...toRefs(state),
-            routeState,
         };
     },
 };

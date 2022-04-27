@@ -1,6 +1,5 @@
 <template>
     <div class="alert-dashboard-page">
-        <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="$t('MONITORING.ALERT.DASHBOARD.DASHBOARD')" />
         <div class="widget-wrapper">
             <alert-state-widget :activated-projects="activatedProjects" class="alert-state-widget" />
@@ -21,7 +20,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle,
+    PPageTitle,
 } from '@spaceone/design-system';
 
 import AlertStateWidget from '@/services/alert-manager/alert-dashboard/modules/AlertStateWidget.vue';
@@ -31,7 +30,6 @@ import Top5ProjectActivityWidget from '@/services/alert-manager/alert-dashboard/
 import ProjectSearchWidget from '@/services/alert-manager/alert-dashboard/modules/project-search-widget/ProjectSearchWidget.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 export default {
     name: 'AlertDashboardPage',
@@ -41,18 +39,11 @@ export default {
         CurrentProjectStatusWidget,
         AlertHistoryWidget,
         AlertStateWidget,
-        PBreadcrumbs,
         PPageTitle,
     },
     setup() {
         const state = reactive({
             activatedProjects: [] as string[],
-        });
-        const routeState = reactive({
-            route: [
-                { name: 'Alert Manager', to: { name: ALERT_MANAGER_ROUTE._NAME } },
-                { name: 'Dashboard' },
-            ],
         });
 
         /* api */
@@ -71,7 +62,6 @@ export default {
 
         return {
             ...toRefs(state),
-            routeState,
         };
     },
 };

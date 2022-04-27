@@ -1,21 +1,24 @@
 <template>
     <section class="api-key-wrapper">
-        <div class="flex">
-            <p-breadcrumbs class="flex-grow" :routes="routeState.route" />
-            <handbook-button :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"
-                             type="identity/user/api-key"
-                             class="flex-shrink-0"
-            >
-                <template #spacectl>
-                    <keep-alive>
-                        <user-a-p-i-key-handbook />
-                    </keep-alive>
-                </template>
-            </handbook-button>
-        </div>
         <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
                       :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')" class="page-title"
-        />
+        >
+            <template #extra>
+                <div class="flex">
+                    <handbook-button :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"
+                                     type="identity/user/api-key"
+                                     class="flex-shrink-0"
+                    >
+                        <template #spacectl>
+                            <keep-alive>
+                                <user-a-p-i-key-handbook />
+                            </keep-alive>
+                        </template>
+                    </handbook-button>
+                </div>
+            </template>
+        </p-page-title>
+
         <user-a-p-i-key-table
             :user-id="userId"
         />
@@ -35,7 +38,7 @@
 
 <script lang="ts">
 import {
-    PBreadcrumbs, PDataTable, PPageTitle, PPaneLayout,
+    PDataTable, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 import {
@@ -47,7 +50,6 @@ import { store } from '@/store';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import UserAPIKeyHandbook from '@/services/my-page/my-account/user-api-key/modules/APIKeyHandbook.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 interface EndpointItem {
     endpoint: string;
@@ -64,7 +66,6 @@ export default {
         UserAPIKeyTable,
         UserAPIKeyHandbook,
         PPaneLayout,
-        PBreadcrumbs,
         PDataTable,
         PPageTitle,
     },
@@ -80,13 +81,6 @@ export default {
             items: [] as EndpointItem[],
             userId: computed(() => store.state.user.userId),
             isAdmin: computed(() => store.getters['user/isAdmin']).value,
-        });
-        const routeState = reactive({
-            route: [
-                { name: 'My Page', to: { name: MY_PAGE_ROUTE._NAME } },
-                { name: 'My Account', to: { name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME } },
-                { name: 'Access with API & CLI' },
-            ],
         });
         const tabState = reactive({
             tabs: computed(() => ([
@@ -114,7 +108,6 @@ export default {
 
         return {
             ...toRefs(state),
-            routeState,
             tabState,
         };
     },

@@ -7,7 +7,8 @@
         </template>
         <template #default>
             <div ref="containerRef" class="right-container">
-                <div class="page-contents">
+                <p-breadcrumbs v-if="breadcrumbs.length" :routes="breadcrumbs" :copiable="copiable" />
+                <div class="page-contents" :class="{'without-breadcrumbs': !breadcrumbs.length}">
                     <slot name="default" />
                 </div>
                 <div class="fnb">
@@ -20,15 +21,17 @@
 </template>
 
 <script lang="ts">
-import { ref } from '@vue/composition-api';
+import { computed, PropType, ref } from '@vue/composition-api';
 
-import { PVerticalLayout } from '@spaceone/design-system';
+import { PBreadcrumbs, PVerticalLayout } from '@spaceone/design-system';
 
 import FNB from '@/common/modules/navigations/FNB.vue';
+import { Breadcrumb } from '@/common/modules/page-layouts/type';
+
 
 export default {
     name: 'VerticalPageLayout',
-    components: { PVerticalLayout, FNB },
+    components: { PVerticalLayout, PBreadcrumbs, FNB },
     props: {
         height: {
             type: String,
@@ -46,12 +49,20 @@ export default {
             type: Number,
             default: 400,
         },
+        breadcrumbs: {
+            type: Array as PropType<Breadcrumb[]>,
+            default: () => [],
+        },
     },
-    setup() {
+    setup(props) {
         const containerRef = ref(undefined);
 
         return {
             containerRef,
+            copiable: computed(() => {
+                const last = props.breadcrumbs?.[props.breadcrumbs?.length - 1];
+                return last?.copiable;
+            }),
         };
     },
 };
@@ -64,10 +75,16 @@ export default {
     flex-direction: column;
     justify-content: stretch;
 
+    > .p-breadcrumbs {
+        padding: 1.5rem 1.5rem 0.625rem 1.5rem;
+    }
     .page-contents {
         max-width: 1920px;
         flex-grow: 1;
-        padding: 1.5rem 1.5rem 2rem 1.5rem;
+        padding: 0 1.5rem 2rem 1.5rem;
+        &.without-breadcrumbs {
+            padding: 1.5rem 1.5rem 2rem 1.5rem;
+        }
     }
 
     .fnb {

@@ -1,5 +1,8 @@
-import { RouteConfig } from 'vue-router';
+import { upperCase } from 'lodash';
+import { getMenuLabel } from '@/lib/menu/menu-info';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { RouteConfig } from 'vue-router';
+import { MENU_ID } from '@/lib/menu/config';
 
 const AssetInventoryContainer = () => import(/* webpackChunkName: "AssetInventoryContainer" */ '@/services/asset-inventory/AssetInventoryContainer.vue');
 
@@ -22,22 +25,24 @@ const ServiceAccountSearchPage = () => import(/* webpackChunkName: "ServiceAccou
 const CollectorHistoryPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/services/asset-inventory/collector/collector-history/CollectorHistoryPage.vue');
 const CollectJobPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/services/asset-inventory/collector/collector-history/collect-job/CollectJobPage.vue');
 
-export default {
+
+const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
-    redirect: 'asset-inventory/cloud-service',
+    meta: { label: getMenuLabel(MENU_ID.ASSET_INVENTORY) },
+    redirect: '/asset-inventory/cloud-service',
     component: AssetInventoryContainer,
     children: [
         {
             path: 'cloud-service',
-            redirect: '/asset-inventory/cloud-service',
+            meta: { label: getMenuLabel(MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE) },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                     meta: { lnbVisible: true },
-                    component: CloudServicePage,
+                    component: CloudServicePage as any,
                 },
                 {
                     path: 'search/:searchKey/:id',
@@ -54,26 +59,35 @@ export default {
                 {
                     path: 'no-resource',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME,
-                    meta: { lnbVisible: true },
+                    meta: { lnbVisible: true, label: 'No Resource' },
                     component: NoResourcePage,
                 },
                 {
-                    path: ':provider/:group/:name?',
-                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                    meta: { lnbVisible: true },
-                    props: true,
-                    component: CloudServiceDetailPage,
+                    path: ':provider/:group',
+                    meta: { label: ({ params }) => `[${upperCase(params.provider)}] ${params.group}` },
+                    redirect: '/asset-inventory/cloud-service/:provider/:group/:name?',
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: ':name?',
+                            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                            meta: { lnbVisible: true, label: ({ params }) => params.name },
+                            props: true,
+                            component: CloudServiceDetailPage as any,
+                        },
+                    ],
                 },
             ],
         },
         {
             path: 'server',
             name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
-            meta: { lnbVisible: true },
-            component: ServerPage,
+            meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.ASSET_INVENTORY_SERVER) },
+            component: ServerPage as any,
         },
         {
             path: 'collector',
+            meta: { label: getMenuLabel(MENU_ID.ASSET_INVENTORY_COLLECTOR) },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -81,44 +95,45 @@ export default {
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
                     meta: { lnbVisible: true },
                     props: true,
-                    component: CollectorPage,
+                    component: CollectorPage as any,
                 },
                 {
                     path: 'create',
-                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
-                    redirect: '/create/plugins',
+                    meta: { label: 'Create Collector' },
                     component: { template: '<router-view />' },
                     children: [
                         {
-                            path: 'plugins',
-                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE.PLUGINS._NAME,
+                            path: '/',
+                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
                             meta: { lnbVisible: true },
-                            component: CollectorPluginPage,
+                            component: CollectorPluginPage as any,
                         },
                         {
-                            path: 'create-collector/:pluginId',
+                            path: ':pluginId',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE.STEPS._NAME,
+                            meta: { label: ({ params }) => params.pluginId, copiable: true },
                             props: true,
-                            component: CreateCollectorPage,
+                            component: CreateCollectorPage as any,
                         },
                     ],
                 },
                 {
                     path: 'history',
+                    meta: { label: 'Collector History' },
                     component: { template: '<keep-alive><router-view /></keep-alive>' },
                     children: [
                         {
                             path: '/',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
                             meta: { lnbVisible: true },
-                            component: CollectorHistoryPage,
+                            component: CollectorHistoryPage as any,
                         },
                         {
                             path: ':jobId',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
-                            meta: { lnbVisible: true },
+                            meta: { lnbVisible: true, label: ({ params }) => params.jobId, copiable: true },
                             props: true,
-                            component: CollectJobPage,
+                            component: CollectJobPage as any,
                         },
                     ],
                 },
@@ -126,6 +141,7 @@ export default {
         },
         {
             path: 'service-account',
+            meta: { label: getMenuLabel(MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT) },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -133,7 +149,7 @@ export default {
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
                     meta: { lnbVisible: true },
                     props: true,
-                    component: ServiceAccountPage,
+                    component: ServiceAccountPage as any,
                 },
                 {
                     path: 'search/:id',
@@ -144,16 +160,18 @@ export default {
                 {
                     path: 'add/:provider',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
+                    meta: { label: 'Add Service Account' },
                     props: true,
-                    component: ServiceAccountAddPage,
+                    component: ServiceAccountAddPage as any,
                 },
                 {
                     path: 'no-resource',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.NO_RESOURCE._NAME,
-                    meta: { lnbVisible: true },
+                    meta: { lnbVisible: true, label: 'No Resource' },
                     component: NoResourcePage,
                 },
             ],
         },
     ],
-} as RouteConfig;
+};
+export default assetInventoryRoute;

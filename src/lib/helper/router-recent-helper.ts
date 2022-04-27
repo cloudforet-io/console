@@ -3,6 +3,7 @@ import { Route } from 'vue-router';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { MenuId } from '@/lib/menu/config';
 
 export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     /* ClOUD SERVICE */
@@ -29,9 +30,9 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     }
 
     /* MENU */
-    const menu = Object.entries(MENU_INFO_MAP).find(([, v]) => v.to.name === to.name);
+    const menu = MENU_INFO_MAP[to.name as MenuId];
     if (menu) {
-        return { itemType: RECENT_TYPE.MENU, itemId: menu[0] };
+        return { itemType: RECENT_TYPE.MENU, itemId: to.name as MenuId };
     }
     return undefined;
 };

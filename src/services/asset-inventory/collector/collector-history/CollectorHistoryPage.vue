@@ -1,10 +1,5 @@
 <template>
     <div class="collector-history-page">
-        <div class="top-wrapper">
-            <p-breadcrumbs :routes="route" class="flex-grow" />
-            <!--            <handbook-button class="flex-shrink-0">-->
-            <!--            </handbook-button>-->
-        </div>
         <p-page-title :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')" child @goBack="$router.go(-1)" />
         <p-collector-history-chart @click-date="onClickDate" />
         <div class="collector-history-table">
@@ -115,7 +110,7 @@ import {
 
 import {
     PPageTitle, PPagination, PButtonModal, PLazyImg,
-    PBreadcrumbs, PIconTextButton, PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
+    PIconTextButton, PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
@@ -168,7 +163,6 @@ export default {
         PLazyImg,
         PIconTextButton,
         PButtonModal,
-        PBreadcrumbs,
         PPagination,
         PToolboxTable,
         PPageTitle,
@@ -250,13 +244,6 @@ export default {
             //
             tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             modalVisible: false,
-        });
-        const routeState = reactive({
-            route: [
-                { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
-                { name: 'Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME } },
-                { name: 'Collector History' },
-            ],
         });
 
         /* api */
@@ -359,7 +346,6 @@ export default {
 
         return {
             ...toRefs(state),
-            ...toRefs(routeState),
             handlers,
             PROGRESS_BAR_COLOR,
             COMPLETED_ICON_COLOR,
@@ -380,10 +366,6 @@ export default {
 
 <style lang="postcss" scoped>
 .collector-history-page {
-    .top-wrapper {
-        display: flex;
-        justify-content: space-between;
-    }
     .collector-history-table {
         @apply bg-white border border-gray-200 rounded-lg;
         margin-top: 1rem;

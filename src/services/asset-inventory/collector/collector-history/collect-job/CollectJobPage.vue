@@ -1,6 +1,5 @@
 <template>
     <div>
-        <p-breadcrumbs :routes="routeState.routes" copiable />
         <p-page-title :title="jobId" child @goBack="$router.go(-1)" />
         <div class="top-wrapper">
             <job-status-chart :job-id="jobId" />
@@ -20,11 +19,11 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, onActivated, computed,
+    reactive, toRefs, onActivated,
 } from '@vue/composition-api';
 
 import {
-    PHorizontalLayout, PPageTitle, PBreadcrumbs,
+    PHorizontalLayout, PPageTitle,
 } from '@spaceone/design-system';
 
 import JobStatusChart from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobStatusChart.vue';
@@ -32,7 +31,6 @@ import JobBasicInformation from '@/services/asset-inventory/collector/collector-
 import JobTable from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskTable.vue';
 import JobTaskDetails from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskDetails.vue';
 import { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
 export default {
@@ -43,7 +41,6 @@ export default {
         JobBasicInformation,
         JobStatusChart,
         PPageTitle,
-        PBreadcrumbs,
         PHorizontalLayout,
     },
     props: {
@@ -52,18 +49,9 @@ export default {
             required: true,
         },
     },
-    setup(props) {
+    setup() {
         const state = reactive({
             selectedItem: null as null|JobTaskData,
-        });
-
-        const routeState = reactive({
-            routes: computed(() => [
-                { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
-                { name: 'Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME } },
-                { name: 'History', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME } },
-                { name: props.jobId },
-            ]),
         });
 
         onActivated(() => {
@@ -72,7 +60,6 @@ export default {
 
         return {
             ...toRefs(state),
-            routeState,
         };
     },
 };

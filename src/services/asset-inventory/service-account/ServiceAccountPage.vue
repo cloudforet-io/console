@@ -1,8 +1,5 @@
 <template>
     <div>
-        <div class="page-navigation">
-            <p-breadcrumbs :routes="route" />
-        </div>
         <p-page-title :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: selectedProviderName})"
                       class="page-title"
         >
@@ -109,7 +106,7 @@
 <script lang="ts">
 /* external library */
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, ref, Ref, toRefs, watch,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, ref, Ref, watch,
 } from '@vue/composition-api';
 import { get } from 'lodash';
 import { render } from 'ejs';
@@ -117,7 +114,7 @@ import { TranslateResult } from 'vue-i18n';
 
 /* spaceone design system */
 import {
-    PBreadcrumbs, PPageTitle, PHorizontalLayout, PIconTextButton,
+    PPageTitle, PHorizontalLayout, PIconTextButton,
     PTab, PDynamicLayout, PEmpty, PDoubleCheckModal, PSelectDropdown,
 } from '@spaceone/design-system';
 import {
@@ -184,7 +181,6 @@ export default {
         PDynamicLayout,
         PHorizontalLayout,
         PPageTitle,
-        PBreadcrumbs,
         PTab,
     },
     setup() {
@@ -201,14 +197,6 @@ export default {
             }))),
         });
         const selectedProviderName = computed(() => store.state.reference.provider.items[selectedProvider.value]?.label || selectedProvider.value);
-
-        /** Page Navigation * */
-        const routeState = reactive({
-            route: [
-                { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
-                { name: 'Service Account' },
-            ],
-        });
 
         /** States for Dynamic Layout(search table type) * */
         const fetchOptionState = reactive({
@@ -548,8 +536,6 @@ export default {
             selectedProvider,
             providerState,
             selectedProviderName,
-            ...toRefs(routeState),
-
             tableState,
             fetchOptionState,
             typeOptionState,

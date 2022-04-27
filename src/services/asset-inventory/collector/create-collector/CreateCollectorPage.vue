@@ -1,8 +1,5 @@
 <template>
     <div class="collector-creator-page">
-        <div class="page-navigation">
-            <p-breadcrumbs :routes="routes" copiable />
-        </div>
         <p-page-title :title="$t('PLUGIN.COLLECTOR.CREATE.TITLE')" child @goBack="$router.go(-1)" />
         <p-progress-wizard :tabs="tabState.tabs"
                            :active-idx.sync="tabState.activeIdx"
@@ -73,7 +70,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PProgressWizard, PSelectDropdown, PLazyImg, PBreadcrumbs, PFieldGroup, PTextInput, PPageTitle, PToggleButton,
+    PProgressWizard, PSelectDropdown, PLazyImg, PFieldGroup, PTextInput, PPageTitle, PToggleButton,
 } from '@spaceone/design-system';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
@@ -96,7 +93,6 @@ export default {
         PProgressWizard,
         TagsInputGroup,
         PPageTitle,
-        PBreadcrumbs,
         PLazyImg,
         PToggleButton,
     },
@@ -148,14 +144,6 @@ export default {
             isConfValid: computed(() => formState.isNameValid && formState.isPriorityValid && formState.isVersionValid),
             isTagsValid: true,
             isAutoUpgrade: true,
-        });
-        const routeState = reactive({
-            routes: computed(() => ([
-                { name: 'Asset Inventory', to: { name: ASSET_INVENTORY_ROUTE._NAME } },
-                { name: 'Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME } },
-                { name: 'Create Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME } },
-                { name: state.pluginId },
-            ])),
         });
         const tabState = reactive({
             tabs: computed(() => [
@@ -276,7 +264,6 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(formState),
-            ...toRefs(routeState),
             tabState,
             onClickCancel,
             onClickConfirm,

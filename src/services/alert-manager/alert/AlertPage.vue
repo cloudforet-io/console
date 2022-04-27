@@ -1,6 +1,5 @@
 <template>
     <div class="alert-page">
-        <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')" />
         <div class="content-wrapper grid grid-cols-12 gap-4">
             <new-assigned-alert-list-card class="col-span-12" />
@@ -21,7 +20,7 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
+import { PPageTitle } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -34,7 +33,6 @@ import {
     AlertListPageUrlQuery, AlertListTableFilters,
 } from '@/services/alert-manager/type';
 import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 export default {
     name: 'AlertPage',
@@ -42,7 +40,6 @@ export default {
         AssignedAlertInfoPanel,
         NewAssignedAlertListCard,
         AlertDataTable,
-        PBreadcrumbs,
         PPageTitle,
     },
     setup() {
@@ -54,13 +51,6 @@ export default {
             urgency: vm.$route.query.urgency ?? ALERT_URGENCY.ALL,
             assigned: vm.$route.query.assigned ?? ASSIGNED_STATE.ALL,
             filters: tagQueryHelper.filters,
-        });
-
-        const routeState = reactive({
-            route: [
-                { name: 'Alert Manager', path: ALERT_MANAGER_ROUTE._NAME },
-                { name: 'Alert' },
-            ],
         });
 
         const replaceAlertListPageUrlQuery = (query: AlertListPageUrlQuery) => {
@@ -102,7 +92,6 @@ export default {
 
         return {
             ...toRefs(state),
-            routeState,
             onSelectAlertState,
             onUpdateTable,
         };

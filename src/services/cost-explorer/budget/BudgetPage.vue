@@ -1,6 +1,5 @@
 <template>
     <div class="budget-page">
-        <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')">
             <template #extra>
                 <!--                <p-select-dropdown-->
@@ -31,7 +30,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle, PDivider, PIconTextButton,
+    PPageTitle, PDivider, PIconTextButton,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -46,7 +45,6 @@ export default {
     name: 'BudgetPage',
     components: {
         BudgetList,
-        PBreadcrumbs,
         PPageTitle,
         // PSelectDropdown,
         PDivider,
@@ -56,13 +54,6 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const queryHelper = new QueryHelper();
-
-        const routeState = reactive({
-            route: [
-                { name: 'Cost Explorer', to: { name: COST_EXPLORER_ROUTE._NAME } },
-                { name: 'Budget' },
-            ],
-        });
 
         const state = reactive({
             createButtonItemList: computed(() => [
@@ -93,7 +84,6 @@ export default {
 
         return {
             ...toRefs(state),
-            routeState,
             handleCreateBudgetSelect,
             handleUpdateFilters,
         };

@@ -22,7 +22,7 @@ export default {
             menuSet: computed<LNBMenu[]>(() => lnbMenuIds.map((id) => {
                 const menuInfo = MENU_INFO_MAP[id];
                 return ({
-                    type: 'item', id, label: menuInfo.label, to: menuInfo.to,
+                    type: 'item', id, label: menuInfo.label, to: { name: id },
                 });
             })),
         };
