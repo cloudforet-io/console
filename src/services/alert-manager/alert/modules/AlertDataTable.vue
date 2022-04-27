@@ -256,17 +256,19 @@ export default {
             selectedItems: computed(() => state.selectIndex.map(d => state.items[d])),
             fields: computed(() => {
                 const fields = [
-                    { name: 'alert_number', label: 'No' },
-                    { name: 'title', label: 'Title', width: '437px' },
-                    { name: 'state', label: 'State' },
-                    { name: 'urgency', label: 'Urgency' },
-                    { name: 'status_message', label: 'Status Updates' },
-                    { name: 'resource', label: 'Resource' },
+                    { name: 'alert_number', label: 'No', sortable: true },
+                    {
+                        name: 'title', label: 'Title', width: '437px', sortable: true,
+                    },
+                    { name: 'state', label: 'State', sortable: true },
+                    { name: 'urgency', label: 'Urgency', sortable: true },
+                    { name: 'status_message', label: 'Status Updates', sortable: true },
+                    { name: 'resource', label: 'Resource', sortable: true },
                     { name: 'project_id', label: 'Project' },
-                    { name: 'created_at', label: 'Created' },
-                    { name: 'created_at', label: 'Duration', sortable: false },
-                    { name: 'assignee', label: 'Assigned to' },
-                    { name: 'triggered_by', label: 'Triggered by' },
+                    { name: 'created_at', label: 'Created', sortable: true },
+                    { name: 'created_at', label: 'Duration', sortable: true },
+                    { name: 'assignee', label: 'Assigned to', sortable: true },
+                    { name: 'triggered_by', label: 'Triggered by', sortable: true },
                 ];
 
                 if (state.totalCount === 0) { fields[1].width = 'auto'; }
