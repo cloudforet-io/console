@@ -8,7 +8,7 @@
                       @goBack="$router.go(-1)"
         />
         <slot name="period-filter" />
-        <p-horizontal-layout :min-height="minHeight" :height="tableState.tableHeight" @drag-end="onTableHeightChange">
+        <p-horizontal-layout :min-height="minHeight" :height="tableState.tableHeight" @drag-end="handleTableHeightChange">
             <template #container="{ height }">
                 <p-dynamic-layout v-if="tableState.schema"
                                   type="query-search-table"
@@ -19,25 +19,18 @@
                                   :style="{height: `${height}px`}"
                                   :field-handler="fieldHandler"
                                   @fetch="fetchTableData"
-                                  @select="onSelect"
+                                  @select="handleSelect"
                                   @export="exportServerData"
-                                  @click-settings="onClickSettings"
+                                  @click-settings="handleClickSettings"
                 >
                     <template #toolbox-left>
                         <div class="flex">
-                            <p-icon-text-button style-type="primary-dark"
-                                                name="ic_plus_bold"
-                                                :disabled="true"
-                                                @click="onClickCollectData"
+                            <p-button style-type="primary-dark" font-weigth="bold" :outline="true"
+                                      :disabled="!tableState.consoleLink || tableState.selectedItems.length > 1"
+                                      @click="handleClickConnectToConsole"
                             >
-                                {{ $t('INVENTORY.SERVER.MAIN.COLLECT_DATA') }}
-                            </p-icon-text-button>
-                            <p-select-dropdown class="left-toolbox-item"
-                                               :items="tableState.dropdown"
-                                               @select="onSelectDropdown"
-                            >
-                                {{ $t('INVENTORY.SERVER.MAIN.ACTION') }}
-                            </p-select-dropdown>
+                                {{ $t('INVENTORY.SERVER.MAIN.CONSOLE') }}
+                            </p-button>
                         </div>
                     </template>
                     <template #toolbox-bottom>
@@ -113,15 +106,6 @@
                               :field-handler="fieldHandler"
             />
         </p-table-check-modal>
-        <project-tree-modal :visible.sync="changeProjectState.visible"
-                            :project-id="changeProjectState.projectId"
-                            :loading="changeProjectState.loading"
-                            @confirm="changeProject"
-        />
-        <collect-modal :visible.sync="tableState.collectModalVisible"
-                       :resources="tableState.selectedItems"
-                       id-key="server_id"
-        />
         <custom-field-modal v-model="tableState.visibleCustomFieldModal"
                             resource-type="inventory.Server"
                             @complete="reloadTable"
@@ -140,23 +124,20 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPageTitle, PHorizontalLayout, PDynamicLayout, PIconTextButton,
-    PTab, PTableCheckModal, PEmpty, PSelectDropdown,
+    PPageTitle, PHorizontalLayout, PDynamicLayout,
+    PTab, PTableCheckModal, PEmpty, PButton,
 } from '@spaceone/design-system';
 import {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import CollectModal from '@/common/modules/collection/collect-modal/CollectModal.vue';
 import ServerDetails from '@/services/asset-inventory/server/modules/ServerDetails.vue';
 import ServerMember from '@/services/asset-inventory/server/modules/ServerMember.vue';
 import ServerHistory from '@/services/asset-inventory/server/modules/ServerHistory.vue';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
-import ProjectTreeModal from '@/common/modules/project/ProjectTreeModal.vue';
 import { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -183,7 +164,7 @@ interface ProjectItemResp {
     id: string;
     name: string;
     has_child: boolean;
-    item_type: 'PROJECT_GROUP'|'PROJECT';
+    item_type: 'PROJECT_GROUP' | 'PROJECT';
 }
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -194,20 +175,17 @@ export default {
     components: {
         CustomFieldModal,
         PPageTitle,
-        CollectModal,
         ServerDetails,
         ServerMember,
         ServerHistory,
         Monitoring,
         TagsPanel,
-        ProjectTreeModal,
         PTableCheckModal,
         PTab,
-        PSelectDropdown,
-        PIconTextButton,
         PDynamicLayout,
         PHorizontalLayout,
         PEmpty,
+        PButton,
     },
     props: {
         isCloudService: {
@@ -231,7 +209,7 @@ export default {
             default: false,
         },
         period: {
-            type: Object as () => Period|undefined,
+            type: Object as () => Period | undefined,
             default: undefined,
         },
         minHeight: {
@@ -258,39 +236,23 @@ export default {
         });
         const tableHeight = store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX) ?? 0;
         const tableState = reactive({
-            schema: null as null|DynamicLayout,
+            schema: null as null | DynamicLayout,
             items: [],
-            selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d]).filter(d => d !== undefined)),
+            selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])
+                .filter(d => d !== undefined)),
             tableHeight: tableHeight > props.minHeight ? tableHeight : props.minHeight,
             consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
-            dropdown: computed<MenuItem[]>(() => [
-                // {
-                //     name: 'delete', label: vm.$t('INVENTORY.SERVER.MAIN.DELETE') as string, type: 'item', disabled: tableState.selectedItems.length === 0,
-                // },
-                {
-                    name: 'null', type: 'divider',
-                }, {
-                    name: 'project', label: vm.$t('INVENTORY.SERVER.MAIN.CHANGE_PROJECT') as string, type: 'item', disabled: tableState.selectedItems.length === 0,
-                }, {
-                    name: 'null', type: 'divider',
-                }, {
-                    name: 'link',
-                    label: vm.$t('INVENTORY.SERVER.MAIN.CONSOLE') as string,
-                    type: 'item',
-                    disabled: !tableState.consoleLink || tableState.selectedItems.length > 1,
-                    link: tableState.consoleLink,
-                    target: '_blank',
-                },
-            ]),
-            collectModalVisible: false,
-            multiSchema: computed<null|DynamicLayout>(() => {
+            multiSchema: computed<null | DynamicLayout>(() => {
                 if (!tableState.schema) return null;
 
                 const res: DynamicLayout = { ...tableState.schema };
                 if (tableState.schema.options.fields) {
                     res.options = {
                         ...tableState.schema.options,
-                        fields: [{ name: 'Server ID', key: 'server_id' }, ...tableState.schema.options.fields],
+                        fields: [{
+                            name: 'Server ID',
+                            key: 'server_id',
+                        }, ...tableState.schema.options.fields],
                     };
                 }
 
@@ -317,27 +279,29 @@ export default {
             api: null as any,
             params: null as any,
         });
-        const changeProjectState = reactive({
-            visible: false,
-            loading: false,
-            projectId: computed(() => {
-                if (tableState.selectedItems.length > 1) return '';
-                return get(tableState.selectedItems[0], 'project_id', '');
-            }),
-        });
         // tabs
         const singleItemTabState = reactive({
             tabs: computed(() => [
                 {
-                    name: 'details', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_DETAILS') as string, type: 'item',
+                    name: 'details',
+                    label: vm.$t('INVENTORY.SERVER.MAIN.TAB_DETAILS') as string,
+                    type: 'item',
                 }, {
-                    name: 'tag', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_TAG') as string, type: 'item',
+                    name: 'tag',
+                    label: vm.$t('INVENTORY.SERVER.MAIN.TAB_TAG') as string,
+                    type: 'item',
                 }, {
-                    name: 'member', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MEMBER') as string, type: 'item',
+                    name: 'member',
+                    label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MEMBER') as string,
+                    type: 'item',
                 }, {
-                    name: 'history', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_HISTORY') as string, type: 'item',
+                    name: 'history',
+                    label: vm.$t('INVENTORY.SERVER.MAIN.TAB_HISTORY') as string,
+                    type: 'item',
                 }, {
-                    name: 'monitoring', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MONITORING') as string, type: 'item',
+                    name: 'monitoring',
+                    label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MONITORING') as string,
+                    type: 'item',
                 },
             ]),
             activeTab: 'details',
@@ -345,9 +309,13 @@ export default {
         const multiItemTabState = reactive({
             tabs: computed(() => [
                 {
-                    name: 'data', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_SELECTED_DATA') as string, type: 'item',
+                    name: 'data',
+                    label: vm.$t('INVENTORY.SERVER.MAIN.TAB_SELECTED_DATA') as string,
+                    type: 'item',
                 }, {
-                    name: 'monitoring', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MONITORING') as string, type: 'item',
+                    name: 'monitoring',
+                    label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MONITORING') as string,
+                    type: 'item',
                 },
             ]),
             activeTab: 'data',
@@ -440,38 +408,6 @@ export default {
                 ErrorHandler.handleError(e);
             }
         };
-        const changeProject = async (data?: ProjectItemResp|null) => {
-            changeProjectState.loading = true;
-
-            const api = SpaceConnector.client.inventory.server.changeProject;
-            const params: any = {
-                servers: tableState.selectedServerIds,
-            };
-            if (data) {
-                try {
-                    params.project_id = data.id;
-                    await api(params);
-                    showSuccessMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_S_CHANGE_PROJECT_TITLE'), '', context.root);
-                } catch (e) {
-                    ErrorHandler.handleRequestError(e, vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHANGE_PROJECT_TITLE'));
-                } finally {
-                    await store.dispatch('reference/project/load');
-                    await listServerData();
-                }
-            } else {
-                try {
-                    params.release_project = true;
-                    await api(params);
-                    showSuccessMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_S_RELEASE_PROJECT_TITLE'), '', context.root);
-                } catch (e) {
-                    ErrorHandler.handleRequestError(e, vm.$t('INVENTORY.SERVER.MAIN.ALT_E_RELEASE_PROJECT_TITLE'));
-                } finally {
-                    await listServerData();
-                }
-            }
-            changeProjectState.loading = false;
-            changeProjectState.visible = false;
-        };
 
         /* event */
         const fetchTableData: DynamicLayoutEventListener['fetch'] = async (changed) => {
@@ -498,24 +434,13 @@ export default {
 
             await listServerData();
         };
-        const onSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
+        const handleSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
             typeOptionState.selectIndex = selectIndex;
         };
-        const onClickSettings = () => {
+        const handleClickSettings = () => {
             tableState.visibleCustomFieldModal = true;
         };
-        const onClickChangeProject = () => { changeProjectState.visible = true; };
-        const onClickDelete = () => {
-            checkTableModalState.title = vm.$tc('INVENTORY.SERVER.MAIN.CHECK_MODAL_DELETE_TITLE', tableState.selectedItems.length);
-            checkTableModalState.subTitle = vm.$tc('INVENTORY.SERVER.MAIN.CHECK_MODAL_DELETE_DESC', tableState.selectedItems.length);
-            checkTableModalState.themeColor = 'alert';
-            checkTableModalState.visible = true;
-            checkTableModalState.api = SpaceConnector.client.inventory.server.delete;
-            checkTableModalState.params = {};
-        };
-        const onClickCollectData = () => {
-            tableState.collectModalVisible = true;
-        };
+        const handleClickConnectToConsole = () => { window.open(tableState.consoleLink, '_blank'); };
         const checkModalConfirm = async () => {
             const resetCheckTableModalState = () => {
                 checkTableModalState.visible = false;
@@ -539,14 +464,7 @@ export default {
                 await listServerData();
             }
         };
-        const onSelectDropdown = (name) => {
-            switch (name) {
-            case 'delete': onClickDelete(); break;
-            case 'project': onClickChangeProject(); break;
-            default: break;
-            }
-        };
-        const onTableHeightChange = (height) => {
+        const handleTableHeightChange = (height) => {
             tableState.tableHeight = height > props.minHeight ? height : props.minHeight;
             store.dispatch('settings/setItem', {
                 key: 'tableHeight',
@@ -590,24 +508,19 @@ export default {
             tableState,
             fetchOptionState,
             typeOptionState,
-            onSelect,
+            handleSelect,
             exportServerData,
-            onClickSettings,
+            handleClickSettings,
             listServerData,
             fetchTableData,
             fieldHandler,
             reloadTable,
-            onTableHeightChange,
-
-            /* Change Project */
-            changeProjectState,
-            changeProject,
+            handleTableHeightChange,
 
             /* Actions & Checking */
             checkTableModalState,
-            onClickCollectData,
             checkModalConfirm,
-            onSelectDropdown,
+            handleClickConnectToConsole,
 
             /* Tabs */
             singleItemTabState,
