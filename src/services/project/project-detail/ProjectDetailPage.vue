@@ -177,6 +177,7 @@ export default {
                 TRIGGERED: find(store.state.service.projectDetail.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
             })),
             maintenanceHappeningListRef: null as null|Vue,
+            isAdmin: computed(() => store.getters['user/isAdmin']),
         });
 
         /* api */
@@ -213,7 +214,7 @@ export default {
                     name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_MEMBER'),
                 },
-                ...(checkDisabledMenu('alert_manager') ? [] : [{
+                ...(checkDisabledMenu('alert_manager') && !state.isAdmin ? [] : [{
                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
                 }]),
