@@ -2,7 +2,7 @@
     <section class="notification-wrapper">
         <p-breadcrumbs class="flex-grow" :routes="routeState.route" />
         <p-page-title :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')" />
-        <p-pane-layout class="list-wrapper">
+        <p-pane-layout>
             <notification-channel-list />
         </p-pane-layout>
     </section>
@@ -20,7 +20,7 @@ import { store } from '@/store';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 export default {
-    name: 'NotificationPage',
+    name: 'UserNotificationPage',
     components: {
         NotificationChannelList,
         PBreadcrumbs,
@@ -45,9 +45,3 @@ export default {
     },
 };
 </script>
-
-<style lang="postcss" scoped>
-.list-wrapper {
-    padding-bottom: 2.5rem;
-}
-</style>

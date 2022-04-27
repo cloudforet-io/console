@@ -288,7 +288,7 @@ export default {
     flex-grow: 1;
     width: 100%;
     height: 100%;
-    padding: 2rem 1rem 0;
+    padding: 2rem 1rem 0.375rem 1rem;
 }
 .sub-title {
     font-size: 1.375rem;
@@ -354,7 +354,8 @@ export default {
     margin-bottom: 1.5rem;
 }
 .empty-msg {
-    margin-top: 2.5rem;
+    margin-top: 0.75rem;
+    margin-bottom: 2.5rem;
     &.protocol {
         margin-bottom: 2.5rem;
     }
