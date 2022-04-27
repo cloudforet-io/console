@@ -38,7 +38,7 @@
             <cloud-service-period-filter :period="overviewState.period"
                                          @update:period="handlePeriodUpdate"
             />
-            <p-horizontal-layout :min-height="TABLE_MIN_HEIGHT" :height="tableState.tableHeight" @drag-end="onTableHeightChange">
+            <p-horizontal-layout :min-height="TABLE_MIN_HEIGHT" :height="tableState.tableHeight" @drag-end="handleTableHeightChange">
                 <template #container="{ height }">
                     <template v-if="tableState.schema">
                         <p-dynamic-layout type="query-search-table"
@@ -49,25 +49,17 @@
                                           :style="{height: `${height}px`}"
                                           :field-handler="fieldHandler"
                                           @fetch="fetchTableData"
-                                          @select="onSelect"
+                                          @select="handleSelect"
                                           @export="exportCloudServiceData"
-                                          @click-settings="onClickSettings"
+                                          @click-settings="handleClickSettings"
                         >
                             <template #toolbox-left>
-                                <p-icon-text-button style-type="primary-dark"
-                                                    name="ic_plus_bold"
-                                                    disabled
-                                                    @click="clickCollectData"
+                                <p-button style-type="primary-dark" font-weigth="bold" :outline="true"
+                                          :disabled="!tableState.consoleLink || tableState.selectedItems.length > 1"
+                                          @click="handleClickConnectToConsole"
                                 >
-                                    {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.COLLECT_DATA') }}
-                                </p-icon-text-button>
-
-                                <p-select-dropdown class="left-toolbox-item mr-4"
-                                                   :items="tableState.dropdown"
-                                                   @select="onSelectDropdown"
-                                >
-                                    {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.ACTION') }}
-                                </p-select-dropdown>
+                                    {{ $t('INVENTORY.SERVER.MAIN.CONSOLE') }}
+                                </p-button>
                             </template>
                             <template #toolbox-bottom>
                                 <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem"
@@ -152,15 +144,6 @@
                                   :field-handler="fieldHandler"
                 />
             </p-table-check-modal>
-            <project-tree-modal :visible.sync="changeProjectState.visible"
-                                :project-id="changeProjectState.projectId"
-                                :loading="changeProjectState.loading"
-                                @confirm="changeProject"
-            />
-            <s-collect-modal :visible.sync="tableState.collectModalVisible"
-                             :resources="tableState.selectedItems"
-                             id-key="cloud_service_id"
-            />
             <custom-field-modal v-model="tableState.visibleCustomFieldModal"
                                 resource-type="inventory.CloudService"
                                 :options="{provider, cloudServiceGroup: group, cloudServiceType: name}"
@@ -179,10 +162,9 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PHorizontalLayout, PSelectDropdown, PTab, PDynamicLayout,
-    PPageTitle, PBreadcrumbs, PIconTextButton, PEmpty, PTableCheckModal,
+    PHorizontalLayout, PTab, PDynamicLayout,
+    PPageTitle, PBreadcrumbs, PEmpty, PTableCheckModal, PButton,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
@@ -190,15 +172,12 @@ import {
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import ServerMain from '@/services/asset-inventory/server/modules/ServerMain.vue';
-import ProjectTreeModal from '@/common/modules/project/ProjectTreeModal.vue';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 import CloudServiceDetail from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceDetail.vue';
 import CloudServiceAdmin from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceAdmin.vue';
 import CloudServiceHistory from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistory.vue';
-import SCollectModal from '@/common/modules/collection/collect-modal/CollectModal.vue';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 import { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
-import { ProjectItemResp } from '@/services/project/type';
 
 import { objectToQueryString, queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string';
 import {
@@ -252,13 +231,10 @@ export default {
         PHorizontalLayout,
         PBreadcrumbs,
         PPageTitle,
-        PIconTextButton,
         PTab,
         TagsPanel,
-        PSelectDropdown,
+        PButton,
         PEmpty,
-        ProjectTreeModal,
-        SCollectModal,
         Monitoring,
     },
     props: {
@@ -326,25 +302,6 @@ export default {
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
             consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
-            dropdown: computed(() => ([
-                { type: 'divider' },
-                {
-                    type: 'item',
-                    name: 'project',
-                    label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.CHANGE_PROJECT'),
-                    disabled: tableState.selectedItems.length === 0,
-                },
-                { type: 'divider' },
-                {
-                    name: 'link',
-                    label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.CONSOLE'),
-                    type: 'item',
-                    disabled: !tableState.consoleLink || tableState.selectedItems.length > 1,
-                    link: tableState.consoleLink,
-                    target: '_blank',
-                },
-            ] as MenuItem[])),
-            collectModalVisible: false,
             multiSchema: computed<null|DynamicLayout>(() => {
                 if (!tableState.schema) return null;
 
@@ -378,7 +335,7 @@ export default {
             period: queryStringToObject(vm.$route.query.period) as Period|undefined,
         });
 
-        const onTableHeightChange = (height) => {
+        const handleTableHeightChange = (height) => {
             tableState.tableHeight = height;
             store.dispatch('settings/setItem', {
                 key: 'tableHeight',
@@ -387,7 +344,7 @@ export default {
             });
         };
 
-        const onSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
+        const handleSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
             typeOptionState.selectIndex = selectIndex;
         };
 
@@ -529,58 +486,9 @@ export default {
             await fetchTableData();
         };
 
-        const onClickSettings = () => {
+        const handleClickSettings = () => {
             tableState.visibleCustomFieldModal = true;
         };
-
-        /* Change Project */
-        const changeProjectState = reactive({
-            visible: false,
-            loading: false,
-            projectId: computed(() => {
-                if (tableState.selectedItems.length > 1) return '';
-                return get(tableState.selectedItems[0], 'project_id', '');
-            }),
-        });
-        const clickProject = () => { changeProjectState.visible = true; };
-        const changeProject = async (data?: ProjectItemResp|null) => {
-            changeProjectState.loading = true;
-
-            const api = SpaceConnector.client.inventory.cloudService.changeProject;
-            const params: any = {
-                cloud_services: tableState.selectedCloudServiceIds,
-            };
-
-            if (data) {
-                try {
-                    params.project_id = data.id;
-                    await api(params);
-                    showSuccessMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_S_CHANGE_PROJECT'), '', root);
-                } catch (e) {
-                    ErrorHandler.handleRequestError(e, vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_CHANGE_PROJECT'));
-                } finally {
-                    await store.dispatch('reference/project/load');
-                    const { items, totalCount } = await getCloudServiceTableData();
-                    tableState.items = items;
-                    typeOptionState.totalCount = totalCount;
-                }
-            } else {
-                try {
-                    params.release_project = true;
-                    await api(params);
-                    showSuccessMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_S_RELEASE_PROJECT_TITLE'), '', root);
-                } catch (e) {
-                    ErrorHandler.handleRequestError(e, vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_RELEASE_PROJECT_TITLE'));
-                } finally {
-                    const { items, totalCount } = await getCloudServiceTableData();
-                    tableState.items = items;
-                    typeOptionState.totalCount = totalCount;
-                }
-            }
-            changeProjectState.loading = false;
-            changeProjectState.visible = false;
-        };
-
 
         /* Tabs */
         const singleItemTabState = reactive({
@@ -603,25 +511,7 @@ export default {
         });
 
         /* Actions */
-        const clickCollectData = () => {
-            tableState.collectModalVisible = true;
-        };
-
-        const clickDelete = () => {
-            checkTableModalState.title = vm.$tc('INVENTORY.CLOUD_SERVICE.MAIN.CHECK_MODAL_DELETE_TITLE', tableState.selectedItems.length);
-            checkTableModalState.subTitle = vm.$tc('INVENTORY.CLOUD_SERVICE.MAIN.CHECK_MODAL_DELETE_DESC', tableState.selectedItems.length);
-            checkTableModalState.themeColor = 'alert';
-            checkTableModalState.visible = true;
-            checkTableModalState.api = SpaceConnector.client.inventory.cloudService.delete;
-            checkTableModalState.params = {};
-        };
-        const onSelectDropdown = (name) => {
-            switch (name) {
-            case 'delete': clickDelete(); break;
-            case 'project': clickProject(); break;
-            default: break;
-            }
-        };
+        const handleClickConnectToConsole = () => { window.open(tableState.consoleLink, '_blank'); };
 
         const checkModalConfirm = async () => {
             const resetCheckTableModalState = () => {
@@ -683,28 +573,22 @@ export default {
             fetchOptionState,
             typeOptionState,
             checkTableModalState,
-            onTableHeightChange,
-            onSelect,
+            handleTableHeightChange,
+            handleSelect,
             exportCloudServiceData,
             fetchTableData,
             fieldHandler,
             reloadTable,
-            onClickSettings,
+            handleClickSettings,
             TABLE_MIN_HEIGHT,
-
-
-            /* Change Project */
-            changeProjectState,
-            changeProject,
 
             /* Tabs */
             singleItemTabState,
             multiItemTabState,
 
             /* Actions */
-            clickCollectData,
-            onSelectDropdown,
             checkModalConfirm,
+            handleClickConnectToConsole,
 
             /* Monitoring Tab */
             monitoringState,
