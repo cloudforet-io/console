@@ -60,7 +60,7 @@ import { objectToQueryString } from '@/lib/router-query-string';
 
 interface Props {
     item: any;
-    queryFilters: QueryStoreFilter[];
+    searchFilters: QueryStoreFilter[];
     selectedRegions: string[];
     period?: Period;
 }
@@ -76,7 +76,7 @@ export default {
             type: Object,
             default: () => {},
         },
-        queryFilters: {
+        searchFilters: {
             type: Array,
             default: () => [],
         },
@@ -96,7 +96,7 @@ export default {
         });
         const cloudServiceDetailQueryHelper = new QueryHelper();
         const getCloudServiceDetailLink = (item) => {
-            cloudServiceDetailQueryHelper.setFilters(props.queryFilters.filter((f: any) => f.k && ![
+            cloudServiceDetailQueryHelper.setFilters(props.searchFilters.filter((f: any) => f.k && ![
                 'cloud_service_type',
                 'cloud_service_group',
                 'service_code',

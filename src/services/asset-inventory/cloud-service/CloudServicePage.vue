@@ -25,7 +25,7 @@
                 <div class="cloud-service-type-wrapper">
                     <cloud-service-list-card v-for="(item, idx) in items" :key="`${item.provider}-${item.cloud_service_group}-${idx}`"
                                              :item="item"
-                                             :query-filters="allFilters"
+                                             :search-filters="searchFilters"
                                              :selected-regions="selectedRegions"
                                              :period="period"
                     />
@@ -144,7 +144,7 @@ export default {
             // asset inventory store
             selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
             period: computed(() => assetInventoryStore.state.cloudService.period),
-            searchFilters: computed(() => assetInventoryStore.state.cloudService.searchFilters),
+            searchFilters: computed<QueryStoreFilter[]>(() => assetInventoryStore.state.cloudService.searchFilters),
             selectedCategories: computed<CloudServiceCategory[]>(() => assetInventoryStore.getters['cloudService/selectedCategories']),
             selectedRegions: computed<string[]>(() => assetInventoryStore.getters['cloudService/selectedRegions']),
             allFilters: computed<QueryStoreFilter[]>(() => assetInventoryStore.getters['cloudService/allFilters']),
