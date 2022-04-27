@@ -288,7 +288,7 @@ export default {
                 state.totalCount = res.total_count;
                 state.items = res.results.map(job => ({
                     ...job,
-                    remained_tasks: job.total_tasks > 0 ? numberFormatter(((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100) : 0,
+                    remained_tasks: job.total_tasks > 0 ? numberFormatter(((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100) : 100,
                     created_at: iso8601Formatter(job.created_at, state.timezone),
                     duration: durationFormatter(job.created_at, job.finished_at, state.timezone) || '--',
                 }));
