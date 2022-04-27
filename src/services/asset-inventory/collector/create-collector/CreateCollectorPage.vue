@@ -3,7 +3,7 @@
         <div class="page-navigation">
             <p-breadcrumbs :routes="routes" copiable />
         </div>
-        <p-page-title :title="$t('PLUGIN.COLLECTOR.CREATE.TITLE')" child @goBack="onClickBackButton" />
+        <p-page-title :title="$t('PLUGIN.COLLECTOR.CREATE.TITLE')" child @goBack="$router.go(-1)" />
         <p-progress-wizard :tabs="tabState.tabs"
                            :active-idx.sync="tabState.activeIdx"
                            :invalid-state="tabState.invalidState"
@@ -229,9 +229,7 @@ export default {
         const onChangeAutoUpgrade = () => {
             formState.isAutoUpgrade = !formState.isAutoUpgrade;
         };
-        const onClickBackButton = () => {
-            vm.$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
-        };
+
         const onClickCancel = () => {
             vm.$router.go(-1);
         };
@@ -282,7 +280,6 @@ export default {
             tabState,
             onClickCancel,
             onClickConfirm,
-            onClickBackButton,
             onChangeAutoUpgrade,
         };
     },
