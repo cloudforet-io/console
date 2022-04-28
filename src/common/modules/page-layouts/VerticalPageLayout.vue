@@ -60,7 +60,7 @@ export default {
         return {
             containerRef,
             copiable: computed(() => {
-                const last = props.breadcrumbs?.[props.breadcrumbs?.length - 1];
+                const last = props.breadcrumbs?.[props.breadcrumbs.length - 1];
                 return last?.copiable;
             }),
         };

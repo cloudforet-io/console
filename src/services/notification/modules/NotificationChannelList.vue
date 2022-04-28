@@ -199,7 +199,7 @@ export default {
 
         const injectProtocolName = (channel: ChannelItem) => {
             const protocolInfoOfChannel = (state.protocolResp as ProtocolItem[])?.find(i => i.protocol_id === channel.protocol_id);
-            if (protocolInfoOfChannel) return protocolInfoOfChannel?.name;
+            if (protocolInfoOfChannel) return protocolInfoOfChannel.name;
             return channel.name;
         };
         const injectProtocolSchema = (channel: ChannelItem) => {

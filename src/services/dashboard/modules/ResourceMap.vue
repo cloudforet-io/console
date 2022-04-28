@@ -266,25 +266,27 @@ export default {
         const hitCircle = async (event) => {
             const originTarget = state.selectedRegion;
             const target = event.target.dataItem?.dataContext;
-            state.selectedProvider = target.provider;
-            state.selectedRegion = target.name;
-            await getFilteredData(target.region_code, state.selectedProvider);
-            if (originTarget !== state.selectedRegion) {
-                moveMarker({ latitude: target.latitude, longitude: target.longitude }, chartState.marker);
+            if (target) {
+                state.selectedProvider = target.provider;
+                state.selectedRegion = target.name;
+                await getFilteredData(target.region_code, state.selectedProvider);
+                if (originTarget !== state.selectedRegion) {
+                    moveMarker({ latitude: target.latitude, longitude: target.longitude }, chartState.marker);
+                }
+                await store.dispatch('settings/setItem', {
+                    key: 'initial_region',
+                    value: {
+                        latitude: target.latitude,
+                        longitude: target.longitude,
+                        // eslint-disable-next-line camelcase
+                        region_code: state.selectedRegionCode,
+                        // eslint-disable-next-line camelcase
+                        region_name: state.selectedRegion,
+                        provider: state.selectedProvider,
+                    },
+                    path: '/dashboard',
+                });
             }
-            await store.dispatch('settings/setItem', {
-                key: 'initial_region',
-                value: {
-                    latitude: target.latitude,
-                    longitude: target.longitude,
-                    // eslint-disable-next-line camelcase
-                    region_code: state.selectedRegionCode,
-                    // eslint-disable-next-line camelcase
-                    region_name: state.selectedRegion,
-                    provider: state.selectedProvider,
-                },
-                path: '/dashboard',
-            });
         };
 
         const disposeChart = (element) => {

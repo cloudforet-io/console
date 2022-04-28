@@ -52,7 +52,7 @@ export default {
     props: {
         dashboard: {
             type: Object as () => DashboardInfo,
-            default: {},
+            default: () => {},
         },
         dashboardId: {
             type: String,

@@ -57,11 +57,9 @@ export default {
             }
         };
         const handleConfirm = () => {
-            const res = deleteBudget();
-            if (res) {
-                state.proxyVisible = false;
-                emit('confirm');
-            }
+            deleteBudget();
+            state.proxyVisible = false;
+            emit('confirm');
         };
 
         const handleUpdate = (visible) => {
