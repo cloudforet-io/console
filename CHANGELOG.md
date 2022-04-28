@@ -1,3 +1,10 @@
+# [1.1.0-beta.286](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.285...v1.1.0-beta.286) (2022-04-28)
+
+
+### Bug Fixes
+
+* fix rules for sortability ([#932](https://github.com/spaceone-dev/spaceone-design-system/issues/932)) ([3ac3844](https://github.com/spaceone-dev/spaceone-design-system/commit/3ac3844c0bb2c57c4bbf77155c4023b4a373dedd))
+
 # [1.1.0-beta.285](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.284...v1.1.0-beta.285) (2022-04-27)
 
 
