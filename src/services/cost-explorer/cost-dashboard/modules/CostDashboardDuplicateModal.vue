@@ -133,7 +133,7 @@ export default defineComponent<Props>({
 
         const getCustomLayouts = async () => {
             const hasDefaultId = Object.prototype.hasOwnProperty.call(props.dashboard, 'default_layout_id');
-            if (hasDefaultId && (!props.dashboard.custom_layouts || props.dashboard.custom_layouts?.length === 0)) {
+            if (hasDefaultId && (!props.dashboard.custom_layouts || props.dashboard.custom_layouts.length === 0)) {
                 return await fetchDefaultLayoutData(props.dashboard.default_layout_id as string) as CustomLayout[];
             }
             return props.dashboard.custom_layouts as CustomLayout[];

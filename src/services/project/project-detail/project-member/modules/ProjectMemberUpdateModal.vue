@@ -6,7 +6,7 @@
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"
-        @confirm="confirm($event)"
+        @confirm="confirm"
     >
         <template #body>
             <div class="field-group-wrapper">
@@ -117,7 +117,7 @@ const tagList = (proxyTags?: Ref<string[]>|null, checkDuplicate = true) => {
      */
     const addTag = (value) => {
         const val = (typeof value === 'string') ? value.trim() : value;
-        if (!val || val === '') return;
+        if (!val) return;
         if (checkDuplicate && !validation(val)) return;
         const updatedTags = [...tags.value];
         updatedTags.push(val);

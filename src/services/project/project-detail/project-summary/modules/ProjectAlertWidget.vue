@@ -37,7 +37,7 @@
                         />
                     </p>
                 </template>
-                <template #item="{item, index}">
+                <template #item="{item}">
                     <alert-list-item
                         :item="item"
                         :show-member-name="true"

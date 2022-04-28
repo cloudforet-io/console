@@ -28,7 +28,7 @@ export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menu
                     name: menu.id,
                     label: menu.label,
                     icon: menu.parents?.[0]?.icon ?? menu.icon,
-                    parents: menu?.parents,
+                    parents: menu.parents,
                     updatedAt: d?.updatedAt,
                 });
             }
@@ -46,14 +46,14 @@ export const convertProjectConfigToReferenceData = (config: ConfigData[]|null, p
                 const result: ReferenceData = {
                     ...d,
                     name: d.itemId,
-                    label: resource?.name || d.itemId,
+                    label: resource.name || d.itemId,
                     icon: 'ic_tree_project',
                     updatedAt: d?.updatedAt,
                 };
                 if (resource?.data?.groupInfo?.id) {
                     result.parents = [{
-                        name: resource?.data?.groupInfo?.id,
-                        label: resource?.data?.groupInfo?.name,
+                        name: resource.data?.groupInfo?.id,
+                        label: resource.data?.groupInfo?.name,
                     }];
                 }
                 results.push(result);
@@ -78,8 +78,8 @@ export const convertProjectGroupConfigToReferenceData = (config: ConfigData[]|nu
                 };
                 if (resource?.data?.parentGroupInfo?.id) {
                     result.parents = [{
-                        name: resource?.data?.parentGroupInfo?.id,
-                        label: resource?.data?.parentGroupInfo?.name,
+                        name: resource.data?.parentGroupInfo?.id,
+                        label: resource.data?.parentGroupInfo?.name,
                     }];
                 }
                 results.push(result);

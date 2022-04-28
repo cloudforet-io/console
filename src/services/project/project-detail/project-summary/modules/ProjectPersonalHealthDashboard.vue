@@ -1,6 +1,6 @@
 <template>
     <div class="project-personal-health-dashboard">
-        <template v-show="awsProvider">
+        <template v-if="awsProvider">
             <div class="title">
                 <span :style="{ color: awsProvider ? awsProvider.color : '' }">AWS </span>
                 <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}</span>

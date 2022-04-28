@@ -142,8 +142,8 @@ export default {
             data: [] as Data[],
             chartData: computed<BubbleChartData[]>(() => state.data.map(d => ({
                 value: d.usd_cost > 1 ? d.usd_cost : undefined,
-                longitude: parseFloat(state.regions[d.region_code]?.longitude) ?? 0,
-                latitude: parseFloat(state.regions[d.region_code]?.latitude) ?? 0,
+                longitude: parseFloat(state.regions[d.region_code]?.longitude ?? 0),
+                latitude: parseFloat(state.regions[d.region_code]?.latitude ?? 0),
                 color: state.providers.aws?.color,
             }))),
             loading: false,
