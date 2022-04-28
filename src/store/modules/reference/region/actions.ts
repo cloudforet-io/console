@@ -32,6 +32,8 @@ export const load: Action<RegionReferenceState, any> = async ({ state, commit },
                 data: {
                     provider: regionInfo.provider,
                 },
+                latitude: regionInfo.tags?.latitude,
+                longitude: regionInfo.tags?.longitude,
             };
         });
 

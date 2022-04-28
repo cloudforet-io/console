@@ -141,9 +141,9 @@ export default {
             providers: computed(() => store.state.reference.provider.items),
             data: [] as Data[],
             chartData: computed<BubbleChartData[]>(() => state.data.map(d => ({
-                value: d.usd_cost,
-                latitude: state.regions[d.region_code]?.continent?.latitude ?? 0,
-                longitude: state.regions[d.region_code]?.continent?.longitude ?? 0,
+                value: d.usd_cost > 1 ? d.usd_cost : undefined,
+                longitude: parseFloat(state.regions[d.region_code]?.longitude) ?? 0,
+                latitude: parseFloat(state.regions[d.region_code]?.latitude) ?? 0,
                 color: state.providers.aws?.color,
             }))),
             loading: false,
@@ -260,9 +260,9 @@ export default {
 
             const imageSeries = chart.series.push(new am4maps.MapImageSeries());
             if (props.printMode) imageSeries.showOnInit = false;
-            polygonSeries.events.on('validated', () => {
-                imageSeries.invalidate();
-            });
+            // polygonSeries.events.on('validated', () => {
+            //     imageSeries.invalidate();
+            // });
 
             const imageTemplate = imageSeries.mapImages.template;
             imageTemplate.nonScaling = true;
@@ -279,9 +279,9 @@ export default {
             imageSeries.heatRules.push({
                 target: circle,
                 property: 'radius',
-                min: 24,
+                min: 10,
                 max: 60,
-                dataField: valueName,
+                dataField: 'value',
             });
         };
 

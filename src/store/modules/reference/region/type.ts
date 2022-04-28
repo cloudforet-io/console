@@ -4,7 +4,7 @@ export interface RegionResourceItemData {
     provider: string;
 }
 
-export type RegionReferenceItem = Required<Pick<ReferenceItem<RegionResourceItemData>, 'label'|'name'|'data'|'continent'>>
+export type RegionReferenceItem = Required<Pick<ReferenceItem<RegionResourceItemData>, 'label'|'name'|'data'|'continent'|'longitude'|'latitude'>>
 
 export type RegionReferenceMap = ReferenceMap<RegionReferenceItem>
 
