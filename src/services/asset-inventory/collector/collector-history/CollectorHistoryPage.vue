@@ -209,12 +209,12 @@ export default {
             plugins: computed(() => store.state.reference.plugin.items),
             isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
             fields: computed(() => [
-                { label: 'Job ID', name: 'job_id', sortable: true },
+                { label: 'Job ID', name: 'job_id' },
                 { label: 'Collector', name: 'collector_info.name', sortable: false },
                 { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
                 { label: 'Status', name: 'status', sortable: false },
-                { label: 'Job Progress', name: 'remained_tasks', sortable: true },
-                { label: 'Created', name: 'created_at', sortable: true },
+                { label: 'Job Progress', name: 'remained_tasks' },
+                { label: 'Created', name: 'created_at' },
                 { label: 'Duration', name: 'duration', sortable: false },
             ]),
             statusList: computed(() => ([
