@@ -162,8 +162,8 @@ export default {
                 end: state.budgetData?.end,
             })),
             budgetCostType: computed<BudgetCostType|null>(() => ({
-                key: getKeyOfCostType(state.budgetData?.cost_types),
-                value: getValueOfCostType(state.budgetData?.cost_types, getKeyOfCostType(state.budgetData?.cost_types)),
+                key: getKeyOfCostType(state.budgetData.cost_types ?? {}),
+                value: getValueOfCostType(state.budgetData.cost_types ?? {}, getKeyOfCostType(state.budgetData.cost_types ?? {})),
             })),
             budgetTarget: computed<BudgetTarget>(() => ({
                 projectId: state.budgetData?.project_id,

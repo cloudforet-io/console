@@ -10,9 +10,11 @@ export const allFilters: Getter<CloudServiceStoreState, any> = (state, getters):
     const filters: QueryStoreFilter[] = [];
     if (state.selectedProvider !== 'all') {
         filters.push({ k: 'provider', v: state.selectedProvider, o: '=' });
-    } if (getters.selectedRegions.length) {
+    }
+    if (getters.selectedRegions.length) {
         filters.push({ k: CLOUD_SERVICE_FILTER_KEY.REGION, v: getters.selectedRegions, o: '=' });
-    } if (getters.selectedCategories.length) {
+    }
+    if (getters.selectedCategories.length) {
         filters.push({ k: CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY, v: getters.selectedCategories, o: '=' });
     }
     return filters.concat(state.searchFilters);

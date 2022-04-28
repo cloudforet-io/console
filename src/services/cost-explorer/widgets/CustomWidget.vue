@@ -242,8 +242,8 @@ export default {
         /* Init */
         const refreshAll = (options, period) => {
             if (!options || !options?.granularity) return;
-            setChartData(options.granularity, period, options?.group_by as GROUP_BY);
-            tableState.fields = getFields(options.granularity, period, options?.group_by as GROUP_BY);
+            setChartData(options.granularity, period, options.group_by as GROUP_BY);
+            tableState.fields = getFields(options.granularity, period, options.group_by as GROUP_BY);
         };
 
         watch([() => props.options, () => state.convertedPeriod], (after, before) => {

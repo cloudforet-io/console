@@ -74,7 +74,6 @@ export default {
     props: {
         visible: {
             type: Boolean,
-            required: true,
         },
     },
     setup(props: Props, { emit }) {

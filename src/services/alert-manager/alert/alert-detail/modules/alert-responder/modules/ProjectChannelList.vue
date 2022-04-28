@@ -42,7 +42,7 @@ export default {
     props: {
         projectChannels: {
             type: Array,
-            default: () => ({}),
+            default: () => ([]),
         },
         notificationLevel: {
             type: String,

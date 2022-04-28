@@ -99,14 +99,14 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
                 results.push({
                     ...d,
                     name: d.itemId,
-                    label: resource?.name || d.itemId,
-                    icon: resource?.icon,
-                    provider: resource?.data?.provider,
+                    label: resource.name || d.itemId,
+                    icon: resource.icon,
+                    provider: resource.data?.provider,
                     parents: [{
-                        name: resource?.data?.group,
-                        label: resource?.data?.group,
+                        name: resource.data?.group,
+                        label: resource.data?.group,
                     }],
-                    updatedAt: d?.updatedAt,
+                    updatedAt: d.updatedAt,
                 });
             }
         });

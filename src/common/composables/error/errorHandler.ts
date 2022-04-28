@@ -38,7 +38,7 @@ export default class ErrorHandler {
         } else if (isInstanceOfNoSearchResourceError(error)) {
             SpaceRouter.router.push(error.redirectUrl);
         } else if (isInstanceOfAPIError(error)) {
-            console.error(error);
+            console.error('API Error', error);
         } else {
             console.error(error);
         }

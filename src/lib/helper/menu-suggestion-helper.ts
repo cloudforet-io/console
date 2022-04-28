@@ -21,7 +21,7 @@ export const getAllSuggestionMenuList = (menuList: GNBMenu[], parent?: Suggestio
                 label: menu.label,
                 parents: [{ id: parent.id, label: parent.label, icon: parent.icon }],
             };
-            if (parent?.parents && tempMenu.parents) {
+            if (parent.parents && tempMenu.parents) {
                 tempMenu.parents.unshift(...parent.parents);
             }
             if (menu?.subMenuList?.length) {

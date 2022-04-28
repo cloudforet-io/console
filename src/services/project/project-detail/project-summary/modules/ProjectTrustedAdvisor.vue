@@ -1,12 +1,12 @@
 <template>
     <widget-layout class="simplified-trusted-advisor">
-        <template v-show="awsProvider" #title>
+        <template v-if="awsProvider" #title>
             <div class="title">
                 <span :style="{ color: awsProvider ? awsProvider.color : '' }">AWS </span>
                 <span>{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.TITLE') }}</span>
             </div>
         </template>
-        <template v-show="awsProvider">
+        <template v-if="awsProvider">
             <div v-if="loading" />
             <div v-else-if="!data" class="no-data-wrapper">
                 <img src="@/assets/images/illust_star.svg">

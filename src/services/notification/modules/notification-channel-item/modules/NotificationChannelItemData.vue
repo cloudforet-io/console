@@ -154,12 +154,12 @@ export default {
         const setKeyListForEdit = () => {
             const hasSchema = !!Object.keys(props.channelData.schema).length;
             if (hasSchema) state.keyListForEdit = computed(() => Object.keys(props.channelData.schema.properties).sort());
-            else state.keyListForEdit = computed(() => Object.keys(props.channelData?.data).sort());
+            else state.keyListForEdit = computed(() => Object.keys(props.channelData.data ?? {}).sort());
         };
 
         const setKeyListForRead = () => {
             if (props.channelData.secret_id) state.keyListForRead = computed(() => Object.keys(props.channelData.schema.properties).sort());
-            else state.keyListForRead = computed(() => Object.keys(props.channelData?.data).sort());
+            else state.keyListForRead = computed(() => Object.keys(props.channelData.data ?? {}).sort());
         };
 
         const setValueList = () => {
