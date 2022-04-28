@@ -9,15 +9,15 @@
         @confirm="handleClickConfirm"
     >
         <template #body>
-            <div v-for="filterName in DASHBOARD_FILTER_NAMES" :key="`filter-wrapper-${filterName}`" class="filter-wrapper">
+            <div v-for="filterName in filterNames" :key="`filter-wrapper-${filterName}`" class="filter-wrapper">
                 <p class="title">
-                    {{ FILTER_ITEM_MAP[filterName].label }} ({{ count[filterName] }})
+                    {{ FILTER_ITEM_MAP[filterName].label }} ({{ items[filterName] ? items[filterName].length : 0 }})
                 </p>
-                <p-empty v-if="!count[filterName]">
+                <p-empty v-if="!items[filterName] || !items[filterName].length">
                     {{ $t('BILLING.COST_MANAGEMENT.MAIN.NO_SELECTED_FILTER') }}
                 </p-empty>
                 <div v-else class="filters">
-                    <p-tag v-for="(item, idx) in filterItemsMap[filterName]" :key="`filter-${item.name}-${idx}`"
+                    <p-tag v-for="(item, idx) in items[filterName]" :key="`filter-${item.name}-${idx}`"
                            :deletable="false"
                     >
                         {{ item.label }}
@@ -45,11 +45,13 @@ import { store } from '@/store';
 import { ReferenceItem } from '@/store/modules/reference/type';
 
 
-const DASHBOARD_FILTER_NAMES = [FILTER.PROJECT_GROUP, FILTER.PROJECT, FILTER.SERVICE_ACCOUNT, FILTER.PROVIDER];
+const DASHBOARD_FILTERS = [FILTER.PROJECT_GROUP, FILTER.PROJECT, FILTER.SERVICE_ACCOUNT, FILTER.PROVIDER];
+const CUSTOM_DASHBOARD_FILTERS = Object.values(FILTER);
 
 interface Props {
     visible: boolean;
     selectedFilters: CostQueryFilters;
+    isCustom?: boolean;
 }
 
 export default {
@@ -68,25 +70,24 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        isCustom: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: Props, { emit }) {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
-            count: computed(() => ({
-                [FILTER.PROJECT_GROUP]: props.selectedFilters[FILTER.PROJECT_GROUP]?.length || 0,
-                [FILTER.PROJECT]: props.selectedFilters[FILTER.PROJECT]?.length || 0,
-                [FILTER.SERVICE_ACCOUNT]: props.selectedFilters[FILTER.SERVICE_ACCOUNT]?.length || 0,
-                [FILTER.PROVIDER]: props.selectedFilters[FILTER.PROVIDER]?.length || 0,
-            })),
-            filterItemsMap: computed(() => {
-                const itemsMap: CostQueryFilterItemsMap = {};
+            filterNames: computed(() => (props.isCustom ? CUSTOM_DASHBOARD_FILTERS : DASHBOARD_FILTERS)),
+            items: computed(() => {
                 const resourceItemsMap = {
-                    project_id: store.state.reference.project.items,
-                    project_group_id: store.state.reference.projectGroup.items,
-                    service_account_id: store.state.reference.serviceAccount.items,
-                    provider: store.state.reference.provider.items,
+                    [FILTER.PROJECT_GROUP]: store.state.reference.projectGroup.items,
+                    [FILTER.PROJECT]: store.state.reference.project.items,
+                    [FILTER.PROVIDER]: store.state.reference.provider.items,
+                    [FILTER.SERVICE_ACCOUNT]: store.state.reference.serviceAccount.items,
+                    [FILTER.REGION]: store.state.reference.region.items,
                 };
-
+                const itemsMap: CostQueryFilterItemsMap = {};
                 Object.entries(props.selectedFilters as CostQueryFilters).forEach(([key, data]) => {
                     const resourceItems = resourceItemsMap[key];
                     if (resourceItems) {
@@ -112,6 +113,7 @@ export default {
                 store.dispatch('reference/projectGroup/load'),
                 store.dispatch('reference/serviceAccount/load'),
                 store.dispatch('reference/provider/load'),
+                store.dispatch('reference/region/load'),
             ]);
         })();
 
@@ -119,7 +121,6 @@ export default {
             ...toRefs(state),
             FILTER,
             FILTER_ITEM_MAP,
-            DASHBOARD_FILTER_NAMES,
             handleClickConfirm,
         };
     },
@@ -141,6 +142,9 @@ export default {
             @apply flex flex-wrap;
             gap: 0.5rem;
         }
+    }
+    .modal-body {
+        max-height: 20rem;
     }
     .modal-footer {
         .cancel-button {
