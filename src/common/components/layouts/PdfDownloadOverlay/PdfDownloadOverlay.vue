@@ -219,15 +219,15 @@ export default defineComponent<Props>({
 
 
         const createContentWithItem = async ({ element, type, tableData }: Item): Promise<Content> => {
-            if (type === 'data-table') {
-                if (!tableData?.body) throw Error('[PdfDownloadOverlay] data-table type item must have data.');
-                const tableBody = applyTableHeaderStyle(tableData?.body);
+            if (type === 'data-table' && tableData) {
+                if (!tableData.body) throw Error('[PdfDownloadOverlay] data-table type item must have data.');
+                const tableBody = applyTableHeaderStyle(tableData.body);
 
-                return tableData?.body.length ? {
+                return tableData.body.length ? {
                     pageBreak: 'before',
                     table: {
                         headerRows: 1,
-                        widths: tableData?.widths,
+                        widths: tableData.widths,
                         body: tableBody,
                     },
                     fillColor: white,

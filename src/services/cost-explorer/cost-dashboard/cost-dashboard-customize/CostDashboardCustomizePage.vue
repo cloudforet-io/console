@@ -129,7 +129,7 @@ export default {
                     state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget as WidgetInfo];
                     costExplorerStore.commit('dashboard/setEditedCustomLayout', [...(state.editingCustomLayout ?? [])]);
                 }
-            } else if (state.editingCustomLayout?.length === 0) {
+            } else if (state.editingCustomLayout.length === 0) {
                 state.editingCustomLayout = [[state.selectedWidget as WidgetInfo]];
             } else {
                 state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget as WidgetInfo];

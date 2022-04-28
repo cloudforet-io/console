@@ -310,17 +310,19 @@ export default defineComponent<Props>({
                     const cloudServiceType = dataState.cloudServiceTypes[cloudServiceTypeId];
                     cloudServiceTypekey = cloudServiceType.data.cloudServiceTypeKey;
                 }
-
-                const itemInfo: string[] = cloudServiceTypekey.split('.');
-                SpaceRouter.router.push({
-                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                    params: {
-                        provider: itemInfo[0],
-                        group: itemInfo[1],
-                        name: itemInfo[2],
-                    },
-                }).catch(() => {});
-                createSearchRecent(type, cloudServiceTypekey);
+                if (cloudServiceTypekey) {
+                    const itemInfo: string[] = cloudServiceTypekey.split('.');
+                    SpaceRouter.router.push({
+                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        params: {
+                            provider: itemInfo[0],
+                            group: itemInfo[1],
+                            name: itemInfo[2],
+                        },
+                    }).catch(() => {
+                    });
+                    createSearchRecent(type, cloudServiceTypekey);
+                }
             }
             hideSuggestion();
         };
