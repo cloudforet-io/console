@@ -43,6 +43,11 @@ export const USER_TYPE_LABEL = Object.freeze({
 
 export type USER_TYPE_LABEL = typeof USER_TYPE_LABEL[keyof typeof USER_TYPE_LABEL];
 
+export const USER_STATE = Object.freeze({
+    ENABLE: 'ENABLED',
+    DISABLE: 'DISABLED',
+} as const);
+
 type ProtocolType = 'INTERNAL' | 'EXTERNAL';
 
 type MetadataDataType = 'PLAIN_TEXT' | 'SECRET';

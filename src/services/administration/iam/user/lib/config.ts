@@ -1,6 +1,11 @@
 import styles from '@/styles/colors';
-import { makeDistinctValueHandler, makeEnumValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
-import { USER_TYPE_LABEL } from '@/services/administration/iam/user/type';
+import {
+    makeDistinctValueHandler,
+    makeEnumValueHandler,
+    makeReferenceValueHandler,
+} from '@spaceone/console-core-lib/component-util/query-search';
+import { USER_STATE, USER_TYPE_LABEL } from '@/services/administration/iam/user/type';
+import { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 
 export const userSearchHandlers = {
     keyItemSets: [{
@@ -37,22 +42,23 @@ export const userSearchHandlers = {
             {
                 name: 'last_accessed_at',
                 label: 'Last Activity',
+                dataType: 'datetime',
             },
             {
                 name: 'timezone',
                 label: 'Timezone',
             },
-        ],
+        ] as KeyItem[],
     }],
     valueHandlerMap: {
         user_id: makeDistinctValueHandler('identity.User', 'user_id'),
         name: makeDistinctValueHandler('identity.User', 'name'),
-        state: makeDistinctValueHandler('identity.User', 'state'),
+        state: makeEnumValueHandler(USER_STATE),
         email: makeDistinctValueHandler('identity.User', 'email'),
         user_type: makeEnumValueHandler(USER_TYPE_LABEL),
-        role_name: makeDistinctValueHandler('identity.User', 'role_name'),
+        role_name: makeReferenceValueHandler('identity.User'),
         backend: makeDistinctValueHandler('identity.User', 'backend'),
-        last_accessed_at: makeDistinctValueHandler('identity.User', 'last_accessed_at'),
+        last_accessed_at: makeDistinctValueHandler('identity.User', 'last_accessed_at', 'datetime'),
         timezone: makeDistinctValueHandler('identity.User', 'timezone'),
     },
 };
