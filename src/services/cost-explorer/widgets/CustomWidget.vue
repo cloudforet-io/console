@@ -52,6 +52,7 @@
         />
         <view-filter-modal :visible.sync="viewFilterModalVisible"
                            :selected-filters="filters"
+                           is-custom
         />
     </cost-dashboard-card-widget-layout>
 </template>
