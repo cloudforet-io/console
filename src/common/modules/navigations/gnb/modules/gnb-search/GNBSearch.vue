@@ -299,6 +299,7 @@ export default defineComponent<Props>({
                 const menuInfo: MenuInfo = MENU_INFO_MAP[menuId];
                 if (menuInfo && SpaceRouter.router.currentRoute.name !== menuId) {
                     SpaceRouter.router.push({ name: menuId }).catch(() => {});
+                    createSearchRecent(type, menuId);
                 }
             } else {
                 let cloudServiceTypekey;
