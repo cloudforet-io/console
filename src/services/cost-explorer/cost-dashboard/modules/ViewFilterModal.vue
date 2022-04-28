@@ -14,7 +14,7 @@
                     {{ FILTER_ITEM_MAP[filterName].label }} ({{ count[filterName] }})
                 </p>
                 <p-empty v-if="!count[filterName]">
-                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.NO_SELECGTED_FILTER') }}
+                    {{ $t('BILLING.COST_MANAGEMENT.MAIN.NO_SELECTED_FILTER') }}
                 </p-empty>
                 <div v-else class="filters">
                     <p-tag v-for="(item, idx) in filterItemsMap[filterName]" :key="`filter-${item.name}-${idx}`"
