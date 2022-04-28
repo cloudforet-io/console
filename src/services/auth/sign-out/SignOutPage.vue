@@ -21,6 +21,7 @@ export default {
             try {
                 const authType = store.state.domain.extendedAuthType;
                 await loadAuth(authType).signOut();
+                await store.dispatch('user/setIsSessionExpired', true);
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {

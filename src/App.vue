@@ -93,7 +93,7 @@ export default defineComponent({
 
         const state = reactive({
             showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
-            isExpired: computed(() => vm.$store.state.user.isSessionExpired === true && !vm.$route.meta.excludeAuth),
+            isExpired: computed(() => vm.$store.state.error.visibleSessionExpiredError && !vm.$route.meta.excludeAuth),
         });
 
         const goToSignIn = () => {
@@ -102,7 +102,7 @@ export default defineComponent({
                 query: { nextPath: vm.$route.fullPath },
             };
             vm.$router.push(res);
-            vm.$store.dispatch('user/setIsSessionExpired', false);
+            vm.$store.dispatch('error/showSessionExpiredError', false);
         };
         const showsBrowserRecommendation = () => !supportsBrowser() && !window.localStorage.getItem('showBrowserRecommendation');
         return {
