@@ -648,6 +648,7 @@
 				"DASHBOARD": "ダッシュボード",
 				"DUPLICATE": "複製",
 				"MONTH": "月",
+				"NO_SELECTED_FILTER": "選択されたフィルターがない",
 				"OVERSPENT": "予算超過",
 				"SET_HOME": "ホームとして設定",
 				"VIEW_FILTER": "フィルタの表示"

@@ -648,6 +648,7 @@
 				"DASHBOARD": "Dashboard",
 				"DUPLICATE": "Duplicate",
 				"MONTH": "Month",
+				"NO_SELECTED_FILTER": "No selected filters.",
 				"OVERSPENT": "Overspent",
 				"SET_HOME": "Set as Home",
 				"VIEW_FILTER": "View Filter"

@@ -648,6 +648,7 @@
 				"DASHBOARD": "대시보드",
 				"DUPLICATE": "복제",
 				"MONTH": "월",
+				"NO_SELECTED_FILTER": "선택한 필터가 없습니다.",
 				"OVERSPENT": "초과 사용",
 				"SET_HOME": "홈 대시보드로 설정",
 				"VIEW_FILTER": "필터 확인"
