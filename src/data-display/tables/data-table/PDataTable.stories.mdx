@@ -222,6 +222,16 @@ This only affects the display of arrows based on the value of `sortDesc` and `so
 There is no built-in function to actually sort data. <br/>
 To sort data, receive the changed `sortBy` and `SortDesc` values through the `changeSort` or `update:sortBy` and `udpate:sortDesc` events, and use them in a way to reflect the changes in the `items` props. <br/>
 
+### Rules for props and fields
+If either one of them(props.sortable, field.sortable) is false, it is false.
+
+> * props.sortable: `true`  &&  field.sortable: `false`  =>  `false`
+> * props.sortable: `true`  &&  field.sortable: `true`  =>  `true`
+> * props.sortable: `false`  &&  field.sortable: `true`  =>  `false`
+> * props.sortable: `false`  &&  field.sortable: `false`  =>  `false`
+> * props.sortable: `true`  &&  field.sortable: `undefined`  =>  `true`
+> * props.sortable: `false`  &&  field.sortable: `undefined`  =>  `false`
+
 <Canvas>
     <Story name="Sortable">
 {{

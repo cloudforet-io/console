@@ -35,7 +35,7 @@
                                         <span class="th-contents"
                                               :class="{
                                                   [field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
-                                                  'has-icon': sortable && field.sortable || colCopy,
+                                                  'has-icon': isFieldSortable(field.sortable) || colCopy,
                                               }"
                                         >
                                             <span class="th-text">
@@ -50,7 +50,7 @@
                                                 />
                                             </span>
 
-                                            <template v-if="sortable && field.sortable">
+                                            <template v-if="isFieldSortable(field.sortable)">
                                                 <p-i
                                                     v-if="sortable && (field.sortKey|| field.name) === sortBy"
                                                     :name="proxyState.sortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'"
@@ -167,39 +167,6 @@ interface TableField extends DataTableFieldType {
     depth?: number;
 }
 
-const getChildFields = (field: DataTableFieldType): DataTableFieldType[]|undefined => field.children?.map(child => ({ sortable: true, ...child }));
-
-const getTableField = (field: string|DataTableFieldType): TableField => {
-    if (typeof field === 'string') return { name: field, label: field, sortable: true };
-
-    const children = getChildFields(field);
-    return { ...field, children, sortable: children?.length ? false : field.sortable };
-};
-
-const getTableFieldRows = (fields: TableField[], tableFieldRows: TableField[][] = []): TableField[][] => {
-    fields.forEach((tableField: TableField) => {
-        const row = tableFieldRows[tableField.depth ?? 0] ?? [];
-        if (!tableField.invisible) row.push(tableField);
-        if (row.length) tableFieldRows[tableField.depth ?? 0] = row;
-    });
-    return tableFieldRows;
-};
-
-const isLeafField = (field: DataTableFieldType): boolean => !field.children || field.children.length === 0;
-
-const getLeafFields = (fields: TableField[]): TableField[] => fields.filter(field => !field.children?.length);
-
-const getTableFields = (fields: DataTableField[], allFields: DataTableFieldType[] = [], depth = 0): TableField[] => {
-    fields.forEach((f) => {
-        const field = getTableField(f);
-        field.depth = depth;
-        allFields.push(field);
-        if (field.children?.length) getTableFields(field.children, allFields, depth + 1);
-    });
-    return allFields;
-};
-
-
 export default defineComponent<DataTableProps>({
     name: 'PDataTable',
     components: {
@@ -302,6 +269,40 @@ export default defineComponent<DataTableProps>({
     setup(props: DataTableProps, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
+        const getChildFields = (field: DataTableFieldType): DataTableFieldType[]|undefined => field.children?.map(child => ({ sortable: true, ...child }));
+
+        const isFieldSortable = (sortable: boolean | undefined): boolean => (props.sortable ? sortable !== false : false);
+
+        const getTableField = (field: string|DataTableFieldType): TableField => {
+            if (typeof field === 'string') return { name: field, label: field, sortable: true };
+
+            const children = getChildFields(field);
+            return { ...field, children, sortable: children?.length ? false : isFieldSortable(field.sortable) };
+        };
+
+        const getTableFieldRows = (fields: TableField[], tableFieldRows: TableField[][] = []): TableField[][] => {
+            fields.forEach((tableField: TableField) => {
+                const row = tableFieldRows[tableField.depth ?? 0] ?? [];
+                if (!tableField.invisible) row.push(tableField);
+                if (row.length) tableFieldRows[tableField.depth ?? 0] = row;
+            });
+            return tableFieldRows;
+        };
+
+        const isLeafField = (field: DataTableFieldType): boolean => !field.children || field.children.length === 0;
+
+        const getLeafFields = (fields: TableField[]): TableField[] => fields.filter(field => !field.children?.length);
+
+        const getTableFields = (fields: DataTableField[], allFields: DataTableFieldType[] = [], depth = 0): TableField[] => {
+            fields.forEach((f) => {
+                const field = getTableField(f);
+                field.depth = depth;
+                allFields.push(field);
+                if (field.children?.length) getTableFields(field.children, allFields, depth + 1);
+            });
+            return allFields;
+        };
+
         const proxyState = reactive({
             selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, []),
             sortBy: makeOptionalProxy<string>('sortBy', vm, true),
@@ -398,7 +399,7 @@ export default defineComponent<DataTableProps>({
         };
 
         const onTheadClick = (field) => {
-            if (props.sortable && field.sortable) {
+            if (isFieldSortable(field.sortable)) {
                 const clickedKey = field.sortKey || field.name;
                 let sortBy = proxyState.sortBy;
                 let sortDesc: undefined|boolean = proxyState.sortDesc;
@@ -491,6 +492,7 @@ export default defineComponent<DataTableProps>({
         return {
             proxyState,
             ...toRefs(state),
+            isFieldSortable,
             isLeafField,
             getFieldRowspan,
             getFieldColspan,
