@@ -74,6 +74,7 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 import SurveyModal from '@/common/modules/survey/SurveyModal.vue';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
+import { store } from '@/store';
 
 export default defineComponent({
     name: 'App',
@@ -102,7 +103,7 @@ export default defineComponent({
                 query: { nextPath: vm.$route.fullPath },
             };
             vm.$router.push(res);
-            vm.$store.dispatch('error/showSessionExpiredError', false);
+            store.commit('error/setVisibleSessionExpiredError', false);
         };
         const showsBrowserRecommendation = () => !supportsBrowser() && !window.localStorage.getItem('showBrowserRecommendation');
         return {
