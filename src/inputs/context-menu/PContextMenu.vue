@@ -2,7 +2,7 @@
     <div class="p-context-menu"
          @keyup.esc="onClickEsc"
     >
-        <slot v-show="menu.length > 0" name="menu" v-bind="{...$props, uuid}">
+        <slot v-show="menu.length > 0" name="menu" v-bind="{...$props}">
             <div v-if="multiSelectable" class="selected-list-wrapper">
                 <div>
                     <b>{{ $t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
@@ -22,7 +22,7 @@
             <template v-for="(item, index) in menu">
                 <a v-if="item.type === undefined || item.type === 'item'"
                    :id="`context-item-${index}-${uuid}`"
-                   :key="`${item.name}-${index}-${uuid}`"
+                   :key="item.name"
                    :tabindex="index"
                    class="context-item"
                    :class="{ disabled: item.disabled, selected: selectedNames.includes(item.name) }"
@@ -41,7 +41,7 @@
                          :name="selectedNames.includes(item.name) ? 'ic_radio--checked' : 'ic_radio'"
                          class="select-marker"
                     />
-                    <slot name="item--format" v-bind="{...$props, uuid, item, index}">
+                    <slot name="item--format" v-bind="{...$props, item, index}">
                         <span class="text" :class="{'with-icon': item.target === '_blank'}">
                             {{ item.label }}
                         </span>
@@ -51,7 +51,7 @@
                     </slot>
                 </a>
                 <div v-else-if="item.type==='divider'" :key="index" class="context-divider" />
-                <slot v-else-if="item.type==='header'" :name="`header-${item.name}`" v-bind="{...$props, uuid, item, key: index}">
+                <slot v-else-if="item.type==='header'" :name="`header-${item.name}`" v-bind="{...$props, item, key: index}">
                     <div :key="index" class="context-header">
                         {{ item.label }}
                     </div>
@@ -59,7 +59,7 @@
             </template>
         </slot>
         <div v-show="menu.length === 0" class="context-item empty">
-            <slot name="no-data-format" v-bind="{...$props, uuid}">
+            <slot name="no-data-format" v-bind="{...$props}">
                 {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
             </slot>
         </div>
@@ -133,12 +133,7 @@ export default defineComponent<ContextMenuProps>({
                 && state.proxySelected.every(item => state.selectableMenuItems.find(selected => selected.name === item.name))),
             selectedCountInFilteredMenu: computed(() => props.menu.filter(d => state.selectedNames.includes(d.name)).length),
             menuItemLength: computed(() => props.menu.filter(d => d.type === undefined || d.type === 'item').length),
-            uuid: computed(() => {
-                // CAUTION: Do not delete code belows. This is for detecting menu changes.
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const menu = props.menu;
-                return `${Math.random()}`.slice(2);
-            }),
+            uuid: `${Math.random()}`.slice(2),
         });
 
         let focusedItemEl: HTMLElement | null = null;
