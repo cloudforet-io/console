@@ -32,7 +32,8 @@ Vue.config.errorHandler = error => ErrorHandler.handleError(error);
 (async () => {
     ErrorHandler.init({
         authenticationErrorHandler: () => {
-            store.dispatch('error/showSessionExpiredError', true);
+            store.dispatch('error/showSessionExpiredError');
+            store.dispatch('user/setIsSessionExpired', true);
         },
         authorizationErrorHandler: () => {
             store.dispatch('error/showAuthorizationError');
