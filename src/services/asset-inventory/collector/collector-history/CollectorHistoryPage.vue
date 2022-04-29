@@ -1,7 +1,7 @@
 <template>
     <div class="collector-history-page">
         <p-page-title :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')" child @goBack="$router.go(-1)" />
-        <p-collector-history-chart @click-date="onClickDate" />
+        <p-collector-history-chart @click-date="handleClickDate" />
         <div class="collector-history-table">
             <div class="status-wrapper">
                 <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
@@ -14,23 +14,21 @@
             <p-toolbox-table search-type="query"
                              :fields="fields"
                              :items="items"
-                             :query-tags="tags"
+                             :query-tags="queryTags"
                              :key-item-sets="handlers.keyItemSets"
                              :value-handler-map="handlers.valueHandlerMap"
                              :loading="loading"
                              :total-count="totalCount"
-                             :sort-by.sync="sortBy"
-                             :sort-desc.sync="sortDesc"
                              :this-page.sync="thisPage"
                              :page-size.sync="pageSize"
-                             :row-cursor-pointer="rowCursorPointer"
+                             row-cursor-pointer
                              sortable
                              :selectable="false"
                              :exportable="false"
                              :class="items.length === 0 ? 'no-data' : ''"
                              :style="{height: '100%', border: 'none'}"
-                             @change="onChange"
-                             @refresh="onChange"
+                             @change="handleChange"
+                             @refresh="handleChange()"
                              @rowLeftClick="onSelect"
             >
                 <template #th-task-format="{  field }">
@@ -68,7 +66,7 @@
                 <p-pagination :total-count="totalCount"
                               :this-page.sync="thisPage"
                               :page-size.sync="pageSize"
-                              @change="onPaginationChange"
+                              @change="handleChangePagination"
                 />
             </div>
         </div>
@@ -112,7 +110,7 @@ import {
     PPageTitle, PPagination, PButtonModal, PLazyImg,
     PIconTextButton, PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { KeyItemSet, QueryTag, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 
 import PCollectorHistoryChart from '@/services/asset-inventory/collector/collector-history/modules/CollectorHistoryChart.vue';
 
@@ -130,6 +128,9 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { peacock, green, red } from '@/styles/colors';
 import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
+import { i18n } from '@/translations';
 
 
 const PROGRESS_BAR_COLOR = peacock[500];
@@ -173,39 +174,28 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const handlers = {
             keyItemSets: [{
                 title: 'Properties',
                 items: [
-                    {
-                        name: 'job_id',
-                        label: 'Job ID',
-                    },
-                    {
-                        name: 'status',
-                        label: 'Status',
-                    },
-                    {
-                        name: 'collector_id',
-                        label: 'Collector',
-                    },
-                    {
-                        dataType: 'datetime',
-                        name: 'created_at',
-                        label: 'Created Time',
-                    },
+                    { name: 'job_id', label: 'Job ID' },
+                    { name: 'status', label: 'Status' },
+                    { name: 'collector_id', label: 'Collector', reference: 'inventory.Collector' },
+                    { dataType: 'datetime', name: 'created_at', label: 'Created Time' },
                 ],
             }] as KeyItemSet[],
             valueHandlerMap: {
                 job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
                 status: makeEnumValueHandler(JOB_STATUS),
                 collector_id: makeReferenceValueHandler('inventory.Collector'),
-            },
+            } as ValueHandlerMap,
         };
+
+        const searchQueryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             loading: true,
+            modalVisible: false,
             plugins: computed(() => store.state.reference.plugin.items),
             isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
             fields: computed(() => [
@@ -219,16 +209,16 @@ export default {
             ]),
             statusList: computed(() => ([
                 {
-                    name: 'all', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'),
+                    name: 'all', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'),
                 },
                 {
-                    name: 'inProgress', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'),
+                    name: 'inProgress', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'),
                 },
                 {
-                    name: 'completed', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.COMPLETED'),
+                    name: 'completed', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.COMPLETED'),
                 },
                 {
-                    name: 'failed', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILED'),
+                    name: 'failed', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILED'),
                 },
             ])),
             selectedStatus: 'all',
@@ -237,21 +227,18 @@ export default {
             pageStart: 1,
             pageSize: 15,
             thisPage: 1,
-            sortBy: 'created_at',
-            sortDesc: true,
             totalCount: 0,
-            rowCursorPointer: true,
-            //
-            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
-            modalVisible: false,
+            queryTags: [] as QueryTag[],
         });
 
         /* api */
-        const apiQuery = new ApiQueryHelper();
+        const apiQueryHelper = new ApiQueryHelper()
+            .setPageStart(1).setPageLimit(15)
+            .setSort('created_at', true);
         const getQuery = () => {
-            apiQuery.setSort(state.sortBy, state.sortDesc)
-                .setPage(state.pageStart, state.pageSize)
-                .setFilters(queryHelper.filters);
+            apiQueryHelper
+                .setPageStart(state.pageStart).setPageLimit(state.pageSize)
+                .setFilters(searchQueryHelper.filters);
 
             let statusValues: JOB_STATUS[] = [];
             if (state.selectedStatus === 'inProgress') {
@@ -263,10 +250,10 @@ export default {
             }
 
             if (statusValues.length > 0) {
-                apiQuery.addFilter({ k: 'status', v: statusValues, o: '=' });
+                apiQueryHelper.addFilter({ k: 'status', v: statusValues, o: '=' });
             }
 
-            return apiQuery.data;
+            return apiQueryHelper.data;
         };
         const getJobs = async () => {
             state.loading = true;
@@ -293,49 +280,50 @@ export default {
                 params: { jobId: item.job_id },
             }).catch(() => {});
         };
-        const onChange = async (item: any = {}) => {
-            if (item.sortBy !== undefined) {
-                state.sortBy = item.sortBy;
-                state.sortDesc = item.sortDesc;
+        const handleChange = async (options: ToolboxOptions = {}) => {
+            setApiQueryWithToolboxOptions(apiQueryHelper, options, { queryTags: true });
+            if (options.queryTags) {
+                state.queryTags = options.queryTags;
+                searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
+                replaceUrlQuery('filters', apiQueryHelper.rawQueryStrings);
             }
-            if (item.pageStart !== undefined) state.pageStart = item.pageStart;
-            if (item.pageLimit !== undefined) state.pageSize = item.pageLimit;
-            if (item.queryTags !== undefined) {
-                state.tags = item.queryTags;
-                queryHelper.setFiltersAsQueryTag(item.queryTags);
-                await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+            if (options?.pageStart !== undefined) state.pageStart = options.pageStart;
+            if (options?.pageLimit !== undefined) {
+                state.pageSize = options.pageLimit;
+                state.thisPage = 1;
+                state.pageStart = getPageStart(state.thisPage, state.pageSize);
             }
-            try {
-                await getJobs();
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+            await getJobs();
         };
-        const onPaginationChange = () => {
+        const handleChangePagination = () => {
             vm.$nextTick(() => {
                 state.pageStart = getPageStart(state.thisPage, state.pageSize);
                 getJobs();
             });
         };
-        const onClickDate = async (data) => {
+        const handleClickDate = async (data) => {
             state.selectedStatus = data.type;
-            state.tags = [
+            state.queryTags = [
                 {
                     key: { label: 'Created Time', name: 'created_at', dataType: 'datetime' },
                     value: { label: data.date, name: data.date },
                     operator: '=',
                 },
             ];
-            await onChange({ queryTags: state.tags });
         };
 
-        const init = async () => {
-            await store.dispatch('reference/plugin/load');
-
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('reference/plugin/load'),
+                store.dispatch('reference/collector/load'),
+            ]);
+            searchQueryHelper.setReference({
+                'inventory.Collector': computed(() => store.state.reference.collector.items),
+            });
+            state.queryTags = searchQueryHelper.queryTags;
             await getJobs();
             if (state.totalCount === 0) state.modalVisible = true;
-        };
-        init();
+        })();
 
         watch(() => state.selectedStatus, (selectedStatus) => {
             state.selectedStatus = selectedStatus;
@@ -352,9 +340,9 @@ export default {
             ASSET_INVENTORY_ROUTE,
             JOB_STATUS,
             onSelect,
-            onChange,
-            onPaginationChange,
-            onClickDate,
+            handleChange,
+            handleChangePagination,
+            handleClickDate,
             statusTextFormatter,
             statusTextColorFormatter,
             statusIconFormatter,
