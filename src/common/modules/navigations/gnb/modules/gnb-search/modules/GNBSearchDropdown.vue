@@ -165,6 +165,7 @@ export default defineComponent<Props>({
     right: 0;
     margin-top: 0.25rem;
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
+    max-height: calc(100vh - $gnb-height - 0.5rem);
 
     .p-data-loader {
         flex-grow: 1;
