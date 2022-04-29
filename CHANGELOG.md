@@ -1,3 +1,10 @@
+# [1.1.0-beta.288](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.287...v1.1.0-beta.288) (2022-04-29)
+
+
+### Bug Fixes
+
+* remove uuid and update item key binding in ContextMenu ([#936](https://github.com/spaceone-dev/spaceone-design-system/issues/936)) ([49ffb3a](https://github.com/spaceone-dev/spaceone-design-system/commit/49ffb3afe7d81867d0735b3c10d6fff7302e054f))
+
 # [1.1.0-beta.287](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.286...v1.1.0-beta.287) (2022-04-29)
 
 
