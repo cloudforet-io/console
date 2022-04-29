@@ -93,15 +93,15 @@
                 </div>
                 <p-divider class="divider" />
                 <div class="sub-menu-list">
-                    <div v-for="{ link, label} in supportMenu" :key="label" class="sub-menu support-menu">
-                        <a :href="link" target="_blank">
-                            {{ label }}
+                    <div v-for="{ link, label} in supportMenu" :key="label" class="sub-menu">
+                        <a :href="link" target="_blank" class="support-menu">
+                            <span>{{ label }}</span>
+                            <p-i name="ic_external-link"
+                                 height="1em" width="1em"
+                                 color="inherit"
+                                 class="external-icon"
+                            />
                         </a>
-                        <p-i name="ic_external-link"
-                             height="1em" width="1em"
-                             color="inherit"
-                             class="external-icon"
-                        />
                     </div>
                 </div>
                 <p-divider class="divider" />
@@ -116,6 +116,7 @@
 </template>
 
 <script lang="ts">
+import ejs from 'ejs';
 import vClickOutside from 'v-click-outside';
 import { Location } from 'vue-router';
 
@@ -140,6 +141,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 import { SpaceRouter } from '@/router';
 
+
 export default {
     name: 'RightSideMenu',
     components: {
@@ -163,7 +165,14 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             showLanguageMenu: false,
-            supportMenu: config.get('DOCS'),
+            supportMenu: computed(() => {
+                const docsList = config.get('DOCS') ?? [];
+                const data = { lang: store.state.user.language };
+                return docsList.map(d => ({
+                    label: ejs.render(d?.label ?? '', data),
+                    link: ejs.render(d?.link ?? '', data),
+                }));
+            }),
             languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
                 label: v, name: k,
             }))),
@@ -410,6 +419,8 @@ export default {
 
                 .support-menu {
                     @apply justify-between;
+                    display: flex;
+                    width: 100%;
                 }
             }
         }
