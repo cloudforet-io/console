@@ -1,3 +1,10 @@
+# [1.1.0-beta.287](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.286...v1.1.0-beta.287) (2022-04-29)
+
+
+### Features
+
+* add title-right-extra, title-left-extra, default slots in PageTitle ([#934](https://github.com/spaceone-dev/spaceone-design-system/issues/934)) ([f7ee0ae](https://github.com/spaceone-dev/spaceone-design-system/commit/f7ee0ae13872b084ba326634acec60473022bb12))
+
 # [1.1.0-beta.286](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.285...v1.1.0-beta.286) (2022-04-28)
 
 
