@@ -126,7 +126,7 @@ import {
     PI,
     PAnchor,
 } from '@spaceone/design-system';
-import { KeyItemSet, KeyItem } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { KeyItemSet, KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -213,10 +213,10 @@ export default {
                     { name: 'alert_id', label: 'Alert ID' },
                     { name: 'assignee', label: 'Assignee' },
                     { name: 'resource.resource_type', label: 'Resource Name' },
-                    { name: 'project_id', label: 'Project' },
+                    { name: 'project_id', label: 'Project', reference: 'identity.Project' },
                     { name: 'created_at', label: 'Created Time', dataType: 'datetime' },
                     { name: 'resolved_at', label: 'Resolved Time', dataType: 'datetime' },
-                    { name: 'webhook_id', label: 'Webhook' },
+                    { name: 'webhook_id', label: 'Webhook', reference: 'monitoring.Webhook' },
                 ];
 
                 if (props.projectId) items.splice(2, 1);
@@ -432,6 +432,10 @@ export default {
                 store.dispatch('reference/user/load'),
                 store.dispatch('reference/project/load'),
             ]);
+            state.tags = tagQueryHelper.setReference({
+                'identity.Project': computed(() => store.state.reference.project.items),
+                'monitoring.Webhook': computed(() => store.state.reference.webhook.items),
+            }).setKeyItemSets(querySearchHandlerState.keyItemSets).queryTags;
         })();
 
         return {
