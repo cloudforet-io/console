@@ -3,7 +3,7 @@
         <p-page-title :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: selectedProviderName})"
                       class="page-title"
         >
-            <template #extra>
+            <template #title-right-extra>
                 <service-provider-dropdown v-model="selectedProvider" class="provider-dropdown" />
                 <div class="total-result-wrapper">
                     <span class="total-result">Total Result</span><span class="total-result-value">{{ typeOptionState.totalCount }}</span>
@@ -564,28 +564,21 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.p-page-title::v-deep {
-    overflow: unset;
-    .extra {
-        @apply justify-between items-center;
+.provider-dropdown {
+    @apply font-normal;
+}
+.total-result-wrapper {
+    @apply text-sm inline-flex flex-wrap gap-2 self-end;
+    float: right;
+    line-height: 2rem;
+    min-width: 5.875rem;
+    .total-result {
+        @apply text-gray-600;
     }
-    .provider-dropdown {
-        @apply font-normal;
-        margin-left: 0.5rem;
-    }
-    .total-result-wrapper {
-        @apply text-sm flex flex-wrap gap-2 self-end;
-        line-height: 1.09375rem;
-        min-width: 5.875rem;
-        .total-result {
-            @apply text-gray-600;
-        }
-        .total-result-value {
-            @apply text-gray-800;
-        }
+    .total-result-value {
+        @apply text-gray-800;
     }
 }
-
 .sidebar-title {
     @apply text-gray-900 text-sm font-bold;
     padding-top: 2rem;

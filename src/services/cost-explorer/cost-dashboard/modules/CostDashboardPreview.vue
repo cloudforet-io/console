@@ -1,14 +1,18 @@
 <template>
     <div class="cost-dashboard-preview">
         <div ref="headerRef" class="top-wrapper">
-            <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
-            <div class="right-part">
-                <cost-dashboard-period-select-dropdown :dashboard-id="dashboardId"
-                                                       :period="period"
-                                                       :period-type="periodType"
-                                                       print-mode
-                />
-            </div>
+            <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
+                <template #title-right-extra>
+                    <div class="right-part">
+                        <cost-dashboard-period-select-dropdown :dashboard-id="dashboardId"
+                                                               :period="period"
+                                                               :period-type="periodType"
+                                                               print-mode
+                        />
+                    </div>
+                </template>
+            </p-page-title>
+
             <cost-dashboard-filter :dashboard-id="dashboardId" :filters="filters" print-mode />
         </div>
         <dashboard-layouts :loading="loading"
@@ -164,23 +168,22 @@ export default {
     flex-direction: column;
     height: 100%;
 }
+.p-page-title {
+    margin-bottom: 0;
+}
 .top-wrapper {
     @apply flex flex-wrap;
     row-gap: 1rem;
     min-width: 62.25rem;
     max-width: 117rem;
     padding-right: 1.5rem;
-    .p-page-title::v-deep {
-        width: auto;
-        margin-bottom: 0;
-        > .title-wrapper > h2 {
-            white-space: nowrap;
-            max-width: 100%;
-        }
-    }
     .right-part {
-        @apply flex items-center;
-        margin-left: auto;
+        float: right;
+        > div {
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+        }
     }
 }
 </style>

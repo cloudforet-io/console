@@ -53,8 +53,9 @@
 </template>
 
 <script lang="ts">
+import { debounce, throttle } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
-import { throttle } from 'lodash';
+
 import vClickOutside from 'v-click-outside';
 
 import {
@@ -283,13 +284,13 @@ export default defineComponent<Props>({
             state.isFocusOnInput = true;
         };
 
-        const handleUpdateInput = async () => {
+        const handleUpdateInput = debounce(async () => {
             if (state.trimmedInputText) {
                 const results = await getCloudServiceResources(state.trimmedInputText);
                 dataState.filteredCloudServiceTypeList = results.map(d => d.data);
                 dataState.filteredMenuList = filterMenuItemsBySearchTerm(dataState.allMenuList, state.trimmedInputText);
             }
-        };
+        }, 300);
 
         const handleSelect = (index: number, type: SUGGESTION_TYPE) => {
             if (type === 'MENU') {

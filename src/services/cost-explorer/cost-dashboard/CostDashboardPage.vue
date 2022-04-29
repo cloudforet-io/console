@@ -1,40 +1,46 @@
 <template>
     <div class="cost-dashboard-page">
         <div v-if="dashboardList.length" class="top-wrapper">
-            <p-i v-if="dashboardType === DASHBOARD_TYPE.PUBLIC" name="ic_public" width="1rem"
-                 height="1rem" :color="PUBLIC_ICON_COLOR"
-                 class="mr-2"
-            />
-            <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
-            <div class="left-part">
-                <p-icon-button name="ic_edit-text"
-                               class="edit-btn"
-                               :outline="false"
-                               :disabled="!isAdmin && dashboardType === DASHBOARD_TYPE.PUBLIC"
-                               @click.stop="handleClickEditDashboard"
-                />
-                <cost-dashboard-more-menu :dashboard-id="dashboardId" :dashboard="dashboard" />
-            </div>
-            <div class="right-part">
-                <cost-dashboard-period-select-dropdown :dashboard-id="dashboardId"
-                                                       :period.sync="period"
-                                                       :period-type.sync="periodType"
-                />
-                <div class="left-divider download-pdf">
-                    <pdf-download-button>
-                        <p-icon-button name="ic_download" style-type="gray-border" size="sm"
-                                       @click="handleClickPdfDownload"
+            <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
+                <template #title-left-extra>
+                    <p-i v-if="dashboardType === DASHBOARD_TYPE.PUBLIC" name="ic_public" width="1rem"
+                         height="1rem" :color="PUBLIC_ICON_COLOR"
+                    />
+                </template>
+                <template #title-right-extra>
+                    <div class="left-part">
+                        <p-icon-button name="ic_edit-text"
+                                       class="edit-btn"
+                                       :outline="false"
+                                       :disabled="!isAdmin && dashboardType === DASHBOARD_TYPE.PUBLIC"
+                                       @click.stop="handleClickEditDashboard"
                         />
-                    </pdf-download-button>
-                </div>
-                <div class="left-divider">
-                    <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm"
-                                        @click.stop="handleClickCustomize"
-                    >
-                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE') }}
-                    </p-icon-text-button>
-                </div>
-            </div>
+                        <cost-dashboard-more-menu :dashboard-id="dashboardId" :dashboard="dashboard" />
+                    </div>
+                    <div class="right-part">
+                        <div>
+                            <cost-dashboard-period-select-dropdown :dashboard-id="dashboardId"
+                                                                   :period.sync="period"
+                                                                   :period-type.sync="periodType"
+                            />
+                            <div class="left-divider download-pdf">
+                                <pdf-download-button>
+                                    <p-icon-button name="ic_download" style-type="gray-border" size="sm"
+                                                   @click="handleClickPdfDownload"
+                                    />
+                                </pdf-download-button>
+                            </div>
+                            <div class="left-divider">
+                                <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm"
+                                                    @click.stop="handleClickCustomize"
+                                >
+                                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE') }}
+                                </p-icon-text-button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </p-page-title>
             <cost-dashboard-filter :dashboard-id="dashboardId" :filters.sync="filters" />
         </div>
         <div v-if="!loading && !dashboardListLoading">
@@ -275,33 +281,30 @@ export default {
     flex-direction: column;
     height: 100%;
 }
+.p-page-title {
+    margin-bottom: 0;
+}
 .top-wrapper {
     @apply flex flex-wrap items-center;
     row-gap: 1rem;
     min-width: 62.25rem;
     max-width: 117rem;
     padding-right: 1.5rem;
-    .p-page-title::v-deep {
-        width: auto;
-        margin-bottom: 0;
-        > .title-wrapper > h2 {
-            word-break: break-word;
-            max-width: 100%;
-        }
-    }
     .left-part {
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        margin-left: 0.5rem;
+        line-height: 1;
         .more-button {
             @apply bg-transparent;
         }
     }
     .right-part {
-        @apply flex items-center;
-        margin-left: auto;
-        .download-pdf {
-            &::v-deep {
+        float: right;
+        > div {
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+            .download-pdf::v-deep {
                 margin-left: 0;
                 .p-button {
                     padding: 0 1rem;
@@ -351,9 +354,6 @@ export default {
 }
 
 @screen mobile {
-    .p-page-title::v-deep .title-wrapper h2 {
-        width: 100%;
-    }
     .left-part {
         margin-left: 0;
     }
