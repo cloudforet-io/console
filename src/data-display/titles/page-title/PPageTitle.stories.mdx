@@ -1,0 +1,140 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PPageTitle from '@/data-display/titles/page-title/PPageTitle.vue'; import {
+    getPageTitleArgTypes
+} from '@/data-display/titles/page-title/story-helper';
+
+<Meta title='Data Display/Titles/Page Title' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124065',
+    }
+}} argTypes={getPageTitleArgTypes()}
+/>
+
+export const Template = (args,{argTypes})=>({
+    props: Object.keys(argTypes),
+    components: { PPageTitle },
+    template: `
+        <div class="w-full">
+            <p-page-title
+                :title="title"
+                :child="child"
+                :use-total-count="useTotalCount"
+                :total-count="totalCount"
+                :use-selected-count="useSelectedCount"
+                :selected-count="selectedCount"
+                @goBack="onGoBack"
+            >
+            </p-page-title>
+        </div>
+    `,
+})
+
+# Page Title
+
+<br/>
+<br/>
+
+## Child Mode
+<Canvas>
+    <Story name="Child Mode">
+        {{
+            components:{ PPageTitle },
+            template: `
+<div class="w-full">
+    <p-page-title child>Page Title</p-page-title>
+</div>`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Total Count
+<Canvas>
+    <Story name="Total Count">
+        {{
+            components:{ PPageTitle },
+            template: `
+<div class="w-full">
+    <p-page-title use-total-count :total-count="32">Page Title With Total Count</p-page-title>
+</div>`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Selected Count
+<Canvas>
+    <Story name="Selected Count">
+        {{
+            components:{ PPageTitle },
+            template: `
+<div class="w-full">
+    <p-page-title use-total-count :total-count="32" use-selected-count :selected-count="2">Page Title With Selected Count</p-page-title>
+</div>`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Long Title
+<Canvas>
+    <Story name="Long Title">
+        {{
+            components:{ PPageTitle },
+            template: `
+<div class="w-full">
+    <p-page-title use-total-count :total-count="32">
+        long long long long long long long long long long long long long long long long long long long long title
+    </p-page-title>
+</div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Slots
+<Canvas>
+    <Story name="Slots">
+        {{
+            components:{ PPageTitle },
+            template: `
+<div class="w-full">
+    <p-page-title use-total-count child>
+        <template #title-left-extra><span class="border border-primary">title-left-extra slot</span></template>
+        <span class="border border-red">default slot with long long long long long long long long long long long long long long long long title</span>
+        <template #title-right-extra><span class="border border-secondary">title-right-extra slot</span></template>
+        <template #total-count><span class="border border-primary-1">total count slot</span></template>
+        <template #extra><span class="border border-peacock-600 inline-block">extra slot</span></template>
+    </p-page-title>
+</div>
+    <!-- <div> -->
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" height="100px">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground" />
