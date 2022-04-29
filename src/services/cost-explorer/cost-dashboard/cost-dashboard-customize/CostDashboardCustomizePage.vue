@@ -3,7 +3,7 @@
         <section class="header">
             <p-icon-button
                 name="ic_back"
-                @click="$router.go(-1)"
+                @click="handleClickCancel"
             />
             <p-text-input v-model="dashboardTitle" block class="dashboard-title" />
             <div class="button-group">
