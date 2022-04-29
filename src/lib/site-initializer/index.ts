@@ -79,16 +79,7 @@ const initGtag = () => {
 
 
 const initQueryHelper = () => {
-    QueryHelper.init(computed(() => store.state.user.timezone), computed(() => ({
-        'identity.Project': store.state.reference.project.items,
-        'identity.ProjectGroup': store.state.reference.projectGroup.items,
-        'inventory.Collector': store.state.reference.collector.items,
-        'identity.ServiceAccount': store.state.reference.serviceAccount.items,
-        'identity.Provider': store.state.reference.provider.items,
-        'inventory.Region': store.state.reference.region.items,
-        'inventory.CloudServiceType': store.state.reference.cloudServiceType.items,
-        'secret.Secret': store.state.reference.secret.items,
-    })));
+    QueryHelper.init(computed(() => store.state.user.timezone));
 };
 
 const initRouter = (domainName?: string) => {

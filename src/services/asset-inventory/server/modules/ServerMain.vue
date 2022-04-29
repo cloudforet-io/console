@@ -399,9 +399,6 @@ export default {
                         'server_id', 'reference.external_link', 'primary_ip_address', 'collection_info.collectors', 'tags', 'provider');
                 }
 
-                // initiate queryTags with keyItemSets
-                fetchOptionState.queryTags = queryHelper.setKeyItemSets(typeOptionState.keyItemSets).queryTags;
-
                 // set schema to tableState -> create dynamic layout
                 tableState.schema = res;
             } catch (e) {
@@ -495,11 +492,24 @@ export default {
 
         watch(() => props.disabled, (disabled) => {
             if (!disabled) init();
-        }, { immediate: true });
+        }, { immediate: false });
 
         // LOAD REFERENCE STORE
         (async () => {
             await store.dispatch('reference/loadAll');
+            await init();
+            // initiate queryTags with keyItemSets & QueryHelper
+            queryHelper.setReference({
+                'identity.Project': computed(() => store.state.reference.project.items),
+                'identity.ProjectGroup': computed(() => store.state.reference.projectGroup.items),
+                'inventory.Collector': computed(() => store.state.reference.collector.items),
+                'identity.ServiceAccount': computed(() => store.state.reference.serviceAccount.items),
+                'identity.Provider': computed(() => store.state.reference.provider.items),
+                'inventory.Region': computed(() => store.state.reference.region.items),
+                'inventory.CloudServiceType': computed(() => store.state.reference.cloudServiceType.items),
+                'secret.Secret': computed(() => store.state.reference.secret.items),
+            });
+            fetchOptionState.queryTags = queryHelper.setKeyItemSets(typeOptionState.keyItemSets).queryTags;
         })();
 
         return {
