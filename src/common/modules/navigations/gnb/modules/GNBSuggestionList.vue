@@ -203,6 +203,7 @@ export default defineComponent<Props>({
     padding-left: 0.75rem;
     padding-right: 0.75rem;
     padding-bottom: 0.125rem;
+    max-height: unset;
 
     &::v-deep {
         .context-header {
