@@ -59,7 +59,7 @@ const filterToQueryTag = (
     /* general case */
     const reference = keyMap[filter.k]?.reference;
     const selectedReferenceStore = (reference && referenceStore) ? ((referenceStore[reference]) ?? undefined) : undefined;
-    const label = (selectedReferenceStore) ? selectedReferenceStore[filter.v.toString()]?.label : filter.v.toString();
+    const label = (selectedReferenceStore) ? selectedReferenceStore.value[filter.v.toString()]?.label : filter.v.toString();
     return {
         key: keyMap[filter.k] || { label: filter.k, name: filter.k },
         value: { label, name: filter.v },
