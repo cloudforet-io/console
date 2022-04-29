@@ -39,51 +39,56 @@
                                   use-total-count
                                   :total-count="storeState.projectCount || 0"
                     >
-                        <template #extra>
-                            <span class="favorite-btn-wrapper">
+                        <template #title-right-extra>
+                            <div class="favorite-btn-wrapper">
                                 <favorite-button v-if="storeState.groupId && !isPermissionDenied"
                                                  :favorite-items="favoriteItems"
                                                  :item-id="storeState.groupId"
                                                  :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
                                 />
-                            </span>
-                            <div class="btns">
-                                <p-icon-text-button v-if="!storeState.groupId"
-                                                    style-type="primary-dark"
-                                                    outline
-                                                    name="ic_plus_bold"
-                                                    :disabled="!hasRootProjectPermission"
-                                                    @click="openProjectGroupCreateForm"
-                                >
-                                    {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
-                                </p-icon-text-button>
-                                <p-select-dropdown v-if="storeState.groupId && !isPermissionDenied"
-                                                   :items="settingMenu"
-                                                   style-type="icon-button"
-                                                   button-icon="ic_setting"
-                                                   @select="onSelectSettingDropdown"
-                                />
-                                <div v-if="storeState.groupId && !isPermissionDenied"
-                                     v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
-                                     class="project-group-member-button"
-                                     :group-id="storeState.groupId"
-                                     @click="openProjectGroupMemberPage"
-                                >
-                                    <p-i name="ic_member"
-                                         width="1rem" height="1rem"
-                                         color="inherit transparent"
+                            </div>
+                            <div class="top-button-box">
+                                <div>
+                                    <p-icon-text-button v-if="!storeState.groupId"
+                                                        style-type="primary-dark"
+                                                        outline
+                                                        name="ic_plus_bold"
+                                                        :disabled="!hasRootProjectPermission"
+                                                        @click="openProjectGroupCreateForm"
+                                    >
+                                        {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
+                                    </p-icon-text-button>
+                                    <p-select-dropdown v-if="storeState.groupId && !isPermissionDenied"
+                                                       :items="settingMenu"
+                                                       style-type="icon-button"
+                                                       button-icon="ic_setting"
+                                                       class="settings-button"
+                                                       @select="onSelectSettingDropdown"
                                     />
-                                    <span class="text">{{ groupMemberCount || 0 }}</span>
-                                </div>
-                                <p-icon-text-button v-if="storeState.groupId && !isPermissionDenied"
-                                                    style-type="primary-dark"
-                                                    name="ic_plus_bold"
-                                                    @click="openProjectForm"
-                                >
-                                    <div class="truncate">
-                                        {{ $t('PROJECT.LANDING.CREATE_PROJECT') }}
+                                    <div v-if="storeState.groupId && !isPermissionDenied"
+                                         v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
+                                         class="project-group-member-button"
+                                         :group-id="storeState.groupId"
+                                         @click="openProjectGroupMemberPage"
+                                    >
+                                        <div>
+                                            <p-i name="ic_member"
+                                                 width="1rem" height="1rem"
+                                                 color="inherit transparent"
+                                            />
+                                            <span class="text">{{ groupMemberCount || 0 }}</span>
+                                        </div>
                                     </div>
-                                </p-icon-text-button>
+                                    <p-icon-text-button v-if="storeState.groupId && !isPermissionDenied"
+                                                        style-type="primary-dark"
+                                                        name="ic_plus_bold"
+                                                        @click="openProjectForm"
+                                    >
+                                        <div class="truncate">
+                                            {{ $t('PROJECT.LANDING.CREATE_PROJECT') }}
+                                        </div>
+                                    </p-icon-text-button>
+                                </div>
                             </div>
                         </template>
                     </p-page-title>
@@ -360,39 +365,48 @@ export default {
     @apply flex flex-col w-full h-full;
 }
 
-.p-page-title::v-deep {
+.p-page-title {
     @apply pb-5 border-b border-gray-200;
-    .extra {
-        @apply justify-between items-center;
-    }
-    .favorite-btn-wrapper {
-        @apply mx-2;
-    }
-    .btns {
-        @apply inline-flex items-center;
+}
+
+.favorite-btn-wrapper {
+    @apply mx-2;
+    height: 1.6rem;
+    display: inline-flex;
+}
+.top-button-box {
+    display: inline-block;
+    float: right;
+    > div {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin-left: 0.75rem;
         .p-icon-text-button {
             @apply ml-4;
+            flex-shrink: 0;
         }
-        .p-dropdown-menu-btn {
-            .p-icon-button {
-                @apply border-transparent rounded-full;
-                &:hover {
-                    @apply bg-blue-200 text-secondary border-transparent;
-                }
-            }
+        .settings-button {
+            display: inline-flex;
         }
         .project-group-member-button {
-            height: 2rem;
+            display: inline-flex;
+            align-items: center;
             cursor: pointer;
             border-radius: 6.25rem;
-            padding: 0.375rem 0.5rem 0 0.5rem;
-            margin-left: 0.75rem;
+            margin-left: 0.25rem;
+            flex-shrink: 0;
             &:hover {
                 @apply bg-blue-200 text-secondary;
             }
-            .text {
-                vertical-align: middle;
-                padding-left: 0.25rem;
+            > div {
+                display: inline-flex;
+                align-items: center;
+                padding: 0 0.5rem;
+                .text {
+                    vertical-align: middle;
+                    padding-left: 0.25rem;
+                }
             }
         }
     }

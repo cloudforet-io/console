@@ -4,7 +4,7 @@
             <p-page-title v-if="!loading" child :title="budgetData.name"
                           @goBack="$router.go(-1)"
             >
-                <template #extra>
+                <template #title-right-extra>
                     <div class="title-button-group">
                         <p-icon-button name="ic_trashcan" @click="handleClickDelete" />
                     </div>
@@ -126,8 +126,6 @@ export default {
     }
 }
 .title-button-group {
-    display: flex;
-    width: 100%;
-    padding-left: 0.5rem;
+    display: inline-flex;
 }
 </style>

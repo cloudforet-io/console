@@ -1,53 +1,47 @@
 <template>
     <div class="cost-analysis-header" :class="{'interactive-mode': !printMode}">
         <section class="title-section">
-            <p-select-dropdown v-if="!printMode"
-                               :items="queryItemList" style-type="icon-button" button-icon="ic_list"
-                               class="list-button"
-                               @select="handleClickQueryItem"
-            >
-                <template #menu-item--format="{item}">
-                    <div class="query-item-wrapper">
-                        <div class="dropdown-item-modal">
-                            <span>{{ item.label }}</span><span v-if="!item.name" class="default-item-suffix">(default)</span>
-                        </div>
-                        <div v-if="item.name" class="button-wrapper">
-                            <p-icon-button name="ic_trashcan" size="sm"
-                                           @click.stop="handleClickDeleteQuery(item.name)"
-                            />
-                            <p-icon-button name="ic_edit-text" size="sm" @click.stop="handleClickEditQuery(item.name)" />
-                        </div>
-                    </div>
+            <p-page-title :title="selectedQueryId ? title : defaultTitle">
+                <template #title-left-extra>
+                    <p-select-dropdown v-if="!printMode"
+                                       :items="queryItemList" style-type="icon-button" button-icon="ic_list"
+                                       class="list-button"
+                                       @select="handleClickQueryItem"
+                    >
+                        <template #menu-item--format="{item}">
+                            <div class="query-item-wrapper">
+                                <div class="dropdown-item-modal">
+                                    <span>{{ item.label }}</span><span v-if="!item.name" class="default-item-suffix">(default)</span>
+                                </div>
+                                <div v-if="item.name" class="button-wrapper">
+                                    <p-icon-button name="ic_trashcan" size="sm"
+                                                   @click.stop="handleClickDeleteQuery(item.name)"
+                                    />
+                                    <p-icon-button name="ic_edit-text" size="sm" @click.stop="handleClickEditQuery(item.name)" />
+                                </div>
+                            </div>
+                        </template>
+                    </p-select-dropdown>
                 </template>
-            </p-select-dropdown>
-            <p-page-title>
-                <template #title>
-                    <div class="title-main-wrapper">
-                        <span>{{ selectedQueryId ? title : defaultTitle }}</span>
-                        <div v-if="!printMode && selectedQueryId" class="button-wrapper">
-                            <p-icon-button name="ic_trashcan"
-                                           @click.stop="handleClickDeleteQuery(selectedQueryId)"
-                            />
-                            <p-icon-button name="ic_edit-text" @click.stop="handleClickEditQuery(selectedQueryId)" />
-                        </div>
+                <template v-if="!printMode" #title-right-extra>
+                    <div v-if="!printMode && selectedQueryId" class="button-wrapper">
+                        <p-icon-button name="ic_trashcan"
+                                       @click.stop="handleClickDeleteQuery(selectedQueryId)"
+                        />
+                        <p-icon-button name="ic_edit-text" @click.stop="handleClickEditQuery(selectedQueryId)" />
                     </div>
-                </template>
-                <template v-if="!printMode" #extra>
-                    <div class="title-extra-wrapper">
-                        <span />
-                        <div class="button-wrapper">
-                            <pdf-download-button>
-                                <p-icon-text-button name="ic_download" style-type="gray-border" @click="handleClickPdf">
-                                    PDF
-                                </p-icon-text-button>
-                            </pdf-download-button>
-                            <p-button v-if="selectedQueryId" style-type="gray-border" @click="handleSaveQueryOption">
-                                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
-                            </p-button>
-                            <p-button style-type="gray-border" @click="handleClickSaveQuery">
-                                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS') }}
-                            </p-button>
-                        </div>
+                    <div class="button-wrapper extra">
+                        <pdf-download-button>
+                            <p-icon-text-button name="ic_download" style-type="gray-border" @click="handleClickPdf">
+                                PDF
+                            </p-icon-text-button>
+                        </pdf-download-button>
+                        <p-button v-if="selectedQueryId" style-type="gray-border" @click="handleSaveQueryOption">
+                            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
+                        </p-button>
+                        <p-button style-type="gray-border" @click="handleClickSaveQuery">
+                            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS') }}
+                        </p-button>
                     </div>
                 </template>
             </p-page-title>
@@ -301,18 +295,13 @@ export default {
         display: flex;
     }
 
-    .p-page-title {
-        flex-wrap: wrap;
-        row-gap: 2rem;
-    }
-
-    .title-main-wrapper {
-        @apply flex items-center flex-wrap gap-2;
-        .button-wrapper {
-            @apply flex items-center;
+    .button-wrapper {
+        @apply inline-flex items-center flex-wrap;
+        &.extra {
+            @apply gap-4 justify-end;
+            float: right;
         }
     }
-
     .dropdown-item-modal {
         @apply flex items-center flex-wrap gap-1;
 
@@ -322,9 +311,8 @@ export default {
     }
 
     .list-button::v-deep {
-        @apply absolute bg-transparent;
-        top: 0;
-        left: 0;
+        @apply bg-transparent;
+        display: inline-flex;
         .p-context-menu {
             min-width: 22rem;
 
@@ -340,22 +328,7 @@ export default {
         width: 100%;
     }
 
-    .title-extra-wrapper {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .button-wrapper {
-            @apply flex items-center flex-wrap gap-4;
-        }
-    }
-
     &.interactive-mode {
-        > .title-section .title-main-wrapper {
-            margin-left: 2.5rem;
-        }
-
         @screen mobile {
             &::v-deep .extra {
                 width: 100%;

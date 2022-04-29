@@ -4,7 +4,7 @@
             <p-page-title :title="providers[selectedProvider] ? providers[selectedProvider].name : selectedProvider"
                           class="page-title"
             >
-                <template #extra>
+                <template #title-right-extra>
                     <service-provider-dropdown class="provider-dropdown"
                                                :selected-provider="selectedProvider"
                                                :has-all="true"
@@ -258,16 +258,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.p-page-title::v-deep {
-    overflow: unset;
-    .extra {
-        @apply justify-between items-center;
-    }
-    .provider-dropdown {
-        margin-left: 0.5rem;
-    }
-}
-
 .page-wrapper {
     @apply flex flex-col w-full h-full;
 }

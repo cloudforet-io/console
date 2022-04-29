@@ -3,38 +3,41 @@
         <p-data-loader class="page-inner" :loading="loading">
             <p-breadcrumbs :routes="pageNavigation" />
             <div v-if="item" class="top-wrapper">
-                <p-page-title :title="item.name" child @goBack="$router.go(-1)" />
-                <div class="button-wrapper">
-                    <span class="favorite-button-wrapper">
-                        <favorite-button :item-id="projectId"
-                                         :favorite-type="FAVORITE_TYPE.PROJECT"
-                        />
-                    </span>
-                    <p-icon-button name="ic_trashcan"
-                                   class="delete-btn"
-                                   @click="openProjectDeleteForm"
-                    />
-                    <p-icon-button name="ic_edit-text"
-                                   class="edit-btn"
-                                   @click="openProjectEditForm"
-                    />
-                </div>
-                <div class="top-right-group">
-                    <p class="copy-project-id">
-                        <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
-                        {{ projectId }}
-                        <p-copy-button class="icon"
-                                       :value="projectId"
-                        />
-                    </p>
-                    <p-icon-text-button name="ic_state_manual" style-type="gray900"
-                                        class="ml-3"
-                                        outline
-                                        @click="maintenanceWindowFormVisible = true"
-                    >
-                        {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CREATE') }}
-                    </p-icon-text-button>
-                </div>
+                <p-page-title :title="item.name" child @goBack="$router.go(-1)">
+                    <template #title-right-extra>
+                        <div class="button-wrapper">
+                            <span class="favorite-button-wrapper">
+                                <favorite-button :item-id="projectId"
+                                                 :favorite-type="FAVORITE_TYPE.PROJECT"
+                                />
+                            </span>
+                            <p-icon-button name="ic_trashcan"
+                                           class="delete-btn"
+                                           @click="openProjectDeleteForm"
+                            />
+                            <p-icon-button name="ic_edit-text"
+                                           class="edit-btn"
+                                           @click="openProjectEditForm"
+                            />
+                        </div>
+                        <div class="top-right-group">
+                            <p class="copy-project-id">
+                                <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
+                                {{ projectId }}
+                                <p-copy-button class="icon"
+                                               :value="projectId"
+                                />
+                            </p>
+                            <p-icon-text-button name="ic_state_manual" style-type="gray900"
+                                                class="ml-3"
+                                                outline
+                                                @click="maintenanceWindowFormVisible = true"
+                            >
+                                {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CREATE') }}
+                            </p-icon-text-button>
+                        </div>
+                    </template>
+                </p-page-title>
             </div>
 
             <maintenance-happening-list ref="maintenanceHappeningListRef" class="maintenance-happening-list" />
@@ -338,10 +341,13 @@ export default {
     max-width: 1368px;
     margin: 0 auto;
 }
+.p-page-title {
+    @apply mb-0;
+}
 .top-wrapper {
     @apply mb-8 flex flex-wrap items-center;
     .button-wrapper {
-        @apply flex-shrink-0 flex items-center;
+        @apply inline-flex items-center;
         .favorite-button-wrapper {
             @apply inline-flex ml-2;
         }
@@ -350,7 +356,8 @@ export default {
         }
     }
     .top-right-group {
-        @apply flex-grow inline-flex items-center justify-end flex-wrap;
+        @apply inline-flex items-center justify-end flex-wrap;
+        float: right;
         .copy-project-id {
             @apply inline-flex items-center text-gray-500;
             font-size: 0.875rem;
@@ -364,13 +371,7 @@ export default {
         }
     }
 }
-.p-page-title::v-deep {
-    @apply mb-0;
-    width: auto;
-    .title {
-        @apply text-2xl;
-    }
-}
+
 .p-tab::v-deep {
     @apply rounded-lg;
     margin: auto;

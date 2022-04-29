@@ -3,11 +3,8 @@
         <p-page-title :title="alertInfo.title" child class="page-title"
                       @goBack="$router.go(-1)"
         >
-            <template #title>
-                <span>{{ alertInfo.title }}</span>
+            <template #title-right-extra>
                 <span class="alert-number">#{{ alertInfo.alert_number }}</span>
-            </template>
-            <template #extra>
                 <span class="title-btn">
                     <p-icon-button name="ic_trashcan"
                                    class="w-full delete-btn"
@@ -180,21 +177,16 @@ export default {
 .alert-detail-page {
     @apply bg-gray-100;
 }
-.p-page-title::v-deep {
-    h2 {
-        flex-wrap: wrap;
-        max-width: 100%;
-        padding-right: 0.5rem;
-        .alert-number {
-            @apply text-gray-700;
-            font-weight: 400;
-            font-size: 1.5rem;
-            margin-left: 0.25rem;
-        }
-    }
-    .extra {
-        justify-content: flex-start;
-    }
+.alert-number {
+    @apply text-gray-700;
+    font-weight: 400;
+    font-size: 1.5rem;
+    margin-left: 0.25rem;
+}
+.title-btn {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.5rem;
 }
 .detail-contents-wrapper {
     @apply grid grid-cols-12 gap-4 w-full;

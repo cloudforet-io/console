@@ -2,16 +2,14 @@
     <div>
         <p-page-title class="mb-6"
                       child
+                      :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE')"
                       @goBack="handleGoBack"
         >
-            <template #title>
-                <div class="page-title">
-                    <p-lazy-img class="icon" :src="providerIcon" :alt="provider"
-                                :loading="providerLoading"
-                                error-icon="ic_provider_other"
-                    />
-                    {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE') }}
-                </div>
+            <template #title-left-extra>
+                <p-lazy-img class="icon" :src="providerIcon" :alt="provider"
+                            :loading="providerLoading"
+                            error-icon="ic_provider_other"
+                />
             </template>
             <template #extra>
                 <info-button v-if="description" :visible="!!description"
@@ -420,11 +418,8 @@ export default {
 
 
 <style lang="postcss" scoped>
-.page-title {
-    @apply flex items-center;
-    .icon {
-        margin-right: 0.5rem;
-    }
+.info-button {
+    line-height: 2rem;
 }
 .p-pane-layout::v-deep {
     width: 100%;
