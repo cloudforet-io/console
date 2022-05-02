@@ -80,11 +80,11 @@ import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 import cloneDeep from 'lodash/cloneDeep';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { i18n } from '@/translations';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 const NOTIFICATION_UNIT = Object.freeze({
     PERCENT: 'PERCENT',
@@ -127,7 +127,7 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             loading: true,
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             conditions: cloneDeep(costExplorerStore.state.budget.budgetData?.notifications) as Condition[],
             units: computed(() => ([
                 {

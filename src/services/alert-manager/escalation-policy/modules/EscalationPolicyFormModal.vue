@@ -31,12 +31,12 @@ import {
 import { PButtonModal } from '@spaceone/design-system';
 import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { EscalationPolicyFormModel } from '@/services/alert-manager/type';
 import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
 import { i18n } from '@/translations';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -62,7 +62,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             inputModel: {} as EscalationPolicyFormModel,
             isAllValid: false,
         });

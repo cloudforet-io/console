@@ -43,8 +43,8 @@ import {
 import {
     computed, reactive, toRefs, watch, onMounted, onUnmounted,
 } from '@vue/composition-api';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { store } from '@/store';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     tabs?: any[];
@@ -73,7 +73,7 @@ export default {
     },
     setup(props: Props, { emit }) {
         const state = reactive({
-            proxyActiveTab: makeProxy('activeTab', props, emit),
+            proxyActiveTab: useProxyValue('activeTab', props, emit),
             storageKey: computed<string>(() => `handbook:${store.state.user.userId}:${props.type}`),
             noMore: false,
         });

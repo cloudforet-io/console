@@ -68,10 +68,10 @@ import {
 
 import CostAnalysisFilterItem from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFilterItem.vue';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
 import { ReferenceItem } from '@/store/modules/reference/type';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import { store } from '@/store';
 
 
@@ -110,7 +110,7 @@ export default {
     },
     setup(props: Props, { emit }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             filters: {} as CostQueryFilters,
             selectedItemsMap: computed<CostQueryFilterItemsMap>(() => {
                 const itemsMap: CostQueryFilterItemsMap = {};

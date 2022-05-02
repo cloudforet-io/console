@@ -160,10 +160,10 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 
 const FORM_MODE = Object.freeze({
@@ -267,7 +267,7 @@ export default {
             totalCount: 0,
             isFocused: false,
             visibleMenu: false,
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             isLabelValid: computed(() => !state.labelInvalidText),
             labelInvalidText: computed(() => {
                 if (formState.labels.includes(state.labelText)) {

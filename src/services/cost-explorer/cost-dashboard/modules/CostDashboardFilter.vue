@@ -39,7 +39,6 @@ import SetFilterModal from '@/services/cost-explorer/modules/SetFilterModal.vue'
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
 import { ReferenceItem } from '@/store/modules/reference/type';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -47,6 +46,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 import { getFiltersText } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 
 interface Props {
@@ -81,7 +81,7 @@ export default {
     setup(props: Props, { emit, root }) {
         const state = reactive({
             isAdmin: computed(() => store.getters['user/isAdmin']),
-            proxyFilters: makeProxy('filters', props, emit),
+            proxyFilters: useProxyValue('filters', props, emit),
             filterItems: [
                 { name: FILTER.PROJECT_GROUP, title: FILTER_ITEM_MAP[FILTER.PROJECT_GROUP].label },
                 { name: FILTER.PROJECT, title: FILTER_ITEM_MAP[FILTER.PROJECT].label },

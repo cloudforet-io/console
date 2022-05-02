@@ -103,10 +103,10 @@ import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/services/asset-
 import { TranslateResult } from 'vue-i18n';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { store } from '@/store';
 import { timezoneList } from '@/store/modules/user/config';
 import { i18n } from '@/translations';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -181,7 +181,7 @@ export default {
         const state = reactive({
             loading: false,
             schedule: null,
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             //
             hoursMatrix: range(24),
             timezones: map(timezoneList, d => ({

@@ -67,13 +67,13 @@ import {
 import {
     PButtonModal, PDataTable, PSelectableList, PBadge,
 } from '@spaceone/design-system';
-import { makeProxy } from '@spaceone/design-system/src/util/composition-helpers';
 
 import { CollectModalProps } from '@/common/modules/collection/collect-modal/type';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import { i18n } from '@/translations';
 
 export default {
@@ -108,7 +108,7 @@ export default {
         const state = reactive({
             loading: true,
             resourceLoading: true,
-            proxyVisible: makeProxy('visible', props, context.emit),
+            proxyVisible: useProxyValue('visible', props, context.emit),
             collectors: [],
             fields: computed(() => ([
                 { name: props.idKey, label: vm.$t('COMMON.COLLECT_MODAL.ID') },

@@ -39,10 +39,10 @@ import {
 } from '@spaceone/design-system';
 
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
 import { store } from '@/store';
 import { ReferenceItem } from '@/store/modules/reference/type';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 
 const DASHBOARD_FILTERS = [FILTER.PROJECT_GROUP, FILTER.PROJECT, FILTER.SERVICE_ACCOUNT, FILTER.PROVIDER];
@@ -77,7 +77,7 @@ export default {
     },
     setup(props: Props, { emit }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             filterNames: computed(() => (props.isCustom ? CUSTOM_DASHBOARD_FILTERS : DASHBOARD_FILTERS)),
             items: computed(() => {
                 const resourceItemsMap = {

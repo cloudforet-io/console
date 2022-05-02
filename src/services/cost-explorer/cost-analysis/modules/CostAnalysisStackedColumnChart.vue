@@ -23,7 +23,6 @@ import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { CURRENCY } from '@/store/modules/display/config';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/cost-analysis/lib/helper';
@@ -38,6 +37,7 @@ import config from '@/lib/config';
 import { gray } from '@/styles/colors';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 const CATEGORY_KEY = 'date';
 
@@ -110,7 +110,7 @@ export default {
 
         const state = reactive({
             chartRef: null as HTMLElement | null,
-            proxyChart: makeProxy('chart', props, emit),
+            proxyChart: useProxyValue('chart', props, emit),
             USDChartData: [] as XYChartData[],
             isChartDrawn: false,
         });

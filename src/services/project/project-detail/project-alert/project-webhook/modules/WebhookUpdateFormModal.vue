@@ -36,7 +36,7 @@ import {
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { makeProxy } from '@/lib/helper/composition-helpers';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -60,7 +60,7 @@ export default {
     setup(props, { emit, root }) {
         const state = reactive({
             loading: false,
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             webhookName: props.selectedItem[0].name,
             state: props.selectedItem[0].state,
             showValidation: false,

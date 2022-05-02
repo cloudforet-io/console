@@ -31,9 +31,9 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { alertManagerStore } from '@/services/alert-manager/store';
 
@@ -69,7 +69,7 @@ export default {
     setup(props, { emit, root }) {
         const state = reactive({
             loading: true,
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             alertTitleInput: props.alertTitle,
             nameInvalidText: computed(() => {
                 if (state.alertTitleInput.length === 0) {

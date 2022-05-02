@@ -60,7 +60,7 @@ import {
     PIconTextButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 
 const CONDITIONS_POLICY = Object.freeze({
@@ -124,8 +124,8 @@ export default {
                     label: i18n.t('PROJECT.EVENT_RULE.DOES_NOT_EQUAL'),
                 },
             ])),
-            proxyConditionsPolicy: makeProxy('conditionsPolicy', props, emit),
-            proxyConditions: makeProxy('conditions', props, emit),
+            proxyConditionsPolicy: useProxyValue('conditionsPolicy', props, emit),
+            proxyConditions: useProxyValue('conditions', props, emit),
             keys: [
                 {
                     name: 'title',

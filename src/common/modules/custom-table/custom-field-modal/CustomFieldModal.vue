@@ -91,7 +91,6 @@ import {
 import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
 import SelectTagColumns from '@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -99,6 +98,7 @@ import { i18n } from '@/translations';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     visible: boolean;
@@ -143,7 +143,7 @@ export default {
         let schema: any = {};
 
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             search: '',
             isAllSelected: computed(() => state.selectedColumns.length === state.allColumns.length),
             loading: true,

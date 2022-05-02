@@ -57,8 +57,8 @@ import {
     PTag,
 } from '@spaceone/design-system';
 import { i18n } from '@/translations';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { TranslateResult } from 'vue-i18n';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Tag {
     key?: string;
@@ -86,7 +86,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             checkBoxValue: '',
             checkBoxLabel: computed(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.KEEP_MY_SETTING')),
         });

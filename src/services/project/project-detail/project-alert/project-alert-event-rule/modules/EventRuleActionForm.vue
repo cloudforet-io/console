@@ -117,7 +117,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import { makeProxy } from '@/lib/helper/composition-helpers';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import { store } from '@/store';
 
 
@@ -170,8 +170,8 @@ export default {
                     label: i18n.t('PROJECT.EVENT_RULE.LOW'),
                 },
             ])),
-            proxyActions: makeProxy('actions', props, emit),
-            proxyOptions: makeProxy('options', props, emit),
+            proxyActions: useProxyValue('actions', props, emit),
+            proxyOptions: useProxyValue('options', props, emit),
             routingProjects: computed<string[]>({
                 get() { return props.actions.change_project ? [props.actions.change_project] : []; },
                 set(projectIds) {

@@ -46,12 +46,12 @@ import { capitalize } from 'lodash';
 import {
     PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
+import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { alertStateBadgeStyleTypeFormatter, alertScopeBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -97,7 +97,7 @@ export default {
                 { name: 'project_id', label: 'Project', sortable: false },
                 { name: 'created_at', label: 'Created' },
             ] as DataTableField[],
-            proxySelectIndex: makeProxy('selectIndex', props, emit),
+            proxySelectIndex: useProxyValue('selectIndex', props, emit),
             sortBy: 'created_at',
             sortDesc: true,
         });

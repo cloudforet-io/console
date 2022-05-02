@@ -29,11 +29,11 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 const RECOVERY_MODE = Object.freeze({
     MANUAL: 'MANUAL',
@@ -63,7 +63,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            proxyVisible: makeProxy<boolean>('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             selectOptions: computed(() => ([
                 {
                     name: RECOVERY_MODE.AUTO,

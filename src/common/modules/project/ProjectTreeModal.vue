@@ -63,13 +63,13 @@ import {
 import {
     PI, PButtonModal, PRadio, PTree,
 } from '@spaceone/design-system';
-import { makeProxy } from '@spaceone/design-system/src/util/composition-helpers';
 
 import { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ProjectGroup } from '@/services/asset-inventory/service-account/type';
 import Vue from 'vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 
 interface Props {
@@ -106,7 +106,7 @@ export default {
             root: null as ProjectTreeRoot|null,
             selectedItem: {} as ProjectGroupTreeItem,
             selectedNode: computed(() => state.selectedItem.node),
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
         });
 
         const toggleOptions = {

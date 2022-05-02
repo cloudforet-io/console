@@ -29,12 +29,12 @@ import {
 
 import { reactive, toRefs, watch } from '@vue/composition-api';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { red } from '@/styles/colors';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 export default {
     name: 'ProjectNotificationPolicyUpdateModal',
@@ -62,7 +62,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            proxyVisible: makeProxy<boolean>('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             notificationUrgency: undefined,
         });
 

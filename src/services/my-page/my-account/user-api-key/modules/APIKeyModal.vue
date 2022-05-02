@@ -80,7 +80,7 @@ import {
     PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PRawData, PIconTextButton, PAnchor,
 } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@/lib/helper/composition-helpers';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import yaml from 'js-yaml';
 
 
@@ -121,7 +121,7 @@ export default {
     },
     setup(props, context) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, context.emit),
+            proxyVisible: useProxyValue('visible', props, context.emit),
             isAPICollapsed: true,
             isSpacectlCollapsed: true,
             apiItem: {} as APIItem,

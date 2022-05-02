@@ -32,7 +32,7 @@ import {
     // PCheckBox, PDivider
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 export default {
     name: 'PluginFilter',
@@ -58,7 +58,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxySelectedRepoId: makeProxy('selectedRepoId', props, emit),
+            proxySelectedRepoId: useProxyValue('selectedRepoId', props, emit),
             // resourceOptions: computed(() => ({
             //     Server: props.resourceTypeSearchTags.includes('Server'),
             //     'Cloud Service': props.resourceTypeSearchTags.includes('Cloud Service'),

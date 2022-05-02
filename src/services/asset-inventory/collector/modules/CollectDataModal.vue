@@ -60,12 +60,12 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PLazyImg,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface SecretModel {
@@ -161,7 +161,7 @@ export default {
 
         const state = reactive({
             loading: false,
-            proxyVisible: makeProxy('visible', props, context.emit),
+            proxyVisible: useProxyValue('visible', props, context.emit),
             collector: null as CollectorModel | null,
             credential: null as SecretModel | null,
             selectedCollectMode: COLLECT_MODE.all as COLLECT_MODE,

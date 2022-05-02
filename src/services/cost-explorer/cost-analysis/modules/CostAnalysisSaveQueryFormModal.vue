@@ -37,11 +37,11 @@ import {
     REQUEST_TYPE,
 } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { CostQuerySetModel } from '@/services/cost-explorer/type';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { i18n } from '@/translations';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 
 interface Props {
@@ -84,7 +84,7 @@ export default {
             queryName: undefined as undefined | string,
         });
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             queryNameInvalidText: computed(() => {
                 if (typeof formState.queryName === 'undefined') return undefined;
                 if (formState.queryName.length === 0) {

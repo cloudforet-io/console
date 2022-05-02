@@ -98,12 +98,12 @@ import {
 } from '@vue/composition-api';
 import dayjs from 'dayjs';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const SCHEDULE_TYPE = Object.freeze({
@@ -161,7 +161,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             loading: false,
             title: '',
             titleInvalidText: computed(() => {

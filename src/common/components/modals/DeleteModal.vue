@@ -23,7 +23,7 @@
 <script lang="ts">
 import { PButtonModal } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@/lib/helper/composition-helpers';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 export default {
     name: 'DeleteModal',
@@ -54,7 +54,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
         });
         return {
             ...toRefs(state),

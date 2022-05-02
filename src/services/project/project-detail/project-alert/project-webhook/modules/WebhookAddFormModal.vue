@@ -53,13 +53,13 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PSelectCard,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface WebhookType {
     plugin_id: string;
@@ -89,7 +89,7 @@ export default {
     setup(props, { emit, root }) {
         const state = reactive({
             plugins: computed(() => store.state.reference.plugin.items),
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             loading: false,
             webhookName: '',
             nameInvalidText: computed(() => {

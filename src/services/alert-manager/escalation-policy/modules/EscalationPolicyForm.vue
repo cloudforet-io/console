@@ -104,7 +104,7 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 import { EscalationPolicyFormModel } from '@/services/alert-manager/type';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { makeProxy } from '@/lib/helper/composition-helpers';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -149,7 +149,7 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             projects: computed(() => store.state.reference.project.items),
-            proxyIsAllValid: makeProxy('isAllValid', props, emit),
+            proxyIsAllValid: useProxyValue('isAllValid', props, emit),
             //
             inputModel: {
                 name: undefined as undefined | string,

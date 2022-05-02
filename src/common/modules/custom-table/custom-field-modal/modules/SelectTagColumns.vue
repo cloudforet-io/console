@@ -37,7 +37,7 @@ import {
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
-import { makeProxy } from '@/lib/helper/composition-helpers';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     selectedKeys: string[];
@@ -71,7 +71,7 @@ export default {
 
         const state = reactive({
             search: '',
-            proxySelectedKeys: makeProxy('selectedKeys', props, emit),
+            proxySelectedKeys: useProxyValue('selectedKeys', props, emit),
             selectedTagKeys: computed<string[]>({
                 get: () => props.selectedKeys.filter(key => key.startsWith(TAGS_PREFIX)),
                 set: (val: string[]) => {

@@ -61,12 +61,12 @@ import {
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 import { i18n } from '@/translations';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import { ProjectItemResp } from '@/services/project/type';
 import { ALERT_URGENCY } from '@/services/alert-manager/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -95,7 +95,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             loading: false,
             // inputs
             title: undefined as undefined|string,

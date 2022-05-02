@@ -35,12 +35,12 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import VueI18n from 'vue-i18n';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -78,7 +78,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             updateMode: computed(() => !!props.project),
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             projectNames: [] as string[],
             projectName: props.project?.name as string|undefined,
             projectNameInvalidText: computed(() => {

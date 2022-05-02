@@ -26,13 +26,13 @@ import {
 import {
     PButtonModal, PTextarea, PFieldGroup,
 } from '@spaceone/design-system';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import { i18n } from '@/translations';
 import { AlertStateUpdateParams } from '@/services/alert-manager/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 export default {
     name: 'AlertResolveModal',
@@ -53,7 +53,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            proxyVisible: makeProxy<boolean>('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             noteInput: '',
         });
 

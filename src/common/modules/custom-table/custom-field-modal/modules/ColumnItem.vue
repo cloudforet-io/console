@@ -23,7 +23,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { PCheckBox, PI } from '@spaceone/design-system';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import { makeProxy } from '@/lib/helper/composition-helpers';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     item: DynamicField[];
@@ -60,7 +60,7 @@ export default {
     setup(props: Props, { emit }) {
         const state = reactive({
             regex: computed(() => new RegExp(props.searchText || '', 'i')),
-            proxySelectedKeys: makeProxy('selectedKeys', props, emit),
+            proxySelectedKeys: useProxyValue('selectedKeys', props, emit),
         });
 
         const getMatchText = (text: string): string => {

@@ -21,13 +21,13 @@
 <script lang="ts">
 import { reactive, toRefs, watch } from '@vue/composition-api';
 import { PButtonModal, PCheckBox } from '@spaceone/design-system';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import { AlertStateUpdateParams } from '@/services/alert-manager/type';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
@@ -48,7 +48,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            proxyVisible: makeProxy<boolean>('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             isAssignedToMe: true,
         });
 

@@ -71,10 +71,6 @@
 
 <script lang="ts">
 import {
-    makeProxy,
-} from '@/lib/helper/composition-helpers';
-
-import {
     ComponentRenderProxy,
     getCurrentInstance,
     reactive, ref, Ref, toRefs,
@@ -89,6 +85,7 @@ import { isEqual } from 'lodash';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import VueI18n from 'vue-i18n';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import { i18n } from '@/translations';
 
 import TranslateResult = VueI18n.TranslateResult;
@@ -193,7 +190,7 @@ export default {
         const formState = reactive({
             labelTagTools: tagList(null),
         });
-        const proxyVisible = makeProxy('visible', props, emit);
+        const proxyVisible = useProxyValue('visible', props, emit);
         const projectId = root.$route.params.id;
 
         // const getRoleList = async () => {

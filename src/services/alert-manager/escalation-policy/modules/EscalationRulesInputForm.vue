@@ -152,9 +152,9 @@ import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modu
 
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { SCOPE } from '@/services/alert-manager/lib/config';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -208,7 +208,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyRepeatCount: makeProxy('repeatCount', props, emit),
+            proxyRepeatCount: useProxyValue('repeatCount', props, emit),
             projectChannels: [],
         });
 

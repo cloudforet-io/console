@@ -49,15 +49,15 @@ import {
 import EscalationPolicyDataTable from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyDataTable.vue';
 import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { EscalationPolicyFormModel } from '@/services/alert-manager/type';
-import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 
@@ -102,7 +102,7 @@ export default {
         });
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            proxyVisible: makeProxy<boolean>('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             tabs: computed(() => ([
                 {
                     name: FORM_MODE.select,

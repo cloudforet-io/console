@@ -82,7 +82,6 @@ import {
     PButtonModal, PSelectDropdown, PLazyImg, PFieldGroup, PButton, PTextInput, PToggleButton,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -90,6 +89,7 @@ import { CollectorPluginModel, CollectorUpdateParameter, UPGRADE_MODE } from '@/
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 
 interface Props {
@@ -124,7 +124,7 @@ export default {
         const state = reactive({
             loading: true,
             collector: null,
-            proxyVisible: makeProxy<boolean>('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             pluginInfo: computed<CollectorPluginModel>(() => get(state.collector, 'plugin_info', {})),
             imageUrl: computed<string>(() => get(store.state.reference.plugin.items[state.pluginInfo.plugin_id], 'icon', '')),
             confirmBtnBind: computed(() => {

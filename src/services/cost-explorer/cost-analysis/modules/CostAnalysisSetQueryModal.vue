@@ -58,7 +58,6 @@ import {
     PSelectDropdown,
     PToggleButton,
 } from '@spaceone/design-system';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { store } from '@/store';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
@@ -66,6 +65,7 @@ import { i18n } from '@/translations';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 
 export default {
@@ -83,7 +83,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             granularity: '' as GRANULARITY,
             stack: false,
             currency: '' as CURRENCY,
