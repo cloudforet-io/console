@@ -31,7 +31,7 @@ class GoogleAuth extends Authenticator {
                 access_token: googleUser.getAuthResponse().access_token,
             };
             await super.signIn(credentials);
-        } catch (e) {
+        } catch (e: any) {
             await GoogleAuth.signOut();
             await store.dispatch('display/showSignInErrorMessage');
             throw new Error(e);

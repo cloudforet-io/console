@@ -109,6 +109,7 @@ import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { XYChart } from '@amcharts/amcharts4/charts';
+import { NumberFormatOptions } from 'vue-i18n';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
@@ -239,7 +240,7 @@ export default {
             if (Math.abs(num) < 10000) {
                 return Math.round(num * 10) / 10;
             }
-            const options = {
+            const options: NumberFormatOptions = {
                 notation: 'compact',
                 signDisplay: 'auto',
                 maximumFractionDigits: 1,

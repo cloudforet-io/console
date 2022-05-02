@@ -273,7 +273,7 @@ export default {
                 getCardToken = undefined;
                 state.cardSummary = cardSummary;
                 state.cardSummaryLoading = false;
-            } catch (e) {
+            } catch (e: any) {
                 if (!axios.isCancel(e.axiosError)) {
                     state.cardSummary = cardSummary;
                     state.cardSummaryLoading = false;
@@ -305,7 +305,7 @@ export default {
                 state.loading = false;
                 listProjectToken = undefined;
                 await getCardSummary(res.results);
-            } catch (e) {
+            } catch (e: any) {
                 if (!axios.isCancel(e.axiosError)) {
                     state.items = [];
                     state.totalCount = 0;

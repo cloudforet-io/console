@@ -187,7 +187,7 @@ export default {
                 state.totalCount = res.total_count || 0;
                 state.loading = false;
                 listCloudServiceRequest = undefined;
-            } catch (e) {
+            } catch (e: any) {
                 if (!axios.isCancel(e.axiosError)) {
                     state.items = [];
                     state.totalCount = 0;

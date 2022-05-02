@@ -82,7 +82,7 @@ export const createProjectGroup: Action<ProjectPageState, any> = async ({ state,
 
         commit('addPermissionInfo', { [res.project_group_id]: true });
         commit('setHasProjectGroup', true);
-    } catch (e) {
+    } catch (e: any) {
         ErrorHandler.handleError(e);
         throw new Error(e);
     } finally {
@@ -105,7 +105,7 @@ export const updateProjectGroup: Action<ProjectPageState, any> = async ({ state,
 
         state.rootNode.updateNodeByPath(getters.actionTargetNodePath,
             { ...getters.actionTargetNodeData, ...projectGroupInfo });
-    } catch (e) {
+    } catch (e: any) {
         ErrorHandler.handleError(e);
         throw new Error(e);
     } finally {
@@ -123,7 +123,7 @@ export const deleteProjectGroup: Action<ProjectPageState, any> = async ({ state,
             project_group_id: getters.actionTargetNodeData.id,
         });
         state.rootNode.deleteNodeByPath(getters.actionTargetNodePath);
-    } catch (e) {
+    } catch (e: any) {
         throw new BadRequestError(e);
     } finally {
         commit('setActionTargetItem', {});
@@ -176,7 +176,7 @@ export const createProject: Action<ProjectPageState, any> = async ({ state, comm
 
             commit('addPermissionInfo', { [res.project_id]: true });
         }
-    } catch (e) {
+    } catch (e: any) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
         throw new Error(e);
     }

@@ -131,7 +131,7 @@ export default {
                 resourceToken = undefined;
 
                 return results;
-            } catch (e) {
+            } catch (e: any) {
                 if (!axios.isCancel(e.axiosError)) {
                     ErrorHandler.handleError(e);
                 }

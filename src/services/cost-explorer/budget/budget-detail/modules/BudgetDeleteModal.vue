@@ -47,19 +47,22 @@ export default {
             verificationText: computed(() => props.budgetName),
         });
 
-        const deleteBudget = async () => {
+        const deleteBudget = async (): Promise<object|undefined> => {
             try {
-                await SpaceConnector.client.costAnalysis.budget.delete({
+                return await SpaceConnector.client.costAnalysis.budget.delete({
                     budget_id: props.budgetId,
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
+                return undefined;
             }
         };
-        const handleConfirm = () => {
-            deleteBudget();
-            state.proxyVisible = false;
-            emit('confirm');
+        const handleConfirm = async () => {
+            const res = await deleteBudget();
+            if (res) {
+                state.proxyVisible = false;
+                emit('confirm');
+            }
         };
 
         const handleUpdate = (visible) => {

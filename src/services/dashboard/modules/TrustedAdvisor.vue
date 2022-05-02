@@ -147,7 +147,8 @@ interface ProjectSummaryData {
     projectId: string;
     projectName: string;
     tooltipText: string;
-    counts: [STATUS, number][];
+    /* parsing error in TypeScript version 4 */
+    counts: any[]; // [STATUS, number][];
     isFavorite: boolean;
 }
 
@@ -344,7 +345,9 @@ export default {
 
                 const projectSummaryData: ProjectSummaryData[] = [];
                 forEach(res, (projectData, projectId) => {
-                    const counts: [STATUS, number][] = Array(5).fill([STATUS.error, 0]);
+                    /* parsing error in TypeScript version 4 */
+                    // const counts: [STATUS, number][] = Array(5).fill([STATUS.error, 0]);
+                    const counts: any[] = Array(5).fill([STATUS.error, 0]);
                     forEach(projectData, (countData, category) => {
                         let count = 0;
                         let type = STATUS.error;

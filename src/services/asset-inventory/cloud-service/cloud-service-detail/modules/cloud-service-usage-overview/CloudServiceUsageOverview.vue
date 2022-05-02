@@ -169,7 +169,7 @@ export default defineComponent<Props>({
                 });
                 fetchDataTokenList[idx] = undefined;
                 return results[0] ?? {};
-            } catch (e) {
+            } catch (e: any) {
                 if (!axios.isCancel(e.axiosError)) {
                     ErrorHandler.handleError(e);
                 }

@@ -9,7 +9,7 @@ export const getAlertData = async ({ commit }, alertId: string): Promise<void|Er
             alert_id: alertId,
         });
         commit('setAlertData', alert);
-    } catch (e) {
+    } catch (e: any) {
         ErrorHandler.handleError(e);
         throw new Error(e);
     }
@@ -22,7 +22,7 @@ export const updateAlertData = async ({ commit }, params: UpdateAlertParams): Pr
             alert_id: params.alertId,
         });
         commit('setAlertData', alert);
-    } catch (e) {
+    } catch (e: any) {
         ErrorHandler.handleError(e);
         throw new Error(e);
     }

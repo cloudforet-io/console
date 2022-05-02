@@ -13,7 +13,7 @@ abstract class Authenticator {
                 userType: userType || 'USER',
                 userId,
             });
-        } catch (e) {
+        } catch (e: any) {
             throw new Error(e);
         }
     }

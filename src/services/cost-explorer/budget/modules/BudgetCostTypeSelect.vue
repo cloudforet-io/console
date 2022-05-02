@@ -153,7 +153,7 @@ export default defineComponent<Props>({
                 resourceToken = undefined;
 
                 return res;
-            } catch (e) {
+            } catch (e: any) {
                 if (!axios.isCancel(e.axiosError)) {
                     ErrorHandler.handleError(e);
                 }

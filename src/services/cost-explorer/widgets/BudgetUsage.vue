@@ -123,8 +123,6 @@ export default {
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({
                     include_budget_count: true,
                     include_project_info: false,
-                    filter: [
-                    ],
                     start: dayjs.utc(props.period?.start).format('YYYY-MM'),
                     end: dayjs.utc(props.period?.end).format('YYYY-MM'),
                     ...budgetQueryHelper.apiQuery,

@@ -89,11 +89,11 @@ export default {
                 });
                 const dashboardList = [...publicDashboardList.results as PublicDashboardInfo[], ...userDashboardList.results as UserDashboardInfo[]];
                 state.existingDashboardData = dashboardList.map(d => ({
+                    ...d,
                     custom_layouts: d.custom_layouts,
                     default_filter: d.default_filter,
                     default_layout_id: d.default_layout_id,
                     name: d.name,
-                    ...d,
                 }) as Partial<DashboardInfo>);
                 state.totalCount = state.existingDashboardData.length ?? 0;
             } catch (e) {

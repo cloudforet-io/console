@@ -54,7 +54,7 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     }
 };
 
-const getUserInfoFromToken = (token: string): [string, string] => {
+const getUserInfoFromToken = (token: string): string[] => {
     const decodedToken = jwt.decode(token);
     return [decodedToken.user_type, decodedToken.aud];
 };

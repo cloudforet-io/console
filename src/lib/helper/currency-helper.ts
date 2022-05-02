@@ -1,6 +1,7 @@
 import { convert as cashifyConvert } from 'cashify';
 import { CURRENCY } from '@/store/modules/display/config';
 import { CurrencyRates } from '@/store/modules/display/type';
+import { NumberFormatOptions } from 'vue-i18n';
 
 /** cashify library: https://www.npmjs.com/package/cashify */
 
@@ -55,7 +56,7 @@ export const currencyMoneyFormatter = (
 
         const shorten: boolean = Math.abs(money) >= transitionValue;
         const digit = currencyToMinimumFractionDigitsMap[currency];
-        const options = {
+        const options: NumberFormatOptions = {
             notation: shorten ? 'compact' : 'standard',
             maximumFractionDigits: shorten ? 2 : digit,
             minimumFractionDigits: shorten ? 0 : digit,

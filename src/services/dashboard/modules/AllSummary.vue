@@ -108,6 +108,7 @@ import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { Location } from 'vue-router';
+import { NumberFormatOptions } from 'vue-i18n';
 
 import {
     PDataLoader, PSkeleton, PButton, PBalloonTab,
@@ -188,7 +189,7 @@ export default {
             if (Math.abs(num) < 10000) {
                 return Math.round(num * 10) / 10;
             }
-            const options = {
+            const options: NumberFormatOptions = {
                 notation: 'compact',
                 signDisplay: 'auto',
                 maximumFractionDigits: 1,
