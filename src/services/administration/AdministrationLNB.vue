@@ -21,6 +21,12 @@ const MenuSet: LNBMenu[] = [
     {
         type: 'item', label: 'User', id: MENU_ID.ADMINISTRATION_USER, to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME },
     },
+    {
+        type: 'item', label: 'Role', id: MENU_ID.ADMINISTRATION_ROLE, to: { name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME },
+    },
+    {
+        type: 'item', label: 'Policy', id: MENU_ID.ADMINISTRATION_POLICY, to: { name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME },
+    },
 ];
 
 export default defineComponent({

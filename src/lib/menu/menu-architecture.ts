@@ -34,6 +34,8 @@ export const MENU_LIST: Menu[] = [
                 id: MENU_ID.ADMINISTRATION_IAM,
                 subMenuList: [
                     { id: MENU_ID.ADMINISTRATION_USER },
+                    { id: MENU_ID.ADMINISTRATION_ROLE },
+                    { id: MENU_ID.ADMINISTRATION_POLICY },
                 ],
             },
         ],

@@ -73,6 +73,14 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         label: 'User',
         translationId: '',
     },
+    [MENU_ID.ADMINISTRATION_ROLE]: {
+        label: 'Role',
+        translationId: '',
+    },
+    [MENU_ID.ADMINISTRATION_POLICY]: {
+        label: 'Policy',
+        translationId: '',
+    },
     [MENU_ID.MY_PAGE]: {
         label: 'My Page',
         translationId: '',

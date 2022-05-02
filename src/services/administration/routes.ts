@@ -6,6 +6,10 @@ import { MENU_ID } from '@/lib/menu/config';
 const AdministrationContainer = () => import(/* webpackChunkName: "AdministrationContainer" */ '@/services/administration/AdministrationContainer.vue');
 
 const UserPage = () => import(/* webpackChunkName: "UserPage" */ '@/services/administration/iam/user/UserPage.vue');
+const RolePage = () => import(/* webpackChunkName: "RolePage" */'@/services/administration/iam/role/RolePage.vue');
+const CreateRolePage = () => import(/* webpackChunkName: "CreateRolePage" */'@/services/administration/iam/role/create-role/CreateRolePage.vue');
+const EditRolePage = () => import(/* webpackChunkName: "EditRolePage" */'@/services/administration/iam/role/edit-role/EditRolePage.vue');
+const PolicyPage = () => import(/* webpackChunkName: "PolicyPage" */ '@/services/administration/iam/policy/PolicyPage.vue');
 
 const administrationRoutes: RouteConfig = {
     path: 'administration',
@@ -26,6 +30,39 @@ const administrationRoutes: RouteConfig = {
                     name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
                     meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.ADMINISTRATION_USER) },
                     component: UserPage as any,
+                },
+                {
+                    path: 'role',
+                    meta: { label: getMenuLabel(MENU_ID.ADMINISTRATION_ROLE) },
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: '/',
+                            name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME,
+                            meta: { lnbVisible: true },
+                            props: true,
+                            component: RolePage as any,
+                        },
+                        {
+                            path: 'create',
+                            name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME,
+                            meta: { label: 'Create Role' },
+                            component: CreateRolePage as any,
+                        },
+                        {
+                            path: 'edit/:id',
+                            name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME,
+                            meta: { label: 'Edit Role' },
+                            props: true,
+                            component: EditRolePage as any,
+                        },
+                    ],
+                },
+                {
+                    path: 'policy',
+                    name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
+                    meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.ADMINISTRATION_POLICY) },
+                    component: PolicyPage as any,
                 },
             ],
         },
