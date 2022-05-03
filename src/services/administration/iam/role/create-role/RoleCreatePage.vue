@@ -1,6 +1,6 @@
 <template>
-    <section class="edit-role-page">
-        <p-page-title title="Edit Role" />
+    <section class="role-create-page">
+        <p-page-title title="Create Role" />
     </section>
 </template>
 
@@ -10,7 +10,7 @@ import { reactive, toRefs } from '@vue/composition-api';
 import { PPageTitle } from '@spaceone/design-system';
 
 export default {
-    name: 'EditRolePage',
+    name: 'RoleCreatePage',
     components: {
         PPageTitle,
     },
@@ -28,7 +28,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.edit-role-page {
+.role-page {
     @apply mx-0;
     max-width: 100%;
 }

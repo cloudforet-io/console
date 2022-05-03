@@ -1,36 +1,62 @@
 <template>
     <section class="role-page">
-        <p-page-title title="Role" />
+        <p-page-title title="Role"
+                      use-selected-count
+                      use-total-count
+                      :total-count="totalCount"
+                      :selected-count="selectedIndices.length"
+        />
         <p-horizontal-layout>
-            <template #container="{ height }" />
+            <template #container="{ height }">
+                <role-management-table :table-height="height"
+                                       @update-selected-indices="handleUpdate"
+                                       @update-total-count="handleUpdate"
+                />
+            </template>
         </p-horizontal-layout>
     </section>
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
+import {
+    defineComponent, reactive, toRefs,
+} from '@vue/composition-api';
 
 import {
-    PHorizontalLayout, PPageTitle,
+    PHorizontalLayout, PPageTitle, PToolboxTable, PIconTextButton, PSelectDropdown,
 } from '@spaceone/design-system';
+import RoleManagementTable from '@/services/administration/iam/role/modules/RoleManagementTable.vue';
 
-export default {
+export default defineComponent({
     name: 'RolePage',
     components: {
         PHorizontalLayout,
         PPageTitle,
+        PToolboxTable,
+        PIconTextButton: PIconTextButton as any,
+        PSelectDropdown,
+        RoleManagementTable,
     },
     setup() {
         const state = reactive({
-            // selected
+            totalCount: 0,
+            selectedIndices: [] as number[],
         });
+        const handleUpdate = (value: number[] | number) => {
+            if (Array.isArray(value)) {
+                state.selectedIndices = value;
+            } else {
+                state.totalCount = value;
+            }
+        };
 
         return {
             ...toRefs(state),
+            handleUpdate,
         };
     },
 
-};
+});
 </script>
 
 <style lang="postcss" scoped>

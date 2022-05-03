@@ -7,8 +7,8 @@ const AdministrationContainer = () => import(/* webpackChunkName: "Administratio
 
 const UserPage = () => import(/* webpackChunkName: "UserPage" */ '@/services/administration/iam/user/UserPage.vue');
 const RolePage = () => import(/* webpackChunkName: "RolePage" */'@/services/administration/iam/role/RolePage.vue');
-const CreateRolePage = () => import(/* webpackChunkName: "CreateRolePage" */'@/services/administration/iam/role/create-role/CreateRolePage.vue');
-const EditRolePage = () => import(/* webpackChunkName: "EditRolePage" */'@/services/administration/iam/role/edit-role/EditRolePage.vue');
+const RoleCreatePage = () => import(/* webpackChunkName: "RoleCreatePage" */'@/services/administration/iam/role/create-role/RoleCreatePage.vue');
+const RoleEditPage = () => import(/* webpackChunkName: "RoleEditPage" */'@/services/administration/iam/role/edit-role/RoleEditPage.vue');
 const PolicyPage = () => import(/* webpackChunkName: "PolicyPage" */ '@/services/administration/iam/policy/PolicyPage.vue');
 
 const administrationRoutes: RouteConfig = {
@@ -41,20 +41,20 @@ const administrationRoutes: RouteConfig = {
                             name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME,
                             meta: { lnbVisible: true },
                             props: true,
-                            component: RolePage as any,
+                            component: RolePage,
                         },
                         {
                             path: 'create',
                             name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME,
                             meta: { label: 'Create Role' },
-                            component: CreateRolePage as any,
+                            component: RoleCreatePage,
                         },
                         {
                             path: 'edit/:id',
                             name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME,
                             meta: { label: 'Edit Role' },
                             props: true,
-                            component: EditRolePage as any,
+                            component: RoleEditPage,
                         },
                     ],
                 },
