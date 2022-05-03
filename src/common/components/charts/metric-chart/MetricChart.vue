@@ -57,9 +57,11 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
 
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    defineComponent, PropType, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
-import { MetricChartProps } from '@/common/components/charts/metric-chart/type';
+import { MetricChartProps, MonitoringResourceType, Unit } from '@/common/components/charts/metric-chart/type';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
@@ -82,7 +84,7 @@ interface Tooltip {
     legends: Legend[];
 }
 
-export default {
+export default defineComponent<MetricChartProps>({
     name: 'PMetricChart',
     components: { PLottie, PSkeleton, PDataLoader },
     props: {
@@ -91,21 +93,21 @@ export default {
             default: true,
         },
         dataset: {
-            type: Object,
+            type: Object as PropType<Record<string, number[]>>,
             default: () => ({}),
         },
         labels: {
-            type: Array,
+            type: Array as PropType<string[]>,
             default: () => [],
         },
         resources: {
-            type: Array,
+            type: Array as PropType<MonitoringResourceType[]>,
             default: () => ([]),
         },
         unit: {
-            type: Object,
+            type: Object as PropType<Unit>,
             default: () => ({ x: 'Timestamp', y: 'Count' }),
-            validator(unit) {
+            validator(unit: Unit) {
                 return typeof unit.x === 'string' && typeof unit.y === 'string';
             },
         },
@@ -122,7 +124,7 @@ export default {
             default: false,
         },
     },
-    setup(props: MetricChartProps) {
+    setup(props) {
         const state = reactive({
             chartRef: null,
             chart: null as null | any,
@@ -251,7 +253,7 @@ export default {
             commaFormatter,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">

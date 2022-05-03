@@ -26,11 +26,12 @@
 import { PPopover } from '@spaceone/design-system';
 import { i18n } from '@/translations';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
+import { defineComponent } from '@vue/composition-api';
 
-export default {
+export default defineComponent({
     name: 'PdfDownloadButton',
     components: {
-        PPopover,
+        PPopover: PPopover as any,
     },
     setup() {
         return {
@@ -38,7 +39,7 @@ export default {
             supportsBrowser,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

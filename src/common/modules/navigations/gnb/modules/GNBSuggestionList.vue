@@ -16,40 +16,42 @@
         </template>
         <template #item--format="{ item }">
             <div class="suggestion-item">
-                <div class="left-part">
+                <span class="image">
                     <p-lazy-img v-if="item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE"
                                 :src="item.icon || ''"
                                 width="1rem" height="1rem"
-                                class="ic-lazy-img"
                     />
                     <p-i v-else
                          :name="item.icon"
                          width="1rem" height="1rem"
-                         class="mr-1"
                     />
-                    <span>
-                        <template v-if="item.parents">
-                            <span v-for="(parent, pIdx) in item.parents" :key="`parents-${pIdx}`">
-                                <span v-for="({text, matched}, i) in getTextList(parent.label)"
-                                      :key="`parent-label-${text}-${i}`"
-                                >
-                                    <span :class="{'matched-character': matched}">{{ text }}</span>
-                                </span>
-                                <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem" />
+                </span>
+                <span class="texts">
+                    <template v-if="item.parents">
+                        <template v-for="(parent, pIdx) in item.parents">
+                            <text-highlighting :key="`parent-${parent.label}-${pIdx}`"
+                                               :term="inputText"
+                                               :text="parent.label"
+                            />
+                            <span :key="`arrow-${pIdx}`">
+                                <p-i name="ic_breadcrumb_arrow"
+                                     width="1rem" height="1rem"
+                                />
                             </span>
                         </template>
-                        <span v-for="({text, matched}, i) in getTextList(item.label)"
-                              :key="`label-${text}-${i}`"
-                        >
-                            <span :class="{'matched-character': matched}">{{ text }}</span>
-                        </span>
-                    </span>
-                </div>
-                <favorite-button v-if="useFavorite"
-                                 :item-id="item.name"
-                                 :favorite-type="item.itemType"
-                                 scale="0.65"
-                />
+                    </template>
+                    <text-highlighting :key="`leaf-${item.label}`"
+                                       :term="inputText"
+                                       :text="item.label"
+                    />
+                </span>
+                <span class="favorite-button">
+                    <favorite-button v-if="useFavorite"
+                                     :item-id="item.name"
+                                     :favorite-type="item.itemType"
+                                     scale="0.65"
+                    />
+                </span>
             </div>
         </template>
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -60,8 +62,7 @@
 
 <script lang="ts">
 import {
-    computed,
-    defineComponent, PropType,
+    defineComponent, onUnmounted, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -73,6 +74,7 @@ import {
     FocusStartPosition,
     SuggestionItem, SUGGESTION_TYPE,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 
 
 interface Props {
@@ -86,6 +88,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'GNBSuggestionList',
     components: {
+        TextHighlighting,
         FavoriteButton,
         PContextMenu,
         PLazyImg,
@@ -119,59 +122,7 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const state = reactive({
             contextMenuRef: null as null | any,
-            searchRegex: computed(() => {
-                let regex = '';
-                if (props.inputText) {
-                    // remove spaces in the search term
-                    const text = props.inputText.replace(/\s/g, '');
-                    for (let i = 0; i < text.length; i++) {
-                        regex += text[i];
-                        // add space regex after every single character to find matching keywords ignoring spaces
-                        if (i < text.length - 1) regex += '\\s*';
-                    }
-                }
-                return new RegExp(regex, 'i');
-            }),
         });
-
-        const getFirstMatchedString = (str: string): string => {
-            const matched = state.searchRegex.exec(str);
-            if (matched?.index === 0) {
-                return matched[0];
-            }
-            return '';
-        };
-
-        const getTextList = (str = ''): {text: string; matched: boolean}[] => {
-            if (!props.inputText?.trim()) return [{ text: str, matched: false }];
-
-            const regex = state.searchRegex;
-            const unmatchedTexts = str.split(regex);
-            const textList: {text: string; matched: boolean}[] = [];
-
-            let remainedStr = str;
-
-            const setMatchedItem = () => {
-                const text = getFirstMatchedString(remainedStr);
-                if (text) {
-                    textList.push({ text, matched: true });
-                    remainedStr = remainedStr.slice(text.length);
-                }
-            };
-
-            setMatchedItem();
-            unmatchedTexts.forEach((t) => {
-                if (t) {
-                    textList.push({ text: t, matched: false });
-                    remainedStr = remainedStr.slice(t.length);
-                }
-                if (remainedStr) {
-                    setMatchedItem();
-                }
-            });
-
-            return textList;
-        };
 
         const handleSelect = (item, index) => {
             emit('select', item, index);
@@ -187,10 +138,13 @@ export default defineComponent<Props>({
             }
         });
 
+        onUnmounted(() => {
+            emit('update:isFocused', false);
+        });
+
         return {
             ...toRefs(state),
             SUGGESTION_TYPE,
-            getTextList,
             handleSelect,
         };
     },
@@ -217,17 +171,25 @@ export default defineComponent<Props>({
             display: flex;
             justify-content: space-between;
             width: 100%;
-            align-items: center;
-            .left-part {
-                display: flex;
-                align-items: center;
+            .image {
+                margin-right: 0.25rem;
+                flex-shrink: 0;
+            }
+            .texts {
+                flex-grow: 1;
+            }
+            .favorite-button {
+                flex-shrink: 0;
             }
         }
 
-        .context-item {
+        .p-context-menu-item {
             justify-content: flex-start;
             line-height: 1.75;
             padding: 0.25rem 0.5rem;
+            .label-wrapper {
+                overflow: visible;
+            }
 
             &:focus {
                 @apply border border-blue-400 rounded-xs;
@@ -237,10 +199,6 @@ export default defineComponent<Props>({
                 &:not(:hover):not(.disabled):not(.empty) {
                     @apply bg-white;
                 }
-            }
-
-            .ic-lazy-img {
-                margin-right: 0.25rem;
             }
         }
 

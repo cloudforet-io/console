@@ -125,15 +125,11 @@ export default {
 .tag-menu-item.p-checkbox::v-deep {
     @apply bg-transparent;
     display: flex;
-    padding: 0.375rem 0.5rem;
-    cursor: pointer;
+    width: 100%;
     .check-icon {
         flex-shrink: 0;
         margin-right: 0.5rem;
         margin-top: 0.125rem;
-    }
-    &:hover {
-        @apply bg-blue-200;
     }
     .text {
         word-break: break-word;
@@ -150,16 +146,6 @@ export default {
 .p-autocomplete-search::v-deep {
     .p-context-menu {
         max-height: 50vh;
-        .context-item:not(.empty) {
-            padding: 0;
-            white-space: unset;
-            .text {
-                max-width: calc(100% - 1.5rem);
-            }
-        }
-        .fake-no-data {
-            height: 1rem;
-        }
     }
 }
 </style>

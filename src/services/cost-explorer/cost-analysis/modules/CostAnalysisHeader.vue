@@ -10,7 +10,7 @@
                     >
                         <template #menu-item--format="{item}">
                             <div class="query-item-wrapper">
-                                <div class="dropdown-item-modal">
+                                <div class="dropdown-item-wrapper">
                                     <span>{{ item.label }}</span><span v-if="!item.name" class="default-item-suffix">(default)</span>
                                 </div>
                                 <div v-if="item.name" class="button-wrapper">
@@ -296,14 +296,14 @@ export default {
     }
 
     .button-wrapper {
-        @apply inline-flex items-center flex-wrap;
+        @apply flex-shrink-0 inline-flex items-center;
         &.extra {
             @apply gap-4 justify-end;
             float: right;
         }
     }
-    .dropdown-item-modal {
-        @apply flex items-center flex-wrap gap-1;
+    .dropdown-item-wrapper {
+        @apply flex items-center gap-1;
 
         .default-item-suffix {
             @apply text-gray-400;
