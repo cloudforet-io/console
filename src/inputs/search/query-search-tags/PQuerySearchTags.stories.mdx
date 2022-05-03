@@ -81,7 +81,7 @@ If you give ```converter``` as props, it will be executed. Otherwise, default co
 ```typescript
 interface QueryItem<T=string> {
     key?: KeyItem; // { label, name, dataType? }
-    operator: OperatorType; // '!', '>', '>=', '<', '<=', '=', '!=', '$'
+    operator: OperatorType; // '!', '>', '>=', '<', '<=', '=', '!=', '~'
     value: ValueItem<T>; // { label, name(string) }
 }
 ```
