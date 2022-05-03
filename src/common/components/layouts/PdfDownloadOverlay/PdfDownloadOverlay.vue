@@ -113,7 +113,7 @@ export default defineComponent<Props>({
         mode: {
             type: String as PropType<Mode>,
             default: 'PDF_EMBED',
-            validator(mode: Mode) {
+            validator(mode: Mode): boolean {
                 return modes.includes(mode);
             },
         },

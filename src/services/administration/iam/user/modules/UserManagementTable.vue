@@ -275,7 +275,7 @@ export default {
 
         const handleChange = async (options: any = {}) => {
             userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
-            if (options.queryRags !== undefined) {
+            if (options.queryTags !== undefined) {
                 await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
             }
             await listUsers();

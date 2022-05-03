@@ -12,11 +12,12 @@
 <script lang="ts">
 import { PI } from '@spaceone/design-system';
 
-enum STYLE_TYPE {
-    gray = 'gray',
-    secondary = 'secondary',
-    peacock = 'peacock'
-}
+const STYLE_TYPE = Object.freeze({
+    gray: 'gray',
+    secondary: 'secondary',
+    peacock: 'peacock',
+} as const);
+type STYLE_TYPE = typeof STYLE_TYPE[keyof typeof STYLE_TYPE];
 
 export default {
     name: 'InfoMessage',
@@ -27,7 +28,7 @@ export default {
         styleType: {
             type: String,
             default: STYLE_TYPE.gray,
-            validator(styleType: any) {
+            validator(styleType: STYLE_TYPE): boolean {
                 return Object.values(STYLE_TYPE).includes(styleType);
             },
         },

@@ -33,6 +33,26 @@
                     Action
                 </p-select-dropdown>
             </template>
+            <template #col-role_type-format="{ value }">
+                <p-badge v-if="value" :outline="true" :style-type="roleTypeBadgeOption[value].styleType">
+                    {{ roleTypeBadgeOption[value] ? roleTypeBadgeOption[value].label : '' }}
+                </p-badge>
+            </template>
+            <template #col-tags.description-format="{ value }">
+                {{ value ? value : '--' }}
+            </template>
+            <template #col-edit_button-format="{ item }">
+                <p-button size="sm"
+                          style-type="gray-border"
+                          :outline="true"
+                          font-weight="bold"
+                          @click="handleEditRole(item.role_id)"
+                >
+                    <p-i class="mr-1" name="ic_edit"
+                         width="1rem" height="1rem"
+                    />Edit
+                </p-button>
+            </template>
         </p-toolbox-table>
     </section>
 </template>
@@ -44,6 +64,7 @@ import {
 
 import {
     PHorizontalLayout, PPageTitle, PToolboxTable, PIconTextButton, PSelectDropdown,
+    PBadge, PButton, PI,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -54,8 +75,17 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { RoleData } from '@/services/administration/iam/role/type';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
+import { ROLE_TYPE } from '@/services/administration/iam/role/config';
+import { store } from '@/store';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
-const DEFAUTL_PAGE_LIMIT = 15;
+const DEFAULT_PAGE_LIMIT = 15;
+
+const roleTypeBadgeOption = {
+    [ROLE_TYPE.SYSTEM]: { label: 'System', styleType: 'secondary1' },
+    [ROLE_TYPE.DOMAIN]: { label: 'Domain', styleType: 'primary1' },
+    [ROLE_TYPE.PROJECT]: { label: 'Project', styleType: 'gray' },
+};
 
 export default defineComponent({
     name: 'RolePage',
@@ -65,6 +95,9 @@ export default defineComponent({
         PToolboxTable,
         PIconTextButton: PIconTextButton as any,
         PSelectDropdown,
+        PBadge,
+        PButton,
+        PI,
     },
     props: {
         tableHeight: {
@@ -74,7 +107,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const roleListApiQueryHelper = new ApiQueryHelper()
-            .setPageStart(1).setPageLimit(DEFAUTL_PAGE_LIMIT)
+            .setPageStart(1).setPageLimit(DEFAULT_PAGE_LIMIT)
             .setSort('name', true);
 
         const state = reactive({
@@ -95,10 +128,16 @@ export default defineComponent({
             roles: [] as RoleData[],
             fields: [
                 { name: 'name', label: 'Name' },
-                { name: 'description', label: 'Description', sortable: false },
+                { name: 'tags.description', label: 'Description', sortable: false },
                 { name: 'role_type', label: 'Role Type' },
                 { name: 'created_at', label: 'Created', sortable: false },
                 { name: 'edit_button', label: ' ', sortable: false },
+            ],
+            excelFields: [
+                { key: 'name', name: 'Name' },
+                { key: 'tags.description', name: 'Description' },
+                { key: 'role_type', name: 'Role Type' },
+                { key: 'created_at', name: 'Created' },
             ],
             // selected
             selectedIndices: [] as number[],
@@ -127,6 +166,7 @@ export default defineComponent({
         const openDeleteModal = () => { console.debug('openDeleteModal', state.selectedIndices); };
         // event
         const handleCreateRole = () => { SpaceRouter.router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME }); };
+        const handleEditRole = (id: string) => { SpaceRouter.router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }); };
         const handleSelectDropdown = (name) => {
             switch (name) {
             case 'edit':
@@ -144,7 +184,20 @@ export default defineComponent({
             setApiQueryWithToolboxOptions(roleListApiQueryHelper, options);
             listRoles();
         };
-        const handleExport = () => { console.debug('handleExport'); };
+        const handleExport = async () => {
+            try {
+                await store.dispatch('file/downloadExcel', {
+                    url: '/identity/role/list',
+                    param: {
+                        query: roleListApiQueryHelper.data,
+                    },
+                    fields: state.excelFields,
+                    file_name_prefix: FILE_NAME_PREFIX.role,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
         watch(() => state.selectedIndices, (indices: number[]) => {
             emit('update-selected-indices', indices);
         });
@@ -156,7 +209,10 @@ export default defineComponent({
         })();
         return {
             ...toRefs(state),
+            ROLE_TYPE,
+            roleTypeBadgeOption,
             handleCreateRole,
+            handleEditRole,
             handleSelectDropdown,
             handleSelect,
             handleChange,
