@@ -63,6 +63,8 @@ export interface WidgetOptions {
     period?: Period;
     group_by?: string | GROUP_BY;
     chart_type?: CHART_TYPE;
+    chart_img?: string;
+    chart_desc_translation_id?: string;
     layout: number;
 }
 

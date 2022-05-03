@@ -9,12 +9,16 @@
                           @input="handleName"
             />
         </p-field-group>
+        <p v-if="selectedWidgetDesc" class="widget-desc">
+            {{ selectedWidgetDesc }}
+        </p>
         <p-field-group
             v-if="editableWidgetOptionList.includes(EDITABLE_WIDGET_OPTIONS.GROUP_BY)"
             :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.LABEL_GROUP_BY')"
             :invalid="invalidState.groupBy"
             :invalid-text="invalidTexts.groupBy"
             required
+            class="group-by"
         >
             <p-select-dropdown
                 :items="groupByItems"
@@ -55,8 +59,11 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 import { GRANULARITY_ITEM_MAP, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { cloneDeep } from 'lodash';
-import { EDITABLE_WIDGET_OPTIONS } from '@/services/cost-explorer/cost-dashboard/type';
+import { EDITABLE_WIDGET_OPTIONS, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import VueI18n from 'vue-i18n';
+
+import TranslateResult = VueI18n.TranslateResult;
 
 
 export default {
@@ -111,8 +118,9 @@ export default {
         });
 
         const state = reactive({
-            _selectedWidget: computed(() => props.selectedWidget),
-            editedSelectedWidget: computed(() => cloneDeep(state._selectedWidget)),
+            _selectedWidget: computed<WidgetInfo>(() => props.selectedWidget),
+            editedSelectedWidget: computed<WidgetInfo>(() => cloneDeep(state._selectedWidget)),
+            selectedWidgetDesc: computed<TranslateResult|undefined>(() => i18n.t(state._selectedWidget?.options?.chart_desc_translation_id)),
             groupByItems: computed<MenuItem[]>(() => Object.values(GROUP_BY_ITEM_MAP)),
             granularityItems: computed<MenuItem[]>(() => Object.values(GRANULARITY_ITEM_MAP)),
             selectedGroupByItem: computed<string>({
@@ -194,6 +202,14 @@ export default {
 .widget-config {
     .p-text-input {
         @apply w-full;
+    }
+    .widget-desc {
+        @apply text-gray-700;
+        font-size: 0.875rem;
+        line-height: 125%;
+    }
+    .group-by {
+        margin-top: 1rem;
     }
 }
 </style>

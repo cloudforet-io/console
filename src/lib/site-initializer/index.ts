@@ -21,6 +21,7 @@ const initApiClient = async () => {
     await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
         // Add session expiration process
         store.dispatch('user/setIsSessionExpired', true);
+        store.dispatch('error/showSessionExpiredError');
     }, { endpoint: config.get('MOCK.ENDPOINT'), all: config.get('MOCK.ALL') }, {
         '/inventory/cloud-service-type/create': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
         '/inventory/cloud-service-type/update': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },

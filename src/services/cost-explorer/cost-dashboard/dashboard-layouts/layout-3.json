@@ -4,6 +4,8 @@
     "name": "Budget Usage Summary",
     "options": {
       "chart_type": "CARD",
+      "chart_img": "Budget_Usage_Summary",
+      "chart_desc_translation_id": "BUDGET_USAGE_SUMMARY_DESC",
       "layout": 100
     }
   }],
@@ -12,6 +14,8 @@
     "name": "Project-wise Budget Usage Summary",
     "options": {
       "chart_type": "TABLE",
+      "chart_img": "Budget_Usage_With_Forecast",
+      "chart_desc_translation_id": "BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.BUDGET_USAGE_WITH_FORECAST_DESC",
       "layout": 100
     }
   }],
@@ -20,6 +24,8 @@
     "name": "Cost Trend By Product",
     "options": {
       "chart_type": "STACKED_COLUMN",
+      "chart_img": "Cost_Trend(Stacked)_B",
+      "chart_desc_translation_id": "BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.COST_TREND_B_DESC",
       "layout": 100,
       "group_by": "product"
     }
