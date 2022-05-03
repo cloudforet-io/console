@@ -1,3 +1,10 @@
+# [1.1.0-beta.290](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.289...v1.1.0-beta.290) (2022-05-03)
+
+
+### Features
+
+* change regex $ -> ~ ([#940](https://github.com/spaceone-dev/spaceone-design-system/issues/940)) ([2338f87](https://github.com/spaceone-dev/spaceone-design-system/commit/2338f87bca9027141c0f9cff36bd9733679cc520))
+
 # [1.1.0-beta.289](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.288...v1.1.0-beta.289) (2022-05-03)
 
 
