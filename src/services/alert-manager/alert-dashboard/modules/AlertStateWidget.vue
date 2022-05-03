@@ -83,6 +83,7 @@
                         <alert-list-item :item="item"
                                          :show-project-link="true"
                                          :project-reference="projects[item.project_id]"
+                                         :user-reference="users[item.assignee]"
                         />
                     </template>
                     <template #no-data>
@@ -194,6 +195,7 @@ export default {
         });
         const state = reactive({
             loading: true,
+            users: computed(() => store.state.reference.user.items),
             projects: computed(() => store.state.reference.project.items),
             urgencyList: computed(() => ([
                 {
@@ -297,7 +299,10 @@ export default {
 
         /* Init */
         (async () => {
-            await store.dispatch('reference/project/load');
+            await Promise.allSettled([
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/user/load'),
+            ]);
         })();
 
         /* Watcher */

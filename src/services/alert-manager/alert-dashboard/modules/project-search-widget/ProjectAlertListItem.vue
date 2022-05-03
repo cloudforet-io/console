@@ -7,7 +7,11 @@
             {{ $t('MONITORING.ALERT.DASHBOARD.OPEN_ALERT') }} ({{ totalCount > 15 ? '15+' : totalCount }})
         </template>
         <template #item="{item, index}">
-            <alert-list-item v-if="index < 15" :item="item" :show-status-message="true" />
+            <alert-list-item v-if="index < 15"
+                             :item="item"
+                             :show-status-message="true"
+                             :user-reference="users[item.assignee]"
+            />
             <div v-else class="view-all-text">
                 <p-anchor :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: projectId } }"
                           :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_ALERTS')"
@@ -25,7 +29,7 @@ import {
 } from '@spaceone/design-system';
 
 import {
-    reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
@@ -35,6 +39,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
 
 
 export default {
@@ -53,6 +58,7 @@ export default {
     setup(props) {
         const state = reactive({
             loading: true,
+            users: computed(() => store.state.reference.user.items),
             items: [],
             totalCount: 0,
         });
@@ -83,6 +89,12 @@ export default {
                 state.loading = false;
             }
         };
+
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('reference/user/load'),
+            ]);
+        })();
 
         watch(() => props.projectId, async (projectId) => {
             if (projectId) await listAlerts();

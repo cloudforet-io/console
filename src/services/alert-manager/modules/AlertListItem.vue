@@ -16,7 +16,7 @@
                          style-type="primary2"
                          class="member-name"
                 >
-                    {{ userReference ? userReference.label : item.assignee }}
+                    {{ userReference ? userReference.name : item.assignee }}
                 </p-badge>
             </div>
             <div class="right-part">

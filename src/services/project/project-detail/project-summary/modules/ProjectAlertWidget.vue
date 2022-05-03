@@ -41,6 +41,7 @@
                     <alert-list-item
                         :item="item"
                         :show-member-name="true"
+                        :user-reference="users[item.assignee]"
                     />
                 </template>
             </p-list-card>
@@ -96,6 +97,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
+            users: computed(() => store.state.reference.user.items),
             alertStates: computed(() => ([
                 {
                     name: ALERT_STATE.TRIGGERED,
@@ -190,6 +192,10 @@ export default {
                 state.alertStateCounts = 0;
             }
         };
+
+        (async () => {
+            await store.dispatch('reference/user/load');
+        })();
 
         watch(() => props.projectId, async (projectId) => {
             if (projectId) {
