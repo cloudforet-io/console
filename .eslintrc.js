@@ -79,14 +79,32 @@ module.exports = {
             'error',
             { allows: ['protected', 'public'] },
         ],
-        '@typescript-eslint/camelcase': ['error', {
-            properties: 'never',
-            allow: [
-                '_id$',
-                '_at$',
-                'total_count',
-            ],
-        },
+        '@typescript-eslint/camelcase': ['off'],
+        '@typescript-eslint/naming-convention': [
+            'error',
+            {
+                selector: 'variable',
+                format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
+                filter: {
+                    regex: '(total_count)',
+                    match: false,
+                },
+                leadingUnderscore: 'allow'
+            },
+            {
+                selector: 'memberLike',
+                format: ['camelCase', 'snake_case', 'PascalCase', 'UPPER_CASE'],
+                leadingUnderscore: 'allow'
+            },
+            {
+                selector: 'parameter',
+                format: ['camelCase'],
+                leadingUnderscore: 'allow'
+            },
+            {
+                selector: 'typeLike',
+                format: ['PascalCase', 'UPPER_CASE']
+            },
         ],
         '@typescript-eslint/no-empty-function': ['off'], // use eslint no-empty-function rule
         '@typescript-eslint/no-use-before-define': ['off'], // use eslint no-use-before-define rule

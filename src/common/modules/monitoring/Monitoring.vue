@@ -130,7 +130,7 @@ interface MetricChartData {
     dataset: {[resourceKey: string]: number[]};
     metric: Metric;
     error?: boolean;
-    resources: object[];
+    resources: any[];
 }
 
 interface DataToolType {

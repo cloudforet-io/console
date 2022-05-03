@@ -94,7 +94,7 @@ interface SecretModel {
     'project_id': string;
     'domain_id': string;
     created_at: TimeStamp;
-    tags: object;
+    tags: any;
 }
 
 export default {
@@ -156,7 +156,7 @@ export default {
             sortBy: 'name',
             sortDesc: true,
             collectDataVisible: false,
-            targetCredentialId: null,
+            targetCredentialId: null as string | null,
             queryTags: [],
         });
 
@@ -226,7 +226,6 @@ export default {
             referenceRouter,
             openCollectDataModal(item: SecretModel) {
                 state.collectDataVisible = true;
-                // @ts-ignore
                 state.targetCredentialId = item.secret_id || null as unknown as string;
             },
             onChange,

@@ -18,7 +18,6 @@ import '@spaceone/design-system/css/light-style.css';
 
 /** ********** SET VUE PLUGINS ************** */
 Vue.use(VueCompositionApi);
-// @ts-ignore
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 Vue.use(PortalVue);

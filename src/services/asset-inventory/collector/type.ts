@@ -46,7 +46,7 @@ export interface CollectorModel extends Tags {
     name: string;
     state: COLLECTOR_STATE;
     provider: string;
-    capability: object;
+    capability: any;
     plugin_info: CollectorPluginModel;
     priority: number;
     created_at: TimeStamp;

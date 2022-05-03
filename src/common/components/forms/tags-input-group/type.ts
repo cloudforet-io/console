@@ -5,6 +5,10 @@ export interface TagItem {
     value: string | number | boolean;
 }
 
+export interface Tag {
+    [key: string | number]: string | number | boolean;
+}
+
 export type ValidationData = {
     isValid: boolean;
     message: string | TranslateResult;
@@ -16,7 +20,7 @@ export interface TagValidation {
 }
 
 export interface TagsInputGroupProps {
-    tags: object;
+    tags: Tag;
     disabled: boolean;
     isValid: boolean;
     showEmptyInput: boolean;

@@ -149,8 +149,8 @@ export default defineComponent<Props>({
 
         const createPublicDashboard = async (): Promise<string|undefined> => {
             try {
-                const { public_dashboard_id } = await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
-                return public_dashboard_id;
+                const res = await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
+                return res.public_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
             }
@@ -159,8 +159,8 @@ export default defineComponent<Props>({
 
         const createUserDashboard = async (): Promise<string|undefined> => {
             try {
-                const { user_dashboard_id } = await SpaceConnector.client.costAnalysis.userDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
-                return user_dashboard_id;
+                const res = await SpaceConnector.client.costAnalysis.userDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
+                return res.user_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
             }

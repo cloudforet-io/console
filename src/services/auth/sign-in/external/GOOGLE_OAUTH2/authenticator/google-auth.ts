@@ -3,8 +3,7 @@ import { Authenticator } from '@/services/auth/authenticator';
 import { loadGapiInsideDOM } from 'gapi-script';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-// @ts-ignore
-let { gapi } = window;
+let { gapi } = window as any;
 
 class GoogleAuth extends Authenticator {
     static async signOut() {

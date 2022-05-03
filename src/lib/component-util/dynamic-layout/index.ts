@@ -7,15 +7,13 @@ import {
 import { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { Filter } from '@spaceone/console-core-lib/space-connector/type';
 import { forEach } from 'lodash';
-import { EnumOptions } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 import { ConsoleDynamicField, ConsoleSearchSchema, Reference } from '@/lib/component-util/dynamic-layout/type';
 
 interface ExcelDataField {
     key: string;
     name: string;
     type?: 'datetime'|'enum';
-    // eslint-disable-next-line camelcase
-    enum_items?: object;
+    enum_items?: any;
     reference?: Reference;
 }
 
@@ -82,15 +80,13 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): E
     } else if (d.type === 'enum') {
         res.type = d.type;
 
-        const options = (d.options as EnumOptions)?.items || d.options;
+        const options = (d.options as any)?.items || d.options;
         if (options) {
             const items = {};
-            // @ts-ignore
             forEach(options, (item, k) => {
                 if (typeof item === 'string') items[k] = item;
                 else items[k] = item.name || k;
             });
-            // eslint-disable-next-line camelcase
             res.enum_items = items;
         }
     }

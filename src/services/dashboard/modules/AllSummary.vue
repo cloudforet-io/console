@@ -235,22 +235,17 @@ export default {
         });
 
         /* util */
-        const disposeChart = () => {
-            // @ts-ignore
-            if (chartState.registry[state.chartRef]) {
-                // @ts-ignore
-                chartState.registry[state.chartRef].dispose();
-                // @ts-ignore
-                delete chartState.registry[state.chartRef];
+        const disposeChart = (chartContext) => {
+            if (chartState.registry[chartContext]) {
+                chartState.registry[chartContext].dispose();
+                delete chartState.registry[chartContext];
             }
         };
-        const drawChart = () => {
+        const drawChart = (chartContext) => {
             const createChart = () => {
-                disposeChart();
-                // @ts-ignore
-                chartState.registry[state.chartRef] = am4core.create(state.chartRef, am4charts.XYChart);
-                // @ts-ignore
-                return chartState.registry[state.chartRef];
+                disposeChart(chartContext);
+                chartState.registry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
+                return chartState.registry[chartContext];
             };
             const chart = createChart();
             state.chart = chart;
@@ -325,7 +320,7 @@ export default {
         let tabInterval;
         const setTabInterval = () => {
             tabInterval = setInterval(() => {
-                disposeChart();
+                disposeChart(state.chartRef);
                 let activeTabIndex = state.tabs.indexOf(state.activeTab);
                 if (activeTabIndex < 3) {
                     activeTabIndex += 1;
@@ -627,7 +622,7 @@ export default {
 
         /* event */
         const onChangeTab = (name) => {
-            if (state.activeTab !== name) disposeChart();
+            if (state.activeTab !== name) disposeChart(state.chartRef);
             state.activeTab = name;
             if (tabInterval) clearInterval(tabInterval);
         };
@@ -655,21 +650,21 @@ export default {
 
         watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
             if (!loading && chartContext) {
-                drawChart();
+                drawChart(chartContext);
             }
         }, { immediate: false });
         watch(() => state.activeTab, async (type) => {
             if (type === DATA_TYPE.billing) {
                 await Promise.all([getBillingSummaryInfo(), getTrend(type)]);
-                drawChart();
+                drawChart(state.chartRef);
             } else {
                 await Promise.all([getSummaryInfo(type), getTrend(type)]);
-                drawChart();
+                drawChart(state.chartRef);
             }
         }, { immediate: false });
         watch(() => state.selectedDateType, async () => {
             await getTrend(state.activeTab);
-            drawChart();
+            drawChart(state.chartRef);
         }, { immediate: false });
 
         onUnmounted(() => {

@@ -79,7 +79,7 @@ interface SecretModel {
     'project_id': string;
     'domain_id': string;
     created_at: TimeStamp;
-    tags: object;
+    tags: any;
 }
 
 enum COLLECT_MODE {
@@ -121,12 +121,12 @@ interface CollectorModel {
     name: string;
     state: COLLECTOR_STATE;
     provider: string;
-    capability: object;
+    capability: any;
     plugin_info: CollectorPluginModel;
     priority: number;
     created_at: TimeStamp;
     last_collected_at: TimeStamp | null;
-    tags: object[];
+    tags: any[];
     icon: string;
 }
 

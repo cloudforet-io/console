@@ -24,7 +24,7 @@ export interface EscalationPolicyFormModel {
     project_id?: string;
 }
 
-type responder = {
+type Responder = {
     resource_type: string;
     resource_id: string;
 }
@@ -37,7 +37,7 @@ interface ResourceModel {
 }
 
 export interface AlertDataModel {
-    responders: responder[];
+    responders: Responder[];
     alert_number: number;
     alert_id: string;
     title: string;
@@ -62,11 +62,11 @@ export interface AlertDataModel {
     acknowledged_at: TimeStamp;
     resolved_at: TimeStamp;
     escalated_at: TimeStamp;
-    additional_info: object;
+    additional_info: any;
 }
 
 export interface Event {
-    additional_info: object;
+    additional_info: any;
     alert_id: string;
     created_at: TimeStamp;
     description: string;
@@ -75,8 +75,8 @@ export interface Event {
     event_type: string;
     occurred_at: TimeStamp;
     project_id: string;
-    raw_data: object;
-    resource: object;
+    raw_data: any;
+    resource: any;
     rule: string;
     severity: string;
     title: string;
@@ -106,11 +106,11 @@ export interface ProjectMember {
     created_at: TimeStamp;
     domain_id?: string;
     labels: string[];
-    project_group_info: object;
-    project_info?: object;
+    project_group_info: any;
+    project_info?: any;
     resource_id: string;
     resource_type: string;
     role_binding_id?: string;
-    role_info?: object;
+    role_info?: any;
     tags: Tags;
 }

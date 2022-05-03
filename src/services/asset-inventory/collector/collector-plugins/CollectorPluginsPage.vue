@@ -103,7 +103,7 @@ enum PLUGIN_STATE {
 
 interface PluginTemplateModel {
     [key: string]: {
-        schema: object;
+        schema: any;
     };
 }
 
@@ -118,7 +118,7 @@ interface PluginModel {
     project_id: string;
     labels: string[];
     created_at: TimeStamp;
-    tags: object[];
+    tags: any[];
     icon?: string;
 }
 

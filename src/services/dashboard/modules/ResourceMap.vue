@@ -125,7 +125,7 @@ export default {
 
         const chartState = reactive({
             registry: {},
-            chartData: [] as object[],
+            chartData: [],
             skeletons: range(5),
             providers: computed(() => state.data.map(d => ({
                 name: state.providers[d.provider]?.label,

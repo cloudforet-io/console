@@ -123,13 +123,10 @@ enum STATUS {
     ok = 'ok',
 }
 enum CATEGORY {
-    // eslint-disable-next-line @typescript-eslint/camelcase
     cost_optimizing,
     performance,
     security,
-    // eslint-disable-next-line @typescript-eslint/camelcase
     fault_tolerance,
-    // eslint-disable-next-line @typescript-eslint/camelcase
     service_limits,
 }
 
@@ -251,15 +248,14 @@ export default {
             series.dataFields.value = 'count';
             series.dataFields.category = 'status';
 
-            series.slices.template.togglable = false;
-            series.slices.template.clickable = false;
-            series.slices.template.stroke = am4core.color('#fff');
-            series.slices.template.tooltipText = '';
-            series.slices.template.strokeWidth = 1;
-            // @ts-ignore
-            series.slices.template.states.getKey('hover').properties.scale = 1;
-            series.slices.template.adapter.add('fill', (fill, target) => {
-                // @ts-ignore
+            const slice: any = series.slices.template;
+            slice.togglable = false;
+            slice.clickable = false;
+            slice.stroke = am4core.color('#fff');
+            slice.tooltipText = '';
+            slice.strokeWidth = 1;
+            slice.states.getKey('hover').properties.scale = 1;
+            slice.adapter.add('fill', (fill, target) => {
                 if (target.dataItem) return am4core.color(chartState.colors[target.dataItem.category]);
                 return fill;
             });

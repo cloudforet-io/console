@@ -72,7 +72,7 @@ interface PropsType {
 }
 interface Rule {
     title: TranslateResult;
-    data: object;
+    data: Record<string, string | number>;
 }
 export default {
     name: 'AlertResponder',
@@ -175,7 +175,7 @@ export default {
 
         const onHideMenu = () => {
             const originResponders = Object.fromEntries((
-                Object.entries(props.alertData.responders).map(([key, { resource_id }]) => [key, resource_id])
+                Object.entries(props.alertData.responders).map(([key, value]) => [key, value.resource_id])
             ));
             const targetItems = difference(responderState.selectedResourceIds, Object.values(originResponders));
             targetItems.forEach((item) => {

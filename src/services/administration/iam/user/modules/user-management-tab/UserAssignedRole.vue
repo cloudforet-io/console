@@ -36,7 +36,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -50,15 +49,17 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { Tags } from '@/models';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { ProjectGroupReferenceItem } from '@/store/modules/reference/project-group/type';
+import { ProjectReferenceItem } from '@/store/modules/reference/project/type';
 
 interface UserRoleItem {
     labels?: string[]|string;
-    project_group_info?: object|string;
-    project_info: object|string;
+    project_group_info?: ProjectGroupReferenceItem|string;
+    project_info: ProjectReferenceItem|string;
     resource_id: string;
     resource_type: string;
     role_binding_id: string;
-    role_info: object;
+    role_info: any;
     tags?: Tags;
 }
 

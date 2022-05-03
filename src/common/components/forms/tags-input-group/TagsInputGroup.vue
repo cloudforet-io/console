@@ -68,12 +68,12 @@ import {
 } from '@spaceone/design-system';
 
 import {
-    TagItem, TagValidation, TagsInputGroupProps, ValidationData,
+    TagItem, TagValidation, TagsInputGroupProps, ValidationData, Tag,
 } from '@/common/components/forms/tags-input-group/type';
 
 const dictToArray = (dict): TagItem[] => Object.keys(dict).sort().map(k => ({ key: k, value: dict[k] }));
 
-const arrayToDict = (arr) => {
+const arrayToDict = (arr: TagItem[]): Tag => {
     const dict = {};
     if (Array.isArray(arr)) {
         arr.forEach(({ key, value }) => {
@@ -130,8 +130,7 @@ export default {
             isAllValid: computed(() => state.validations.every(d => d.key.isValid && d.value.isValid)),
         });
 
-        const setTags = (tags: object) => {
-            state._tags = tags;
+        const setTags = (tags: Tag) => {
             emit('update:tags', tags);
         };
 

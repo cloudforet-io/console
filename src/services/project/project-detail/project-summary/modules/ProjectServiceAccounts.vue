@@ -86,7 +86,7 @@ export default {
         const queryHelper = new QueryHelper();
 
         const state = reactive({
-            data: [] as object[],
+            data: [],
             loading: true,
             fields: computed(() => [
                 { name: 'provider', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.PROVIDER') },

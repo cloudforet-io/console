@@ -21,8 +21,8 @@ export interface ParamType {
     user_channel_id?: string;
     project_channel_id?: string;
     name?: string;
-    data?: object;
-    schedule?: object;
+    data?: any;
+    schedule?: any;
     notification_level?: string;
 }
 

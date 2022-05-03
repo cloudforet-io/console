@@ -36,7 +36,7 @@ const getSources = ({ urlPrefix, formats }, name) => formats.map(format => `url(
 interface FontInfo {
     family: string;
     source: string;
-    descriptors: object;
+    descriptors: any;
 }
 
 export const fontInfoMap: Record<string, FontInfo[]> = {
@@ -138,7 +138,6 @@ export const fontInfoMap: Record<string, FontInfo[]> = {
 
 export const loadFont = async (fontsInfo: FontInfo[]) => {
     const fonts = fontsInfo.map(({ family, source, descriptors }) => {
-        // @ts-ignore
         const font = new FontFace(family, source, descriptors);
         font.display = 'block';
         return font;

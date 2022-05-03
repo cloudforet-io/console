@@ -59,14 +59,14 @@ interface Capability {
 
 interface Metadata {
 	data?: {
-		schema: object;
+		schema: any;
 	};
 	data_type: MetadataDataType;
 }
 interface PluginInfo {
 	plugin_id: string;
 	version: string;
-	options: object;
+	options: any;
 	secret_id?: string;
 	upgrade_mode?: string;
 	metadata: Metadata;
@@ -97,7 +97,7 @@ export interface ChannelItem {
 	project_channel_id?: string;
 	user_id: string;
 	name: string;
-	data: object;
+	data: any;
 	is_subscribe: boolean;
 	protocol_id: string;
 	schedule: string[];

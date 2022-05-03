@@ -104,7 +104,7 @@ export interface APIKeyItem {
 interface ModalItem {
     loading?: boolean;
     items: APIKeyItem;
-    endpoints: object;
+    endpoints: any;
 }
 
 interface EndpointItem {

@@ -7,5 +7,5 @@ export interface BudgetStoreState {
 
 export interface UpdateBudgetParams {
 	budgetId: string;
-	updateParams: object;
+	updateParams: any;
 }

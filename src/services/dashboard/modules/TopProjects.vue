@@ -195,13 +195,11 @@ export default {
             valueAxis.renderer.minGridDistance = 60;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
             valueAxis.renderer.grid.template.strokeOpacity = 1;
-            valueAxis.renderer.grid.template.adapter.add('strokeOpacity', (opacity, target) => {
-                // @ts-ignore
+            valueAxis.renderer.grid.template.adapter.add('strokeOpacity', (opacity, target: any) => {
                 if (target.dataItem && (target.dataItem.value === 0)) return 0;
                 return opacity;
             });
-            valueAxis.renderer.labels.template.adapter.add('text', (label, target) => {
-                // @ts-ignore
+            valueAxis.renderer.labels.template.adapter.add('text', (label, target: any) => {
                 if (target.dataItem && (target.dataItem.value === 0)) return '';
                 return label;
             });

@@ -95,12 +95,12 @@ interface MemberItem {
     created_at?: TimeStamp;
     domain_id?: string;
     labels: string[];
-    project_info?: object;
-    project_group_info?: object;
+    project_info?: any;
+    project_group_info?: any;
     resource_id?: string;
     resource_type?: string;
     role_binding_id?: string;
-    role_info?: object;
+    role_info?: any;
     tags?: Tags;
 }
 interface MemberListApiResponse {

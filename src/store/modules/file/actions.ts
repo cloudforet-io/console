@@ -33,7 +33,7 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
         let params;
         if (Array.isArray(payload)) {
             params = payload.map(({
-                // eslint-disable-next-line @typescript-eslint/camelcase
+                // eslint-disable-next-line @typescript-eslint/naming-convention
                 url, param, fields, sheet_name, file_name_prefix, header_message,
             }) => ({
                 source: {

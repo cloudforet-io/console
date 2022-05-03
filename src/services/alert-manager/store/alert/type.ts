@@ -6,5 +6,5 @@ export interface AlertState {
 
 export interface UpdateAlertParams {
 	alertId: string;
-	updateParams: object;
+	updateParams: any;
 }

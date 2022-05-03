@@ -72,9 +72,10 @@ import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInput
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { Tag } from '@/common/components/forms/tags-input-group/type';
 
 interface Props {
-    tags: object;
+    tags: Tag;
     resourceKey: string;
     resourceId: string;
     resourceType: string;

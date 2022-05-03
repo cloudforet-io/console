@@ -70,12 +70,11 @@ export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, co
 
 export const editQuery: Action<CostAnalysisStoreState, any> = async (_, { selectedQuery, formState }): Promise<CostQuerySetModel|Error> => {
     try {
-        const { cost_query_set_id, name } = selectedQuery;
         const { queryName } = formState;
         let updatedQueryData;
-        if (name !== queryName) {
+        if (selectedQuery.name !== queryName) {
             updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
-                cost_query_set_id,
+                cost_query_set_id: selectedQuery.cost_query_set_id,
                 name: queryName,
             });
         }

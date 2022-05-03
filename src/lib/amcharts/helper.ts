@@ -1,7 +1,7 @@
 import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 
 type ToggleSeries = (chart: XYChart | PieChart | TreeMap, index: number) => void;
-type toggleAllSeries = (chart: XYChart | PieChart | TreeMap) => void;
+type ToggleAllSeries = (chart: XYChart | PieChart | TreeMap) => void;
 
 export const toggleSeries: ToggleSeries = (chart, index) => {
     if (chart instanceof PieChart) {
@@ -26,7 +26,7 @@ export const toggleSeries: ToggleSeries = (chart, index) => {
         }
     }
 };
-export const hideAllSeries: toggleAllSeries = (chart) => {
+export const hideAllSeries: ToggleAllSeries = (chart) => {
     if (chart instanceof PieChart) {
         const series = chart.series.getIndex(0);
         if (!series) return;
@@ -41,7 +41,7 @@ export const hideAllSeries: toggleAllSeries = (chart) => {
         });
     }
 };
-export const showAllSeries: toggleAllSeries = (chart) => {
+export const showAllSeries: ToggleAllSeries = (chart) => {
     if (chart instanceof PieChart) {
         const series = chart.series.getIndex(0);
         if (!series) return;

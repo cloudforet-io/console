@@ -13,7 +13,7 @@ export interface ExcelDataField {
     key: string;
     name: string;
     type?: 'datetime'|'enum'|'currency';
-    enum_items?: object;
+    enum_items?: any;
     reference?: Reference;
     options?: Options;
 }

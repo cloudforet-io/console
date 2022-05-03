@@ -35,13 +35,12 @@ export default {
     setup(props) {
         const state = reactive({
             items: [],
-            schema: null as null | object,
+            schema: {},
         });
 
         const getDetails = async (accountId) => {
             try {
                 const res = await SpaceConnector.client.identity.serviceAccount.get({
-                    // eslint-disable-next-line camelcase
                     service_account_id: accountId,
                 });
                 state.items = res;

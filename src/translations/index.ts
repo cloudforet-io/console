@@ -16,7 +16,7 @@ import componentJA from '@spaceone/design-system/src/translations/language-pack/
 Vue.use(VueI18n);
 
 // simple recursive remove keys with empty value
-const removeEmpty = (obj: object | any): LocaleMessageObject => Object.keys(obj)
+const removeEmpty = (obj: any): LocaleMessageObject => Object.keys(obj)
     .filter((k: string) => obj[k] !== null && obj[k] !== undefined && obj[k] !== '') // Remove undef. and null and empty.string.
     .reduce(
         (newObj, k) => (typeof obj[k] === 'object'
