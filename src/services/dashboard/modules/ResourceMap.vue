@@ -2,99 +2,112 @@
     <widget-layout class="resource-map">
         <template #title>
             <p class="title">
-                {{ $t('COMMON.WIDGETS.RESOURCE_BY_REGION_REGIONS') }} <span class="count">({{ data.length }})</span>
+                {{ $t('COMMON.WIDGETS.RESOURCE_BY_REGION_REGIONS') }}
             </p>
         </template>
         <div class="contents-wrapper">
             <div class="col-span-12 lg:col-span-9 chart-wrapper">
-                <p-data-loader :loading="loading">
-                    <template #loader>
-                        <p-skeleton width="100%" height="100%" />
-                    </template>
-                    <div id="chartRef" ref="chartRef" class="chart" />
+                <p-data-loader :loading="loading" loader-type="skeleton" disable-empty-case
+                               class="col-span-12 lg:col-span-9 chart-wrapper"
+                >
+                    <div id="chartRef" ref="chartRef" class="chart w-full h-full" />
                 </p-data-loader>
-                <div v-if="!loading" class="circle-wrapper">
-                    <div v-for="(item) in chartState.providers" :key="item.name">
-                        <p class="circle" :style="{background: item.color}" /><span>{{ item.name }}</span>
+                <div v-if="!chartState.legendsLoading" class="circle-wrapper">
+                    <div v-for="(item) in chartState.providerLegends" :key="item.name">
+                        <div class="cursor-pointer" @click="handleClickLegends(item.provider)">
+                            <p class="circle" :style="{background: chartState.providerFilter.includes(item.provider) ? item.color : 'gray'}" />
+                            <span>{{ item.name }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div v-if="!loading && filteredData.length > 0" class="col-span-12 lg:col-span-3 resource-info-wrapper">
-                <div class="resource-info-title">
-                    <span class="resource-info-provider"
-                          :style="{color: providers[selectedProvider] ? providers[selectedProvider].color : undefined }"
+            <p-data-loader
+                :loading="loading"
+                class="col-span-12 lg:col-span-3 resource-info-wrapper"
+            >
+                <template v-if="data.length > 0">
+                    <div class="resource-info-title">
+                        <span class="resource-info-provider"
+                              :style="{color: providers[selectedProvider] ? providers[selectedProvider].color : 'gray' }"
+                        >
+                            {{ providers[selectedProvider] ? providers[selectedProvider].label : '' }}</span>
+                        <span class="resource-info-region"> {{ selectedRegionLabel }}</span>
+                    </div>
+                    <div class="grid-cols-1 sm:grid-cols-2 lg:grid-cols-1
+                                        progress-bar-wrapper"
                     >
-                        {{ providers[selectedProvider].label }}</span>
-                    <span class="resource-info-region"> {{ selectedRegion }}</span>
+                        <router-link v-for="(item, index) in resourceDataByRegion" :key="index" class="progress-bar-link"
+                                     :to="goToCloudService(item)"
+                        >
+                            <div class="progress-bar-label">
+                                <span class="label-text text-xs">{{ item.cloud_service_group }} > {{ item.cloud_service_type }}</span>
+                                <span class="label-number text-xs text-gray-600">{{ item.count }}</span>
+                            </div>
+                            <p-progress-bar :percentage="(item.count / maxValue) * 100"
+                                            class="progress-bar" :class="selectedProvider||'aws'"
+                                            :color="providers[selectedProvider] ? providers[selectedProvider].color : 'gray'"
+                            />
+                        </router-link>
+                    </div>
+                </template>
+                <div v-if="resourceDataByRegion.length === 0 || data.length === 0" class="no-data-wrapper">
+                    <img src="@/assets/images/illust_microscope.svg" class="no-data-img">
+                    <p class="no-data-text">
+                        {{ $t('COMMON.WIDGETS.RESOURCE_MAP.NO_REGION') }}
+                    </p>
                 </div>
-                <div class="grid-cols-1 sm:grid-cols-2 lg:grid-cols-1
-                            progress-bar-wrapper"
-                >
-                    <router-link v-for="(item, index) in filteredData" :key="index" class="progress-bar-link"
-                                 :to="goToCloudService(item)"
-                    >
-                        <div class="progress-bar-label">
-                            <span class="label-text text-xs">{{ item.display_name || item.cloud_service_group }}</span>
-                            <span class="label-number text-xs text-gray-600">{{ item.count }}</span>
-                        </div>
-                        <p-progress-bar :percentage="(item.count / maxValue) * 100"
-                                        class="progress-bar" :class="selectedProvider||'aws'"
-                                        :color="providers[selectedProvider||'aws'] ? providers[selectedProvider||'aws'].color : undefined"
-                        />
-                    </router-link>
-                </div>
-            </div>
-            <div v-else-if="!loading && filteredData.length === 0" class="no-data-wrapper">
-                <img src="@/assets/images/illust_microscope.svg" class="no-data-img">
-                <p class="no-data-text">
-                    {{ $t('COMMON.WIDGETS.RESOURCE_MAP.NO_REGION') }}
-                </p>
-            </div>
-            <div v-else class="col-span-12 lg:col-span-3 xl:col-span-3 2xl:col-span-3">
-                <div v-for="v in chartState.skeletons" :key="v" class="flex p-2">
-                    <p-skeleton width="flex-grow" />
-                </div>
-            </div>
+            </p-data-loader>
         </div>
     </widget-layout>
 </template>
 
 <script lang="ts">
+import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { PDataLoader, PProgressBar } from '@spaceone/design-system';
+import {
+    computed, onUnmounted, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
-import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
-import {
-    computed, onUnmounted,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
-
-import { PDataLoader, PSkeleton, PProgressBar } from '@spaceone/design-system';
-
-import { range } from 'lodash';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { store } from '@/store';
 import { coral, gray } from '@/styles/colors';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
-import { Location } from 'vue-router';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { store } from '@/store';
+import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
 import config from '@/lib/config';
+import { Location } from 'vue-router';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { MapChart } from '@amcharts/amcharts4/maps';
 
+interface CloudService {
+    cloud_service_group: string;
+    cloud_service_type: string;
+    count: number;
+}
 
-interface Provider {
-    label: string;
+interface Resource {
+    cloud_services: CloudService[];
     color: string;
+    latitude: number;
+    longitude: number;
+    provider: string;
+    region_code: string;
+    title: string;
+    total_count: number;
+}
+
+interface ProviderLegend {
+    color: string;
+    name: string;
+    provider: string;
 }
 
 export default {
-    name: 'ResourceMap',
+    name: 'ResourceMapNew',
     components: {
-        PSkeleton,
-        PDataLoader,
         WidgetLayout,
+        PDataLoader,
         PProgressBar,
     },
     props: {
@@ -103,135 +116,36 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props) {
-        const queryHelper = new QueryHelper();
-        const apiQuery = new ApiQueryHelper();
 
+    setup() {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chartRegistry: {},
-            chart: null as null|any,
-            data: [] as any,
-            filteredData: [] as any,
-            selectedProvider: '', // aws
-            selectedRegion: '', // Asia Pacific (Seoul)
-            selectedRegionCode: '', // ap-northeast-2
-            providers: computed(() => store.state.reference.provider.items),
-            regionList: [],
+            chart: null as MapChart|null,
+            data: [] as Resource[],
             loading: true,
+            providers: computed(() => store.state.reference.provider.items),
+            regions: computed(() => store.state.reference.region.items),
+            resourceDataByRegion: [] as CloudService[],
+            selectedRegionLabel: '',
+            selectedRegionCode: '',
+            selectedProvider: '',
             maxValue: 0,
-            initialRegion: {} as any,
         });
 
         const chartState = reactive({
-            registry: {},
-            chartData: [],
-            skeletons: range(5),
-            providers: computed(() => state.data.map(d => ({
-                name: state.providers[d.provider]?.label,
-                color: state.providers[d.provider]?.color as string,
-            }))
-                .filter((data, index, arr) => arr.findIndex(item => item.name === data.name) === index)),
             marker: null,
+            initialRegion: computed(() => ({
+                title: state.regions[state.data[0]?.region_code]?.name || state.data[0]?.region_code,
+                longitude: state.data[0]?.longitude,
+                latitude: state.data[0]?.latitude,
+                color: state.providers[state.data[0]?.provider]?.color,
+            })),
+            providerLegends: [] as ProviderLegend[],
+            providerFilter: undefined as string[]|undefined,
+            legendsLoading: true,
         });
 
-        /* Create map instance */
-        const getFilteredData = async (regionCode, provider) => {
-            state.selectedRegionCode = regionCode;
-            try {
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                    ...props.extraParams,
-                    query: apiQuery.setFilters([
-                        { k: 'region_code', v: regionCode, o: '=' },
-                        { k: 'provider', v: provider, o: '=' },
-                    ]).setPageLimit(10)
-                        .setSort('count', true)
-                        .data,
-                    // eslint-disable-next-line camelcase
-                    is_major: true,
-                    // eslint-disable-next-line camelcase
-                    is_primary: true,
-                });
-                state.filteredData = res.results;
-                if (state.filteredData) {
-                    const countArray = state.filteredData.map(d => d.count) as number[];
-                    state.maxValue = Math.max(...countArray);
-                } else state.maxValue = 0;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-
-        const getRegionList = async () => {
-            try {
-                const resp = await SpaceConnector.client.inventory.region.list({
-                    ...props.extraParams,
-                    query: {
-                        filter: [
-                            {
-                                k: 'region_code',
-                                v: 'global',
-                                o: 'not',
-                            },
-                        ],
-                    },
-                });
-                state.regionList = resp?.results;
-                return state.regionList;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return [];
-            }
-        };
-        const convertRegionListToData = (regionList) => {
-            state.data = [
-                ...regionList.map(d => ({
-                    title: d.name,
-                    latitude: parseFloat(d.tags.latitude),
-                    longitude: parseFloat(d.tags.longitude),
-                    color: state.providers[d.provider]?.color as string,
-                    ...d,
-                })),
-            ];
-        };
-
-        const setInitialRegionSetting = async () => {
-            const initialRegionFromLocalStorage = store.getters['settings/getItem']('initial_region', '/dashboard');
-            if (initialRegionFromLocalStorage) {
-                state.initialRegion = initialRegionFromLocalStorage;
-                // eslint-disable-next-line max-len
-                [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] = [initialRegionFromLocalStorage.provider, initialRegionFromLocalStorage.region_name, initialRegionFromLocalStorage.region_code];
-            }
-
-            if (!initialRegionFromLocalStorage) {
-                let regionWithTheMostService = '';
-                const resp = await SpaceConnector.client.statistics.topic.cloudServiceByRegion({
-                    ...props.extraParams,
-                    query: {
-                        sort: {
-                            name: 'count',
-                            desc: true,
-                        },
-                        only: ['count', 'region_name'],
-                    },
-                });
-                if (resp.results.length > 0) {
-                    regionWithTheMostService = resp.results[0].region_name;
-                    if (regionWithTheMostService === 'global') regionWithTheMostService = 'ap-northeast-2';
-                    const allInitialRegionInfo = state.data.find(data => data.region_code === regionWithTheMostService);
-                    const initialRegion = {
-                        longitude: allInitialRegionInfo.longitude,
-                        latitude: allInitialRegionInfo.latitude,
-                        // eslint-disable-next-line camelcase
-                        region_code: allInitialRegionInfo.region_code,
-                        name: allInitialRegionInfo.name,
-                        provider: allInitialRegionInfo.provider,
-                    };
-                    state.initialRegion = initialRegion;
-                    [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] = [initialRegion.provider, initialRegion.name, initialRegion.region_code];
-                }
-            }
-        };
 
         const animateBullet = (circle) => {
             const animation = circle.animate([{ property: 'scale', from: 1, to: 5 }, { property: 'opacity', from: 1, to: 0 }],
@@ -239,6 +153,41 @@ export default {
             animation.events.on('animationended', (event) => {
                 animateBullet(event.target.object);
             });
+        };
+
+        const getResourceByRegionData = async () => {
+            try {
+                state.loading = true;
+                const { results } = await SpaceConnector.client.statistics.topic.resourceByRegion({
+                    providers: chartState.providerFilter,
+                });
+                state.data = results.map(d => ({
+                    ...d,
+                    title: state.regions[d.region_code]?.name || d.region_code,
+                    longitude: parseFloat(state.regions[d.region_code]?.longitude ?? 0),
+                    latitude: parseFloat(state.regions[d.region_code]?.latitude ?? 0),
+                    color: state.providers[d.provider]?.color ?? '',
+                })) as Resource[];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        const initResourceInfo = () => {
+            state.resourceDataByRegion = state.data[0]?.cloud_services ?? [];
+            state.selectedProvider = state.data[0]?.provider ?? '';
+            state.selectedRegionLabel = state.data[0]?.title ?? '';
+            state.selectedRegionCode = state.data[0]?.region_code ?? '';
+            state.maxValue = state.data[0]?.cloud_services[0]?.count ?? 0;
+        };
+
+        const disposeChart = (element) => {
+            if (state.chartRegistry[element]) {
+                state.chartRegistry[element].dispose();
+                delete state.chartRegistry[element];
+            }
         };
 
         const moveMarker = (coords, marker) => {
@@ -264,37 +213,21 @@ export default {
         };
 
         const hitCircle = async (event) => {
-            const originTarget = state.selectedRegion;
+            const originTarget = state.selectedRegionCode;
             const target = event.target.dataItem?.dataContext;
+
             if (target) {
+                state.selectedRegionCode = target.region_code;
+                state.selectedRegionLabel = target.title;
                 state.selectedProvider = target.provider;
-                state.selectedRegion = target.name;
-                await getFilteredData(target.region_code, state.selectedProvider);
-                if (originTarget !== state.selectedRegion) {
+                if (originTarget !== state.selectedRegionCode) {
                     moveMarker({ latitude: target.latitude, longitude: target.longitude }, chartState.marker);
+                    state.resourceDataByRegion = target.cloud_services;
+                    if (target.cloud_services) state.maxValue = target.cloud_services[0]?.count ?? 0;
                 }
-                await store.dispatch('settings/setItem', {
-                    key: 'initial_region',
-                    value: {
-                        latitude: target.latitude,
-                        longitude: target.longitude,
-                        // eslint-disable-next-line camelcase
-                        region_code: state.selectedRegionCode,
-                        // eslint-disable-next-line camelcase
-                        region_name: state.selectedRegion,
-                        provider: state.selectedProvider,
-                    },
-                    path: '/dashboard',
-                });
             }
         };
 
-        const disposeChart = (element) => {
-            if (state.chartRegistry[element]) {
-                state.chartRegistry[element].dispose();
-                delete state.chartRegistry[element];
-            }
-        };
         const drawChart = async (chartContext) => {
             /* draw map */
             const createChart = () => {
@@ -303,12 +236,13 @@ export default {
                 return state.chartRegistry[chartContext];
             };
             const chart = createChart();
+
             chart.geodata = am4geodataWorldLow;
             chart.projection = new am4maps.projections.Miller();
             chart.responsive.enabled = true;
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.chartContainer.wheelable = true;
-            chart.zoomControl = new am4maps.ZoomControl();
+
             const polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
             polygonSeries.useGeodata = true;
             polygonSeries.exclude = ['AQ'];
@@ -343,16 +277,42 @@ export default {
             imageSeries.data = state.data;
 
             /* draw initial marker with initial coords */
-            moveMarker({ longitude: state.initialRegion.longitude, latitude: state.initialRegion.latitude }, chartState.marker);
+            moveMarker({ longitude: chartState.initialRegion.longitude, latitude: chartState.initialRegion.latitude }, chartState.marker);
+            initResourceInfo();
 
             state.chart = chart;
         };
 
+        const handleClickLegends = async (provider: string) => {
+            if (chartState.providerFilter === undefined) {
+                chartState.providerFilter = [provider];
+            } else if (!chartState.providerFilter.includes(provider)) {
+                chartState.providerFilter.push(provider);
+            } else {
+                chartState.providerFilter = chartState.providerFilter.filter(item => item !== provider);
+            }
+            await getResourceByRegionData();
+        };
+
+        const initLegends = () => {
+            chartState.legendsLoading = true;
+            chartState.providerLegends = state.data
+                .map(d => ({
+                    name: state.providers[d.provider]?.label,
+                    color: state.providers[d.provider]?.color as string,
+                    provider: d.provider,
+                }))
+                .filter((data, index, arr) => arr.findIndex(item => item.name === data.name) === index);
+            chartState.providerFilter = chartState.providerLegends.map(d => d.provider);
+            chartState.legendsLoading = false;
+        };
+
+        const queryHelper = new QueryHelper();
         const goToCloudService = (item) => {
             const res: Location = {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
-                    provider: item.provider,
+                    provider: state.selectedProvider,
                     group: item.cloud_service_group,
                     name: item.cloud_service_type,
                 },
@@ -369,31 +329,26 @@ export default {
             if (chartCtx && !loading) {
                 drawChart(chartCtx);
             }
-        }, { immediate: true });
+        }, { immediate: false });
 
-        watch(() => state.providers, (providers) => {
-            if (providers) convertRegionListToData(state.regionList);
-        });
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
         });
 
         (async () => {
-            state.loading = true;
-            // LOAD REFERENCE STORE
-            await store.dispatch('reference/provider/load', true);
-            convertRegionListToData(await getRegionList());
-            if (state.data.length > 0) {
-                await setInitialRegionSetting();
-                await getFilteredData(state.initialRegion.region_code, state.initialRegion.provider);
-            }
-            state.loading = false;
+            await Promise.allSettled([
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/region/load'),
+            ]);
+            await getResourceByRegionData();
+            initLegends();
+            initResourceInfo();
         })();
 
         return {
             ...toRefs(state),
             chartState,
-            referenceRouter,
+            handleClickLegends,
             goToCloudService,
         };
     },
@@ -424,35 +379,35 @@ export default {
     }
 }
 .contents-wrapper {
-    @apply grid grid-cols-12 grid-flow-row gap-4 h-full;
+    @apply grid grid-cols-12 grid-flow-row gap-4 w-full h-full;
     .chart-wrapper {
         @apply flex flex-col justify-between;
-        flex-shrink: 0;
-        flex-grow: 1;
+        flex-basis: 100%;
         margin-right: 1rem;
         .chart {
             @apply w-full h-full;
+            flex-shrink: 0;
+            flex-grow: 1;
             height: 21.625rem;
         }
-
-        .circle-wrapper {
-            margin-top: 0.625rem;
-            display: inline-flex;
-            .circle {
-                @apply inline-block rounded-full;
-                margin-right: 0.25rem;
-                width: 0.5rem;
-                height: 0.5rem;
-            }
-            span {
-                @apply mr-4 text-gray-500;
-                font-size: 0.75rem;
-                line-height: 1.5;
-            }
+    }
+    .circle-wrapper {
+        margin-top: 0.625rem;
+        display: inline-flex;
+        .circle {
+            @apply inline-block rounded-full;
+            margin-right: 0.25rem;
+            width: 0.5rem;
+            height: 0.5rem;
+        }
+        span {
+            @apply mr-4 text-gray-500;
+            font-size: 0.75rem;
+            line-height: 1.5;
         }
     }
     .no-data-wrapper {
-        @apply col-span-12;
+        @apply col-span-12 flex flex-col;
         justify-self: center;
         opacity: 0.7;
         .no-data-img {
