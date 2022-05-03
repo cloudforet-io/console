@@ -1,3 +1,10 @@
+# [1.1.0-beta.291](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.290...v1.1.0-beta.291) (2022-05-03)
+
+
+### Features
+
+* add text highlighting component ([#941](https://github.com/spaceone-dev/spaceone-design-system/issues/941)) ([5f88302](https://github.com/spaceone-dev/spaceone-design-system/commit/5f88302d52ba2d833ecd4f664b0fe38f0f6abfef))
+
 # [1.1.0-beta.290](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.289...v1.1.0-beta.290) (2022-05-03)
 
 
