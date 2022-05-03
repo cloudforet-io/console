@@ -43,21 +43,21 @@
                                         class="rounded flex-shrink-0 service-img"
                             />
                         </div>
-                        <p v-if="item.created_count || item.deleted_count" class="daily-service">
-                            {{ item.title }}<br> <span class="font-bold text-sm">{{ item.total_count || 0 }}</span>
+                        <p v-if="item.createdCount || item.deletedCount" class="daily-service">
+                            {{ item.title }}<br> <span class="font-bold text-sm">{{ item.totalCount || 0 }}</span>
                         </p>
-                        <router-link v-if="item.created_count" :to="item.createdHref" class="daily-created-count">
+                        <router-link v-if="item.createdCount" :to="item.href" class="daily-created-count">
                             {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
-                            <span class="text-blue-600 font-bold text-sm">{{ item.created_count || 0 }}
-                                <p-i v-if="item.create_warning" name="ic_state_duplicated" width="0.75rem"
+                            <span class="text-blue-600 font-bold text-sm">{{ item.createdCount || 0 }}
+                                <p-i v-if="item.isCreateWarning" name="ic_state_duplicated" width="0.75rem"
                                      height="0.75rem"
                                 />
                             </span>
                         </router-link>
-                        <router-link v-if="item.deleted_count" :to="item.deletedHref" class="daily-deleted-count">
+                        <router-link v-if="item.deletedCount" :to="item.href" class="daily-deleted-count">
                             {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
-                            <span class="text-red-500 font-bold text-sm"> {{ item.deleted_count || 0 }}
-                                <p-i v-if="item.delete_warning" name="ic_state_duplicated" width="0.75rem"
+                            <span class="text-red-500 font-bold text-sm"> {{ item.deletedCount || 0 }}
+                                <p-i v-if="item.isDeleteWarning" name="ic_state_duplicated" width="0.75rem"
                                      height="0.75rem"
                                 />
                             </span>
@@ -124,7 +124,8 @@ interface CloudServiceData {
 
 interface Item {
     title: string;
-    isWarning?: boolean;
+    isCreateWarning?: boolean;
+    isDeleteWarning?: boolean;
     icon?: string;
     totalCount: number;
     createdCount: number;
@@ -204,7 +205,8 @@ export default {
                 const result: Item = {
                     title: d.display_name ?? d.cloud_service_group,
                     icon: d.icon || state.providers[d.provider]?.icon,
-                    isWarning: d.create_warning || d.delete_warning,
+                    isCreateWarning: d.create_warning,
+                    isDeleteWarning: d.delete_warning,
                     totalCount: d.total_count,
                     createdCount: d.created_count,
                     deletedCount: d.deleted_count,
@@ -227,7 +229,7 @@ export default {
         const getWarningData = (data: Item[]) => {
             const warningData: Item[] = [];
             find(data, (d) => {
-                if (d.isWarning) {
+                if (d.isCreateWarning || d.isDeleteWarning) {
                     warningData.push(d);
                 }
             });
