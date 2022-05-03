@@ -1,0 +1,162 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PTextHighlighting from './PTextHighlighting.vue';
+import {
+    getTextHighlightingArgTypes
+} from '@/data-display/text-highlighting/story-helper';
+import {
+    getTextHighlightingProps
+} from '@/data-display/text-highlighting/mock';
+
+
+<Meta title='Inputs/Text Highlighting' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}} argTypes={getTextHighlightingArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PTextHighlighting },
+    template: `
+        <p-text-highlighting :text="text"
+            :term="term"
+            :style-type="styleType"
+        >
+        </p-text-highlighting>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Text Highlighting
+<br/>
+<br/>
+
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PTextHighlighting },
+            template: `
+        <p-text-highlighting :text="text"
+            :term="term"
+        >
+        </p-text-highlighting>
+    `,
+            setup() {
+                const { text, term } = getTextHighlightingProps()
+                return {
+                    text,
+                    term,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Style Types
+
+<Canvas>
+    <Story name="Style Types">
+        {{
+            components: { PTextHighlighting },
+            template: `
+<div>
+        <p class="text-lg my-4">primary</p>
+        <p-text-highlighting :text="text"
+            :term="term"
+            style-type="primary"
+        >
+        </p-text-highlighting>
+        <p class="text-lg my-4">secondary</p>
+        <p-text-highlighting :text="text"
+                             :term="term"
+                             style-type="secondary"
+        >
+        </p-text-highlighting>
+</div>
+    `,
+            setup() {
+                const { text, term } = getTextHighlightingProps()
+                return {
+                    text,
+                    term,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Slots
+
+<br/>
+
+### default Slot's Props
+
+| name | description |
+| ---- | ----------- |
+| textList | The text is split into multiple texts(```textList```) based on the term. ```{ text: string; matched: boolean; }[]``` |
+| regex | The regex for text highlighting. |
+| text | Each text of textList. |
+| index | The index of the current text in textList. |
+| matched | Whether the current text in textList is matched or not. |
+
+
+
+
+
+
+
+
+<Canvas>
+    <Story name="Slots">
+        {{
+            components: { PTextHighlighting },
+            template: `
+<div>
+        <p class="text-lg my-4">default slot</p>
+        <p-text-highlighting :text="text"
+            :term="term"
+        >
+            <template #default="{text, matched}">
+                <span class="text-blue" :class="{'!text-black': matched, '!font-bold': matched}">{{text}}</span>
+            </template>
+        </p-text-highlighting>
+</div>
+    `,
+            setup() {
+                const { text, term } = getTextHighlightingProps()
+                return {
+                    text,
+                    term,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
