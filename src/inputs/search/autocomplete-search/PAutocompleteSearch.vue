@@ -384,12 +384,6 @@ export default defineComponent<AutocompleteSearchProps>({
         z-index: 1000;
         min-width: 100%;
         width: 100%;
-
-        /* min-width: unset; */
-
-        .context-header.secondary {
-            @apply text-secondary;
-        }
     }
 }
 </style>

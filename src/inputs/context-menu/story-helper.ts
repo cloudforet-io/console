@@ -152,6 +152,24 @@ export const getContextMenuArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    itemHeightFixed: {
+        name: 'itemHeightFixed',
+        type: { name: 'boolean' },
+        description: 'Determines whether to make all items\' height fixed or not. If it\'s `true`, item text overflow will be ellipsis.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     ...getArgTypes('slots', slots),
     ...getArgTypes('events', events),
 });

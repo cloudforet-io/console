@@ -47,6 +47,8 @@
             <p-context-menu ref="menuRef"
                             :loading="lazyLoading"
                             :menu="menu"
+                            @keyup:up:end="focus"
+                            @keyup:down:end="focus"
                             @select="onMenuSelect"
                             @blur="focus"
             >

@@ -8,7 +8,7 @@ import PRawData from '@/data-display/raw-data/PRawData';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 
 import {getContextMenuArgTypes} from '@/inputs/context-menu/story-helper';
-import {menuItems} from '@/inputs/context-menu/mock';
+import {menuItems, longMenuItems} from '@/inputs/context-menu/mock';
 
 
 <Meta title='Inputs/Context Menu' parameters={{
@@ -31,6 +31,7 @@ export const Template = (args, { argTypes }) => ({
             :multi-selectable="multiSelectable"
             :show-radio-icon="showRadioIcon"
             :strict-select-mode="strictSelectMode"
+            :item-height-fixed="itemHeightFixed"
             @select="onSelect"
             @focus="onFocus"
             @blur="onBlur"
@@ -451,6 +452,24 @@ Context Menu have 3 types fot slots:
 
 <br/>
 <br/>
+
+## Items Height Fixed
+
+<Canvas>
+    <Story name="Items Height Fixed" args={{menu: longMenuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu" item-height-fixed/>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Playground
 

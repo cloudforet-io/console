@@ -13,43 +13,32 @@
                 </p-button>
             </div>
             <slot name="help-text" />
-            <a v-if="multiSelectable" class="context-item" @click.stop="onClickSelectAll">
+            <div v-if="multiSelectable" class="select-all-wrapper" @click.stop="onClickSelectAll">
                 <p-i :name="isAllSelected ? 'ic_checkbox--checked' : 'ic_checkbox'"
-                     class="select-marker"
+                     class="select-marker" width="1em" height="1em"
                 />
-                <b class="text">{{ $t('COMPONENT.CONTEXT_MENU.SELECT_ALL') }}</b>
-            </a>
+                <span>{{ $t('COMPONENT.CONTEXT_MENU.SELECT_ALL') }}</span>
+            </div>
             <template v-for="(item, index) in menu">
-                <a v-if="item.type === undefined || item.type === 'item'"
-                   :id="`context-item-${index}-${uuid}`"
-                   :key="item.name"
-                   :tabindex="index"
-                   class="context-item"
-                   :class="{ disabled: item.disabled, selected: selectedNames.includes(item.name) }"
-                   :href="item.disabled ? undefined : item.link"
-                   :target="item.target"
-                   @click.stop="onClickMenu(item, index, $event)"
-                   @keyup.enter="onClickMenu(item, index, $event)"
-                   @keydown.up="onKeyUp(index)"
-                   @keydown.down="onKeyDown(index)"
+                <p-context-menu-item v-if="item.type === undefined || item.type === 'item'"
+                                     :id="getItemId(index)"
+                                     :key="item.name"
+                                     :name="item.name"
+                                     :label="item.label"
+                                     :link="item.link"
+                                     :target="item.target"
+                                     :disabled="item.disabled"
+                                     :selected="selectedNameMap[item.name] !== undefined"
+                                     :select-marker="multiSelectable ? 'checkbox' : (showRadioIcon ? 'radio' : undefined)"
+                                     :ellipsis="itemHeightFixed"
+                                     :tabindex="index"
+                                     @click.stop="onClickMenu(item, index, $event)"
+                                     @keyup.enter="onClickMenu(item, index, $event)"
+                                     @keydown.up="onKeyUp(index)"
+                                     @keydown.down="onKeyDown(index)"
                 >
-                    <p-i v-if="multiSelectable"
-                         :name="selectedNames.includes(item.name) ? 'ic_checkbox--checked' : 'ic_checkbox'"
-                         class="select-marker"
-                    />
-                    <p-i v-else-if="showRadioIcon"
-                         :name="selectedNames.includes(item.name) ? 'ic_radio--checked' : 'ic_radio'"
-                         class="select-marker"
-                    />
-                    <slot name="item--format" v-bind="{...$props, item, index}">
-                        <span class="text" :class="{'with-icon': item.target === '_blank'}">
-                            {{ item.label }}
-                        </span>
-                        <p-i v-if="item.target === '_blank'" class="external-link-icon" name="ic_external-link"
-                             width="0.875rem" height="0.875rem"
-                        />
-                    </slot>
-                </a>
+                    <slot name="item--format" v-bind="{...$props, item, index}" />
+                </p-context-menu-item>
                 <div v-else-if="item.type==='divider'" :key="index" class="context-divider" />
                 <slot v-else-if="item.type==='header'" :name="`header-${item.name}`" v-bind="{...$props, item, key: index}">
                     <div :key="index" class="context-header">
@@ -58,20 +47,23 @@
                 </slot>
             </template>
         </slot>
-        <div v-show="menu.length === 0" class="context-item empty">
+        <div v-show="menu.length === 0" class="no-data">
             <slot name="no-data-format" v-bind="{...$props}">
                 {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
             </slot>
         </div>
-        <div v-if="loading" class="loader">
-            <p-lottie name="thin-spinner" auto :size="1" />
+        <div v-show="loading" class="loader-wrapper">
+            <div class="loader-backdrop" />
+            <div class="loader">
+                <p-lottie name="thin-spinner" auto :size="1.5" />
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs, ComponentRenderProxy, getCurrentInstance, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import PLottie from '@/foundation/lottie/PLottie.vue';
@@ -80,7 +72,9 @@ import PButton from '@/inputs/buttons/button/PButton.vue';
 
 import { ContextMenuProps, MenuItem } from '@/inputs/context-menu/type';
 import { i18n } from '@/translations';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import PContextMenuItem from '@/inputs/context-menu/context-menu-item/PContextMenuItem.vue';
+import { useProxyValue } from '@/hooks/proxy-state';
+import { useListFocus } from '@/hooks/list-focus';
 
 const filterSelectedItems = (selected: MenuItem[], menu: MenuItem[]) => {
     const filtered = selected.filter(d => menu.find(item => item.name === d.name));
@@ -88,9 +82,12 @@ const filterSelectedItems = (selected: MenuItem[], menu: MenuItem[]) => {
     return filtered;
 };
 
+const FOCUS_GROUP_ID = 'context-item';
+
 export default defineComponent<ContextMenuProps>({
     name: 'PContextMenu',
     components: {
+        PContextMenuItem,
         PLottie,
         PI,
         PButton,
@@ -121,86 +118,69 @@ export default defineComponent<ContextMenuProps>({
             type: Boolean,
             default: false,
         },
+        itemHeightFixed: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: ContextMenuProps, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            proxySelected: makeOptionalProxy('selected', vm, props.selected),
-            selectedNames: computed(() => state.proxySelected.map(item => item.name)),
+            proxySelected: useProxyValue('selected', props, emit),
+            selectedNameMap: computed<Record<string, number>>(() => {
+                const selectedMap = {};
+                state.proxySelected.forEach((item, idx) => {
+                    selectedMap[item.name] = idx;
+                });
+                return selectedMap;
+            }),
             selectableMenuItems: computed(() => props.menu.filter(d => !d.disabled && (d.type === undefined || d.type === 'item'))),
             isAllSelected: computed(() => state.selectableMenuItems.length
                     && state.selectableMenuItems.length === state.proxySelected.length
                 && state.proxySelected.every(item => state.selectableMenuItems.find(selected => selected.name === item.name))),
-            selectedCountInFilteredMenu: computed(() => props.menu.filter(d => state.selectedNames.includes(d.name)).length),
+            selectedCountInFilteredMenu: computed(() => state.selectableMenuItems.filter(d => state.selectedNameMap[d.name] !== undefined).length),
             menuItemLength: computed(() => props.menu.filter(d => d.type === undefined || d.type === 'item').length),
-            uuid: `${Math.random()}`.slice(2),
         });
 
-        let focusedItemEl: HTMLElement | null = null;
-        const itemsIndex = computed<number[]>(() => {
-            const indices: number[] = [];
-            props.menu.forEach((menuItem, i) => {
-                if ((!menuItem.type || menuItem.type === 'item') && !menuItem.disabled) {
-                    indices.push(i);
-                }
-            });
-            return indices;
-        });
+
+        const {
+            focus: _focus, blur: _blur, handleMoveUp, handleMoveDown, getItemId,
+        } = useListFocus<MenuItem>(computed(() => props.menu), FOCUS_GROUP_ID, item => (!item.type || item.type === 'item') && !item.disabled);
 
         /* util */
         const focus = (position) => {
-            const idx = position === -1 ? itemsIndex.value[itemsIndex.value.length - 1] : itemsIndex.value[position || 0];
-            const el = document.getElementById(`context-item-${idx}-${state.uuid}`);
-            if (el) {
-                el.focus();
-                focusedItemEl = el;
-                emit('focus', idx);
-            }
+            const focusedIdx = _focus(position);
+            if (focusedIdx !== undefined) emit('focus', focusedIdx);
         };
         const blur = () => {
-            if (focusedItemEl) {
-                focusedItemEl.blur();
-                focusedItemEl = null;
-            }
+            _blur();
             emit('blur');
         };
 
         /* event */
         const onKeyUp = (idx: number) => {
-            const pos = itemsIndex.value.indexOf(idx);
-            if (pos !== 0) {
-                focus(pos - 1);
-            } else {
-                emit('keyup:up:end');
-                blur();
-            }
+            const focusedIdx = handleMoveUp(idx);
+            if (focusedIdx === undefined) emit('keyup:up:end');
         };
         const onKeyDown = (idx) => {
-            const pos = itemsIndex.value.indexOf(idx) + 1;
-            if (pos !== itemsIndex.value.length) {
-                focus(pos);
-            } else {
-                emit('keyup:down:end');
-                blur();
-            }
+            const focusedIdx = handleMoveDown(idx);
+            if (focusedIdx === undefined) emit('keyup:down:end');
         };
         const onClickMenu = (item, index, event) => {
-            if (!props.menu[index].disabled) {
-                emit(`${item.name}:select`, index, event);
-                emit('select', item, index);
+            if (item.disabled) return;
 
-                if (props.multiSelectable) {
-                    if (state.selectedNames.includes(item.name)) {
-                        const indexOfSelectedList = state.selectedNames.indexOf(item.name);
-                        state.proxySelected.splice(indexOfSelectedList, 1);
-                        state.proxySelected = [...state.proxySelected];
-                    } else {
-                        state.proxySelected = [...state.proxySelected, item];
-                    }
+            if (props.multiSelectable) {
+                if (state.selectedNameMap[item.name] !== undefined) {
+                    const indexOfSelected = state.selectedNameMap[item.name];
+                    state.proxySelected.splice(indexOfSelected, 1);
                 } else {
-                    state.proxySelected = [item];
+                    state.proxySelected.splice(state.proxySelected.length - 1, 0, item);
                 }
+            } else {
+                state.proxySelected = [item];
             }
+
+            emit(`${item.name}:select`, index, event);
+            emit('select', item, index);
         };
         const onClickEsc = (e) => {
             emit('keyup:esc', e);
@@ -230,6 +210,7 @@ export default defineComponent<ContextMenuProps>({
             focus,
             onClickEsc,
             onClickSelectAll,
+            getItemId,
         };
     },
 });
@@ -248,16 +229,27 @@ export default defineComponent<ContextMenuProps>({
     border-style: solid;
     user-select: none;
 
-    .selected-list-wrapper {
+    > .selected-list-wrapper {
         @apply border-b border-gray-200;
         display: flex;
         justify-content: space-between;
         font-size: 0.875rem;
         line-height: 1.5;
-        margin: 0.5rem;
-        padding-bottom: 0.5rem;
+        padding: 0.5rem;
     }
-    .context-header {
+    > .select-all-wrapper {
+        @apply font-semibold;
+        padding: 0 0.5rem;
+        font-size: 0.875rem;
+        line-height: 2rem;
+        vertical-align: middle;
+        cursor: pointer;
+        > .select-marker {
+            font-size: 1.25rem;
+            margin-right: 0.25rem;
+        }
+    }
+    > .context-header {
         @apply text-gray-500;
         margin-top: 0.875rem;
         margin-bottom: 0.25rem;
@@ -267,59 +259,32 @@ export default defineComponent<ContextMenuProps>({
         font-size: 0.75rem;
         line-height: 1.5;
     }
-    .context-divider {
+    > .context-divider {
         @apply border-t border-gray-200;
         border-top-width: 1px;
         border-top-style: solid;
     }
-    .context-item {
-        @apply text-gray-900;
-        display: flex;
-        padding: 0.25rem 0.5rem;
-        line-height: 1.6;
-        font-size: 0.875rem;
-        cursor: pointer;
-        justify-content: space-between;
-        align-items: center;
 
-        &:not(.disabled):not(.empty) {
-            &:hover, &:focus {
-                @apply bg-blue-100;
-            }
+    > .loader-wrapper {
+        @apply absolute w-full h-full overflow-hidden;
+        top: 0;
+        z-index: 1;
+        .loader-backdrop {
+            @apply w-full h-full bg-white;
+            opacity: 0.5;
         }
-        &.disabled {
-            @apply text-gray-300;
-            cursor: not-allowed;
-        }
-        &.empty {
-            @apply text-gray-300;
-            cursor: default;
-        }
-
-        .text {
-            @apply truncate;
-            flex-shrink: 0;
-            flex-grow: 1;
-            max-width: 100%;
-            &.with-icon {
-                max-width: calc(100% - 0.25rem - 0.875rem);
-            }
-        }
-        .external-link-icon {
-            flex-shrink: 0;
-            margin-left: 0.25rem;
-        }
-        .select-marker {
-            flex-shrink: 0;
-            margin-right: 0.25rem;
+        .loader {
+            @apply absolute flex w-full h-full justify-center items-center;
+            top: 0;
+            z-index: 1;
+            max-height: 16.875rem;
         }
     }
-
-    .loader {
-        @apply absolute w-full h-full flex items-center justify-center;
-        left: 0;
-        top: 0;
-        background-color: rgba(theme('colors.white'), 0.5);
+    > .no-data {
+        @apply text-gray-300;
+        padding: 0.5rem;
+        line-height: 1.25;
+        font-size: 0.875rem;
     }
 }
 </style>
