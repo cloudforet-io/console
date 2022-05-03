@@ -12,7 +12,7 @@ export const rawQueryOperatorToApiQueryOperatorMap: Record<RawQueryOperator, Fil
     '>=': 'gte',
     '<': 'lt',
     '<=': 'lte',
-    $: 'regex',
+    '~': 'regex',
     /* datetime only */
     '>t': 'datetime_gt',
     '>=t': 'datetime_gte',

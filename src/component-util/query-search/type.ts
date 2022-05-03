@@ -17,7 +17,7 @@ export const OPERATOR = Object.freeze({
     lessEqual: '<=',
     equal: '=',
     notEqual: '!=',
-    regex: '$'
+    regex: '~'
 } as const);
 
 export const operators = Object.values(OPERATOR);
