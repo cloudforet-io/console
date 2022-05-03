@@ -1,3 +1,10 @@
+# [1.1.0-beta.289](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.288...v1.1.0-beta.289) (2022-05-03)
+
+
+### Features
+
+* add context menu item & refactor context menu ([#939](https://github.com/spaceone-dev/spaceone-design-system/issues/939)) ([400a26f](https://github.com/spaceone-dev/spaceone-design-system/commit/400a26f80204cf73151b8539c56897ffc6ad520d))
+
 # [1.1.0-beta.288](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.287...v1.1.0-beta.288) (2022-04-29)
 
 
