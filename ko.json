@@ -605,7 +605,7 @@
 					"FORM": {
 						"DELETE_CONTENTS": "삭제시 복구가 불가합니다.",
 						"DELETE_TITLE": "선택한 위젯을 삭제하시겠습니까?",
-						"LABEL_GROUP_BY": "그룹별 통계",
+						"LABEL_GROUP_BY": "그룹별 통계 (Group By)",
 						"LABEL_NAME": "이름",
 						"UPDATE_TITLE": "위젯 이름 변경"
 					},

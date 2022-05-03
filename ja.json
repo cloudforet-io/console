@@ -605,7 +605,7 @@
 					"FORM": {
 						"DELETE_CONTENTS": "このウィジェットを復元することはできません",
 						"DELETE_TITLE": "選択したウィジェットを削除しますか？",
-						"LABEL_GROUP_BY": "グループ別統計",
+						"LABEL_GROUP_BY": "グループ別統計 (Group By)",
 						"LABEL_NAME": "名前",
 						"UPDATE_TITLE": "ウィジェットの更新"
 					},
