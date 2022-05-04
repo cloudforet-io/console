@@ -44,7 +44,7 @@
                           :outline="false"
                           @clickButton="goToSignIn"
             />
-            <survey-modal />
+            <!--            <survey-modal />-->
         </template>
         <!-- Iframe for file download -->
         <iframe class="hidden"
@@ -71,7 +71,7 @@ import { Location } from 'vue-router';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
-import SurveyModal from '@/common/modules/survey/SurveyModal.vue';
+// import SurveyModal from '@/common/modules/survey/SurveyModal.vue';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 import { store } from '@/store';
@@ -79,7 +79,7 @@ import { store } from '@/store';
 export default defineComponent({
     name: 'App',
     components: {
-        SurveyModal,
+        // SurveyModal,
         RecommendedBrowserModal,
         TopNotification,
         GNB: GNB as any,
