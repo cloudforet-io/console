@@ -1,3 +1,10 @@
+# [1.1.0-beta.293](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.292...v1.1.0-beta.293) (2022-05-04)
+
+
+### Features
+
+* remove IconTextButton & add icon prop to Button & add button type to ContextMenu ([#943](https://github.com/spaceone-dev/spaceone-design-system/issues/943)) ([e8d1600](https://github.com/spaceone-dev/spaceone-design-system/commit/e8d16004f1eeb2a23d0cdb3ae09a91d1eee0200b))
+
 # [1.1.0-beta.292](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.291...v1.1.0-beta.292) (2022-05-04)
 
 
