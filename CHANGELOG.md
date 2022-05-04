@@ -1,3 +1,10 @@
+# [1.1.0-beta.292](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.291...v1.1.0-beta.292) (2022-05-04)
+
+
+### Features
+
+* add highlightTerm to ContextMenu, ContextMenuItem & add noSelectIndication to ContextMenu ([#942](https://github.com/spaceone-dev/spaceone-design-system/issues/942)) ([28f0ff7](https://github.com/spaceone-dev/spaceone-design-system/commit/28f0ff70baf303bc8b8810a841ae17f12ac95635))
+
 # [1.1.0-beta.291](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.290...v1.1.0-beta.291) (2022-05-03)
 
 
