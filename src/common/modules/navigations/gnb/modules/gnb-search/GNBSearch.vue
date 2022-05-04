@@ -4,8 +4,8 @@
                             :is-focused.sync="isFocusOnInput"
                             @click="showSuggestion"
                             @esc="hideSuggestion"
-                            @arrow-up="moveFocusToSuggestion('END')"
-                            @arrow-down="moveFocusToSuggestion('START')"
+                            @arrow-up="moveFocusToSuggestion('UPWARD')"
+                            @arrow-down="moveFocusToSuggestion('DOWNWARD')"
                             @input="handleUpdateInput"
         />
 
@@ -28,11 +28,11 @@
         <g-n-b-search-dropdown v-show="proxyVisibleSuggestion"
                                :input-text="trimmedInputText"
                                :loading="loading"
-                               :menu-items="dataState.menuSuggestions"
-                               :cloud-service-type-items="dataState.cloudServiceTypeSuggestions"
-                               :focus-start-position="focusStartPosition"
+                               :items="dataState.dropdownItems"
+                               :focusing-direction.sync="focusingDirection"
                                :is-focused.sync="isFocusOnSuggestion"
                                :is-recent="showRecent"
+                               :search-limit="SEARCH_LIMIT"
                                @move-focus-end="handleMoveFocusEnd"
                                @close="hideSuggestion"
                                @select="handleSelect"
@@ -43,8 +43,8 @@
                                     :is-focused.sync="isFocusOnInput"
                                     @click="showSuggestion"
                                     @esc="hideSuggestion"
-                                    @arrow-up="moveFocusToSuggestion('END')"
-                                    @arrow-down="moveFocusToSuggestion('START')"
+                                    @arrow-up="moveFocusToSuggestion('UPWARD')"
+                                    @arrow-down="moveFocusToSuggestion('DOWNWARD')"
                                     @input="handleUpdateInput"
                 />
             </template>
@@ -74,8 +74,7 @@ import { RecentConfig } from '@/store/modules/recent/type';
 import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
 import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchDropdown.vue';
 import {
-    FocusStartPosition, SUGGESTION_TYPE,
-    SuggestionItem,
+    SUGGESTION_TYPE, SuggestionItem,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -90,9 +89,10 @@ import { getTextHighlightRegex } from '@/common/components/text/text-highlightin
 import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import { MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
 
 
-interface CloudServiceTypeData {
+interface CloudServiceData {
     id: string;
     provider: string;
     group: string;
@@ -107,6 +107,7 @@ interface Props {
 }
 
 const RECENT_LIMIT = 5;
+const SEARCH_LIMIT = 15;
 
 export default defineComponent<Props>({
     name: 'GNBSearch',
@@ -129,7 +130,7 @@ export default defineComponent<Props>({
             proxyVisibleSuggestion: useProxyValue('visibleSuggestion', props, emit),
             isFocusOnInput: false,
             isFocusOnSuggestion: false,
-            focusStartPosition: 'START',
+            focusingDirection: 'DOWNWARD',
             inputText: '',
             trimmedInputText: computed<string>(() => {
                 if (state.inputText) return state.inputText.trim();
@@ -145,11 +146,13 @@ export default defineComponent<Props>({
             recentMenuList: [] as RecentConfig[],
             allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allGnbMenuList'])),
             filteredMenuList: [] as SuggestionMenu[],
-            menuSuggestions: computed<SuggestionItem[]>(() => {
+            _menuTotalCount: 0,
+            _menuSuggestions: computed<SuggestionItem[]>(() => {
                 if (state.showRecent) {
                     return convertMenuConfigToReferenceData(dataState.recentMenuList, store.getters['display/allGnbMenuList']);
                 }
                 return dataState.filteredMenuList.map(d => ({
+                    itemType: SUGGESTION_TYPE.MENU,
                     name: d.id,
                     label: d.label,
                     parents: d.parents ? d.parents.map(p => ({ name: p.id, label: p.label })) : undefined,
@@ -158,13 +161,14 @@ export default defineComponent<Props>({
             }),
             // cloud service
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.state.reference.cloudServiceType.items),
-            filteredCloudServiceTypeList: [] as CloudServiceTypeData[],
+            filteredCloudServices: [] as CloudServiceData[],
             recentCloudServices: [] as RecentConfig[],
-            cloudServiceTypeSuggestions: computed<SuggestionItem[]>(() => {
+            _cloudServiceTotalCount: 0,
+            _cloudServiceSuggestions: computed<SuggestionItem[]>(() => {
                 if (state.showRecent) {
                     return convertCloudServiceConfigToReferenceData(dataState.recentCloudServices, dataState.cloudServiceTypes);
                 }
-                return dataState.filteredCloudServiceTypeList.map(d => ({
+                return dataState.filteredCloudServices.map(d => ({
                     itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
                     name: d.id,
                     label: d.name,
@@ -174,12 +178,24 @@ export default defineComponent<Props>({
                     provider: d.provider,
                 }));
             }),
+            // all
+            dropdownItems: computed<DropdownItem[]>(() => [
+                {
+                    itemType: SUGGESTION_TYPE.MENU,
+                    totalCount: dataState._menuTotalCount,
+                    suggestionItems: dataState._menuSuggestions,
+                },
+                {
+                    itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
+                    totalCount: dataState._cloudServiceTotalCount,
+                    suggestionItems: dataState._cloudServiceSuggestions,
+                },
+            ]),
         });
 
         const filterMenuItemsBySearchTerm = (menu: SuggestionMenu[], searchTerm?: string): SuggestionMenu[] => {
             const regex = getTextHighlightRegex(searchTerm);
-
-            return menu.map(d => ({
+            const results = menu.map(d => ({
                 id: d.id,
                 label: d.label,
                 parents: d.parents ? d.parents : undefined,
@@ -188,7 +204,10 @@ export default defineComponent<Props>({
                 if (regex.test(d.label as string)) return true;
                 if (d.parents && d.parents.some(p => regex.test(p.label as string))) return true;
                 return false;
-            }).slice(0, 5);
+            });
+
+            dataState._menuTotalCount = results.length;
+            return results.slice(0, SEARCH_LIMIT);
         };
 
 
@@ -202,7 +221,7 @@ export default defineComponent<Props>({
             resourceToken = axios.CancelToken.source();
 
             try {
-                const { results } = await SpaceConnector.client.addOns.autocomplete.resource({
+                const { results, total_count } = await SpaceConnector.client.addOns.autocomplete.resource({
                     resource_type: 'inventory.CloudServiceType',
                     search: inputText,
                     options: {
@@ -213,11 +232,13 @@ export default defineComponent<Props>({
                     cancelToken: resourceToken.token,
                 });
                 resourceToken = undefined;
+                dataState._cloudServiceTotalCount = total_count;
                 return results;
             } catch (e: any) {
                 if (!axios.isCancel(e.axiosError)) {
                     ErrorHandler.handleError(e);
                 }
+                dataState._cloudServiceTotalCount = 0;
                 return [];
             }
         };
@@ -253,6 +274,7 @@ export default defineComponent<Props>({
 
         /* Event */
         const showSuggestion = async () => {
+            state.isFocusOnSuggestion = false;
             if (!state.isFocusOnInput) state.isFocusOnInput = true;
             if (!state.proxyVisibleSuggestion) {
                 state.loading = true;
@@ -267,19 +289,20 @@ export default defineComponent<Props>({
                 state.inputText = '';
                 state.isFocusOnInput = false;
                 state.isFocusOnSuggestion = false;
-                dataState.filteredCloudServiceTypeList = [];
+                dataState.filteredCloudServices = [];
                 dataState.filteredMenuList = [];
             }
         };
 
-        const moveFocusToSuggestion = (focusStartPosition: FocusStartPosition) => {
+        const moveFocusToSuggestion = (focusingDirection: FocusingDirection) => {
             if (!state.proxyVisibleSuggestion) state.proxyVisibleSuggestion = true;
+            state.focusingDirection = focusingDirection;
             state.isFocusOnInput = false;
-            state.focusStartPosition = focusStartPosition;
             state.isFocusOnSuggestion = true;
         };
 
         const handleMoveFocusEnd = () => {
+            state.focusingDirection = undefined;
             state.isFocusOnSuggestion = false;
             state.isFocusOnInput = true;
         };
@@ -287,7 +310,7 @@ export default defineComponent<Props>({
         const handleUpdateInput = debounce(async () => {
             if (state.trimmedInputText) {
                 const results = await getCloudServiceResources(state.trimmedInputText);
-                dataState.filteredCloudServiceTypeList = results.map(d => d.data);
+                dataState.filteredCloudServices = results.map(d => d.data);
                 dataState.filteredMenuList = filterMenuItemsBySearchTerm(dataState.allMenuList, state.trimmedInputText);
             }
         }, 300);
@@ -306,10 +329,10 @@ export default defineComponent<Props>({
                 let cloudServiceTypekey;
                 if (state.showRecent) cloudServiceTypekey = dataState.recentCloudServices[index]?.itemId;
                 else {
-                    const cloudServiceTypeId = dataState.filteredCloudServiceTypeList[index]?.id;
-                    if (!cloudServiceTypeId) return;
-                    const cloudServiceType = dataState.cloudServiceTypes[cloudServiceTypeId];
-                    cloudServiceTypekey = cloudServiceType.data.cloudServiceTypeKey;
+                    const cloudServiceId = dataState.filteredCloudServices[index]?.id;
+                    if (!cloudServiceId) return;
+                    const cloudService = dataState.cloudServiceTypes[cloudServiceId];
+                    cloudServiceTypekey = cloudService.data.cloudServiceTypeKey;
                 }
                 if (cloudServiceTypekey) {
                     const itemInfo: string[] = cloudServiceTypekey.split('.');
@@ -363,6 +386,7 @@ export default defineComponent<Props>({
         return {
             ...toRefs(state),
             dataState,
+            SEARCH_LIMIT,
             showSuggestion,
             hideSuggestion,
             moveFocusToSuggestion,

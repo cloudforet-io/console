@@ -2,9 +2,6 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { RECENT_TYPE } from '@/store/modules/recent/type';
 
-export const focusStartPositions = ['START', 'END'] as const;
-export type FocusStartPosition = typeof focusStartPositions[number];
-
 export const SUGGESTION_TYPE = Object.freeze({
     ...FAVORITE_TYPE,
     ...RECENT_TYPE,

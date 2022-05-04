@@ -6,8 +6,6 @@
         >
             <g-n-b-suggestion-list :items="items"
                                    use-favorite
-                                   @update:isFocused="$emit('update:isFocused', $event)"
-                                   @move-focus-end="$emit('move-focus-end')"
                                    @close="$emit('close')"
                                    @select="handleSelect"
             />
@@ -155,10 +153,14 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .gnb-recent {
-    padding: 1rem 0;
-    .p-data-loader {
+    .p-data-loader::v-deep {
         &.loading {
             height: 13rem;
+        }
+        .data-loader-container {
+            max-height: calc(100vh - $gnb-height - 3.75rem);
+            overflow-y: auto;
+            padding: 1rem 0;
         }
     }
     .no-data {

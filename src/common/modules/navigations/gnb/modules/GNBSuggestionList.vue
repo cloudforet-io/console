@@ -2,8 +2,9 @@
     <p-context-menu ref="contextMenuRef"
                     class="gnb-search-suggestion-list"
                     :menu="items"
-                    @keyup:up:end="$emit('move-focus-end')"
-                    @keyup:down:end="$emit('move-focus-end')"
+                    no-select-indication
+                    @keyup:up:end="$emit('move-focus-end', 'UPWARD')"
+                    @keyup:down:end="$emit('move-focus-end', 'DOWNWARD')"
                     @keyup:esc="$emit('close')"
                     @focus="$emit('update:isFocused', true)"
                     @blur="$emit('update:isFocused', false)"
@@ -70,18 +71,17 @@ import { PContextMenu, PI, PLazyImg } from '@spaceone/design-system';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import {
-    focusStartPositions,
-    FocusStartPosition,
     SuggestionItem, SUGGESTION_TYPE,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
+import { FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
 
 
 interface Props {
     items: SuggestionItem[];
     inputText: string;
     isFocused: boolean;
-    focusStartPosition: FocusStartPosition;
+    focusingDirection: FocusingDirection;
     useFavorite: boolean;
 }
 
@@ -107,12 +107,9 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
-        focusStartPosition: {
-            type: String as PropType<FocusStartPosition>,
-            default: 'START',
-            validator(position: FocusStartPosition) {
-                return focusStartPositions.includes(position);
-            },
+        focusingDirection: {
+            type: String as PropType<FocusingDirection>,
+            default: undefined,
         },
         useFavorite: {
             type: Boolean,
@@ -131,7 +128,7 @@ export default defineComponent<Props>({
         watch(() => props.isFocused, (isFocused) => {
             if (!state.contextMenuRef) return;
             if (!isFocused) return;
-            if (props.focusStartPosition === 'START') {
+            if (props.focusingDirection === 'DOWNWARD') {
                 state.contextMenuRef.focus(0);
             } else {
                 state.contextMenuRef.focus(-1);
