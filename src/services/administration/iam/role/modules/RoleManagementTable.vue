@@ -34,8 +34,8 @@
                 </p-select-dropdown>
             </template>
             <template #col-role_type-format="{ value }">
-                <p-badge v-if="value" :outline="true" :style-type="roleTypeBadgeOption[value].styleType">
-                    {{ roleTypeBadgeOption[value] ? roleTypeBadgeOption[value].label : '' }}
+                <p-badge v-if="value" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType">
+                    {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
                 </p-badge>
             </template>
             <template #col-tags.description-format="{ value }">
@@ -75,17 +75,12 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { RoleData } from '@/services/administration/iam/role/type';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { ROLE_TYPE } from '@/services/administration/iam/role/config';
+import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { administrationStore } from '@/services/administration/store';
 
 const DEFAULT_PAGE_LIMIT = 15;
-
-const roleTypeBadgeOption = {
-    [ROLE_TYPE.SYSTEM]: { label: 'System', styleType: 'secondary1' },
-    [ROLE_TYPE.DOMAIN]: { label: 'Domain', styleType: 'primary1' },
-    [ROLE_TYPE.PROJECT]: { label: 'Project', styleType: 'gray' },
-};
 
 export default defineComponent({
     name: 'RolePage',
@@ -207,10 +202,19 @@ export default defineComponent({
         (async () => {
             await listRoles();
         })();
+
+        const saveSelectedValueToStore = (selectedIndices: number[]) => {
+            administrationStore.dispatch('role/selectIndices', selectedIndices);
+            administrationStore.dispatch('role/selectRoles', state.selectedRoles);
+        };
+
+        watch(() => state.selectedIndices, (after) => {
+            saveSelectedValueToStore(after);
+        });
+
         return {
             ...toRefs(state),
-            ROLE_TYPE,
-            roleTypeBadgeOption,
+            ROLE_TYPE_BADGE_OPTION,
             handleCreateRole,
             handleEditRole,
             handleSelectDropdown,

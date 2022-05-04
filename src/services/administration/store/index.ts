@@ -4,6 +4,7 @@ import * as getters from './getters';
 import * as actions from './actions';
 import * as mutations from './mutations';
 import user from './user';
+import role from './role';
 
 const state: AdministrationState = {};
 
@@ -12,6 +13,7 @@ export const administrationStoreModule: Module<AdministrationState, any> = {
     state: () => ({ ...state }),
     modules: {
         user,
+        role,
     },
     getters,
     actions,

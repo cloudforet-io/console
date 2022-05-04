@@ -14,6 +14,7 @@
                 />
             </template>
         </p-horizontal-layout>
+        <role-management-tab />
     </section>
 </template>
 
@@ -26,10 +27,12 @@ import {
     PHorizontalLayout, PPageTitle, PToolboxTable, PIconTextButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import RoleManagementTable from '@/services/administration/iam/role/modules/RoleManagementTable.vue';
+import RoleManagementTab from '@/services/administration/iam/role/modules/RoleManagementTab.vue';
 
 export default defineComponent({
     name: 'RolePage',
     components: {
+        RoleManagementTab,
         PHorizontalLayout,
         PPageTitle,
         PToolboxTable,
