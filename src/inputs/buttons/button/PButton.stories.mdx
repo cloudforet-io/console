@@ -25,6 +25,7 @@ export const Template = (args, {argTypes})=>({
                 :outline="outline"
                 :block="block"
                 :fontWeight="fontWeight"
+                :icon="icon"
             >
                 {{$props.default}}
             </p-button>
@@ -37,9 +38,9 @@ export const Template = (args, {argTypes})=>({
 <br/>
 <br/>
 
-## Size
+## Sizes
 <Canvas>
-    <Story name='size' height='150px'>
+    <Story name='Sizes' height='150px'>
         {{
             components:{ PButton, PLottie },
             template: `
@@ -58,7 +59,29 @@ export const Template = (args, {argTypes})=>({
     </Story>
 </Canvas>
 
-## Style Type
+
+## With Icon
+<Canvas>
+    <Story name='With Icon' height='150px'>
+        {{
+            components:{ PButton, PLottie },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
+                    <p-button styleType="primary" style="margin-right: 20px" size="sm" icon="ic_plus_bold">
+                        <div>small</div>
+                    </p-button>
+                    <p-button styleType="primary" style="margin-right: 20px" icon="ic_plus_bold">
+                        <div>default</div>
+                    </p-button>
+                    <p-button styleType="primary" style="margin-right: 20px" size="lg" icon="ic_plus_bold">
+                        <div>large</div>
+                    </p-button>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Style Types
 <Canvas>
     <Story name='Style Types' height='250px'>
         {{
@@ -197,16 +220,30 @@ export const Template = (args, {argTypes})=>({
 
 ## Block
 <Canvas>
-    <Story name='Block' height='150px'>
+    <Story name='Block' height='200px'>
         {{
             components:{ PButton, PLottie },
             template: `
-                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 50px; background-color: white">
                     <p-button
                         styleType="primary"
                         :block="true"
                     >
                         <div>Block</div>
+                    </p-button>
+                    <p-button
+                        styleType="primary"
+                        :block="true"
+                        size="lg"
+                    >
+                        <div>Block, size: lg</div>
+                    </p-button>
+                    <p-button
+                        styleType="primary"
+                        :block="true"
+                        size="sm"
+                    >
+                        <div>Block, size: sm</div>
                     </p-button>
                 </div>`,
         }}

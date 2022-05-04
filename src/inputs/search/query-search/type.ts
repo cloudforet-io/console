@@ -1,4 +1,4 @@
-import { CONTEXT_MENU_TYPE } from '@/inputs/context-menu/type';
+import { ContextMenuType } from '@/inputs/context-menu/type';
 
 
 export const dataTypes = ['string', 'integer', 'float', 'boolean', 'datetime', 'object'] as const;
@@ -41,7 +41,7 @@ export interface QueryItem {
 export type MenuType ='ROOT_KEY'|'KEY'|'VALUE'|'OPERATOR'
 
 export interface MenuItem<T> {
-    type?: CONTEXT_MENU_TYPE;
+    type?: ContextMenuType;
     data?: T;
 }
 

@@ -100,7 +100,10 @@ export default defineComponent({
     min-height: 2rem;
     max-width: 2rem;
     max-height: 2rem;
-    .p-i-icon {
+    > .p-lottie {
+        flex-shrink: 0;
+    }
+    > .p-i-icon {
         flex-shrink: 0;
     }
 

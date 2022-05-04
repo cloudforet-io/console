@@ -58,10 +58,11 @@ Context Menu's `menu` props is an `array` of `MenuItem`.
 |-|-|-|
 |name|The key of the corresponding item. must be UNIQUE.|`string`|
 |label|Value to be displayed|`string`|
-|type|The type of item |`['divider', 'header', 'item']`|
+|type|The type of item |`['divider', 'header', 'item', 'button']`|
 |disabled|Whether to disable the selection|`boolean`|
 |link|A value given when it is necessary to move to a specific link when pressed. In this case, the corresponding item is displayed as a tag.|`string`|
 |target|When the link property is assigned to the corresponding item, it is bound to the a tag attribute together. |`string`|
+|icon|An icon name that will be displayed on left side of the button. It only works with button type.|`string`|
 
 <br/>
 
@@ -76,6 +77,7 @@ Each `MenuItem` has the following type to represent it:
 |item|Default type. Selectable and Focusable. If no value is given to the type property of `MenuItem`, it is regarded as this type.|
 |divider| Divider. This type is designated when you want to display a divider line. For this type, you don't need any of the `MenuItem` properties.|
 |header|Use it when you want to group items among related items and display the category of items. Not selectable, Not focusable.|
+|button|Button. Useful with icon property. 'click-button' event will be emitted when the button is clicked.|
 
 <br/>
 

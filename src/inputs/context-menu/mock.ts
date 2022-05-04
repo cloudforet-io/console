@@ -1,8 +1,15 @@
 import faker from 'faker';
+import { MenuItem } from '@/inputs/context-menu/type';
 
-export const menuItems = [
+export const menuItems: MenuItem[] = [
 
     { type: 'header', label: 'Actions', name: 'actions' },
+    {
+        label: 'Add', name: 'add', type: 'button', icon: 'ic_plus_bold',
+    },
+    {
+        label: 'Remove', name: 'remove', type: 'button', disabled: true,
+    },
     {
         label: 'Create', name: 'create',
     },
@@ -22,12 +29,11 @@ export const menuItems = [
         label: 'Go to Google', name: 'google', link: 'https://www.google.com', target: '_blank',
     },
     { type: 'divider' },
-    { type: 'info', label: 'Information', name: 'information' },
     {
         label: 'Hello', name: 'hello',
     },
 ];
-export const longMenuItems = [
+export const longMenuItems: MenuItem[] = [
     {
         label: faker.lorem.sentence(30), name: 'create',
     },

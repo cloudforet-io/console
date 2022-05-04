@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 
 import PListCard from './PListCard.vue';
 import PI from '@/foundation/icons/PI.vue';
-import PIconTextButton from '@/inputs/buttons/icon-text-button/PIconTextButton';
+import PButton from '@/inputs/buttons/button/PButton.vue';
 import PBadge from '@/data-display/badges/PBadge';
 import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
 import { getListCardArgTypes } from '@/data-display/cards/list-card/story-helper';
@@ -194,15 +194,14 @@ If you give ```false``` to ```header``` props and don't give ```header``` slot, 
 <Canvas>
     <Story name="Customize Loader">
         {{
-            components: { PListCard, PIconTextButton },
+            components: { PListCard, PButton },
             template: `
     <div class="h-full w-full overflow p-8" style="height: 200px;">
-         <p-icon-text-button
-                class="mb-4" name="ic_refresh"
-                @click="updateItems"
-        >
+         <p-button class="mb-4" icon="ic_refresh"
+                   @click="updateItems"
+         >
              Refresh
-        </p-icon-text-button>
+         </p-button>
         <p-list-card
             header="Customize Loader of List Card"
             :items="items"
@@ -243,15 +242,14 @@ If you give ```false``` to ```header``` props and don't give ```header``` slot, 
 <Canvas>
     <Story name="Customize Loader and Empty Case">
         {{
-            components: { PListCard, PIconTextButton },
+            components: { PListCard, PButton },
             template: `
     <div class="h-full w-full overflow p-8" style="height: 200px;">
-         <p-icon-text-button
-                class="mb-4" name="ic_refresh"
-                @click="updateItems"
-        >
+         <p-button class="mb-4" icon="ic_refresh"
+                   @click="updateItems"
+         >
              Refresh
-        </p-icon-text-button>
+         </p-button>
         <p-list-card
             header="Customize No Data Case of List Card"
             :items="items"

@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+import icon from 'vue-svgicon';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 export const getButtonArgTypes = (): ArgTypes => ({
@@ -164,6 +165,26 @@ export const getButtonArgTypes = (): ArgTypes => ({
             options: ['light', 'normal', 'bold'],
         },
     },
+    icon: {
+        name: 'icon',
+        type: { name: 'string' },
+        description: 'Icon name',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'null',
+            },
+        },
+        control: {
+            type: 'select',
+            options: [null, ...Object.keys(icon.icons)],
+        },
+    },
+    // events
     onClick: {
         name: 'click',
         type: { name: 'function' },

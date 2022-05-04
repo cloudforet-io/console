@@ -1,8 +1,8 @@
-import { Button } from '@/inputs/buttons/button/type';
+import { ButtonProps } from '@/inputs/buttons/button/type';
 
 type ButtonType = 'default' | 'text';
 
-export interface SelectButtonType extends Button {
+export interface SelectButtonType extends ButtonProps {
     label: string;
     name: string;
 }

@@ -4,17 +4,19 @@ export const CONTEXT_MENU_TYPE = {
     divider: 'divider',
     header: 'header',
     item: 'item',
+    button: 'button',
 } as const;
 
-export type CONTEXT_MENU_TYPE = typeof CONTEXT_MENU_TYPE[keyof typeof CONTEXT_MENU_TYPE];
+export type ContextMenuType = typeof CONTEXT_MENU_TYPE[keyof typeof CONTEXT_MENU_TYPE];
 
 export interface MenuItem {
     name?: string;
     label?: string | TranslateResult;
-    type?: CONTEXT_MENU_TYPE;
+    type?: ContextMenuType;
     disabled?: boolean;
     link?: string;
     target?: string;
+    icon?: string;
 }
 
 export interface ContextMenuProps {

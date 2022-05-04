@@ -1,10 +1,11 @@
 <script lang="ts">
 import { getBindClass } from '@/util/functional-helpers';
-import { Button } from '@/inputs/buttons/button/type';
+import { ButtonProps, ButtonSize } from '@/inputs/buttons/button/type';
 import PLottie from '@/foundation/lottie/PLottie.vue';
+import PI from '@/foundation/icons/PI.vue';
 import { VNode } from 'vue/types/vnode';
 
-const getClass = (attrs: Button) => {
+const getClass = (attrs: ButtonProps) => {
     const cls = {
         'p-button': true,
         loading: !!attrs.loading,
@@ -24,7 +25,7 @@ const getClass = (attrs: Button) => {
     return cls;
 };
 
-const LOADING_SIZE = {
+const LOADING_SIZE: Record<ButtonSize, number> = {
     sm: 0.75,
     md: 1,
     lg: 1,
@@ -34,10 +35,11 @@ export default {
     functional: true,
     components: {
         PLottie,
+        PI,
     },
     render(h, {
         props, listeners, children, data,
-    }) {
+    }: { props: ButtonProps; listeners: any; children: any[]; data: any }) {
         const tag = props.href ? 'a' : 'button';
 
         const childrenEl: VNode[] = children ? [...children] : [];
@@ -47,7 +49,17 @@ export default {
                 props: {
                     name: 'thin-spinner',
                     auto: true,
-                    size: LOADING_SIZE[props.size] || LOADING_SIZE.md,
+                    size: LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md,
+                },
+            }));
+        } else if (props.icon) {
+            childrenEl.splice(0, 0, h(PI, {
+                class: 'icon',
+                props: {
+                    name: props.icon,
+                    width: '1em',
+                    height: '1em',
+                    color: 'inherit',
                 },
             }));
         }
@@ -104,7 +116,7 @@ export default {
         &.loading {
             @apply bg-gray-200 text-gray-400 border-gray-100;
             cursor: not-allowed;
-            .spinner {
+            > .spinner {
                 margin-right: 0.5em;
             }
         }
@@ -120,6 +132,7 @@ export default {
     letter-spacing: 0;
     font-size: 0.875rem;
     line-height: 2rem;
+    white-space: nowrap;
     transition:
         color 0.15s ease-in-out,
         background-color 0.15s ease-in-out,
@@ -132,6 +145,7 @@ export default {
 
     &.block {
         min-width: 100%;
+        display: flex;
     }
 
     &.lg {
@@ -140,6 +154,12 @@ export default {
         text-align: center;
         font-size: 1rem;
         line-height: 1.125rem;
+        &.block {
+            min-width: 100%;
+        }
+        > .icon {
+            font-size: 1.5rem;
+        }
     }
 
     &.sm {
@@ -149,6 +169,12 @@ export default {
         text-align: center;
         font-size: 0.75rem;
         line-height: 0.875rem;
+        &.block {
+            min-width: 100%;
+        }
+        > .icon {
+            font-size: 1rem;
+        }
     }
 
     &.bold {
@@ -157,6 +183,12 @@ export default {
 
     &.normal {
         @apply font-normal;
+    }
+
+    > .icon {
+        flex-shrink: 0;
+        margin-right: 0.25em;
+        font-size: 1.25rem;
     }
 
     @mixin btn-color primary-dark, theme('colors.primary-dark'), theme('colors.white');

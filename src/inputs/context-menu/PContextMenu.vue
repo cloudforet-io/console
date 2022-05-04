@@ -51,6 +51,21 @@
                         {{ item.label }}
                     </div>
                 </slot>
+                <div v-else-if="item.type === 'button'" :key="`button-${index}`" class="context-button"
+                     :class="{disabled: item.disabled}"
+                >
+                    <p-button :disabled="item.disabled"
+                              size="sm"
+                              style-type="gray-border"
+                              font-weight="bold"
+                              :outline="true"
+                              :block="true"
+                              :icon="item.icon"
+                              @click="$emit('click-button', item, index, $event)"
+                    >
+                        {{ item.label }}
+                    </p-button>
+                </div>
             </template>
         </slot>
         <div v-show="menu.length === 0" class="no-data">
@@ -281,6 +296,15 @@ export default defineComponent<ContextMenuProps>({
         @apply border-t border-gray-200;
         border-top-width: 1px;
         border-top-style: solid;
+    }
+    > .context-button {
+        padding: 0.5rem 0.5rem 0.75rem 0.5rem;
+
+        @media (hover: hover) {
+            &:hover:not(.disabled) {
+                @apply bg-blue-100;
+            }
+        }
     }
 
     > .loader-wrapper {
