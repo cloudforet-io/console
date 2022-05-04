@@ -3,6 +3,7 @@ import { SELECT_MARKERS } from '@/inputs/context-menu/context-menu-item/config';
 
 const slots: [string, string][] = [
     ['default', 'The slot for item. Default style will be applied.'],
+    ['text-list', 'The slot for item. Default style will bel applied. This works only when the highlightTerm is given.'],
 ];
 
 const events: [string, string][] = [
@@ -177,6 +178,24 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'boolean',
+        },
+    },
+    highlightTerm: {
+        name: 'highlightTerm',
+        type: { name: 'string' },
+        description: 'The term for highlighting part of the label.',
+        defaultValue: 'highlight',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '""',
+            },
+        },
+        control: {
+            type: 'text',
         },
     },
     ...getArgTypes('slots', slots),

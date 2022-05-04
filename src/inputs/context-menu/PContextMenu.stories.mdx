@@ -32,12 +32,8 @@ export const Template = (args, { argTypes }) => ({
             :show-radio-icon="showRadioIcon"
             :strict-select-mode="strictSelectMode"
             :item-height-fixed="itemHeightFixed"
-            @select="onSelect"
-            @focus="onFocus"
-            @blur="onBlur"
-            @keyup:up:end="$props['onKeyup:up:end']"
-            @keyup:down:end="$props['onKeyup:down:end']"
-            @keyup:esc="$props['onKeyup:esc']"
+            :highlight-term="highlightTerm"
+            :no-select-indication="noSelectIndication"
         />
     </div>
     `,
@@ -240,7 +236,7 @@ Context Menu have 3 types fot slots:
                         <pre ref="slotPropsRef">{{slotProps}}</pre>
                     </template>
                 </p-context-menu>
-                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
+                <p-raw-data v-if="slotPropsText" :raw="slotPropsText" folded style="font-size: 12px;" />
             </div>
         </div>
 <!--<div>-->
@@ -283,13 +279,13 @@ Context Menu have 3 types fot slots:
                 </p-context-menu>
             </div>
             <div class="mt-4">
-                <h2 class="mb-4">Slot Props:</h2>
+                <h2 class="mb-4">The last item's Slot Props:</h2>
                 <p-context-menu :menu="menu" loading v-show="false">
                     <template #item--format="slotProps">
                         <pre ref="slotPropsRef">{{slotProps}}</pre>
                     </template>
                 </p-context-menu>
-                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
+                <p-raw-data v-if="slotPropsText" :raw="slotPropsText" folded style="font-size: 12px;" />
             </div>
         </div>
 <!--<div>-->
@@ -339,7 +335,7 @@ Context Menu have 3 types fot slots:
                         <pre ref="slotPropsRef">{{slotProps}}</pre>
                     </template>
                 </p-context-menu>
-                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
+                <p-raw-data v-if="slotPropsText" :raw="slotPropsText" folded style="font-size: 12px;" />
             </div>
         </div>
 <!--<div>-->
@@ -470,6 +466,49 @@ Context Menu have 3 types fot slots:
 <br/>
 <br/>
 
+## Highlight Term & Item Text List Slot
+
+<Canvas>
+    <Story name="Highlight Term & Item Text List Slot" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu, PRawData },
+            template: `
+        <div>
+            <p class="text-lg my-4">highlight term: 'o'</p>
+            <p-context-menu :menu="menu" highlight-term="o"/>
+            <p class="text-lg my-4">item-text-list slot case of having highlight term: 'o'</p>
+            <p-context-menu :menu="menu" highlight-term="o">
+                <template #item-text-list="{text, matched}">
+                    <span :class="matched ? 'text-peacock-700' : 'text-peacock-500'">{{text}}</span>
+                </template>
+            </p-context-menu>
+            <p class="text-lg my-4">The last item's <strong>Slot Props</strong> for <strong>item-text-list</strong> slot with highlight term: 'o'</p>
+            <p-raw-data v-if="slotPropsText" :raw="slotPropsText" folded style="font-size: 12px;" />
+            <p-context-menu v-show="false" :menu="menu" highlight-term="o">
+                <template #item-text-list="slotProps">
+                    <pre ref="slotPropsRef">{{slotProps}}</pre>
+                </template>
+            </p-context-menu>
+        </div>
+<!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    slotPropsRef: null,
+                    slotPropsText: ''
+                })
+                watch(() => state.slotPropsRef, (slotPropsRef) => {
+                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
+                })
+                return {...toRefs((state))}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 ## Playground
 

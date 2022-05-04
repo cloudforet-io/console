@@ -17,6 +17,7 @@
                         ref="menuRef"
                         :menu="bindingMenu"
                         :loading="loading"
+                        no-select-indication
                         :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
                         @select="onClickMenuItem"
                         @keyup:up:end="focusSearch"

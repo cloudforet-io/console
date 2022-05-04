@@ -28,16 +28,22 @@
                                      :link="item.link"
                                      :target="item.target"
                                      :disabled="item.disabled"
-                                     :selected="selectedNameMap[item.name] !== undefined"
+                                     :selected="!noSelectIndication && selectedNameMap[item.name] !== undefined"
                                      :select-marker="multiSelectable ? 'checkbox' : (showRadioIcon ? 'radio' : undefined)"
                                      :ellipsis="itemHeightFixed"
+                                     :highlight-term="highlightTerm"
                                      :tabindex="index"
                                      @click.stop="onClickMenu(item, index, $event)"
                                      @keyup.enter="onClickMenu(item, index, $event)"
                                      @keydown.up="onKeyUp(index)"
                                      @keydown.down="onKeyDown(index)"
                 >
-                    <slot name="item--format" v-bind="{...$props, item, index}" />
+                    <template #default="slotProps">
+                        <slot name="item--format" v-bind="{...$props, item, index}" />
+                    </template>
+                    <template #text-list="{text, matched, textList, regex, index: textIndex}">
+                        <slot name="item-text-list" v-bind="{...$props, item, index, text, matched, textList, regex, textIndex}" />
+                    </template>
                 </p-context-menu-item>
                 <div v-else-if="item.type==='divider'" :key="index" class="context-divider" />
                 <slot v-else-if="item.type==='header'" :name="`header-${item.name}`" v-bind="{...$props, item, key: index}">
@@ -63,7 +69,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, defineComponent, onUnmounted, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import PLottie from '@/foundation/lottie/PLottie.vue';
@@ -76,7 +82,7 @@ import PContextMenuItem from '@/inputs/context-menu/context-menu-item/PContextMe
 import { useProxyValue } from '@/hooks/proxy-state';
 import { useListFocus } from '@/hooks/list-focus';
 
-const filterSelectedItems = (selected: MenuItem[], menu: MenuItem[]) => {
+const getFilteredSelectedItems = (selected: MenuItem[], menu: MenuItem[]): MenuItem[] => {
     const filtered = selected.filter(d => menu.find(item => item.name === d.name));
     if (filtered.length === selected.length) return selected;
     return filtered;
@@ -95,7 +101,7 @@ export default defineComponent<ContextMenuProps>({
     i18n,
     props: {
         menu: {
-            type: Array,
+            type: Array as PropType<MenuItem[]>,
             default: () => [],
         },
         loading: {
@@ -103,7 +109,7 @@ export default defineComponent<ContextMenuProps>({
             default: false,
         },
         selected: {
-            type: Array,
+            type: Array as PropType<MenuItem[]>,
             default: () => [],
         },
         multiSelectable: {
@@ -122,10 +128,18 @@ export default defineComponent<ContextMenuProps>({
             type: Boolean,
             default: false,
         },
+        highlightTerm: {
+            type: String,
+            default: '',
+        },
+        noSelectIndication: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: ContextMenuProps, { emit }) {
+    setup(props, { emit }) {
         const state = reactive({
-            proxySelected: useProxyValue('selected', props, emit),
+            proxySelected: useProxyValue<MenuItem[]>('selected', props, emit),
             selectedNameMap: computed<Record<string, number>>(() => {
                 const selectedMap = {};
                 state.proxySelected.forEach((item, idx) => {
@@ -165,12 +179,12 @@ export default defineComponent<ContextMenuProps>({
             const focusedIdx = handleMoveDown(idx);
             if (focusedIdx === undefined) emit('keyup:down:end');
         };
-        const onClickMenu = (item, index, event) => {
+        const onClickMenu = (item: MenuItem, index, event) => {
             if (item.disabled) return;
 
             if (props.multiSelectable) {
-                if (state.selectedNameMap[item.name] !== undefined) {
-                    const indexOfSelected = state.selectedNameMap[item.name];
+                if (state.selectedNameMap[item.name ?? ''] !== undefined) {
+                    const indexOfSelected = state.selectedNameMap[item.name ?? ''];
                     state.proxySelected.splice(indexOfSelected, 1);
                 } else {
                     state.proxySelected.splice(state.proxySelected.length - 1, 0, item);
@@ -198,9 +212,13 @@ export default defineComponent<ContextMenuProps>({
             if (!proxySelected.length) return;
 
             if (props.strictSelectMode) {
-                state.proxySelected = filterSelectedItems(proxySelected, state.selectableMenuItems);
+                state.proxySelected = getFilteredSelectedItems(proxySelected, state.selectableMenuItems);
             }
         }, { immediate: true });
+
+        onUnmounted(() => {
+            state.proxySelected = [];
+        });
 
         return {
             ...toRefs(state),

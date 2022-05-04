@@ -20,8 +20,11 @@ export interface MenuItem {
 export interface ContextMenuProps {
     menu: MenuItem[];
     loading?: boolean;
-    selected?: string[];
+    selected?: MenuItem[];
     multiSelectable?: boolean;
     showRadioIcon?: boolean;
     strictSelectMode?: boolean;
+    itemHeightFixed?: boolean;
+    highlightTerm?: string;
+    noSelectIndication?: boolean;
 }

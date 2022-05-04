@@ -52,6 +52,7 @@
                             ...(styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON && {width: 'auto'}),
                         }"
                         item-height-fixed
+                        no-select-indication
                         @select="onSelectMenu"
         >
             <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">

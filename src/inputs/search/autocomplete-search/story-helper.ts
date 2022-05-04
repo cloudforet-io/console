@@ -4,6 +4,24 @@ import { ArgTypes } from '@storybook/addons';
 
 const extraArgTypes: ArgTypes = {
     /* props */
+    focused: {
+        name: 'focused',
+        type: { name: 'boolean' },
+        description: 'Whether to make focused at the first time or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     handler: {
         name: 'handler',
         type: { name: 'function' },

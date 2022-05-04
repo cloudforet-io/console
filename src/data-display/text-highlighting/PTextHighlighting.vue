@@ -1,13 +1,10 @@
 <template>
-    <span class="text-highlighting" :class="styleType" v-on="$listeners">
+    <span class="p-text-highlighting" :class="styleType" v-on="$listeners">
         <span v-for="({text, matched}, i) in textList"
               :key="`label-${text}-${i}`"
+              :class="{'matched-character': matched}"
         >
-            <span :class="{'matched-character': matched}">
-                <slot v-bind="{ textList, text, matched, index: i, regex }">
-                    {{ text }}
-                </slot>
-            </span>
+            <slot v-bind="{ textList, text, matched, index: i, regex }">{{ text }}</slot>
         </span>
     </span>
 </template>
@@ -104,8 +101,8 @@ export default defineComponent<TextHighlightingProps>({
 
 </script>
 
-<style lang="postcss" scoped>
-.text-highlighting {
+<style lang="postcss">
+.p-text-highlighting {
     color: inherit;
     font-weight: inherit;
     font-size: inherit;

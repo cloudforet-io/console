@@ -5,7 +5,7 @@ import {
 } from '@/inputs/context-menu/context-menu-item/story-helper';
 
 
-<Meta title='Inputs/Context Menu/Context Menu Item' parameters={{
+<Meta title='Inputs/Context Menu Item' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
@@ -26,6 +26,7 @@ export const Template = (args, { argTypes }) => ({
             :selected="selected"
             :select-marker="selectMarker"
             :ellipsis="ellipsis"
+            :highlightTerm="highlightTerm"
             @click.stop="onClick"
         ></PContextMenuItem>
     `,
@@ -118,7 +119,38 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 
 
+## Highlight Term
+
+<Canvas>
+    <Story name="Highlight Term">
+        {{
+            components: { PContextMenuItem },
+            template: `
+        <div class="border border-primary-1 p-4">
+            <p-context-menu-item label="This is the context menu item with highlight term 'highlight'. This uses Text Highlighting component internally." highlight-term="highlight" />
+            <p-context-menu-item label="This is the context menu item with highlight term 'highlight' and with the link. This uses Text Highlighting component internally." highlight-term="highlight" link="https://google.com" />
+            <p-context-menu-item label="This is the context menu item with highlight term 'highlight' and with the selected checkbox. This uses Text Highlighting component internally." highlight-term="highlight" select-marker="checkbox" selected />
+            <p-context-menu-item label="This is the disabled context menu item with highlight term 'highlight'. This uses Text Highlighting component internally." highlight-term="highlight" disabled />
+        </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
 ## Slots
+
+<br/>
+<br/>
+
+### Slot Props
+
+All props will be provided with the default slot's props. <br/>
+In case of `highlightTerm` prop is given, `TextHighlighting` component's default slot's props will be merged to it. <br/>
+
 
 <Canvas>
     <Story name="Slots">
@@ -127,13 +159,18 @@ export const Template = (args, { argTypes }) => ({
             template: `
         <div>
             <p-context-menu-item>
-                <template><span class="text-xl font-bold text-primary-dark">default slot.</span></template>
+                <span class="text-xl font-bold text-primary-dark">default slot.</span>
             </p-context-menu-item>
             <p-context-menu-item link="https://google.com">
-                <template><span class="text-xl font-bold text-primary-dark">default slot with link</span></template>
+                <span class="text-xl font-bold text-primary-dark">default slot with link</span>
             </p-context-menu-item>
             <p-context-menu-item link="https://google.com" select-marker="checkbox">
-                <template><span class="text-xl font-bold text-primary-dark">default slot with link, select marker</span></template>
+                <span class="text-xl font-bold text-primary-dark">default slot with link, select marker</span>
+            </p-context-menu-item>
+            <p-context-menu-item label="This is the text-list slot with highlight term." highlight-term="text-list">
+                <template #text-list="{text, matched}">
+                    <span class="text-xl font-bold text-primary-dark" :class="{'text-red': matched}">{{text}}</span>
+                </template>
             </p-context-menu-item>
         </div>
     `,

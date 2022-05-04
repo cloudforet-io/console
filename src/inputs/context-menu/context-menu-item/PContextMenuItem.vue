@@ -15,7 +15,16 @@
                      width="1em" height="1em"
                 />
                 <span class="label-wrapper" :class="{ellipsis}">
-                    <span class="text" :class="{'is-anchor': isAnchor}">
+                    <p-text-highlighting v-if="highlightTerm && !$slots.default"
+                                         :text="label" :term="highlightTerm"
+                                         class="text" :class="{'is-anchor': isAnchor}"
+                                         style-type="secondary"
+                    >
+                        <template #default="textHighlightingSlotProps">
+                            <slot name="text-list" v-bind="{...textHighlightingSlotProps, ...$props}" />
+                        </template>
+                    </p-text-highlighting>
+                    <span v-else class="text" :class="{'is-anchor': isAnchor}">
                         <slot name="default" v-bind="$props">
                             {{ label }}
                         </slot>
@@ -39,6 +48,7 @@ import {
 } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
 import { SELECT_MARKERS } from '@/inputs/context-menu/context-menu-item/config';
+import PTextHighlighting from '@/data-display/text-highlighting/PTextHighlighting.vue';
 
 
 export type SelectMarker = typeof SELECT_MARKERS[number];
@@ -51,11 +61,13 @@ export interface ContextMenuItemProps {
     selected?: boolean;
     selectMarker?: SelectMarker;
     ellipsis?: boolean;
+    highlightTerm?: string;
 }
 
 export default defineComponent<ContextMenuItemProps>({
     name: 'PContextMenuItem',
     components: {
+        PTextHighlighting,
         PI,
     },
     props: {
@@ -93,6 +105,10 @@ export default defineComponent<ContextMenuItemProps>({
         ellipsis: {
             type: Boolean,
             default: false,
+        },
+        highlightTerm: {
+            type: String,
+            default: '',
         },
     },
     setup(props) {
