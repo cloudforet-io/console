@@ -128,8 +128,9 @@ export default {
                     user_id: state.userId,
                     name: `console:survey:${SURVEY_KEY}`,
                 });
-                if (!results.length) state.visible = true;
+                state.visible = !results.length;
             } catch (e) {
+                state.visible = false;
                 ErrorHandler.handleError(e);
             }
         };
@@ -155,9 +156,9 @@ export default {
             state.visible = false;
         };
 
-        watch(() => state.isSessionExpired, (isSessionExpired) => {
+        watch(() => state.isSessionExpired, async (isSessionExpired) => {
             if (!isSessionExpired && !state.isDomainOwner) {
-                listSurveyConfig();
+                await listSurveyConfig();
             }
         }, { immediate: true });
 
