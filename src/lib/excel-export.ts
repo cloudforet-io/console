@@ -9,5 +9,6 @@ export const FILE_NAME_PREFIX = Object.freeze({
     alert: 'alert',
     costAnalysis: 'costAnalysis',
     budget: 'budget',
+    policy: 'policy',
 });
 export type FILE_NAME_PREFIX = typeof FILE_NAME_PREFIX[keyof typeof FILE_NAME_PREFIX]

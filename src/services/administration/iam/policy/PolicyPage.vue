@@ -3,7 +3,7 @@
         <p-page-title
             title="Policy"
             use-total-count
-            :total-count="1"
+            :total-count="totalCount"
         >
             <template #extra>
                 <router-link to="#">
@@ -15,14 +15,15 @@
                 </router-link>
             </template>
         </p-page-title>
-        <policy-list-data-table />
+        <policy-list-data-table @update-total-count="handleUpdate" />
     </section>
 </template>
 
 <script lang="ts">
 import { PPageTitle, PButton } from '@spaceone/design-system';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import PolicyListDataTable from '@/services/administration/iam/policy/modules/PolicyListDataTable.vue';
+import PolicyListDataTable from '@/services/administration/modules/PolicyListDataTable.vue';
+import { reactive, toRefs } from '@vue/composition-api';
 
 export default {
     name: 'PolicyPage',
@@ -32,8 +33,16 @@ export default {
         PolicyListDataTable,
     },
     setup() {
+        const state = reactive({
+            totalCount: 0,
+        });
+
+        const handleUpdate = (value: number) => { state.totalCount = value; };
+
         return {
+            ...toRefs(state),
             ADMINISTRATION_ROUTE,
+            handleUpdate,
         };
     },
 };
