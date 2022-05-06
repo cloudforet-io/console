@@ -24,6 +24,7 @@
                             :selected.sync="formState.userItems"
                             multi-selectable
                             use-fixed-menu-style
+                            :invalid="invalid"
                         />
                         <!-- keycloak의 경우 auto-complete-input 사용 -->
                         <!--                        <p-search-dropdown-->
@@ -54,7 +55,7 @@
                 >
                     <p-search-dropdown
                         :menu="roleItems"
-                        :selected.sync="formState.roles"
+                        :selected.sync="formState.roleItems"
                         type="radioButton"
                         use-fixed-menu-style
                     />
@@ -126,10 +127,6 @@ export default {
                 properties: {},
             }),
         },
-        updateMode: {
-            type: Boolean,
-            default: false,
-        },
         isProjectGroup: {
             type: Boolean,
             default: false,
@@ -145,7 +142,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const formState = reactive({
-            roles: [],
+            roleItems: [] as MenuItem[],
             labels: [] as string[],
             userItems: [] as MenuItem[],
             users: computed(() => formState.userItems.map(item => item.name)),
@@ -172,9 +169,6 @@ export default {
                 return tabs;
             }),
             activeTab: FORM_MODE.INTERNAL_USER,
-            fields: computed(() => [
-                { name: 'user_id', label: i18n.t('PROJECT.DETAIL.MEMBER.USER_ID'), type: 'item' },
-            ]),
             roleItems: [] as MenuItem[],
             internalItems: [] as MenuItem[],
             externalItems: [] as MenuItem[],
@@ -184,13 +178,14 @@ export default {
             searchText: '',
             labelText: '',
             totalCount: 0,
-            isFocused: false,
-            visibleMenu: false,
             proxyVisible: useProxyValue('visible', props, emit),
             isLabelValid: computed(() => !state.labelInvalidText),
             labelInvalidText: computed(() => {
                 if (formState.labels.includes(state.labelText)) {
                     return i18n.t('PROJECT.DETAIL.MEMBER.ALREADY_EXISTING');
+                }
+                if (formState.labels.length > 5) {
+                    return i18n.t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT');
                 }
                 return '';
             }),
@@ -199,12 +194,12 @@ export default {
                 if (isInvalid) return false;
                 const isExisting = !!formState.users.filter(user => state.existingUserList.includes(user)).length;
                 if (isExisting) return false;
-                if (!formState.roles.length) return false;
+                if (!formState.roleItems.length) return false;
                 return formState.users.length > 0;
             }),
         });
 
-        /* util */
+        /* Util */
         const setInternalMenuItems = () => {
             state.internalItems = [];
             const memberIdList = state.members.map(d => d.resource_id);
@@ -255,8 +250,8 @@ export default {
             }
         };
 
-        /* api */
-        const getRoleList = async () => {
+        /* Api */
+        const listRoles = async () => {
             const { results } = await SpaceConnector.client.identity.role.list({
                 role_type: 'PROJECT',
             });
@@ -266,31 +261,24 @@ export default {
                 name: d.role_id,
             }));
         };
-        const handleConfirm = async () => {
+        const addMember = async () => {
             try {
+                const params: any = {
+                    role_id: formState.roleItems[0].name,
+                    users: formState.users,
+                    labels: formState.labels,
+                    is_external_user: state.activeTab !== FORM_MODE.INTERNAL_USER,
+                };
                 if (props.isProjectGroup) {
-                    await SpaceConnector.client.identity.projectGroup.member.add({
-                        project_group_id: props.projectGroupId,
-                        role_id: formState.roles[0].name,
-                        users: formState.users,
-                        labels: formState.labels,
-                        is_external_user: state.activeTab !== FORM_MODE.INTERNAL_USER,
-                    });
+                    params.project_group_id = props.projectGroupId;
+                    await SpaceConnector.client.identity.projectGroup.member.add(params);
                 } else {
-                    await SpaceConnector.client.identity.project.member.add({
-                        project_id: props.projectId,
-                        role_id: formState.roles[0].name,
-                        users: formState.users,
-                        labels: formState.labels,
-                        is_external_user: state.activeTab !== FORM_MODE.INTERNAL_USER,
-                    });
+                    params.project_id = props.projectId;
+                    await SpaceConnector.client.identity.project.member.add(params);
                 }
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), '', root);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.MEMBER.ALT_E_ADD_MEMBER'));
-            } finally {
-                emit('confirm');
-                state.proxyVisible = false;
             }
         };
         const listMember = async () => {
@@ -329,7 +317,7 @@ export default {
             }
         }, 300);
 
-        /* event */
+        /* Event */
         const handleClickDeleteAllUsers = () => {
             formState.userItems = [];
         };
@@ -339,18 +327,23 @@ export default {
         const handleDeleteLabel = (index) => {
             formState.labels.splice(index, 1);
         };
-        const handleAddLabel = async () => {
-            let labelText = state.labelText;
-            labelText = labelText.trim();
-
-            if (!labelText) return;
-            if (!state.isLabelValid) return;
-            if (!formState.labels.every(tag => tag !== labelText)) return;
-            if (formState.labels.length >= 5) return;
-
-            formState.labels.push(labelText);
-            state.labelText = '';
+        const handleConfirm = async () => {
+            await addMember();
+            emit('confirm');
+            state.proxyVisible = false;
         };
+        // const handleAddLabel = async () => {
+        //     let labelText = state.labelText;
+        //     labelText = labelText.trim();
+        //
+        //     if (!labelText) return;
+        //     if (!state.isLabelValid) return;
+        //     if (!formState.labels.every(tag => tag !== labelText)) return;
+        //     if (formState.labels.length >= 5) return;
+        //
+        //     formState.labels.push(labelText);
+        //     state.labelText = '';
+        // };
         const handleSearchExternalUser = (text) => {
             if (text.length) {
                 listExternalUser();
@@ -368,14 +361,18 @@ export default {
             listExternalUser();
         };
 
+        /* Init */
         (async () => {
-            await getRoleList();
-        })();
-        (async () => {
-            await listMember();
-            setInternalMenuItems();
+            await Promise.allSettled([
+                listMember(),
+                listRoles(),
+                // LOAD REFERENCE STORE
+                store.dispatch('reference/user/load'),
+            ]);
+            await setInternalMenuItems();
         })();
 
+        /* Watcher */
         watch(() => state.activeTab, () => {
             formState.userItems = [];
             state.externalItems = [];
@@ -384,10 +381,6 @@ export default {
             listExternalUser();
         });
 
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/user/load');
-        })();
 
         return {
             ...toRefs(state),
@@ -396,7 +389,6 @@ export default {
             handleConfirm,
             handleClickDeleteAllUsers,
             handleClickDeleteUser,
-            handleAddLabel,
             handleDeleteLabel,
             handleSearchExternalUser,
             handleKeydownEnter,
