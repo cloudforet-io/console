@@ -31,13 +31,14 @@
                                   :show-header="showHeader"
                 >
                     <template #addButton="scope">
-                        <p-icon-text-button
-                            outline style-type="primary-dark" :disabled="scope.disabled"
-                            name="ic_plus_bold"
+                        <p-button
+                            style-type="primary-dark" :disabled="scope.disabled"
+                            :outline="true"
+                            icon="ic_plus_bold"
                             @click="scope.addPair($event)"
                         >
                             {{ $t('COMMON.TAGS.ADD_TAG') }}
-                        </p-icon-text-button>
+                        </p-button>
                     </template>
                 </tags-input-group>
             </p-pane-layout>
@@ -54,7 +55,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
     camelCase, isEmpty, get,
 } from 'lodash';
@@ -64,7 +64,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PIconButton, PPaneLayout, PIconTextButton, PButton,
+    PIconButton, PPaneLayout, PButton,
 } from '@spaceone/design-system';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
@@ -88,7 +88,6 @@ export default {
         PIconButton,
         PButton,
         PPaneLayout,
-        PIconTextButton,
     },
     props: {
         tags: {

@@ -37,14 +37,13 @@
                     </div>
                 </template>
                 <template #toolbox-left>
-                    <p-icon-text-button
-                        class="mr-4"
-                        style-type="primary-dark"
-                        name="ic_plus_bold"
-                        @click="visibleAlertFormModal = true"
+                    <p-button class="mr-4"
+                              style-type="primary-dark"
+                              icon="ic_plus_bold"
+                              @click="visibleAlertFormModal = true"
                     >
                         {{ $t('MONITORING.ALERT.ALERT_LIST.CREATE') }}
-                    </p-icon-text-button>
+                    </p-button>
                 </template>
                 <template #toolbox-bottom>
                     <alert-table-bottom-filters
@@ -120,7 +119,7 @@ import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
 import {
     PToolboxTable,
-    PIconTextButton,
+    PButton,
     PPanelTop,
     PBadge,
     PI,
@@ -166,7 +165,7 @@ export default {
         AlertActions,
         AlertTriggeredBy,
         PToolboxTable,
-        PIconTextButton,
+        PButton,
         PPanelTop,
         PBadge,
         PI,

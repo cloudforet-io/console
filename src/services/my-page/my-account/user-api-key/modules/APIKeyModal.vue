@@ -29,12 +29,12 @@
                     />
                 </p>
                 <p-divider class="divider" />
-                <p-icon-text-button style-type="primary-dark" outline
-                                    name="ic_download" class="download-btn"
-                                    @click="onClickDownloadFile(FileType.JSON)"
+                <p-button style-type="primary-dark" :outline="true"
+                          icon="ic_download" class="download-btn"
+                          @click="onClickDownloadFile(FileType.JSON)"
                 >
                     {{ $t('IDENTITY.USER.API_KEY.DOWNLOAD_JSON') }}
-                </p-icon-text-button>
+                </p-button>
             </p-pane-layout>
             <p-pane-layout class="box-wrapper">
                 <span class="box-header">
@@ -64,12 +64,12 @@
                     />
                 </p>
                 <p-divider class="divider" />
-                <p-icon-text-button style-type="primary-dark" outline
-                                    name="ic_download" class="download-btn"
-                                    @click="onClickDownloadFile(FileType.YAML)"
+                <p-button style-type="primary-dark" :outline="true"
+                          icon="ic_download" class="download-btn"
+                          @click="onClickDownloadFile(FileType.YAML)"
                 >
                     {{ $t('IDENTITY.USER.API_KEY.DOWNLOAD_YAML') }}
-                </p-icon-text-button>
+                </p-button>
             </p-pane-layout>
         </template>
     </p-icon-modal>
@@ -77,7 +77,7 @@
 
 <script lang="ts">
 import {
-    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PRawData, PIconTextButton, PAnchor,
+    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PRawData, PButton, PAnchor,
 } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -102,7 +102,7 @@ export default {
         PDivider,
         PCollapsibleToggle,
         PRawData,
-        PIconTextButton,
+        PButton,
         PAnchor,
     },
     props: {

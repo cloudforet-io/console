@@ -49,15 +49,15 @@
                             </div>
                             <div class="top-button-box">
                                 <div>
-                                    <p-icon-text-button v-if="!storeState.groupId"
-                                                        style-type="primary-dark"
-                                                        outline
-                                                        name="ic_plus_bold"
-                                                        :disabled="!hasRootProjectPermission"
-                                                        @click="openProjectGroupCreateForm"
+                                    <p-button v-if="!storeState.groupId"
+                                              style-type="primary-dark"
+                                              :outline="true"
+                                              icon="ic_plus_bold"
+                                              :disabled="!hasRootProjectPermission"
+                                              @click="openProjectGroupCreateForm"
                                     >
                                         {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
-                                    </p-icon-text-button>
+                                    </p-button>
                                     <p-select-dropdown v-if="storeState.groupId && !isPermissionDenied"
                                                        :items="settingMenu"
                                                        style-type="icon-button"
@@ -79,15 +79,15 @@
                                             <span class="text">{{ groupMemberCount || 0 }}</span>
                                         </div>
                                     </div>
-                                    <p-icon-text-button v-if="storeState.groupId && !isPermissionDenied"
-                                                        style-type="primary-dark"
-                                                        name="ic_plus_bold"
-                                                        @click="openProjectForm"
+                                    <p-button v-if="storeState.groupId && !isPermissionDenied"
+                                              style-type="primary-dark"
+                                              icon="ic_plus_bold"
+                                              @click="openProjectForm"
                                     >
                                         <div class="truncate">
                                             {{ $t('PROJECT.LANDING.CREATE_PROJECT') }}
                                         </div>
-                                    </p-icon-text-button>
+                                    </p-button>
                                 </div>
                             </div>
                         </template>
@@ -119,7 +119,7 @@ import {
 import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import {
-    PI, PPageTitle, PBreadcrumbs, PIconTextButton, PSelectDropdown,
+    PI, PPageTitle, PBreadcrumbs, PButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
@@ -162,10 +162,10 @@ export default {
         ProjectTree,
         PVerticalPageLayout,
         PI,
+        PButton,
         PPageTitle,
         ProjectSearch,
         ProjectGroupFormModal,
-        PIconTextButton,
     },
     setup() {
         const vm: ComponentRenderProxy = getCurrentInstance() as ComponentRenderProxy;

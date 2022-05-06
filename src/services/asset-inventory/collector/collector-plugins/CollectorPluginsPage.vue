@@ -54,12 +54,12 @@
                                     </p-badge>
                                 </div>
                                 <div class="btns">
-                                    <p-icon-text-button style-type="primary-dark"
-                                                        name="ic_plus_bold"
-                                                        @click="handlePluginCreate(item)"
+                                    <p-button style-type="primary-dark"
+                                              icon="ic_plus_bold"
+                                              @click="handlePluginCreate(item)"
                                     >
                                         {{ $t('PLUGIN.COLLECTOR.PLUGINS.CREATE') }}
-                                    </p-icon-text-button>
+                                    </p-button>
                                 </div>
                             </div>
                         </template>
@@ -79,7 +79,7 @@ import {
 
 import {
     PPageTitle, PCardItem,
-    PIconTextButton, PBadge, PI, PDivider, PDataLoader,
+    PButton, PBadge, PI, PDivider, PDataLoader,
 } from '@spaceone/design-system';
 
 import PluginFilter from '@/services/asset-inventory/collector/collector-plugins/modules/PluginFilter.vue';
@@ -139,7 +139,7 @@ export default {
         PBadge,
         PI,
         PluginFilter,
-        PIconTextButton,
+        PButton,
         PDivider,
         PDataLoader,
         CollectorPluginsToolbox,

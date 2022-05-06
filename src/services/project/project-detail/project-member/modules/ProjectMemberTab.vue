@@ -16,13 +16,13 @@
                 <p-panel-top :title="$t('PROJECT.DETAIL.MEMBER_TITLE')" use-total-count :total-count="totalCount" />
             </template>
             <template #toolbox-left>
-                <p-icon-text-button style-type="primary-dark" class="mr-4 add-btn"
-                                    name="ic_plus_bold"
-                                    @click="openMemberAddForm()"
+                <p-button style-type="primary-dark" class="mr-4 add-btn"
+                          icon="ic_plus_bold"
+                          @click="openMemberAddForm()"
                 >
                     <!-- song-lang -->
                     Invite
-                </p-icon-text-button>
+                </p-button>
                 <p-select-dropdown :items="dropdownMenu"
                                    @select="onSelectDropdown"
                 >
@@ -72,7 +72,7 @@
 import {
     PAnchor,
     PBadge,
-    PIconTextButton,
+    PButton,
     PPanelTop,
     PSelectDropdown,
     PTableCheckModal,
@@ -120,7 +120,7 @@ export default {
         PAnchor,
         PToolboxTable,
         PPanelTop,
-        PIconTextButton,
+        PButton,
         PSelectDropdown,
         PBadge,
         PTableCheckModal,

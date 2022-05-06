@@ -17,14 +17,13 @@
                 @refresh="onChange()"
             >
                 <template #left-area>
-                    <p-icon-text-button
-                        class="create-button"
-                        style-type="primary-dark"
-                        name="ic_plus_bold"
-                        @click="onSelectAction(ACTION.create)"
+                    <p-button class="create-button"
+                              style-type="primary-dark"
+                              icon="ic_plus_bold"
+                              @click="onSelectAction(ACTION.create)"
                     >
                         {{ $t('MONITORING.ALERT.ESCALATION_POLICY.CREATE') }}
-                    </p-icon-text-button>
+                    </p-button>
                     <p-select-dropdown
                         :selected="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
                         :items="actionItems"
@@ -64,7 +63,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPageTitle, PIconTextButton, PSelectDropdown, PToolbox,
+    PPageTitle, PButton, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
 import EscalationPolicyFormModal from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -92,7 +91,7 @@ export default {
         DeleteModal,
         EscalationPolicyDataTable,
         PPageTitle,
-        PIconTextButton,
+        PButton,
         PSelectDropdown,
         PToolbox,
     },

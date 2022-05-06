@@ -7,12 +7,11 @@
         >
             <template #extra>
                 <router-link to="#">
-                    <p-icon-text-button
-                        style-type="primary-dark"
-                        name="ic_plus_bold"
+                    <p-button style-type="primary-dark"
+                              name="ic_plus_bold"
                     >
                         {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
-                    </p-icon-text-button>
+                    </p-button>
                 </router-link>
             </template>
         </p-page-title>
@@ -21,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import { PPageTitle, PIconTextButton } from '@spaceone/design-system';
+import { PPageTitle, PButton } from '@spaceone/design-system';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import PolicyListDataTable from '@/services/administration/iam/policy/modules/PolicyListDataTable.vue';
 
@@ -29,7 +28,7 @@ export default {
     name: 'PolicyPage',
     components: {
         PPageTitle,
-        PIconTextButton,
+        PButton,
         PolicyListDataTable,
     },
     setup() {

@@ -4,13 +4,13 @@
             <p class="title">
                 <strong>{{ $t('PROJECT.EVENT_RULE.CONDITION') }}</strong>
             </p>
-            <p-icon-text-button style-type="gray900" name="ic_plus_bold"
-                                outline
-                                class="add-button"
-                                @click="onClickAdd"
+            <p-button style-type="gray900" icon="ic_plus_bold"
+                      :outline="true"
+                      class="add-button"
+                      @click="onClickAdd"
             >
                 {{ $t('PROJECT.EVENT_RULE.ADD') }}
-            </p-icon-text-button>
+            </p-button>
         </div>
         <div class="content-wrapper">
             <div>
@@ -57,7 +57,7 @@ import { i18n } from '@/translations';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PIconTextButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
+    PButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
 } from '@spaceone/design-system';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -77,7 +77,7 @@ const OPERATOR = Object.freeze({
 export default {
     name: 'EventRuleConditionForm',
     components: {
-        PIconTextButton,
+        PButton,
         PRadio,
         PSelectDropdown,
         PTextInput,

@@ -81,13 +81,14 @@
                     <template #addButton="{addPair}">
                         <div class="top-part">
                             <p>{{ $t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') }}</p>
-                            <p-icon-text-button style-type="gray900" outline
-                                                name="ic_plus_bold"
-                                                class="mb-2"
-                                                @click="addPair($event)"
+                            <p-button style-type="gray900"
+                                      :outline="true"
+                                      icon="ic_plus_bold"
+                                      class="mb-2"
+                                      @click="addPair($event)"
                             >
                                 {{ $t('PROJECT.EVENT_RULE.ADD') }}
-                            </p-icon-text-button>
+                            </p-button>
                         </div>
                     </template>
                 </tags-input-group>
@@ -110,7 +111,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToggleButton, PRadio, PIconTextButton, PCheckBox, PSelectDropdown, PSearchDropdown,
+    PToggleButton, PRadio, PButton, PCheckBox, PSelectDropdown, PSearchDropdown,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
@@ -134,7 +135,7 @@ export default {
         TagsInputGroup,
         PToggleButton,
         PRadio,
-        PIconTextButton,
+        PButton,
         PCheckBox,
         PSelectDropdown,
         PSearchDropdown,

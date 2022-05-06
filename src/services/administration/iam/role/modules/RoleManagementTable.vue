@@ -17,13 +17,13 @@
                          @export="handleExport"
         >
             <template slot="toolbox-left">
-                <p-icon-text-button style-type="primary-dark"
-                                    name="ic_plus_bold"
-                                    @click="handleCreateRole"
+                <p-button style-type="primary-dark"
+                          icon="ic_plus_bold"
+                          @click="handleCreateRole"
                 >
                     <!--song-lang-->
                     Create
-                </p-icon-text-button>
+                </p-button>
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
                                    :items="dropdownMenu"
                                    @select="handleSelectDropdown"
@@ -63,7 +63,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PHorizontalLayout, PPageTitle, PToolboxTable, PIconTextButton, PSelectDropdown,
+    PHorizontalLayout, PPageTitle, PToolboxTable, PSelectDropdown,
     PBadge, PButton, PI,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -88,7 +88,6 @@ export default defineComponent({
         PHorizontalLayout,
         PPageTitle,
         PToolboxTable,
-        PIconTextButton: PIconTextButton as any,
         PSelectDropdown,
         PBadge,
         PButton,

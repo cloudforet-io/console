@@ -100,11 +100,11 @@
                         <p class="content-order">
                             <strong>2.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_2') }}
                         </p>
-                        <p-icon-text-button style-type="primary-dark" class="mt-6" name="ic_plus_bold"
-                                            width="1rem" height="1rem" @click="$emit('create-project-group')"
+                        <p-button style-type="primary-dark" class="mt-6" icon="ic_plus_bold"
+                                  @click="$emit('create-project-group')"
                         >
                             {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_CREATE_BTN') }}
-                        </p-icon-text-button>
+                        </p-button>
                     </div>
                     <div v-else-if="noProject" class="empty-project">
                         <p class="text-primary2">
@@ -130,7 +130,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PSkeleton, PI, PIconTextButton, PToolbox, PDataLoader,
+    PSkeleton, PI, PButton, PToolbox, PDataLoader,
 } from '@spaceone/design-system';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 
@@ -163,7 +163,7 @@ export default {
     name: 'ProjectCardList',
     components: {
         ProjectFormModal,
-        PIconTextButton,
+        PButton,
         FavoriteButton,
         PI,
         PSkeleton,

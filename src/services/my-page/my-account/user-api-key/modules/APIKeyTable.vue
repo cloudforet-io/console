@@ -3,14 +3,14 @@
         <p-pane-layout class="main-table-wrapper">
             <article class="table-header">
                 <div class="left-section">
-                    <p-icon-text-button style-type="secondary-dark"
-                                        name="ic_plus_bold"
-                                        :disabled="disableCreateBtn"
-                                        @click="openAPIKeyConfirmModal"
-                                        @confirm="confirm"
+                    <p-button style-type="secondary-dark"
+                              icon="ic_plus_bold"
+                              :disabled="disableCreateBtn"
+                              @click="openAPIKeyConfirmModal"
+                              @confirm="confirm"
                     >
                         {{ $t('IDENTITY.USER.MAIN.CREATE_API_KEY') }}
-                    </p-icon-text-button>
+                    </p-button>
                     <p-select-dropdown class="dropdown-btn"
                                        :items="dropdownMenu"
                                        @select="onSelectDropdown"
@@ -69,7 +69,7 @@
 
 <script lang="ts">
 import {
-    PIconTextButton, PDataTable, PPaneLayout, PTableCheckModal, PStatus, PSelectDropdown,
+    PButton, PDataTable, PPaneLayout, PTableCheckModal, PStatus, PSelectDropdown,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, UnwrapRef, watch,
@@ -89,13 +89,10 @@ import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export interface APIKeyItem {
-    // eslint-disable-next-line camelcase
     api_key: string;
-    // eslint-disable-next-line camelcase
     api_key_id: string;
     created_at: TimeStamp;
     domain_id?: string;
-    // eslint-disable-next-line camelcase
     last_accessed_at?: TimeStamp;
     state?: string;
     user_id?: string;
@@ -121,7 +118,7 @@ export default {
         UserAPIKeyModal,
         PStatus,
         PPaneLayout,
-        PIconTextButton,
+        PButton,
         PSelectDropdown,
         PDataTable,
         PTableCheckModal,

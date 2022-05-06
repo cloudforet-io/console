@@ -25,12 +25,12 @@
                          @changeSort="listSchedules"
         >
             <template slot="toolbox-left">
-                <p-icon-text-button style-type="primary-dark"
-                                    name="ic_plus_bold"
-                                    @click="openEditModal(false)"
+                <p-button style-type="primary-dark"
+                          icon="ic_plus_bold"
+                          @click="openEditModal(false)"
                 >
                     {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_ADD') }}
-                </p-icon-text-button>
+                </p-button>
 
                 <p-select-dropdown :items="dropdown"
                                    class="ml-4"
@@ -90,7 +90,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PIconTextButton, PToolboxTable, PSelectDropdown, PTableCheckModal, PLottie, PPanelTop,
+    PButton, PToolboxTable, PSelectDropdown, PTableCheckModal, PLottie, PPanelTop,
 } from '@spaceone/design-system';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -111,7 +111,7 @@ export default {
         PTableCheckModal,
         PSelectDropdown,
         PToolboxTable,
-        PIconTextButton,
+        PButton,
         PPanelTop,
         EditScheduleModal,
     },

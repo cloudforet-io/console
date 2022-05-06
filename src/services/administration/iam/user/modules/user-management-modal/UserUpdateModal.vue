@@ -87,14 +87,14 @@
                               :is-valid.sync="validationState.isTagsValid"
             >
                 <template #addButton="scope">
-                    <p-icon-text-button
-                        outline style-type="primary" :disabled="scope.disabled"
-                        name="ic_plus_bold"
+                    <p-button
+                        :outline="true" style-type="primary" :disabled="scope.disabled"
+                        icon="ic_plus_bold"
                         class="mb-4"
                         @click="scope.addPair($event)"
                     >
                         {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_ADD') }}
-                    </p-icon-text-button>
+                    </p-button>
                 </template>
             </tags-input-group>
         </template>
@@ -109,7 +109,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PSelectDropdown, PFieldGroup, PTextInput, PIconTextButton, PDivider,
+    PButtonModal, PSelectDropdown, PFieldGroup, PTextInput, PButton, PDivider,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -138,7 +138,7 @@ export default {
         PFieldGroup,
         PTextInput,
         PSelectDropdown,
-        PIconTextButton,
+        PButton,
         PDivider,
         TagsInputGroup,
     },

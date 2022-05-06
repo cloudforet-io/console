@@ -44,11 +44,11 @@
                     <div v-for="n in getAddWidgetColumnByLayout(row[0].options.layout, row.length)"
                          :key="`${n}-${getUUID()}`" :class="`col-${row[0].options.layout} empty-widget`"
                     >
-                        <p-icon-text-button style-type="primary-dark" name="ic_plus_bold" :outline="true"
-                                            @click="handleClickAdd(rowIdx, n, row[0].options.layout)"
+                        <p-button style-type="primary-dark" icon="ic_plus_bold" :outline="true"
+                                  @click="handleClickAdd(rowIdx, n, row[0].options.layout)"
                         >
                             {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}
-                        </p-icon-text-button>
+                        </p-button>
                     </div>
                 </template>
             </div>
@@ -67,7 +67,7 @@
 <script lang="ts">
 import DynamicWidget from '@/services/cost-explorer/cost-dashboard/modules/DynamicWidget.vue';
 import { CURRENCY } from '@/store/modules/display/config';
-import { PDataLoader, PIconButton, PIconTextButton } from '@spaceone/design-system';
+import { PDataLoader, PIconButton, PButton } from '@spaceone/design-system';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 import {
     ComponentRenderProxy,
@@ -99,7 +99,7 @@ export default {
         PDataLoader,
         DeleteModal,
         PIconButton,
-        PIconTextButton,
+        PButton,
     },
     props: {
         loading: {

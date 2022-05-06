@@ -32,11 +32,11 @@
                 >
                     <template #toolbox-left>
                         <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }">
-                            <p-icon-text-button style-type="primary-dark"
-                                                name="ic_plus_bold"
+                            <p-button style-type="primary-dark"
+                                      icon="ic_plus_bold"
                             >
                                 {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
-                            </p-icon-text-button>
+                            </p-button>
                         </router-link>
                         <p-select-dropdown class="left-toolbox-item"
                                            :items="dropdown"
@@ -182,7 +182,7 @@ import {
 
 import {
     PHorizontalLayout, PSelectDropdown, PLazyImg, PPageTitle, PDataTable, PQuerySearchTable,
-    PTab, PTableCheckModal, PIconTextButton, PStatus, PI, PEmpty, PButton,
+    PTab, PTableCheckModal, PButton, PStatus, PI, PEmpty,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
@@ -216,7 +216,7 @@ export default {
         PPageTitle,
         PLazyImg,
         PHorizontalLayout,
-        PIconTextButton,
+        PButton,
         PSelectDropdown,
         PDataTable,
         PQuerySearchTable,
@@ -224,7 +224,6 @@ export default {
         PTab,
         PTableCheckModal,
         PEmpty,
-        PButton,
         CollectorUpdateModal,
         CollectDataModal,
         CollectorDetails,

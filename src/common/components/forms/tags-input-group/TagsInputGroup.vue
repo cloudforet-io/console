@@ -1,12 +1,12 @@
 <template>
     <div class="tags-input-group">
         <slot name="addButton" :disabled="disabled" :addPair="addPair">
-            <p-icon-text-button style-type="primary-dark"
-                                class="add-btn" name="ic_plus_bold"
-                                @click="addPair"
+            <p-button style-type="primary-dark"
+                      class="add-btn" icon="ic_plus_bold"
+                      @click="addPair"
             >
                 <span>{{ $t('COMMON.COMPONENTS.TAGS.ADD') }}</span>
-            </p-icon-text-button>
+            </p-button>
         </slot>
         <div v-if="showHeader" class="tag-header">
             <div class="key">
@@ -64,7 +64,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PIconTextButton, PFieldGroup, PIconButton, PTextInput,
+    PButton, PFieldGroup, PIconButton, PTextInput,
 } from '@spaceone/design-system';
 
 import {
@@ -89,7 +89,7 @@ export default {
         PIconButton,
         PTextInput,
         PFieldGroup,
-        PIconTextButton,
+        PButton,
     },
     props: {
         tags: {

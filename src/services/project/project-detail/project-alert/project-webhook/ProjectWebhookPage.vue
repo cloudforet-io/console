@@ -27,14 +27,13 @@
                 />
             </template>
             <template #toolbox-left>
-                <p-icon-text-button
-                    class="mr-4 add-btn"
-                    style-type="primary-dark"
-                    name="ic_plus_bold"
-                    @click="onClickAdd"
+                <p-button class="mr-4 add-btn"
+                          style-type="primary-dark"
+                          icon="ic_plus_bold"
+                          @click="onClickAdd"
                 >
                     {{ $t('PROJECT.DETAIL.ADD') }}
-                </p-icon-text-button>
+                </p-button>
                 <p-select-dropdown
                     :items="dropdown"
                     :disabled="!isSelectedItem"
@@ -124,7 +123,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
     reactive, toRefs, ComponentRenderProxy, computed, getCurrentInstance, onActivated,
 } from '@vue/composition-api';
@@ -132,7 +130,7 @@ import {
 import {
     PToolboxTable,
     PPanelTop,
-    PIconTextButton,
+    PButton,
     PStatus,
     PLazyImg,
     PTextInput,
@@ -140,14 +138,16 @@ import {
     PSelectDropdown,
     PTableCheckModal,
 } from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+
 import WebhookAddFormModal from '@/services/project/project-detail/project-alert/project-webhook/modules/WebhookAddFormModal.vue';
+
 import WebhookUpdateFormModal from '@/services/project/project-detail/project-alert/project-webhook/modules/WebhookUpdateFormModal.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -160,7 +160,6 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { WEBHOOK_STATE } from '@/services/alert-manager/lib/config';
 import { i18n } from '@/translations';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { TranslateResult } from 'vue-i18n';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -172,7 +171,7 @@ export default {
         DeleteModal,
         PToolboxTable,
         PPanelTop,
-        PIconTextButton,
+        PButton,
         PSelectDropdown,
         PStatus,
         PLazyImg,

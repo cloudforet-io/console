@@ -3,11 +3,12 @@
         <div class="panel-container">
             <div class="tree-panel-header">
                 <span class="title">{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE') }}</span>
-                <p-icon-text-button style-type="primary" name="ic_plus_bold" outline
-                                    @click="goToProject"
+                <p-button style-type="primary" icon="ic_plus_bold"
+                          :outline="true"
+                          @click="goToProject"
                 >
                     {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_CREATE') }}
-                </p-icon-text-button>
+                </p-button>
             </div>
             <div class="body-container">
                 <div class="radio-row">
@@ -49,7 +50,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPaneLayout, PIconTextButton, PRadio,
+    PPaneLayout, PButton, PRadio,
 } from '@spaceone/design-system';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
@@ -62,7 +63,7 @@ export default {
     name: 'ProjectTreePanel',
     components: {
         PPaneLayout,
-        PIconTextButton,
+        PButton,
         PRadio,
         ProjectSelectDropdown,
     },

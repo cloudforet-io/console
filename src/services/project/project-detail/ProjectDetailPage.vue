@@ -28,13 +28,13 @@
                                                :value="projectId"
                                 />
                             </p>
-                            <p-icon-text-button name="ic_state_manual" style-type="gray900"
-                                                class="ml-3"
-                                                outline
-                                                @click="maintenanceWindowFormVisible = true"
+                            <p-button icon="ic_state_manual" style-type="gray900"
+                                      class="ml-3"
+                                      :outline="true"
+                                      @click="maintenanceWindowFormVisible = true"
                             >
                                 {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CREATE') }}
-                            </p-icon-text-button>
+                            </p-button>
                         </div>
                     </template>
                 </p-page-title>
@@ -97,7 +97,7 @@ import { find } from 'lodash';
 
 import {
     PTab, PPageTitle, PButtonModal,
-    PIconButton, PCopyButton, PBreadcrumbs, PIconTextButton, PBadge, PDataLoader,
+    PButton, PCopyButton, PBreadcrumbs, PIconButton, PBadge, PDataLoader,
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
@@ -142,7 +142,7 @@ export default {
         PIconButton,
         PCopyButton,
         PBreadcrumbs,
-        PIconTextButton,
+        PButton,
         PBadge,
         PDataLoader,
     },

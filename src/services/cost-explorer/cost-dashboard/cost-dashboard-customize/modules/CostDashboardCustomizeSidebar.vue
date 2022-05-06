@@ -8,12 +8,12 @@
                 <p class="sidebar-desc">
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SIDEBAR_DESC') }}
                 </p>
-                <p-icon-text-button style-type="primary-dark" name="ic_plus_bold" :outline="true"
-                                    size="lg"
-                                    class="add-widget-button" @click="handleClickAddWidget"
+                <p-button style-type="primary-dark" icon="ic_plus_bold" :outline="true"
+                          size="lg" :block="true"
+                          class="add-widget-button" @click="handleClickAddWidget"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}
-                </p-icon-text-button>
+                </p-button>
                 <p class="widget-count">
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CURRENT_WIDGETS') }}
                 </p>
@@ -44,7 +44,7 @@
 <script lang="ts">
 import draggable from 'vuedraggable';
 
-import { PIconTextButton, PI } from '@spaceone/design-system';
+import { PButton, PI } from '@spaceone/design-system';
 import {
     computed,
     onUnmounted, reactive, toRefs,
@@ -61,7 +61,7 @@ export default {
     components: {
         CostDashboardCustomizeWidgetModal,
         PI,
-        PIconTextButton,
+        PButton,
         draggable,
     },
 
@@ -110,7 +110,7 @@ export default {
         width: 12.75rem;
     }
     .add-widget-button {
-        @apply block mt-6 mb-6;
+        @apply mt-6 mb-6;
     }
     .widget-count {
         @apply mb-2 font-bold;

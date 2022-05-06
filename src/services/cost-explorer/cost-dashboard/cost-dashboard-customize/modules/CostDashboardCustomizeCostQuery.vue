@@ -7,9 +7,9 @@
                 <p-anchor :to="{ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME }"
                           :icon-visible="false"
                 >
-                    <p-icon-text-button style-type="primary1" name="ic_plus_bold">
+                    <p-button style-type="primary1" icon="ic_plus_bold">
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}
-                    </p-icon-text-button>
+                    </p-button>
                 </p-anchor>
             </template>
         </div>
@@ -24,11 +24,11 @@
                         <p class="name">
                             {{ query.name }}
                         </p>
-                        <p-icon-text-button style-type="gray-border" name="ic_plus_bold" size="sm"
-                                            @click="handleAddToCustomWidget(query)"
+                        <p-button style-type="gray-border" icon="ic_plus_bold" size="sm"
+                                  @click="handleAddToCustomWidget(query)"
                         >
                             <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ADD_TO_CUSTOM_WIDGET') }}</span>
-                        </p-icon-text-button>
+                        </p-button>
                     </div>
                 </div>
                 <template #no-data>
@@ -43,9 +43,9 @@
                               :icon-visible="false"
                               class="btn-add-query"
                     >
-                        <p-icon-text-button style-type="primary1" name="ic_plus_bold">
+                        <p-button style-type="primary1" icon="ic_plus_bold">
                             <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}</span>
-                        </p-icon-text-button>
+                        </p-button>
                     </p-anchor>
                 </template>
             </p-data-loader>
@@ -57,7 +57,7 @@
 import { reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PAnchor, PDataLoader, PIconButton, PIconTextButton, PLabel,
+    PAnchor, PDataLoader, PIconButton, PButton, PLabel,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -77,7 +77,7 @@ export default {
     name: 'CostDashboardCustomizeCostQuery',
     components: {
         PIconButton,
-        PIconTextButton,
+        PButton,
         PAnchor,
         PDataLoader,
         PLabel,

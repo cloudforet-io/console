@@ -26,13 +26,13 @@
                                   @click-settings="onClickSettings"
                 >
                     <template #toolbox-left>
-                        <p-icon-text-button style-type="primary-dark"
-                                            name="ic_plus_bold"
-                                            class="mr-4"
-                                            @click="clickAddServiceAccount"
+                        <p-button style-type="primary-dark"
+                                  icon="ic_plus_bold"
+                                  class="mr-4"
+                                  @click="clickAddServiceAccount"
                         >
                             {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
-                        </p-icon-text-button>
+                        </p-button>
                         <p-select-dropdown class="left-toolbox-item"
                                            :items="tableState.dropdown"
                                            @select="onSelectDropdown"
@@ -114,7 +114,7 @@ import { TranslateResult } from 'vue-i18n';
 
 /* spaceone design system */
 import {
-    PPageTitle, PHorizontalLayout, PIconTextButton,
+    PPageTitle, PHorizontalLayout, PButton,
     PTab, PDynamicLayout, PEmpty, PDoubleCheckModal, PSelectDropdown,
 } from '@spaceone/design-system';
 import {
@@ -171,7 +171,7 @@ export default {
         ProjectTreeModal,
         PDoubleCheckModal,
         PSelectDropdown,
-        PIconTextButton,
+        PButton,
         ServiceAccountDetails,
         PEmpty,
         ServiceAccountMember,

@@ -24,18 +24,14 @@
                                                                    :period-type.sync="periodType"
                             />
                             <div class="left-divider download-pdf">
-                                <pdf-download-button>
-                                    <p-icon-button name="ic_download" style-type="gray-border" size="sm"
-                                                   @click="handleClickPdfDownload"
-                                    />
-                                </pdf-download-button>
+                                <pdf-download-button icon-only @click="handleClickPdfDownload" />
                             </div>
                             <div class="left-divider">
-                                <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm"
-                                                    @click.stop="handleClickCustomize"
+                                <p-button icon="ic_edit" style-type="gray-border" size="sm"
+                                          @click.stop="handleClickCustomize"
                                 >
                                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE') }}
-                                </p-icon-text-button>
+                                </p-button>
                             </div>
                         </div>
                     </div>
@@ -56,11 +52,11 @@
             <div v-else class="empty-dashboard">
                 <img src="@/assets/images/illust_circle_boy.svg" class="empty-img">
                 <span class="empty-text">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.NO_SAVED_DASHBOARD_FOUND') }}</span>
-                <p-icon-text-button v-if="isAdmin" name="ic_plus" style-type="primary1"
-                                    @click="handleClickCreate"
+                <p-button v-if="isAdmin" icon="ic_plus" style-type="primary1"
+                          @click="handleClickCreate"
                 >
                     <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE_DASHBOARD') }}</span>
-                </p-icon-text-button>
+                </p-button>
             </div>
         </div>
         <cost-dashboard-update-modal :visible.sync="updateModalVisible"
@@ -85,7 +81,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    PI, PIconButton, PIconTextButton, PPageTitle,
+    PI, PIconButton, PButton, PPageTitle,
 } from '@spaceone/design-system';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -133,7 +129,7 @@ export default {
         CostDashboardFilter,
         PPageTitle,
         PIconButton,
-        PIconTextButton,
+        PButton,
         PI,
     },
     props: {

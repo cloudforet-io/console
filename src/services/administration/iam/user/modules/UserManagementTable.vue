@@ -23,12 +23,12 @@
             @export="handleExport"
         >
             <template slot="toolbox-left">
-                <p-icon-text-button style-type="primary-dark"
-                                    name="ic_plus_bold"
-                                    @click="clickAdd"
+                <p-button style-type="primary-dark"
+                          icon="ic_plus_bold"
+                          @click="clickAdd"
                 >
                     {{ $t('IDENTITY.USER.MAIN.ADD') }}
-                </p-icon-text-button>
+                </p-button>
                 <p-select-dropdown class="left-toolbox-item"
                                    :items="dropdownMenu"
                                    @select="handleSelectDropdown"
@@ -110,7 +110,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import {
     PBadge,
-    PIconTextButton,
+    PButton,
     PSelectDropdown,
     PStatus, PToolboxTable,
 } from '@spaceone/design-system';
@@ -127,7 +127,7 @@ export default {
     components: {
         UserManagementModal,
         PToolboxTable,
-        PIconTextButton,
+        PButton,
         UserCreateModal,
         UserUpdateModal,
         PStatus,

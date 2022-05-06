@@ -64,14 +64,13 @@
                               :is-valid.sync="isTagsValid"
             >
                 <template #addButton="scope">
-                    <p-icon-text-button
-                        outline style-type="primary" :disabled="scope.disabled"
-                        name="ic_plus_bold"
-                        class="mb-2"
-                        @click="scope.addPair($event)"
+                    <p-button :outline="true" style-type="primary" :disabled="scope.disabled"
+                              icon="ic_plus_bold"
+                              class="mb-2"
+                              @click="scope.addPair($event)"
                     >
                         {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_ADD') }}
-                    </p-icon-text-button>
+                    </p-button>
                 </template>
             </tags-input-group>
         </p-pane-layout>
@@ -143,7 +142,7 @@ import {
 
 import {
     PPageTitle, PJsonSchemaForm, PTab, PFieldGroup, PLazyImg,
-    PPaneLayout, PIconTextButton, PRadio, PMarkdown, PTextEditor, PButton, PTextInput,
+    PPaneLayout, PButton, PRadio, PMarkdown, PTextEditor, PTextInput,
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
@@ -174,7 +173,6 @@ export default {
         PPageTitle,
         PFieldGroup,
         PPaneLayout,
-        PIconTextButton,
         PButton,
         PRadio,
         TagsInputGroup,

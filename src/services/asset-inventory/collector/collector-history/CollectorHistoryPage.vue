@@ -87,13 +87,12 @@
                 </p>
             </template>
             <template #confirm-button>
-                <p-icon-text-button
-                    class="create-collector-button"
-                    name="ic_plus_bold"
-                    @click="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
+                <p-button class="create-collector-button"
+                          icon="ic_plus_bold"
+                          @click="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
                 >
                     {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_CREATE_COLLECTOR') }}
-                </p-icon-text-button>
+                </p-button>
             </template>
         </p-button-modal>
     </div>
@@ -108,7 +107,7 @@ import {
 
 import {
     PPageTitle, PPagination, PButtonModal, PLazyImg,
-    PIconTextButton, PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
+    PButton, PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import { KeyItemSet, QueryTag, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 
@@ -162,7 +161,7 @@ export default {
     components: {
         // HandbookButton,
         PLazyImg,
-        PIconTextButton,
+        PButton,
         PButtonModal,
         PPagination,
         PToolboxTable,

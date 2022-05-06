@@ -7,15 +7,15 @@
             </template>
         </p-panel-top>
 
-        <p-icon-text-button name="ic_download" style-type="secondary-dark" @click="handleClickTemplateDownload(true)">
+        <p-button icon="ic_download" style-type="secondary-dark" @click="handleClickTemplateDownload(true)">
             Template with the following values
-        </p-icon-text-button>
+        </p-button>
         OR
-        <p-icon-text-button name="ic_download" style-type="gray-border" :outline="true"
-                            @click="handleClickTemplateDownload(false)"
+        <p-button icon="ic_download" style-type="gray-border" :outline="true"
+                  @click="handleClickTemplateDownload(false)"
         >
             Template with headers only
-        </p-icon-text-button>
+        </p-button>
 
         <budget-period-select disable-validation @update="handleUpdatePeriodSelect" />
 
@@ -42,7 +42,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PFieldGroup, PIconTextButton, PPaneLayout, PPanelTop, PRadio,
+    PFieldGroup, PButton, PPaneLayout, PPanelTop, PRadio,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -74,7 +74,7 @@ export default {
         BudgetPeriodSelect,
         PPaneLayout,
         PPanelTop,
-        PIconTextButton,
+        PButton,
         PFieldGroup,
         PRadio,
     },

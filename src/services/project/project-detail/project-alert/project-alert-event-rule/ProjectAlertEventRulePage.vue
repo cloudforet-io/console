@@ -17,11 +17,11 @@
             <p class="help-text">
                 {{ $t('PROJECT.EVENT_RULE.NO_EVENT_RULES_HELP_TEXT') }}
             </p>
-            <p-icon-text-button style-type="primary-dark" name="ic_plus_bold"
-                                @click="onClickAddEventRule"
+            <p-button style-type="primary-dark" icon="ic_plus_bold"
+                      @click="onClickAddEventRule"
             >
                 {{ $t('PROJECT.EVENT_RULE.ADD_EVENT_RULE') }}
-            </p-icon-text-button>
+            </p-button>
         </div>
         <div v-for="data in orderedCardData" :key="data.order" class="card-list-wrapper">
             <p-card class="card"
@@ -89,15 +89,16 @@
                              @cancel="onClickFormCancel"
             />
         </p-card>
-        <p-icon-text-button v-if="cardData.length"
-                            :disabled="isEditMode"
-                            style-type="primary-dark" name="ic_plus_bold"
-                            outline
-                            class="add-event-rule-button"
-                            @click="onClickAddEventRule"
+        <p-button v-if="cardData.length"
+                  :disabled="isEditMode"
+                  style-type="primary-dark"
+                  icon="ic_plus_bold"
+                  :outline="true"
+                  class="add-event-rule-button"
+                  @click="onClickAddEventRule"
         >
             {{ $t('PROJECT.EVENT_RULE.ADD_EVENT_RULE') }}
-        </p-icon-text-button>
+        </p-button>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
                       :contents="$t('PROJECT.EVENT_RULE.DELETE_MODAL_DESC')"
@@ -108,13 +109,12 @@
 
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { i18n } from '@/translations';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PPageTitle, PBreadcrumbs, PCard, PI, PIconTextButton,
+    PPageTitle, PBreadcrumbs, PCard, PI, PButton,
 } from '@spaceone/design-system';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -146,7 +146,7 @@ export default {
         PPageTitle,
         PCard,
         PI,
-        PIconTextButton,
+        PButton,
     },
     props: {
         projectId: {

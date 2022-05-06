@@ -30,9 +30,9 @@
                     {{ $t('COMMON.WIDGETS.TOP_PROJECTS.NO_PROJECT_HELP_TEXT') }}
                 </p>
                 <router-link :to="{ name: PROJECT_ROUTE._NAME }">
-                    <p-icon-text-button name="ic_plus" style-type="primary1">
+                    <p-button icon="ic_plus" style-type="primary1">
                         <span>{{ $t('COMMON.WIDGETS.TOP_PROJECTS.CREATE_PROJECT') }}</span>
-                    </p-icon-text-button>
+                    </p-button>
                 </router-link>
             </div>
             <template v-else>
@@ -88,7 +88,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PDataLoader, PDataTable, PIconTextButton, PSkeleton, PI,
+    PDataLoader, PDataTable, PButton, PSkeleton, PI,
 } from '@spaceone/design-system';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
@@ -136,7 +136,7 @@ export default {
     components: {
         WidgetLayout,
         PDataTable,
-        PIconTextButton,
+        PButton,
         PDataLoader,
         PSkeleton,
         PI,

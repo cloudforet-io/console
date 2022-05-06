@@ -23,12 +23,12 @@
                           highlight
                 />
             </div>
-            <p-icon-text-button name="ic_plus_bold" outline
-                                style-type="gray900"
-                                @click="handleAddCondition"
+            <p-button icon="ic_plus_bold" :outline="true"
+                      style-type="gray900"
+                      @click="handleAddCondition"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ADD_CONDITION') }}
-            </p-icon-text-button>
+            </p-button>
             <section class="condition-wrapper">
                 <p v-if="conditions.length > 0" class="condition-header">
                     <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.UNIT') }}</span>
@@ -74,7 +74,7 @@
 
 <script lang="ts">
 import {
-    PButtonModal, PTextInput, PAnchor, PIconTextButton, PSelectDropdown, PIconButton,
+    PButtonModal, PTextInput, PAnchor, PButton, PSelectDropdown, PIconButton,
 } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs,
@@ -109,7 +109,7 @@ export default {
     components: {
         PButtonModal,
         PAnchor,
-        PIconTextButton,
+        PButton,
         PTextInput,
         PSelectDropdown,
         PIconButton,

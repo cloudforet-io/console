@@ -1,49 +1,47 @@
 <template>
-    <div>
-        <div class="page-wrapper">
-            <p-page-title :title="providers[selectedProvider] ? providers[selectedProvider].name : selectedProvider"
-                          class="page-title"
-            >
-                <template #title-right-extra>
-                    <service-provider-dropdown class="provider-dropdown"
-                                               :selected-provider="selectedProvider"
-                                               :has-all="true"
-                                               @update:selectedProvider="handleProviderSelect"
-                    />
-                </template>
-            </p-page-title>
-            <p-divider class="cloud-service-divider" />
-            <cloud-service-toolbox :total-count="totalCount"
-                                   :handlers="handlers"
-                                   @update-pagination="handlePaginationUpdate"
-            />
+    <div class="page-wrapper">
+        <p-page-title :title="providers[selectedProvider] ? providers[selectedProvider].name : selectedProvider"
+                      class="page-title"
+        >
+            <template #title-right-extra>
+                <service-provider-dropdown class="provider-dropdown"
+                                           :selected-provider="selectedProvider"
+                                           :has-all="true"
+                                           @update:selectedProvider="handleProviderSelect"
+                />
+            </template>
+        </p-page-title>
+        <p-divider class="cloud-service-divider" />
+        <cloud-service-toolbox :total-count="totalCount"
+                               :handlers="handlers"
+                               @update-pagination="handlePaginationUpdate"
+        />
 
-            <p-data-loader class="flex-grow" :data="items" :loading="loading">
-                <div class="cloud-service-type-wrapper">
-                    <cloud-service-list-card v-for="(item, idx) in items" :key="`${item.provider}-${item.cloud_service_group}-${idx}`"
-                                             :item="item"
-                                             :search-filters="searchFilters"
-                                             :selected-regions="selectedRegions"
-                                             :period="period"
-                    />
+        <p-data-loader class="flex-grow" :data="items" :loading="loading">
+            <div class="cloud-service-type-wrapper">
+                <cloud-service-list-card v-for="(item, idx) in items" :key="`${item.provider}-${item.cloud_service_group}-${idx}`"
+                                         :item="item"
+                                         :search-filters="searchFilters"
+                                         :selected-regions="selectedRegions"
+                                         :period="period"
+                />
+            </div>
+            <template #no-data>
+                <div class="text-center empty-cloud-service">
+                    <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
+                    <p class="text-primary2 mb-12">
+                        {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.EMPTY_CLOUD_SERVICE') }}
+                    </p>
+                    <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME, params: { provider: selectedProvider}}">
+                        <p-button style-type="primary" icon="ic_plus_bold"
+                                  class="mx-auto text-center"
+                        >
+                            {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.ADD_SERVICE_ACCOUNT') }}
+                        </p-button>
+                    </router-link>
                 </div>
-                <template #no-data>
-                    <div class="text-center empty-cloud-service">
-                        <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
-                        <p class="text-primary2 mb-12">
-                            {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.EMPTY_CLOUD_SERVICE') }}
-                        </p>
-                        <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME, params: { provider: selectedProvider}}">
-                            <p-icon-text-button style-type="primary" name="ic_plus_bold"
-                                                class="mx-auto text-center"
-                            >
-                                {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.ADD_SERVICE_ACCOUNT') }}
-                            </p-icon-text-button>
-                        </router-link>
-                    </div>
-                </template>
-            </p-data-loader>
-        </div>
+            </template>
+        </p-data-loader>
     </div>
 </template>
 
@@ -55,7 +53,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PDataLoader, PDivider, PIconTextButton, PPageTitle,
+    PDataLoader, PDivider, PButton, PPageTitle,
 } from '@spaceone/design-system';
 
 import CloudServiceToolbox from '@/services/asset-inventory/cloud-service/modules/CloudServiceToolbox.vue';
@@ -104,7 +102,7 @@ export default {
         CloudServiceToolbox,
         ServiceProviderDropdown,
         PDivider,
-        PIconTextButton,
+        PButton,
         PPageTitle,
         PDataLoader,
     },

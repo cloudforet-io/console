@@ -8,13 +8,13 @@
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.CANCEL') }}
                 </p-button>
-                <p-icon-text-button v-if="mode === 'ELEMENT_EMBED'" name="ic_download"
-                                    style-type="secondary-dark"
-                                    :loading="loading"
-                                    @click="handleClickDownload"
+                <p-button v-if="mode === 'ELEMENT_EMBED'" icon="ic_download"
+                          style-type="secondary-dark"
+                          :loading="loading"
+                          @click="handleClickDownload"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.DOWNLOAD_PDF') }}
-                </p-icon-text-button>
+                </p-button>
             </div>
         </div>
         <div v-if="mode === 'PDF_EMBED' ? (loading && !pdfDataUrl) : true" class="preview-wrapper">
@@ -45,7 +45,7 @@ import {
     defineComponent, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { PButton, PIconTextButton, PI } from '@spaceone/design-system';
+import { PButton, PI } from '@spaceone/design-system';
 
 import { toPng } from 'html-to-image';
 import * as pdfMake from 'pdfmake/build/pdfmake';
@@ -98,7 +98,6 @@ export default defineComponent<Props>({
     name: 'PdfDownloadOverlay',
     components: {
         PButton,
-        PIconTextButton: PIconTextButton as any,
         PI,
     },
     model: {

@@ -10,12 +10,12 @@
             </div>
             <div class="filter-wrapper">
                 <span class="filters-count">{{ selectedFiltersCount }}</span>
-                <p-icon-text-button name="ic_setting" style-type="gray900" size="sm"
-                                    outline
-                                    @click="handleClickSet"
+                <p-button icon="ic_setting" style-type="gray900" size="sm"
+                          :outline="true"
+                          @click="handleClickSet"
                 >
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SET') }}
-                </p-icon-text-button>
+                </p-button>
             </div>
             <div class="total-result-wrapper">
                 <span class="total-result">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.TOTAL_RESULT') }}</span><span class="total-result-value">{{ totalCount }}</span>
@@ -44,7 +44,7 @@ import {
 
 // design system
 import {
-    PDivider, PIconTextButton,
+    PDivider, PButton,
     PToolbox,
 } from '@spaceone/design-system';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
@@ -96,7 +96,7 @@ export default defineComponent<Props>({
         CloudServiceFilterModal,
         PToolbox,
         PDivider,
-        PIconTextButton: PIconTextButton as any,
+        PButton,
     },
     props: {
         totalCount: {

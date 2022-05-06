@@ -31,11 +31,7 @@
                         <p-icon-button name="ic_edit-text" @click.stop="handleClickEditQuery(selectedQueryId)" />
                     </div>
                     <div class="button-wrapper extra">
-                        <pdf-download-button>
-                            <p-icon-text-button name="ic_download" style-type="gray-border" @click="handleClickPdf">
-                                PDF
-                            </p-icon-text-button>
-                        </pdf-download-button>
+                        <pdf-download-button @click="handleClickPdf" />
                         <p-button v-if="selectedQueryId" style-type="gray-border" @click="handleSaveQueryOption">
                             {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
                         </p-button>
@@ -75,7 +71,7 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    PButton, PIconButton, PIconTextButton, PPageTitle, PSelectDropdown,
+    PButton, PIconButton, PPageTitle, PSelectDropdown,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { i18n } from '@/translations';
@@ -110,7 +106,6 @@ export default {
         PPageTitle,
         PIconButton,
         PSelectDropdown,
-        PIconTextButton,
         PButton,
     },
     props: {

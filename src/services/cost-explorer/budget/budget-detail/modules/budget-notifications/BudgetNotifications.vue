@@ -35,11 +35,11 @@
                                     <span v-else>% of budget > {{ item.threshold }}%</span>
                                 </li>
                             </ul>
-                            <p-icon-text-button name="ic_setting" style-type="gray900" outline
-                                                @click="handleSetNotifications"
+                            <p-button icon="ic_setting" style-type="gray900" :outline="true"
+                                      @click="handleSetNotifications"
                             >
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET') }}
-                            </p-icon-text-button>
+                            </p-button>
                         </article>
                         <article class="noti-channel">
                             <span class="sub-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NOTIFICATIONS_CHANNEL') }}</span>
@@ -65,11 +65,11 @@
                             <p class="desc">
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_DESC') }}
                             </p>
-                            <p-icon-text-button name="ic_setting" style-type="gray900" outline
-                                                @click="handleSetNotifications"
+                            <p-button icon="ic_setting" style-type="gray900" :outline="true"
+                                      @click="handleSetNotifications"
                             >
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_SET') }}
-                            </p-icon-text-button>
+                            </p-button>
                         </div>
                     </template>
                 </section>
@@ -90,7 +90,7 @@
 
 <script lang="ts">
 import {
-    PCard, PIconButton, PAnchor, PIconTextButton, PBadge, PLottie,
+    PCard, PIconButton, PAnchor, PButton, PBadge, PLottie,
 } from '@spaceone/design-system';
 import BudgetNotificationsChannel
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-notifications/BudgetNotificationsChannel.vue';
@@ -115,7 +115,7 @@ export default {
         PLottie,
         PCard,
         PIconButton,
-        PIconTextButton,
+        PButton,
         PAnchor,
         PBadge,
         DeleteModal,

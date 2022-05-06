@@ -1,7 +1,14 @@
 <template>
-    <span>
+    <span class="pdf-download-button">
         <p-popover v-if="!supportsBrowser()" class="popover" position="bottom-end">
-            <slot />
+            <p-icon-button v-if="iconOnly" name="ic_download" style-type="gray-border"
+                           size="sm" @click="$emit('click', $event)"
+            />
+            <p-button v-else icon="ic_download" style-type="gray-border"
+                      @click="$emit('click', $event)"
+            >
+                PDF
+            </p-button>
             <template #content>
                 <i18n class="popover-content"
                       path="COMMON.BUTTONS.PDF_DOWNLOAD_BUTTON.SUPPORT_PDF_HELP_TEXT"
@@ -18,20 +25,38 @@
                 </i18n>
             </template>
         </p-popover>
-        <slot v-else />
+        <p-icon-button v-if="iconOnly" name="ic_download" style-type="gray-border"
+                       size="sm" @click="$emit('click', $event)"
+        />
+        <p-button v-else icon="ic_download" style-type="gray-border"
+                  @click="$emit('click', $event)"
+        >
+            PDF
+        </p-button>
     </span>
 </template>
 
 <script lang="ts">
-import { PPopover } from '@spaceone/design-system';
+import { PPopover, PIconButton, PButton } from '@spaceone/design-system';
 import { i18n } from '@/translations';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 import { defineComponent } from '@vue/composition-api';
 
-export default defineComponent({
+interface Props {
+    iconOnly?: boolean;
+}
+export default defineComponent<Props>({
     name: 'PdfDownloadButton',
     components: {
         PPopover: PPopover as any,
+        PIconButton,
+        PButton,
+    },
+    props: {
+        iconOnly: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup() {
         return {
@@ -43,6 +68,9 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
+.pdf-download-button {
+    display: inline-flex;
+}
 .popover::v-deep {
     .popper {
         z-index: 1;

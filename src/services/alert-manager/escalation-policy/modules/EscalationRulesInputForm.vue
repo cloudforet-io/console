@@ -128,15 +128,15 @@
                     </span>
                 </span>
             </span>
-            <p-icon-text-button
-                class="add-button"
-                name="ic_plus_bold" outline
-                style-type="gray900"
-                :disabled="rules.length >= 5"
-                @click="onClickAddStep"
+            <p-button class="add-button"
+                      icon="ic_plus_bold"
+                      :outline="true"
+                      style-type="gray900"
+                      :disabled="rules.length >= 5"
+                      @click="onClickAddStep"
             >
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ADD_RULE') }}
-            </p-icon-text-button>
+            </p-button>
         </div>
     </div>
 </template>
@@ -145,7 +145,7 @@
 import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import {
-    PAnchor, PBadge, PIconButton, PSelectDropdown, PI, PIconTextButton, PTextInput, PRadio,
+    PAnchor, PBadge, PIconButton, PSelectDropdown, PI, PButton, PTextInput, PRadio,
 } from '@spaceone/design-system';
 
 import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
@@ -184,7 +184,7 @@ export default {
         PIconButton,
         PSelectDropdown,
         PI,
-        PIconTextButton,
+        PButton,
         PTextInput,
         PRadio,
     },
