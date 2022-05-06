@@ -48,9 +48,11 @@
         </p-toolbox-table>
 
         <project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" :is-project-group="isProjectGroup"
+                                  :project-id="projectId"
                                   :project-group-id="projectGroupId" @confirm="onAddMemberConfirm()"
         />
         <project-member-update-modal v-if="memberUpdateFormVisible" :visible.sync="memberUpdateFormVisible" :selected-member="selectedItems[0]"
+                                     :project-id="projectId"
                                      :is-project-group="isProjectGroup" :project-group-id="projectGroupId"
                                      @confirm="onAddMemberConfirm"
         />

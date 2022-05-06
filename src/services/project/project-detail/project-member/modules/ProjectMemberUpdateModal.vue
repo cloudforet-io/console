@@ -6,7 +6,8 @@
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"
-        @confirm="confirm"
+        :disabled="!validationState.isAllValid"
+        @confirm="handleConfirm"
     >
         <template #body>
             <div class="field-group-wrapper">
@@ -18,52 +19,31 @@
                         {{ userId }}
                     </span>
                 </p>
-                <!--                <p-field-group-->
-                <!--                    :label="$t('PROJECT.DETAIL.PROJECT_ROLE')"-->
-                <!--                    :required="true"-->
-                <!--                    :invalid="validationState.isProjectRoleValid === false"-->
-                <!--                    :invalid-text="validationState.projectRoleCheckInvalidText"-->
-                <!--                    class="dropdown"-->
-                <!--                >-->
-                <!--                    <template #default="{invalid}">-->
-                <!--                        <p-select-dropdown v-model="projectRole"-->
-                <!--                                           :items="projectRoleList"-->
-                <!--                                           :disabled="projectRoleList.length < 1"-->
-                <!--                                           use-fixed-menu-style-->
-                <!--                        >-->
-                <!--                            {{ $t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE') }}-->
-                <!--                        </p-select-dropdown>-->
-                <!--                    </template>-->
-                <!--                </p-field-group>-->
-                <div class="label-text-wrapper">
-                    <span class="label-text">
-                        {{ $t('PROJECT.DETAIL.PROJECT_MEMBER_LABEL') }}
-                    </span>
-                    <span class="label-help-msg">
-                        Up to 5 Labels
-                    </span>
-                </div>
-                <div class="label-input-wrapper">
-                    <p-text-input v-model="memberLabel" block
-                                  :placeholder="'Ex. Developer'"
-                                  @keyup.enter="addMemberLabel"
-                    />
-                    <p-button class="icon-button" style-type="gray900"
-                              @click="addMemberLabel"
-                    >
-                        <p-i name="ic_plus" width="1.5rem" height="1.5rem"
-                             color="inherit"
+                <p-field-group label="Role"
+                               required
+                               :invalid="!validationState.isRoleValid"
+                >
+                    <template #default="{invalid}">
+                        <p-search-dropdown
+                            :menu="roleItems"
+                            :selected.sync="formState.roleItems"
+                            type="radioButton"
+                            use-fixed-menu-style
+                            :invalid="invalid"
                         />
-                    </p-button>
-                </div>
-                <p class="tag-wrapper">
-                    <p-tag v-for="(tag, idx) in labelTagTools.tags" :key="`label-tag-${tag}`"
-                           class="tag"
-                           @delete="labelTagTools.deleteTag(idx)"
-                    >
-                        {{ tag }}
-                    </p-tag>
-                </p>
+                    </template>
+                </p-field-group>
+                <p-field-group
+                    :label="$t('PROJECT.DETAIL.MEMBER.LABEL_LABEL')"
+                    :help-text="$t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT')"
+                    :invalid="!validationState.isLabelValid"
+                    :invalid-text="validationState.labelInvalidText"
+                >
+                    <div>
+                        <!-- TODO: need tag input -->
+                        {{ formState.labels }}
+                    </div>
+                </p-field-group>
             </div>
         </template>
     </p-button-modal>
@@ -71,72 +51,27 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
-    getCurrentInstance,
-    reactive, ref, Ref, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PTag, PTextInput, PButton, PI,
+    PButtonModal, PFieldGroup, PSearchDropdown,
 } from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { isEqual } from 'lodash';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import VueI18n from 'vue-i18n';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { i18n } from '@/translations';
 
-import TranslateResult = VueI18n.TranslateResult;
-
-const tagList = (proxyTags?: Ref<string[]>|null, checkDuplicate = true) => {
-    const tags: Ref<any[]> = proxyTags || ref([]);
-    if (!tags.value) tags.value = [];
-
-    /**
-     * @param idx {Number}
-     */
-    const deleteTag = (idx: number) => {
-        const updatedTags = [...tags.value];
-        updatedTags.splice(idx, 1);
-        tags.value = updatedTags;
-    };
-
-    const deleteAllTags = () => {
-        tags.value = [];
-    };
-
-    const validation = value => tags.value.every(tag => !isEqual(tag, value));
-
-    /**
-     * @param value {String}
-     */
-    const addTag = (value) => {
-        const val = (typeof value === 'string') ? value.trim() : value;
-        if (!val) return;
-        if (checkDuplicate && !validation(val)) return;
-        const updatedTags = [...tags.value];
-        updatedTags.push(val);
-        tags.value = updatedTags;
-    };
-
-    return reactive({
-        tags,
-        deleteTag,
-        addTag,
-        deleteAllTags,
-    });
-};
 
 export default {
     name: 'ProjectMemberUpdateModal',
     components: {
         PButtonModal,
-        PTag,
-        PTextInput,
-        PButton,
-        PI,
+        PFieldGroup,
+        PSearchDropdown,
     },
     directives: {
         focus: {
@@ -170,132 +105,95 @@ export default {
             type: String,
             default: '',
         },
+        projectId: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props, { emit, root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
             loading: false,
-            projectRole: '',
-            projectRoleList: [] as any[],
-            memberLabel: '',
+            proxyVisible: useProxyValue('visible', props, emit),
+            roleItems: [] as MenuItem[],
+            labelText: '',
             userId: '',
         });
-        const validationState = reactive({
-            // isProjectRoleValid: undefined as undefined | boolean,
-            // projectRoleCheckInvalidText: '' as TranslateResult | string,
-            isLabelValid: undefined as undefined | boolean,
-            labelInvalidText: '' as TranslateResult | string,
-        });
         const formState = reactive({
-            labelTagTools: tagList(null),
+            roleItems: [] as MenuItem[],
+            labels: [] as string[],
         });
-        const proxyVisible = useProxyValue('visible', props, emit);
-        const projectId = root.$route.params.id;
-
-        // const getRoleList = async () => {
-        //     const res = await SpaceConnector.client.identity.role.list({
-        //         // eslint-disable-next-line camelcase
-        //         role_type: 'PROJECT',
-        //     });
-        //     state.projectRoleList = res.results.map(d => ({
-        //         type: 'item',
-        //         label: d.name,
-        //         name: d.role_id,
-        //     }));
-        // };
-
-        // const checkProjectRole = async () => {
-        //     if (state.projectRole === '') {
-        //         validationState.isProjectRoleValid = false;
-        //         validationState.projectRoleCheckInvalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE');
-        //     } else {
-        //         validationState.isProjectRoleValid = true;
-        //         validationState.projectRoleCheckInvalidText = '';
-        //     }
-        // };
-
-        const addMemberLabel = () => {
-            formState.labelTagTools.addTag(state.memberLabel);
-            state.memberLabel = '';
-        };
-
-        const checkLabel = async () => {
-            if (formState.labelTagTools.tags.length > 5) {
-                validationState.isLabelValid = false;
-                validationState.labelInvalidText = 'Up to 5 labels';
-            } else {
-                validationState.isLabelValid = true;
-                validationState.labelInvalidText = '';
-            }
-        };
-
-        const editProjectMember = async (labels) => {
-            await SpaceConnector.client.identity.project.member.modify({
-                project_id: projectId,
-                role_id: state.projectRole,
-                user_id: state.userId,
-                labels,
-            });
-            showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '', root);
-        };
-
-        const editProjectGroupMember = async (labels) => {
-            await SpaceConnector.client.identity.projectGroup.member.modify({
-                project_group_id: props.projectGroupId,
-                role_id: state.projectRole,
-                user_id: state.userId,
-                labels,
-            });
-            showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '', root);
-        };
-
-        const confirm = async () => {
-            const labels = formState.labelTagTools.tags;
-
-            // await checkProjectRole();
-            await checkLabel();
-
-            if (validationState.isLabelValid) {
-                try {
-                    if (props.isProjectGroup) await editProjectGroupMember(labels);
-                    else await editProjectMember(labels);
-                } catch (e) {
-                    if (props.isProjectGroup) ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_GROUP_MEMBER'));
-                    else ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'));
-                } finally {
-                    emit('confirm');
-                    proxyVisible.value = false;
+        const validationState = reactive({
+            isRoleValid: computed(() => !!formState.roleItems.length),
+            isLabelValid: computed(() => !validationState.labelInvalidText),
+            labelInvalidText: computed(() => {
+                if (formState.labels.includes(state.labelText)) {
+                    return i18n.t('PROJECT.DETAIL.MEMBER.ALREADY_EXISTING');
                 }
+                if (formState.labels.length > 5) {
+                    return i18n.t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT');
+                }
+                return '';
+            }),
+            isAllValid: computed(() => validationState.isRoleValid && validationState.isLabelValid),
+        });
+
+        /* Api */
+        const listRole = async () => {
+            const res = await SpaceConnector.client.identity.role.list({
+                role_type: 'PROJECT',
+            });
+            state.roleItems = res.results.map(d => ({
+                type: 'item',
+                label: d.name,
+                name: d.role_id,
+            }));
+        };
+
+        /* Event */
+        const handleConfirm = async () => {
+            if (!validationState.isAllValid) return;
+            try {
+                const params: any = {
+                    role_id: formState.roleItems[0].name,
+                    user_id: state.userId,
+                    labels: formState.labels,
+                };
+                if (props.isProjectGroup) {
+                    params.project_group_id = props.projectGroupId;
+                    await SpaceConnector.client.identity.projectGroup.member.modify(params);
+                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '', root);
+                } else {
+                    params.project_id = props.projectId;
+                    await SpaceConnector.client.identity.project.member.modify(params);
+                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '', root);
+                }
+            } catch (e) {
+                if (props.isProjectGroup) ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_GROUP_MEMBER'));
+                else ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'));
+            } finally {
+                emit('confirm');
+                state.proxyVisible = false;
             }
         };
 
-        const setCurrentProjectRole = async () => {
-            if (props.selectedMember.role_info?.name === state.projectRoleList[0]?.label) {
-                state.projectRole = state.projectRoleList[0].name;
-            } else {
-                state.projectRole = '';
-            }
-        };
-
-        const setCurrentUserIdAndLabel = async () => {
+        /* Init */
+        const initForm = () => {
             state.userId = props.selectedMember.user_id;
-            if (props.selectedMember.labels) formState.labelTagTools.tags = props.selectedMember.labels;
+            const roleId = props.selectedMember.role_info?.role_id;
+            formState.roleItems = state.roleItems.filter(d => d.name === roleId);
+            formState.labels = props.selectedMember.labels;
         };
-
 
         (async () => {
-            // await getRoleList();
-            await Promise.all([setCurrentProjectRole(), setCurrentUserIdAndLabel()]);
+            await listRole();
+            await initForm();
         })();
 
         return {
             ...toRefs(state),
-            ...toRefs(formState),
+            formState,
             validationState,
-            confirm,
-            addMemberLabel,
-            proxyVisible,
+            handleConfirm,
         };
     },
 };
