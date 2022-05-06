@@ -27,7 +27,7 @@ import {
     PHorizontalLayout, PPageTitle, PToolboxTable, PSelectDropdown,
 } from '@spaceone/design-system';
 import RoleManagementTable from '@/services/administration/iam/role/modules/RoleManagementTable.vue';
-import RoleManagementTab from '@/services/administration/iam/role/modules/RoleManagementTab.vue';
+import RoleManagementTab from '@/services/administration/iam/role/modules/role-management-tab/RoleManagementTab.vue';
 
 export default defineComponent({
     name: 'RolePage',

@@ -3,7 +3,9 @@
         <p-tab v-if="selectedIndex.length === 1" :tabs="singleItemTabState.tabs"
                :active-tab.sync="singleItemTabState.activeTab"
         >
-            <template #detail />
+            <template #detail>
+                <role-detail :role-id="selectedRoleId" />
+            </template>
         </p-tab>
         <p-tab v-else-if="selectedIndex.length > 1" :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
@@ -67,6 +69,7 @@ import { SpaceRouter } from '@/router';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
+import RoleDetail from '@/services/administration/iam/role/modules/role-management-tab/RoleDetail.vue';
 
 export default {
     name: 'RoleManagementTab',
@@ -77,11 +80,11 @@ export default {
         PI,
         PBadge,
         PButton,
+        RoleDetail,
     },
     setup() {
         const state = reactive({
             loading: true,
-            roles: [] as RoleData[],
             fields: computed<DataTableField[]>(() => ([
                 { name: 'name', label: 'Name' },
                 { name: 'tags.description', label: 'Description', sortable: false },
@@ -92,6 +95,7 @@ export default {
             selectedIndex: computed<number[]>(() => administrationStore.state.role.selectedIndices),
             selectedRoles: computed<RoleData[]>(() => administrationStore.state.role.selectedRoles),
             isSelected: computed<boolean>(() => administrationStore.getters['role/isRoleSelected']),
+            selectedRoleId: computed(() => state.selectedRoles[0]?.role_id),
         });
 
         const singleItemTabState = reactive({
