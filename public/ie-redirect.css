@@ -1,0 +1,50 @@
+.i-e-redirect-page {
+    background-color: #fff;
+    height: 100vh;
+}
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    margin: 0 auto;
+    max-width: 27.5rem;
+}
+
+.error-img {
+    width: 20rem;
+}
+
+.main-description {
+    width: 100%;
+    color: #48248c;
+    margin: 1.25rem 0;
+    text-align: center;
+    font-size: 1.5rem;
+    line-height: 30px;
+}
+
+.sub-description {
+    width: 100%;
+    color: #898995;
+    text-align: center;
+    line-height: 1.3125rem;
+}
+.edge-link {
+    color: #0062b8;
+}
+
+@media (max-width: 768px) {
+
+    .i-e-redirect-page {
+        width: 100%;
+    }
+    .error-img {
+        display: none;
+    }
+
+    .content {
+        max-width: 19.5rem;
+    }
+}

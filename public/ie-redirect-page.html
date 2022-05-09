@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="lottie.js"></script>
+    <link rel="stylesheet" href="./ie-redirect.css">
+</head>
+<body>
+    <div class="i-e-redirect-page">
+        <div class="content">
+            <div id="lottie_whoops" class="error-img" ></div>
+            <p class="main-description">Internet Explorer 11 (IE11) or lower is not supported.</p>
+            <p class="sub-description">
+                To continue using, please upgrade your browser to IE 12 (or higher) or use <a target="_blank" class="edge-link" href="https://www.microsoft.com/edge">Edge Browser</a> instead.
+            </p>
+        </div>
+    </div>
+    <script>
+        lottie.loadAnimation({
+            container: document.getElementById('lottie_whoops'), // the dom element that will contain the animation
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: 'lottie_whoops.json', // the path to the animation json
+        });
+    </script>
+</body>
+</html>
