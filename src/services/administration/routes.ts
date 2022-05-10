@@ -10,6 +10,7 @@ const RolePage = () => import(/* webpackChunkName: "RolePage" */'@/services/admi
 const RoleCreatePage = () => import(/* webpackChunkName: "RoleCreatePage" */'@/services/administration/iam/role/create-role/RoleCreatePage.vue');
 const RoleEditPage = () => import(/* webpackChunkName: "RoleEditPage" */'@/services/administration/iam/role/edit-role/RoleEditPage.vue');
 const PolicyPage = () => import(/* webpackChunkName: "PolicyPage" */ '@/services/administration/iam/policy/PolicyPage.vue');
+const PolicyDetailPage = () => import(/* webpackChunkName: "PolicyDetailPage" */ '@/services/administration/iam/policy/policy-detail/PolicyDetailPage.vue');
 
 const administrationRoutes: RouteConfig = {
     path: 'administration',
@@ -60,9 +61,24 @@ const administrationRoutes: RouteConfig = {
                 },
                 {
                     path: 'policy',
-                    name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
-                    meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.ADMINISTRATION_POLICY) },
-                    component: PolicyPage as any,
+                    meta: { label: getMenuLabel(MENU_ID.ADMINISTRATION_POLICY) },
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: '/',
+                            name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
+                            meta: { lnbVisible: true },
+                            props: true,
+                            component: PolicyPage,
+                        },
+                        {
+                            path: ':id?',
+                            name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
+                            meta: { lnbVisible: true, label: ({ params }) => params.id, copiable: true },
+                            props: true,
+                            component: PolicyDetailPage,
+                        },
+                    ],
                 },
             ],
         },

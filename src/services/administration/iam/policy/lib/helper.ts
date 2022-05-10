@@ -1,4 +1,4 @@
-import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/type';
+import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
 
 export const policyTypeColorFormatter = (policyType: POLICY_TYPES) => {
     switch (policyType) {

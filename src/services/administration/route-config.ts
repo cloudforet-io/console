@@ -18,6 +18,9 @@ export const ADMINISTRATION_ROUTE = Object.freeze({
         },
         POLICY: {
             _NAME: MENU_ID.ADMINISTRATION_POLICY,
+            DETAIL: {
+                _NAME: `${MENU_ID.ADMINISTRATION_POLICY}.detail`,
+            },
         },
     },
 });

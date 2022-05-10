@@ -43,8 +43,8 @@
                         :icon-visible="false"
                         highlight
                         :to="{
-                            name: '#',
-                            params: { id: '#' }
+                            name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
+                            params: { id: item.policy_id }
                         }"
                     >
                         {{ value }}
@@ -64,7 +64,7 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/type';
+import { POLICY_TYPES, policySearchHandlers } from '@/services/administration/iam/policy/lib/config';
 import { policyTypeColorFormatter, policyTypeURIFormatter } from '@/services/administration/iam/policy/lib/helper';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
@@ -72,8 +72,9 @@ import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/compon
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { policySearchHandlers } from '@/services/administration/iam/policy/lib/config';
+
 import { iso8601Formatter } from '@spaceone/console-core-lib';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 // FIXME:: This is DUMMY, should be removed
 const DUMMY_REPO_ID = 'repo-d9e115714edc';
@@ -184,6 +185,7 @@ export default {
 
         return {
             ...toRefs(state),
+            ADMINISTRATION_ROUTE,
             policyTypeColorFormatter,
             handleChange,
             handleExport,
