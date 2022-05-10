@@ -176,7 +176,7 @@ export default defineComponent({
             case 'edit':
                 SpaceRouter.router.push({
                     name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME,
-                    params: { id: state.selectedRoles[state.selectedIndices].role_id },
+                    params: { id: state.selectedRoles[0].role_id },
                 });
                 break;
             case 'delete': openDeleteModal(); break;

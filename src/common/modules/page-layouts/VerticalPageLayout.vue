@@ -7,7 +7,10 @@
         </template>
         <template #default>
             <div ref="containerRef" class="right-container">
-                <p-breadcrumbs v-if="breadcrumbs.length" :routes="breadcrumbs" :copiable="copiable" />
+                <div class="header">
+                    <p-breadcrumbs v-if="breadcrumbs.length" :routes="breadcrumbs" :copiable="copiable" />
+                    <slot name="handbook" />
+                </div>
                 <div class="page-contents" :class="{'without-breadcrumbs': !breadcrumbs.length}">
                     <slot name="default" />
                 </div>
@@ -75,9 +78,11 @@ export default {
     flex-direction: column;
     justify-content: stretch;
 
-    > .p-breadcrumbs {
+    .header {
+        @apply flex justify-between;
         padding: 1.5rem 1.5rem 0.625rem 1.5rem;
     }
+
     .page-contents {
         max-width: 1920px;
         flex-grow: 1;

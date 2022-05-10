@@ -6,6 +6,20 @@
             <template #sidebar>
                 <my-page-l-n-b />
             </template>
+            <template v-if="handbookState.isVisible" #handbook>
+                <div class="flex">
+                    <handbook-button :tabs="handbookState.tabs" :active-tab.sync="handbookState.activeTab"
+                                     type="identity/user/api-key"
+                                     class="flex-shrink-0"
+                    >
+                        <template #spacectl>
+                            <keep-alive>
+                                <user-a-p-i-key-handbook />
+                            </keep-alive>
+                        </template>
+                    </handbook-button>
+                </div>
+            </template>
             <router-view />
         </vertical-page-layout>
         <general-page-layout v-else
@@ -18,7 +32,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, defineComponent, getCurrentInstance,
+    ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive,
 } from '@vue/composition-api';
 import { PDivider, PI } from '@spaceone/design-system';
 
@@ -28,8 +42,12 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 
 import MyPageLNB from '@/services/my-page/MyPageLNB.vue';
 import myPageStore from '@/services/my-page/store';
+import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
+import UserAPIKeyHandbook from '@/services/my-page/my-account/user-api-key/modules/APIKeyHandbook.vue';
+
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 export default defineComponent({
     name: 'MyPageContainer',
@@ -37,6 +55,8 @@ export default defineComponent({
         MyPageLNB,
         GeneralPageLayout,
         VerticalPageLayout,
+        HandbookButton,
+        UserAPIKeyHandbook,
         PI,
         PDivider,
     },
@@ -44,8 +64,14 @@ export default defineComponent({
         registerServiceStore('myPage', myPageStore);
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const { breadcrumbs } = useBreadcrumbs(computed(() => vm.$route), [MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME]);
+        const handbookState = reactive({
+            tabs: [{ name: 'spacectl', label: 'Spacectl', keepAlive: true }] as TabItem[],
+            activeTab: 'spacectl',
+            isVisible: computed((): boolean => vm?.$route.name === 'my_page.api_key'),
+        });
         return {
             breadcrumbs,
+            handbookState,
         };
     },
 });

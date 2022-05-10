@@ -2,23 +2,7 @@
     <section class="api-key-wrapper">
         <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
                       :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')" class="page-title"
-        >
-            <template #extra>
-                <div class="flex">
-                    <handbook-button :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"
-                                     type="identity/user/api-key"
-                                     class="flex-shrink-0"
-                    >
-                        <template #spacectl>
-                            <keep-alive>
-                                <user-a-p-i-key-handbook />
-                            </keep-alive>
-                        </template>
-                    </handbook-button>
-                </div>
-            </template>
-        </p-page-title>
-
+        />
         <user-a-p-i-key-table
             :user-id="userId"
         />
@@ -40,15 +24,12 @@
 import {
     PDataTable, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
-import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
 import { store } from '@/store';
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import UserAPIKeyHandbook from '@/services/my-page/my-account/user-api-key/modules/APIKeyHandbook.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface EndpointItem {
@@ -62,9 +43,7 @@ interface EndpointItem {
 export default {
     name: 'UserAPIKeyPage',
     components: {
-        HandbookButton,
         UserAPIKeyTable,
-        UserAPIKeyHandbook,
         PPaneLayout,
         PDataTable,
         PPageTitle,
@@ -81,12 +60,6 @@ export default {
             items: [] as EndpointItem[],
             userId: computed(() => store.state.user.userId),
             isAdmin: computed(() => store.getters['user/isAdmin']).value,
-        });
-        const tabState = reactive({
-            tabs: computed(() => ([
-                { name: 'spacectl', label: 'Spacectl', keepAlive: true },
-            ] as TabItem[])),
-            activeTab: 'spacectl',
         });
         const listEndpoints = async () => {
             state.loading = true;
@@ -108,7 +81,6 @@ export default {
 
         return {
             ...toRefs(state),
-            tabState,
         };
     },
 

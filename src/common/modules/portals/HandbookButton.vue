@@ -41,7 +41,7 @@ import {
     PI, PCheckBox, PTab,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs, watch, onMounted, onUnmounted,
+    computed, reactive, toRefs, watch, onMounted, onUnmounted, defineComponent,
 } from '@vue/composition-api';
 import { store } from '@/store';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -52,7 +52,7 @@ interface Props {
     type: string;
 }
 
-export default {
+export default defineComponent({
     name: 'HandbookButton',
     components: {
         PI, PCheckBox, PTab,
@@ -108,7 +108,7 @@ export default {
             handleHandbookButton,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
