@@ -22,6 +22,22 @@
                                 :skeleton-rows="3" v-on="$listeners"
             />
         </div>
+        <!--song-lang-->
+        <p-panel-top>API Policy Attachment</p-panel-top>
+        <p-data-table :fields="policyState.fields"
+                      :items="policyState.items"
+                      :loading="loading"
+                      :sortable="true"
+                      sort-by="name"
+                      :sort-desc="true"
+        >
+            <template #col-policy_type-format="{ value }" />
+            <template #col-policy_id-format="{ value }">
+                <p-anchor :highlight="true">
+                    {{ value }}
+                </p-anchor>
+            </template>
+        </p-data-table>
     </div>
 </template>
 
@@ -30,7 +46,9 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PPanelTop, PDefinitionTable, PBadge } from '@spaceone/design-system';
+import {
+    PPanelTop, PDefinitionTable, PBadge, PDataTable, PAnchor,
+} from '@spaceone/design-system';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import { i18n } from '@/translations';
@@ -41,6 +59,15 @@ import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/confi
 import { RoleData } from '@/services/administration/iam/role/type';
 import { MENU_ID, MenuId } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import {
+    DataTableField,
+} from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { TranslateResult } from 'vue-i18n';
+import { Tags } from '@/models';
+
+type DataTableTranslationField = DataTableField | {
+    label?: TranslateResult | string;
+}
 
 interface DefinitionTableState {
     id: MenuId;
@@ -48,13 +75,20 @@ interface DefinitionTableState {
     fields: { name: MenuId; label: string }[];
     data: any;
 }
-
+interface PolicyData {
+    name?: string;
+    policy_id: string;
+    policy_type: string;
+    tags?: Tags;
+}
 export default {
     name: 'UserDetail',
     components: {
         PDefinitionTable,
         PPanelTop,
         PBadge,
+        PDataTable,
+        PAnchor,
     },
     props: {
         roleId: {
@@ -69,7 +103,7 @@ export default {
             title: computed(() => i18n.t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')),
             loading: true,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
-            fields: computed(() => [ // song-lang
+            fields: computed<DataTableTranslationField[]>(() => [ // song-lang
                 { name: 'name', label: i18n.t('IDENTITY.USER.MAIN.NAME') },
                 { name: 'tag.description', label: 'Description' },
                 { name: 'role_type', label: 'Role Type', disableCopy: true },
@@ -123,13 +157,23 @@ export default {
             ]),
             data: {} as any,
         });
+        const policyState = reactive({
+            fields: [
+                { name: 'policy_name', label: 'Policy Name' },
+                { name: 'policy_type', label: 'Policy Type' },
+                { name: 'policy_id', label: 'Policy ID', sortable: false },
+                { name: 'description', label: 'Policy Description', sortable: false },
+            ] as DataTableField[],
+            items: [] as PolicyData[],
+        });
+
         const getRoleDetailData = async (roleId) => {
             baseInfoState.loading = true;
             try {
-                const res = await SpaceConnector.client.identity.role.get({
+                baseInfoState.data = await SpaceConnector.client.identity.role.get({
                     role_id: roleId,
                 });
-                baseInfoState.data = res;
+                policyState.items = baseInfoState.data.policies ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 baseInfoState.data = {};
@@ -147,6 +191,7 @@ export default {
             ...toRefs(baseInfoState),
             pageAccessState,
             gnbStateList: [assetInventoryState, costExplorerState, alertManagerState, administrationState],
+            policyState,
             iso8601Formatter,
             ROLE_TYPE_BADGE_OPTION,
         };

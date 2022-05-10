@@ -1,13 +1,14 @@
 <template>
     <p-button-modal :header-title="headerTitle"
                     :scrollable="false"
-                    size="sm"
+                    :size="size"
                     :fade="true"
                     :backdrop="true"
                     :visible.sync="proxyVisible"
                     :disabled="disabled"
-                    theme-color="alert"
-                    @confirm="$emit('confirm')"
+                    :hide-footer-close-button="onlyShowFooterCloseButton"
+                    :theme-color="onlyShowFooterCloseButton? 'gray-border': 'alert'"
+                    @confirm="handleConfirm"
     >
         <template #body>
             <p class="delete-modal-content">
@@ -17,6 +18,9 @@
         <template v-if="confirmText" #confirm-button>
             {{ confirmText }}
         </template>
+        <template v-if="onlyShowFooterCloseButton" #confirm-button>
+            close
+        </template>
     </p-button-modal>
 </template>
 
@@ -24,6 +28,7 @@
 import { PButtonModal } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { SIZE } from '@/common/components/modals/config';
 
 export default {
     name: 'DeleteModal',
@@ -51,13 +56,31 @@ export default {
             type: String,
             default: '',
         },
+        size: {
+            type: String,
+            validator(value: SIZE): boolean {
+                return Object.values(SIZE).includes(value);
+            },
+            default: SIZE.sm,
+        },
+        onlyShowFooterCloseButton: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
         });
+        const handleConfirm = () => {
+            if (props.onlyShowFooterCloseButton) {
+                state.proxyVisible = false;
+            } else emit('confirm');
+        };
         return {
             ...toRefs(state),
+            handleConfirm,
+            SIZE,
         };
     },
 };

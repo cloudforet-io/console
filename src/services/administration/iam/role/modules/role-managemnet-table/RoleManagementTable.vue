@@ -54,6 +54,10 @@
                 </p-button>
             </template>
         </p-toolbox-table>
+        <role-delete-modal :visible.sync="deleteModalVisible"
+                           :roles="selectedRoles"
+                           @refresh="handleChange"
+        />
     </section>
 </template>
 
@@ -79,12 +83,15 @@ import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/confi
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { administrationStore } from '@/services/administration/store';
+import RoleDeleteModal
+    from '@/services/administration/iam/role/modules/role-managemnet-table/modules/RoleDeleteModal.vue';
 
 const DEFAULT_PAGE_LIMIT = 15;
 
 export default defineComponent({
     name: 'RolePage',
     components: {
+        RoleDeleteModal,
         PHorizontalLayout,
         PPageTitle,
         PToolboxTable,
@@ -133,6 +140,7 @@ export default defineComponent({
                 { key: 'role_type', name: 'Role Type' },
                 { key: 'created_at', name: 'Created' },
             ],
+            deleteModalVisible: false,
             // selected
             selectedIndices: [] as number[],
             selectedRoles: computed<RoleData[]>(() => state.selectedIndices.map(d => state.roles[d]) || []),
@@ -157,7 +165,9 @@ export default defineComponent({
             }
         };
 
-        const openDeleteModal = () => { console.debug('openDeleteModal', state.selectedIndices); };
+        const openDeleteModal = () => {
+            state.deleteModalVisible = true;
+        };
         // event
         const handleCreateRole = () => { SpaceRouter.router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME }); };
         const handleEditRole = (id: string) => { SpaceRouter.router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }); };

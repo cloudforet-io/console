@@ -1,0 +1,224 @@
+<template>
+    <delete-modal :visible.sync="proxyVisible"
+                  size="lg"
+                  :header-title="headerTitle"
+                  :only-show-footer-close-button="!isDeletable"
+                  @confirm="handleDelete"
+    >
+        <!--song-lang-->
+        <div v-if="!isDeletable" class="mb-4">
+            Please note that the following role has the assigned users / project member.
+        </div>
+        <p-data-table v-if="isDeletable"
+                      :items="roles"
+                      :fields="fields"
+        >
+            <template #col-role_type-format="{ value }">
+                <p-badge v-if="value" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType">
+                    {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
+                </p-badge>
+            </template>
+            <template #col-tags.description-format="{ value }">
+                {{ value ? value : '--' }}
+            </template>
+        </p-data-table>
+        <p-data-table v-else
+                      :items="unDeletableRoles"
+                      :fields="unDeletableRoleFields"
+                      :loading="loading"
+        >
+            <template #col-roleDescription-format="{ value }">
+                {{ value ? value : '--' }}
+            </template>
+            <template #col-roleType-format="{ value }">
+                <p-badge v-if="value" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType">
+                    {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
+                </p-badge>
+            </template>
+            <template #col-assignTo-format="{ value }">
+                {{ users[value.resource_id] ? users[value.resource_id].label : '--' }}
+            </template>
+            <template #col-project-format="{ value }">
+                <p-anchor v-if="value" :highlight="true" :href="getProjectLink(value)">
+                    {{ projectFieldHandler(value) }}
+                </p-anchor>
+            </template>
+        </p-data-table>
+    </delete-modal>
+</template>
+
+<script lang="ts">
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import { PDataTable, PBadge, PAnchor } from '@spaceone/design-system';
+import {
+    computed, PropType, reactive, toRefs, watch,
+} from '@vue/composition-api';
+import { useProxyValue } from '@/common/composables/proxy-state';
+import { RoleData } from '@/services/administration/iam/role/type';
+import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { i18n } from '@/translations';
+import { store } from '@/store';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { SpaceRouter } from '@/router';
+import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { RoleBindingType } from '@/services/administration/iam/role/modules/role-managemnet-table/modules/type';
+import { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
+
+interface UnDeletableRole {
+    roleName: string;
+    roleDescription: string;
+    roleType: string;
+    assignTo: { resource_id: string; resource_type: string };
+    project?: {
+        project_info: ProjectModel | undefined;
+        project_group_info: ProjectGroupInfo | undefined;
+    };
+}
+
+export default {
+    name: 'RoleDeleteModal',
+    components: {
+        DeleteModal,
+        PDataTable,
+        PBadge,
+        PAnchor,
+    },
+    props: {
+        visible: {
+            type: Boolean,
+            default: false,
+        },
+        roles: {
+            type: Array as PropType<RoleData[]>,
+            default: () => [],
+        },
+    },
+    setup(props, { emit }) {
+        const state = reactive({
+            users: computed(() => store.state.reference.user.items),
+            projects: computed(() => store.state.reference.project.items),
+            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            loading: true,
+            proxyVisible: useProxyValue('visible', props, emit),
+            fields: [
+                { name: 'name', label: 'Name' },
+                { name: 'tags.description', label: 'Description' },
+                { name: 'role_type', label: 'Role Type' },
+                { name: 'created_at', label: 'Created' },
+            ] as DataTableField[],
+            unDeletableRoles: [] as UnDeletableRole[],
+            unDeletableRoleFields: [
+                { name: 'roleName', label: 'Role Name' },
+                { name: 'roleDescription', label: 'Role Description' },
+                { name: 'roleType', label: 'Role Type' },
+                { name: 'assignTo', label: 'Assigned To' },
+                { name: 'project', label: ' ' },
+            ] as DataTableField[],
+            isDeletable: computed(() => state.unDeletableRoles.length === 0),
+            // song-lang
+            headerTitle: computed(() => (state.isDeletable ? i18n.t('Are you sure you want to delete selected item? ') : i18n.t('Cannot delete this role'))),
+        });
+
+        const handleDelete = async () => {
+            let isAllSucceed = true;
+            await Promise.all(props.roles.map(async (role) => {
+                try {
+                    await SpaceConnector.client.identity.role.delete({
+                        role_id: role.role_id,
+                    });
+                } catch (e) {
+                    // song-lang
+                    ErrorHandler.handleRequestError(e, 'Failed to delete role.');
+                    isAllSucceed = false;
+                }
+            }));
+            if (isAllSucceed) {
+                // song-lang
+                showSuccessMessage('Successfully deleted Data', '');
+                state.proxyVisible = false;
+                emit('refresh');
+            }
+        };
+
+        const projectFieldHandler = (value) => {
+            if (value) {
+                const projectId = value.project_info?.project_id;
+                if (projectId) {
+                    return state.projects[projectId] ? state.projects[projectId].label : projectId;
+                }
+                const projectGroupId = value.project_group_info?.project_group_id;
+                return state.projectGroups[projectGroupId] ? state.projectGroups[projectGroupId].label : projectGroupId;
+            }
+            return '--';
+        };
+
+        const getProjectLink = (value) => {
+            const projectId = value?.project_info?.project_id;
+            let link;
+            if (projectId) {
+                link = SpaceRouter.router.resolve(referenceRouter(
+                    projectId, {
+                        resource_type: 'identity.Project',
+                    },
+                ));
+            } else {
+                const projectGroupId = value?.project_group_info?.project_group_id;
+                link = SpaceRouter.router.resolve(referenceRouter(
+                    projectGroupId, {
+                        resource_type: 'identity.ProjectGroup',
+                    },
+                ));
+            }
+            return link.href;
+        };
+        const getRoleBindingList = () => Promise.all(props.roles.map(async (role) => {
+            try {
+                const { results }: Record<'results', RoleBindingType[]> = await SpaceConnector.client.identity.roleBinding.list({ role_id: role.role_id });
+                const roleBindingList: UnDeletableRole[] = results.map((roleBinding) => {
+                    const {
+                        // eslint-disable-next-line @typescript-eslint/naming-convention
+                        resource_id, resource_type, role_info, project_info, project_group_info,
+                    } = roleBinding;
+                    return {
+                        roleName: role_info?.name,
+                        roleDescription: role_info?.tags?.description,
+                        roleType: role_info?.role_type,
+                        assignTo: { resource_id, resource_type },
+                        project: (project_info || project_group_info) ? { project_info, project_group_info } : undefined,
+                    };
+                });
+                state.unDeletableRoles = state.unDeletableRoles.concat(roleBindingList);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.unDeletableRoles = [];
+            }
+        }));
+        watch(() => state.proxyVisible, async (after) => {
+            state.loading = true;
+            if (after) {
+                state.unDeletableRoles = [];
+                await getRoleBindingList();
+                state.loading = false;
+            }
+        }, { immediate: true });
+
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/user/load'),
+            ]);
+        })();
+        return {
+            ...toRefs(state),
+            handleDelete,
+            projectFieldHandler,
+            getProjectLink,
+            ROLE_TYPE_BADGE_OPTION,
+        };
+    },
+};
+</script>
