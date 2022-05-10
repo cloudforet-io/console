@@ -7,7 +7,7 @@
                            use-fixed-menu-style
                            :exact-mode="false"
                            :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
-                           @update:selected="handleSelectMenuItem"
+                           @select-menu="handleSelectMenuItem"
                            @search="handleSearch"
         >
             <template v-if="type === CLOUD_SERVICE_FILTER_KEY.REGION" #menu-item--format="{item}">
@@ -140,8 +140,16 @@ export default defineComponent<Props>({
         };
 
         /* event */
-        const handleSelectMenuItem = (selectedItems) => {
-            emit('update:selected', selectedItems.map(d => d.name));
+        const handleSelectMenuItem = (selectedItem: SearchDropdownMenuItem) => {
+            const selectedNames = [...props.selected];
+            const selectedName = selectedItem.name as string;
+            if (props.selected?.includes(selectedName)) {
+                const idx = props.selected.indexOf(selectedName);
+                selectedNames.splice(idx, 1);
+            } else {
+                selectedNames.push(selectedItem.name as string);
+            }
+            emit('update:selected', selectedNames);
         };
         const handleSearch = (val: string) => {
             emit('update:selected', state.selectedItems.map(d => d.name).concat([val]));
