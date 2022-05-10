@@ -1,6 +1,7 @@
 import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 import { Tags } from '@/models';
 import { ROLE_TYPE } from '@/services/administration/iam/role/config';
+import { TranslateResult } from 'vue-i18n';
 
 interface Policy {
     policy_id: string;
@@ -16,4 +17,13 @@ export interface RoleData {
     role_id: string;
     role_type: ROLE_TYPE;
     tags?: Tags; // [ description: string ]
+}
+
+export interface PageAccessMenuItem {
+    id: string;
+    labels: string[] | TranslateResult[];
+    isViewed: boolean;
+    isManaged: boolean;
+    hideMenu: boolean;
+    subMenuList?: PageAccessMenuItem[];
 }
