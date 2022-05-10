@@ -19,7 +19,7 @@
             multi-selectable
             use-fixed-menu-style
             :exact-mode="false"
-            @update:selected="handleSelectMenuItem"
+            @select-menu="handleSelectMenuItem"
             @search="handleSearch"
         />
         <p-search-dropdown
@@ -30,7 +30,7 @@
             multi-selectable
             use-fixed-menu-style
             :exact-mode="false"
-            @update:selected="handleSelectMenuItem"
+            @select-menu="handleSelectMenuItem"
             @search="handleSearch"
         />
     </div>
@@ -48,6 +48,7 @@ import {
 } from '@spaceone/design-system';
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import {
     AutocompleteHandler, SearchDropdownMenuItem,
@@ -153,8 +154,16 @@ export default {
         const handleSelectedProjectIds = (selectedProjectIds) => {
             emit('update:selected', selectedProjectIds);
         };
-        const handleSelectMenuItem = (selectedItems) => {
-            emit('update:selected', selectedItems.map(d => d.name));
+        const handleSelectMenuItem = (selectedItem: MenuItem) => {
+            const selectedNames = [...props.selected];
+            const selectedName = selectedItem.name as string;
+            if (props.selected?.includes(selectedName)) {
+                const idx = props.selected.indexOf(selectedName);
+                selectedNames.splice(idx, 1);
+            } else {
+                selectedNames.push(selectedItem.name as string);
+            }
+            emit('update:selected', selectedNames);
         };
         const handleSearch = (val: string) => {
             emit('update:selected', state.selectedItems.map(d => d.name).concat([val]));
