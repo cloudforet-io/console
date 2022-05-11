@@ -32,7 +32,7 @@
             </template>
 
             <template #col-type-format="{ value }">
-                <p-badge outline :style-type="policyTypeColorFormatter(value)">
+                <p-badge outline :style-type="policyTypeBadgeColorFormatter(value)">
                     {{ value }}
                 </p-badge>
             </template>
@@ -44,7 +44,8 @@
                         highlight
                         :to="{
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
-                            params: { id: item.policy_id }
+                            params: { id: item.policy_id },
+                            query: { type: selectedType }
                         }"
                     >
                         {{ value }}
@@ -65,7 +66,7 @@ import {
 } from '@vue/composition-api';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { POLICY_TYPES, policySearchHandlers } from '@/services/administration/iam/policy/lib/config';
-import { policyTypeColorFormatter, policyTypeURIFormatter } from '@/services/administration/iam/policy/lib/helper';
+import { policyTypeBadgeColorFormatter, policyTypeURIFormatter } from '@/services/administration/iam/policy/lib/helper';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
@@ -186,7 +187,7 @@ export default {
         return {
             ...toRefs(state),
             ADMINISTRATION_ROUTE,
-            policyTypeColorFormatter,
+            policyTypeBadgeColorFormatter,
             handleChange,
             handleExport,
         };

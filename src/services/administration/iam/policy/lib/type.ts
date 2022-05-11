@@ -1,4 +1,4 @@
-import { PolicyState } from '@/services/administration/iam/policy/lib/config';
+import { POLICY_TYPES, PolicyState } from '@/services/administration/iam/policy/lib/config';
 import { Tags, TimeStamp } from '@/models';
 
 export interface PolicyStoreState {
@@ -28,4 +28,5 @@ interface RepositoryInfoDataModel {
 
 export interface PolicyDetailPageProps {
     id: string;
+    type: POLICY_TYPES
 }
