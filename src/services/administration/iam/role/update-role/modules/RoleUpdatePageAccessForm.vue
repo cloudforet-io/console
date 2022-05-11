@@ -40,12 +40,12 @@ import {
 } from '@vue/composition-api';
 
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
-import { GNBMenu, GNBMenu as GNBMenuType } from '@/store/modules/display/type';
+import { GNBMenu } from '@/store/modules/display/type';
 import { store } from '@/store';
 import { MENU_ID } from '@/lib/menu/config';
 import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
-import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
+import { PageAccessMenuItem, PagePermission } from '@/services/administration/iam/role/type';
 
 
 const EXCEPTION_MENU = [MENU_ID.PROJECT, MENU_ID.MY_PAGE];
@@ -68,6 +68,26 @@ const flattenSubMenuList = (subMenuList?: GNBMenu[], labels?: Array<string|Trans
     });
     return results;
 };
+const getPagePermissions = (menuItems: PageAccessMenuItem[]): PagePermission[] => {
+    const allItem = find(menuItems, { id: 'all' });
+    if (allItem && allItem.isManaged) return [{ page: '*', permission: 'MANAGE' }];
+
+    const results: PagePermission[] = [];
+    menuItems.forEach((menu) => {
+        if (menu.id === 'all' && menu.isViewed) results.push({ page: '*', permission: 'VIEW' });
+        else if (menu.isManaged) results.push({ page: `${menu.id}.*`, permission: 'MANAGE' });
+        else if (menu.isViewed) results.push({ page: `${menu.id}.*`, permission: 'VIEW' });
+        if (menu.subMenuList?.length) {
+            menu.subMenuList.forEach((subMenu) => {
+                if (!menu.isManaged) {
+                    if (subMenu.isManaged) results.push({ page: subMenu.id, permission: 'MANAGE' });
+                    else if (!menu.isViewed && subMenu.isViewed) results.push({ page: subMenu.id, permission: 'VIEW' });
+                }
+            });
+        }
+    });
+    return results;
+};
 
 export default {
     name: 'RoleUpdatePageAccessForm',
@@ -81,12 +101,12 @@ export default {
             menuItems: [] as PageAccessMenuItem[],
         });
         const state = reactive({
-            allMenuList: computed<GNBMenuType[]>(() => {
+            allMenuList: computed<GNBMenu[]>(() => {
                 const allMenu = store.getters['display/allGnbMenuList'];
                 return allMenu.filter(d => !EXCEPTION_MENU.includes(d.id));
             }),
-            menuVisibleMap: {},
             hideAllMenu: computed(() => formState.menuItems.find(d => d.id === 'all')?.hideMenu),
+            pagePermissions: computed<PagePermission[]>(() => getPagePermissions(formState.menuItems)),
         });
 
         /* Util */

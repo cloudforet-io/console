@@ -19,6 +19,7 @@ export interface RoleData {
     tags?: Tags; // [ description: string ]
 }
 
+// Page Access
 export interface PageAccessMenuItem {
     id: string;
     labels: string[] | TranslateResult[];
@@ -26,4 +27,8 @@ export interface PageAccessMenuItem {
     isManaged: boolean;
     hideMenu: boolean;
     subMenuList?: PageAccessMenuItem[];
+}
+export interface PagePermission {
+    page: string;
+    permission: 'MANAGE' | 'VIEW';
 }
