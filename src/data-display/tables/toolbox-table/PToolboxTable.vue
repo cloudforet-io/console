@@ -62,6 +62,7 @@
                 <slot v-if="!slot.startsWith('toolbox')" :name="slot" v-bind="scope" />
             </template>
         </p-data-table>
+        <slot name="toolbox-table-bottom" />
     </p-pane-layout>
 </template>
 

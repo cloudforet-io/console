@@ -58,6 +58,23 @@ export const getToolboxTableArgTypes = (): ArgTypes => {
                 type: 'text',
             },
         },
+        toolboxTableBottomSlot: {
+            name: 'toolbox-table-bottom',
+            description: 'Slot for bottom area of toolbox table.',
+            defaultValue: null,
+            table: {
+                type: {
+                    summary: null,
+                },
+                category: 'slots',
+                defaultValue: {
+                    summary: null,
+                },
+            },
+            control: {
+                type: 'text',
+            },
+        },
     };
 
     delete argTypes.leftAreaSlot;
