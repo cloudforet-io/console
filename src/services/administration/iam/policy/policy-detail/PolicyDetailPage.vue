@@ -155,12 +155,12 @@ export default defineComponent<PolicyDetailPageProps>({
     }
 }
 .policy-detail-info-wrapper {
-    padding: 18px 16px 40px;
+    padding: 1.125rem 1rem 2.5rem;
     .policy-detail-type-badge {
-        margin-top: 4px;
+        margin-top: 0.25rem;
     }
     .policy-detail-contents {
-        margin-bottom: 18px;
+        margin-bottom: 1.125rem;
         & p {
             @apply text-sm text-gray-900;
         }

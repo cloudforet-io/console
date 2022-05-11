@@ -1,12 +1,13 @@
 <template>
     <section>
+        <!--        song-lang-->
         <p-page-title
             title="Policy"
             use-total-count
             :total-count="totalCount"
         >
             <template #extra>
-                <router-link to="#">
+                <router-link :to="{name: ADMINISTRATION_ROUTE.IAM.POLICY.CREATE._NAME}">
                     <p-button style-type="primary-dark"
                               name="ic_plus_bold"
                     >

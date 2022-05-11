@@ -10,6 +10,7 @@ const RolePage = () => import(/* webpackChunkName: "RolePage" */'@/services/admi
 const RoleCreatePage = () => import(/* webpackChunkName: "RoleCreatePage" */'@/services/administration/iam/role/update-role/RoleCreatePage.vue');
 const RoleEditPage = () => import(/* webpackChunkName: "RoleEditPage" */'@/services/administration/iam/role/update-role/RoleEditPage.vue');
 const PolicyPage = () => import(/* webpackChunkName: "PolicyPage" */ '@/services/administration/iam/policy/PolicyPage.vue');
+const PolicyCreatePage = () => import(/* webpackChunkName: "PolicyPage" */ '@/services/administration/iam/policy/policy-create/PolicyCreatePage.vue');
 const PolicyDetailPage = () => import(/* webpackChunkName: "PolicyDetailPage" */ '@/services/administration/iam/policy/policy-detail/PolicyDetailPage.vue');
 
 const administrationRoutes: RouteConfig = {
@@ -70,6 +71,13 @@ const administrationRoutes: RouteConfig = {
                             meta: { lnbVisible: true },
                             props: true,
                             component: PolicyPage,
+                        },
+                        {
+                            path: 'create',
+                            name: ADMINISTRATION_ROUTE.IAM.POLICY.CREATE._NAME,
+                            meta: { lnbVisible: false },
+                            props: true,
+                            component: PolicyCreatePage,
                         },
                         {
                             path: ':id?',
