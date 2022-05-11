@@ -12,11 +12,15 @@
             :items="items"
             :value-handler-map="valueHandlerMap"
             :key-item-sets="keyItemSets"
+            :selectable="selectable"
+            :select-index.sync="selectedIndices"
             @change="handleChange"
             @refresh="handleChange()"
             @export="handleExport"
+            @select="handleSelect"
         >
             <template #toolbox-top>
+                <slot name="panel-top" />
                 <div class="filter">
                     <!--                    song-lang-->
                     <span class="filter-label">Type</span>
@@ -40,7 +44,7 @@
             <template #col-policy_id-format="{ value, item }">
                 <template v-if="value">
                     <p-anchor
-                        :icon-visible="false"
+                        :icon-visible="anchorIconVisible"
                         highlight
                         :to="{
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
@@ -76,6 +80,7 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 
 // FIXME:: This is DUMMY, should be removed
 const DUMMY_REPO_ID = 'repo-d9e115714edc';
@@ -89,6 +94,14 @@ export default {
         PBadge,
     },
     props: {
+        selectable: {
+            type: Boolean,
+            default: false,
+        },
+        anchorIconVisible: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props, { emit }) {
         const policyListApiQueryHelper = new ApiQueryHelper()
@@ -108,13 +121,14 @@ export default {
                 { name: 'tags', label: 'Description', sortable: false },
                 { name: 'created_at', label: 'Created' },
             ],
-            items: [],
+            items: [] as PolicyDataModel[],
             valueHandlerMap: computed(() => ({
                 // FIXME:: Custom valueHandler here
                 // name: makeDistinctValueHandler(`${policyTypeURIFormatter(state.selectedType)}.Policy`, 'name', undefined, undefined, undefined, { repository_id: DUMMY_REPO_ID }),
                 // policy_id: makeDistinctValueHandler(`${policyTypeURIFormatter(state.selectedType)}.Policy`, 'policy_id'),
                 // created_at: makeDistinctValueHandler(`${policyTypeURIFormatter(state.selectedType)}.Policy`, 'created_at', 'datetime'),
             })),
+            selectedIndices: [] as number[],
             keyItemSets: policySearchHandlers.keyItemSets,
             timezone: computed(() => store.state.user.timezone),
             totalCount: 0,
@@ -173,12 +187,18 @@ export default {
             });
         };
 
+        const handleSelect = (index) => { state.selectedIndices = index; };
+
         watch(() => state.selectedType, () => {
             listPolicies(state.selectedType);
         });
 
         watch(() => state.totalCount, (value: number) => {
             emit('update-total-count', value);
+        });
+
+        watch(() => state.selectedIndices, (indices: number[]) => {
+            emit('update-selected-policy-id', indices.map(idx => state.items[idx]?.policy_id));
         });
 
         (async () => {
@@ -191,6 +211,7 @@ export default {
             policyTypeBadgeColorFormatter,
             handleChange,
             handleExport,
+            handleSelect,
         };
     },
 };
