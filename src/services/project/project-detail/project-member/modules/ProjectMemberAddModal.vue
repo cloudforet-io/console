@@ -13,58 +13,80 @@
             <p-box-tab v-if="authType && authType !== 'GOOGLE_OAUTH2'" v-model="activeTab" :tabs="tabs" />
             <div class="form-wrapper">
                 <p class="title">
-                    {{ $t('PROJECT.DETAIL.MEMBER.MEMBER') }} ({{ formState.users.length }})
+                    {{ $t('PROJECT.DETAIL.MEMBER.MEMBER') }} ({{ selectedUserItems.length }})
                 </p>
                 <!-- song-lang -->
-                <p-field-group label="Member" required>
+                <p-field-group label="Member" required
+                               :invalid="invalidState.selectedUserItems"
+                               :invalid-text="invalidTexts.selectedUserItems"
+                >
                     <template #default="{invalid}">
                         <p-search-dropdown
                             v-show="activeTab === FORM_MODE.INTERNAL_USER"
                             :menu="internalItems"
-                            :selected.sync="formState.userItems"
+                            :selected="selectedUserItems"
                             multi-selectable
                             use-fixed-menu-style
                             :invalid="invalid"
+                            @update:selected="setForm('selectedUserItems', $event)"
                         />
                         <!-- keycloak의 경우 auto-complete-input 사용 -->
-                        <!--                        <p-search-dropdown-->
-                        <!--                            v-show="activeTab !== FORM_MODE.INTERNAL_USER"-->
-                        <!--                            v-model="searchText"-->
-                        <!--                            :loading="loading"-->
-                        <!--                            :menu="externalItems"-->
-                        <!--                            :selected.sync="formState.userItems"-->
-                        <!--                            disable-handler-->
-                        <!--                            :exact-mode="false"-->
-                        <!--                            multi-selectable-->
-                        <!--                            use-fixed-menu-style-->
-                        <!--                            @search="handleSearchExternalUser"-->
-                        <!--                            @focus="handleFocusExternalUserSearch"-->
-                        <!--                            @keydown.enter="handleKeydownEnter"-->
-                        <!--                        >-->
-                        <!--                            <template v-if="externalItems.length > 100" #menu-help-text>-->
-                        <!--                                <div class="help-text">-->
-                        <!--                                    {{ $t('PROJECT.DETAIL.MEMBER.TOO_MANY_RESULTS') }}-->
-                        <!--                                </div>-->
-                        <!--                            </template>-->
-                        <!--                        </p-search-dropdown>-->
+                        <p-search-dropdown
+                            v-show="activeTab !== FORM_MODE.INTERNAL_USER"
+                            v-model="searchText"
+                            :loading="loading"
+                            :menu="externalItems"
+                            :selected="selectedUserItems"
+                            disable-handler
+                            :exact-mode="false"
+                            multi-selectable
+                            use-fixed-menu-style
+                            @search="handleSearchExternalUser"
+                            @focus="handleFocusExternalUserSearch"
+                            @keydown.enter="handleKeydownEnter"
+                            @update:selected="setForm('selectedUserItems', $event)"
+                        >
+                            <template v-if="externalItems.length > 100" #menu-help-text>
+                                <div class="help-text">
+                                    {{ $t('PROJECT.DETAIL.MEMBER.TOO_MANY_RESULTS') }}
+                                </div>
+                            </template>
+                        </p-search-dropdown>
                     </template>
                 </p-field-group>
                 <!-- song-lang -->
                 <p-field-group label="Role" required
                                help-text="Set a role for selected member"
+                               :invalid="invalidState.selectedRoleItems"
+                               :invalid-text="invalidTexts.selectedRoleItems"
                 >
-                    <p-search-dropdown
-                        :menu="roleItems"
-                        :selected.sync="formState.roleItems"
-                        type="radioButton"
-                        use-fixed-menu-style
-                    />
+                    <template #label-extra>
+                        <p-tooltip class="help-icon"
+                                   contents="List of Role varies depending on the role type granted to your account."
+                                   position="bottom"
+                        >
+                            <p-i name="ic_help"
+                                 width="0.875rem" height="0.875rem"
+                                 color="inherit"
+                            />
+                        </p-tooltip>
+                    </template>
+                    <template #default="{invalid}">
+                        <p-search-dropdown
+                            :menu="roleItems"
+                            :selected="selectedRoleItems"
+                            type="radioButton"
+                            use-fixed-menu-style
+                            :invalid="invalid"
+                            @update:selected="setForm('selectedRoleItems', $event)"
+                        />
+                    </template>
                 </p-field-group>
                 <p-field-group
                     :label="$t('PROJECT.DETAIL.MEMBER.LABEL_LABEL')"
                     :help-text="$t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT')"
-                    :invalid="!isLabelValid"
-                    :invalid-text="labelInvalidText"
+                    :invalid="invalidState.labels"
+                    :invalid-text="invalidTexts.labels"
                 >
                     <div>
                         tag text input
@@ -83,7 +105,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PFieldGroup, PBoxTab, PSearchDropdown,
+    PButtonModal, PFieldGroup, PBoxTab, PSearchDropdown, PTooltip, PI,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
@@ -93,6 +115,7 @@ import { i18n } from '@/translations';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useFormValidator } from '@/common/composables/form-validator';
 
 
 const FORM_MODE = Object.freeze({
@@ -108,6 +131,8 @@ export default {
         PFieldGroup,
         PBoxTab,
         PSearchDropdown,
+        PTooltip,
+        PI,
     },
     directives: {
         focus: {
@@ -141,14 +166,9 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        const formState = reactive({
-            roleItems: [] as MenuItem[],
-            labels: [] as string[],
-            userItems: [] as MenuItem[],
-            users: computed(() => formState.userItems.map(item => item.name)),
-        });
         const state = reactive({
             loading: false,
+            proxyVisible: useProxyValue('visible', props, emit),
             authType: computed(() => store.state.domain.extendedAuthType),
             users: computed(() => store.state.reference.user.items),
             members: [] as any,
@@ -173,30 +193,40 @@ export default {
             internalItems: [] as MenuItem[],
             externalItems: [] as MenuItem[],
             externalItemsLabelMap: {},
-            invalidUserList: [],
-            existingUserList: [],
+            invalidUserList: [] as string[],
+            existingMemberList: [] as string[],
             searchText: '',
             labelText: '',
-            totalCount: 0,
-            proxyVisible: useProxyValue('visible', props, emit),
-            isLabelValid: computed(() => !state.labelInvalidText),
-            labelInvalidText: computed(() => {
-                if (formState.labels.includes(state.labelText)) {
-                    return i18n.t('PROJECT.DETAIL.MEMBER.ALREADY_EXISTING');
-                }
-                if (formState.labels.length > 5) {
-                    return i18n.t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT');
-                }
-                return '';
-            }),
-            isAllValid: computed(() => {
-                const isInvalid = !!formState.users.filter(user => state.invalidUserList.includes(user)).length;
-                if (isInvalid) return false;
-                const isExisting = !!formState.users.filter(user => state.existingUserList.includes(user)).length;
-                if (isExisting) return false;
-                if (!formState.roleItems.length) return false;
-                return formState.users.length > 0;
-            }),
+        });
+        const {
+            forms: { labels, selectedRoleItems, selectedUserItems },
+            invalidState,
+            invalidTexts,
+            setForm, isAllValid,
+            initForm,
+        } = useFormValidator({
+            labels: [] as string[],
+            selectedRoleItems: [] as MenuItem[],
+            selectedUserItems: [] as MenuItem[],
+        }, {
+            selectedUserItems: (val: MenuItem[]) => {
+                const users = val.map(d => d.name) as string[];
+                const isInvalidUser = !!users.filter(user => state.invalidUserList.includes(user)).length;
+                if (isInvalidUser) return false;
+                const isExistingMember = !!users.filter(user => state.existingMemberList.includes(user)).length;
+                if (isExistingMember) return false;
+                if (!users.length) return 'Required Field'; // song-lang
+                return true;
+            },
+            selectedRoleItems: (val: MenuItem[]) => {
+                if (!val.length) return 'Required Field'; // song-lang
+                return true;
+            },
+            labels: (val: string[]) => {
+                if (val.includes(state.labelText)) return i18n.t('PROJECT.DETAIL.MEMBER.ALREADY_EXISTING');
+                if (val.length > 5) return i18n.t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT');
+                return true;
+            },
         });
 
         /* Util */
@@ -232,11 +262,11 @@ export default {
                 state.externalItemsLabelMap[user.user_id] = user.name ? `${user.user_id} (${user.name})` : user.user_id;
             });
         };
-        const validateExternalUser = async (userId) => {
+        const validateExternalUser = async (userId: string) => {
             /* 1. check existing */
             const memberIdList = state.members.map(d => d.resource_id);
             if (memberIdList.includes(userId)) {
-                state.existingUserList.push(userId);
+                state.existingMemberList.push(userId);
                 return;
             }
             /* 2. check invalid */
@@ -264,9 +294,9 @@ export default {
         const addMember = async () => {
             try {
                 const params: any = {
-                    role_id: formState.roleItems[0].name,
-                    users: formState.users,
-                    labels: formState.labels,
+                    role_id: selectedRoleItems.value[0].name,
+                    users: selectedUserItems.value.map(d => d.name),
+                    labels: labels.value,
                     is_external_user: state.activeTab !== FORM_MODE.INTERNAL_USER,
                 };
                 if (props.isProjectGroup) {
@@ -318,32 +348,16 @@ export default {
         }, 300);
 
         /* Event */
-        const handleClickDeleteAllUsers = () => {
-            formState.userItems = [];
-        };
-        const handleClickDeleteUser = (index) => {
-            formState.userItems.splice(index, 1);
-        };
         const handleDeleteLabel = (index) => {
-            formState.labels.splice(index, 1);
+            const _labels = [...labels.value];
+            _labels.splice(index, 1);
+            setForm('labels', _labels);
         };
         const handleConfirm = async () => {
             await addMember();
             emit('confirm');
             state.proxyVisible = false;
         };
-        // const handleAddLabel = async () => {
-        //     let labelText = state.labelText;
-        //     labelText = labelText.trim();
-        //
-        //     if (!labelText) return;
-        //     if (!state.isLabelValid) return;
-        //     if (!formState.labels.every(tag => tag !== labelText)) return;
-        //     if (formState.labels.length >= 5) return;
-        //
-        //     formState.labels.push(labelText);
-        //     state.labelText = '';
-        // };
         const handleSearchExternalUser = (text) => {
             if (text.length) {
                 listExternalUser();
@@ -352,9 +366,15 @@ export default {
             }
         };
         const handleKeydownEnter = () => {
-            if (state.searchText.trim().length && !formState.users.includes(state.searchText)) {
+            const userNames = selectedUserItems.value.map(d => d.name);
+            if (state.searchText.trim().length && !userNames.includes(state.searchText)) {
                 validateExternalUser(state.searchText);
-                formState.userItems.push({ name: state.searchText, label: state.searchText });
+
+                const _newSelectedUserItems = [
+                    ...selectedUserItems.value,
+                    { name: state.searchText, label: state.searchText },
+                ];
+                setForm('selectedUserItems', _newSelectedUserItems);
             }
         };
         const handleFocusExternalUserSearch = () => {
@@ -374,7 +394,7 @@ export default {
 
         /* Watcher */
         watch(() => state.activeTab, () => {
-            formState.userItems = [];
+            initForm();
             state.externalItems = [];
         });
         watch(() => state.searchText, () => {
@@ -384,11 +404,16 @@ export default {
 
         return {
             ...toRefs(state),
-            formState,
+            selectedUserItems,
+            selectedRoleItems,
+            labels,
+            invalidState,
+            invalidTexts,
+            setForm,
+            isAllValid,
+            //
             FORM_MODE,
             handleConfirm,
-            handleClickDeleteAllUsers,
-            handleClickDeleteUser,
             handleDeleteLabel,
             handleSearchExternalUser,
             handleKeydownEnter,
@@ -427,6 +452,9 @@ export default {
                     align-items: baseline;
                 }
             }
+        }
+        .help-icon {
+            @apply text-gray-400;
         }
     }
 }
