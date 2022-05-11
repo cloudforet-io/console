@@ -46,7 +46,7 @@ import { GNBMenu, GNBMenu as GNBMenuType } from '@/store/modules/display/type';
 import { store } from '@/store';
 import { MENU_ID } from '@/lib/menu/config';
 import RoleCreatePageAccessMenuItem
-    from '@/services/administration/iam/role/create-role/RoleCreatePageAccessMenuItem.vue';
+    from '@/services/administration/iam/role/update-role/modules/RoleCreatePageAccessMenuItem.vue';
 import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 
 

@@ -9,7 +9,7 @@
 import { reactive, toRefs } from '@vue/composition-api';
 
 import { PPageTitle } from '@spaceone/design-system';
-import RoleCreatePageAccessForm from '@/services/administration/iam/role/create-role/RoleCreatePageAccessForm.vue';
+import RoleCreatePageAccessForm from '@/services/administration/iam/role/update-role/modules/RoleCreatePageAccessForm.vue';
 
 export default {
     name: 'RoleCreatePage',

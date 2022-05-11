@@ -7,8 +7,8 @@ const AdministrationContainer = () => import(/* webpackChunkName: "Administratio
 
 const UserPage = () => import(/* webpackChunkName: "UserPage" */ '@/services/administration/iam/user/UserPage.vue');
 const RolePage = () => import(/* webpackChunkName: "RolePage" */'@/services/administration/iam/role/RolePage.vue');
-const RoleCreatePage = () => import(/* webpackChunkName: "RoleCreatePage" */'@/services/administration/iam/role/create-role/RoleCreatePage.vue');
-const RoleEditPage = () => import(/* webpackChunkName: "RoleEditPage" */'@/services/administration/iam/role/edit-role/RoleEditPage.vue');
+const RoleCreatePage = () => import(/* webpackChunkName: "RoleCreatePage" */'@/services/administration/iam/role/update-role/RoleCreatePage.vue');
+const RoleEditPage = () => import(/* webpackChunkName: "RoleEditPage" */'@/services/administration/iam/role/update-role/RoleEditPage.vue');
 const PolicyPage = () => import(/* webpackChunkName: "PolicyPage" */ '@/services/administration/iam/policy/PolicyPage.vue');
 const PolicyDetailPage = () => import(/* webpackChunkName: "PolicyDetailPage" */ '@/services/administration/iam/policy/policy-detail/PolicyDetailPage.vue');
 
