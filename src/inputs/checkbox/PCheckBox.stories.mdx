@@ -120,15 +120,19 @@ export const Template = (args, { argTypes }) => ({
             template: `
         <div>
             <div class="flex flex-col mb-8">
-                <p-check-box v-model="selected" disabled>
+                <p-check-box v-model="notSelected" disabled>
                     you can't select disabled checkbox.
+                </p-check-box>
+                <p-check-box v-model="selected" disabled>
+                    checked disabled
                 </p-check-box>
             </div>
         </div>
     `,
             setup() {
                 const state = reactive({
-                    selected: false,
+                    notSelected: false,
+                    selected: true,
                 })
                 return {
                     ...toRefs(state)
