@@ -1,6 +1,7 @@
 <template>
     <section class="role-edit-page">
         <p-page-title title="Edit Role" />
+        <role-update-form />
     </section>
 </template>
 
@@ -8,11 +9,13 @@
 import { reactive, toRefs } from '@vue/composition-api';
 
 import { PPageTitle } from '@spaceone/design-system';
+import RoleUpdateForm from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
 
 export default {
     name: 'RoleEditPage',
     components: {
         PPageTitle,
+        RoleUpdateForm,
     },
     setup() {
         const state = reactive({
