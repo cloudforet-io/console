@@ -1,3 +1,10 @@
+# [1.1.0-beta.294](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.293...v1.1.0-beta.294) (2022-05-11)
+
+
+### Bug Fixes
+
+* add checked-disabled state in PCheckbox ([#946](https://github.com/spaceone-dev/spaceone-design-system/issues/946)) ([7f5650b](https://github.com/spaceone-dev/spaceone-design-system/commit/7f5650b12df97b74378d790345f7eeb7988d0f6c))
+
 # [1.1.0-beta.293](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.292...v1.1.0-beta.293) (2022-05-04)
 
 
