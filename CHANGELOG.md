@@ -1,3 +1,10 @@
+# [1.1.0-beta.295](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.294...v1.1.0-beta.295) (2022-05-11)
+
+
+### Features
+
+* add toolbox-table-slot to PToolboxTable ([#947](https://github.com/spaceone-dev/spaceone-design-system/issues/947)) ([a703169](https://github.com/spaceone-dev/spaceone-design-system/commit/a703169cad31b03a8a8ed788f7febafd252bc6af))
+
 # [1.1.0-beta.294](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.293...v1.1.0-beta.294) (2022-05-11)
 
 
