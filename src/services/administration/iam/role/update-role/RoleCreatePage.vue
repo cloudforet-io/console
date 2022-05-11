@@ -2,7 +2,6 @@
     <section class="role-create-page">
         <p-page-title title="Create Role" />
         <role-update-form />
-        <role-create-page-access-form />
     </section>
 </template>
 
@@ -10,7 +9,6 @@
 import { reactive, toRefs } from '@vue/composition-api';
 
 import { PPageTitle } from '@spaceone/design-system';
-import RoleCreatePageAccessForm from '@/services/administration/iam/role/update-role/modules/RoleCreatePageAccessForm.vue';
 import RoleUpdateForm from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
 
 export default {
@@ -18,7 +16,6 @@ export default {
     components: {
         RoleUpdateForm,
         PPageTitle,
-        RoleCreatePageAccessForm,
     },
     setup() {
         const state = reactive({

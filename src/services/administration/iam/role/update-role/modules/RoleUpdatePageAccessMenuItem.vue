@@ -1,5 +1,7 @@
 <template>
-    <div class="role-create-page-access-menu-item">
+    <div class="role-create-page-access-menu-item"
+         :class="[menu.subMenuList && menu.subMenuList.length ? 'parent' : '', menu.id]"
+    >
         <div class="left-part">
             <p-icon-button v-if="!isSubMenu"
                            :name="menu.hideMenu ? 'ic_tree_arrow' : 'ic_tree_arrow--opened'"
@@ -24,32 +26,39 @@
             </p-check-box>
             <p-check-box :selected="menu.isManaged" @change="handleChangeManage">
                 <span>Manage</span>
-                <span v-if="isSubMenu" class="help-icon">
-                    <p-i name="ic_help"
-                         width="0.875rem" height="0.875rem"
-                         color="inherit"
-                    />
-                </span>
             </p-check-box>
+            <p-tooltip v-if="isSubMenu"
+                       class="help-icon"
+                       :contents="tooltipText"
+                       :position="'bottom'"
+            >
+                <p-i name="ic_help"
+                     width="0.875rem" height="0.875rem"
+                     color="inherit"
+                />
+            </p-tooltip>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { PropType } from '@vue/composition-api';
 import {
-    PCheckBox, PIconButton, PI,
+    computed, PropType, reactive, toRefs,
+} from '@vue/composition-api';
+import {
+    PCheckBox, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
 
 import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 
 
 export default {
-    name: 'RoleCreatePageAccessMenuItem',
+    name: 'RoleUpdatePageAccessMenuItem',
     components: {
         PCheckBox,
         PIconButton,
         PI,
+        PTooltip,
     },
     props: {
         menu: {
@@ -62,6 +71,20 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const state = reactive({
+            tooltipText: computed(() => {
+                // song-lang
+                const title = 'Admin Features';
+                const features = [
+                    'Collecting Data',
+                    'Change Project',
+                    'Connect to Console',
+                    'Tag-Edit',
+                ];
+                return `<b>${title}</b></br><ul>${features.map(d => `<li>&#8729; ${d}</li>`).join('')}</ul>`;
+            }),
+        });
+
         /* Event */
         const handleToggleMenuVisible = () => {
             const key = 'hideMenu';
@@ -80,6 +103,7 @@ export default {
         };
 
         return {
+            ...toRefs(state),
             handleToggleMenuVisible,
             handleChangeView,
             handleChangeManage,
@@ -94,18 +118,29 @@ export default {
     align-items: center;
     padding: 0.75rem 1rem;
 
+    &.parent {
+        padding: 0.75rem 0.5rem;
+        .right-part {
+            margin-right: 1rem;
+        }
+    }
+    &.all {
+        .right-part {
+            margin-right: 0.5rem;
+        }
+    }
     .left-part {
         flex-grow: 1;
     }
     .right-part {
-        width: 12.5rem;
-        &.menu {
-            margin-right: 0.5rem;
-        }
+        display: flex;
+        align-items: center;
+        width: 12rem;
         .p-checkbox::v-deep {
             display: inline-flex;
             align-items: center;
             .text {
+                display: flex;
                 padding-left: 0.375rem;
             }
         }
@@ -117,6 +152,13 @@ export default {
 
     @screen mobile {
         display: block;
+        .right-part {
+            padding-left: 1rem;
+            padding-top: 0.75rem;
+            &.sub-menu {
+                padding-left: 0;
+            }
+        }
     }
 }
 </style>

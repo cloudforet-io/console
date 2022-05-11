@@ -6,8 +6,9 @@
         </p-panel-top>
         <div class="page-access-menu">
             <div class="header-wrapper">
+                <!-- song-lang -->
                 <span class="left-part">Menu</span>
-                <span class="right-part">Permission</span>
+                <span class="right-part mr-6">Permission</span>
             </div>
             <div class="content-wrapper">
                 <template v-for="menu in formState.menuItems">
@@ -15,15 +16,12 @@
                          class="menu-wrapper"
                          :class="menu.id"
                     >
-                        <role-create-page-access-menu-item :menu="menu" @update="handleUpdate" />
+                        <role-update-page-access-menu-item :menu="menu" @update="handleUpdate" />
                         <template v-for="subMenu in menu.subMenuList">
                             <div v-if="menu.subMenuList && !menu.hideMenu && !hideAllMenu" :key="subMenu.id"
                                  class="sub-menu-wrapper"
                             >
-                                <role-create-page-access-menu-item :menu="subMenu"
-                                                                   :is-sub-menu="true"
-                                                                   @update="handleUpdate"
-                                />
+                                <role-update-page-access-menu-item :menu="subMenu" is-sub-menu @update="handleUpdate" />
                             </div>
                         </template>
                     </div>
@@ -45,12 +43,13 @@ import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import { GNBMenu, GNBMenu as GNBMenuType } from '@/store/modules/display/type';
 import { store } from '@/store';
 import { MENU_ID } from '@/lib/menu/config';
-import RoleCreatePageAccessMenuItem
-    from '@/services/administration/iam/role/update-role/modules/RoleCreatePageAccessMenuItem.vue';
+import RoleUpdatePageAccessMenuItem
+    from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
 import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 
 
 const EXCEPTION_MENU = [MENU_ID.PROJECT, MENU_ID.MY_PAGE];
+
 const flattenSubMenuList = (subMenuList?: GNBMenu[], labels?: Array<string|TranslateResult>): PageAccessMenuItem[] => {
     if (!subMenuList) return [];
     let results: PageAccessMenuItem[] = [];
@@ -71,16 +70,14 @@ const flattenSubMenuList = (subMenuList?: GNBMenu[], labels?: Array<string|Trans
 };
 
 export default {
-    name: 'RoleCreatePageAccessForm',
+    name: 'RoleUpdatePageAccessForm',
     components: {
-        RoleCreatePageAccessMenuItem,
+        RoleUpdatePageAccessMenuItem,
         PPaneLayout,
         PPanelTop,
     },
     setup() {
         const formState = reactive({
-            isAllManaged: false,
-            isAllViewed: false,
             menuItems: [] as PageAccessMenuItem[],
         });
         const state = reactive({
@@ -92,23 +89,46 @@ export default {
             hideAllMenu: computed(() => formState.menuItems.find(d => d.id === 'all')?.hideMenu),
         });
 
-        /* Event */
-        const handleUpdate = (menuId, key, val) => {
-            const item = find(formState.menuItems, { id: menuId });
-            if (item) item[key] = val;
-            else {
-                formState.menuItems.forEach((menuItem) => {
-                    if (menuItem?.subMenuList) {
-                        const subItem = find(menuItem.subMenuList, { id: menuId });
-                        if (subItem) subItem[key] = val;
-                    }
+        /* Util */
+        const updateMenuItems = (item: PageAccessMenuItem, key: string, val: boolean, parentItem?: PageAccessMenuItem) => {
+            item[key] = val;
+            if (key === 'isManaged') item.isViewed = val;
+            if (parentItem && !val) {
+                parentItem[key] = val;
+                parentItem.isViewed = false;
+            }
+            if (item?.subMenuList?.length) {
+                item.subMenuList.forEach((subMenu) => {
+                    if (key === 'isViewed' && subMenu.isManaged) return;
+                    if (key === 'isManaged') subMenu.isViewed = val;
+                    subMenu[key] = val;
                 });
             }
         };
 
-        /* Init */
-        (async () => {
-        })();
+        /* Event */
+        const handleUpdate = (menuId: string, key: string, val: boolean) => {
+            const item = find(formState.menuItems, { id: menuId });
+            if (item) {
+                if (item.id === 'all') {
+                    formState.menuItems.forEach((menu) => {
+                        updateMenuItems(menu, key, val);
+                    });
+                } else {
+                    const parentItem = find(formState.menuItems, { id: 'all' });
+                    updateMenuItems(item, key, val, parentItem);
+                }
+            } else {
+                formState.menuItems.forEach((menuItem) => {
+                    if (menuItem?.subMenuList?.length) {
+                        const subItem = find(menuItem.subMenuList, { id: menuId });
+                        if (subItem) {
+                            updateMenuItems(subItem, key, val, menuItem);
+                        }
+                    }
+                });
+            }
+        };
 
         /* Watcher */
         watch(() => state.allMenuList, (menuList) => {
