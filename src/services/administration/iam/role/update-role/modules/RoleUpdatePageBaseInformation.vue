@@ -8,22 +8,21 @@
             <!--            song-lang-->
             <p-field-group
                 :label="$t('Name')"
-                :invalid="roleName"
-                :valid="false"
-                :required="true"
+                :invalid="invalidState.roleName"
+                :invalid-text="invalidTexts.roleName"
+                required
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="roleName"
-                                  class="role-name-input input"
+                    <p-text-input class="role-name-input input"
+                                  :value="roleName"
                                   :invalid="invalid"
+                                  @input="setForm('roleName', $event)"
                     />
                 </template>
             </p-field-group>
             <!--            song-lang-->
             <p-field-group
                 :label="$t('Description')"
-                :invalid="roleDescription"
-                :valid="false"
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="roleDescription"
@@ -57,7 +56,12 @@
 import {
     PPaneLayout, PPanelTop, PFieldGroup, PLabel, PTextInput, PSelectCard,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
+import { useFormValidator } from '@/common/composables/form-validator';
+import { i18n } from '@/translations';
+import { ROLE_TYPE, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
 
 export default {
     name: 'RoleUpdatePageBaseInformation',
@@ -69,18 +73,39 @@ export default {
         PLabel,
         PSelectCard,
     },
-    setup() {
+    setup(props, { emit }) {
+        const {
+            forms: {
+                roleName,
+            },
+            setForm,
+            invalidState,
+            invalidTexts,
+            isAllValid,
+        } = useFormValidator({
+            roleName: '',
+        }, {
+            roleName(value: string) { return value.trim().length > 2 ? '' : i18n.t('Must be longer than 2 characters'); }, // song-lang
+        });
+
         const state = reactive({
-            roleName: undefined as undefined | string,
             roleDescription: undefined as undefined | string,
             roleTypes: computed(() => [ // song-lang
-                { label: 'User', key: 'user', description: 'Invited projects only' },
-                { label: 'Admin', key: 'admin', description: 'All projects' },
+                { label: ROLE_TYPE_BADGE_OPTION.PROJECT.label, key: ROLE_TYPE.PROJECT, description: 'Invited projects only' },
+                { label: ROLE_TYPE_BADGE_OPTION.DOMAIN.label, key: ROLE_TYPE.DOMAIN, description: 'All projects' },
             ]),
-            selectedRoleType: undefined as undefined | string,
+            selectedRoleType: ROLE_TYPE.PROJECT as string,
         });
+        watch(() => isAllValid.value, (after) => {
+            emit('update-validation', after);
+        }, { immediate: true });
         return {
             ...toRefs(state),
+            roleName,
+            setForm,
+            invalidState,
+            invalidTexts,
+            isAllValid,
         };
     },
 };

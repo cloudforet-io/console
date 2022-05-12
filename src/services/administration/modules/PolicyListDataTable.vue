@@ -56,6 +56,9 @@
                     </p-anchor>
                 </template>
             </template>
+            <template #toolbox-table-bottom>
+                <slot name="toolbox-table-bottom" />
+            </template>
         </p-toolbox-table>
     </section>
 </template>
