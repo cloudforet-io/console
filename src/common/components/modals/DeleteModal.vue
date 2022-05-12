@@ -11,9 +11,10 @@
                     @confirm="handleConfirm"
     >
         <template #body>
-            <p class="delete-modal-content">
+            <p v-if="contents || $scopedSlots.default" class="delete-modal-content">
                 <slot>{{ contents }}</slot>
             </p>
+            <slot name="delete-modal-body" />
         </template>
         <template v-if="confirmText" #confirm-button>
             {{ confirmText }}
