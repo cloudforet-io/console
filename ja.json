@@ -791,7 +791,9 @@
 				"NO_RESULT_2": "クラウドサービスまたはメニューに関連する他のキーワードを試してください。",
 				"RECENT_CLOUD_SERVICE": "最近の検索[クラウドサービス]",
 				"RECENT_MENU": "最近の検索[メニュー]",
-				"SERACH": "検索..."
+				"SERACH": "検索...",
+				"TOO_MANY_RESULTS": "",
+				"TRY_SEARCH_AGAIN": ""
 			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "APIガイド ",
@@ -1044,6 +1046,70 @@
 			}
 		}
 	},
+	"IAM": {
+		"ROLE": {
+			"ACTION": "作業",
+			"ALT_E_DELETE_ROLE": "",
+			"ALT_S_DELETE_ROLE": "",
+			"CREATE": "",
+			"DELETE": "削除",
+			"DETAIL": {
+				"API_POLICY": "",
+				"BASE_INFORMATION": "基本情報",
+				"CREATED_AT": "作成日",
+				"DESCRIPTION": "",
+				"DETAILS": "",
+				"NAME": "",
+				"PAGE_ACCESS": "",
+				"ROLE_TYPE": "",
+				"SELECTED_DATA": "選択したデータ"
+			},
+			"EDIT": "編集",
+			"FORM": {
+				"ALL": "",
+				"CANCEL": "",
+				"CREATE": "",
+				"MANAGE": "",
+				"MENU": "",
+				"PERMISSION": "",
+				"ROLE_TYPE_DOMAIN": "",
+				"ROLE_TYPE_PROJECT": "",
+				"SAVE": "",
+				"SELECTED": "",
+				"TOOLTIP_ADMIN_FEATURES": "",
+				"TOOLTIP_CHANGE_PROJECT": "",
+				"TOOLTIP_COLLECTING_DATA": "",
+				"TOOLTIP_CONNECT_TO_CONSOLE": "",
+				"TOOLTIP_TAG_EDIT": "",
+				"VALIDATION_API_POLICY": "",
+				"VALIDATION_ROLE_NAME": "",
+				"VIEW": ""
+			},
+			"HANDBOOK": {
+				"API_POLICY": "",
+				"API_POLICY_CREATE": "",
+				"API_POLICY_DESC": "",
+				"API_POLICY_HEARE": "",
+				"PAGE_ACCESS": "",
+				"PAGE_ACCESS_DESC": "",
+				"PAGE_ACCESS_MANAGE": "",
+				"PAGE_ACCESS_MANAGE_DESC": "",
+				"PAGE_ACCESS_VIEW": "",
+				"PAGE_ACCESS_VIEW_DESC": "",
+				"ROLE_TYPE": "",
+				"ROLE_TYPE_ADMIN": "",
+				"ROLE_TYPE_ADMIN_DESC": "",
+				"ROLE_TYPE_DESC": "",
+				"ROLE_TYPE_USER": "",
+				"ROLE_TYPE_USER_DESC": ""
+			},
+			"MODAL": {
+				"DELETE_HELP_TEXT": "",
+				"DELETE_TITLE": "",
+				"DELETE_TITLE_CANNOT": ""
+			}
+		}
+	},
 	"IDENTITY": {
 		"SERVICE_ACCOUNT": {
 			"ADD": {
@@ -1107,7 +1173,6 @@
 		"USER": {
 			"ACCOUNT": {
 				"ACCOUNT_N_PROFILE": "アカウント＆情報",
-				"BASE_INFORMATION": "基本情報",
 				"CHANGE_PASSWORD": "パスワード変更",
 				"SAVE_CHANGES": "変更事項を保存"
 			},
@@ -1216,7 +1281,6 @@
 				"API_KEY": "API Key",
 				"API_TABLE_DESC": "API Keyは2個まで作成できます。",
 				"ASSIGNED_ROLES": "割り当てられたロール",
-				"CREATED_AT": "作成日",
 				"CREATE_API_KEY": "API Key作成",
 				"DAYS": "日前",
 				"DELETE": "削除",
@@ -2094,16 +2158,22 @@
 				"GOOGLE_OAUTH2": "Google Oauth2",
 				"INTERNAL_USER": "内部ユーザー",
 				"INVALID": "無効",
+				"INVITE": "",
 				"KEYCLOAK": "キークローク",
 				"LABEL_HELP_TEXT": "最大5つのラベルまで追加可能",
 				"LABEL_LABEL": "ラベル",
 				"LABEL_PLACEHOLDER": "ex. 開発者",
 				"MEMBER": "構成員",
 				"MEMBER_HELP_TEXT": "追加するプロジェクトメンバーを選択します。",
+				"MODAL_INVITE_MEMBER_TITLE": "",
+				"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
 				"NO_MEMBER": "メンバーがいません",
 				"NO_RESULTS_FOUND": "検索結果が見つかりません",
 				"NO_RESULTS_FOUND_HELP_TEXT": "検索キーワードに一致する項目が見つかりません",
 				"PROJECT_ROLE_LABEL": "プロジェクト権限",
+				"ROLE": "",
+				"ROLE_HELP_TEXT": "",
+				"ROLE_TOOLTIP": "",
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。 別のキーワードを使用してください",
 				"USER_ID": "ユーザーID"
 			},

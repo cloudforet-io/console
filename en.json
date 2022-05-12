@@ -791,7 +791,9 @@
 				"NO_RESULT_2": "Try different keywords related to Cloud service or Menu.",
 				"RECENT_CLOUD_SERVICE": "RECENT SEARCHES [CLOUD SERVICE]",
 				"RECENT_MENU": "RECENT SEARCHES [MENU]",
-				"SERACH": "Search..."
+				"SERACH": "Search...",
+				"TOO_MANY_RESULTS": "Too many results for this search.",
+				"TRY_SEARCH_AGAIN": "Try your search again with more specific terms."
 			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "API Guide",
@@ -1044,6 +1046,70 @@
 			}
 		}
 	},
+	"IAM": {
+		"ROLE": {
+			"ACTION": "Action",
+			"ALT_E_DELETE_ROLE": "Failed to delete role.",
+			"ALT_S_DELETE_ROLE": "Successfully deleted Data",
+			"CREATE": "Create",
+			"DELETE": "Delete",
+			"DETAIL": {
+				"API_POLICY": "API Policy Attachment",
+				"BASE_INFORMATION": "Base Information",
+				"CREATED_AT": "Created",
+				"DESCRIPTION": "Description",
+				"DETAILS": "Details",
+				"NAME": "Name",
+				"PAGE_ACCESS": "Page Access",
+				"ROLE_TYPE": "Role Type",
+				"SELECTED_DATA": "Selected Data"
+			},
+			"EDIT": "Edit",
+			"FORM": {
+				"ALL": "All",
+				"CANCEL": "Cancel",
+				"CREATE": "Create",
+				"MANAGE": "Manage",
+				"MENU": "Menu",
+				"PERMISSION": "Permission",
+				"ROLE_TYPE_DOMAIN": "All projects",
+				"ROLE_TYPE_PROJECT": "Invited projects only",
+				"SAVE": "Save",
+				"SELECTED": "selected",
+				"TOOLTIP_ADMIN_FEATURES": "Admin Features",
+				"TOOLTIP_CHANGE_PROJECT": "Change Project",
+				"TOOLTIP_COLLECTING_DATA": "Collecting Data",
+				"TOOLTIP_CONNECT_TO_CONSOLE": "Connect to Console",
+				"TOOLTIP_TAG_EDIT": "Tag-Edit",
+				"VALIDATION_API_POLICY": "At least one API policy must be attached.",
+				"VALIDATION_ROLE_NAME": "Must be longer than 2 characters",
+				"VIEW": "View"
+			},
+			"HANDBOOK": {
+				"API_POLICY": "API Policy Attachment",
+				"API_POLICY_CREATE": "Create new or manage existing policy",
+				"API_POLICY_DESC": "A policy can reference the resource it wants to apply to. Access is granted with RBAC.",
+				"API_POLICY_HEARE": "here",
+				"PAGE_ACCESS": "Page Access",
+				"PAGE_ACCESS_DESC": "Restrict access to each page with ‘View’ & ‘Manage’ permission.",
+				"PAGE_ACCESS_MANAGE": "‘Manage’:",
+				"PAGE_ACCESS_MANAGE_DESC": "Only users with this permission for specific service can access to its admin features such as Create, Edit, Add etc., (Each service has its own admin features)",
+				"PAGE_ACCESS_VIEW": "‘View’:",
+				"PAGE_ACCESS_VIEW_DESC": "Only users with this permission for specific service can view its page.",
+				"ROLE_TYPE": "Role Type",
+				"ROLE_TYPE_ADMIN": "‘Admin’:",
+				"ROLE_TYPE_ADMIN_DESC": "Full access to all projects/ project groups.",
+				"ROLE_TYPE_DESC": "Restrict access to project management with different role type.",
+				"ROLE_TYPE_USER": "‘User’:",
+				"ROLE_TYPE_USER_DESC": "Only invited(or self-made) projects/project groups and their child projects can be managed."
+			},
+			"MODAL": {
+				"DELETE_HELP_TEXT": "Please note that the following role has the assigned users / project member.",
+				"DELETE_TITLE": "Are you sure you want to delete selected item?",
+				"DELETE_TITLE_CANNOT": "Cannot delete this role"
+			}
+		}
+	},
 	"IDENTITY": {
 		"SERVICE_ACCOUNT": {
 			"ADD": {
@@ -1107,7 +1173,6 @@
 		"USER": {
 			"ACCOUNT": {
 				"ACCOUNT_N_PROFILE": "Account & Profile",
-				"BASE_INFORMATION": "Base Information",
 				"CHANGE_PASSWORD": "Change Password",
 				"SAVE_CHANGES": "Save Changes"
 			},
@@ -1216,7 +1281,6 @@
 				"API_KEY": "API Key",
 				"API_TABLE_DESC": "Able to create API key up to 2.",
 				"ASSIGNED_ROLES": "Assigned Roles",
-				"CREATED_AT": "Created",
 				"CREATE_API_KEY": "Create API Key",
 				"DAYS": "days",
 				"DELETE": "Delete",
@@ -2094,16 +2158,22 @@
 				"GOOGLE_OAUTH2": "Google Oauth2",
 				"INTERNAL_USER": "Internal User",
 				"INVALID": "Invalid",
+				"INVITE": "Invite",
 				"KEYCLOAK": "Keycloak",
 				"LABEL_HELP_TEXT": "Up to 5 labels",
 				"LABEL_LABEL": "Label",
 				"LABEL_PLACEHOLDER": "ex. Developer",
 				"MEMBER": "Member",
 				"MEMBER_HELP_TEXT": "Select project members.",
+				"MODAL_INVITE_MEMBER_TITLE": "Invite Member",
+				"MODAL_VALIDATION_REQUIRED": "Required field",
 				"NO_MEMBER": "No Member",
 				"NO_RESULTS_FOUND": "No Results Found",
 				"NO_RESULTS_FOUND_HELP_TEXT": "We can’t find any item matching your search.",
 				"PROJECT_ROLE_LABEL": "Project Role",
+				"ROLE": "Role",
+				"ROLE_HELP_TEXT": "Set a role for selected member",
+				"ROLE_TOOLTIP": "List of Role varies depending on the role type granted to your account.",
 				"TOO_MANY_RESULTS": "Too many search results. Try a different keyword.",
 				"USER_ID": "User ID"
 			},

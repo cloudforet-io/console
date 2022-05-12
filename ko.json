@@ -791,7 +791,9 @@
 				"NO_RESULT_2": "클라우드 서비스 또는 메인 메뉴와 관련된 검색어를 입력해주세요.",
 				"RECENT_CLOUD_SERVICE": "최근 검색 [클라우드 서비스]",
 				"RECENT_MENU": "최근 검색 [메뉴]",
-				"SERACH": "검색"
+				"SERACH": "검색",
+				"TOO_MANY_RESULTS": "",
+				"TRY_SEARCH_AGAIN": ""
 			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "API 가이드",
@@ -1044,6 +1046,70 @@
 			}
 		}
 	},
+	"IAM": {
+		"ROLE": {
+			"ACTION": "작업",
+			"ALT_E_DELETE_ROLE": "",
+			"ALT_S_DELETE_ROLE": "",
+			"CREATE": "",
+			"DELETE": "삭제",
+			"DETAIL": {
+				"API_POLICY": "",
+				"BASE_INFORMATION": "기본 정보",
+				"CREATED_AT": "생성일",
+				"DESCRIPTION": "",
+				"DETAILS": "상세 정보",
+				"NAME": "",
+				"PAGE_ACCESS": "",
+				"ROLE_TYPE": "",
+				"SELECTED_DATA": "선택한 데이터"
+			},
+			"EDIT": "편집",
+			"FORM": {
+				"ALL": "",
+				"CANCEL": "",
+				"CREATE": "",
+				"MANAGE": "",
+				"MENU": "",
+				"PERMISSION": "",
+				"ROLE_TYPE_DOMAIN": "",
+				"ROLE_TYPE_PROJECT": "",
+				"SAVE": "",
+				"SELECTED": "",
+				"TOOLTIP_ADMIN_FEATURES": "",
+				"TOOLTIP_CHANGE_PROJECT": "",
+				"TOOLTIP_COLLECTING_DATA": "",
+				"TOOLTIP_CONNECT_TO_CONSOLE": "",
+				"TOOLTIP_TAG_EDIT": "",
+				"VALIDATION_API_POLICY": "",
+				"VALIDATION_ROLE_NAME": "",
+				"VIEW": ""
+			},
+			"HANDBOOK": {
+				"API_POLICY": "",
+				"API_POLICY_CREATE": "",
+				"API_POLICY_DESC": "",
+				"API_POLICY_HEARE": "",
+				"PAGE_ACCESS": "",
+				"PAGE_ACCESS_DESC": "",
+				"PAGE_ACCESS_MANAGE": "",
+				"PAGE_ACCESS_MANAGE_DESC": "",
+				"PAGE_ACCESS_VIEW": "",
+				"PAGE_ACCESS_VIEW_DESC": "",
+				"ROLE_TYPE": "",
+				"ROLE_TYPE_ADMIN": "",
+				"ROLE_TYPE_ADMIN_DESC": "",
+				"ROLE_TYPE_DESC": "",
+				"ROLE_TYPE_USER": "",
+				"ROLE_TYPE_USER_DESC": ""
+			},
+			"MODAL": {
+				"DELETE_HELP_TEXT": "",
+				"DELETE_TITLE": "",
+				"DELETE_TITLE_CANNOT": ""
+			}
+		}
+	},
 	"IDENTITY": {
 		"SERVICE_ACCOUNT": {
 			"ADD": {
@@ -1107,7 +1173,6 @@
 		"USER": {
 			"ACCOUNT": {
 				"ACCOUNT_N_PROFILE": "계정 & 정보 ",
-				"BASE_INFORMATION": "기본 정보",
 				"CHANGE_PASSWORD": "비밀번호 변경 ",
 				"SAVE_CHANGES": "변경사항 저장 "
 			},
@@ -1216,7 +1281,6 @@
 				"API_KEY": "API 키",
 				"API_TABLE_DESC": "API Key는 2개까지 생성할 수 있습니다. ",
 				"ASSIGNED_ROLES": "할당된 권한 ",
-				"CREATED_AT": "생성일",
 				"CREATE_API_KEY": "API Key 생성",
 				"DAYS": "일 전 ",
 				"DELETE": "삭제",
@@ -2094,16 +2158,22 @@
 				"GOOGLE_OAUTH2": "Google Oauth2",
 				"INTERNAL_USER": "내부 사용자",
 				"INVALID": "잘못된값",
+				"INVITE": "",
 				"KEYCLOAK": "Keycloak",
 				"LABEL_HELP_TEXT": "최대 5개 추가 가능",
 				"LABEL_LABEL": "라벨",
 				"LABEL_PLACEHOLDER": "ex. 개발자",
 				"MEMBER": "구성원",
 				"MEMBER_HELP_TEXT": "추가할 프로젝트 구성원을 선택해주세요.",
+				"MODAL_INVITE_MEMBER_TITLE": "",
+				"MODAL_VALIDATION_REQUIRED": "필수 입력 항목입니다.",
 				"NO_MEMBER": "구성원이 없습니다.",
 				"NO_RESULTS_FOUND": "검색결과가 없습니다.",
 				"NO_RESULTS_FOUND_HELP_TEXT": "검색결과가 없습니다.",
 				"PROJECT_ROLE_LABEL": "프로젝트 권한",
+				"ROLE": "",
+				"ROLE_HELP_TEXT": "",
+				"ROLE_TOOLTIP": "",
 				"TOO_MANY_RESULTS": "검색결과가 너무 많습니다. 다른 검색어로 검색해보세요.",
 				"USER_ID": "사용자 아이디"
 			},
