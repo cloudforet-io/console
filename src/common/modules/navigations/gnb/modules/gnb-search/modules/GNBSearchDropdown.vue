@@ -14,6 +14,7 @@
                                    @select="handleSelect"
             />
             <div v-if="inputText && menuTotalCount > searchLimit" class="too-many-results-wrapper">
+                <div class="dim-wrapper" />
                 <!-- song-lang -->
                 <p>Too many results for this search.<br>Try your search again with more specific terms.</p>
             </div>
@@ -27,6 +28,7 @@
                                    @select="handleSelect"
             />
             <div v-if="inputText && cloudServiceTotalCount > searchLimit" class="too-many-results-wrapper">
+                <div class="dim-wrapper" />
                 <!-- song-lang -->
                 <p>Too many results for this search.<br>Try your search again with more specific terms.</p>
             </div>
@@ -245,6 +247,15 @@ export default defineComponent<Props>({
         line-height: 1.5;
         text-align: center;
         padding: 1rem 0.75rem;
+
+        .dim-wrapper {
+            position: relative;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, white 100%);
+            height: 2rem;
+            pointer-events: none;
+            margin-top: -3rem;
+            margin-bottom: 1rem;
+        }
     }
 }
 
