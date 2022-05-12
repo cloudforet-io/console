@@ -22,7 +22,7 @@
                 >
                     <template #default="{invalid}">
                         <p-search-dropdown
-                            v-show="activeTab === FORM_MODE.INTERNAL_USER"
+                            v-show="activeTab === AUTH_TYPE.INTERNAL_USER"
                             :menu="internalItems"
                             :selected="selectedUserItems"
                             multi-selectable
@@ -32,7 +32,7 @@
                         />
                         <!-- keycloak의 경우 auto-complete-input 사용 -->
                         <p-search-dropdown
-                            v-show="activeTab !== FORM_MODE.INTERNAL_USER"
+                            v-show="activeTab !== AUTH_TYPE.INTERNAL_USER"
                             v-model="searchText"
                             :loading="loading"
                             :menu="externalItems"
@@ -111,18 +111,13 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { i18n } from '@/translations';
-import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { AUTH_TYPE, MemberItem } from '@/services/project/project-detail/project-member/type';
+import { i18n } from '@/translations';
+import { store } from '@/store';
 
-
-const FORM_MODE = Object.freeze({
-    INTERNAL_USER: 'INTERNAL_USER',
-    KEYCLOAK: 'KEYCLOAK',
-    GOOGLE_OAUTH2: 'GOOGLE_OAUTH2',
-});
 
 export default {
     name: 'ProjectMemberAddModal',
@@ -146,12 +141,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        item: {
-            type: Object,
-            default: () => ({
-                properties: {},
-            }),
-        },
         isProjectGroup: {
             type: Boolean,
             default: false,
@@ -171,24 +160,24 @@ export default {
             proxyVisible: useProxyValue('visible', props, emit),
             authType: computed(() => store.state.domain.extendedAuthType),
             users: computed(() => store.state.reference.user.items),
-            members: [] as any,
+            members: [] as MemberItem[],
             //
             tabs: computed(() => {
                 const tabs = [
                     {
-                        name: FORM_MODE.INTERNAL_USER,
+                        name: AUTH_TYPE.INTERNAL_USER,
                         label: i18n.t('PROJECT.DETAIL.MEMBER.ADD_FROM', { user_type: i18n.t('PROJECT.DETAIL.MEMBER.INTERNAL_USER') }),
                     },
                 ];
-                if (state.authType === FORM_MODE.KEYCLOAK) {
+                if (state.authType === AUTH_TYPE.KEYCLOAK) {
                     tabs.push({
-                        name: FORM_MODE.KEYCLOAK,
+                        name: AUTH_TYPE.KEYCLOAK,
                         label: i18n.t('PROJECT.DETAIL.MEMBER.ADD_FROM', { user_type: i18n.t('PROJECT.DETAIL.MEMBER.KEYCLOAK') }),
                     });
                 }
                 return tabs;
             }),
-            activeTab: FORM_MODE.INTERNAL_USER,
+            activeTab: AUTH_TYPE.INTERNAL_USER,
             roleItems: [] as MenuItem[],
             internalItems: [] as MenuItem[],
             externalItems: [] as MenuItem[],
@@ -232,7 +221,7 @@ export default {
         /* Util */
         const setInternalMenuItems = () => {
             state.internalItems = [];
-            const memberIdList = state.members.map(d => d.resource_id);
+            const memberIdList: string[] = state.members.map(d => d.resource_id);
             Object.keys(state.users).forEach((userId) => {
                 const userName = state.users[userId]?.name;
                 const singleItem = {
@@ -297,7 +286,7 @@ export default {
                     role_id: selectedRoleItems.value[0].name,
                     users: selectedUserItems.value.map(d => d.name),
                     labels: labels.value,
-                    is_external_user: state.activeTab !== FORM_MODE.INTERNAL_USER,
+                    is_external_user: state.activeTab !== AUTH_TYPE.INTERNAL_USER,
                 };
                 if (props.isProjectGroup) {
                     params.project_group_id = props.projectGroupId;
@@ -412,7 +401,7 @@ export default {
             setForm,
             isAllValid,
             //
-            FORM_MODE,
+            AUTH_TYPE,
             handleConfirm,
             handleDeleteLabel,
             handleSearchExternalUser,

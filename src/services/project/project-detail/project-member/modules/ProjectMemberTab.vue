@@ -18,7 +18,7 @@
             <template #toolbox-left>
                 <p-button style-type="primary-dark" class="mr-4 add-btn"
                           icon="ic_plus_bold"
-                          @click="handleClickInviteMember()"
+                          @click="handleClickInviteMember"
                 >
                     <!-- song-lang -->
                     Invite
@@ -93,30 +93,20 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import ProjectMemberAddModal from '@/services/project/project-detail/project-member/modules/ProjectMemberAddModal.vue';
 import ProjectMemberUpdateModal
     from '@/services/project/project-detail/project-member/modules/ProjectMemberUpdateModal.vue';
-import { Tags, TimeStamp } from '@/models';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
+import { MemberItem } from '@/services/project/project-detail/project-member/type';
+import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 
-interface MemberItem {
-    created_at?: TimeStamp;
-    domain_id?: string;
-    labels: string[];
-    project_info?: any;
-    project_group_info?: any;
-    resource_id?: string;
-    resource_type?: string;
-    role_binding_id?: string;
-    role_info?: any;
-    tags?: Tags;
+interface MemberDataTableItem extends MemberItem {
+    user_id: string;
+    assigned: string;
 }
-interface MemberListApiResponse {
-    results: MemberItem[];
-    total_count: number;
-}
+
 export default {
     name: 'ProjectMemberTab',
     components: {
@@ -159,15 +149,13 @@ export default {
             searchText: apiQueryHelper.filters.map(d => d.v).join(' ') || '',
             selectIndex: [] as number[],
             fields: [
-                { label: 'User ID', name: 'user_id', type: 'item' },
-                { label: 'User Name', name: 'resource_id', type: 'item' },
-                { label: 'Role', name: 'role_info.name', type: 'item' },
-                {
-                    label: 'Assigned', name: 'assigned', type: 'item', sortable: false,
-                },
-                { label: 'Label', name: 'labels', type: 'item' },
-            ],
-            items: [] as MemberItem[],
+                { label: 'User ID', name: 'user_id' },
+                { label: 'User Name', name: 'resource_id' },
+                { label: 'Role', name: 'role_info.name' },
+                { label: 'Assigned', name: 'assigned', sortable: false },
+                { label: 'Label', name: 'labels' },
+            ] as DataTableField[],
+            items: [] as MemberDataTableItem[],
             loading: true,
             totalCount: 0,
             selectedItems: computed(() => state.selectIndex.map(i => state.items[i])),
@@ -218,7 +206,7 @@ export default {
             state.loading = true;
             state.selectIndex = [];
             try {
-                let res: MemberListApiResponse;
+                let res;
                 if (props.isProjectGroup) {
                     res = await SpaceConnector.client.identity.projectGroup.member.list({
                         project_group_id: props.projectGroupId,
@@ -234,7 +222,7 @@ export default {
                 state.items = res.results.map((d) => {
                     let assigned;
                     if (d.project_info) assigned = storeState.projects[d.project_info?.project_id]?.label;
-                    else assigned = storeState.projectGroups[d.project_group_info.project_group_id]?.label;
+                    else if (d.project_group_info) assigned = storeState.projectGroups[d.project_group_info.project_group_id]?.label;
                     return {
                         ...d,
                         user_id: d.resource_id,
