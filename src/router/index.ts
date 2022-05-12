@@ -7,7 +7,7 @@ import config from '@/lib/config';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { ERROR_ROUTE } from '@/router/error-routes';
-import { getRouteAccessLevel, isRouteAccessible, ROUTE_ACCESS_LEVEL } from '@/lib/access-control';
+import { getRouteAccessLevel, getUserAccessLevelToRoute, ROUTE_ACCESS_LEVEL } from '@/lib/access-control';
 // import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
@@ -51,24 +51,17 @@ export class SpaceRouter {
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             nextPath = to.fullPath;
             const isTokenAlive = SpaceConnector.isTokenAlive;
+            const routeAccessLevel = getRouteAccessLevel(to);
+            const userAccessLevel = getUserAccessLevelToRoute(to, SpaceRouter.router.app.$store.getters['user/pagePermissionList'], isTokenAlive);
             let nextLocation;
 
-            if (isTokenAlive) {
-                const isAdmin = SpaceRouter.router.app.$store.getters['user/isAdmin'];
-
+            if (userAccessLevel >= ROUTE_ACCESS_LEVEL.AUTHENTICATED) {
                 if (to.meta?.isSignInPage) {
                     nextLocation = { name: DASHBOARD_ROUTE._NAME };
-                } else if (to.meta?.isDomainOwnerOnly && !isAdmin) {
+                } else if (userAccessLevel < routeAccessLevel) {
                     nextLocation = { name: ERROR_ROUTE._NAME };
-                } else {
-                    const isAccessible = isRouteAccessible(to, SpaceRouter.router.app.$store.getters['user/pagePermissionList']);
-                    if (isAccessible) {
-                        SpaceRouter.router.app.$store.dispatch('error/hideAuthorizationError');
-                    } else {
-                        SpaceRouter.router.app.$store.dispatch('error/showAuthorizationError');
-                    }
                 }
-            } else if (getRouteAccessLevel(to) >= ROUTE_ACCESS_LEVEL.REQUIRED_AUTH) {
+            } else if (routeAccessLevel >= ROUTE_ACCESS_LEVEL.AUTHENTICATED) {
                 const res = await SpaceConnector.refreshAccessToken(false);
                 if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
                 else nextLocation = { name: to.name, params: to.params };

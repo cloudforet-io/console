@@ -29,7 +29,7 @@ export default class ErrorHandler {
             const isTokenAlive = SpaceConnector.isTokenAlive;
 
             if (!isTokenAlive
-                && getRouteAccessLevel(SpaceRouter.router.currentRoute) >= ROUTE_ACCESS_LEVEL.REQUIRED_AUTH) {
+                && getRouteAccessLevel(SpaceRouter.router.currentRoute) >= ROUTE_ACCESS_LEVEL.AUTHENTICATED) {
                 ErrorHandler.authenticationErrorHandler();
             }
         } else if (isInstanceOfAuthorizationError(error)) {

@@ -1,10 +1,13 @@
 import jwt from 'jsonwebtoken';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { Action } from 'vuex';
+import { getUserAccessLevelToRoute } from '@/lib/access-control';
+import { Route } from 'vue-router';
 import {
     UserState, SignInRequest, UpdateUserRequest, UserRole,
 } from './type';
 
-const getDomainOwnerInfo = async (ownerId: string): Promise<UserState> => {
+const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> => {
     const response = await SpaceConnector.client.identity.domainOwner.get({ owner_id: ownerId });
     return {
         userId: response.owner_id,
@@ -18,7 +21,7 @@ const getDomainOwnerInfo = async (ownerId: string): Promise<UserState> => {
 };
 
 
-const getUserInfo = async (userId: string): Promise<UserState> => {
+const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
     const response = await SpaceConnector.client.identity.user.get({ user_id: userId });
     return {
         userId: response.user_id,
@@ -65,8 +68,6 @@ const getUserRoleBindings = async (userId: string): Promise<Array<UserRole>> => 
         const { results } = await SpaceConnector.client.identity.roleBinding.list({
             resource_type: 'identity.User',
             resource_id: userId,
-        }, {
-            mockMode: true,
         });
 
         results.forEach((roleBindingInfo) => {
@@ -148,4 +149,9 @@ export const getUser = async ({ commit, state }, userId): Promise<void> => {
         const userInfo = await getUserInfo(userId);
         commit('setUser', userInfo);
     }
+};
+
+export const updateAccessLevel: Action<UserState, any> = ({ commit, getters }, route: Route) => {
+    const accessLevel = getUserAccessLevelToRoute(route, getters.pagePermissionList, SpaceConnector.isTokenAlive);
+    commit('setAccessLevel', accessLevel);
 };

@@ -58,7 +58,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy, computed,
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -95,7 +95,7 @@ export default defineComponent({
 
         const state = reactive({
             showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
-            isExpired: computed(() => vm.$store.state.error.visibleSessionExpiredError && getRouteAccessLevel(vm.$route) >= ROUTE_ACCESS_LEVEL.REQUIRED_AUTH),
+            isExpired: computed(() => vm.$store.state.error.visibleSessionExpiredError && getRouteAccessLevel(vm.$route) >= ROUTE_ACCESS_LEVEL.AUTHENTICATED),
         });
 
         const goToSignIn = () => {
@@ -107,6 +107,11 @@ export default defineComponent({
             store.commit('error/setVisibleSessionExpiredError', false);
         };
         const showsBrowserRecommendation = () => !supportsBrowser() && !window.localStorage.getItem('showBrowserRecommendation');
+
+        watch(() => vm.$route, (route) => {
+            store.dispatch('user/updateAccessLevel', route);
+        }, { immediate: true });
+
         return {
             ...toRefs(state),
             goToSignIn,

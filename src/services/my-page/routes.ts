@@ -16,7 +16,7 @@ const ManageUserNotificationPage = () => import(/* webpackChunkName: "ManageUser
 const myPageRoutes: RouteConfig = {
     path: 'my-page',
     name: MY_PAGE_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.MY_PAGE), accessLevel: ROUTE_ACCESS_LEVEL.REQUIRED_AUTH },
+    meta: { label: getMenuLabel(MENU_ID.MY_PAGE), accessLevel: ROUTE_ACCESS_LEVEL.AUTHENTICATED },
     redirect: '/my-page/account',
     component: MyPageContainer,
     children: [

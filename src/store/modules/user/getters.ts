@@ -1,28 +1,14 @@
 import { languages, userTypes } from '@/store/modules/user/config';
 import { Getter } from 'vuex';
-import {
-    getPagePermissionMap, PagePermissionTuple, PagePermissionType,
-} from '@/lib/access-control/page-permission-helper';
+import { getPagePermissionMap, PagePermissionTuple, PagePermissionType } from '@/lib/access-control/page-permission-helper';
+import { ROUTE_ACCESS_LEVEL } from '@/lib/access-control';
 import { UserState } from './type';
 
 export const isDomainOwner = (state: UserState): boolean => state.userType === 'DOMAIN_OWNER';
 export const isAdmin = (state: UserState): boolean => {
-    let isAdminUser = false;
-
-    if (state.userType === 'DOMAIN_OWNER') {
-        isAdminUser = true;
-    }
-
-    if (state.roles) {
-        state.roles.forEach((role) => {
-            if (role.name === 'Domain Admin') {
-                isAdminUser = true;
-            }
-        });
-    }
-    // if (role.roleType === 'DOMAIN') { // in this case, icon must be root account
-
-    return isAdminUser;
+    if (state.userType === 'DOMAIN_OWNER') return true;
+    if (state.roles) return state.roles.some(role => role.roleType === 'DOMAIN');
+    return false;
 };
 export const languageLabel = (state: UserState): string => languages[state.language as string] || state.language;
 export const userTypeLabel = (state: UserState): string => userTypes[state.userType as string] || state.userType;
@@ -71,3 +57,5 @@ export const pagePermissionMap: Getter<UserState, any> = (state): Record<string,
 };
 
 export const pagePermissionList: Getter<UserState, any> = (state, getters): PagePermissionTuple[] => Object.entries(getters.pagePermissionMap);
+
+export const hasNoManagePermission: Getter<UserState, any> = (state): boolean => state.accessLevel >= ROUTE_ACCESS_LEVEL.MANAGE_PERMISSION;
