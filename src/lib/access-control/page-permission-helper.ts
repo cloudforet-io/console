@@ -1,12 +1,17 @@
 import { MENU_ID, MenuId } from '@/lib/menu/config';
 
-export type PagePermissionType = 'VIEW'|'MANAGE'
+export const PAGE_PERMISSION_TYPE = Object.freeze({
+    VIEW: 'VIEW',
+    MANAGE: 'MANAGE',
+} as const);
+
+export type PagePermissionType = typeof PAGE_PERMISSION_TYPE[keyof typeof PAGE_PERMISSION_TYPE];
 
 export interface PagePermission {
     page: string;
     permission: PagePermissionType
 }
-type PagePermissionMap = Record<string, PagePermissionType>
+export type PagePermissionMap = Record<string, PagePermissionType>
 // export type PagePermissionTuple = [page: string, permission: PagePermissionType] // eslint parsing error occurs
 export type PagePermissionTuple = Array<string|PagePermissionType>
 

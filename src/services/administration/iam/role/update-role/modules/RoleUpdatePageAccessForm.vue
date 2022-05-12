@@ -45,8 +45,8 @@ import { store } from '@/store';
 import { MENU_ID } from '@/lib/menu/config';
 import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
-import { PageAccessMenuItem, PagePermission } from '@/services/administration/iam/role/type';
-
+import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
+import { PagePermission } from '@/lib/access-control/page-permission-helper';
 
 const EXCEPTION_MENU = [MENU_ID.PROJECT, MENU_ID.MY_PAGE];
 

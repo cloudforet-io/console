@@ -2,6 +2,7 @@ import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 import { Tags } from '@/models';
 import { ROLE_TYPE } from '@/services/administration/iam/role/config';
 import { TranslateResult } from 'vue-i18n';
+import { PagePermission } from '@/lib/access-control/page-permission-helper';
 
 interface Policy {
     policy_id: string;
@@ -14,6 +15,7 @@ export interface RoleData {
     domain_id: string;
     name: string;
     policies?: Policy[];
+    page_permissions: PagePermission[];
     role_id: string;
     role_type: ROLE_TYPE;
     tags?: Tags; // [ description: string ]
@@ -27,8 +29,4 @@ export interface PageAccessMenuItem {
     isManaged: boolean;
     hideMenu: boolean;
     subMenuList?: PageAccessMenuItem[];
-}
-export interface PagePermission {
-    page: string;
-    permission: 'MANAGE' | 'VIEW';
 }
