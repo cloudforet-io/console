@@ -1047,6 +1047,30 @@
 		}
 	},
 	"IAM": {
+		"POLICY": {
+			"FORM": {
+				"CANCEL": "Cancel",
+				"CONTENT": "Content",
+				"CREATE": "Create",
+				"CREATE_TITLE": "Create Custom Policy",
+				"CUSTOM_POLICY": "Custom Policy",
+				"DESCRIPTION": "Description",
+				"ID": "ID",
+				"MANAGED_POLICY": "Managed Policy",
+				"SAVE": "Save Changes",
+				"TYPE": "Type",
+				"VIEW_ONLY": "View Only"
+			},
+			"MODAL": {
+				"DELETE_CANNOT_POLICY": "Cannot delete this policy",
+				"DELETE_FOLLOW_ROLES": "attached in following roles.",
+				"DELETE_HELP_TEXT": "Please note that this policy is currently",
+				"DELETE_POLICY": "Are you sure you want to delete this?",
+				"EDIT_TITLE": "Edit Policy Name",
+				"NAME": "Name"
+			},
+			"POLICY": "Policy"
+		},
 		"ROLE": {
 			"ACTION": "Action",
 			"ALT_E_DELETE_ROLE": "Failed to delete role.",

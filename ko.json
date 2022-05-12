@@ -1047,6 +1047,30 @@
 		}
 	},
 	"IAM": {
+		"POLICY": {
+			"FORM": {
+				"CANCEL": "",
+				"CONTENT": "",
+				"CREATE": "",
+				"CREATE_TITLE": "",
+				"CUSTOM_POLICY": "",
+				"DESCRIPTION": "",
+				"ID": "",
+				"MANAGED_POLICY": "",
+				"SAVE": "",
+				"TYPE": "",
+				"VIEW_ONLY": ""
+			},
+			"MODAL": {
+				"DELETE_CANNOT_POLICY": "",
+				"DELETE_FOLLOW_ROLES": "",
+				"DELETE_HELP_TEXT": "",
+				"DELETE_POLICY": "",
+				"EDIT_TITLE": "",
+				"NAME": ""
+			},
+			"POLICY": ""
+		},
 		"ROLE": {
 			"ACTION": "작업",
 			"ALT_E_DELETE_ROLE": "",
