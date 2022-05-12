@@ -1,62 +1,61 @@
 <template>
     <section>
-        <!--song-lang-->
         <article class="desc-wrapper">
             <h2 class="header2">
-                Role Type
+                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE') }}
             </h2>
             <p class="desc2">
-                Restrict access to project management with different role type.
+                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_DESC') }}
             </p>
             <h4 class="header4">
-                ‘User’:
+                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_USER') }}
             </h4>
             <p class="desc4">
-                Only invited(or self-made) projects/project groups and their child projects can be managed.
+                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_USER_DESC') }}
             </p>
             <h4 class="header4">
-                ‘Admin’:
+                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_ADMIN') }}
             </h4>
             <p class="desc4">
-                Full access to all projects/ project groups.
+                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_ADMIN_DESC') }}
             </p>
         </article>
         <p-divider class="divider" />
         <article class="desc-wrapper">
             <h2 class="header2">
-                Page Access
+                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS') }}
             </h2>
             <p class="desc2">
-                Restrict access to each page with ‘View’ & ‘Manage’ permission.
+                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_DESC') }}
             </p>
             <h4 class="header4">
-                ‘View’:
+                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_VIEW') }}
             </h4>
             <p class="desc4">
-                Only users with this permission for specific service can view its page.
+                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_VIEW_DESC') }}
             </p>
             <h4 class="header4">
-                ‘Manage’:
+                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_MANAGE') }}
             </h4>
             <p class="desc4">
-                Only users with this permission for specific service can access to its admin features such as Create, Edit, Add etc., (Each service has its own admin features)
+                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_MANAGE_DESC') }}
             </p>
         </article>
         <p-divider class="divider" />
         <h2 class="header2">
-            API Policy Attachment
+            {{ $t('IAM.ROLE.HANDBOOK.API_POLICY') }}
         </h2>
         <p class="desc2">
-            A policy can reference the resource it wants to apply to. Access is granted with RBAC.
+            {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_DESC') }}
         </p>
         <p class="desc4">
-            Create new or manage existing policy
+            {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_CREATE') }}
             <p-anchor :highlight="true"
                       :to="{
                           name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
                       }"
             >
-                here
+                {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_HEARE') }}
             </p-anchor>
         </p>
     </section>

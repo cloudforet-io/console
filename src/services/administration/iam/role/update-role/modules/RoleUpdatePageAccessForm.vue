@@ -1,14 +1,12 @@
 <template>
     <p-pane-layout class="role-create-page-access-form">
         <p-panel-top>
-            <!-- song-lang -->
-            Page Access
+            {{ $t('IAM.ROLE.DETAIL.PAGE_ACCESS') }}
         </p-panel-top>
         <div class="page-access-menu">
             <div class="header-wrapper">
-                <!-- song-lang -->
-                <span class="left-part">Menu</span>
-                <span class="right-part mr-6">Permission</span>
+                <span class="left-part">{{ $t('IAM.ROLE.FORM.MENU') }}</span>
+                <span class="right-part mr-6">{{ $t('IAM.ROLE.FORM.PERMISSION') }}</span>
             </div>
             <div class="content-wrapper">
                 <template v-for="menu in formState.menuItems">
@@ -47,6 +45,7 @@ import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
 import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 import { PagePermission } from '@/lib/access-control/page-permission-helper';
+import { i18n } from '@/translations';
 
 const EXCEPTION_MENU = [MENU_ID.PROJECT, MENU_ID.MY_PAGE];
 
@@ -156,8 +155,7 @@ export default {
                 formState.menuItems = [
                     {
                         id: 'all',
-                        // song-lang
-                        labels: ['All'],
+                        labels: [i18n.t('IAM.ROLE.FORM.ALL')],
                         isViewed: false,
                         isManaged: false,
                         hideMenu: false,

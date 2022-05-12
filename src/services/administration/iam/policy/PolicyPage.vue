@@ -1,8 +1,7 @@
 <template>
     <section>
-        <!--        song-lang-->
         <p-page-title
-            title="Policy"
+            :title="$t('IAM.POLICY.POLICY')"
             use-total-count
             :total-count="totalCount"
         >

@@ -20,8 +20,7 @@
                           icon="ic_plus_bold"
                           @click="handleClickInviteMember"
                 >
-                    <!-- song-lang -->
-                    Invite
+                    {{ $t('PROJECT.DETAIL.MEMBER.INVITE') }}
                 </p-button>
                 <p-select-dropdown :items="dropdownMenu"
                                    @select="handleSelectDropdown"

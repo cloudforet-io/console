@@ -21,16 +21,13 @@
                           icon="ic_plus_bold"
                           @click="handleCreateRole"
                 >
-                    <!--song-lang-->
-                    Create
+                    {{ $t('IAM.ROLE.CREATE') }}
                 </p-button>
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
                                    :items="dropdownMenu"
                                    @select="handleSelectDropdown"
                 >
-                    <!--song-lang-->
-                    <!--{{ $t('IDENTITY.USER.MAIN.ACTION') }}-->
-                    Action
+                    {{ $t('IAM.ROLE.ACTION') }}
                 </p-select-dropdown>
             </template>
             <template #col-role_type-format="{ value }">
@@ -63,7 +60,8 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -107,6 +105,8 @@ export default defineComponent({
         },
     },
     setup(props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const roleListApiQueryHelper = new ApiQueryHelper()
             .setPageStart(1).setPageLimit(DEFAULT_PAGE_LIMIT)
             .setSort('name', true);
@@ -118,12 +118,11 @@ export default defineComponent({
                 {
                     type: 'item',
                     name: 'edit',
-                    label: 'Edit', // song-lang
+                    label: vm.$t('IAM.ROLE.EDIT'),
                     disabled: state.selectedIndices.length > 1 || !state.isSelected,
                 },
                 {
-                    // song-lang : label
-                    type: 'item', name: 'delete', label: 'Delete', disabled: !state.isSelected,
+                    type: 'item', name: 'delete', label: vm.$t('IAM.ROLE.DELETE'), disabled: !state.isSelected,
                 },
             ] as MenuItem[])),
             roles: [] as RoleData[],

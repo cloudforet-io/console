@@ -22,8 +22,7 @@
             <template #toolbox-top>
                 <slot name="panel-top" />
                 <div class="filter">
-                    <!--                    song-lang-->
-                    <span class="filter-label">Type</span>
+                    <span class="filter-label">{{ $t('IAM.POLICY.FORM.TYPE') }}</span>
                     <p-select-status
                         v-for="(item, index) in policyTypeList"
                         :key="index"

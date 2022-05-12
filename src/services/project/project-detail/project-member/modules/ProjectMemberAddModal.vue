@@ -1,8 +1,7 @@
 <template>
-    <!-- song-lang -->
     <p-button-modal
         class="project-member-add-modal"
-        header-title="Invite Member"
+        :header-title="$t('PROJECT.DETAIL.MEMBER.MODAL_INVITE_MEMBER_TITLE')"
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"
@@ -15,8 +14,7 @@
                 <p class="title">
                     {{ $t('PROJECT.DETAIL.MEMBER.MEMBER') }} ({{ selectedUserItems.length }})
                 </p>
-                <!-- song-lang -->
-                <p-field-group label="Member" required
+                <p-field-group :label="$t('PROJECT.DETAIL.MEMBER.MEMBER')" required
                                :invalid="invalidState.selectedUserItems"
                                :invalid-text="invalidTexts.selectedUserItems"
                 >
@@ -54,15 +52,14 @@
                         </p-search-dropdown>
                     </template>
                 </p-field-group>
-                <!-- song-lang -->
-                <p-field-group label="Role" required
-                               help-text="Set a role for selected member"
+                <p-field-group :label="$t('PROJECT.DETAIL.MEMBER.ROLE')" required
+                               :help-text="$t('PROJECT.DETAIL.MEMBER.ROLE_HELP_TEXT')"
                                :invalid="invalidState.selectedRoleItems"
                                :invalid-text="invalidTexts.selectedRoleItems"
                 >
                     <template #label-extra>
                         <p-tooltip class="help-icon"
-                                   contents="List of Role varies depending on the role type granted to your account."
+                                   :contents="$t('PROJECT.DETAIL.MEMBER.ROLE_TOOLTIP')"
                                    position="bottom"
                         >
                             <p-i name="ic_help"
@@ -204,11 +201,11 @@ export default {
                 if (isInvalidUser) return false;
                 const isExistingMember = !!users.filter(user => state.existingMemberList.includes(user)).length;
                 if (isExistingMember) return false;
-                if (!users.length) return 'Required Field'; // song-lang
+                if (!users.length) return i18n.t('PROJECT.DETAIL.MEMBER.MODAL_VALIDATION_REQUIRED');
                 return true;
             },
             selectedRoleItems: (val: MenuItem[]) => {
-                if (!val.length) return 'Required Field'; // song-lang
+                if (!val.length) return i18n.t('PROJECT.DETAIL.MEMBER.MODAL_VALIDATION_REQUIRED');
                 return true;
             },
             labels: (val: string[]) => {

@@ -15,8 +15,7 @@
             />
             <div v-if="inputText && menuTotalCount > searchLimit" class="too-many-results-wrapper">
                 <div class="dim-wrapper" />
-                <!-- song-lang -->
-                <p>Too many results for this search.<br>Try your search again with more specific terms.</p>
+                <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
             </div>
             <g-n-b-suggestion-list v-show="!!cloudServiceSuggestionItems.length"
                                    :items="cloudServiceSuggestionItems"
@@ -29,8 +28,7 @@
             />
             <div v-if="inputText && cloudServiceTotalCount > searchLimit" class="too-many-results-wrapper">
                 <div class="dim-wrapper" />
-                <!-- song-lang -->
-                <p>Too many results for this search.<br>Try your search again with more specific terms.</p>
+                <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
             </div>
             <template #no-data>
                 <div v-if="isRecent" class="no-data">

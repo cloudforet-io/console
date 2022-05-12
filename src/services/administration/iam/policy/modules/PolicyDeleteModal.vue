@@ -1,17 +1,14 @@
 <template>
-    <!--    song-lang-->
     <delete-modal
         :visible.sync="proxyVisible"
-        :header-title="attachedRoles ? 'Cannot delete this policy' : 'Are you sure you want to delete this?'"
+        :header-title="attachedRoles ? $t('IAM.POLICY.MODAL.DELETE_CANNOT_POLICY') : $t('IAM.POLICY.MODAL.DELETE_POLICY')"
         :only-show-footer-close-button="attachedRoles"
     >
         <template v-if="attachedRoles" #delete-modal-body>
             <div class="modal-delete-disabled-title">
-                <!--                song-lang-->
-                <span>Please note that this policy is currently </span>
-                <!--                song-lang-->
+                <span>{{ $t('IAM.POLICY.MODAL.DELETE_HELP_TEXT') }} </span>
                 <p-anchor :to="{name: '#'}" size="lg" highlight>
-                    attached in following roles.
+                    {{ $t('IAM.POLICY.MODAL.DELETE_FOLLOW_ROLES') }}
                 </p-anchor>
             </div>
             <p-data-table :fields="fields" />

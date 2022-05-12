@@ -6,13 +6,12 @@
             <p-button style-type="gray-border" :outline="true" class="mr-4"
                       @click="$router.go(-1)"
             >
-                <!-- song-lang-->
-                {{ $t('Cancel') }}
+                {{ $t('IAM.ROLE.FORM.CANCEL') }}
             </p-button>
             <p-button style-type="primary-dark" :loading="loading" :disabled="!isAllValid"
                       @click="handleClickConfirm"
             >
-                {{ $t('Create') }}
+                {{ $t('IAM.ROLE.FORM.CREATE') }}
             </p-button>
         </div>
     </section>

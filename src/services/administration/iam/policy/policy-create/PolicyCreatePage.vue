@@ -1,46 +1,39 @@
 <template>
     <section>
-        <!--        song-lang-->
         <p-page-title
             child
-            title="Create Custom Policy"
+            :title="$t('IAM.POLICY.FORM.CREATE_TITLE')"
             @goBack="$router.go(-1)"
         />
         <p-pane-layout class="policy-create-info-wrapper">
             <div class="policy-create-contents">
-                <p-label>Type</p-label>
+                <p-label>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-label>
                 <br>
-                <!--            song-lang-->
                 <p-badge outline style-type="primary1">
-                    Custom Policy
+                    {{ $t('IAM.POLICY.FORM.CUSTOM_POLICY') }}
                 </p-badge>
             </div>
             <div class="policy-create-contents">
-                <!--                song-lang-->
-                <p-field-group label="Name" required>
+                <p-field-group :label="$t('IAM.POLICY.MODAL.NAME')" required>
                     <p-text-input />
                 </p-field-group>
             </div>
             <div class="policy-create-contents">
-                <!--                song-lang-->
-                <p-field-group label="Description">
+                <p-field-group :label="$t('IAM.POLICY.FORM.DESCRIPTION')">
                     <p-text-input />
                 </p-field-group>
             </div>
             <div class="policy-create-contents">
-                <!--            song-lang-->
-                <p-field-group label="Content" />
+                <p-field-group :label="$t('IAM.POLICY.FORM.CONTENT')" />
                 <p-text-editor :code="code" />
             </div>
         </p-pane-layout>
         <div class="policy-modify-buttons">
-            <!--            song-lang-->
             <p-button style-type="gray-border" size="lg">
-                Cancel
+                {{ $t('IAM.POLICY.FORM.CANCEL') }}
             </p-button>
-            <!--            song-lang-->
             <p-button style-type="primary-dark" size="lg">
-                Create
+                {{ $t('IAM.POLICY.FORM.CREATE') }}
             </p-button>
         </div>
     </section>

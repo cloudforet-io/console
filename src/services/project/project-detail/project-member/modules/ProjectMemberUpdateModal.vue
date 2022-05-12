@@ -132,7 +132,7 @@ export default {
             selectedRoleItems: [] as MenuItem[],
         }, {
             selectedRoleItems: (val: MenuItem[]) => {
-                if (!val.length) return 'Required Field'; // song-lang
+                if (!val.length) return i18n.t('PROJECT.DETAIL.MEMBER.MODAL_VALIDATION_REQUIRED');
                 return true;
             },
             labels: (val: string[]) => {
@@ -191,8 +191,7 @@ export default {
                     showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '', root);
                 }
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Member'));
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'));
             }
         };
         const updateMember = async () => {
@@ -211,8 +210,7 @@ export default {
                     showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '', root);
                 }
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Member'));
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'));
             }
         };
 

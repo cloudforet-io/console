@@ -5,9 +5,8 @@
                   :only-show-footer-close-button="!isDeletable"
                   @confirm="handleDelete"
     >
-        <!--song-lang-->
         <div v-if="!isDeletable" class="mb-4">
-            Please note that the following role has the assigned users / project member.
+            {{ $t('IAM.ROLE.MODAL.DELETE_HELP_TEXT') }}
         </div>
         <p-data-table v-if="isDeletable"
                       :items="roles"
@@ -118,8 +117,7 @@ export default {
                 { name: 'project', label: ' ' },
             ] as DataTableField[],
             isDeletable: computed(() => state.unDeletableRoles.length === 0),
-            // song-lang
-            headerTitle: computed(() => (state.isDeletable ? i18n.t('Are you sure you want to delete selected item? ') : i18n.t('Cannot delete this role'))),
+            headerTitle: computed(() => (state.isDeletable ? i18n.t('IAM.ROLE.MODAL.DELETE_TITLE') : i18n.t('IAM.ROLE.MODAL.DELETE_TITLE_CANNOT'))),
         });
 
         const handleDelete = async () => {
@@ -130,14 +128,12 @@ export default {
                         role_id: role.role_id,
                     });
                 } catch (e) {
-                    // song-lang
-                    ErrorHandler.handleRequestError(e, 'Failed to delete role.');
+                    ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.ALT_E_DELETE_ROLE'));
                     isAllSucceed = false;
                 }
             }));
             if (isAllSucceed) {
-                // song-lang
-                showSuccessMessage('Successfully deleted Data', '');
+                showSuccessMessage(i18n.t('IAM.ROLE.ALT_S_DELETE_ROLE'), '');
                 state.proxyVisible = false;
                 emit('refresh');
             }

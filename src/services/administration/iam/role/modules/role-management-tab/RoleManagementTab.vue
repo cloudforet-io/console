@@ -100,16 +100,14 @@ export default {
 
         const singleItemTabState = reactive({
             tabs: computed<TabItem[]>(() => ([
-                // song-lang: administration > USER에서도 똑같이 사용되고 있는데 혹시 몰라 주석 남깁니다!
-                { label: i18n.t('IDENTITY.USER.MAIN.DETAILS'), name: 'detail', keepAlive: true },
+                { label: i18n.t('IAM.ROLE.DETAIL.DETAILS'), name: 'detail', keepAlive: true },
             ])),
             activeTab: 'detail',
         });
 
         const multiItemTabState = reactive({
             tabs: computed<TabItem[]>(() => ([
-                // song-lang: administration > USER에서도 똑같이 사용되고 있는데 혹시 몰라 주석 남깁니다!
-                { name: 'data', label: i18n.t('IDENTITY.USER.MAIN.TAB_SELECTED_DATA'), keepAlive: true },
+                { name: 'data', label: i18n.t('IAM.ROLE.DETAIL.SELECTED_DATA'), keepAlive: true },
             ])),
             activeTab: 'data',
         });

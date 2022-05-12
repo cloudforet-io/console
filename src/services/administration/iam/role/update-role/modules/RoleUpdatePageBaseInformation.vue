@@ -1,13 +1,11 @@
 <template>
     <p-pane-layout class="role-update-page-base-information">
         <p-panel-top>
-            <!-- song-lang -->
-            Base Information
+            {{ $t('IAM.ROLE.DETAIL.BASE_INFORMATION') }}
         </p-panel-top>
         <div class="input-wrapper">
-            <!--            song-lang-->
             <p-field-group
-                :label="$t('Name')"
+                :label="$t('IAM.ROLE.DETAIL.NAME')"
                 :invalid="invalidState.roleName"
                 :invalid-text="invalidTexts.roleName"
                 required
@@ -20,9 +18,8 @@
                     />
                 </template>
             </p-field-group>
-            <!--            song-lang-->
             <p-field-group
-                :label="$t('Description')"
+                :label="$t('IAM.ROLE.DETAIL.DESCRIPTION')"
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="roleDescription"
@@ -31,8 +28,7 @@
                     />
                 </template>
             </p-field-group>
-            <!--            song-lang-->
-            <p-label :label="$t('Role Type')" />
+            <p-label :label="$t('IAM.ROLE.DETAIL.ROLE_TYPE')" />
             <div class="select-card-wrapper">
                 <p-select-card v-for="roleType in roleTypes" :key="roleType.key"
                                v-model="selectedRoleType"
@@ -85,14 +81,14 @@ export default {
         } = useFormValidator({
             roleName: '',
         }, {
-            roleName(value: string) { return value.trim().length > 2 ? '' : i18n.t('Must be longer than 2 characters'); }, // song-lang
+            roleName(value: string) { return value.trim().length > 2 ? '' : i18n.t('IAM.ROLE.FORM.VALIDATION_ROLE_NAME'); },
         });
 
         const state = reactive({
             roleDescription: undefined as undefined | string,
-            roleTypes: computed(() => [ // song-lang
-                { label: ROLE_TYPE_BADGE_OPTION.PROJECT.label, key: ROLE_TYPE.PROJECT, description: 'Invited projects only' },
-                { label: ROLE_TYPE_BADGE_OPTION.DOMAIN.label, key: ROLE_TYPE.DOMAIN, description: 'All projects' },
+            roleTypes: computed(() => [
+                { label: ROLE_TYPE_BADGE_OPTION.PROJECT.label, key: ROLE_TYPE.PROJECT, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_PROJECT') },
+                { label: ROLE_TYPE_BADGE_OPTION.DOMAIN.label, key: ROLE_TYPE.DOMAIN, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_DOMAIN') },
             ]),
             selectedRoleType: ROLE_TYPE.PROJECT as string,
         });

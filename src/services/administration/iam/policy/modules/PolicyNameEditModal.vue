@@ -1,11 +1,10 @@
 <template>
     <p-button-modal
         :visible.sync="proxyVisible"
-        header-title="Edit Policy Name"
+        :header-title="$t('IAM.POLICY.MODAL.EDIT_TITLE')"
     >
         <template #body>
-            <!--            song-lang-->
-            <p-field-group label="Name" required>
+            <p-field-group :label="$t('IAM.POLICY.MODAL.NAME')" required>
                 <p-text-input />
             </p-field-group>
         </template>

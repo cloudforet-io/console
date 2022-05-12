@@ -7,50 +7,42 @@
         >
             <template #title-right-extra>
                 <span v-if="type === POLICY_TYPES.MANAGED" class="policy-managed-badge">
-                    <!--                    song-lang-->
-                    <p-badge style-type="gray200">View Only</p-badge>
+                    <p-badge style-type="gray200">{{ $t('IAM.POLICY.FORM.VIEW_ONLY') }}</p-badge>
                 </span>
                 <span v-if="type === POLICY_TYPES.CUSTOM" class="policy-edit-buttons">
                     <p-icon-button name="ic_trashcan" class="w-full delete-btn" @click="handlerVisibleDeleteModal" />
                     <p-icon-button name="ic_edit-text" class="edit-btn" @click="handlerVisibleNameEditModal" />
                 </span>
                 <div v-if="type === POLICY_TYPES.CUSTOM" class="policy-modify-buttons">
-                    <!--                    song-lang-->
                     <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="gray-border">
-                        Cancel
+                        {{ $t('IAM.POLICY.FORM.CANCEL') }}
                     </p-button>
-                    <!--                    song-lang-->
                     <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="primary-dark">
-                        Save Changes
+                        {{ $t('IAM.POLICY.FORM.SAVE') }}
                     </p-button>
                 </div>
             </template>
         </p-page-title>
         <p-pane-layout class="policy-detail-info-wrapper">
             <div class="policy-detail-contents">
-                <!--                song-lang-->
-                <p-label>Type</p-label>
+                <p-label>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-label>
                 <br>
                 <div class="policy-detail-type-badge">
                     <p-badge v-if="type === POLICY_TYPES.MANAGED" outline style-type="gray">
-                        <!--                        song-lang-->
-                        Managed Policy
+                        {{ $t('IAM.POLICY.FORM.MANAGED_POLICY') }}
                     </p-badge>
                     <p-badge v-else outline style-type="primary1">
-                        <!--                        song-lang-->
-                        Custom Policy
+                        {{ $t('IAM.POLICY.FORM.CUSTOM_POLICY') }}
                     </p-badge>
                 </div>
             </div>
             <div class="policy-detail-contents">
-                <!--                song-lang-->
-                <p-label>ID</p-label>
+                <p-label>{{ $t('IAM.POLICY.FORM.ID') }}</p-label>
                 <p>{{ policyInfo.policy_id }}</p>
             </div>
             <div class="policy-detail-contents">
-                <!--                song-lang-->
                 <p-label>
-                    Description
+                    {{ $t('IAM.POLICY.FORM.DESCRIPTION') }}
                 </p-label>
                 <br>
                 <p v-if="type === POLICY_TYPES.MANAGED">
@@ -63,8 +55,7 @@
                 />
             </div>
             <div class="policy-detail-contents">
-                <!--                song-lang-->
-                <p-label>Content</p-label>
+                <p-label>{{ $t('IAM.POLICY.FORM.CONTENT') }}</p-label>
                 <p-text-editor
                     :mode="type === POLICY_TYPES.MANAGED ? 'readOnly' : 'edit'"
                     :code="code"

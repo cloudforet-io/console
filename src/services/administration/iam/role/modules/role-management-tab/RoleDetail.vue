@@ -26,8 +26,7 @@
                 </template>
             </p-definition-table>
         </div>
-        <!--song-lang-->
-        <p-panel-top>API Policy Attachment</p-panel-top>
+        <p-panel-top>{{ $t('IAM.ROLE.DETAIL.API_POLICY') }}</p-panel-top>
         <p-data-table :fields="policyState.fields"
                       :items="policyState.items"
                       :loading="loading"
@@ -102,22 +101,20 @@ export default {
     },
     setup(props) {
         const baseInfoState = reactive({
-            // song-lang
-            title: computed(() => i18n.t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')),
+            title: computed(() => i18n.t('IAM.ROLE.DETAIL.BASE_INFORMATION')),
             loading: true,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
-            fields: computed<DataTableTranslationField[]>(() => [ // song-lang
-                { name: 'name', label: i18n.t('IDENTITY.USER.MAIN.NAME') },
-                { name: 'tag.description', label: 'Description' },
-                { name: 'role_type', label: 'Role Type', disableCopy: true },
-                { name: 'created_at', label: i18n.t('IDENTITY.USER.MAIN.CREATED_AT') },
+            fields: computed<DataTableTranslationField[]>(() => [
+                { name: 'name', label: i18n.t('IAM.ROLE.DETAIL.NAME') },
+                { name: 'tag.description', label: i18n.t('IAM.ROLE.DETAIL.DESCRIPTION') },
+                { name: 'role_type', label: i18n.t('IAM.ROLE.DETAIL.ROLE_TYPE'), disableCopy: true },
+                { name: 'created_at', label: i18n.t('IAM.ROLE.DETAIL.CREATED_AT') },
             ]),
             data: {} as Partial<RoleData>,
         });
 
         const pageAccessState = reactive({
-            // song-lang
-            title: 'Page Access',
+            title: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS'),
             loading: false,
         });
         const assetInventoryState = reactive({
@@ -239,9 +236,9 @@ export default {
         const convertPagePermissionLabel = (data) => {
             switch (data) {
             case PAGE_PERMISSION_TYPE.MANAGE:
-                return i18n.t('Manage'); // song-lang
+                return i18n.t('IAM.ROLE.FORM.MANAGE');
             case PAGE_PERMISSION_TYPE.VIEW:
-                return i18n.t('View'); // song-lang
+                return i18n.t('IAM.ROLE.FORM.VIEW');
             default:
                 return '--';
             }

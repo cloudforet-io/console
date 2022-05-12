@@ -9,11 +9,9 @@
         >
             <template #panel-top>
                 <p-panel-top>
-                    <!-- song-lang -->
-                    API Policy Attachment
+                    {{ $t('IAM.ROLE.DETAIL.API_POLICY') }}
                     <template #extra>
-                        <!--song-lang-->
-                        <span class="selected-count">({{ selectedPolicyIdList.length }} {{ $t('selected') }})</span>
+                        <span class="selected-count">({{ selectedPolicyIdList.length }} {{ $t('IAM.ROLE.FORM.SELECTED') }})</span>
                     </template>
                 </p-panel-top>
             </template>
@@ -58,7 +56,7 @@ export default {
         } = useFormValidator({
             selectedPolicyIdList: [],
         }, {
-            selectedPolicyIdList(value: string[]) { return value.length ? '' : i18n.t('At least one API policy must be attached.'); }, // song-lang
+            selectedPolicyIdList(value: string[]) { return value.length ? '' : i18n.t('IAM.ROLE.FORM.VALIDATION_API_POLICY'); },
         });
         const state = reactive({
             isBaseInformationValid: false,

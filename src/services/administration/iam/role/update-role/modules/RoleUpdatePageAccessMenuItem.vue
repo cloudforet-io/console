@@ -18,11 +18,10 @@
             </template>
         </div>
         <div class="right-part" :class="isSubMenu ? 'sub-menu' : 'menu'">
-            <!-- song-lang -->
             <p-check-box :selected="menu.isViewed" :disabled="menu.isManaged" class="pr-6"
                          @change="handleChangeView"
             >
-                <span>View</span>
+                <span>{{ $t('IAM.ROLE.FORM.VIEW') }}</span>
             </p-check-box>
             <p-check-box :selected="menu.isManaged" @change="handleChangeManage">
                 <span>Manage</span>
@@ -50,6 +49,7 @@ import {
 } from '@spaceone/design-system';
 
 import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
+import { i18n } from '@/translations';
 
 
 export default {
@@ -73,13 +73,12 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             tooltipText: computed(() => {
-                // song-lang
-                const title = 'Admin Features';
+                const title = i18n.t('IAM.ROLE.FORM.TOOLTIP_ADMIN_FEATURES');
                 const features = [
-                    'Collecting Data',
-                    'Change Project',
-                    'Connect to Console',
-                    'Tag-Edit',
+                    i18n.t('IAM.ROLE.FORM.TOOLTIP_COLLECTING_DATA'),
+                    i18n.t('IAM.ROLE.FORM.TOOLTIP_CHANGE_PROJECT'),
+                    i18n.t('IAM.ROLE.FORM.TOOLTIP_CONNECT_TO_CONSOLE'),
+                    i18n.t('IAM.ROLE.FORM.TOOLTIP_TAG_EDIT'),
                 ];
                 return `<b>${title}</b></br><ul>${features.map(d => `<li>&#8729; ${d}</li>`).join('')}</ul>`;
             }),
