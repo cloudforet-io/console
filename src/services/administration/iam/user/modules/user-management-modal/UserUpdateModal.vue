@@ -119,7 +119,6 @@ import {
     Validation,
 } from '@/services/administration/iam/user/lib/user-form-validations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { MODAL_TYPE } from '@/services/administration/store/user/type';
 import { User } from '@/services/administration/iam/user/type';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import { administrationStore } from '@/services/administration/store';
@@ -331,7 +330,6 @@ export default {
             validationState,
             confirm,
             handleClose,
-            MODAL_TYPE,
         };
     },
 };

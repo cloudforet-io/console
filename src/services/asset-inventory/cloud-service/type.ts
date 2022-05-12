@@ -6,6 +6,13 @@ type CloudServicePageUrlQueryKey = typeof CLOUD_SERVICE_PAGE_URL_QUERY_KEY[numbe
 
 export type CloudServicePageUrlQuery = Partial<Record<CloudServicePageUrlQueryKey, RouteQueryString>>
 
+export type CloudServiceCategory = typeof CLOUD_SERVICE_CATEGORY[keyof typeof CLOUD_SERVICE_CATEGORY]
+
+export interface Period {
+    start?: string;
+    end?: string;
+}
+
 export type CloudServicePageUrlQueryValue = {
     provider?: string;
     service?: CloudServiceCategory[];
@@ -16,14 +23,7 @@ export type CloudServicePageUrlQueryValue = {
 
 export type CloudServiceFilterKey = typeof CLOUD_SERVICE_FILTER_KEY[keyof typeof CLOUD_SERVICE_FILTER_KEY];
 
-export type CloudServiceCategory = typeof CLOUD_SERVICE_CATEGORY[keyof typeof CLOUD_SERVICE_CATEGORY]
-
 export type CloudServiceFilterMap = {
     [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]?: CloudServiceCategory[];
     [CLOUD_SERVICE_FILTER_KEY.REGION]?: string[];
-}
-
-export interface Period {
-    start?: string;
-    end?: string;
 }

@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import { PDivider, PPaneLayout, PSkeleton } from '@spaceone/design-system';
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY_SYMBOL, CurrencySymbol } from '@/store/modules/display/config';
 import {
     computed, defineComponent, PropType, reactive, toRefs,
 } from '@vue/composition-api';
@@ -45,14 +45,13 @@ const UNIT_TYPE = Object.freeze({
     PERCENT: 'PERCENT',
     CURRENCY: 'CURRENCY',
 });
-
-type UNIT_TYPE = typeof UNIT_TYPE[keyof typeof UNIT_TYPE];
+type UnitType = typeof UNIT_TYPE[keyof typeof UNIT_TYPE];
 
 interface Props {
     loading: boolean;
     title: string;
-    currencySymbol: CURRENCY_SYMBOL;
-    unitType: UNIT_TYPE;
+    currencySymbol: CurrencySymbol;
+    unitType: UnitType;
     value?: number|string;
     showDivider: boolean;
     description: string;
@@ -78,16 +77,16 @@ export default defineComponent<Props>({
             default: '',
         },
         currencySymbol: {
-            type: String as PropType<CURRENCY_SYMBOL>,
+            type: String as PropType<CurrencySymbol>,
             default: CURRENCY_SYMBOL.USD,
-            validator(value: CURRENCY_SYMBOL) {
+            validator(value: CurrencySymbol) {
                 return Object.values(CURRENCY_SYMBOL).includes(value);
             },
         },
         unitType: {
-            type: String as PropType<UNIT_TYPE>,
+            type: String as PropType<UnitType>,
             default: UNIT_TYPE.CURRENCY,
-            validator(value: UNIT_TYPE) {
+            validator(value: UnitType) {
                 return Object.values(UNIT_TYPE).includes(value);
             },
         },

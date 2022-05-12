@@ -73,12 +73,6 @@ interface Data {
 }
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
 
-interface RegionData {
-    provider: string;
-    region_code: string;
-    region_id: string;
-}
-
 export default {
     name: 'ProjectRegionService',
     components: {

@@ -78,7 +78,7 @@ import { i18n } from '@/translations';
 import { CostQuerySetModel, CostQuerySetOption } from '@/services/cost-explorer/type';
 import { store } from '@/store';
 import { TranslateResult } from 'vue-i18n';
-import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
+import { REQUEST_TYPE, RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { SaveQueryEmitParam } from '@/services/cost-explorer/cost-analysis/CostAnalysisPage.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -147,7 +147,7 @@ export default {
             visible: false,
             title: '' as string | TranslateResult,
             selectedQuery: {},
-            requestType: REQUEST_TYPE.SAVE as REQUEST_TYPE,
+            requestType: REQUEST_TYPE.SAVE as RequestType,
         });
 
         const checkDeleteState = reactive({

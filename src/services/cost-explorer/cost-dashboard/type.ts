@@ -1,13 +1,14 @@
 import { Tags, TimeStamp } from '@/models';
-import { CostQueryFilters, Period } from '@/services/cost-explorer/type';
-import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
+import {
+    CostQueryFilters, Period, Granularity, GroupBy,
+} from '@/services/cost-explorer/type';
 
 const DASHBOARD_SCOPE = {
     PRIVATE: 'PRIVATE',
     PUBLIC: 'PUBLIC',
 } as const;
 
-export type DASHBOARD_SCOPE = typeof DASHBOARD_SCOPE[keyof typeof DASHBOARD_SCOPE];
+export type DashboardScope = typeof DASHBOARD_SCOPE[keyof typeof DASHBOARD_SCOPE];
 
 interface DefaultFilter {
     projects?: string[];
@@ -15,6 +16,41 @@ interface DefaultFilter {
     service_accounts?: string[];
     provider?: string[];
 }
+
+
+export const CHART_TYPE = Object.freeze({
+    CARD: 'CARD',
+    TREEMAP: 'TREEMAP',
+    MAP: 'MAP',
+    LINE: 'LINE',
+    STACKED_COLUMN: 'STACKED_COLUMN',
+    DONUT: 'DONUT',
+    PIE: 'PIE',
+    WAFFLE: 'WAFFLE',
+    TABLE: 'TABLE',
+} as const);
+export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
+
+export interface WidgetOptions {
+    stack?: boolean;
+    granularity?: Granularity;
+    filters?: CostQueryFilters;
+    period?: Period;
+    group_by?: string | GroupBy;
+    chart_type?: ChartType;
+    chart_img?: string;
+    chart_desc_translation_id?: string;
+    layout: number;
+}
+
+export interface WidgetInfo {
+    widget_id: string;
+    name?: string;
+    options: WidgetOptions;
+}
+
+export type CustomLayout = WidgetInfo[];
+
 export interface DashboardItem {
     created_at: TimeStamp;
     updated_at: TimeStamp;
@@ -23,7 +59,7 @@ export interface DashboardItem {
     default_layout_id: string;
     domain_id?: string;
     name: string;
-    scope: DASHBOARD_SCOPE;
+    scope: DashboardScope;
     tags: Tags;
     user_id: string;
     period_type: string;
@@ -42,50 +78,16 @@ export type DashboardInfo = PublicDashboardInfo | UserDashboardInfo;
 
 export type DashboardMenuItem = Partial<DashboardInfo> & { label: string; routeName: string};
 
-
-export const CHART_TYPE = Object.freeze({
-    CARD: 'CARD',
-    TREEMAP: 'TREEMAP',
-    MAP: 'MAP',
-    LINE: 'LINE',
-    STACKED_COLUMN: 'STACKED_COLUMN',
-    DONUT: 'DONUT',
-    PIE: 'PIE',
-    WAFFLE: 'WAFFLE',
-    TABLE: 'TABLE',
-} as const);
-export type CHART_TYPE = typeof CHART_TYPE[keyof typeof CHART_TYPE];
-
-export interface WidgetOptions {
-    stack?: boolean;
-    granularity?: GRANULARITY;
-    filters?: CostQueryFilters;
-    period?: Period;
-    group_by?: string | GROUP_BY;
-    chart_type?: CHART_TYPE;
-    chart_img?: string;
-    chart_desc_translation_id?: string;
-    layout: number;
-}
-
 export const EDITABLE_WIDGET_OPTIONS = Object.freeze({
     GRANULARITY: 'granularity',
     GROUP_BY: 'group_by',
 } as const);
 export type EDITABLE_WIDGET_OPTIONS_TYPE = typeof EDITABLE_WIDGET_OPTIONS[keyof typeof EDITABLE_WIDGET_OPTIONS];
 
-export interface WidgetInfo {
-    widget_id: string;
-    name?: string;
-    options: WidgetOptions;
-}
-
 export interface DefaultLayout {
     name: string;
     widgetList: any;
 }
-
-export type CustomLayout = WidgetInfo[];
 
 export const PERIOD_TYPE = Object.freeze({
     AUTO: 'AUTO',

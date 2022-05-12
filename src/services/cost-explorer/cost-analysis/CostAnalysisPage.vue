@@ -19,7 +19,7 @@ import CostAnalysisGroupByFilter from '@/services/cost-explorer/cost-analysis/mo
 import CostAnalysisDataTable from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisDataTable.vue';
 
 import {
-    REQUEST_TYPE,
+    RequestType,
 } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { SpaceRouter } from '@/router';
 import {
@@ -32,14 +32,13 @@ import {
 } from '@/lib/router-query-string';
 import CostAnalysisHeader from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisHeader.vue';
 import { CostAnalysisPageUrlQuery } from '@/services/cost-explorer/cost-analysis/type';
-import { CostQuerySetModel, CostQuerySetOption } from '@/services/cost-explorer/type';
+import { CostQuerySetModel, CostQuerySetOption, GroupBy } from '@/services/cost-explorer/type';
 import { Location } from 'vue-router';
-import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
 export interface SaveQueryEmitParam {
     updatedQuery: CostQuerySetModel;
-    requestType: REQUEST_TYPE;
+    requestType: RequestType;
 }
 
 export default {
@@ -77,7 +76,7 @@ export default {
             granularity: queryStringToString(urlQuery.granularity),
             stack: queryStringToBoolean(urlQuery.stack),
             group_by: queryStringToArray(urlQuery.groupBy),
-            primary_group_by: queryStringToString(urlQuery.primaryGroupBy) as GROUP_BY,
+            primary_group_by: queryStringToString(urlQuery.primaryGroupBy) as GroupBy,
             period: queryStringToObject(urlQuery.period),
             filters: queryStringToObject(urlQuery.filters),
         });

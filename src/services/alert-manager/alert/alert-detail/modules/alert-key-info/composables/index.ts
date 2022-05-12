@@ -3,7 +3,7 @@ import {
 } from '@vue/composition-api';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
-import { EDIT_MODE } from '@/services/alert-manager/lib/config';
+import { EDIT_MODE, EditMode } from '@/services/alert-manager/lib/config';
 import { cloneDeep } from 'lodash';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { alertManagerStore } from '@/services/alert-manager/store';
@@ -44,14 +44,14 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
         }
     };
 
-    const getMessage = (editMode: EDIT_MODE, isSuccessful: boolean) => {
+    const getMessage = (editMode: EditMode, isSuccessful: boolean) => {
         if (isSuccessful) {
             return editMode === EDIT_MODE.DESCRIPTION ? i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_S_UPDATE_DESCRIPTION') : i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_S_UPDATE_PROJECT');
         }
         return editMode === EDIT_MODE.PROJECT ? i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_E_UPDATE_DESCRIPTION') : i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_E_UPDATE_PROJECT');
     };
 
-    const getParams = (editMode: EDIT_MODE) => {
+    const getParams = (editMode: EditMode) => {
         const param = {} as ParamType;
 
         if (editMode === EDIT_MODE.DESCRIPTION) {
@@ -61,7 +61,7 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
         } else if (editMode === EDIT_MODE.PROJECT) param.project_id = state.dataForUpdate;
         return param;
     };
-    const updateAlert = async (editMode: EDIT_MODE) => {
+    const updateAlert = async (editMode: EditMode) => {
         try {
             await alertManagerStore.dispatch('alert/updateAlertData', {
                 updateParams: getParams(editMode),
@@ -74,7 +74,7 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
         }
     };
 
-    const onClickSave = async (editMode: EDIT_MODE) => {
+    const onClickSave = async (editMode: EditMode) => {
         await updateAlert(editMode);
     };
 

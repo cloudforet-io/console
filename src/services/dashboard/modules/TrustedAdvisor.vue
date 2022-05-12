@@ -134,12 +134,7 @@ interface OverallData {
     status: keyof typeof STATUS;
     count: number;
 }
-interface LegendData {
-    name: string;
-    label: string;
-    color: string;
-    count: number;
-}
+
 interface ProjectSummaryData {
     projectId: string;
     projectName: string;

@@ -97,7 +97,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { User, USER_TYPE } from '@/services/administration/iam/user/type';
+import { User, USER_TYPE, UserType } from '@/services/administration/iam/user/type';
 import { store } from '@/store';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { userSearchHandlers } from '@/services/administration/iam/user/lib/config';
@@ -227,7 +227,7 @@ export default {
         });
 
         const getArrayWithNotDuplicatedItem = array => [...new Set(array)];
-        const getUserType = (userType: USER_TYPE) => {
+        const getUserType = (userType: UserType) => {
             let formattedUserType;
             if (userType === USER_TYPE.API_USER) formattedUserType = 'Console, API';
             else formattedUserType = 'User';

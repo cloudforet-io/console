@@ -82,7 +82,9 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { durationFormatter, iso8601Formatter } from '@spaceone/console-core-lib';
 
-import { ALERT_ACTION, ALERT_URGENCY, ALERT_STATE } from '@/services/alert-manager/lib/config';
+import {
+    ALERT_ACTION, ALERT_URGENCY, ALERT_STATE, AlertAction,
+} from '@/services/alert-manager/lib/config';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
 import AlertAcknowledgeModal from '@/services/alert-manager/alert/modules/AlertAcknowledgeModal.vue';
 import AlertResolveModal from '@/services/alert-manager/alert/modules/AlertResolveModal.vue';
@@ -190,7 +192,7 @@ export default {
             }
         };
 
-        const onSelectAction = async (type: ALERT_ACTION) => {
+        const onSelectAction = async (type: AlertAction) => {
             if (type === ALERT_ACTION.acknowledge) {
                 state.visibleAcknowledgeModal = true;
             } else if (type === ALERT_ACTION.resolve) {

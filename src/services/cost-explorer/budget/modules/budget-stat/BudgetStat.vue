@@ -62,17 +62,17 @@ interface Props {
     printMode?: boolean;
 }
 
-interface Card {
-    title: TranslateResult;
-    data: number;
-    unit: UNIT;
-}
-
 const UNIT = Object.freeze({
     currency: 'currency',
     percent: 'percent',
 } as const);
-type UNIT = typeof UNIT[keyof typeof UNIT]
+type Unit = typeof UNIT[keyof typeof UNIT]
+
+interface Card {
+    title: TranslateResult;
+    data: number;
+    unit: Unit;
+}
 
 export default {
     name: 'BudgetStat',

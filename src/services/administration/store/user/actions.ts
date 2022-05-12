@@ -1,5 +1,5 @@
 import { Action } from 'vuex';
-import { MODAL_TYPE, UserStoreState } from '@/services/administration/store/user/type';
+import { MODAL_TYPE, ModalType, UserStoreState } from '@/services/administration/store/user/type';
 
 export const selectIndex: Action<UserStoreState, any> = ({ commit }, selectedIndex: number[]): void => {
     commit('setSelectedIndex', selectedIndex);
@@ -9,7 +9,7 @@ export const selectUsers: Action<UserStoreState, any> = ({ commit }, selectedUse
     commit('setSelectedUsers', selectedUsers);
 };
 
-export const showModal: Action<UserStoreState, any> = ({ commit }, modalType: MODAL_TYPE): void => {
+export const showModal: Action<UserStoreState, any> = ({ commit }, modalType: ModalType): void => {
     if (modalType === MODAL_TYPE.MANAGEMENT) commit('setVisibleManagementModal', true);
     else if (modalType === MODAL_TYPE.CREATE) commit('setVisibleCreateModal', true);
     else if (modalType === MODAL_TYPE.UPDATE) commit('setVisibleUpdateModal', true);

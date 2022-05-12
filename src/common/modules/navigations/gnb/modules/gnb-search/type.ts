@@ -1,7 +1,7 @@
-import { SUGGESTION_TYPE, SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 
 export interface DropdownItem {
-    itemType: SUGGESTION_TYPE;
+    itemType: SuggestionType;
     totalCount: number;
     suggestionItems: SuggestionItem[];
 }

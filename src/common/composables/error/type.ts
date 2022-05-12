@@ -5,5 +5,3 @@ export const CONSOLE_ERROR_CODE = {
     AUTHENTICATION_ERROR: 'AuthenticationError',
     AUTHORIZATION_ERROR: 'AuthorizationError',
 } as const;
-
-export type CONSOLE_ERROR_CODE = typeof CONSOLE_ERROR_CODE[keyof typeof CONSOLE_ERROR_CODE];

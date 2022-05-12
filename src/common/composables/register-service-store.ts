@@ -4,7 +4,7 @@ import { Module } from 'vuex';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 type Path = string[]|string;
-type AfterRegisterFunc = (...args: any[]) => void
+// type AfterRegisterFunc = (...args: any[]) => void
 
 const getPathList = (path: Path): string[] => {
     if (typeof path === 'string') {

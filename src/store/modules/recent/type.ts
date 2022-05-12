@@ -4,14 +4,13 @@ export const RECENT_TYPE = Object.freeze({
     PROJECT: 'PROJECT',
     PROJECT_GROUP: 'PROJECT_GROUP',
 } as const);
-export type RECENT_TYPE = typeof RECENT_TYPE[keyof typeof RECENT_TYPE]
+export type RecentType = typeof RECENT_TYPE[keyof typeof RECENT_TYPE]
 
 export interface RecentConfig {
-    itemType: RECENT_TYPE;
+    itemType: RecentType;
     itemId: string;
     updatedAt?: string;
 }
-
 
 export interface RecentItem extends RecentConfig {
     name?: string;

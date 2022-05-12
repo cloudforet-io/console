@@ -120,7 +120,7 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import {
-    CLOUD_SERVICE_LABEL, DATE_TYPE, SERVICE_CATEGORY, SERVICE_CATEGORY_TYPE,
+    CLOUD_SERVICE_LABEL, DATE_TYPE, SERVICE_CATEGORY,
 } from '@/services/project/project-detail/project-summary/modules/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray, primary1, primary2 } from '@/styles/colors';
@@ -132,10 +132,6 @@ import config from '@/lib/config';
 interface ChartData {
     date: string;
     count: number;
-}
-interface Data {
-    type: SERVICE_CATEGORY_TYPE;
-    label: TranslateResult;
 }
 interface SummaryData {
     type: string;

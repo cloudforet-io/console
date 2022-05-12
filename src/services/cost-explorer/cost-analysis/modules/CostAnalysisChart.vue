@@ -141,9 +141,9 @@ import {
     Legend, PieChartData, XYChartData,
 } from '@/services/cost-explorer/widgets/type';
 import {
-    FILTER_ITEM_MAP, GRANULARITY, GROUP_BY,
+    FILTER_ITEM_MAP, GRANULARITY,
 } from '@/services/cost-explorer/lib/config';
-import { Period } from '@/services/cost-explorer/type';
+import { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
 import {
     getLegends,
     getPieChartData,
@@ -250,7 +250,7 @@ export default {
                 return [];
             }
         };
-        const setChartData = debounce(async (granularity: GRANULARITY, period: Period, groupBy?: GROUP_BY) => {
+        const setChartData = debounce(async (granularity: Granularity, period: Period, groupBy?: GroupBy) => {
             state.loading = true;
 
             const rawData = await listCostAnalysisData();

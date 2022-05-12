@@ -77,7 +77,7 @@ import {
     CostAnalyzeModel,
     Legend, PieChartData, WidgetProps, XYChartData,
 } from '@/services/cost-explorer/widgets/type';
-import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import {
@@ -86,7 +86,9 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { CostQuerySetOption, Period } from '@/services/cost-explorer/type';
+import {
+    CostQuerySetOption, Period, Granularity, GroupBy,
+} from '@/services/cost-explorer/type';
 import {
     getLegends,
     getPieChartData,
@@ -192,7 +194,7 @@ export default {
         });
 
         /* Util */
-        const getFields = (granularity: GRANULARITY, period: Period, groupBy?: GROUP_BY) => {
+        const getFields = (granularity: Granularity, period: Period, groupBy?: GroupBy) => {
             let groupByFields: DataTableFieldType[] = [];
             if (groupBy) groupByFields = [GROUP_BY_ITEM_MAP[groupBy]];
             const costFields: DataTableFieldType[] = getDataTableCostFields(granularity, period, !!groupBy);
@@ -221,7 +223,7 @@ export default {
                 tableState.loading = false;
             }
         };
-        const setChartData = async (granularity: GRANULARITY, period: Period, groupBy?: GROUP_BY) => {
+        const setChartData = async (granularity: Granularity, period: Period, groupBy?: GroupBy) => {
             state.loading = true;
 
             const rawData = await listCostAnalysisData();
@@ -243,8 +245,8 @@ export default {
         /* Init */
         const refreshAll = (options, period) => {
             if (!options || !options?.granularity) return;
-            setChartData(options.granularity, period, options.group_by as GROUP_BY);
-            tableState.fields = getFields(options.granularity, period, options.group_by as GROUP_BY);
+            setChartData(options.granularity, period, options.group_by as GroupBy);
+            tableState.fields = getFields(options.granularity, period, options.group_by as GroupBy);
         };
 
         watch([() => props.options, () => state.convertedPeriod], (after, before) => {

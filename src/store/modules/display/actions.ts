@@ -1,6 +1,8 @@
 import { Action, Dispatch } from 'vuex';
 import dayjs from 'dayjs';
-import { CURRENCY, DEFAULT_CURRENCY_RATES, SIDEBAR_TYPE } from '@/store/modules/display/config';
+import {
+    CURRENCY, DEFAULT_CURRENCY_RATES, SIDEBAR_TYPE, Currency,
+} from '@/store/modules/display/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { CurrencyRates, DisplayState } from '@/store/modules/display/type';
@@ -133,7 +135,7 @@ export const startCheckNotification: Action<DisplayState, any> = ({ dispatch }):
 };
 
 type ExchangeRateData = {
-    currency: CURRENCY;
+    currency: Currency;
     rate: number;
     is_default: boolean;
     state: string;

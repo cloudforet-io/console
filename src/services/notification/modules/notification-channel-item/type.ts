@@ -6,7 +6,7 @@ export const EDIT_TYPE = {
     LEVEL: 'notification_level',
     USERS: 'users',
 } as const;
-export type EDIT_TYPE = typeof EDIT_TYPE[keyof typeof EDIT_TYPE];
+// export type EditType = typeof EDIT_TYPE[keyof typeof EDIT_TYPE];
 
 export const PARAM_KEY_TYPE = {
     NAME: 'name',
@@ -15,7 +15,7 @@ export const PARAM_KEY_TYPE = {
     LEVEL: 'notification_level',
     USERS: 'users',
 } as const;
-export type PARAM_KEY_TYPE = typeof PARAM_KEY_TYPE[keyof typeof PARAM_KEY_TYPE];
+// export type ParamKeyType = typeof PARAM_KEY_TYPE[keyof typeof PARAM_KEY_TYPE];
 
 export interface ParamType {
     user_channel_id?: string;
@@ -31,4 +31,4 @@ export const PROTOCOL_TYPE = {
     SLACK: 'Slack',
     VOICE_CALL: 'Voice Call',
 } as const;
-export type PROTOCOL_TYPE = typeof PROTOCOL_TYPE[keyof typeof PROTOCOL_TYPE];
+// export type ProtocolType = typeof PROTOCOL_TYPE[keyof typeof PROTOCOL_TYPE];

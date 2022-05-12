@@ -93,6 +93,14 @@ enum COLLECTOR_STATE {
     disabled = 'DISABLED'
 }
 
+interface FilterFormat {
+    name: string;
+    type: string;
+    change_key: string[];
+    resource_type: string;
+    object_key?: string;
+}
+
 interface PluginOptions {
     supported_resource_type: string[];
     filter_format: FilterFormat[];
@@ -106,14 +114,6 @@ interface CollectorPluginModel {
     secret_id?: string;
     secret_group_id?: string;
     provider?: string;
-}
-
-interface FilterFormat {
-    name: string;
-    type: string;
-    change_key: string[];
-    resource_type: string;
-    object_key?: string;
 }
 
 interface CollectorModel {

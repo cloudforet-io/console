@@ -206,12 +206,6 @@ const DEFAULT_PAGE_SIZE = 15;
 const STORAGE_PREFIX = 'inventory/cloudService';
 const TABLE_MIN_HEIGHT = 400;
 
-type SidebarItemType = {
-    id?: string;
-    name: string;
-    type?: string;
-}
-
 export default {
     name: 'CloudServiceDetailPage',
     components: {

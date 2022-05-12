@@ -1,11 +1,8 @@
 import { Tags, TimeStamp } from '@/models';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import {
-    ALERT_SEVERITY, ALERT_STATE,
-    ALERT_STATE_FILTER, ALERT_URGENCY,
-    ASSIGNED_STATE,
-    FINISH_CONDITION,
-    SCOPE,
+    FINISH_CONDITION, SCOPE,
+    AlertState, AlertUrgency, AlertSeverity, AlertStateFilter, AssignedState,
 } from '@/services/alert-manager/lib/config';
 import { RouteQueryString } from '@/lib/router-query-string';
 
@@ -41,12 +38,12 @@ export interface AlertDataModel {
     alert_number: number;
     alert_id: string;
     title: string;
-    state: ALERT_STATE;
+    state: AlertState;
     status_message: string;
     description: string;
     assignee: string;
-    urgency: ALERT_URGENCY;
-    severity: ALERT_SEVERITY;
+    urgency: AlertUrgency;
+    severity: AlertSeverity;
     is_snoozed: true;
     snoozed_end_time: TimeStamp;
     escalation_step: number;
@@ -84,9 +81,9 @@ export interface Event {
 }
 
 export interface AlertBottomFilters {
-    state: ALERT_STATE_FILTER;
-    urgency: ALERT_URGENCY;
-    assigned: ASSIGNED_STATE;
+    state: AlertStateFilter;
+    urgency: AlertUrgency;
+    assigned: AssignedState;
 }
 
 export interface AlertListTableFilters extends AlertBottomFilters {
@@ -95,7 +92,7 @@ export interface AlertListTableFilters extends AlertBottomFilters {
 
 export interface AlertStateUpdateParams {
     alerts: string[];
-    state: ALERT_STATE;
+    state: AlertState;
     assignee?: string;
     note?: string;
 }

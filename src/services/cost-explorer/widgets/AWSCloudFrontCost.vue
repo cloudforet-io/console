@@ -64,12 +64,12 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { i18n } from '@/translations';
 
-interface Data {
-    project_id: string;
-    usage_quantity: number;
-    usage_type: 'data-transfer.out'|'requests.http'|'requests.https';
-    usd_cost: number;
-}
+// interface Data {
+//     project_id: string;
+//     usage_quantity: number;
+//     usage_type: 'data-transfer.out'|'requests.http'|'requests.https';
+//     usd_cost: number;
+// }
 
 interface TableItem {
     usd_cost: number;

@@ -132,7 +132,7 @@ const EDIT_MODE = Object.freeze({
     CREATE: 'CREATE',
     UPDATE: 'UPDATE',
 });
-type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];
+type EditMode = typeof EDIT_MODE[keyof typeof EDIT_MODE];
 
 export default {
     name: 'ProjectAlertEventRulePage',
@@ -161,7 +161,7 @@ export default {
             cardData: [],
             orderedCardData: computed(() => state.cardData.sort((a, b) => a.order - b.order)),
             isEditMode: false,
-            mode: undefined as undefined | EDIT_MODE,
+            mode: undefined as undefined | EditMode,
             selectedOrder: undefined,
         });
         const routeState = reactive({

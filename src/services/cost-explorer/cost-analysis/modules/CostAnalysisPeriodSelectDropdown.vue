@@ -31,7 +31,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 
 import CostManagementCustomRangeModal from '@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue';
 
-import { Period } from '@/services/cost-explorer/type';
+import { Period, Granularity } from '@/services/cost-explorer/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { i18n } from '@/translations';
@@ -46,7 +46,7 @@ interface PeriodItem {
     label: TranslateResult;
     start: Dayjs;
     end: Dayjs;
-    enabled: GRANULARITY[];
+    enabled: Granularity[];
 }
 
 export default {

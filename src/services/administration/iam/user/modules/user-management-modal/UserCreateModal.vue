@@ -171,7 +171,6 @@ import { debounce } from 'lodash';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { MODAL_TYPE } from '@/services/administration/store/user/type';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import { administrationStore } from '@/services/administration/store';
 
@@ -523,7 +522,6 @@ export default {
             onSelectExternalUser,
             onDeleteSelectedExternalUser,
             onSearchExternalUser,
-            MODAL_TYPE,
         };
     },
 };

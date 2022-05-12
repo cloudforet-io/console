@@ -71,22 +71,23 @@ import { AlertDataModel } from '@/services/alert-manager/type';
 import AlertReassignModal from '@/services/alert-manager/alert/alert-detail/modules/alert-summary/modules/AlertReassignModal.vue';
 import dayjs from 'dayjs';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { ALERT_STATE, ALERT_URGENCY } from '@/services/alert-manager/lib/config';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import {
+    ALERT_STATE, ALERT_URGENCY, AlertState, AlertUrgency,
+} from '@/services/alert-manager/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { alertManagerStore } from '@/services/alert-manager/store';
 
 
-interface HeaderState {
-    alertState: ALERT_STATE;
-    alertUrgency: ALERT_URGENCY;
-    reassignModalVisible: boolean;
-    duration: string;
-    alertStateList: MenuItem[];
-    alertUrgencyList: MenuItem[];
-}
+// interface HeaderState {
+//     alertState: ALERT_STATE;
+//     alertUrgency: ALERT_URGENCY;
+//     reassignModalVisible: boolean;
+//     duration: string;
+//     alertStateList: MenuItem[];
+//     alertUrgencyList: MenuItem[];
+// }
 
 interface PropsType {
     id: string;
@@ -146,7 +147,7 @@ export default {
             state.reassignModalVisible = true;
         };
 
-        const changeAlertState = async (alertState: ALERT_STATE) => {
+        const changeAlertState = async (alertState: AlertState) => {
             try {
                 await alertManagerStore.dispatch('alert/updateAlertData', {
                     updateParams: {
@@ -160,7 +161,7 @@ export default {
             }
         };
 
-        const changeAlertUrgency = async (alertUrgency: ALERT_URGENCY) => {
+        const changeAlertUrgency = async (alertUrgency: AlertUrgency) => {
             try {
                 await alertManagerStore.dispatch('alert/updateAlertData', {
                     updateParams: {

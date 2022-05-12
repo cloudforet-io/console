@@ -160,13 +160,6 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { Period } from '@/services/cost-explorer/type';
 
 
-interface ProjectItemResp {
-    id: string;
-    name: string;
-    has_child: boolean;
-    item_type: 'PROJECT_GROUP' | 'PROJECT';
-}
-
 const DEFAULT_PAGE_SIZE = 15;
 const STORAGE_PREFIX = 'inventory/server';
 

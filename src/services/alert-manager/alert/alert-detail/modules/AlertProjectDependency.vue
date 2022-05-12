@@ -27,14 +27,12 @@ import {
     PAnchor, PEmpty, PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
 import { AlertDataModel } from '@/services/alert-manager/type';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, PropType, reactive, toRefs,
+} from '@vue/composition-api';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 
-interface PropsType {
-    id: string;
-    alertData: AlertDataModel;
-}
 
 export default {
     name: 'AlertProjectDependency',
@@ -51,7 +49,7 @@ export default {
         },
         alertData: {
             type: Object,
-            default: () => ({}),
+            default: () => ({}) as PropType<AlertDataModel>,
         },
     },
     setup(props) {

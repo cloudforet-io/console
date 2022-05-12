@@ -31,7 +31,7 @@ import config from '@/lib/config';
 import { gray, violet } from '@/styles/colors';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL, Currency } from '@/store/modules/display/config';
 import { WidgetProps, XYChartData } from '@/services/cost-explorer/widgets/type';
 import { getXYChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -64,7 +64,7 @@ export default defineComponent<WidgetProps>({
         currency: {
             type: String,
             default: CURRENCY.USD,
-            validator(value: CURRENCY) {
+            validator(value: Currency) {
                 return Object.values(CURRENCY).includes(value);
             },
         },

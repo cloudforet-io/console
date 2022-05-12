@@ -62,7 +62,7 @@ import {
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 import { PDataLoader, PDivider } from '@spaceone/design-system';
 import {
-    SuggestionItem, SUGGESTION_TYPE,
+    SuggestionItem, SUGGESTION_TYPE, SuggestionType,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import {
     DropdownItem, FocusingDirection,
@@ -142,7 +142,7 @@ export default defineComponent<Props>({
             }),
             // focus
             proxyFocusingDirection: useProxyValue('focusingDirection', props, emit),
-            focusingType: SUGGESTION_TYPE.MENU as SUGGESTION_TYPE,
+            focusingType: SUGGESTION_TYPE.MENU as SuggestionType,
         });
 
         /* Event */
@@ -151,7 +151,7 @@ export default defineComponent<Props>({
             if (item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE && state.menuSuggestionItems.length) itemIndex -= 1; // extract divider
             emit('select', itemIndex, item.itemType);
         };
-        const handleFocusEnd = (type: SUGGESTION_TYPE, direction: FocusingDirection) => {
+        const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
             if (type === SUGGESTION_TYPE.MENU) {
                 if (direction === 'DOWNWARD' && state.cloudServiceSuggestionItems.length) {
                     state.proxyFocusingDirection = direction;

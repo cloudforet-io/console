@@ -4,7 +4,6 @@ export const GRANULARITY = Object.freeze({
     MONTHLY: 'MONTHLY',
     YEARLY: 'YEARLY',
 });
-export type GRANULARITY = typeof GRANULARITY[keyof typeof GRANULARITY];
 
 export const GROUP_BY = Object.freeze({
     PROJECT_GROUP: 'project_group_id',
@@ -18,7 +17,6 @@ export const GROUP_BY = Object.freeze({
     TYPE: 'usage_type',
     ACCOUNT: 'account',
 } as const);
-export type GROUP_BY = typeof GROUP_BY[keyof typeof GROUP_BY];
 
 export const GRANULARITY_ITEM_MAP = Object.freeze({
     [GRANULARITY.ACCUMULATED]: { name: GRANULARITY.ACCUMULATED, label: 'Accumulated' },
@@ -43,7 +41,6 @@ export const GROUP_BY_ITEM_MAP = Object.freeze({
 export const FILTER = Object.freeze({
     ...GROUP_BY,
 } as const);
-export type FILTER = typeof FILTER[keyof typeof FILTER];
 
 export const FILTER_ITEM_MAP = Object.freeze({
     ...GROUP_BY_ITEM_MAP,

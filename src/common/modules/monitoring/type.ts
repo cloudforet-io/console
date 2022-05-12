@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import { STATISTICS_TYPE } from '@/common/modules/monitoring/config';
+
 export interface Metric {
     key: string;
     name: string;
@@ -23,4 +25,28 @@ export interface MonitoringProps {
     selectedMetrics?: Metric[];
     dataSourceId?: string;
     responsive?: boolean;
+}
+
+export type StatisticsType = typeof STATISTICS_TYPE[keyof typeof STATISTICS_TYPE]
+
+export interface MetricChartData {
+    loading: boolean;
+    labels: string[];
+    dataset: {[resourceKey: string]: number[]};
+    metric: Metric;
+    error?: boolean;
+    resources: any[];
+}
+
+export interface AvailableResource {
+    id: string;
+    name: string;
+    color: string;
+    link: string;
+}
+
+export interface StatItem {
+    type: string;
+    label: string;
+    name: string;
 }

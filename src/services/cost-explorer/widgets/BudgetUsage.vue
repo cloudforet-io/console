@@ -40,7 +40,7 @@ import {
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY, Currency } from '@/store/modules/display/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import dayjs from 'dayjs';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -77,7 +77,7 @@ export default {
         currency: {
             type: String,
             default: CURRENCY.USD,
-            validator(value: CURRENCY) {
+            validator(value: Currency) {
                 return Object.values(CURRENCY).includes(value);
             },
         },

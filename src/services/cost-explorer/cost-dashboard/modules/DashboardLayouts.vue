@@ -83,12 +83,6 @@ import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { i18n } from '@/translations';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
-type Row = string[]
-
-interface Props {
-    layout: Row[];
-    printMode?: boolean;
-}
 
 export default {
     name: 'DashboardLayouts',

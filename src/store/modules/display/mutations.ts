@@ -1,12 +1,12 @@
 import { Mutation } from 'vuex';
-import { CURRENCY, SIDEBAR_TYPE } from '@/store/modules/display/config';
+import { Currency, SidebarType } from '@/store/modules/display/config';
 import { CurrencyRates, DisplayState } from './type';
 
 export const setVisibleSidebar: Mutation<DisplayState> = (state, visible: boolean): void => {
     state.visibleSidebar = visible;
 };
 
-export const setSidebarType: Mutation<DisplayState> = (state, type: SIDEBAR_TYPE): void => {
+export const setSidebarType: Mutation<DisplayState> = (state, type: SidebarType): void => {
     state.sidebarType = type;
 };
 
@@ -26,7 +26,7 @@ export const setIsSignInFailed: Mutation<DisplayState> = (state, isSignInFailed:
     state.isSignInFailed = isSignInFailed;
 };
 
-export const setCurrency: Mutation<DisplayState> = (state, currency: CURRENCY): void => {
+export const setCurrency: Mutation<DisplayState> = (state, currency: Currency): void => {
     state.currency = currency;
 };
 

@@ -4,4 +4,4 @@ export const SIZE = Object.freeze({
     lg: 'lg',
 } as const);
 
-export type SIZE = typeof SIZE[keyof typeof SIZE];
+export type Size = typeof SIZE[keyof typeof SIZE];

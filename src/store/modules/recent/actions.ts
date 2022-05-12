@@ -1,10 +1,12 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { RECENT_TYPE, RecentConfig, RecentState } from '@/store/modules/recent/type';
+import {
+    RECENT_TYPE, RecentConfig, RecentState, RecentType,
+} from '@/store/modules/recent/type';
 import { Action } from 'vuex';
 
 
-const createRecent = async (itemType: RECENT_TYPE, itemId: string) => {
+const createRecent = async (itemType: RecentType, itemId: string) => {
     try {
         await SpaceConnector.client.addOns.recent.visit.create({
             type: itemType,
@@ -29,7 +31,7 @@ export const addItem: Action<RecentState, any> = async ({ commit }, recent: Rece
 };
 
 interface RecentLoadPayload {
-    itemType: RECENT_TYPE;
+    itemType: RecentType;
     limit?: number;
 }
 const setCommitsByItemType = {

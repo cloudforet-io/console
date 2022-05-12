@@ -56,7 +56,7 @@ import {
 } from '@vue/composition-api';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL, Currency } from '@/store/modules/display/config';
 import { WidgetProps } from '@/services/cost-explorer/widgets/type';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -88,7 +88,7 @@ export default defineComponent<WidgetProps>({
         currency: {
             type: String,
             default: CURRENCY.USD,
-            validator(value: CURRENCY) {
+            validator(value: Currency) {
                 return Object.values(CURRENCY).includes(value);
             },
         },

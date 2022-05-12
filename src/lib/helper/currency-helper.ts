@@ -1,5 +1,5 @@
 import { convert as cashifyConvert } from 'cashify';
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY, Currency } from '@/store/modules/display/config';
 import { CurrencyRates } from '@/store/modules/display/type';
 import { NumberFormatOptions } from 'vue-i18n';
 
@@ -11,7 +11,7 @@ import { NumberFormatOptions } from 'vue-i18n';
  * @param rates
  * @description Converts US Dollars to a given currency based on a given exchange rate.
  */
-export const convertUSDToCurrency = (money: number, currency: CURRENCY, rates: CurrencyRates): number => cashifyConvert(money, {
+export const convertUSDToCurrency = (money: number, currency: Currency, rates: CurrencyRates): number => cashifyConvert(money, {
     base: CURRENCY.USD,
     rates,
     from: CURRENCY.USD,
@@ -21,12 +21,12 @@ export const convertUSDToCurrency = (money: number, currency: CURRENCY, rates: C
 /*
   IANA Language Subtag Registry: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
  */
-const currencyToLocaleMap: Record<CURRENCY, string> = {
+const currencyToLocaleMap: Record<Currency, string> = {
     [CURRENCY.KRW]: 'ko',
     [CURRENCY.JPY]: 'ja',
     [CURRENCY.USD]: 'en',
 };
-const currencyToMinimumFractionDigitsMap: Record<CURRENCY, number> = {
+const currencyToMinimumFractionDigitsMap: Record<Currency, number> = {
     [CURRENCY.KRW]: 0,
     [CURRENCY.JPY]: 0,
     [CURRENCY.USD]: 2,
@@ -46,7 +46,7 @@ const currencyToMinimumFractionDigitsMap: Record<CURRENCY, number> = {
  */
 export const currencyMoneyFormatter = (
     value?: number,
-    currency: CURRENCY = CURRENCY.USD,
+    currency: Currency = CURRENCY.USD,
     rates?: CurrencyRates,
     disableSymbol = false,
     transitionValue = 10000,

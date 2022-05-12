@@ -25,6 +25,7 @@ import {
 
 import { CURRENCY } from '@/store/modules/display/config';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { Granularity } from '@/services/cost-explorer/type';
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import {
     getStackedChartData, getCurrencyAppliedChartData,
@@ -46,7 +47,7 @@ interface Props extends WidgetProps {
     chart: XYChart;
     chartData: XYChartData[];
     legends: Legend[];
-    granularity: GRANULARITY;
+    granularity: Granularity;
     stack: boolean;
 }
 
@@ -80,7 +81,7 @@ export default {
         granularity: {
             type: String,
             default: GRANULARITY.DAILY,
-            validator(value: any) {
+            validator(value: Granularity) {
                 return Object.values(GRANULARITY).includes(value);
             },
         },

@@ -47,13 +47,13 @@ const CHANNEL_TYPE = {
     SLACK: 'Slack',
     SPACEONE_USER: 'SpaceONEUser',
 } as const;
-type CHANNEL_TYPE = typeof CHANNEL_TYPE[keyof typeof CHANNEL_TYPE];
+// type ChannelType = typeof CHANNEL_TYPE[keyof typeof CHANNEL_TYPE];
 
 const PROTOCOL_TYPE = {
     INTERNAL: 'INTERNAL',
     EXTERNAL: 'EXTERNAL',
 } as const;
-type PROTOCOL_TYPE = typeof PROTOCOL_TYPE[keyof typeof PROTOCOL_TYPE];
+// type ProtocolType = typeof PROTOCOL_TYPE[keyof typeof PROTOCOL_TYPE];
 
 export default {
     name: 'AddNotificationData',

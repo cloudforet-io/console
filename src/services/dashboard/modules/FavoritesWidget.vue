@@ -46,7 +46,7 @@ import {
 
 import { PI } from '@spaceone/design-system';
 
-import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
 import { TranslateResult } from 'vue-i18n';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { i18n } from '@/translations';
@@ -96,7 +96,7 @@ export default {
         });
 
         /* Util */
-        const getResourceType = (type: FAVORITE_TYPE) => {
+        const getResourceType = (type: FavoriteType) => {
             if (type === FAVORITE_TYPE.CLOUD_SERVICE) return 'inventory.CloudServiceType';
             if (type === FAVORITE_TYPE.PROJECT) return 'identity.Project';
             if (type === FAVORITE_TYPE.PROJECT_GROUP) return 'identity.ProjectGroup';

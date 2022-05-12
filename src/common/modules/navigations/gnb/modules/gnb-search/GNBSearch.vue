@@ -74,7 +74,7 @@ import { RecentConfig } from '@/store/modules/recent/type';
 import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
 import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchDropdown.vue';
 import {
-    SUGGESTION_TYPE, SuggestionItem,
+    SUGGESTION_TYPE, SuggestionItem, SuggestionType,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -242,7 +242,7 @@ export default defineComponent<Props>({
                 return [];
             }
         };
-        const listSearchRecent = async (type: SUGGESTION_TYPE) => {
+        const listSearchRecent = async (type: SuggestionType) => {
             try {
                 const { results } = await SpaceConnector.client.addOns.recent.search.list({
                     type,
@@ -261,7 +261,7 @@ export default defineComponent<Props>({
                 else if (type === SUGGESTION_TYPE.CLOUD_SERVICE) dataState.recentCloudServices = [];
             }
         };
-        const createSearchRecent = async (type: SUGGESTION_TYPE, id: string) => {
+        const createSearchRecent = async (type: SuggestionType, id: string) => {
             try {
                 await SpaceConnector.client.addOns.recent.search.create({
                     type,
@@ -315,7 +315,7 @@ export default defineComponent<Props>({
             }
         }, 300);
 
-        const handleSelect = (index: number, type: SUGGESTION_TYPE) => {
+        const handleSelect = (index: number, type: SuggestionType) => {
             if (type === 'MENU') {
                 const menuId = state.showRecent ? dataState.recentMenuList[index]?.itemId : dataState.filteredMenuList[index]?.id;
                 if (!menuId) return;

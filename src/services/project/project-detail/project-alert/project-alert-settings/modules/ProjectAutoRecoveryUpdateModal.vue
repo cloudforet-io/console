@@ -39,7 +39,7 @@ const RECOVERY_MODE = Object.freeze({
     MANUAL: 'MANUAL',
     AUTO: 'AUTO',
 });
-type RECOVERY_MODE = typeof RECOVERY_MODE[keyof typeof RECOVERY_MODE];
+type RecoveryMode = typeof RECOVERY_MODE[keyof typeof RECOVERY_MODE];
 
 export default {
     name: 'ProjectAutoRecoveryUpdateModal',
@@ -74,7 +74,7 @@ export default {
                     label: i18n.t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_NO'),
                 },
             ])),
-            recoveryMode: undefined as RECOVERY_MODE | undefined,
+            recoveryMode: undefined as RecoveryMode | undefined,
         });
 
         const onClickConfirm = async () => {

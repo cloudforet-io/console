@@ -51,7 +51,7 @@ import {
 
 import { PI, PIconButton } from '@spaceone/design-system';
 
-import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
 import { FavoriteListProps } from '@/common/modules/favorites/favorite-list/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -84,7 +84,7 @@ export default {
             isExpanded: false,
         });
 
-        const getResourceType = (type: FAVORITE_TYPE) => {
+        const getResourceType = (type: FavoriteType) => {
             if (type === FAVORITE_TYPE.CLOUD_SERVICE) return 'inventory.CloudService';
             if (type === FAVORITE_TYPE.PROJECT) return 'identity.Project';
             if (type === FAVORITE_TYPE.PROJECT_GROUP) return 'identity.ProjectGroup';

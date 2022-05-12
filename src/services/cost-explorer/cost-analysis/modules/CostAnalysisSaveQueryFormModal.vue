@@ -34,7 +34,7 @@ import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 import {
-    REQUEST_TYPE,
+    REQUEST_TYPE, RequestType,
 } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { CostQuerySetModel } from '@/services/cost-explorer/type';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -48,7 +48,7 @@ interface Props {
     visible: boolean;
     headerTitle: string;
     selectedQuery: CostQuerySetModel;
-    requestType: REQUEST_TYPE;
+    requestType: RequestType;
 }
 
 export default {
@@ -74,7 +74,7 @@ export default {
         requestType: {
             type: String,
             default: REQUEST_TYPE.SAVE,
-            validator(type: REQUEST_TYPE) {
+            validator(type: RequestType) {
                 return Object.values(REQUEST_TYPE).includes(type);
             },
         },

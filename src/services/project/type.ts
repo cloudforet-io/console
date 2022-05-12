@@ -1,6 +1,5 @@
 import { TimeStamp } from '@/models';
 import { TreeItem, Tree } from '@spaceone/design-system/dist/src/data-display/tree/type';
-import { MAINTENANCE_WINDOW_STATE } from '@/services/project/project-detail/project-alert/project-maintenance-window/lib/config';
 
 export type ItemType = 'PROJECT_GROUP'|'PROJECT'
 
@@ -49,12 +48,10 @@ export type ProjectTreeRoot = Tree<ProjectItemResp>
 export type ProjectGroupTreeItem = Partial<ProjectTreeItem>
 
 
-export type MAINTENANCE_WINDOW_STATE = typeof MAINTENANCE_WINDOW_STATE[keyof typeof MAINTENANCE_WINDOW_STATE]
-
 export const SUMMARY_TYPE = Object.freeze({
     COMPUTE: 'Compute',
     DATABASE: 'Database',
     STORAGE: 'Storage',
 } as const);
 
-export type SUMMARY_TYPE = typeof SUMMARY_TYPE[keyof typeof SUMMARY_TYPE];
+export type SummaryType = typeof SUMMARY_TYPE[keyof typeof SUMMARY_TYPE];

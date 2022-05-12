@@ -1,4 +1,4 @@
-export enum SIDEBAR_STYLE {
-    link = 'link',
-    default = 'default',
-}
+export const SIDEBAR_STYLE = Object.freeze({
+    LINK: 'LINK',
+    DEFAULT: 'DEFAULT',
+});

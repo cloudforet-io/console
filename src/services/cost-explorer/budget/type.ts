@@ -17,34 +17,32 @@ export type CostType = 'provider' | 'region_code' | 'service_account_id' | 'prod
 
 export type BudgetCostType = 'all'| CostType
 
-export type BudgetTimeUnit = 'MONTHLY' | 'YEARLY' | 'TOTAL'
 
 export const BUDGET_TIME_UNIT = Object.freeze({
     MONTHLY: 'MONTHLY',
     YEARLY: 'YEARLY',
     TOTAL: 'TOTAL',
 } as const);
-
-export type BUDGET_TIME_UNIT = typeof BUDGET_TIME_UNIT[keyof typeof BUDGET_TIME_UNIT];
+export type BudgetTimeUnit = typeof BUDGET_TIME_UNIT[keyof typeof BUDGET_TIME_UNIT];
 
 export const BUDGET_NOTIFICATIONS_UNIT = Object.freeze({
     PERCENT: 'PERCENT',
     ACTUAL_COST: 'ACTUAL_COST',
 } as const);
 
-export type BUDGET_NOTIFICATIONS_UNIT = typeof BUDGET_NOTIFICATIONS_UNIT[keyof typeof BUDGET_NOTIFICATIONS_UNIT];
+type BudgetNotificationsUnit = typeof BUDGET_NOTIFICATIONS_UNIT[keyof typeof BUDGET_NOTIFICATIONS_UNIT];
 
 export const BUDGET_NOTIFICATIONS_TYPE = Object.freeze({
     CRITICAL: 'CRITICAL',
     WARNING: 'WARNING',
 } as const);
 
-export type BUDGET_NOTIFICATIONS_TYPE = typeof BUDGET_NOTIFICATIONS_TYPE[keyof typeof BUDGET_NOTIFICATIONS_TYPE];
+type BudgetNotificationsType = typeof BUDGET_NOTIFICATIONS_TYPE[keyof typeof BUDGET_NOTIFICATIONS_TYPE];
 
 export interface BudgetNotifications {
 	threshold: number;
-	unit: BUDGET_NOTIFICATIONS_UNIT;
-	notification_type: BUDGET_NOTIFICATIONS_TYPE;
+	unit: BudgetNotificationsUnit;
+	notification_type: BudgetNotificationsType;
 }
 
 export interface BudgetData {

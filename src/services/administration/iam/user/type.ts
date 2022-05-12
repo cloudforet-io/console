@@ -10,7 +10,7 @@ export const USER_TYPE = Object.freeze({
     API_USER: 'API_USER',
     USER: 'USER',
 } as const);
-export type USER_TYPE = typeof USER_TYPE[keyof typeof USER_TYPE];
+export type UserType = typeof USER_TYPE[keyof typeof USER_TYPE];
 
 interface UserData {
 	created_at: Timestamp;
@@ -29,7 +29,7 @@ interface UserData {
 export interface User extends UserData {
 	api_key_count?: number;
 	roles?: string[];
-	user_type?: USER_TYPE;
+	user_type?: UserType;
 }
 
 export const USER_TYPE_LABEL = Object.freeze({
@@ -41,7 +41,7 @@ export const USER_TYPE_LABEL = Object.freeze({
     },
 } as const);
 
-export type USER_TYPE_LABEL = typeof USER_TYPE_LABEL[keyof typeof USER_TYPE_LABEL];
+// export type UserTypeLabel = typeof USER_TYPE_LABEL[keyof typeof USER_TYPE_LABEL];
 
 export const USER_STATE = Object.freeze({
     ENABLE: 'ENABLED',

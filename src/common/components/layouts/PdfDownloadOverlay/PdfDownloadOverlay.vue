@@ -62,9 +62,6 @@ const modes = ['ELEMENT_EMBED', 'PDF_EMBED', 'PDF_NEW_TAB'] as const;
 const PAGE_PADDING = 12;
 const IMAGE_ROW_MARGIN_Y = 4;
 const orientations = ['portrait', 'landscape'] as const;
-const paperSizeInfoMap: Record<PaperSize, PaperSizeInfo> = Object.freeze({
-    A4: { width: 595.28, height: 841.89 },
-});
 const EMPTY_ROW_COUNT = 5;
 
 type PaperSize = typeof paperSizes[number];
@@ -73,6 +70,10 @@ type Orientation = typeof orientations[number]
 type PaperSizeInfo = {width: number; height: number}
 
 type ItemType = 'data-table'|'image'
+
+const paperSizeInfoMap: Record<PaperSize, PaperSizeInfo> = Object.freeze({
+    A4: { width: 595.28, height: 841.89 },
+});
 
 export interface Item {
     type?: ItemType; // default: 'image'

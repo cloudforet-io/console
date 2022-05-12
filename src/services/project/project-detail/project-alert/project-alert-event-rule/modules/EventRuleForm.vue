@@ -45,7 +45,7 @@ const CONDITIONS_POLICY = Object.freeze({
     ALL: 'ALL',
     ANY: 'ANY',
 });
-type CONDITIONS_POLICY = typeof CONDITIONS_POLICY[keyof typeof CONDITIONS_POLICY];
+type ConditionsPolicy = typeof CONDITIONS_POLICY[keyof typeof CONDITIONS_POLICY];
 
 const OPERATOR = Object.freeze({
     eq: 'eq',
@@ -53,19 +53,18 @@ const OPERATOR = Object.freeze({
     not: 'not',
     not_contain: 'not_contain',
 });
-type OPERATOR = typeof OPERATOR[keyof typeof OPERATOR];
+type Operator = typeof OPERATOR[keyof typeof OPERATOR];
 
 interface Condition {
     key: string;
     value: string;
-    operator: OPERATOR;
+    operator: Operator;
 }
 
 const EDIT_MODE = Object.freeze({
     CREATE: 'CREATE',
     UPDATE: 'UPDATE',
 });
-type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];
 
 type Responder = {
     resource_type: string;
@@ -104,7 +103,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            conditionsPolicy: CONDITIONS_POLICY.ALL as CONDITIONS_POLICY,
+            conditionsPolicy: CONDITIONS_POLICY.ALL as ConditionsPolicy,
             conditions: [
                 {
                     key: '',

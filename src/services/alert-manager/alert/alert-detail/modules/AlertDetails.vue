@@ -41,9 +41,6 @@ import { map } from 'lodash';
 import { store } from '@/store';
 import { alertManagerStore } from '@/services/alert-manager/store';
 
-interface Props {
-    id: string;
-}
 
 export default {
     name: 'AlertDetails',

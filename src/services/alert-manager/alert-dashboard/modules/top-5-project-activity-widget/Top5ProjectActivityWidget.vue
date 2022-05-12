@@ -105,10 +105,6 @@ interface Activity {
     date: string;
     status?: string;
 }
-interface ProjectActivity {
-    projectId: string;
-    activities: Activity[];
-}
 
 export default {
     name: 'Top5ProjectActivityWidget',

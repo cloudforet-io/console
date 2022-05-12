@@ -63,7 +63,7 @@ import {
     PPaneLayout, PDefinitionTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs,
+    computed, PropType, reactive, toRefs,
 } from '@vue/composition-api';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -80,15 +80,11 @@ import AlertTriggeredBy from '@/services/alert-manager/alert/modules/AlertTrigge
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { alertManagerStore } from '@/services/alert-manager/store';
 
-interface Props {
-    id: string;
-    alertData: AlertDataModel;
-}
 
-const EDIT_MODE = {
-    DESCRIPTION: 'description',
-} as const;
-type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];
+// const EDIT_MODE = {
+//     DESCRIPTION: 'description',
+// } as const;
+// type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];
 
 export default {
     name: 'AlertKeyInfo',
@@ -108,7 +104,7 @@ export default {
         },
         alertData: {
             type: Object,
-            default: () => ({}),
+            default: () => ({}) as PropType<AlertDataModel>,
         },
     },
     setup() {
@@ -165,7 +161,6 @@ export default {
             ...toRefs(state),
             iso8601Formatter,
             referenceRouter,
-            EDIT_MODE,
             ALERT_MANAGER_ROUTE,
             ALERT_SEVERITY,
             ALERT_SEVERITY_COLORS,

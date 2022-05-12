@@ -1,5 +1,6 @@
-import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { CostQueryFilters, CostQuerySetModel, Period } from '@/services/cost-explorer/type';
+import {
+    CostQueryFilters, CostQuerySetModel, Period, Granularity, GroupBy,
+} from '@/services/cost-explorer/type';
 
 export interface GroupByItem {
     name: string;
@@ -7,10 +8,10 @@ export interface GroupByItem {
 }
 
 export interface CostAnalysisStoreState {
-    granularity: GRANULARITY;
+    granularity: Granularity;
     stack: boolean;
-    groupBy: GROUP_BY[];
-    primaryGroupBy?: GROUP_BY;
+    groupBy: GroupBy[];
+    primaryGroupBy?: GroupBy;
     period: Period;
     filters: CostQueryFilters;
     selectedQueryId?: string;

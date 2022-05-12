@@ -147,7 +147,7 @@ import { PROJECT_ROUTE } from '@/services/project/route-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { i18n } from '@/translations';
 import bytes from 'bytes';
-import { SUMMARY_TYPE } from '@/services/project/type';
+import { SUMMARY_TYPE, SummaryType } from '@/services/project/type';
 import { arrayToQueryString } from '@/lib/router-query-string';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -338,7 +338,7 @@ export default {
         };
 
         const queryHelper = new QueryHelper();
-        const getLocation = (serviceType: SUMMARY_TYPE, name, projectId) => ({
+        const getLocation = (serviceType: SummaryType, name, projectId) => ({
             name,
             query: {
                 provider: 'all',

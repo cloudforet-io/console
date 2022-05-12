@@ -120,11 +120,6 @@ const makeMenuItems = (...args: MenuOption[]): MenuItem[] => {
     return items;
 };
 
-interface Props {
-    groupId?: string;
-    groupName?: string;
-}
-
 
 export default {
     name: 'ProjectSearch',

@@ -62,10 +62,9 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import {
-    CHART_TYPE,
     EDITABLE_WIDGET_OPTIONS,
     EDITABLE_WIDGET_OPTIONS_TYPE,
-    WidgetInfo,
+    WidgetInfo, ChartType,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 import { PRadio, PLabel, PTextPagination } from '@spaceone/design-system';
@@ -118,7 +117,7 @@ export default {
                 throw new Error('Failed to fetch widget list');
             }
         };
-        const getChartTypeImageFileName = (chartType: CHART_TYPE) => chartTypeItemMap[chartType].imageFileName;
+        const getChartTypeImageFileName = (chartType: ChartType) => chartTypeItemMap[chartType].imageFileName;
 
         const selectWidget = (value: WidgetInfo) => {
             costExplorerStore.commit('dashboard/setOriginSelectedWidget', value);

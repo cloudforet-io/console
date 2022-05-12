@@ -66,7 +66,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { CostAnalyzeModel, PieChartData, WidgetProps } from '@/services/cost-explorer/widgets/type';
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY, Currency } from '@/store/modules/display/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -117,7 +117,7 @@ export default defineComponent<WidgetProps>({
         currency: {
             type: String,
             default: CURRENCY.USD,
-            validator(value: CURRENCY) {
+            validator(value: Currency) {
                 return Object.values(CURRENCY).includes(value);
             },
         },

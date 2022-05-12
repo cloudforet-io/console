@@ -1,10 +1,12 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { FAVORITE_TYPE, FavoriteConfig, FavoriteState } from '@/store/modules/favorite/type';
+import {
+    FAVORITE_TYPE, FavoriteConfig, FavoriteState, FavoriteType,
+} from '@/store/modules/favorite/type';
 import { Action } from 'vuex';
 
 
-const createFavorite = async (itemType: FAVORITE_TYPE, itemId: string) => {
+const createFavorite = async (itemType: FavoriteType, itemId: string) => {
     try {
         await SpaceConnector.client.addOns.favorite.create({
             type: itemType,
@@ -14,7 +16,7 @@ const createFavorite = async (itemType: FAVORITE_TYPE, itemId: string) => {
         ErrorHandler.handleError(e);
     }
 };
-const deleteFavorite = async (itemType: FAVORITE_TYPE, itemId: string) => {
+const deleteFavorite = async (itemType: FavoriteType, itemId: string) => {
     try {
         await SpaceConnector.client.addOns.favorite.delete({
             type: itemType,
@@ -63,7 +65,7 @@ const setCommitsByItemType = {
     [FAVORITE_TYPE.CLOUD_SERVICE]: 'setCloudServiceItems',
     [FAVORITE_TYPE.MENU]: 'setMenuItems',
 };
-export const load: Action<FavoriteState, any> = async ({ state, commit }, itemType: FAVORITE_TYPE): Promise<void|Error> => {
+export const load: Action<FavoriteState, any> = async ({ state, commit }, itemType: FavoriteType): Promise<void|Error> => {
     const stateName = favoriteItemsByItemType[itemType];
     if (!stateName) return;
 

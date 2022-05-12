@@ -1,4 +1,4 @@
-import { CURRENCY, SIDEBAR_TYPE } from '@/store/modules/display/config';
+import { SidebarType, Currency } from '@/store/modules/display/config';
 import { Location } from 'vue-router';
 import { Menu } from '@/lib/menu/config';
 
@@ -11,19 +11,19 @@ export interface GNBMenu extends Menu {
     isBeta?: boolean;
 }
 
+export type CurrencyRates = {
+    [K in Currency]: number;
+}
+
 export interface DisplayState {
     visibleSidebar: boolean;
-    sidebarType: SIDEBAR_TYPE;
+    sidebarType: SidebarType;
     isInitialized: boolean;
     isLoading: boolean;
     uncheckedNotificationCount: number;
     isSignInFailed: boolean;
-    currency: CURRENCY;
+    currency: Currency;
     currencyRates: CurrencyRates;
-}
-
-export type CurrencyRates = {
-    [K in CURRENCY]: number;
 }
 
 export interface SidebarProps {

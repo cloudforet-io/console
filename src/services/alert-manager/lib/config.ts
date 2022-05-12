@@ -9,19 +9,19 @@ export enum ACTION {
     default = 'default',
 }
 
-export const EDIT_MODE = {
+export const EDIT_MODE = Object.freeze({
     DESCRIPTION: 'description',
     PROJECT: 'project',
-} as const;
-export type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];
+} as const);
+export type EditMode = typeof EDIT_MODE[keyof typeof EDIT_MODE];
 
-export const ALERT_ACTION = {
+export const ALERT_ACTION = Object.freeze({
     acknowledge: 'acknowledge',
     resolve: 'resolve',
     merge: 'merge',
     delete: 'delete',
-} as const;
-export type ALERT_ACTION = typeof ALERT_ACTION[keyof typeof ALERT_ACTION]
+} as const);
+export type AlertAction = typeof ALERT_ACTION[keyof typeof ALERT_ACTION]
 
 export enum SCOPE {
     global = 'GLOBAL',
@@ -33,37 +33,37 @@ export enum FINISH_CONDITION {
     resolved = 'RESOLVED',
 }
 
-export const WEBHOOK_STATE = {
+export const WEBHOOK_STATE = Object.freeze({
     ENABLED: 'ENABLED',
     DISABLED: 'DISABLED',
-} as const;
-export type WEBHOOK_STATE = typeof WEBHOOK_STATE[keyof typeof WEBHOOK_STATE];
+} as const);
+export type WebhookState = typeof WEBHOOK_STATE[keyof typeof WEBHOOK_STATE];
 
 
-export const ALERT_STATE = {
+export const ALERT_STATE = Object.freeze({
     TRIGGERED: 'TRIGGERED',
     ACKNOWLEDGED: 'ACKNOWLEDGED',
     RESOLVED: 'RESOLVED',
     ERROR: 'ERROR',
-} as const;
-export type ALERT_STATE = typeof ALERT_STATE[keyof typeof ALERT_STATE];
+} as const);
+export type AlertState = typeof ALERT_STATE[keyof typeof ALERT_STATE];
 
 export const ALERT_URGENCY = Object.freeze({
     ALL: 'ALL',
     HIGH: 'HIGH',
     LOW: 'LOW',
 } as const);
-export type ALERT_URGENCY = typeof ALERT_URGENCY[keyof typeof ALERT_URGENCY];
+export type AlertUrgency = typeof ALERT_URGENCY[keyof typeof ALERT_URGENCY];
 
-export const ALERT_SEVERITY = {
+export const ALERT_SEVERITY = Object.freeze({
     CRITICAL: 'Critical',
     ERROR: 'Error',
     WARNING: 'Warning',
     INFO: 'Info',
     NOT_AVAILABLE: 'Not Available',
     NONE: 'None',
-};
-export type ALERT_SEVERITY = typeof ALERT_SEVERITY[keyof typeof ALERT_SEVERITY];
+} as const);
+export type AlertSeverity = typeof ALERT_SEVERITY[keyof typeof ALERT_SEVERITY];
 
 export const ALERT_STATE_FILTER = Object.freeze({
     OPEN: 'OPEN',
@@ -73,13 +73,13 @@ export const ALERT_STATE_FILTER = Object.freeze({
     ERROR: 'ERROR',
     ALL: 'ALL',
 } as const);
-export type ALERT_STATE_FILTER = typeof ALERT_STATE_FILTER[keyof typeof ALERT_STATE_FILTER];
+export type AlertStateFilter = typeof ALERT_STATE_FILTER[keyof typeof ALERT_STATE_FILTER];
 
 export const ASSIGNED_STATE = Object.freeze({
     ALL: 'ALL',
     ASSIGNED_TO_ME: 'ASSIGNED_TO_ME',
 } as const);
-export type ASSIGNED_STATE = typeof ASSIGNED_STATE[keyof typeof ASSIGNED_STATE];
+export type AssignedState = typeof ASSIGNED_STATE[keyof typeof ASSIGNED_STATE];
 
 export const ALERT_SEVERITY_COLORS: Record<keyof typeof ALERT_SEVERITY, string> = {
     CRITICAL: red[600],

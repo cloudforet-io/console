@@ -157,7 +157,7 @@ import {
     makeDistinctValueHandler, makeEnumValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { WEBHOOK_STATE } from '@/services/alert-manager/lib/config';
+import { WEBHOOK_STATE, WebhookState } from '@/services/alert-manager/lib/config';
 import { i18n } from '@/translations';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { TranslateResult } from 'vue-i18n';
@@ -267,7 +267,7 @@ export default {
             deleteModalVisible: false,
         });
         const checkModalState = reactive({
-            mode: '',
+            mode: '' as WebhookState,
             title: '' as TranslateResult,
             subTitle: '' as TranslateResult,
             themeColor: undefined as string | undefined,

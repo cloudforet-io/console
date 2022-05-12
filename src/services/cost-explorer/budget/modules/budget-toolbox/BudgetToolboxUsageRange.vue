@@ -26,9 +26,9 @@ const USAGE_RANGE = Object.freeze({
     between90And100: 'between90And100',
     lessThan90: 'lessThan90',
 } as const);
-type USAGE_RANGE = typeof USAGE_RANGE[keyof typeof USAGE_RANGE]
+type UsageRange = typeof USAGE_RANGE[keyof typeof USAGE_RANGE]
 
-type SelectedMap = Partial<Record<USAGE_RANGE, boolean>>
+type SelectedMap = Partial<Record<UsageRange, boolean>>
 
 export default {
     name: 'BudgetToolboxUsageRange',
@@ -39,7 +39,7 @@ export default {
                 { name: USAGE_RANGE.between90And100, label: '90-100%', color: yellow[500] },
                 { name: USAGE_RANGE.lessThan90, label: '< 90%', color: indigo[500] },
             ]),
-            selected: [USAGE_RANGE.overspent, USAGE_RANGE.between90And100, USAGE_RANGE.lessThan90] as USAGE_RANGE[],
+            selected: [USAGE_RANGE.overspent, USAGE_RANGE.between90And100, USAGE_RANGE.lessThan90] as UsageRange[],
             selectedMap: computed<SelectedMap>(() => {
                 const selectedMap: SelectedMap = {};
                 state.selected.forEach((d) => { selectedMap[d] = true; });
@@ -82,7 +82,7 @@ export default {
             }),
         });
 
-        const handleClick = (name: USAGE_RANGE) => {
+        const handleClick = (name: UsageRange) => {
             const index = state.selected.findIndex(d => d === name);
             if (index !== -1) state.selected.splice(index, 1);
             else state.selected.push(name);

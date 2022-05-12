@@ -11,7 +11,7 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { BUDGET_TIME_UNIT, BudgetData } from '@/services/cost-explorer/budget/type';
+import { BUDGET_TIME_UNIT, BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -19,25 +19,24 @@ import { Query } from '@spaceone/console-core-lib/space-connector/type';
 import {
     getConvertedFilter,
 } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { CostQueryFilters } from '@/services/cost-explorer/type';
+import { CostQueryFilters, Granularity } from '@/services/cost-explorer/type';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { store } from '@/store';
 import dayjs from 'dayjs';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 
 interface Props {
     projectId?: string;
     projectGroupId?: string;
     costTypes?: CostQueryFilters;
-    timeUnit: BUDGET_TIME_UNIT;
+    timeUnit: BudgetTimeUnit;
 }
 
 interface BudgetListParams extends Query {
     start: string;
     end: string;
-    granularity: GRANULARITY;
+    granularity: Granularity;
 }
 
 export default {

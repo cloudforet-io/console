@@ -19,10 +19,6 @@
 <script lang="ts">
 import { PPopover } from '@spaceone/design-system';
 
-interface Props {
-    costTypeKey: string;
-    costTypeValue: string;
-}
 
 const costTypeMap = {
     region_code: 'Region',

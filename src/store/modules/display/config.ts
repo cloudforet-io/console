@@ -3,14 +3,14 @@ export const SIDEBAR_TYPE = Object.freeze({
     handbook: 'secondary',
     widget: 'widget',
 });
-export type SIDEBAR_TYPE = typeof SIDEBAR_TYPE[keyof typeof SIDEBAR_TYPE];
+export type SidebarType = typeof SIDEBAR_TYPE[keyof typeof SIDEBAR_TYPE];
 
 export const CURRENCY = Object.freeze({
     USD: 'USD',
     KRW: 'KRW',
     JPY: 'JPY',
 });
-export type CURRENCY = typeof CURRENCY[keyof typeof CURRENCY]
+export type Currency = typeof CURRENCY[keyof typeof CURRENCY]
 
 export const CURRENCY_SYMBOL = Object.freeze({
     USD: '$',
@@ -18,7 +18,7 @@ export const CURRENCY_SYMBOL = Object.freeze({
     JPY: '¥',
 });
 
-export type CURRENCY_SYMBOL = typeof CURRENCY_SYMBOL[keyof typeof CURRENCY_SYMBOL]
+export type CurrencySymbol = typeof CURRENCY_SYMBOL[keyof typeof CURRENCY_SYMBOL]
 
 export const DEFAULT_CURRENCY_RATES = Object.freeze({
     USD: 1,

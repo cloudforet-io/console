@@ -77,20 +77,19 @@ import { EDIT_TYPE, PROTOCOL_TYPE } from '@/services/notification/modules/notifi
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-interface ParamType {
-    user_channel_id?: string;
-    project_channel_id?: string;
-    name?: string;
-    data?: any;
-    schedule?: any;
-    notification_level?: string;
-}
+// interface ParamType {
+//     user_channel_id?: string;
+//     project_channel_id?: string;
+//     name?: string;
+//     data?: any;
+//     schedule?: any;
+//     notification_level?: string;
+// }
 
 export const STATE_TYPE = {
     ENABLED: 'ENABLED',
     DISABLED: 'DISABLED',
 } as const;
-export type STATE_TYPE = typeof STATE_TYPE[keyof typeof STATE_TYPE];
 
 export default {
     name: 'NotificationChannelItem',

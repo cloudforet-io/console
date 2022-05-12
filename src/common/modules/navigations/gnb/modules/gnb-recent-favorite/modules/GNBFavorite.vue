@@ -72,7 +72,7 @@ import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSugge
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
-import { SUGGESTION_TYPE, SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import { SUGGESTION_TYPE, SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -104,7 +104,7 @@ export default {
         const state = reactive({
             loading: true,
             showAll: false,
-            showAllType: undefined as undefined|SUGGESTION_TYPE,
+            showAllType: undefined as undefined|SuggestionType,
             items: computed<SuggestionItem[]>(() => {
                 const results: SuggestionItem[] = [];
                 if (state.favoriteMenuItems) {
@@ -172,7 +172,7 @@ export default {
         });
 
         /* Util */
-        const getItemLength = (type: SUGGESTION_TYPE): number => {
+        const getItemLength = (type: SuggestionType): number => {
             if (type === SUGGESTION_TYPE.MENU) return state.favoriteMenuItems.length;
             if (type === SUGGESTION_TYPE.PROJECT) return state.favoriteProjects.length;
             if (type === SUGGESTION_TYPE.CLOUD_SERVICE) return state.favoriteCloudServiceItems.length;
@@ -180,7 +180,7 @@ export default {
         };
 
         /* Event */
-        const handleClickMenuButton = (type: SUGGESTION_TYPE) => {
+        const handleClickMenuButton = (type: SuggestionType) => {
             if (type === SUGGESTION_TYPE.PROJECT) {
                 SpaceRouter.router.replace({
                     name: PROJECT_ROUTE._NAME,
@@ -192,7 +192,7 @@ export default {
             }
             emit('close');
         };
-        const handleClickShowAll = (type: SUGGESTION_TYPE) => {
+        const handleClickShowAll = (type: SuggestionType) => {
             state.showAll = true;
             state.showAllType = type;
         };

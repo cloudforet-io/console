@@ -2,8 +2,9 @@ import { Mutation } from 'vuex';
 import {
     CostAnalysisStoreState,
 } from '@/services/cost-explorer/store/cost-analysis/type';
-import { GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { CostQueryFilters, CostQuerySetModel, Period } from '@/services/cost-explorer/type';
+import {
+    CostQueryFilters, CostQuerySetModel, GroupBy, Period,
+} from '@/services/cost-explorer/type';
 
 
 export const setGranularity: Mutation<CostAnalysisStoreState> = (state, granularity: string) => {
@@ -14,11 +15,11 @@ export const setStack: Mutation<CostAnalysisStoreState> = (state, stack: boolean
     state.stack = stack;
 };
 
-export const setGroupBy: Mutation<CostAnalysisStoreState> = (state, groupBy: GROUP_BY[]) => {
+export const setGroupBy: Mutation<CostAnalysisStoreState> = (state, groupBy: GroupBy[]) => {
     state.groupBy = groupBy;
 };
 
-export const setPrimaryGroupBy: Mutation<CostAnalysisStoreState> = (state, primaryGroupBy?: GROUP_BY) => {
+export const setPrimaryGroupBy: Mutation<CostAnalysisStoreState> = (state, primaryGroupBy?: GroupBy) => {
     state.primaryGroupBy = primaryGroupBy;
 };
 

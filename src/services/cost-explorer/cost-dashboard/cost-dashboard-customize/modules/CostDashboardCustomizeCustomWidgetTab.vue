@@ -75,7 +75,7 @@ import CustomWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CustomWidgetPreview.vue';
 
 import { store } from '@/store';
-import { CHART_TYPE, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import { WidgetInfo, ChartType } from '@/services/cost-explorer/cost-dashboard/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -172,7 +172,7 @@ export default {
             state.selectedItem = createdCustomWidget;
             state.thisPage = 1;
         };
-        const getChartTypeImageFileName = (chartType: CHART_TYPE) => chartTypeItemMap[chartType].imageFileName;
+        const getChartTypeImageFileName = (chartType: ChartType) => chartTypeItemMap[chartType].imageFileName;
 
         (() => {
             listCustomWidget();

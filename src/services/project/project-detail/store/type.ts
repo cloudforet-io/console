@@ -1,7 +1,7 @@
-import { ALERT_STATE } from '@/services/alert-manager/lib/config';
+import { AlertState } from '@/services/alert-manager/lib/config';
 
 export interface AlertCount {
-    state: ALERT_STATE;
+    state: AlertState;
     count: number;
 }
 

@@ -1,10 +1,10 @@
 <template>
-    <header :class="{'link': styleType === SIDEBAR_STYLE.link}">
+    <header :class="{'link': styleType === SIDEBAR_STYLE.LINK}">
         <span class="title"
               :class="{'selected': selected}"
         >
             <slot name="default">{{ title }}</slot>
-            <p-i v-if="styleType === SIDEBAR_STYLE.link" name="ic_arrow_right" width="1rem"
+            <p-i v-if="styleType === SIDEBAR_STYLE.LINK" name="ic_arrow_right" width="1rem"
                  height="1rem"
                  color="inherit transparent"
             />
@@ -33,7 +33,7 @@ export default {
         },
         styleType: {
             type: String,
-            default: SIDEBAR_STYLE.default,
+            default: SIDEBAR_STYLE.DEFAULT,
         },
     },
     setup() {

@@ -102,71 +102,25 @@ import {
     PSelectButtonGroup, PSelectDropdown, PIconButton, PLottie, PButton, PAnchor,
 } from '@spaceone/design-system';
 
-import {
-    blue, coral, green, peacock, violet, yellow, indigo,
-} from '@/styles/colors';
-import { Metric, MonitoringProps } from '@/common/modules/monitoring/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import {
+    AvailableResource,
+    Metric, MetricChartData, MonitoringProps, StatisticsType, StatItem,
+} from '@/common/modules/monitoring/type';
+import {
+    COLORS, MONITORING_TYPE, STATISTICS_TYPE, TIME_RANGE,
+} from '@/common/modules/monitoring/config';
+import { store } from '@/store';
 
-
-enum MONITORING_TYPE {
-    metric = 'METRIC',
-    log = 'LOG',
-}
-
-enum STATISTICS_TYPE {
-    average = 'AVERAGE',
-    maximum = 'MAXIMUM',
-    minimum = 'MINIMUM'
-}
-
-interface MetricChartData {
-    loading: boolean;
-    labels: string[];
-    dataset: {[resourceKey: string]: number[]};
-    metric: Metric;
-    error?: boolean;
-    resources: any[];
-}
 
 interface DataToolType {
     id: string;
     name: string;
-    statisticsTypes: STATISTICS_TYPE[];
+    statisticsTypes: StatisticsType[];
 }
-
-interface AvailableResource {
-    id: string;
-    name: string;
-    color: string;
-    link: string;
-}
-
-interface StatItem {
-    type: string;
-    label: string;
-    name: string;
-}
-
-
-const colors = [
-    coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[500], coral[600],
-    peacock[400], green[600], green[500], blue[400], indigo[500], violet[400], indigo[400], blue[600],
-];
-const TIME_RANGE = {
-    '1h': 1,
-    '3h': 3,
-    '6h': 6,
-    '12h': 12,
-    '1d': 24,
-    '3d': 24 * 3,
-    '1w': 24 * 7,
-    '2w': 24 * 14,
-};
 
 const LOAD_LIMIT = 12;
 
@@ -220,12 +174,12 @@ export default {
             selectedTimeRange: '1h',
             statisticsTypes: computed(() => {
                 const tool = find(state.dataTools, { id: state.selectedToolId });
-                return tool ? tool.statisticsTypes : [STATISTICS_TYPE.average];
+                return tool ? tool.statisticsTypes : [STATISTICS_TYPE.AVERAGE];
             }),
             statItems: computed<StatItem[]>(() => state.statisticsTypes.map(d => ({
                 type: 'item', label: capitalize(d), name: d,
             }))),
-            selectedStat: STATISTICS_TYPE.average,
+            selectedStat: STATISTICS_TYPE.AVERAGE,
             metricsLoading: true,
             metrics: [] as Metric[],
             metricChartDataList: [] as MetricChartData[],
@@ -238,7 +192,7 @@ export default {
             let resources = props.resources.slice(0, 16);
             resources = resources.map((resource, idx) => ({
                 ...resource,
-                color: colors[idx],
+                color: COLORS[idx],
                 link: vm.$router.resolve(referenceRouter(resource.id, { resource_type: 'inventory.Server' })).href,
             }));
             state.availableResources = sortBy(resources, m => m.name);
@@ -252,7 +206,7 @@ export default {
                 state.dataTools = [{
                     id: props.dataSourceId,
                     name: res.name,
-                    statisticsTypes: get(res, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.average]),
+                    statisticsTypes: get(res, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.AVERAGE]),
                 }];
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -266,7 +220,7 @@ export default {
             try {
                 apiQuery.setFilters([{ k: 'provider', o: '=', v: props.resources.map(d => d.provider) }]);
                 const res = await SpaceConnector.client.monitoring.dataSource.list({
-                    monitoring_type: MONITORING_TYPE.metric,
+                    monitoring_type: MONITORING_TYPE.METRIC,
                     query: apiQuery.data,
                 });
                 state.dataTools = chain(res.results)
@@ -275,7 +229,7 @@ export default {
                             return {
                                 id: d.data_source_id,
                                 name: d.name,
-                                statisticsTypes: get(d, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.average]),
+                                statisticsTypes: get(d, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.AVERAGE]),
                             };
                         }
                         return undefined;
@@ -383,7 +337,7 @@ export default {
         };
 
         watch(() => state.statisticsTypes, (types) => {
-            if (types) state.selectedStat = types[0] || STATISTICS_TYPE.average;
+            if (types) state.selectedStat = types[0] || STATISTICS_TYPE.AVERAGE;
         }, { immediate: true });
 
         watch(() => props.resources, async () => {
@@ -406,7 +360,6 @@ export default {
 
         return {
             ...toRefs(state),
-            colors,
             TIME_RANGE,
             legendFormatter(resource): string {
                 return resource.name ? `${resource.name} (${resource.id})` : `(${resource.id})`;

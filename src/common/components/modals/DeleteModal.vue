@@ -29,7 +29,7 @@
 import { PButtonModal } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { SIZE } from '@/common/components/modals/config';
+import { SIZE, Size } from '@/common/components/modals/config';
 
 export default {
     name: 'DeleteModal',
@@ -59,7 +59,7 @@ export default {
         },
         size: {
             type: String,
-            validator(value: SIZE): boolean {
+            validator(value: Size): boolean {
                 return Object.values(SIZE).includes(value);
             },
             default: SIZE.sm,

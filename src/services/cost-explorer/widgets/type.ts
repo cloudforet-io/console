@@ -1,4 +1,4 @@
-import { CURRENCY } from '@/store/modules/display/config';
+import { Currency } from '@/store/modules/display/config';
 import { CurrencyRates } from '@/store/modules/display/type';
 import { TranslateResult } from 'vue-i18n';
 import { Period } from '@/services/cost-explorer/type';
@@ -15,6 +15,10 @@ export interface XYChartData {
     [key: string]: any;
 }
 
+export interface UsdCost {
+    [key: string]: number;
+}
+
 export interface PieChartData {
     category: string;
     value: number | UsdCost;
@@ -26,10 +30,6 @@ export interface Legend {
     label: string | TranslateResult;
     color?: string;
     disabled?: boolean;
-}
-
-export interface UsdCost {
-    [key: string]: number;
 }
 
 export interface CostAnalyzeModel {
@@ -47,7 +47,7 @@ export interface WidgetProps<Options = any> {
     options: Options;
     period: Period;
     filters: Record<string, string[]>;
-    currency: CURRENCY;
+    currency: Currency;
     currencyRates: CurrencyRates;
     printMode?: boolean;
 }

@@ -75,6 +75,10 @@ import CloudServiceUsageOverviewSummary
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewSummary.vue';
 import { store } from '@/store';
 
+interface Data {
+    name?: string;
+    value?: number;
+}
 
 interface Props {
     visible: boolean;
@@ -84,11 +88,6 @@ interface Props {
     isServer: boolean;
     filters: QueryStoreFilter[];
     period?: Period;
-}
-
-interface Data {
-    name?: string;
-    value?: number;
 }
 
 export default defineComponent<Props>({

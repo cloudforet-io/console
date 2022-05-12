@@ -2,13 +2,13 @@ import dayjs from 'dayjs';
 import { TimeUnit } from '@amcharts/amcharts4/core';
 
 import { store } from '@/store';
-import { CURRENCY } from '@/store/modules/display/config';
+import { Currency } from '@/store/modules/display/config';
 import { CurrencyRates } from '@/store/modules/display/type';
 
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { Period } from '@/services/cost-explorer/type';
+import { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
 import {
     ChartData,
     CostAnalyzeModel,
@@ -46,7 +46,7 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
  * @description Extract legends from raw data.
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary
  */
-export const getLegends = (rawData: CostAnalyzeModel[], granularity: GRANULARITY, groupBy?: GROUP_BY): Legend[] => {
+export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity, groupBy?: GroupBy): Legend[] => {
     if (groupBy) {
         const _providers = store.state.reference.provider.items;
         const _serviceAccounts = store.state.reference.serviceAccount.items;
@@ -107,7 +107,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: GRANULARITY
  * @usage AWSCloudFrontCost
  * @example ('project-111111', 'project_id') => 'SpaceOne Dev Project'
  */
-export const getReferenceLabel = (data: string, groupBy: GROUP_BY): string => {
+export const getReferenceLabel = (data: string, groupBy: GroupBy): string => {
     if (!data) return 'Unknown';
     const _providers = store.state.reference.provider.items;
     const _serviceAccounts = store.state.reference.serviceAccount.items;
@@ -130,7 +130,7 @@ export const getReferenceLabel = (data: string, groupBy: GROUP_BY): string => {
  *       => [{ category: 'aws', value: 100 }, { category: 'azure', value: 30 }]
  * @usage SpcProjectWiseUsageSummary, CostAnalysisChart
  */
-export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY): PieChartData[] => {
+export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GroupBy): PieChartData[] => {
     let chartData: PieChartData[] = [];
     if (groupBy) {
         rawData.forEach((d) => {
@@ -182,7 +182,7 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GROUP_BY)
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary, LastMonthTotalSpend, BudgetSummaryChart
  */
 export const getXYChartData = (
-    rawData: CostAnalyzeModel[], granularity: GRANULARITY, period: Period, groupBy?: GROUP_BY, valueKey = 'usd_cost',
+    rawData: CostAnalyzeModel[], granularity: Granularity, period: Period, groupBy?: GroupBy, valueKey = 'usd_cost',
 ): XYChartData[] => {
     const chartData: XYChartData[] = [];
     const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
@@ -247,7 +247,7 @@ export const getStackedChartData = (chartData: XYChartData[], period: Period, ti
  */
 export const getCurrencyAppliedChartData = (
     chartData: ChartData[],
-    currency: CURRENCY,
+    currency: Currency,
     currencyRates: CurrencyRates,
 ): ChartData[] => chartData.map((dataObj) => {
     const results = {};

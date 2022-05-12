@@ -56,7 +56,7 @@ import {
     getCurrencyAppliedChartData, getLegends, getTooltipText, getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { CURRENCY } from '@/store/modules/display/config';
 import {
     ChartData, CostAnalyzeModel, Legend, WidgetProps,
@@ -64,7 +64,7 @@ import {
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { toggleSeries } from '@/lib/amcharts/helper';
 import { store } from '@/store';
-import { Period } from '@/services/cost-explorer/type';
+import { GroupBy, Period } from '@/services/cost-explorer/type';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
@@ -159,8 +159,8 @@ export default defineComponent<Props>({
                 start: start.format('YYYY-MM-DD'),
                 end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
             };
-            state.chartData = getXYChartData(state.items, GRANULARITY.MONTHLY, _period, props.groupBy as GROUP_BY);
-            state.legends = getLegends(state.items, GRANULARITY.MONTHLY, props.groupBy as GROUP_BY);
+            state.chartData = getXYChartData(state.items, GRANULARITY.MONTHLY, _period, props.groupBy as GroupBy);
+            state.legends = getLegends(state.items, GRANULARITY.MONTHLY, props.groupBy as GroupBy);
         };
         const disposeChart = (chartContext) => {
             if (state.chartRegistry[chartContext]) {

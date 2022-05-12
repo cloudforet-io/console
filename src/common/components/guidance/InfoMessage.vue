@@ -17,7 +17,7 @@ const STYLE_TYPE = Object.freeze({
     secondary: 'secondary',
     peacock: 'peacock',
 } as const);
-type STYLE_TYPE = typeof STYLE_TYPE[keyof typeof STYLE_TYPE];
+type StyleType = typeof STYLE_TYPE[keyof typeof STYLE_TYPE];
 
 export default {
     name: 'InfoMessage',
@@ -28,7 +28,7 @@ export default {
         styleType: {
             type: String,
             default: STYLE_TYPE.gray,
-            validator(styleType: STYLE_TYPE): boolean {
+            validator(styleType: StyleType): boolean {
                 return Object.values(STYLE_TYPE).includes(styleType);
             },
         },

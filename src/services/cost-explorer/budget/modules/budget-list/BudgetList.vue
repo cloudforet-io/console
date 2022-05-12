@@ -42,13 +42,9 @@ import {
 } from '@/services/cost-explorer/budget/type';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { Period } from '@/services/cost-explorer/type';
-import { Query } from '@spaceone/console-core-lib/space-connector/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { store } from '@/store';
 
-interface BudgetParam {
-    query: Query;
-}
 
 interface Props {
     filters: QueryStoreFilter[];

@@ -2,7 +2,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { TimeUnit } from '@amcharts/amcharts4/core';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { CostQueryFilters, Period } from '@/services/cost-explorer/type';
+import { CostQueryFilters, Period, Granularity } from '@/services/cost-explorer/type';
 import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 
@@ -46,7 +46,7 @@ export const getConvertedBudgetFilter = (filters: CostQueryFilters): QueryStoreF
     return result;
 };
 
-export const getTimeUnitByPeriod = (granularity: GRANULARITY, start: Dayjs, end: Dayjs): TimeUnit => {
+export const getTimeUnitByPeriod = (granularity: Granularity, start: Dayjs, end: Dayjs): TimeUnit => {
     if (granularity !== GRANULARITY.ACCUMULATED) {
         if (granularity === GRANULARITY.DAILY) return 'day';
         if (granularity === GRANULARITY.MONTHLY) return 'month';
@@ -64,7 +64,7 @@ export const getInitialDates = (): Period => {
 };
 
 /* data table field */
-const getDataTableDateFields = (granularity: GRANULARITY, period: Period): DataTableFieldType[] => {
+const getDataTableDateFields = (granularity: Granularity, period: Period): DataTableFieldType[] => {
     const dateFields: DataTableFieldType[] = [];
     const start = dayjs.utc(period.start);
     const end = dayjs.utc(period.end);
@@ -94,7 +94,7 @@ const getDataTableDateFields = (granularity: GRANULARITY, period: Period): DataT
     }
     return dateFields;
 };
-export const getDataTableCostFields = (granularity: GRANULARITY, period: Period, hasGroupBy: boolean): DataTableFieldType[] => {
+export const getDataTableCostFields = (granularity: Granularity, period: Period, hasGroupBy: boolean): DataTableFieldType[] => {
     const costFields: DataTableFieldType[] = [];
 
     if (granularity === GRANULARITY.ACCUMULATED) {

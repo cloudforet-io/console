@@ -12,4 +12,4 @@ export const MODAL_TYPE = Object.freeze({
     UPDATE: 'UPDATE',
 } as const);
 
-export type MODAL_TYPE = typeof MODAL_TYPE[keyof typeof MODAL_TYPE];
+export type ModalType = typeof MODAL_TYPE[keyof typeof MODAL_TYPE];

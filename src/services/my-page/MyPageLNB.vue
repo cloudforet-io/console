@@ -26,7 +26,6 @@
 </template>
 
 <script lang="ts">
-import { TranslateResult } from 'vue-i18n';
 import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
@@ -37,13 +36,13 @@ import { LNBMenu } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import { MENU_ID } from '@/lib/menu/config';
 
-interface SidebarItemType {
-    label?: TranslateResult;
-    routeName?: string;
-    userOnly?: boolean;
-    isAdminMenu?: boolean;
-    beta?: boolean;
-}
+// interface SidebarItemType {
+//     label?: TranslateResult;
+//     routeName?: string;
+//     userOnly?: boolean;
+//     isAdminMenu?: boolean;
+//     beta?: boolean;
+// }
 
 const MenuSet: LNBMenu[] = [
     {

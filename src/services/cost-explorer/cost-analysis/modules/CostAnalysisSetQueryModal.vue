@@ -61,8 +61,9 @@ import {
 import { store } from '@/store';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { Granularity } from '@/services/cost-explorer/type';
 import { i18n } from '@/translations';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { Currency, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -84,9 +85,9 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
-            granularity: '' as GRANULARITY,
+            granularity: '' as Granularity,
             stack: false,
-            currency: '' as CURRENCY,
+            currency: '' as Currency,
             granularityItems: computed<MenuItem[]>(() => ([
                 {
                     type: 'item',
@@ -129,7 +130,7 @@ export default {
         const handleSelectGranularity = (granularity: string) => {
             state.granularity = granularity;
         };
-        const handleSelectCurrency = (currency: CURRENCY) => {
+        const handleSelectCurrency = (currency: Currency) => {
             state.currency = currency;
         };
         const handleToggleStack = ({ value }) => {

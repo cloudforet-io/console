@@ -68,15 +68,15 @@ const categoryItems = [
 ];
 
 
-interface AutocompleteResult<Data> {
-    name: string;
-    key: string;
-    data?: Data;
-}
+// interface AutocompleteResult<Data> {
+//     name: string;
+//     key: string;
+//     data?: Data;
+// }
 
-type RegionAutocompleteResult = AutocompleteResult<{
-    provider: string;
-}>
+// type RegionAutocompleteResult = AutocompleteResult<{
+//     provider: string;
+// }>
 
 
 interface Props {
