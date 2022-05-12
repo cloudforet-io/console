@@ -61,28 +61,30 @@ const getUserInfoFromToken = (token: string): string[] => {
 
 const getUserRoleBindings = async (userId: string): Promise<Array<UserRole>> => {
     try {
-        const userRoles: Array<UserRole> = [];
-        const userRoleIds: Array<string> = [];
-        const response = await SpaceConnector.client.identity.roleBinding.list({
+        const userRoles: Record<string, UserRole> = {};
+        const { results } = await SpaceConnector.client.identity.roleBinding.list({
             resource_type: 'identity.User',
             resource_id: userId,
+        }, {
+            mockMode: true,
         });
 
-        response.results.forEach((roleBindingInfo) => {
+        results.forEach((roleBindingInfo) => {
             const role = roleBindingInfo.role_info;
-            if (userRoleIds.indexOf(role.role_id) < 0) {
-                userRoles.push({
-                    roleId: role.role_id,
+            const roleId = role.role_id;
+            if (!userRoles[roleId]) {
+                userRoles[roleId] = {
+                    roleId,
                     name: role.name,
                     roleType: role.role_type,
-                });
-                userRoleIds.push(role.role_id);
+                    pagePermissions: role.page_permissions,
+                };
             }
         });
 
-        return userRoles;
+        return Object.values(userRoles);
     } catch (e) {
-        console.log(`RoleBinding Load Error: ${e}`);
+        console.error(`RoleBinding Load Error: ${e}`);
         return [];
     }
 };
@@ -90,7 +92,7 @@ const getUserRoleBindings = async (userId: string): Promise<Array<UserRole>> => 
 export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
     const response = await SpaceConnector.client.identity.token.issue({
         domain_id: signInRequest.domainId,
-        user_id: signInRequest.userId || null, // user_id 비어있을 수 있음
+        user_id: signInRequest.userId || null, // user_id is nullable
         user_type: signInRequest.userType,
         credentials: signInRequest.credentials,
     }, { skipAuthRefresh: true });

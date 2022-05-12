@@ -7,6 +7,7 @@ import config from '@/lib/config';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { ERROR_ROUTE } from '@/router/error-routes';
+import { getRouteAccessLevel, isRouteAccessible, PAGE_ACCESS_LEVEL } from '@/lib/access-control';
 // import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
@@ -54,17 +55,20 @@ export class SpaceRouter {
 
             if (isTokenAlive) {
                 const isAdmin = SpaceRouter.router.app.$store.getters['user/isAdmin'];
-                // const hasPermission = SpaceRouter.router.app.$store.getters['user/hasPermission'];
-                //
-                // if (!hasPermission && to.name !== AUTH_ROUTE.SIGN_OUT._NAME && to.name !== MY_PAGE_ROUTE.MY_ACCOUNT._NAME) {
-                //     if (to.name !== MY_PAGE_ROUTE.MY_ACCOUNT._NAME) nextLocation = { name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME };
-                // }
+
                 if (to.meta?.isSignInPage) {
                     nextLocation = { name: DASHBOARD_ROUTE._NAME };
                 } else if (to.meta?.isDomainOwnerOnly && !isAdmin) {
                     nextLocation = { name: ERROR_ROUTE._NAME };
+                } else {
+                    const isAccessible = isRouteAccessible(to, SpaceRouter.router.app.$store.getters['user/pagePermissionList']);
+                    if (isAccessible) {
+                        SpaceRouter.router.app.$store.dispatch('error/hideAuthorizationError');
+                    } else {
+                        SpaceRouter.router.app.$store.dispatch('error/showAuthorizationError');
+                    }
                 }
-            } else if (!to.meta?.excludeAuth) {
+            } else if (getRouteAccessLevel(to) >= PAGE_ACCESS_LEVEL.REQUIRED_AUTH) {
                 const res = await SpaceConnector.refreshAccessToken(false);
                 if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
                 else nextLocation = { name: to.name, params: to.params };

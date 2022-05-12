@@ -75,6 +75,7 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 import { store } from '@/store';
+import { getRouteAccessLevel, PAGE_ACCESS_LEVEL } from '@/lib/access-control';
 
 export default defineComponent({
     name: 'App',
@@ -94,7 +95,7 @@ export default defineComponent({
 
         const state = reactive({
             showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
-            isExpired: computed(() => vm.$store.state.error.visibleSessionExpiredError && !vm.$route.meta.excludeAuth),
+            isExpired: computed(() => vm.$store.state.error.visibleSessionExpiredError && getRouteAccessLevel(vm.$route) >= PAGE_ACCESS_LEVEL.REQUIRED_AUTH),
         });
 
         const goToSignIn = () => {

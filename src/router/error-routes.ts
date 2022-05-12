@@ -1,5 +1,6 @@
 import { RouteConfig } from 'vue-router';
 import ErrorPage from '@/common/pages/ErrorPage.vue';
+import { PAGE_ACCESS_LEVEL } from '@/lib/access-control';
 
 export const ERROR_ROUTE = Object.freeze({
     _NAME: 'error',
@@ -10,7 +11,7 @@ export const errorRoutes: RouteConfig[] = [
     {
         path: '/error-page',
         name: ERROR_ROUTE._NAME,
-        meta: { excludeAuth: true },
+        meta: { accessLevel: PAGE_ACCESS_LEVEL.EXCLUDE_AUTH },
         component: ErrorPage,
     },
     {

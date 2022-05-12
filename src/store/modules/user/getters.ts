@@ -1,4 +1,6 @@
 import { languages, userTypes } from '@/store/modules/user/config';
+import { Getter } from 'vuex';
+import { getPagePermissionMap, PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
 import { UserState } from './type';
 
 export const isDomainOwner = (state: UserState): boolean => state.userType === 'DOMAIN_OWNER';
@@ -59,3 +61,9 @@ export const hasDomainRole = (state: UserState): boolean => {
 };
 
 export const hasPermission = (state: UserState): boolean => !!state.roles?.length;
+
+export const pagePermissionList: Getter<UserState, any> = (state): PagePermissionTuple[] => {
+    const permissions = state.roles?.flatMap(role => role.pagePermissions) ?? [];
+    const permissionMap = getPagePermissionMap(permissions);
+    return Object.entries(permissionMap);
+};

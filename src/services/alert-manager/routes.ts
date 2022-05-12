@@ -2,6 +2,7 @@ import { RouteConfig } from 'vue-router';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { getMenuLabel } from '@/lib/menu/menu-info';
 import { MENU_ID } from '@/lib/menu/config';
+import { PAGE_ACCESS_LEVEL } from '@/lib/access-control';
 
 const AlertManagerContainer = () => import(/* webpackChunkName: "AlertManagerContainer" */ '@/services/alert-manager/AlertManagerContainer.vue');
 
@@ -13,7 +14,7 @@ const AlertDetailPage = () => import(/* webpackChunkName: "AlertDetailPage" */ '
 const alertManagerRoutes: RouteConfig = {
     path: 'alert-manager',
     name: ALERT_MANAGER_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.ALERT_MANAGER) },
+    meta: { label: getMenuLabel(MENU_ID.ALERT_MANAGER), accessLevel: PAGE_ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: '/alert-manager/dashboard',
     component: AlertManagerContainer,
     children: [

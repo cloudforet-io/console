@@ -7,6 +7,7 @@ import { isInstanceOfNoResourceError, isInstanceOfNoSearchResourceError } from '
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { TranslateResult } from 'vue-i18n';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { getRouteAccessLevel, PAGE_ACCESS_LEVEL } from '@/lib/access-control';
 
 interface GlobalErrorHandlers {
     authenticationErrorHandler: () => void;
@@ -26,7 +27,9 @@ export default class ErrorHandler {
     static handleError(error) {
         if (isInstanceOfAuthenticationError(error)) {
             const isTokenAlive = SpaceConnector.isTokenAlive;
-            if (!isTokenAlive && !SpaceRouter.router.currentRoute.meta.excludeAuth) {
+
+            if (!isTokenAlive
+                && getRouteAccessLevel(SpaceRouter.router.currentRoute) >= PAGE_ACCESS_LEVEL.REQUIRED_AUTH) {
                 ErrorHandler.authenticationErrorHandler();
             }
         } else if (isInstanceOfAuthorizationError(error)) {

@@ -2,6 +2,7 @@ import { RouteConfig } from 'vue-router';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { getMenuLabel } from '@/lib/menu/menu-info';
 import { MENU_ID } from '@/lib/menu/config';
+import { PAGE_ACCESS_LEVEL } from '@/lib/access-control';
 
 const AdministrationContainer = () => import(/* webpackChunkName: "AdministrationContainer" */ '@/services/administration/AdministrationContainer.vue');
 
@@ -16,7 +17,7 @@ const PolicyDetailPage = () => import(/* webpackChunkName: "PolicyDetailPage" */
 const administrationRoutes: RouteConfig = {
     path: 'administration',
     name: ADMINISTRATION_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.ADMINISTRATION) },
+    meta: { label: getMenuLabel(MENU_ID.ADMINISTRATION), accessLevel: PAGE_ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: '/administration/iam/user',
     component: AdministrationContainer,
     children: [
@@ -48,13 +49,13 @@ const administrationRoutes: RouteConfig = {
                         {
                             path: 'create',
                             name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME,
-                            meta: { label: 'Create Role' },
+                            meta: { label: 'Create Role', accessLevel: PAGE_ACCESS_LEVEL.MANAGE_PERMISSION },
                             component: RoleCreatePage,
                         },
                         {
                             path: 'edit/:id',
                             name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME,
-                            meta: { label: 'Edit Role' },
+                            meta: { label: 'Edit Role', accessLevel: PAGE_ACCESS_LEVEL.MANAGE_PERMISSION },
                             props: true,
                             component: RoleEditPage,
                         },
@@ -75,7 +76,7 @@ const administrationRoutes: RouteConfig = {
                         {
                             path: 'create',
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.CREATE._NAME,
-                            meta: { lnbVisible: false },
+                            meta: { lnbVisible: false, accessLevel: PAGE_ACCESS_LEVEL.MANAGE_PERMISSION },
                             props: true,
                             component: PolicyCreatePage,
                         },

@@ -1,5 +1,6 @@
 import { RouteConfig } from 'vue-router';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
+import { PAGE_ACCESS_LEVEL } from '@/lib/access-control';
 
 const SignOutPage = () => import(/* webpackChunkName: "SignOutPage" */ '@/services/auth/sign-out/SignOutPage.vue');
 
@@ -13,13 +14,15 @@ export default [
         path: '/sign-out',
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         component: SignOutPage,
-        meta: { label: '', excludeAuth: true, isSignInPage: false },
+        meta: {
+            label: '', isSignInPage: false, accessLevel: PAGE_ACCESS_LEVEL.EXCLUDE_AUTH,
+        },
     },
     {
         path: '/sign-in',
         meta: {
-            excludeAuth: true,
             isSignInPage: true,
+            accessLevel: PAGE_ACCESS_LEVEL.EXCLUDE_AUTH,
         },
         component: { template: '<router-view />' },
         children: [
@@ -27,7 +30,6 @@ export default [
                 path: '/',
                 name: AUTH_ROUTE.SIGN_IN._NAME,
                 meta: {
-                    excludeAuth: true,
                     isSignInPage: true,
 
                 },
@@ -40,7 +42,6 @@ export default [
                 path: 'admin',
                 name: AUTH_ROUTE.ADMIN_SIGN_IN._NAME,
                 meta: {
-                    excludeAuth: true,
                     isSignInPage: true,
                 },
                 component: DomainAdminSignInPage,
@@ -53,7 +54,6 @@ export default [
                 path: 'keycloak',
                 name: AUTH_ROUTE.SIGN_IN.KEYCLOAK._NAME,
                 meta: {
-                    excludeAuth: true,
                     isSignInPage: true,
                 },
                 props: route => ({
@@ -67,7 +67,6 @@ export default [
         path: '/kbsso/checkauth.jsp',
         name: AUTH_ROUTE.SIGN_IN.KB._NAME,
         meta: {
-            excludeAuth: true,
             isSignInPage: true,
         },
         props: ({ query }) => ({
