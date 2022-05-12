@@ -5,6 +5,9 @@ import * as mutations from './mutations';
 
 const state: PolicyState = {
     policyData: null,
+    policyListLoading: false,
+    policyList: undefined,
+    totalCount: 0,
 };
 
 export default {

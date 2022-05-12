@@ -64,25 +64,22 @@
 
 <script lang="ts">
 import {
-    PToolboxTable, PSelectStatus, PAnchor, PBadge,
+    PAnchor, PBadge, PSelectStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import {
-    computed,
-    reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { POLICY_TYPES, policySearchHandlers } from '@/services/administration/iam/policy/lib/config';
 import { policyTypeBadgeColorFormatter, policyTypeURIFormatter } from '@/services/administration/iam/policy/lib/helper';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
+import { administrationStore } from '@/services/administration/store';
 
 // FIXME:: This is DUMMY, should be removed
 const DUMMY_REPO_ID = 'repo-d9e115714edc';
@@ -110,7 +107,7 @@ export default {
             .setPage(1, 15).setSort('name', true);
 
         const state = reactive({
-            loading: false,
+            loading: computed(() => administrationStore.state.policy.policyListLoading),
             policyTypeList: [
                 { name: POLICY_TYPES.MANAGED, label: 'Managed' },
                 { name: POLICY_TYPES.CUSTOM, label: 'Custom' },
@@ -123,7 +120,16 @@ export default {
                 { name: 'tags', label: 'Description', sortable: false },
                 { name: 'created_at', label: 'Created' },
             ],
-            items: [] as PolicyDataModel[],
+            items: computed(() => {
+                const policyList = administrationStore.state.policy.policyList;
+                return policyList?.map(d => ({
+                    ...d,
+                    type: d?.policy_type ?? POLICY_TYPES.MANAGED,
+                    created_at: d?.policy_type === POLICY_TYPES.MANAGED
+                        ? '--'
+                        : iso8601Formatter(d.created_at.toString(), state.timezone, 'YYYY-MM-DD hh:mm:ss'),
+                })) ?? [];
+            }),
             valueHandlerMap: computed(() => ({
                 // FIXME:: Custom valueHandler here
                 // name: makeDistinctValueHandler(`${policyTypeURIFormatter(state.selectedType)}.Policy`, 'name', undefined, undefined, undefined, { repository_id: DUMMY_REPO_ID }),
@@ -133,40 +139,16 @@ export default {
             selectedIndices: [] as number[],
             keyItemSets: policySearchHandlers.keyItemSets,
             timezone: computed(() => store.state.user.timezone),
-            totalCount: 0,
+            totalCount: computed(() => administrationStore.state.policy.totalCount),
         });
 
-        const listPolicies = async (type: POLICY_TYPES) => {
-            state.loading = true;
-            try {
-                const res = type === POLICY_TYPES.MANAGED
-                    ? await SpaceConnector.client.repository.policy.list({
-                        repository_id: DUMMY_REPO_ID,
-                        query: policyListApiQueryHelper.data,
-                    })
-                    : await SpaceConnector.client.identity.policy.list({
-                        query: policyListApiQueryHelper.data,
-                    });
-                state.items = res.results.map(d => ({
-                    ...d,
-                    type,
-                    created_at: type === POLICY_TYPES.MANAGED
-                        ? '--'
-                        : iso8601Formatter(d.created_at, state.timezone, 'YYYY-MM-DD hh:mm:ss'),
-                }));
-                state.totalCount = res.total_count;
-            } catch (e: unknown) {
-                ErrorHandler.handleError(e);
-                state.items = [];
-                state.totalCount = 0;
-            } finally {
-                state.loading = false;
-            }
+        const listPolicies = () => {
+            console.log('Filter policy lists');
         };
 
         const handleChange = (options: ToolboxOptions = {}) => {
             setApiQueryWithToolboxOptions(policyListApiQueryHelper, options);
-            listPolicies(state.selectedType);
+            listPolicies();
         };
 
         const handleExport = async () => {
@@ -192,10 +174,10 @@ export default {
         const handleSelect = (index) => { state.selectedIndices = index; };
 
         watch(() => state.selectedType, () => {
-            listPolicies(state.selectedType);
+            listPolicies();
         });
 
-        watch(() => state.totalCount, (value: number) => {
+        watch(() => state.totalCount as number, (value: number) => {
             emit('update-total-count', value);
         });
 
@@ -204,7 +186,8 @@ export default {
         });
 
         (async () => {
-            await listPolicies(state.selectedType);
+            await administrationStore.dispatch('policy/fetchPolicyList', policyListApiQueryHelper.data);
+            await listPolicies();
         })();
 
         return {

@@ -1,8 +1,9 @@
 import { POLICY_TYPES, PolicyState } from '@/services/administration/iam/policy/lib/config';
 import { Tags, TimeStamp } from '@/models';
 
-export interface PolicyStoreState {
-    name: string;
+export interface PolicyListDataModel {
+    results: PolicyDataModel[];
+    total_count: number;
 }
 
 export interface PolicyDataModel {
@@ -13,6 +14,7 @@ export interface PolicyDataModel {
     policy_id: string;
     repository_info?: RepositoryInfoDataModel;
     tags: Tags;
+    policy_type?: string;
     project_id?: string;
     labels?: any;
     state?: PolicyState;
