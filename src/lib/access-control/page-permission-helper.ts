@@ -6,8 +6,7 @@ export interface PagePermission {
     page: string;
     permission: PagePermissionType
 }
-export type PagePermissionMap = Record<MenuId, PagePermissionType>
-
+type PagePermissionMap = Record<string, PagePermissionType>
 // export type PagePermissionTuple = [page: string, permission: PagePermissionType] // eslint parsing error occurs
 export type PagePermissionTuple = Array<string|PagePermissionType>
 
@@ -20,6 +19,7 @@ const permissionRequiredMenuIds: readonly MenuId[] = Object.freeze([
     MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE,
     MENU_ID.ASSET_INVENTORY_SERVER,
     MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT,
+    MENU_ID.COST_EXPLORER_DASHBOARD,
     MENU_ID.COST_EXPLORER_COST_ANALYSIS,
     MENU_ID.COST_EXPLORER_BUDGET,
     MENU_ID.ALERT_MANAGER_DASHBOARD,
@@ -31,8 +31,10 @@ const permissionRequiredMenuIds: readonly MenuId[] = Object.freeze([
 ]);
 
 export const getPagePermissionMap = (pagePermissions: PagePermission[]): PagePermissionMap => {
-    const result = {} as Record<MenuId, PagePermissionType>;
-    pagePermissions.forEach(({ page, permission }) => {
+    const result = {} as PagePermissionMap;
+    pagePermissions.forEach((data) => {
+        const { page, permission } = data ?? { page: '' };
+
         // in case of wildcard
         if (page === '*') {
             permissionRequiredMenuIds.forEach((id) => {
@@ -41,7 +43,7 @@ export const getPagePermissionMap = (pagePermissions: PagePermission[]): PagePer
             // in case of service wildcard
         } else if (page.endsWith('*')) {
             const menuId = page.replace('.*', '');
-            const menuIds = permissionRequiredMenuIds.filter(id => id.startsWith(menuId));
+            const menuIds = permissionRequiredMenuIds.filter(id => id.split('.')[0] === menuId);
             menuIds.forEach((id) => {
                 result[id] = getProperPermissionType(permission, result[id]);
             });

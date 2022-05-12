@@ -3,7 +3,7 @@ import { getMenuLabel } from '@/lib/menu/menu-info';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { RouteConfig } from 'vue-router';
 import { MENU_ID } from '@/lib/menu/config';
-import { PAGE_ACCESS_LEVEL } from '@/lib/access-control';
+import { ROUTE_ACCESS_LEVEL } from '@/lib/access-control';
 
 const AssetInventoryContainer = () => import(/* webpackChunkName: "AssetInventoryContainer" */ '@/services/asset-inventory/AssetInventoryContainer.vue');
 
@@ -30,7 +30,7 @@ const CollectJobPage = () => import(/* webpackChunkName: "CollectorHistory" */ '
 const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.ASSET_INVENTORY), accessLevel: PAGE_ACCESS_LEVEL.VIEW_PERMISSION },
+    meta: { label: getMenuLabel(MENU_ID.ASSET_INVENTORY), accessLevel: ROUTE_ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: '/asset-inventory/cloud-service',
     component: AssetInventoryContainer,
     children: [
@@ -106,13 +106,13 @@ const assetInventoryRoute: RouteConfig = {
                         {
                             path: '/',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
-                            meta: { lnbVisible: true, accessLevel: PAGE_ACCESS_LEVEL.MANAGE_PERMISSION },
+                            meta: { lnbVisible: true, accessLevel: ROUTE_ACCESS_LEVEL.MANAGE_PERMISSION },
                             component: CollectorPluginPage as any,
                         },
                         {
                             path: ':pluginId',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE.STEPS._NAME,
-                            meta: { label: ({ params }) => params.pluginId, copiable: true, accessLevel: PAGE_ACCESS_LEVEL.MANAGE_PERMISSION },
+                            meta: { label: ({ params }) => params.pluginId, copiable: true, accessLevel: ROUTE_ACCESS_LEVEL.MANAGE_PERMISSION },
                             props: true,
                             component: CreateCollectorPage as any,
                         },
@@ -161,7 +161,7 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: 'add/:provider',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
-                    meta: { label: 'Add Service Account', accessLevel: PAGE_ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { label: 'Add Service Account', accessLevel: ROUTE_ACCESS_LEVEL.MANAGE_PERMISSION },
                     props: true,
                     component: ServiceAccountAddPage as any,
                 },

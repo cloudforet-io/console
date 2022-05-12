@@ -1,4 +1,4 @@
-import { PageAccessLevel } from '@/lib/access-control';
+import { RouteAccessLevel } from '@/lib/access-control';
 
 declare module 'vue-router' {
   import {
@@ -18,7 +18,7 @@ declare module 'vue-router' {
     translationId?: string;
     copiable?: boolean; // for breadcrumbs
     isSignInPage?: boolean;
-    accessLevel?: PageAccessLevel;
+    accessLevel?: RouteAccessLevel;
   }
   export interface RouteConfigSingleView extends OriginRouteConfigSingleView {
       meta?: RouteMeta;

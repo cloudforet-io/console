@@ -2,7 +2,7 @@ import { RouteConfig } from 'vue-router';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { getMenuLabel } from '@/lib/menu/menu-info';
 import { MENU_ID } from '@/lib/menu/config';
-import { PAGE_ACCESS_LEVEL } from '@/lib/access-control';
+import { ROUTE_ACCESS_LEVEL } from '@/lib/access-control';
 
 const CostExplorerContainer = () => import(/* webpackChunkName: "CostExplorerContainer" */ '@/services/cost-explorer/CostExplorerContainer.vue');
 
@@ -20,7 +20,7 @@ const BudgetDetailPage = () => import(/* webpackChunkName: "BudgetDetailPage" */
 const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.COST_EXPLORER), accessLevel: PAGE_ACCESS_LEVEL.VIEW_PERMISSION },
+    meta: { label: getMenuLabel(MENU_ID.COST_EXPLORER), accessLevel: ROUTE_ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: '/cost-explorer/dashboard',
     component: CostExplorerContainer,
     children: [
@@ -32,7 +32,7 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: 'create',
                     name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME,
-                    meta: { label: 'Create Dashboard', accessLevel: PAGE_ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { label: 'Create Dashboard', accessLevel: ROUTE_ACCESS_LEVEL.MANAGE_PERMISSION },
                     props: true,
                     component: CostDashboardCreatePage as any,
                 },
@@ -89,19 +89,19 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: 'create',
                     name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
-                    meta: { label: 'Create Budget', accessLevel: PAGE_ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { label: 'Create Budget', accessLevel: ROUTE_ACCESS_LEVEL.MANAGE_PERMISSION },
                     component: BudgetCreatePage as any,
                 },
                 {
                     path: 'bulk-create',
                     name: COST_EXPLORER_ROUTE.BUDGET.BULK_CREATE._NAME,
-                    meta: { label: 'Create Bulk Budget', accessLevel: PAGE_ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { label: 'Create Bulk Budget', accessLevel: ROUTE_ACCESS_LEVEL.MANAGE_PERMISSION },
                     component: BudgetBulkCreatePage as any,
                 },
                 {
                     path: 'update/:budgetId',
                     name: COST_EXPLORER_ROUTE.BUDGET.UPDATE._NAME,
-                    meta: { label: 'Update Budget', accessLevel: PAGE_ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { label: 'Update Budget', accessLevel: ROUTE_ACCESS_LEVEL.MANAGE_PERMISSION },
                     props: true,
                     component: BudgetUpdatePage as any,
                 },

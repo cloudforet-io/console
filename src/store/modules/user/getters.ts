@@ -1,6 +1,8 @@
 import { languages, userTypes } from '@/store/modules/user/config';
 import { Getter } from 'vuex';
-import { getPagePermissionMap, PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
+import {
+    getPagePermissionMap, PagePermissionTuple, PagePermissionType,
+} from '@/lib/access-control/page-permission-helper';
 import { UserState } from './type';
 
 export const isDomainOwner = (state: UserState): boolean => state.userType === 'DOMAIN_OWNER';
@@ -18,6 +20,7 @@ export const isAdmin = (state: UserState): boolean => {
             }
         });
     }
+    // if (role.roleType === 'DOMAIN') { // in this case, icon must be root account
 
     return isAdminUser;
 };
@@ -62,8 +65,9 @@ export const hasDomainRole = (state: UserState): boolean => {
 
 export const hasPermission = (state: UserState): boolean => !!state.roles?.length;
 
-export const pagePermissionList: Getter<UserState, any> = (state): PagePermissionTuple[] => {
+export const pagePermissionMap: Getter<UserState, any> = (state): Record<string, PagePermissionType> => {
     const permissions = state.roles?.flatMap(role => role.pagePermissions) ?? [];
-    const permissionMap = getPagePermissionMap(permissions);
-    return Object.entries(permissionMap);
+    return getPagePermissionMap(permissions);
 };
+
+export const pagePermissionList: Getter<UserState, any> = (state, getters): PagePermissionTuple[] => Object.entries(getters.pagePermissionMap);
