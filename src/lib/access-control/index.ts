@@ -28,7 +28,7 @@ export const getRouteAccessLevel = (route: Route): AccessLevel => {
     const reversedMatched = clone(route.matched).reverse();
     const closestRoute = reversedMatched.find(d => d.meta?.accessLevel !== undefined);
     if (!closestRoute) return 'AUTHENTICATED';
-    return closestRoute.meta.accessLevel;
+    return closestRoute.meta.accessLevel ?? 'AUTHENTICATED';
 };
 
 export const getUserAccessLevel = (routeName?: string|null, pagePermissions: PagePermissionTuple[] = [], isTokenAlive = true): AccessLevel => {
