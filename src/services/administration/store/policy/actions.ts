@@ -22,8 +22,7 @@ export const fetchPolicyList = async ({ commit }, params: any): Promise<void|Err
 
 export const getPolicyData = async ({ commit }, policyId: string): Promise<void|Error> => {
     try {
-        // FIXME:: Should be changed = repository => identity
-        const policy: PolicyDataModel = await SpaceConnector.client.repository.policy.get({
+        const policy: PolicyDataModel = await SpaceConnector.client.identity.policy.get({
             policy_id: policyId,
         });
         commit('setPolicyData', policy);
