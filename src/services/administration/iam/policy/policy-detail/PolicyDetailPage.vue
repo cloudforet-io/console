@@ -10,8 +10,8 @@
                     <p-badge style-type="gray200">{{ $t('IAM.POLICY.FORM.VIEW_ONLY') }}</p-badge>
                 </span>
                 <span v-if="type === POLICY_TYPES.CUSTOM" class="policy-edit-buttons">
-                    <p-icon-button name="ic_trashcan" class="w-full delete-btn" @click="handlerVisibleDeleteModal" />
-                    <p-icon-button name="ic_edit-text" class="edit-btn" @click="handlerVisibleNameEditModal" />
+                    <p-icon-button name="ic_trashcan" class="w-full delete-btn" @click="handleVisibleDeleteModal" />
+                    <p-icon-button name="ic_edit-text" class="edit-btn" @click="handleVisibleTitleEditModal" />
                 </span>
                 <div v-if="type === POLICY_TYPES.CUSTOM" class="policy-modify-buttons">
                     <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="gray-border">
@@ -63,8 +63,8 @@
                 />
             </div>
         </p-pane-layout>
-        <policy-delete-modal :visible.sync="visibleDeleteModal" :attached-roles="attachedRoles" />
-        <policy-name-edit-modal :visible.sync="visibleNameEditModal" />
+        <policy-delete-modal :visible.sync="visibleDeleteModal" :policy-id="policyInfo.policy_id" />
+        <policy-name-edit-modal :visible.sync="visibleTitleEditModal" :policy-id="policyInfo.policy_id" :policy-name="policyInfo.name" />
     </section>
 </template>
 
@@ -108,13 +108,12 @@ export default defineComponent<PolicyDetailPageProps>({
         const state = reactive({
             policyInfo: computed(() => administrationStore.state.policy.policyData),
             type: SpaceRouter.router.currentRoute.query.type,
-            code: computed(() => JSON.stringify(administrationStore.state.policy.policyData, undefined, 4)),
+            code: computed(() => JSON.stringify(administrationStore.state.policy.policyData?.permissions ?? {}, undefined, 4)),
             isCodeModified: false,
             description: computed(() => administrationStore.state.policy.policyData?.tags?.description ?? ''),
             isDescriptionModified: false,
             visibleDeleteModal: false,
-            visibleNameEditModal: false,
-            attachedRoles: true,
+            visibleTitleEditModal: false,
         });
 
         const handleCodeUpdate = (modifiedCode: string) => {
@@ -127,8 +126,8 @@ export default defineComponent<PolicyDetailPageProps>({
             state.description = modifiedDescription;
         };
 
-        const handlerVisibleDeleteModal = () => { state.visibleDeleteModal = true; };
-        const handlerVisibleNameEditModal = () => { state.visibleNameEditModal = true; };
+        const handleVisibleDeleteModal = () => { state.visibleDeleteModal = true; };
+        const handleVisibleTitleEditModal = () => { state.visibleTitleEditModal = true; };
 
         (async () => {
             try {
@@ -143,8 +142,8 @@ export default defineComponent<PolicyDetailPageProps>({
             POLICY_TYPES,
             handleCodeUpdate,
             handleDescriptionUpdate,
-            handlerVisibleDeleteModal,
-            handlerVisibleNameEditModal,
+            handleVisibleDeleteModal,
+            handleVisibleTitleEditModal,
         };
     },
 });

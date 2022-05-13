@@ -15,7 +15,7 @@
                 </router-link>
             </template>
         </p-page-title>
-        <policy-list-data-table @update-total-count="handleUpdate" />
+        <policy-list-data-table :anchor-icon-visible="false" @update-total-count="handleUpdate" />
     </section>
 </template>
 

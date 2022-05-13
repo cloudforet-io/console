@@ -16,7 +16,7 @@
             <div class="policy-create-contents">
                 <!--                song-lang-->
                 <p-field-group
-                    label="$t('IAM.POLICY.MODAL.NAME')"
+                    :label="$t('IAM.POLICY.MODAL.NAME')"
                     required
                     :invalid="isNameModified"
                     invalid-text="Must be longer than 2 characters"
