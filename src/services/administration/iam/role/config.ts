@@ -1,3 +1,5 @@
+import { MENU_ID } from '@/lib/menu/config';
+
 export const ROLE_TYPE = Object.freeze({
     SYSTEM: 'SYSTEM',
     PROJECT: 'PROJECT',
@@ -11,3 +13,5 @@ export const ROLE_TYPE_BADGE_OPTION = Object.freeze({
     [ROLE_TYPE.DOMAIN]: { label: 'Admin', styleType: 'primary1' },
     [ROLE_TYPE.PROJECT]: { label: 'User', styleType: 'gray' },
 });
+
+export const EXCEPTION_MENU = [MENU_ID.PROJECT, MENU_ID.MY_PAGE];

@@ -40,14 +40,12 @@ import {
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import { GNBMenu } from '@/store/modules/display/type';
 import { store } from '@/store';
-import { MENU_ID } from '@/lib/menu/config';
+import { EXCEPTION_MENU } from '@/services/administration/iam/role/config';
 import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
 import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 import { PagePermission } from '@/lib/access-control/page-permission-helper';
 import { i18n } from '@/translations';
-
-const EXCEPTION_MENU = [MENU_ID.PROJECT, MENU_ID.MY_PAGE];
 
 const flattenSubMenuList = (subMenuList?: GNBMenu[], labels?: Array<string|TranslateResult>): PageAccessMenuItem[] => {
     if (!subMenuList) return [];

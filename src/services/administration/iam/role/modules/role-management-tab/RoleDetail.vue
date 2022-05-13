@@ -14,11 +14,11 @@
             </template>
         </p-definition-table>
         <p-panel-top>{{ pageAccessState.title }}</p-panel-top>
-        <div v-for="gnbState in gnbStateList" :key="gnbState.id">
+        <div v-for="pagePermissionState in pageAccessState.pagePermissionStates" :key="pagePermissionState.id">
             <h4 class="definition-table-header">
-                {{ gnbState.title }}
+                {{ pagePermissionState.label }}
             </h4>
-            <p-definition-table :fields="gnbState.fields" :data="gnbState.data" :loading="pageAccessState.loading"
+            <p-definition-table :fields="pagePermissionState.fields" :data="pagePermissionState.data" :loading="pageAccessState.loading"
                                 :skeleton-rows="3" disable-copy v-on="$listeners"
             >
                 <template #data="{ data }">
@@ -62,10 +62,9 @@ import { i18n } from '@/translations';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
+import { EXCEPTION_MENU, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
 import { RoleData } from '@/services/administration/iam/role/type';
-import { MENU_ID } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { MENU_ID, MenuId } from '@/lib/menu/config';
 import {
     DataTableField,
 } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
@@ -76,13 +75,19 @@ import {
 } from '@/lib/access-control/page-permission-helper';
 import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 import { policyTypeBadgeColorFormatter } from '@/services/administration/iam/policy/lib/helper';
+import { GNBMenu } from '@/store/modules/display/type';
+import { DefinitionField } from '@spaceone/design-system/dist/src/data-display/tables/definition-table/type';
 
 type DataTableTranslationField = DataTableField | {
     label?: TranslateResult | string;
 }
 
-type PageAccessState = Record<string, PagePermissionType | '--'>;
+type PageAccessDataState = Record<string, PagePermissionType | '--'>;
 
+interface PageAccessState extends GNBMenu {
+    data?: PageAccessDataState;
+    fields?: DefinitionField[];
+}
 export default {
     name: 'UserDetail',
     components: {
@@ -116,46 +121,11 @@ export default {
         const pageAccessState = reactive({
             title: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS'),
             loading: false,
-        });
-        const assetInventoryState = reactive({
-            id: MENU_ID.ASSET_INVENTORY,
-            title: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].label,
-            fields: computed(() => [
-                { name: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE, label: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].label },
-                { name: MENU_ID.ASSET_INVENTORY_COLLECTOR, label: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_COLLECTOR].label },
-                { name: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT, label: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT].label },
-            ]),
-            data: {} as PageAccessState,
-        });
-        const costExplorerState = reactive({
-            id: MENU_ID.COST_EXPLORER,
-            title: MENU_INFO_MAP[MENU_ID.COST_EXPLORER].label,
-            fields: computed(() => [
-                { name: MENU_ID.COST_EXPLORER_DASHBOARD, label: MENU_INFO_MAP[MENU_ID.COST_EXPLORER_DASHBOARD].label },
-                { name: MENU_ID.COST_EXPLORER_COST_ANALYSIS, label: MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].label },
-                { name: MENU_ID.COST_EXPLORER_BUDGET, label: MENU_INFO_MAP[MENU_ID.COST_EXPLORER_BUDGET].label },
-            ]),
-            data: {} as PageAccessState,
-        });
-        const alertManagerState = reactive({
-            id: MENU_ID.ALERT_MANAGER,
-            title: MENU_INFO_MAP[MENU_ID.ALERT_MANAGER].label,
-            fields: computed(() => [
-                { name: MENU_ID.ALERT_MANAGER_DASHBOARD, label: MENU_INFO_MAP[MENU_ID.ALERT_MANAGER_DASHBOARD].label },
-                { name: MENU_ID.ALERT_MANAGER_ALERT, label: MENU_INFO_MAP[MENU_ID.ALERT_MANAGER_ALERT].label },
-                { name: MENU_ID.ALERT_MANAGER_ESCALATION_POLICY, label: MENU_INFO_MAP[MENU_ID.ALERT_MANAGER_ESCALATION_POLICY].label },
-            ]),
-            data: {} as PageAccessState,
-        });
-        const administrationState = reactive({
-            id: MENU_ID.ADMINISTRATION,
-            title: MENU_INFO_MAP[MENU_ID.ADMINISTRATION].label,
-            fields: computed(() => [
-                { name: MENU_ID.ADMINISTRATION_USER, label: `${MENU_INFO_MAP[MENU_ID.ADMINISTRATION_IAM].label} > ${MENU_INFO_MAP[MENU_ID.ADMINISTRATION_USER].label}` },
-                { name: MENU_ID.ADMINISTRATION_ROLE, label: `${MENU_INFO_MAP[MENU_ID.ADMINISTRATION_IAM].label} > ${MENU_INFO_MAP[MENU_ID.ADMINISTRATION_ROLE].label}` },
-                { name: MENU_ID.ADMINISTRATION_POLICY, label: `${MENU_INFO_MAP[MENU_ID.ADMINISTRATION_IAM].label} > ${MENU_INFO_MAP[MENU_ID.ADMINISTRATION_POLICY].label}` },
-            ]),
-            data: {} as PageAccessState,
+            allMenuList: computed<GNBMenu[]>(() => {
+                const allMenu = store.getters['display/allGnbMenuList'];
+                return (allMenu ?? []).filter(d => !EXCEPTION_MENU.includes(d.id));
+            }),
+            pagePermissionStates: [] as PageAccessState[],
         });
         const policyState = reactive({
             fields: [
@@ -167,33 +137,40 @@ export default {
             items: [] as (PolicyDataModel | { policy_type: POLICY_TYPES })[],
         });
 
-        const initStateData = () => {
-            assetInventoryState.data = { [MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE]: '--' };
-            costExplorerState.data = { [MENU_ID.COST_EXPLORER_DASHBOARD]: '--' };
-            alertManagerState.data = { [MENU_ID.ALERT_MANAGER_DASHBOARD]: '--' };
-            administrationState.data = { [MENU_ID.ADMINISTRATION_USER]: '--' };
-        };
+        const initPageAccessData = (pageAccessDataList: PageAccessState[]): PageAccessState[] => pageAccessDataList.map((pageAccessData) => {
+            const multiDepthMenuList = [MENU_ID.ADMINISTRATION] as MenuId[];
+            const subMenu = pageAccessData.subMenuList;
+            if (!pageAccessData?.data || !subMenu) return pageAccessData;
+            if (!multiDepthMenuList.includes(pageAccessData.id)) {
+                pageAccessData.data[subMenu[0].id] = '--';
+                pageAccessData.fields = (subMenu ?? []).map(menu => ({
+                    name: menu.id,
+                    label: menu.label,
+                }));
+            } else {
+                const grandChildMenu = subMenu[0].subMenuList;
+                if (!grandChildMenu) return pageAccessData;
+                pageAccessData.data[grandChildMenu[0].id] = '--';
+                pageAccessData.fields = grandChildMenu.map(menu => ({
+                    name: menu.id,
+                    label: `${subMenu[0].label} > ${menu.label}`,
+                }));
+            }
+            return pageAccessData;
+        });
         const convertPagePermissionData = () => {
-            const pagePermissionData = getPagePermissionMap(baseInfoState.data.page_permissions ?? []);
-            initStateData();
-            Object.keys(pagePermissionData).forEach((pagePermission) => {
-                switch (pagePermission.split('.')[0]) {
-                case MENU_ID.ASSET_INVENTORY:
-                    assetInventoryState.data[pagePermission] = pagePermissionData[pagePermission];
-                    break;
-                case MENU_ID.COST_EXPLORER:
-                    costExplorerState.data[pagePermission] = pagePermissionData[pagePermission];
-                    break;
-                case MENU_ID.ALERT_MANAGER:
-                    alertManagerState.data[pagePermission] = pagePermissionData[pagePermission];
-                    break;
-                case MENU_ID.ADMINISTRATION:
-                    administrationState.data[pagePermission] = pagePermissionData[pagePermission];
-                    break;
-                default:
-                    break;
-                }
+            const pageAccessDataInitialValue = pageAccessState.allMenuList.map(menuState => ({
+                ...menuState,
+                data: {},
+                fields: [],
+            })) as PageAccessState[];
+            const pageAccessData = initPageAccessData(pageAccessDataInitialValue);
+            const transFormedPagePermission = getPagePermissionMap(baseInfoState.data.page_permissions ?? []);
+            Object.keys(transFormedPagePermission).forEach((pagePermission) => {
+                const selectedPageAccessData = pageAccessData.find(gnb => gnb.id === pagePermission.split('.')[0]);
+                if (selectedPageAccessData?.data) selectedPageAccessData.data[pagePermission] = transFormedPagePermission[pagePermission];
             });
+            return pageAccessData;
         };
 
         const getRoleDetailData = async (roleId) => {
@@ -203,7 +180,8 @@ export default {
                 baseInfoState.data = await SpaceConnector.client.identity.role.get({
                     role_id: roleId,
                 });
-                convertPagePermissionData();
+
+                pageAccessState.pagePermissionStates = convertPagePermissionData();
                 policyState.items = [];
                 await Promise.all((baseInfoState.data.policies ?? []).map(async (policy) => {
                     try {
@@ -251,7 +229,6 @@ export default {
         return {
             ...toRefs(baseInfoState),
             pageAccessState,
-            gnbStateList: [assetInventoryState, costExplorerState, alertManagerState, administrationState],
             policyState,
             iso8601Formatter,
             ROLE_TYPE_BADGE_OPTION,
