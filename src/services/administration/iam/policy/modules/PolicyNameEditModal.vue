@@ -20,6 +20,7 @@ import { reactive, toRefs } from '@vue/composition-api';
 import { administrationStore } from '@/services/administration/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { i18n } from '@/translations';
 
 export default {
     name: 'PolicyNameEditModal',
@@ -60,11 +61,9 @@ export default {
                     },
                     policyId: props.policyId,
                 });
-                // song-lang
-                showSuccessMessage('Successfully updated policy name', '');
+                showSuccessMessage(i18n.t('IAM.POLICY.MODAL.ALT_S_UPDATE_POLICY'), '');
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, 'Failed to update policy name');
+                ErrorHandler.handleRequestError(e, i18n.t('IAM.POLICY.MODAL.ALT_E_UPDATE_POLICY'));
             } finally {
                 state.loading = false;
             }

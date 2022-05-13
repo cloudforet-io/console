@@ -159,7 +159,6 @@ export default {
                     repository_id: state.selectedType === POLICY_TYPES.MANAGED ? DUMMY_REPO_ID : '',
                     query: policyListApiQueryHelper.data,
                 },
-                // song-lang
                 fields: [
                     { name: 'Name', key: 'name' },
                     { name: 'Type', key: 'type' },

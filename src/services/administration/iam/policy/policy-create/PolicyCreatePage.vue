@@ -14,19 +14,17 @@
                 </p-badge>
             </div>
             <div class="policy-create-contents">
-                <!--                song-lang-->
                 <p-field-group
                     :label="$t('IAM.POLICY.MODAL.NAME')"
                     required
                     :invalid="isNameModified"
-                    invalid-text="Must be longer than 2 characters"
+                    :invalid-text="$t('IAM.POLICY.FORM.VALIDATION_NAME')"
                 >
                     <template #default="{invalid}">
-                        <!--                    song-lang-->
                         <p-text-input
                             :value.sync="name"
                             :invalid="invalid"
-                            invalid-text="Must be longer than 2 characters"
+                            :invalid-text="$t('IAM.POLICY.FORM.VALIDATION_NAME')"
                             @input="handleNameInput"
                         />
                     </template>
@@ -50,7 +48,6 @@
             >
                 {{ $t('IAM.POLICY.FORM.CANCEL') }}
             </p-button>
-            <!--            song-lang-->
             <p-button
                 style-type="primary-dark"
                 size="lg"
@@ -72,6 +69,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceRouter } from '@/router';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { i18n } from '@/translations';
 
 export default {
     name: 'PolicyCreatePage',
@@ -97,12 +95,10 @@ export default {
         const handleCreatePolicy = async () => {
             try {
                 await SpaceConnector.client.identity.policy.create({ permissions: permissionsParser(state.code), name: state.name });
-                // song-lang
-                showSuccessMessage('Successfully created policy', '');
+                showSuccessMessage(i18n.t('IAM.POLICY.MODAL.ALT_S_CREATE_POLICY'), '');
                 SpaceRouter.router.go(-1);
             } catch (e: any) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, 'Failed to create policy');
+                ErrorHandler.handleRequestError(e, i18n.t('IAM.POLICY.MODAL.ALT_E_CREATE_POLICY'));
             }
         };
 
