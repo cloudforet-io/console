@@ -1,13 +1,14 @@
 <template>
     <section class="policy-list-data-table">
         <p-toolbox-table
-            exportable
+            :exportable="false"
             :sortable="false"
             searchable
             search-type="query"
             :loading="loading"
             :fields="fields"
             :items="items"
+            :query-tags="queryTags"
             :key-item-sets="policySearchHandler.keyItemSets"
             :value-handler-map="policySearchHandler.valueHandlerMap"
             :selectable="selectable"
@@ -15,7 +16,7 @@
             :pagination-visible="false"
             :page-size-changeable="false"
             @change="handleChange"
-            @refresh="handleChange()"
+            @refresh="handleRefresh"
             @export="handleExport"
         >
             <template #toolbox-top>
@@ -63,6 +64,7 @@
 </template>
 
 <script lang="ts">
+import { filter } from 'lodash';
 import {
     PAnchor, PBadge, PSelectStatus, PToolboxTable,
 } from '@spaceone/design-system';
@@ -85,9 +87,25 @@ import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { administrationStore } from '@/services/administration/store';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
+
 
 // FIXME:: This is DUMMY, should be removed
 const DUMMY_REPO_ID = 'repo-d9e115714edc';
+
+const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], selectedType: POLICY_TYPES): PolicyDataModel[] => {
+    // 1. filter by type
+    const _typeFilteredItems = filter(policyList, { policy_type: selectedType });
+
+    // 2. filter by query tags
+    let _tagFilteredItems = [..._typeFilteredItems];
+    queryTags.forEach((queryTag) => {
+        _tagFilteredItems = filter(_tagFilteredItems, item => !!item[queryTag.key?.name].includes(queryTag.value.name));
+    });
+
+    return _tagFilteredItems;
+};
 
 export default {
     name: 'PolicyListDataTable',
@@ -108,7 +126,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const policyListApiQueryHelper = new ApiQueryHelper().setSort('name', true);
+        const policyListApiQueryHelper = new ApiQueryHelper();
         const state = reactive({
             loading: computed(() => administrationStore.state.policy.policyListLoading),
             policyList: computed(() => administrationStore.state.policy.policyList),
@@ -126,8 +144,8 @@ export default {
             ],
             items: computed(() => {
                 if (!state.policyList) return [];
-                const filteredPolicyListByType = state.policyList.filter(d => d.policy_type === state.selectedType);
-                return filteredPolicyListByType.map(d => ({
+                const _filteredPolicyList = getFilteredItems(state.queryTags, state.policyList, state.selectedType);
+                return _filteredPolicyList.map(d => ({
                     ...d,
                     type: d?.policy_type ?? POLICY_TYPES.MANAGED,
                     created_at: d?.policy_type === POLICY_TYPES.MANAGED
@@ -138,6 +156,7 @@ export default {
             selectedIndices: [] as number[],
             timezone: computed(() => store.state.user.timezone),
             totalCount: computed(() => administrationStore.state.policy.totalCount),
+            queryTags: [] as QueryTag[],
         });
         const policySearchHandler = reactive({
             keyItemSets: [{
@@ -145,14 +164,11 @@ export default {
                 items: [
                     { name: 'name', label: 'Name' },
                     { name: 'policy_id', label: 'ID' },
-                    { name: 'tags', label: 'Description' },
-                    { name: 'created_at', label: 'Created', dataType: 'datetime' },
                 ],
             }] as KeyItemSet[],
             valueHandlerMap: computed(() => ({
-                name: makeCustomValueHandler(state.policyList, 'name'),
-                policy_id: makeCustomValueHandler(state.policyList, 'policy_id'),
-                created_at: makeCustomValueHandler(state.policyList, 'created_at', 'datetime'),
+                name: makeCustomValueHandler(state.items, 'name'),
+                policy_id: makeCustomValueHandler(state.items, 'policy_id'),
             })),
         });
 
@@ -162,7 +178,9 @@ export default {
 
         const handleChange = (options: ToolboxOptions = {}) => {
             setApiQueryWithToolboxOptions(policyListApiQueryHelper, options);
-            listPolicies();
+            if (options.queryTags !== undefined) {
+                state.queryTags = options.queryTags;
+            }
         };
 
         const handleExport = async () => {
@@ -184,8 +202,13 @@ export default {
             });
         };
 
+        const handleRefresh = () => {
+            listPolicies();
+        };
+
         const handleChangePolicyType = () => {
             state.selectedIndices = [];
+            state.queryTags = [];
         };
 
         watch(() => state.totalCount as number, (value: number) => {
@@ -207,6 +230,7 @@ export default {
             policyTypeBadgeColorFormatter,
             handleChange,
             handleExport,
+            handleRefresh,
             handleChangePolicyType,
         };
     },
