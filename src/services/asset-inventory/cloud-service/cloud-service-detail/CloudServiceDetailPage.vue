@@ -87,6 +87,7 @@
                     <tags-panel :resource-id="tableState.selectedCloudServiceIds[0]"
                                 resource-type="inventory.CloudService"
                                 resource-key="cloud_service_id"
+                                :disabled="tableState.hasNoManagePermission"
                     />
                 </template>
                 <template #member>
@@ -274,6 +275,7 @@ export default {
 
         const tableHeight = store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX) ?? 0;
         const tableState = reactive({
+            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
             schema: null as null|DynamicLayout,
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),

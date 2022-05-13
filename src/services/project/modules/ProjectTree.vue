@@ -11,13 +11,14 @@
                     <template v-else>
                         <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.EDIT')"
                                        name="ic_edit-text" style-type="transparent" size="sm"
+                                       :disabled="hasNoManagePermission"
                                        @click="startTreeEdit"
                         />
                         <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.CREATE')"
                                        name="ic_plus_thin" style-type="transparent" size="sm"
                                        color="inherit"
                                        class="ml-1"
-                                       :disabled="!hasRootProjectPermission"
+                                       :disabled="!hasRootProjectPermission || hasNoManagePermission"
                                        @click="openProjectGroupCreateForm()"
                         />
                     </template>
@@ -78,11 +79,12 @@
                                        name="ic_delete" class="group-delete-btn"
                                        size="sm"
                                        color="inherit"
+                                       :disabled="hasNoManagePermission"
                                        @click.stop="openProjectGroupDeleteCheckModal({node, path})"
                         />
                         <p-icon-button v-if="!treeEditMode && node.data.item_type !== 'PROJECT'" name="ic_plus" class="group-add-btn"
                                        size="sm"
-                                       :disabled="permissionInfo[node.data.id] !== true"
+                                       :disabled="permissionInfo[node.data.id] !== true || hasNoManagePermission"
                                        @click.stop="openProjectGroupCreateForm({node, path})"
                         />
                     </template>
@@ -134,6 +136,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
+            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
             loading: false,
             rootNode: computed(() => store.state.service.project.rootNode),
             permissionInfo: computed(() => store.state.service.project.permissionInfo),
@@ -145,7 +148,7 @@ export default {
                 setDataAfterEdit: false,
             })),
             dragOptions: computed(() => ({
-                disabled: !state.treeEditMode,
+                disabled: !state.treeEditMode || state.hasNoManagePermission,
                 dragValidator(node, dragNodeParent) {
                     if (!dragNodeParent) return store.getters['user/hasDomainRole'];
                     return !!(state.permissionInfo[node.data.id] || node.data.has_permission);

@@ -12,6 +12,7 @@
                 <!--                />-->
                 <p-button :outline="true" style-type="primary-dark"
                           icon="ic_plus_bold"
+                          :disabled="hasNoManagePermission"
                           @click="handleCreateBudgetSelect(createButtonItemList[0].name)"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
@@ -39,6 +40,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { SpaceRouter } from '@/router';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { store } from '@/store';
 
 export default {
     name: 'BudgetPage',
@@ -66,6 +68,7 @@ export default {
                 // },
             ]),
             filters: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).filters,
+            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
         });
 
         const handleCreateBudgetSelect = (name) => {

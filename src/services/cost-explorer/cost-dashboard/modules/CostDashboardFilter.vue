@@ -80,7 +80,6 @@ export default {
     },
     setup(props: Props, { emit, root }) {
         const state = reactive({
-            isAdmin: computed(() => store.getters['user/isAdmin']),
             proxyFilters: useProxyValue('filters', props, emit),
             filterItems: [
                 { name: FILTER.PROJECT_GROUP, title: FILTER_ITEM_MAP[FILTER.PROJECT_GROUP].label },
@@ -111,7 +110,8 @@ export default {
             viewFilterModalVisible: false,
             selectFilterModalVisible: false,
             isUserDashboard: computed(() => (props.dashboardId?.startsWith(DASHBOARD_TYPE.USER))),
-            showSetting: computed(() => ((!state.isAdmin && state.isUserDashboard) || state.isAdmin) && !props.printMode),
+            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            showSetting: computed(() => ((state.hasNoManagePermission && state.isUserDashboard) || !state.hasNoManagePermission) && !props.printMode),
         });
 
         /* api */

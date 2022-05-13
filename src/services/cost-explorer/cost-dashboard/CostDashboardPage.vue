@@ -12,7 +12,7 @@
                         <p-icon-button name="ic_edit-text"
                                        class="edit-btn"
                                        :outline="false"
-                                       :disabled="!isAdmin && dashboardType === DASHBOARD_TYPE.PUBLIC"
+                                       :disabled="hasNoManagePermission && dashboardType === DASHBOARD_TYPE.PUBLIC"
                                        @click.stop="handleClickEditDashboard"
                         />
                         <cost-dashboard-more-menu :dashboard-id="dashboardId" :dashboard="dashboard" />
@@ -52,7 +52,7 @@
             <div v-else class="empty-dashboard">
                 <img src="@/assets/images/illust_circle_boy.svg" class="empty-img">
                 <span class="empty-text">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.NO_SAVED_DASHBOARD_FOUND') }}</span>
-                <p-button v-if="isAdmin" icon="ic_plus" style-type="primary1"
+                <p-button v-if="!hasNoManagePermission" icon="ic_plus" style-type="primary1"
                           @click="handleClickCreate"
                 >
                     <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE_DASHBOARD') }}</span>
@@ -152,6 +152,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
+            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
             dashboard: {} as DashboardInfo,
             loading: true,
             layout: [] as any[],
@@ -166,7 +167,6 @@ export default {
             pdfFileName: computed<string>(() => `${state.dashboard.name ?? 'Cost_Dashboard'}_${dayjs().format('YYYYMMDD')}`),
             dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(state.dashboard, 'public_dashboard_id') ? 'public' : 'user')),
             updateModalVisible: false,
-            isAdmin: computed((() => store.getters['user/isAdmin'])),
             dashboardList: computed(() => costExplorerStore.getters.dashboardList ?? []),
             dashboardListLoading: computed(() => costExplorerStore.state.dashboardListLoading),
         });

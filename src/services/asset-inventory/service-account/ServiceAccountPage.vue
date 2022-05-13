@@ -29,12 +29,14 @@
                         <p-button style-type="primary-dark"
                                   icon="ic_plus_bold"
                                   class="mr-4"
+                                  :disabled="tableState.hasNoManagePermission"
                                   @click="clickAddServiceAccount"
                         >
                             {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
                         </p-button>
                         <p-select-dropdown class="left-toolbox-item"
                                            :items="tableState.dropdown"
+                                           :disabled="tableState.hasNoManagePermission"
                                            @select="onSelectDropdown"
                         >
                             {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ACTION') }}
@@ -56,6 +58,7 @@
                 <tags-panel :resource-id="tableState.selectedAccountIds[0]"
                             resource-type="identity.ServiceAccount"
                             resource-key="service_account_id"
+                            :disabled="tableState.hasNoManagePermission"
                 />
             </template>
             <template #credentials>
@@ -218,6 +221,7 @@ export default {
         });
 
         const tableState = reactive({
+            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
             consoleLink: '',

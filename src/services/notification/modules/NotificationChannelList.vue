@@ -9,6 +9,7 @@
                     <div v-for="item in protocolList"
                          :key="item.protocol_id"
                          class="channel-item-wrapper"
+                         :class="{'disabled': hasNoManagePermission}"
                     >
                         <router-link :to="item.link">
                             <li class="channel-item">
@@ -23,7 +24,7 @@
                                             height="2.25rem"
                                             class="service-img"
                                 />
-                                <span class="text">
+                                <span class="text" :class="{'disabled': hasNoManagePermission}">
                                     <p-i name="ic_plus_bold"
                                          width="1rem" height="1rem"
                                          color="inherit transparent"
@@ -104,6 +105,7 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
             protocolList: undefined as unknown as ProtocolItem[],
             loading: true,
             channelLoading: true,
@@ -322,6 +324,10 @@ export default {
     &.hide {
         display: none;
     }
+    &.disabled {
+        @apply bg-gray-100 text-gray-700;
+        pointer-events: none;
+    }
 }
 .channel-item {
     @apply border border-gray-300 rounded-lg;
@@ -335,6 +341,9 @@ export default {
         @apply text-primaryDark font-bold;
         text-align: center;
         line-height: 160%;
+        &.disabled {
+            @apply text-gray-300;
+        }
     }
     .item-desc {
         @apply text-violet-800;

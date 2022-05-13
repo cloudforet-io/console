@@ -7,7 +7,9 @@
             <template #header>
                 <section class="header">
                     <span class="title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS') }}</span>
-                    <p-icon-button v-if="hasBudgetAlert" name="ic_trashcan" @click="handleDelete" />
+                    <p-icon-button v-if="hasBudgetAlert" name="ic_trashcan" :disabled="hasNoManagePermission"
+                                   @click="handleDelete"
+                    />
                 </section>
             </template>
             <template #default>
@@ -36,6 +38,7 @@
                                 </li>
                             </ul>
                             <p-button icon="ic_setting" style-type="gray900" :outline="true"
+                                      :disabled="hasNoManagePermission"
                                       @click="handleSetNotifications"
                             >
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET') }}
@@ -66,6 +69,7 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_DESC') }}
                             </p>
                             <p-button icon="ic_setting" style-type="gray900" :outline="true"
+                                      :disabled="hasNoManagePermission"
                                       @click="handleSetNotifications"
                             >
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_SET') }}
@@ -106,6 +110,7 @@ import { getUUID } from '@/lib/component-util/getUUID';
 import { commaFormatter } from '@spaceone/console-core-lib';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import { store } from '@/store';
 
 export default {
     name: 'BudgetNotifications',
@@ -134,6 +139,7 @@ export default {
             budgetId: computed(() => costExplorerStore.state.budget.budgetData?.budget_id),
             budgetTargetId: computed(() => costExplorerStore.state.budget.budgetData?.project_id) || undefined,
             isBudgetLoading: computed(() => costExplorerStore.getters['budget/isBudgetLoading']),
+            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
         });
 
         const checkDeleteState = reactive({

@@ -3,41 +3,43 @@
         <div class="card-header">
             <div class="left-section">
                 <p-toggle-button :value="isActivated"
+                                 :disabled="hasNoManagePermission"
                                  @change="onToggleChange"
                 />
                 <span class="card-title">{{ channelData.protocol_name }}</span>
             </div>
             <p-icon-button name="ic_trashcan" width="1.5rem" height="1.5rem"
+                           :disabled="hasNoManagePermission"
                            @click="onClickDelete"
             />
         </div>
         <ul class="card-body">
             <notification-channel-item-name :channel-data="channelData" :project-id="projectId"
-                                            :disable-edit="editTarget && editTarget !== EDIT_TYPE.NAME"
+                                            :disable-edit="editTarget && editTarget !== EDIT_TYPE.NAME || hasNoManagePermission"
                                             @change="onChange"
                                             @edit="onEdit"
             />
             <p-divider />
             <notification-channel-item-data :channel-data="channelData" :project-id="projectId"
-                                            :disable-edit="editTarget && editTarget !== EDIT_TYPE.DATA"
+                                            :disable-edit="editTarget && editTarget !== EDIT_TYPE.DATA || hasNoManagePermission"
                                             @change="onChange"
                                             @edit="onEdit"
             />
             <p-divider v-if="projectId" />
             <notification-channel-item-level :channel-data="channelData" :project-id="projectId"
-                                             :disable-edit="editTarget && editTarget !== EDIT_TYPE.LEVEL"
+                                             :disable-edit="editTarget && editTarget !== EDIT_TYPE.LEVEL || hasNoManagePermission"
                                              @change="onChange"
                                              @edit="onEdit"
             />
             <p-divider />
             <notification-channel-item-schedule :channel-data="channelData" :project-id="projectId"
-                                                :disable-edit="editTarget && editTarget !== EDIT_TYPE.SCHEDULE"
+                                                :disable-edit="editTarget && editTarget !== EDIT_TYPE.SCHEDULE || hasNoManagePermission"
                                                 @change="onChange"
                                                 @edit="onEdit"
             />
             <p-divider />
             <notification-channel-item-topic :channel-data="channelData" :project-id="projectId"
-                                             :disable-edit="editTarget && editTarget !== EDIT_TYPE.TOPIC"
+                                             :disable-edit="editTarget && editTarget !== EDIT_TYPE.TOPIC || hasNoManagePermission"
                                              @change="onChange"
                                              @edit="onEdit"
             />
@@ -56,6 +58,7 @@ import {
     PDivider, PIconButton, PPaneLayout, PToggleButton,
 } from '@spaceone/design-system';
 import {
+    computed,
     reactive, toRefs,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -75,6 +78,7 @@ import NotificationChannelItemTopic
     from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemTopic.vue';
 import { EDIT_TYPE, PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
 
 
 // interface ParamType {
@@ -117,6 +121,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
+            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
             isActivated: props.channelData?.state === STATE_TYPE.ENABLED,
             userChannelId: props.channelData?.user_channel_id,
             projectChannelId: props.channelData?.project_channel_id,

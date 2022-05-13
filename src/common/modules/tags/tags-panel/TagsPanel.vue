@@ -4,6 +4,7 @@
             <template>{{ $t('COMMON.TAGS.TITLE') }}</template>
             <template #extra>
                 <p-button style-type="primary-dark"
+                          :disabled="disabled"
                           @click="editTag"
                 >
                     {{ $t('COMMON.TAGS.EDIT') }}
@@ -70,6 +71,10 @@ export default {
             type: String,
             default: '',
             required: true,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: Props) {

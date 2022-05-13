@@ -40,6 +40,7 @@
                     <p-button class="mr-4"
                               style-type="primary-dark"
                               icon="ic_plus_bold"
+                              :disabled="hasNoManagePermission"
                               @click="visibleAlertFormModal = true"
                     >
                         {{ $t('MONITORING.ALERT.ALERT_LIST.CREATE') }}
@@ -247,6 +248,7 @@ export default {
         });
 
         const state = reactive({
+            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
             timezone: computed(() => store.state.user.timezone),
             projects: computed(() => store.state.reference.project.items),
             webhooks: computed(() => store.state.reference.webhook.items),

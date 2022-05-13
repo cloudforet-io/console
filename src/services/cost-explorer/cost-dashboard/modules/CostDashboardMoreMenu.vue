@@ -74,7 +74,7 @@ export default {
                     menuItems[2].disabled = true;
                     return menuItems;
                 }
-                if (state.dashboardType === DASHBOARD_TYPE.PUBLIC && !state.isAdmin) {
+                if (state.dashboardType === DASHBOARD_TYPE.PUBLIC && state.hasNoManagePermission) {
                     if (state.homeDashboardId === props.dashboardId) {
                         menuItems[1].disabled = true;
                         menuItems[2].disabled = true;
@@ -84,9 +84,9 @@ export default {
                 }
                 return defaultMenuItems.value;
             }),
-            isAdmin: computed((() => store.getters['user/isAdmin'])),
             homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
             duplicateModalVisible: false,
+            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
             dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(props.dashboard, 'public_dashboard_id') ? DASHBOARD_TYPE.PUBLIC : DASHBOARD_TYPE.USER)),
         });
 

@@ -1,10 +1,12 @@
 <template>
     <aside class="sidebar-menu">
-        <l-n-b header="Cost Explorer"
-               :top-title="{ label: 'Dashboard', visibleAddButton: true,
-                             addButtonLink: { name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME}
-               }"
-               :menu-set="menuSet"
+        <l-n-b
+            v-if="!dashboardListLoading"
+            header="Cost Explorer"
+            :top-title="{ label: 'Dashboard', visibleAddButton: true,
+                          addButtonLink: { name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME}
+            }"
+            :menu-set="menuSet"
         >
             <template #after-text="{item}">
                 <p-i v-if="item.id === homeDashboardId" name="ic_home" width="1rem"
@@ -40,9 +42,10 @@ export default {
     },
     setup() {
         const state = reactive({
-            publicDashboardList: computed<PublicDashboardInfo[]>(() => costExplorerStore.state.publicDashboardList ?? []),
+            publicDashboardList: computed<PublicDashboardInfo[]>(() => costExplorerStore.state?.publicDashboardList ?? []),
             userDashboardList: computed<UserDashboardInfo[]>(() => costExplorerStore.state.userDashboardList ?? []),
             loading: true,
+            dashboardListLoading: computed<boolean>(() => costExplorerStore.state?.dashboardListLoading ?? true),
             menuSet: computed<LNBMenu[]>(() => [
                 [
                     {
@@ -77,7 +80,7 @@ export default {
                 },
             ]),
             selectedMenu: {} as LNBItem,
-            homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
+            homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters?.homeDashboardId),
         });
 
         const listDashboard = async () => {

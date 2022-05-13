@@ -53,19 +53,19 @@
                                               style-type="primary-dark"
                                               :outline="true"
                                               icon="ic_plus_bold"
-                                              :disabled="!hasRootProjectPermission"
+                                              :disabled="!hasRootProjectPermission || hasNoManagePermission"
                                               @click="openProjectGroupCreateForm"
                                     >
                                         {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
                                     </p-button>
-                                    <p-select-dropdown v-if="storeState.groupId && !isPermissionDenied"
+                                    <p-select-dropdown v-if="storeState.groupId && !isPermissionDenied || hasNoManagePermission"
                                                        :items="settingMenu"
                                                        style-type="icon-button"
                                                        button-icon="ic_setting"
                                                        class="settings-button"
                                                        @select="onSelectSettingDropdown"
                                     />
-                                    <div v-if="storeState.groupId && !isPermissionDenied"
+                                    <div v-if="storeState.groupId && !isPermissionDenied || hasNoManagePermission"
                                          v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
                                          class="project-group-member-button"
                                          :group-id="storeState.groupId"
@@ -202,6 +202,7 @@ export default {
         });
 
         const state = reactive({
+            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
             initGroupId: vm.$route.query.select_pg as string,
             favoriteItems: computed<FavoriteItem[]>(() => [
                 ...convertProjectGroupConfigToReferenceData(storeState.favoriteProjectGroups, storeState.projectGroups),
