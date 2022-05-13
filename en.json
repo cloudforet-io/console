@@ -1098,8 +1098,16 @@
 			"EDIT": "Edit",
 			"FORM": {
 				"ALL": "All",
+				"ALT_E_CREATE_ROLE": "Failed to create role",
+				"ALT_E_DELETE_ROLE": "Failed to delete role",
+				"ALT_E_UPDATE_ROLE": "Failed to update role",
+				"ALT_S_CREATE_ROLE": "Successfully created role",
+				"ALT_S_DELETE_ROLE": "Successfully deleted role",
+				"ALT_S_UPDATE_ROLE": "Successfully updated role",
 				"CANCEL": "Cancel",
 				"CREATE": "Create",
+				"CREATE_TITLE": "Create Role",
+				"EDIT_TITLE": "Edit Role",
 				"MANAGE": "Manage",
 				"MENU": "Menu",
 				"PERMISSION": "Permission",
@@ -1138,7 +1146,8 @@
 				"DELETE_HELP_TEXT": "Please note that the following role has the assigned users / project member.",
 				"DELETE_TITLE": "Are you sure you want to delete selected item?",
 				"DELETE_TITLE_CANNOT": "Cannot delete this role"
-			}
+			},
+			"ROLE": "ROLE"
 		}
 	},
 	"IDENTITY": {

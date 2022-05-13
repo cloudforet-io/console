@@ -1098,8 +1098,16 @@
 			"EDIT": "編集",
 			"FORM": {
 				"ALL": "",
+				"ALT_E_CREATE_ROLE": "",
+				"ALT_E_DELETE_ROLE": "",
+				"ALT_E_UPDATE_ROLE": "",
+				"ALT_S_CREATE_ROLE": "",
+				"ALT_S_DELETE_ROLE": "",
+				"ALT_S_UPDATE_ROLE": "",
 				"CANCEL": "",
 				"CREATE": "",
+				"CREATE_TITLE": "",
+				"EDIT_TITLE": "",
 				"MANAGE": "",
 				"MENU": "",
 				"PERMISSION": "",
@@ -1138,7 +1146,8 @@
 				"DELETE_HELP_TEXT": "",
 				"DELETE_TITLE": "",
 				"DELETE_TITLE_CANNOT": ""
-			}
+			},
+			"ROLE": ""
 		}
 	},
 	"IDENTITY": {
