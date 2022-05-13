@@ -1,6 +1,6 @@
 <template>
     <span class="pdf-download-button">
-        <p-popover v-if="!supportsBrowser()" class="popover" position="bottom-end">
+        <p-popover v-if="!isBrowserSupported" class="popover" position="bottom-end">
             <p-icon-button v-if="iconOnly" name="ic_download" style-type="gray-border"
                            size="sm" @click="$emit('click', $event)"
             />
@@ -25,14 +25,16 @@
                 </i18n>
             </template>
         </p-popover>
-        <p-icon-button v-if="iconOnly" name="ic_download" style-type="gray-border"
-                       size="sm" @click="$emit('click', $event)"
-        />
-        <p-button v-else icon="ic_download" style-type="gray-border"
-                  @click="$emit('click', $event)"
-        >
-            PDF
-        </p-button>
+        <template v-if="isBrowserSupported">
+            <p-icon-button v-if="iconOnly" name="ic_download" style-type="gray-border"
+                           size="sm" @click="$emit('click', $event)"
+            />
+            <p-button v-else icon="ic_download" style-type="gray-border"
+                      @click="$emit('click', $event)"
+            >
+                PDF
+            </p-button>
+        </template>
     </span>
 </template>
 
@@ -61,7 +63,7 @@ export default defineComponent<Props>({
     setup() {
         return {
             i18n,
-            supportsBrowser,
+            isBrowserSupported: supportsBrowser(),
         };
     },
 });
