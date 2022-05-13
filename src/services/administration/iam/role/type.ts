@@ -4,7 +4,7 @@ import { ROLE_TYPE } from '@/services/administration/iam/role/config';
 import { TranslateResult } from 'vue-i18n';
 import { PagePermission } from '@/lib/access-control/page-permission-helper';
 
-interface Policy {
+export interface Policy {
     policy_id: string;
     policy_type: string;
 }

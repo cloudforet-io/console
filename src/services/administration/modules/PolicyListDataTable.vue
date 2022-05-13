@@ -216,7 +216,10 @@ export default {
         });
 
         watch(() => state.selectedIndices, (indices: number[]) => {
-            emit('update-selected-policy-id', indices.map(idx => state.items[idx]?.policy_id));
+            emit('update-selected-policy-list', indices.map(idx => ({
+                policy_id: state.items[idx]?.policy_id,
+                policy_type: state.items[idx]?.policy_type,
+            })));
         });
 
         (async () => {

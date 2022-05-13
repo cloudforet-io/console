@@ -1,6 +1,6 @@
 <template>
     <section class="role-page">
-        <p-page-title title="Role"
+        <p-page-title :title="$t('IAM.ROLE.ROLE')"
                       use-selected-count
                       use-total-count
                       :total-count="totalCount"

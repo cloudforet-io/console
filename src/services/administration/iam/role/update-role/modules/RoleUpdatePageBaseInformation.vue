@@ -95,6 +95,9 @@ export default {
         watch(() => isAllValid.value, (after) => {
             emit('update-validation', after);
         }, { immediate: true });
+        watch([() => state.selectedRoleType, () => state.roleDescription, () => roleName.value], ([selectedRoleType, roleDescription, roleNameValue]) => {
+            emit('update-form', { roleName: roleNameValue, roleDescription, roleType: selectedRoleType });
+        }, { immediate: true });
         return {
             ...toRefs(state),
             roleName,

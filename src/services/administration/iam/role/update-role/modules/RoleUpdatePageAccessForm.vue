@@ -93,7 +93,7 @@ export default {
         PPaneLayout,
         PPanelTop,
     },
-    setup() {
+    setup(props, { emit }) {
         const formState = reactive({
             menuItems: [] as PageAccessMenuItem[],
         });
@@ -168,6 +168,9 @@ export default {
                     })),
                 ];
             }
+        }, { immediate: true });
+        watch(() => state.pagePermissions, (after) => {
+            emit('update-form', after);
         }, { immediate: true });
 
         return {

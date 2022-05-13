@@ -1,24 +1,26 @@
 <template>
     <div class="role-update-form">
-        <role-update-page-base-information @update-validation="handleBaseInfoValidate" />
-        <role-update-page-access-form />
+        <role-update-page-base-information @update-validation="handleBaseInfoValidate"
+                                           @update-form="handleUpdateBaseInfoForm"
+        />
+        <role-update-page-access-form @update-form="handleUpdatePageAccessForm" />
         <policy-list-data-table class="policy-list-data-table"
                                 :selectable="true"
                                 :anchor-icon-visible="true"
-                                @update-selected-policy-id="handleUpdate"
+                                @update-selected-policy-list="handleUpdatePolicy"
         >
             <template #panel-top>
                 <p-panel-top>
                     {{ $t('IAM.ROLE.DETAIL.API_POLICY') }}
                     <template #extra>
-                        <span class="selected-count">({{ selectedPolicyIdList.length }} {{ $t('IAM.ROLE.FORM.SELECTED') }})</span>
+                        <span class="selected-count">({{ selectedPolicyList.length }} {{ $t('IAM.ROLE.FORM.SELECTED') }})</span>
                     </template>
                 </p-panel-top>
             </template>
             <template #toolbox-table-bottom>
                 <div class="help-text-wrapper">
                     <p v-if="!isPolicySectionValid" class="policy-list-invalid-text">
-                        {{ invalidTexts.selectedPolicyIdList }}
+                        {{ invalidTexts.selectedPolicyList }}
                     </p>
                 </div>
             </template>
@@ -36,7 +38,15 @@ import {
 } from '@vue/composition-api';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { i18n } from '@/translations';
+import { ROLE_TYPE } from '@/services/administration/iam/role/config';
+import { PagePermission } from '@/lib/access-control/page-permission-helper';
+import { Policy } from '@/services/administration/iam/role/type';
 
+interface BaseInformationFormData {
+    roleName: string;
+    roleDescription?: string;
+    roleType: ROLE_TYPE;
+}
 export default {
     name: 'RoleUpdateForm',
     components: {
@@ -48,36 +58,54 @@ export default {
     setup(props, { emit }) {
         const {
             forms: {
-                selectedPolicyIdList,
+                selectedPolicyList,
             },
             setForm,
             invalidTexts,
             isAllValid: isPolicySectionValid,
         } = useFormValidator({
-            selectedPolicyIdList: [],
+            selectedPolicyList: [],
         }, {
-            selectedPolicyIdList(value: string[]) { return value.length ? '' : i18n.t('IAM.ROLE.FORM.VALIDATION_API_POLICY'); },
+            selectedPolicyList(value: Policy[]) { return value.length ? '' : i18n.t('IAM.ROLE.FORM.VALIDATION_API_POLICY'); },
         });
         const state = reactive({
             isBaseInformationValid: false,
+            baseInformationFormData: {} as BaseInformationFormData,
+            pageAccessFormData: [] as PagePermission[],
             isAllValid: computed(() => isPolicySectionValid.value && state.isBaseInformationValid),
+            formData: computed(() => ({
+                name: state.baseInformationFormData.roleName,
+                role_type: state.baseInformationFormData.roleType,
+                policies: selectedPolicyList.value,
+                page_permissions: state.pageAccessFormData,
+                tags: {
+                    description: state.baseInformationFormData.roleDescription,
+                },
+            })),
         });
-        const handleUpdate = (value) => { setForm('selectedPolicyIdList', value); };
+        const handleUpdatePolicy = (value) => { setForm('selectedPolicyList', value); };
         const handleBaseInfoValidate = (value: boolean) => {
             state.isBaseInformationValid = value;
         };
 
+        const handleUpdateBaseInfoForm = (value) => { state.baseInformationFormData = value; };
+        const handleUpdatePageAccessForm = (value) => { state.pageAccessFormData = value; };
+
         watch(() => state.isAllValid, (after) => {
             emit('update-validation', after);
         });
+        watch(() => state.formData, (after) => {
+            emit('update-form-data', after);
+        });
         return {
             ...toRefs(state),
-            handleUpdate,
+            handleUpdatePolicy,
             handleBaseInfoValidate,
-            selectedPolicyIdList,
+            handleUpdateBaseInfoForm,
+            handleUpdatePageAccessForm,
+            selectedPolicyList,
             invalidTexts,
             isPolicySectionValid,
-
         };
     },
 };

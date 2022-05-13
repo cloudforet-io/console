@@ -1,6 +1,9 @@
 <template>
     <section class="role-edit-page">
-        <p-page-title title="Edit Role" />
+        <p-page-title child
+                      :title="$t('IAM.ROLE.FORM.EDIT_TITLE')"
+                      @goBack="$router.go(-1)"
+        />
         <role-update-form @update-validation="handleFormValidate" />
         <div class="text-right mt-4">
             <p-button style-type="primary-dark" :outline="true" class="mr-4"
