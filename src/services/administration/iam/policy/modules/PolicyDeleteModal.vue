@@ -29,6 +29,7 @@ import deleteModal from '@/common/components/modals/DeleteModal.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { i18n } from '@/translations';
 
 export default {
     name: 'PolicyDeleteModal',
@@ -67,11 +68,9 @@ export default {
                 await SpaceConnector.client.identity.policy.delete({
                     policy_id: props.policyId,
                 });
-                // song-lang
-                showSuccessMessage('Successfully deleted policy', '');
+                showSuccessMessage(i18n.t('IAM.POLICY.MODAL.ALT_S_DELETE_POLICY'), '');
             } catch (e: any) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, 'Failed to delete policy');
+                ErrorHandler.handleRequestError(e, i18n.t('IAM.POLICY.MODAL.ALT_S_DELETE_POLICY'));
             } finally {
                 state.loading = false;
             }
