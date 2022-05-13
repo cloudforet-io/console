@@ -1,4 +1,3 @@
-import { ROUTE_ACCESS_LEVEL } from '@/lib/access-control';
 import { UserState } from './type';
 import * as getters from './getters';
 import * as actions from './actions';
@@ -24,7 +23,7 @@ const state: UserState = {
     language: storedUserState.language || 'en',
     timezone: storedUserState.timezone,
     roles: storedUserState.roles,
-    accessLevel: ROUTE_ACCESS_LEVEL.EXCLUDE_AUTH,
+    accessLevel: 'EXCLUDE_AUTH',
 };
 
 export default {

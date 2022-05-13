@@ -1,14 +1,10 @@
 import { SidebarType, Currency } from '@/store/modules/display/config';
 import { Location } from 'vue-router';
-import { Menu } from '@/lib/menu/config';
+import { Menu, MenuInfo } from '@/lib/menu/config';
 
-export interface GNBMenu extends Menu {
-    label: string;
+export interface GNBMenu extends Menu, MenuInfo {
     to: Location;
-    icon?: string;
     subMenuList?: GNBMenu[];
-    isNew?: boolean;
-    isBeta?: boolean;
 }
 
 export type CurrencyRates = {

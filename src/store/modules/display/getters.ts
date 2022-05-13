@@ -13,6 +13,7 @@ import {
 } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
 
 export const hasUncheckedNotifications: Getter<DisplayState, any> = (state): boolean => state.uncheckedNotificationCount > 0;
 
@@ -27,20 +28,10 @@ export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarP
     return { styleType: 'primary', disableButton: false, size: 'md' };
 };
 
-const filterMenuByRoute = (menuList: GNBMenu[], disabledMenu: string[], showBilling: boolean, isAdmin: boolean, router: VueRouter): GNBMenu[] => menuList.reduce((results, _menu) => {
-    if (!showBilling) {
-        const idx = results.findIndex(item => item.id === MENU_ID.COST_EXPLORER);
-        if (idx > -1) results.splice(idx, 1);
-    }
-    if (!isAdmin) {
-        const idx = results.findIndex(item => item.id === MENU_ID.ADMINISTRATION);
-        if (idx > -1) results.splice(idx, 1);
-    }
-    if (disabledMenu.includes(_menu.id) && !isAdmin) return results;
-
+const filterMenuByRoute = (menuList: GNBMenu[], router: VueRouter): GNBMenu[] => menuList.reduce((results, _menu) => {
     const menu = { ..._menu };
     if (menu.subMenuList) {
-        menu.subMenuList = filterMenuByRoute(menu.subMenuList, disabledMenu, showBilling, isAdmin, router);
+        menu.subMenuList = filterMenuByRoute(menu.subMenuList, router);
         if (menu.subMenuList.length) {
             results.push(menu);
             return results;
@@ -49,6 +40,22 @@ const filterMenuByRoute = (menuList: GNBMenu[], disabledMenu: string[], showBill
 
     const link = router.resolve(menu.to);
     if (link?.href !== '/') results.push(menu);
+
+    return results;
+}, [] as GNBMenu[]);
+
+const filterMenuByPermission = (menuList: GNBMenu[], pagePermissionList: PagePermissionTuple[]): GNBMenu[] => menuList.reduce((results, _menu) => {
+    const menu = { ..._menu };
+
+    if (menu.subMenuList) {
+        menu.subMenuList = filterMenuByPermission(menu.subMenuList, pagePermissionList);
+    }
+
+    if (menu.subMenuList?.length) results.push(menu);
+    else {
+        const hasPermission = pagePermissionList.some(([permissionMenuId]) => permissionMenuId === menu.id);
+        if (hasPermission) results.push(menu);
+    }
 
     return results;
 }, [] as GNBMenu[]);
@@ -66,14 +73,14 @@ const getGnbMenuList = (menuList: Menu[]): GNBMenu[] => menuList.map((d) => {
     } as GNBMenu;
 });
 export const allGnbMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): GNBMenu[] => {
-    const _isAdmin = rootGetters['user/isAdmin'];
-    const _billingEnabledMenuList: string[] = config.get('BILLING_ENABLED') ?? [];
-    const _showBilling = _billingEnabledMenuList.includes(rootState.domain.domainId);
-    const _disabledMenu = config.get('DISABLED_MENU');
+    const billingAccessibleDomainList: string[] = config.get('BILLING_ENABLED') ?? [];
+    const _showBilling = billingAccessibleDomainList.includes(rootState.domain.domainId);
+    const menuList = _showBilling ? MENU_LIST : MENU_LIST.filter(d => d.id !== MENU_ID.COST_EXPLORER);
 
-    const _allMenuList: GNBMenu[] = getGnbMenuList(MENU_LIST);
-
-    return filterMenuByRoute(_allMenuList, _disabledMenu, _showBilling, _isAdmin, SpaceRouter.router);
+    let _allGnbMenuList: GNBMenu[] = getGnbMenuList(menuList);
+    _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
+    _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
+    return _allGnbMenuList;
 };
 
 export const GNBMenuList: Getter<DisplayState, any> = (state, getters): GNBMenu[] => getters.allGnbMenuList.filter(d => !d.optional);

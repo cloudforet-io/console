@@ -1,5 +1,5 @@
 import { PagePermission } from '@/lib/access-control/page-permission-helper';
-import { RouteAccessLevel } from '@/lib/access-control';
+import { AccessLevel } from '@/lib/access-control/config';
 
 type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
 type UserBackend = 'LOCAL' | 'EXTERNAL';
@@ -24,7 +24,7 @@ export interface UserState {
     language?: string;
     timezone?: string;
     roles?: Array<UserRole>;
-    accessLevel: RouteAccessLevel;
+    accessLevel: AccessLevel;
 }
 
 export interface SignInRequest {

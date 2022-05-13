@@ -7,7 +7,8 @@ import config from '@/lib/config';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { ERROR_ROUTE } from '@/router/error-routes';
-import { getRouteAccessLevel, getUserAccessLevelToRoute, ROUTE_ACCESS_LEVEL } from '@/lib/access-control';
+import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
+import { ACCESS_LEVEL } from '@/lib/access-control/config';
 // import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
@@ -52,16 +53,16 @@ export class SpaceRouter {
             nextPath = to.fullPath;
             const isTokenAlive = SpaceConnector.isTokenAlive;
             const routeAccessLevel = getRouteAccessLevel(to);
-            const userAccessLevel = getUserAccessLevelToRoute(to, SpaceRouter.router.app.$store.getters['user/pagePermissionList'], isTokenAlive);
+            const userAccessLevel = getUserAccessLevel(to.name, SpaceRouter.router.app.$store.getters['user/pagePermissionList'], isTokenAlive);
             let nextLocation;
 
-            if (userAccessLevel >= ROUTE_ACCESS_LEVEL.AUTHENTICATED) {
+            if (ACCESS_LEVEL[userAccessLevel] >= ACCESS_LEVEL.AUTHENTICATED) {
                 if (to.meta?.isSignInPage) {
                     nextLocation = { name: DASHBOARD_ROUTE._NAME };
-                } else if (userAccessLevel < routeAccessLevel) {
+                } else if (ACCESS_LEVEL[userAccessLevel] < ACCESS_LEVEL[routeAccessLevel]) {
                     nextLocation = { name: ERROR_ROUTE._NAME };
                 }
-            } else if (routeAccessLevel >= ROUTE_ACCESS_LEVEL.AUTHENTICATED) {
+            } else if (ACCESS_LEVEL[routeAccessLevel] >= ACCESS_LEVEL.AUTHENTICATED) {
                 const res = await SpaceConnector.refreshAccessToken(false);
                 if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
                 else nextLocation = { name: to.name, params: to.params };

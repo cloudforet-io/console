@@ -125,7 +125,8 @@ import ProjectDetailStoreModule from '@/services/project/project-detail/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { NoResourceError } from '@/common/composables/error/error';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import config from '@/lib/config';
+import { isAccessibleToMenu } from '@/lib/access-control';
+import { MENU_ID } from '@/lib/menu/config';
 
 export default {
     name: 'ProjectDetailPage',
@@ -201,11 +202,6 @@ export default {
         };
 
         /** Tabs */
-        const checkDisabledMenu = (menuItem) => {
-            const disabledMenu = config.get('DISABLED_MENU') ?? [];
-            return disabledMenu.find(i => i === menuItem) === menuItem;
-        };
-
         const singleItemTabState = reactive({
             tabs: computed<TabItem[]>(() => [
                 {
@@ -217,10 +213,10 @@ export default {
                     name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_MEMBER'),
                 },
-                ...(checkDisabledMenu('alert_manager') && !state.isAdmin ? [] : [{
+                ...(isAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList']) ? [{
                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
-                }]),
+                }] : []),
                 {
                     name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),

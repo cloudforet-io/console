@@ -75,7 +75,7 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 import { store } from '@/store';
-import { getRouteAccessLevel, ROUTE_ACCESS_LEVEL } from '@/lib/access-control';
+import { isRouteAccessible } from '@/lib/access-control';
 
 export default defineComponent({
     name: 'App',
@@ -95,7 +95,7 @@ export default defineComponent({
 
         const state = reactive({
             showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
-            isExpired: computed(() => vm.$store.state.error.visibleSessionExpiredError && getRouteAccessLevel(vm.$route) >= ROUTE_ACCESS_LEVEL.AUTHENTICATED),
+            isExpired: computed(() => vm.$store.state.error.visibleSessionExpiredError && isRouteAccessible(vm.$route, 'AUTHENTICATED')),
         });
 
         const goToSignIn = () => {
@@ -109,7 +109,7 @@ export default defineComponent({
         const showsBrowserRecommendation = () => !supportsBrowser() && !window.localStorage.getItem('showBrowserRecommendation');
 
         watch(() => vm.$route, (route) => {
-            store.dispatch('user/updateAccessLevel', route);
+            store.dispatch('user/updateAccessLevel', route.name);
         }, { immediate: true });
 
         return {

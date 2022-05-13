@@ -7,7 +7,7 @@ import { isInstanceOfNoResourceError, isInstanceOfNoSearchResourceError } from '
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { TranslateResult } from 'vue-i18n';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { getRouteAccessLevel, ROUTE_ACCESS_LEVEL } from '@/lib/access-control';
+import { isRouteAccessible } from '@/lib/access-control';
 
 interface GlobalErrorHandlers {
     authenticationErrorHandler: () => void;
@@ -29,7 +29,7 @@ export default class ErrorHandler {
             const isTokenAlive = SpaceConnector.isTokenAlive;
 
             if (!isTokenAlive
-                && getRouteAccessLevel(SpaceRouter.router.currentRoute) >= ROUTE_ACCESS_LEVEL.AUTHENTICATED) {
+                && isRouteAccessible(SpaceRouter.router.currentRoute, 'AUTHENTICATED')) {
                 ErrorHandler.authenticationErrorHandler();
             }
         } else if (isInstanceOfAuthorizationError(error)) {

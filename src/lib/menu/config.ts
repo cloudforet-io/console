@@ -1,3 +1,5 @@
+import { AccessLevel } from '@/lib/access-control/config';
+
 export const MENU_ID = Object.freeze({
     PROJECT: 'project',
     ASSET_INVENTORY: 'asset_inventory',
@@ -39,6 +41,7 @@ export interface MenuInfo {
     icon?: string;
     isNew?: boolean;
     isBeta?: boolean;
+    accessLevel: AccessLevel;
 }
 
 interface RouteName {

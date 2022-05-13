@@ -2,7 +2,6 @@ import { RouteConfig } from 'vue-router';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 import { getMenuLabel } from '@/lib/menu/menu-info';
 import { MENU_ID } from '@/lib/menu/config';
-import { ROUTE_ACCESS_LEVEL } from '@/lib/access-control';
 
 const MyPageContainer = () => import(/* webpackChunkName: "MyPageContainer" */'@/services/my-page/MyPageContainer.vue');
 
@@ -16,7 +15,7 @@ const ManageUserNotificationPage = () => import(/* webpackChunkName: "ManageUser
 const myPageRoutes: RouteConfig = {
     path: 'my-page',
     name: MY_PAGE_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.MY_PAGE), accessLevel: ROUTE_ACCESS_LEVEL.AUTHENTICATED },
+    meta: { label: getMenuLabel(MENU_ID.MY_PAGE), accessLevel: 'AUTHENTICATED' },
     redirect: '/my-page/account',
     component: MyPageContainer,
     children: [

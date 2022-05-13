@@ -1,32 +1,54 @@
+/* eslint-disable import/no-cycle */
 import { Route } from 'vue-router';
 import { clone } from 'lodash';
 import { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/page-permission-helper';
+import { MENU_ID, MenuId } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { AccessLevel, ACCESS_LEVEL } from '@/lib/access-control/config';
 
-export enum ROUTE_ACCESS_LEVEL {
-    EXCLUDE_AUTH = 0,
-    AUTHENTICATED = 1,
-    VIEW_PERMISSION = 2,
-    MANAGE_PERMISSION = 3,
-}
-
-export type RouteAccessType = keyof typeof ROUTE_ACCESS_LEVEL
-export type RouteAccessLevel = typeof ROUTE_ACCESS_LEVEL[RouteAccessType]
-
-const getAccessTypeFromPermission = (permission?: string | PagePermissionType): RouteAccessType => {
+const getAccessTypeFromPermission = (permission?: string | PagePermissionType): AccessLevel => {
     if (permission === 'VIEW') return 'VIEW_PERMISSION';
     if (permission === 'MANAGE') return 'MANAGE_PERMISSION';
     return 'AUTHENTICATED';
 };
 
-export const getRouteAccessLevel = (route: Route): RouteAccessLevel => {
+const menuIdList = Object.values(MENU_ID);
+const getMenuIdByRouteName = (routeName?: string|null): MenuId|undefined => {
+    if (!routeName) return undefined;
+
+    const isSubMenu = routeName.includes('.');
+    return menuIdList.find((id) => {
+        if (id === routeName) return true;
+        if (isSubMenu && !id.includes('.')) return false;
+        return routeName.startsWith(`${id}.`);
+    });
+};
+
+export const getRouteAccessLevel = (route: Route): AccessLevel => {
     const reversedMatched = clone(route.matched).reverse();
     const closestRoute = reversedMatched.find(d => d.meta?.accessLevel !== undefined);
-    if (!closestRoute) return ROUTE_ACCESS_LEVEL.AUTHENTICATED;
+    if (!closestRoute) return 'AUTHENTICATED';
     return closestRoute.meta.accessLevel;
 };
 
-export const getUserAccessLevelToRoute = (route: Route, pagePermissions: PagePermissionTuple[] = [], isTokenAlive = true) => {
-    if (!isTokenAlive) return ROUTE_ACCESS_LEVEL.EXCLUDE_AUTH;
-    const [, permission] = pagePermissions.find(([id]) => route.matched.find(r => r.name === id)) ?? [];
-    return ROUTE_ACCESS_LEVEL[getAccessTypeFromPermission(permission)];
+export const getUserAccessLevel = (routeName?: string|null, pagePermissions: PagePermissionTuple[] = [], isTokenAlive = true): AccessLevel => {
+    if (!isTokenAlive) return 'EXCLUDE_AUTH';
+
+    const menuId = getMenuIdByRouteName(routeName);
+    if (!menuId) return 'AUTHENTICATED';
+
+    const [, permission] = pagePermissions.find(([id]) => id === menuId) ?? [];
+    return getAccessTypeFromPermission(permission);
+};
+
+export const getMenuAccessLevel = (id: MenuId): AccessLevel => MENU_INFO_MAP[id]?.accessLevel ?? 'AUTHENTICATED';
+
+export const isAccessibleToMenu = (menuId: MenuId, pagePermissions: PagePermissionTuple[] = []): boolean => {
+    const [, permission] = pagePermissions.find(([id]) => id === menuId) ?? [];
+    return ACCESS_LEVEL[getAccessTypeFromPermission(permission)] >= ACCESS_LEVEL[getMenuAccessLevel(menuId)];
+};
+
+export const isRouteAccessible = (route: Route, accessLevel: AccessLevel): boolean => {
+    const routeAccessLevel = getRouteAccessLevel(route);
+    return ACCESS_LEVEL[routeAccessLevel] >= ACCESS_LEVEL[accessLevel];
 };

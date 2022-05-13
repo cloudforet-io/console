@@ -1,4 +1,7 @@
-import { MENU_ID, MenuId } from '@/lib/menu/config';
+/* eslint-disable import/no-cycle */
+import { MenuId, MenuInfo } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
 export const PAGE_PERMISSION_TYPE = Object.freeze({
     VIEW: 'VIEW',
@@ -12,7 +15,6 @@ export interface PagePermission {
     permission: PagePermissionType
 }
 export type PagePermissionMap = Record<string, PagePermissionType>
-// export type PagePermissionTuple = [page: string, permission: PagePermissionType] // eslint parsing error occurs
 export type PagePermissionTuple = Array<string|PagePermissionType>
 
 const getProperPermissionType = (permissionA: PagePermissionType = 'VIEW', permissionB: PagePermissionType = 'VIEW'): PagePermissionType => {
@@ -20,21 +22,13 @@ const getProperPermissionType = (permissionA: PagePermissionType = 'VIEW', permi
     return 'VIEW';
 };
 
-const permissionRequiredMenuIds: readonly MenuId[] = Object.freeze([
-    MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE,
-    MENU_ID.ASSET_INVENTORY_SERVER,
-    MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT,
-    MENU_ID.COST_EXPLORER_DASHBOARD,
-    MENU_ID.COST_EXPLORER_COST_ANALYSIS,
-    MENU_ID.COST_EXPLORER_BUDGET,
-    MENU_ID.ALERT_MANAGER_DASHBOARD,
-    MENU_ID.ALERT_MANAGER_ALERT,
-    MENU_ID.ALERT_MANAGER_ESCALATION_POLICY,
-    MENU_ID.ADMINISTRATION_USER,
-    MENU_ID.ADMINISTRATION_ROLE,
-    MENU_ID.ADMINISTRATION_POLICY,
-]);
+const menuIdList = Object.keys(MENU_INFO_MAP) as MenuId[];
+const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter((id) => {
+    const info = MENU_INFO_MAP[id];
+    return ACCESS_LEVEL[info.accessLevel] >= ACCESS_LEVEL.VIEW_PERMISSION;
+});
 
+const permissionRequiredMenuIds: MenuId[] = getPermissionRequiredMenuIds();
 export const getPagePermissionMap = (pagePermissions: PagePermission[]): PagePermissionMap => {
     const result = {} as PagePermissionMap;
     pagePermissions.forEach((data) => {
@@ -59,3 +53,20 @@ export const getPagePermissionMap = (pagePermissions: PagePermission[]): PagePer
     });
     return result;
 };
+
+const getPermissionRequiredMenuInfo = (): Partial<Record<MenuId, MenuInfo>> => {
+    const result: Partial<Record<MenuId, MenuInfo>> = {};
+    menuIdList.forEach((id) => {
+        const info = MENU_INFO_MAP[id];
+        if (ACCESS_LEVEL[info.accessLevel] >= ACCESS_LEVEL.VIEW_PERMISSION) {
+            result[id] = info;
+        }
+    });
+    return result;
+};
+
+const permissionRequiredMenuInfoMap = getPermissionRequiredMenuInfo();
+export const filterMenuIdsByPermission = (menuIds: MenuId[], pagePermissionList: PagePermissionTuple[]): MenuId[] => menuIds.filter((menuId) => {
+    const hasPermission = pagePermissionList.some(([permissionMenuId]) => !permissionRequiredMenuInfoMap[permissionMenuId] || permissionMenuId === menuId);
+    return hasPermission;
+});

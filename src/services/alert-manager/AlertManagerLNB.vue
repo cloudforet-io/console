@@ -6,25 +6,31 @@
 import { LNBMenu } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import { MENU_ID } from '@/lib/menu/config';
-import { computed } from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { store } from '@/store';
+import { filterMenuIdsByPermission } from '@/lib/access-control/page-permission-helper';
 
 const lnbMenuIds = [MENU_ID.ALERT_MANAGER_DASHBOARD, MENU_ID.ALERT_MANAGER_ALERT, MENU_ID.ALERT_MANAGER_ESCALATION_POLICY];
-
 export default {
     name: 'AlertManagerLNB',
     components: {
         LNB,
     },
     setup() {
-        return {
-            header: computed(() => MENU_INFO_MAP[MENU_ID.ALERT_MANAGER_DASHBOARD].label),
-            menuSet: computed<LNBMenu[]>(() => lnbMenuIds.map((id) => {
+        const state = reactive({
+            lnbMenuIds: computed(() => filterMenuIdsByPermission(lnbMenuIds, store.getters['user/pagePermissionList'])),
+            header: computed(() => MENU_INFO_MAP[MENU_ID.ALERT_MANAGER].label),
+            menuSet: computed<LNBMenu[]>(() => state.lnbMenuIds.map((id) => {
                 const menuInfo = MENU_INFO_MAP[id];
                 return ({
                     type: 'item', id, label: menuInfo.label, to: { name: id },
                 });
             })),
+        });
+
+        return {
+            ...toRefs(state),
         };
     },
 };
