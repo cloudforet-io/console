@@ -2,23 +2,14 @@
     <l-n-b header="My Page" :menu-set="MenuSet">
         <template #default>
             <div class="member-profile">
-                <p-i v-if="isDomainOwner" class="member-icon" name="root-account"
-                     width="3rem" height="3rem"
-                />
-                <p-i v-else-if="!isDomainOwner && isAdmin" class="member-icon" name="admin"
-                     width="3rem" height="3rem"
-                />
-                <p-i v-else class="member-icon" name="user"
+                <p-i class="member-icon" :name="icon"
                      width="3rem" height="3rem"
                 />
                 <p class="member-id">
                     {{ userId }}
                 </p>
-                <p v-if="isDomainOwner" class="member-type">
-                    {{ $t('IDENTITY.USER.MAIN.ROOT_ACCOUNT') }}
-                </p>
-                <p v-else class="member-type">
-                    {{ $t('IDENTITY.USER.MAIN.SPACEONE_USER') }}
+                <p class="member-type">
+                    {{ memberType }}
                 </p>
             </div>
         </template>
@@ -35,14 +26,7 @@ import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 import { LNBMenu } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import { MENU_ID } from '@/lib/menu/config';
-
-// interface SidebarItemType {
-//     label?: TranslateResult;
-//     routeName?: string;
-//     userOnly?: boolean;
-//     isAdminMenu?: boolean;
-//     beta?: boolean;
-// }
+import { i18n } from '@/translations';
 
 const MenuSet: LNBMenu[] = [
     {
@@ -69,13 +53,22 @@ export default defineComponent({
     },
     setup() {
         const state = reactive({
-            isAdmin: computed(() => store.getters['user/isAdmin']),
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            hasDomainRole: computed(() => store.getters['user/hasDomainRole']),
             userType: computed(() => store.state.user.backend) as unknown as string,
             userName: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
             userId: computed(() => store.state.user.userId),
             hasPermission: computed((() => store.getters['user/hasPermission'])),
+            icon: computed(() => {
+                if (state.isDomainOwner) return 'root-account';
+                if (state.hasDomainRole) return 'admin';
+                return 'user';
+            }),
+            memberType: computed(() => {
+                if (state.isDomainOwner) return i18n.t('IDENTITY.USER.MAIN.ROOT_ACCOUNT');
+                return 'IDENTITY.USER.MAIN.SPACEONE_USER';
+            }),
         });
 
         return {

@@ -147,7 +147,7 @@ export default {
             dragOptions: computed(() => ({
                 disabled: !state.treeEditMode,
                 dragValidator(node, dragNodeParent) {
-                    if (!dragNodeParent) return store.getters['user/isAdmin'];
+                    if (!dragNodeParent) return store.getters['user/hasDomainRole'];
                     return !!(state.permissionInfo[node.data.id] || node.data.has_permission);
                 },
                 dropValidator(node, oldParent, parent) {
@@ -155,7 +155,7 @@ export default {
 
                     if (!parent) {
                         if (node.data.item_type === 'PROJECT') return false;
-                        return store.getters['user/isAdmin'];
+                        return store.getters['user/hasDomainRole'];
                     }
                     if (parent.data.item_type === 'PROJECT') return false;
                     if (parent.children.some(child => child.data.name === node.data.name)) return false;

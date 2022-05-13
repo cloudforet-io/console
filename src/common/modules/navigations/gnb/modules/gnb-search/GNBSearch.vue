@@ -87,9 +87,10 @@ import {
 } from '@/lib/helper/config-data-helper';
 import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
 import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import { MenuInfo } from '@/lib/menu/config';
+import { MENU_ID, MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
+import { isUserAccessibleToMenu } from '@/lib/access-control';
 
 
 interface CloudServiceData {
@@ -179,18 +180,24 @@ export default defineComponent<Props>({
                 }));
             }),
             // all
-            dropdownItems: computed<DropdownItem[]>(() => [
-                {
-                    itemType: SUGGESTION_TYPE.MENU,
-                    totalCount: dataState._menuTotalCount,
-                    suggestionItems: dataState._menuSuggestions,
-                },
-                {
-                    itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
-                    totalCount: dataState._cloudServiceTotalCount,
-                    suggestionItems: dataState._cloudServiceSuggestions,
-                },
-            ]),
+            dropdownItems: computed<DropdownItem[]>(() => {
+                const items: DropdownItem[] = [
+                    {
+                        itemType: SUGGESTION_TYPE.MENU,
+                        totalCount: dataState._menuTotalCount,
+                        suggestionItems: dataState._menuSuggestions,
+                    },
+                ];
+
+                if (isUserAccessibleToMenu(MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE, store.getters['user/pagePermissionList'])) {
+                    items.push({
+                        itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
+                        totalCount: dataState._cloudServiceTotalCount,
+                        suggestionItems: dataState._cloudServiceSuggestions,
+                    });
+                }
+                return items;
+            }),
         });
 
         const filterMenuItemsBySearchTerm = (menu: SuggestionMenu[], searchTerm?: string): SuggestionMenu[] => {

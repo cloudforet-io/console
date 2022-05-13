@@ -12,10 +12,9 @@ import {
     PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs,
+    reactive, toRefs,
 } from '@vue/composition-api';
 import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
-import { store } from '@/store';
 
 export default {
     name: 'UserNotificationPage',
@@ -26,7 +25,6 @@ export default {
     },
     setup() {
         const state = reactive({
-            isAdmin: computed(() => store.getters['user/isAdmin']).value,
         });
         return {
             ...toRefs(state),

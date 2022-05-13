@@ -125,7 +125,7 @@ import ProjectDetailStoreModule from '@/services/project/project-detail/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { NoResourceError } from '@/common/composables/error/error';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import { isAccessibleToMenu } from '@/lib/access-control';
+import { isUserAccessibleToMenu } from '@/lib/access-control';
 import { MENU_ID } from '@/lib/menu/config';
 
 export default {
@@ -181,7 +181,6 @@ export default {
                 TRIGGERED: find(store.state.service.projectDetail.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
             })),
             maintenanceHappeningListRef: null as null|Vue,
-            isAdmin: computed(() => store.getters['user/isAdmin']),
         });
 
         /* api */
@@ -213,7 +212,7 @@ export default {
                     name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_MEMBER'),
                 },
-                ...(isAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList']) ? [{
+                ...(isUserAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList']) ? [{
                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
                 }] : []),

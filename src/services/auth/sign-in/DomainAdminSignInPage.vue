@@ -16,7 +16,7 @@
         >
             <template #input>
                 <i-d-p-w-sign-in class="local-sign-in-wrapper"
-                                 :is-admin="true"
+                                 is-domain-owner
                                  @sign-in="onSignIn"
                 />
             </template>

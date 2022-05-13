@@ -59,7 +59,6 @@ export default {
             ],
             items: [] as EndpointItem[],
             userId: computed(() => store.state.user.userId),
-            isAdmin: computed(() => store.getters['user/isAdmin']).value,
         });
         const listEndpoints = async () => {
             state.loading = true;

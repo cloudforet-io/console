@@ -10,12 +10,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'SignOutPage',
-    props: {
-        isAdmin: {
-            type: Boolean,
-            default: false,
-        },
-    },
     beforeRouteEnter(to) {
         (async () => {
             try {

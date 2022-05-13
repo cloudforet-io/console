@@ -135,7 +135,6 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            isAdmin: computed(() => store.getters['user/isAdmin']).value,
             userId: computed(() => store.state.user.userId),
             userRole: computed(() => {
                 const roleArray = store.getters['user/roleNames'];

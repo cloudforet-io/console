@@ -47,9 +47,10 @@ import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { MenuInfo } from '@/lib/menu/config';
+import { MENU_ID, MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { isUserAccessibleToMenu } from '@/lib/access-control';
 
 
 const RECENT_LIMIT = 30;
@@ -87,18 +88,27 @@ export default {
                 storeState.recents.filter(d => d.itemType === RECENT_TYPE.MENU),
                 storeState.menuItems,
             )),
-            recentCloudServiceItems: computed<RecentItem[]>(() => convertCloudServiceConfigToReferenceData(
-                storeState.recents.filter(d => d.itemType === RECENT_TYPE.CLOUD_SERVICE),
-                storeState.cloudServiceTypes,
-            )),
-            recentProjectItems: computed<RecentItem[]>(() => convertProjectConfigToReferenceData(
-                storeState.recents.filter(d => d.itemType === RECENT_TYPE.PROJECT),
-                storeState.projects,
-            )),
-            recentProjectGroupItems: computed<RecentItem[]>(() => convertProjectGroupConfigToReferenceData(
-                storeState.recents.filter(d => d.itemType === RECENT_TYPE.PROJECT_GROUP),
-                storeState.projectGroups,
-            )),
+            recentCloudServiceItems: computed<RecentItem[]>(() => {
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE, store.getters['user/pagePermissionList']);
+                return isUserAccessible ? convertCloudServiceConfigToReferenceData(
+                    storeState.recents.filter(d => d.itemType === RECENT_TYPE.CLOUD_SERVICE),
+                    storeState.cloudServiceTypes,
+                ) : [];
+            }),
+            recentProjectItems: computed<RecentItem[]>(() => {
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pagePermissionList']);
+                return isUserAccessible ? convertProjectConfigToReferenceData(
+                    storeState.recents.filter(d => d.itemType === RECENT_TYPE.PROJECT),
+                    storeState.projects,
+                ) : [];
+            }),
+            recentProjectGroupItems: computed<RecentItem[]>(() => {
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pagePermissionList']);
+                return isUserAccessible ? convertProjectGroupConfigToReferenceData(
+                    storeState.recents.filter(d => d.itemType === RECENT_TYPE.PROJECT_GROUP),
+                    storeState.projectGroups,
+                ) : [];
+            }),
         });
 
         const handleSelect = (item: SuggestionItem) => {

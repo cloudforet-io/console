@@ -1,7 +1,7 @@
 <template>
     <div class="local-wrapper">
         <form class="form">
-            <p-field-group :label="isAdmin ? $t('COMMON.SIGN_IN.ADMIN_ID') : $t('COMMON.SIGN_IN.USER_ID')"
+            <p-field-group :label="isDomainOwner ? $t('COMMON.SIGN_IN.ADMIN_ID') : $t('COMMON.SIGN_IN.USER_ID')"
                            :invalid="isIdValid === false" required
             >
                 <template #default="{invalid}">
@@ -64,7 +64,7 @@ export default defineComponent({
         PFieldGroup,
     },
     props: {
-        isAdmin: {
+        isDomainOwner: {
             type: Boolean,
             default: false,
         },
@@ -118,7 +118,7 @@ export default defineComponent({
                 password: state.password.trim(),
             };
             try {
-                await loadAuth().signIn(credentials, state.userId?.trim(), props.isAdmin ? 'DOMAIN_OWNER' : 'USER');
+                await loadAuth().signIn(credentials, state.userId?.trim(), props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER');
                 context.emit('sign-in');
                 await store.dispatch('display/hideSignInErrorMessage');
             } catch (e) {
@@ -128,7 +128,7 @@ export default defineComponent({
             }
         };
 
-        const buttonStyleType = computed(() => (props.isAdmin ? 'primary-dark' : 'primary1'));
+        const buttonStyleType = computed(() => (props.isDomainOwner ? 'primary-dark' : 'primary1'));
 
         return {
             ...toRefs(state),

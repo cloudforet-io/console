@@ -86,7 +86,8 @@ import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-grou
 import { i18n } from '@/translations';
 import { TranslateResult } from 'vue-i18n';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
-import { MenuInfo } from '@/lib/menu/config';
+import { MENU_ID, MenuInfo } from '@/lib/menu/config';
+import { isUserAccessibleToMenu } from '@/lib/access-control';
 
 const FAVORITE_LIMIT = 5;
 
@@ -160,11 +161,16 @@ export default {
                 store.state.favorite.menuItems,
                 store.getters['display/allGnbMenuList'],
             )),
-            favoriteCloudServiceItems: computed<FavoriteItem[]>(() => convertCloudServiceConfigToReferenceData(
-                store.state.favorite.cloudServiceItems,
-                state.cloudServiceTypes,
-            )),
+            favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE, store.getters['user/pagePermissionList']);
+                return isUserAccessible ? convertCloudServiceConfigToReferenceData(
+                    store.state.favorite.cloudServiceItems,
+                    state.cloudServiceTypes,
+                ) : [];
+            }),
             favoriteProjects: computed<FavoriteItem[]>(() => {
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pagePermissionList']);
+                if (!isUserAccessible) return [];
                 const favoriteProjectItems = convertProjectConfigToReferenceData(store.state.favorite.projectItems, state.projects);
                 const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(store.state.favorite.projectGroupItems, state.projectGroups);
                 return [...favoriteProjectGroupItems, ...favoriteProjectItems];
