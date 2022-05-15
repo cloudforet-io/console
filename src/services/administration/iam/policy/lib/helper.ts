@@ -1,19 +1,19 @@
-import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
+import { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
 import { KeyDataType, ValueHandler, ValueItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 
-export const policyTypeBadgeColorFormatter = (policyType: POLICY_TYPES) => {
+export const policyTypeBadgeColorFormatter = (policyType: PolicyTypes) => {
     switch (policyType) {
-    case POLICY_TYPES.MANAGED: return 'gray';
-    case POLICY_TYPES.CUSTOM: return 'primary1';
+    case PolicyTypes.MANAGED: return 'gray';
+    case PolicyTypes.CUSTOM: return 'primary1';
     default: return '';
     }
 };
 
-export const policyTypeURIFormatter = (policyType: POLICY_TYPES) => {
+export const policyTypeURIFormatter = (policyType: PolicyTypes) => {
     switch (policyType) {
-    case POLICY_TYPES.MANAGED: return 'repository';
-    case POLICY_TYPES.CUSTOM: return 'identity';
+    case PolicyTypes.MANAGED: return 'repository';
+    case PolicyTypes.CUSTOM: return 'identity';
     default: return '';
     }
 };

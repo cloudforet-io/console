@@ -49,7 +49,7 @@
                         :to="{
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
                             params: { id: item.policy_id },
-                            query: { type: selectedType }
+                            query: { type: item.policy_type }
                         }"
                     >
                         {{ value }}
@@ -71,7 +71,7 @@ import {
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
+import { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
 import {
     makeCustomValueHandler,
     policyTypeBadgeColorFormatter,
@@ -94,9 +94,9 @@ import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 // FIXME:: This is DUMMY, should be removed
 const DUMMY_REPO_ID = 'repo-d9e115714edc';
 
-const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], selectedType: POLICY_TYPES): PolicyDataModel[] => {
+const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], selectedType: PolicyTypes): PolicyDataModel[] => {
     // 1. filter by type
-    const _typeFilteredItems = filter(policyList, { policy_type: selectedType });
+    const _typeFilteredItems = filter(policyList, selectedType === PolicyTypes.ALL ? {} : { policy_type: selectedType });
 
     // 2. filter by query tags
     let _tagFilteredItems = [..._typeFilteredItems];
@@ -131,10 +131,11 @@ export default {
             loading: computed(() => administrationStore.state.policy.policyListLoading),
             policyList: computed(() => administrationStore.state.policy.policyList),
             policyTypeList: [
-                { name: POLICY_TYPES.MANAGED, label: 'Managed' },
-                { name: POLICY_TYPES.CUSTOM, label: 'Custom' },
+                { name: PolicyTypes.MANAGED, label: 'Managed' },
+                { name: PolicyTypes.CUSTOM, label: 'Custom' },
+                { name: PolicyTypes.ALL, label: 'All' },
             ],
-            selectedType: POLICY_TYPES.MANAGED,
+            selectedType: PolicyTypes.MANAGED,
             fields: [
                 { name: 'name', label: 'Name' },
                 { name: 'type', label: 'Type' },
@@ -147,8 +148,8 @@ export default {
                 const _filteredPolicyList = getFilteredItems(state.queryTags, state.policyList, state.selectedType);
                 return _filteredPolicyList.map(d => ({
                     ...d,
-                    type: d?.policy_type ?? POLICY_TYPES.MANAGED,
-                    created_at: d?.policy_type === POLICY_TYPES.MANAGED
+                    type: d?.policy_type ?? PolicyTypes.MANAGED,
+                    created_at: d?.policy_type === PolicyTypes.MANAGED
                         ? '--'
                         : iso8601Formatter(d.created_at.toString(), state.timezone, 'YYYY-MM-DD hh:mm:ss'),
                 }));
@@ -188,7 +189,7 @@ export default {
                 url: `/${policyTypeURIFormatter(state.selectedType)}/policy/list`,
                 param: {
                     include_parent_member: true,
-                    repository_id: state.selectedType === POLICY_TYPES.MANAGED ? DUMMY_REPO_ID : '',
+                    repository_id: state.selectedType === PolicyTypes.MANAGED ? DUMMY_REPO_ID : '',
                     query: policyListApiQueryHelper.data,
                 },
                 fields: [
