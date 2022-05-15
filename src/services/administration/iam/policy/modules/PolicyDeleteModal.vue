@@ -10,7 +10,11 @@
         <template v-if="attachedRoles.length" #delete-modal-body>
             <div class="modal-delete-disabled-title">
                 <span>{{ $t('IAM.POLICY.MODAL.DELETE_HELP_TEXT') }} </span>
-                <p-anchor :to="{name: '#'}" size="lg" highlight>
+                <p-anchor
+                    :to="{ name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME }"
+                    size="lg"
+                    highlight
+                >
                     {{ $t('IAM.POLICY.MODAL.DELETE_FOLLOW_ROLES') }}
                 </p-anchor>
             </div>
@@ -30,6 +34,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { i18n } from '@/translations';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 export default {
     name: 'PolicyDeleteModal',
@@ -55,9 +60,9 @@ export default {
             loading: true,
             proxyVisible: useProxyValue('visible', props, emit),
             fields: [
-                { name: 'Name', key: 'name' },
-                { name: 'Description', key: 'tags' },
-                { name: 'Type', key: 'type' },
+                { name: 'name', label: 'Name' },
+                { name: 'tags.description', label: 'Description' },
+                { name: 'role_type', label: 'Type' },
             ],
             attachedRoles: [],
         });
@@ -84,10 +89,13 @@ export default {
 
         const listRoles = async () => {
             try {
-                state.attachedRoles = await SpaceConnector.client.identity.role.list({
+                const roleList = await SpaceConnector.client.identity.role.list({
                     policy_id: props.policyId,
-                })?.results ?? [];
+                });
+                const { results } = roleList;
+                state.attachedRoles = results;
             } catch (e) {
+                state.attachedRoles = [];
                 ErrorHandler.handleError(e);
             }
         };
@@ -100,6 +108,7 @@ export default {
             ...toRefs(state),
             deletePolicy,
             handleConfirm,
+            ADMINISTRATION_ROUTE,
         };
     },
 };
