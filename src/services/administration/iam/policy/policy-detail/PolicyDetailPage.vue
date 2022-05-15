@@ -14,10 +14,10 @@
                     <p-icon-button name="ic_edit-text" class="edit-btn" @click="handleVisibleTitleEditModal" />
                 </span>
                 <div v-if="type === POLICY_TYPES.CUSTOM" class="policy-modify-buttons">
-                    <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="gray-border">
+                    <p-button :disabled="!isCodeModified" style-type="gray-border">
                         {{ $t('IAM.POLICY.FORM.CANCEL') }}
                     </p-button>
-                    <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="primary-dark">
+                    <p-button :disabled="!isCodeModified" style-type="primary-dark" @click="handleSaveChanges">
                         {{ $t('IAM.POLICY.FORM.SAVE') }}
                     </p-button>
                 </div>
@@ -41,18 +41,20 @@
                 <p>{{ policyInfo.policy_id }}</p>
             </div>
             <div class="policy-detail-contents">
-                <p-label>
-                    {{ $t('IAM.POLICY.FORM.DESCRIPTION') }}
-                </p-label>
-                <br>
-                <p v-if="type === POLICY_TYPES.MANAGED">
-                    {{ policyInfo.tags.description }}
-                </p>
-                <p-text-input
-                    v-else
-                    :value="description"
-                    @input="handleDescriptionUpdate"
-                />
+                <div v-if="type === POLICY_TYPES.MANAGED">
+                    <p-label>
+                        {{ $t('IAM.POLICY.FORM.DESCRIPTION') }}
+                    </p-label>
+                    <br>
+                    <p>{{ policyInfo.tags.description }}</p>
+                </div>
+                <p-field-group v-else>
+                    <p-text-input
+                        v-model="description"
+                        :label="$t('IAM.POLICY.FORM.DESCRIPTION')"
+                        @input="handleDescriptionUpdate"
+                    />
+                </p-field-group>
             </div>
             <div class="policy-detail-contents">
                 <p-label>{{ $t('IAM.POLICY.FORM.CONTENT') }}</p-label>
@@ -82,6 +84,9 @@ import { SpaceRouter } from '@/router';
 import PolicyDeleteModal from '@/services/administration/iam/policy/modules/PolicyDeleteModal.vue';
 import PolicyNameEditModal from '@/services/administration/iam/policy/modules/PolicyNameEditModal.vue';
 import deleteModal from '@/common/components/modals/DeleteModal.vue';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 export default defineComponent<PolicyDetailPageProps>({
     name: 'PolicyDetailPage',
@@ -105,35 +110,59 @@ export default defineComponent<PolicyDetailPageProps>({
         deleteModal,
     },
     setup(props) {
+        const stringifyPermission = (permissions: Array<string>|undefined) => permissions?.toString().replace(/,/gi, '\n') ?? '';
+        const arrayifyPermission = (permissionsCode: string) => permissionsCode.split('\n');
+
         const state = reactive({
             policyInfo: computed(() => administrationStore.state.policy.policyData),
             type: SpaceRouter.router.currentRoute.query.type,
-            code: computed(() => JSON.stringify(administrationStore.state.policy.policyData?.permissions ?? {}, undefined, 4)),
+            code: '',
             isCodeModified: false,
-            description: computed(() => administrationStore.state.policy.policyData?.tags?.description ?? ''),
-            isDescriptionModified: false,
+            description: '',
             visibleDeleteModal: false,
             visibleTitleEditModal: false,
         });
 
         const handleCodeUpdate = (modifiedCode: string) => {
-            state.isCodeModified = modifiedCode !== JSON.stringify(state.policyInfo, undefined, 4);
+            state.isCodeModified = modifiedCode !== stringifyPermission(state.policyInfo?.permissions);
             state.code = modifiedCode;
         };
 
         const handleDescriptionUpdate = (modifiedDescription: string) => {
-            state.isDescriptionModified = modifiedDescription !== state.policyInfo?.tags?.description ?? '';
             state.description = modifiedDescription;
         };
 
         const handleVisibleDeleteModal = () => { state.visibleDeleteModal = true; };
         const handleVisibleTitleEditModal = () => { state.visibleTitleEditModal = true; };
 
+        const handleSaveChanges = () => {
+            try {
+                SpaceConnector.client.identity.policy.update({
+                    policy_id: props.id,
+                    permissions: arrayifyPermission(state.code),
+                    tags: {
+                        description: state.description,
+                    },
+                });
+                // sul-lang
+                showSuccessMessage('Successfully saved changes', '');
+            } catch (e) {
+                // sul-lang
+                ErrorHandler.handleRequestError(e, 'Failed to save changes');
+            }
+        };
+
+        const getPolicyStoreData = () => {
+            state.code = stringifyPermission(administrationStore.state.policy.policyData?.permissions);
+            state.description = administrationStore.state.policy.policyData?.tags?.description;
+        };
+
         (async () => {
             try {
                 await administrationStore.dispatch('policy/getPolicyData', props.id);
+                await getPolicyStoreData();
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         })();
 
@@ -144,6 +173,7 @@ export default defineComponent<PolicyDetailPageProps>({
             handleDescriptionUpdate,
             handleVisibleDeleteModal,
             handleVisibleTitleEditModal,
+            handleSaveChanges,
         };
     },
 });
