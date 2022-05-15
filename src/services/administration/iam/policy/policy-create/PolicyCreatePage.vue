@@ -17,22 +17,21 @@
                 <p-field-group
                     :label="$t('IAM.POLICY.MODAL.NAME')"
                     required
-                    :invalid="isNameModified"
-                    :invalid-text="$t('IAM.POLICY.FORM.VALIDATION_NAME')"
+                    :invalid="invalidState.policyName"
+                    :invalid-text="invalidTexts.policyName"
                 >
                     <template #default="{invalid}">
                         <p-text-input
-                            :value.sync="name"
+                            :value="policyName"
                             :invalid="invalid"
-                            :invalid-text="$t('IAM.POLICY.FORM.VALIDATION_NAME')"
-                            @input="handleNameInput"
+                            @input="setForm('policyName', $event)"
                         />
                     </template>
                 </p-field-group>
             </div>
             <div class="policy-create-contents">
                 <p-field-group :label="$t('IAM.POLICY.FORM.DESCRIPTION')">
-                    <p-text-input />
+                    <p-text-input v-model="description" />
                 </p-field-group>
             </div>
             <div class="policy-create-contents">
@@ -48,10 +47,11 @@
             >
                 {{ $t('IAM.POLICY.FORM.CANCEL') }}
             </p-button>
+            <!-- Apply disabled prop as isAllValid -->
             <p-button
                 style-type="primary-dark"
                 size="lg"
-                :disabled="isNameModified"
+                :disabled="!(policyName.length > 2 && code.length)"
                 @click="handleCreatePolicy"
             >
                 {{ $t('IAM.POLICY.FORM.CREATE') }}
@@ -64,12 +64,13 @@
 import {
     PPageTitle, PPaneLayout, PBadge, PLabel, PFieldGroup, PTextInput, PTextEditor, PButton,
 } from '@spaceone/design-system';
-import { reactive, toRefs, computed } from '@vue/composition-api';
+import { reactive, toRefs } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceRouter } from '@/router';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { i18n } from '@/translations';
+import { useFormValidator } from '@/common/composables/form-validator';
 
 export default {
     name: 'PolicyCreatePage',
@@ -84,17 +85,35 @@ export default {
         PButton,
     },
     setup() {
+        const {
+            forms: {
+                policyName,
+            },
+            setForm,
+            invalidState,
+            invalidTexts,
+        } = useFormValidator({
+            policyName: '',
+        }, {
+            policyName(value: string) { return value.trim().length > 2 ? '' : i18n.t('IAM.POLICY.FORM.VALIDATION_NAME'); },
+        });
+
         const state = reactive({
-            name: '',
+            description: '',
             code: '',
         });
 
         const permissionsParser = (code: string) => code.split('\n').filter(d => d !== '');
 
-        const handleNameInput = (inputtedName: string) => { state.name = inputtedName; };
         const handleCreatePolicy = async () => {
             try {
-                await SpaceConnector.client.identity.policy.create({ permissions: permissionsParser(state.code), name: state.name });
+                await SpaceConnector.client.identity.policy.create({
+                    name: policyName.value,
+                    tags: {
+                        description: state.description,
+                    },
+                    permissions: permissionsParser(state.code),
+                });
                 showSuccessMessage(i18n.t('IAM.POLICY.MODAL.ALT_S_CREATE_POLICY'), '');
                 SpaceRouter.router.go(-1);
             } catch (e: any) {
@@ -104,14 +123,14 @@ export default {
 
         const handleCodeUpdate = (modifiedCode: string) => { state.code = modifiedCode; };
 
-        const isNameModified = computed(() => !(state.name.length >= 2));
-
         return {
             ...toRefs(state),
             handleCreatePolicy,
-            handleNameInput,
             handleCodeUpdate,
-            isNameModified,
+            policyName,
+            setForm,
+            invalidState,
+            invalidTexts,
         };
     },
 };
