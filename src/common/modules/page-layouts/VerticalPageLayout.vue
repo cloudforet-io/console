@@ -80,7 +80,7 @@ export default {
 
     .header {
         @apply flex justify-between;
-        padding: 1.5rem 1.5rem 0.625rem 1.5rem;
+        padding: 1.5rem 1.5rem 0.25rem 1.5rem;
     }
 
     .page-contents {
