@@ -202,12 +202,12 @@ export const Template = (args, { argTypes }) => ({
 
 ## Search
 <Canvas>
-    <Story name="AutoComplete" args={{menu: getSearchDropdownMenu()}}>
+    <Story name="Enable AutoComplete" args={{menu: getSearchDropdownMenu()}}>
         {{
             props: Object.keys(getSearchDropdownArgTypes()),
             components: { PTextInput },
             template: `
-                <p-text-input :menu="menu"  multi-input use-fixed-menu-style auto-complete />
+                <p-text-input :menu="menu"  multi-input use-fixed-menu-style use-auto-complete />
             `,
             setup() {
                 const state = reactive({
@@ -324,7 +324,7 @@ export const Template = (args, { argTypes }) => ({
         {{
             components: { PTextInput },
             template: `
-                <p-text-input :entered="entered" block multi-input />
+                <p-text-input :selected="entered" block multi-input />
             `,
             setup() {
                 const state = reactive({

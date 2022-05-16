@@ -40,7 +40,7 @@
                 @click="handleDeleteAllTags"
             />
         </div>
-        <p-context-menu v-if="proxyVisibleMenu && autoComplete"
+        <p-context-menu v-if="proxyVisibleMenu && useAutoComplete"
                         ref="menuRef"
                         :menu="bindingMenu"
                         :highlight-term="proxyValue"
@@ -57,16 +57,18 @@ import { inputTypes } from '@/inputs/input/config';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { PContextMenu, PI, PTag } from '@/index';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import { MenuItem } from '@/inputs/context-menu/type';
 import { SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
 import { useProxyValue } from '@/hooks/proxy-state';
 import { focus } from 'vue-focus';
 import vClickOutside from 'v-click-outside';
+import PTag from '@/data-display/tags/PTag.vue';
+import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import PI from '@/foundation/icons/PI.vue';
 
 export default {
-    name: 'PTextInputNew',
+    name: 'PTextInput',
     components: {
         PTag,
         PI,
@@ -145,7 +147,7 @@ export default {
             type: Boolean,
             default: true,
         },
-        autoComplete: {
+        useAutoComplete: {
             type: Boolean,
             default: false,
         },
@@ -261,7 +263,7 @@ export default {
             ...listeners,
             input(event) {
                 state.proxyValue = event.target.value;
-                if (state.proxyValue.length && props.autoComplete) {
+                if (state.proxyValue.length && props.useAutoComplete) {
                     showMenu();
                     filterMenu(state.proxyValue);
                 }
@@ -270,7 +272,7 @@ export default {
                 state.isFocused = true;
             },
             keyup(event) {
-                if ((event.key === 'ArrowDown' || event.key === 'Down') && props.autoComplete) {
+                if ((event.key === 'ArrowDown' || event.key === 'Down') && props.useAutoComplete) {
                     if (state.bindingMenu.length === 0) return;
                     if (state.menuRef) state.menuRef.focus();
                 }
@@ -283,7 +285,7 @@ export default {
             keydown(event) {
                 if (event.code === 'Backspace') {
                     const isInputEmpty = state.proxySelectedValue.length <= 1 && state.proxyValue.length <= 1;
-                    if (isInputEmpty && props.autoComplete) hideMenu();
+                    if (isInputEmpty && props.useAutoComplete) hideMenu();
                     if (props.multiInput) deleteSelectedTags();
                 }
             },
