@@ -1,3 +1,10 @@
+# [1.1.0-beta.296](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.295...v1.1.0-beta.296) (2022-05-16)
+
+
+### Bug Fixes
+
+* breadcrumbs style ([#949](https://github.com/spaceone-dev/spaceone-design-system/issues/949)) ([e103cda](https://github.com/spaceone-dev/spaceone-design-system/commit/e103cda7b850085fcf69ef6378cef0a19953272f))
+
 # [1.1.0-beta.295](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.294...v1.1.0-beta.295) (2022-05-11)
 
 
