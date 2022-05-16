@@ -78,7 +78,7 @@ export default {
     },
     model: {
         prop: 'value',
-        event: 'update:value',
+        event: 'input',
     },
     props: {
         value: {
