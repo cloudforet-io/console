@@ -1,9 +1,12 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import PTextInput from './PTextInput.vue';
-import { inputTypes } from './config'; import { reactive, toRefs } from '@vue/composition-api';
+import PTextInput from '@/inputs/input/PTextInput.vue';
+import { inputTypes } from '@/inputs/input/config';
+import { reactive, toRefs } from '@vue/composition-api';
+import { getSearchDropdownArgTypes } from '@/inputs/dropdown/search-dropdown/story-helper';
+import { getSearchDropdownMenu, getSearchDropdownMenuWithMultiTypes } from '@/inputs/dropdown/search-dropdown/mock';
 
 
-<Meta title='Inputs/Input' parameters={{
+<Meta title='Inputs/InputNew' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5191%3A2'
@@ -155,6 +158,8 @@ export const Template = (args, { argTypes }) => ({
     template: `
         <p-text-input :value="value" :invalid="invalid"
                       :type="type" :disabled="disabled" :block="block"
+                      :menu="menu" :use-fixed-menu-style="useFixedMenuStyle"
+                      :loading="loading"
         >
             <template v-if="rightExtraSlot" #right-extra>
                 <span v-html="rightExtraSlot"></span>
@@ -194,6 +199,29 @@ export const Template = (args, { argTypes }) => ({
 
 <br/>
 <br/>
+
+## Search
+<Canvas>
+    <Story name="AutoComplete" args={{menu: getSearchDropdownMenu()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PTextInput },
+            template: `
+                <p-text-input :menu="menu"  multi-input use-fixed-menu-style auto-complete />
+            `,
+            setup() {
+                const state = reactive({
+                })
+                return {
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Placeholder
 <Canvas>
@@ -296,11 +324,18 @@ export const Template = (args, { argTypes }) => ({
         {{
             components: { PTextInput },
             template: `
-                <p-text-input v-model="value" block />
+                <p-text-input :entered="entered" block multi-input />
             `,
             setup() {
                 const state = reactive({
-                    value: 'value'
+                    entered: [{
+                        value: 'value1',
+                        label: 'Value 1'
+                    }, {
+                        value: 'value2',
+                        label: 'Value 2',
+                        invalid: true,
+                    }]
                 })
                 return {
                     ...toRefs(state)
@@ -378,7 +413,7 @@ export const Template = (args, { argTypes }) => ({
         {{
             components: { PTextInput },
             template: `
-                <p-text-input style="width: 80px;" v-model="value" type="number">
+                <p-text-input style="width: 80px;" multi-input v-model="value" >
                     <template #right-extra>%</template>
                 </p-text-input>
             `,
