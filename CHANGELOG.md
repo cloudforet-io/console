@@ -1,3 +1,10 @@
+# [1.1.0-beta.297](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.296...v1.1.0-beta.297) (2022-05-16)
+
+
+### Bug Fixes
+
+* event name of input component ([#950](https://github.com/spaceone-dev/spaceone-design-system/issues/950)) ([261fd1e](https://github.com/spaceone-dev/spaceone-design-system/commit/261fd1e623e5b0e17f25ef86b6b53cca922f0601))
+
 # [1.1.0-beta.296](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.295...v1.1.0-beta.296) (2022-05-16)
 
 
