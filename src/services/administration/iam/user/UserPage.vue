@@ -4,7 +4,7 @@
                       use-selected-count
                       :selected-count="selectedIndex.length"
         />
-        <p-horizontal-layout>
+        <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
                 <user-management-table :table-height="height" />
             </template>
@@ -60,5 +60,10 @@ export default {
 .user-page {
     @apply mx-0;
     max-width: 100%;
+}
+.user-toolbox-layout::v-deep {
+    .horizontal-contents {
+        overflow: unset;
+    }
 }
 </style>

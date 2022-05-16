@@ -6,7 +6,7 @@
                       :total-count="totalCount"
                       :selected-count="selectedIndices.length"
         />
-        <p-horizontal-layout>
+        <p-horizontal-layout class="role-toolbox-layout">
             <template #container="{ height }">
                 <role-management-table :table-height="height"
                                        @update-selected-indices="handleUpdate"
@@ -65,5 +65,10 @@ export default defineComponent({
 .role-page {
     @apply mx-0;
     max-width: 100%;
+}
+.role-toolbox-layout::v-deep {
+    .horizontal-contents {
+        overflow: unset;
+    }
 }
 </style>
