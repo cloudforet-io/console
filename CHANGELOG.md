@@ -1,3 +1,10 @@
+# [1.1.0-beta.299](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.298...v1.1.0-beta.299) (2022-05-16)
+
+
+### Bug Fixes
+
+* useProxy hook ([#952](https://github.com/spaceone-dev/spaceone-design-system/issues/952)) ([d7c7105](https://github.com/spaceone-dev/spaceone-design-system/commit/d7c7105fc90239ead435c58488580c9b1df8f15d))
+
 # [1.1.0-beta.298](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.297...v1.1.0-beta.298) (2022-05-16)
 
 
