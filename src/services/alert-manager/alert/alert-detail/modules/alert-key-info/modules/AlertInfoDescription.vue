@@ -77,4 +77,7 @@ export default {
 .description {
     white-space: pre-wrap;
 }
+.textarea {
+    min-height: 15rem;
+}
 </style>

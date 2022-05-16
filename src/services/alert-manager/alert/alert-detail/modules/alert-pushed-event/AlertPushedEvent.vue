@@ -203,6 +203,7 @@ export default {
     }
     .desc {
         @apply text-gray-500;
+        white-space: pre-line;
     }
 }
 .severity {
