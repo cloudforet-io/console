@@ -14,10 +14,10 @@
                     <p-icon-button name="ic_edit-text" class="edit-btn" @click="handleVisibleTitleEditModal" />
                 </span>
                 <div v-if="type === POLICY_TYPES.CUSTOM" class="policy-modify-buttons">
-                    <p-button :disabled="!isCodeModified" style-type="gray-border">
+                    <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="gray-border">
                         {{ $t('IAM.POLICY.FORM.CANCEL') }}
                     </p-button>
-                    <p-button :disabled="!isCodeModified" style-type="primary-dark" @click="handleSaveChanges">
+                    <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="primary-dark" @click="handleSaveChanges">
                         {{ $t('IAM.POLICY.FORM.SAVE') }}
                     </p-button>
                 </div>
@@ -123,6 +123,7 @@ export default defineComponent<PolicyDetailPageProps>({
             code: '',
             isCodeModified: false,
             description: '',
+            isDescriptionModified: false,
             visibleDeleteModal: false,
             visibleTitleEditModal: false,
         });
@@ -133,6 +134,7 @@ export default defineComponent<PolicyDetailPageProps>({
         };
 
         const handleDescriptionUpdate = (modifiedDescription: string) => {
+            state.isDescriptionModified = modifiedDescription !== state.policyInfo?.tags?.description ?? '';
             state.description = modifiedDescription;
         };
 
