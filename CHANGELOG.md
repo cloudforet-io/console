@@ -1,3 +1,10 @@
+# [1.1.0-beta.298](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.297...v1.1.0-beta.298) (2022-05-16)
+
+
+### Features
+
+* add extraEventName parameter and fix input component ([#951](https://github.com/spaceone-dev/spaceone-design-system/issues/951)) ([bec03b7](https://github.com/spaceone-dev/spaceone-design-system/commit/bec03b7eb2ea99b9ce658d2cf8a39707ca5ac15b))
+
 # [1.1.0-beta.297](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.296...v1.1.0-beta.297) (2022-05-16)
 
 
