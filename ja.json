@@ -1063,9 +1063,11 @@
 				"VIEW_ONLY": ""
 			},
 			"MODAL": {
+				"ALT_E_CHANGE_POLICY": "",
 				"ALT_E_CREATE_POLICY": "",
 				"ALT_E_DELETE_POLICY": "",
 				"ALT_E_UPDATE_POLICY": "",
+				"ALT_S_CHANGE_POLICY": "",
 				"ALT_S_CREATE_POLICY": "",
 				"ALT_S_DELETE_POLICY": "",
 				"ALT_S_UPDATE_POLICY": "",
