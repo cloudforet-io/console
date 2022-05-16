@@ -148,10 +148,8 @@ export default defineComponent<PolicyDetailPageProps>({
                         description: state.description,
                     },
                 });
-                // sul-lang
                 showSuccessMessage(i18n.t('IAM.POLICY.MODAL.ALT_S_CHANGE_POLICY'), '');
             } catch (e) {
-                // sul-lang
                 ErrorHandler.handleRequestError(e, i18n.t('IAM.POLICY.MODAL.ALT_E_CHANGE_POLICY'));
             }
         };

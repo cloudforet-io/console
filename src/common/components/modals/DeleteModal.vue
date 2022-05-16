@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="headerTitle"
+    <p-button-modal class="delete-modal" :header-title="headerTitle"
                     :scrollable="false"
                     :size="size"
                     :fade="true"
@@ -8,6 +8,7 @@
                     :disabled="disabled"
                     :hide-footer-close-button="onlyShowFooterCloseButton"
                     :theme-color="onlyShowFooterCloseButton? 'gray-border': 'alert'"
+                    :loading="loading"
                     @confirm="handleConfirm"
     >
         <template #body>
@@ -57,6 +58,10 @@ export default {
             type: String,
             default: '',
         },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
         size: {
             type: String,
             validator(value: Size): boolean {
@@ -88,6 +93,15 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.delete-modal::v-deep {
+    .modal-header {
+        @apply text-alert;
+        .header-lottie {
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+    }
+}
 .delete-modal-content {
     line-height: 160%;
 }

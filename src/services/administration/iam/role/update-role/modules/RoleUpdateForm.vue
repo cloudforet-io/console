@@ -61,7 +61,7 @@ export default {
     props: {
         initialRoleData: {
             type: Object as PropType<RoleData>,
-            default: {},
+            default: () => ({}),
         },
     },
     setup(props, { emit }) {
@@ -107,7 +107,8 @@ export default {
             emit('update-form-data', after);
         });
         watch(() => props.initialRoleData, (initialRoleData) => {
-            if (!initialRoleData) return;
+            const isObjectEmpty = !Object.keys(initialRoleData).length;
+            if (isObjectEmpty) return;
             state.baseInfoFormData = {
                 roleName: initialRoleData.name,
                 roleDescription: initialRoleData.tags?.description,

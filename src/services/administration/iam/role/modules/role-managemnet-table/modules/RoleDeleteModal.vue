@@ -3,6 +3,7 @@
                   size="lg"
                   :header-title="headerTitle"
                   :only-show-footer-close-button="!isDeletable"
+                  :loading="loading"
                   @confirm="handleDelete"
     >
         <div v-if="!isDeletable" class="mb-4">
@@ -11,6 +12,7 @@
         <p-data-table v-if="isDeletable"
                       :items="roles"
                       :fields="fields"
+                      :loading="loading"
         >
             <template #col-role_type-format="{ value }">
                 <p-badge v-if="value" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType">
