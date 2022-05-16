@@ -41,7 +41,7 @@
                 <p>{{ policyInfo.policy_id }}</p>
             </div>
             <div class="policy-detail-contents">
-                <div v-if="type === PolicyTypes.MANAGED">
+                <div v-if="type === POLICY_TYPES.MANAGED">
                     <p-label>
                         {{ $t('IAM.POLICY.FORM.DESCRIPTION') }}
                     </p-label>
