@@ -102,7 +102,6 @@ export default defineComponent<Props>({
 <style lang="postcss">
 .p-breadcrumbs {
     display: inline-flex;
-    margin-bottom: 0.5rem;
 
     .link {
         @apply text-xs text-gray-700 cursor-pointer;
