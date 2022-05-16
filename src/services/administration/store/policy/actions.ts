@@ -2,6 +2,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { UpdatePolicyParams } from '@/services/administration/store/policy/type';
 import { PolicyDataModel, PolicyListDataModel } from '@/services/administration/iam/policy/lib/type';
+import { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
 
 export const fetchPolicyList = async ({ commit }, params: any): Promise<void|Error> => {
     commit('setPolicyListLoading', true);
@@ -20,11 +21,18 @@ export const fetchPolicyList = async ({ commit }, params: any): Promise<void|Err
     }
 };
 
-export const getPolicyData = async ({ commit }, policyId: string): Promise<void|Error> => {
+export const getPolicyData = async ({ commit }, {
+    policyId,
+    policyType,
+}): Promise<void|Error> => {
     try {
-        const policy: PolicyDataModel = await SpaceConnector.client.identity.policy.get({
-            policy_id: policyId,
-        });
+        const policy: PolicyDataModel = policyType === PolicyTypes.MANAGED
+            ? await SpaceConnector.client.repository.policy.get({
+                policy_id: policyId,
+            })
+            : await SpaceConnector.client.identity.policy.get({
+                policy_id: policyId,
+            });
         commit('setPolicyData', policy);
     } catch (e: any) {
         ErrorHandler.handleError(e);

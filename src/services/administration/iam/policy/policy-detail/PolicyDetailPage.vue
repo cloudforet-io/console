@@ -41,7 +41,7 @@
                 <p>{{ policyInfo.policy_id }}</p>
             </div>
             <div class="policy-detail-contents">
-                <div v-if="type === POLICY_TYPES.MANAGED">
+                <div v-if="type === PolicyTypes.MANAGED">
                     <p-label>
                         {{ $t('IAM.POLICY.FORM.DESCRIPTION') }}
                     </p-label>
@@ -159,8 +159,10 @@ export default defineComponent<PolicyDetailPageProps>({
         };
 
         (async () => {
+            const policyType = SpaceRouter.router.currentRoute.query.type;
+
             try {
-                await administrationStore.dispatch('policy/getPolicyData', props.id);
+                await administrationStore.dispatch('policy/getPolicyData', { policyId: props.id, policyType });
                 await getPolicyStoreData();
             } catch (e) {
                 ErrorHandler.handleError(e);
