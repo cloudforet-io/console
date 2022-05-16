@@ -166,7 +166,7 @@ export default {
             menuRef: null,
             targetRef: null,
             isFocused: false,
-            proxyValue: useProxyValue('value', props, emit),
+            proxyValue: useProxyValue('value', props, emit, 'input'),
             proxySelectedValue: useProxyValue('selected', props, emit),
             deleteTarget: undefined as string | undefined,
             deleteTargetIdx: -1,
