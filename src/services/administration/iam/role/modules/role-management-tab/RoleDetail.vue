@@ -39,8 +39,14 @@
                     {{ value }}
                 </p-badge>
             </template>
-            <template #col-policy_id-format="{ value }">
-                <p-anchor :highlight="true">
+            <template #col-policy_id-format="{ value, item }">
+                <p-anchor :highlight="true"
+                          :to="{
+                              name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
+                              params: { id: value },
+                              query: { type: item.policy_type }
+                          }"
+                >
                     {{ value }}
                 </p-anchor>
             </template>
@@ -77,6 +83,7 @@ import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 import { policyTypeBadgeColorFormatter } from '@/services/administration/iam/policy/lib/helper';
 import { GNBMenu } from '@/store/modules/display/type';
 import { DefinitionField } from '@spaceone/design-system/dist/src/data-display/tables/definition-table/type';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 type DataTableTranslationField = DataTableField | {
     label?: TranslateResult | string;
@@ -235,6 +242,7 @@ export default {
             PAGE_PERMISSION_TYPE,
             convertPagePermissionLabel,
             policyTypeBadgeColorFormatter,
+            ADMINISTRATION_ROUTE,
         };
     },
 };

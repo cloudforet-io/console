@@ -71,18 +71,18 @@ const flattenSubMenuList = (subMenuList?: GNBMenu[], labels?: Array<string|Trans
 };
 const getPagePermissions = (menuItems: PageAccessMenuItem[]): PagePermission[] => {
     const allItem = find(menuItems, { id: 'all' });
-    if (allItem && allItem.isManaged) return [{ page: '*', permission: 'MANAGE' }];
+    if (allItem && allItem.isManaged) return [{ page: '*', permission: PAGE_PERMISSION_TYPE.MANAGE }];
 
     const results: PagePermission[] = [];
     menuItems.forEach((menu) => {
-        if (menu.id === 'all' && menu.isViewed) results.push({ page: '*', permission: 'VIEW' });
-        else if (menu.isManaged) results.push({ page: `${menu.id}.*`, permission: 'MANAGE' });
-        else if (menu.isViewed) results.push({ page: `${menu.id}.*`, permission: 'VIEW' });
+        if (menu.id === 'all' && menu.isViewed) results.push({ page: '*', permission: PAGE_PERMISSION_TYPE.VIEW });
+        else if (menu.isManaged) results.push({ page: `${menu.id}.*`, permission: PAGE_PERMISSION_TYPE.MANAGE });
+        else if (menu.isViewed) results.push({ page: `${menu.id}.*`, permission: PAGE_PERMISSION_TYPE.VIEW });
         if (menu.subMenuList?.length) {
             menu.subMenuList.forEach((subMenu) => {
                 if (!menu.isManaged) {
-                    if (subMenu.isManaged) results.push({ page: subMenu.id, permission: 'MANAGE' });
-                    else if (!menu.isViewed && subMenu.isViewed) results.push({ page: subMenu.id, permission: 'VIEW' });
+                    if (subMenu.isManaged) results.push({ page: subMenu.id, permission: PAGE_PERMISSION_TYPE.MANAGE });
+                    else if (!menu.isViewed && subMenu.isViewed) results.push({ page: subMenu.id, permission: PAGE_PERMISSION_TYPE.VIEW });
                 }
             });
         }

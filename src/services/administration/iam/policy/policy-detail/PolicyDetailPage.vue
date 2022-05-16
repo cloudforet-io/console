@@ -87,6 +87,7 @@ import deleteModal from '@/common/components/modals/DeleteModal.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { i18n } from '@/translations';
 
 export default defineComponent<PolicyDetailPageProps>({
     name: 'PolicyDetailPage',
@@ -145,10 +146,10 @@ export default defineComponent<PolicyDetailPageProps>({
                     },
                 });
                 // sul-lang
-                showSuccessMessage('Successfully saved changes', '');
+                showSuccessMessage(i18n.t('IAM.POLICY.MODAL.ALT_S_CHANGE_POLICY'), '');
             } catch (e) {
                 // sul-lang
-                ErrorHandler.handleRequestError(e, 'Failed to save changes');
+                ErrorHandler.handleRequestError(e, i18n.t('IAM.POLICY.MODAL.ALT_E_CHANGE_POLICY'));
             }
         };
 

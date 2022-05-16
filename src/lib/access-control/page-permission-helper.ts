@@ -18,8 +18,8 @@ export type PagePermissionMap = Record<string, PagePermissionType>
 export type PagePermissionTuple = Array<string|PagePermissionType>
 
 const getProperPermissionType = (permissionA: PagePermissionType = 'VIEW', permissionB: PagePermissionType = 'VIEW'): PagePermissionType => {
-    if (permissionA === 'MANAGE' || permissionB === 'MANAGE') return 'MANAGE';
-    return 'VIEW';
+    if (permissionA === PAGE_PERMISSION_TYPE.MANAGE || permissionB === PAGE_PERMISSION_TYPE.MANAGE) return PAGE_PERMISSION_TYPE.MANAGE;
+    return PAGE_PERMISSION_TYPE.VIEW;
 };
 
 const menuIdList = Object.keys(MENU_INFO_MAP) as MenuId[];
