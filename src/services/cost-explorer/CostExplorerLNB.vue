@@ -2,10 +2,8 @@
     <aside class="sidebar-menu">
         <l-n-b
             v-if="!dashboardListLoading"
-            header="Cost Explorer"
-            :top-title="{ label: 'Dashboard', visibleAddButton: true,
-                          addButtonLink: { name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME}
-            }"
+            :header="header"
+            :top-title="topTitle"
             :menu-set="menuSet"
         >
             <template #after-text="{item}">
@@ -33,6 +31,10 @@ import { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import { MENU_ID } from '@/lib/menu/config';
 import { PI } from '@spaceone/design-system';
+import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
+import { store } from '@/store';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { isUserAccessibleToMenu } from '@/lib/access-control';
 
 export default {
     name: 'CostExplorerLNB',
@@ -46,39 +48,57 @@ export default {
             userDashboardList: computed<UserDashboardInfo[]>(() => costExplorerStore.state.userDashboardList ?? []),
             loading: true,
             dashboardListLoading: computed<boolean>(() => costExplorerStore.state?.dashboardListLoading ?? true),
-            menuSet: computed<LNBMenu[]>(() => [
-                [
-                    {
-                        type: 'title', label: 'Public', id: 'public', foldable: false,
-                    },
-                    ...state.publicDashboardList.map((list: PublicDashboardInfo) => ({
-                        type: 'item',
-                        label: list.name,
-                        id: list.public_dashboard_id,
-                        to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.public_dashboard_id } },
-                        hideFavorite: true,
-                    })),
-                ],
-                [
-                    {
-                        type: 'title', label: 'My Dashboard', id: 'my', foldable: true,
-                    },
-                    ...state.userDashboardList.map((list: UserDashboardInfo) => ({
-                        type: 'item',
-                        label: list.name,
-                        id: list.user_dashboard_id,
-                        to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.user_dashboard_id } },
-                        hideFavorite: true,
-                    })),
-                ],
-                { type: 'divider' },
+            header: computed(() => MENU_INFO_MAP[MENU_ID.COST_EXPLORER].label),
+            topTitle: computed(() => {
+                if (isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_DASHBOARD)) {
+                    return {
+                        label: MENU_ID.COST_EXPLORER_DASHBOARD,
+                        visibleAddButton: true,
+                        addButtonLink: { name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME },
+                    };
+                }
+                return undefined;
+            }),
+            dashboardMenuSet: computed<LNBMenu[]>(() => {
+                const results: LNBMenu[] = [];
+                if (state.topTitle) {
+                    results.push([
+                        {
+                            type: 'title', label: 'Public', id: 'public', foldable: false,
+                        },
+                        ...state.publicDashboardList.map((list: PublicDashboardInfo) => ({
+                            type: 'item',
+                            label: list.name,
+                            id: list.public_dashboard_id,
+                            to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.public_dashboard_id } },
+                            hideFavorite: true,
+                        })),
+                    ],
+                    [
+                        {
+                            type: 'title', label: 'My Dashboard', id: 'my', foldable: true,
+                        },
+                        ...state.userDashboardList.map((list: UserDashboardInfo) => ({
+                            type: 'item',
+                            label: list.name,
+                            id: list.user_dashboard_id,
+                            to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.user_dashboard_id } },
+                            hideFavorite: true,
+                        })),
+                    ],
+                    { type: 'divider' });
+                }
+                return results;
+            }),
+            menuSet: computed<LNBMenu[]>(() => filterLNBMenuByPermission([
+                ...state.dashboardMenuSet,
                 {
                     type: 'item', id: MENU_ID.COST_EXPLORER_COST_ANALYSIS, label: 'Cost Analysis', to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
                 },
                 {
                     type: 'item', id: MENU_ID.COST_EXPLORER_BUDGET, label: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
                 },
-            ]),
+            ], store.getters['user/pagePermissionList'])),
             selectedMenu: {} as LNBItem,
             homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters?.homeDashboardId),
         });

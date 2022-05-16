@@ -1,5 +1,5 @@
 <template>
-    <l-n-b header="Asset Inventory" :back-link="backLink" :top-title="topTitle"
+    <l-n-b :header="header" :back-link="backLink" :top-title="topTitle"
            :menu-set="menuSet"
     />
 </template>
@@ -26,6 +26,9 @@ import {
     CloudServiceTypeInfo,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
+import { store } from '@/store';
 
 
 export default defineComponent({
@@ -39,6 +42,7 @@ export default defineComponent({
                 if (state.isCloudServiceDetailPage) return vm.$route.params as unknown as CloudServiceDetailPageParams;
                 return undefined;
             }),
+            header: computed(() => MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].label),
             backLink: computed<BackLink|undefined>(() => {
                 if (!state.isCloudServiceDetailPage) return undefined;
                 return { label: 'Cloud Service', to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME } };
@@ -84,7 +88,7 @@ export default defineComponent({
                         type: 'item', id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT, label: 'Service Account', to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
                     },
                 );
-                return menuItems;
+                return filterLNBMenuByPermission(menuItems, store.getters['user/pagePermissionList']);
             }),
         });
 
