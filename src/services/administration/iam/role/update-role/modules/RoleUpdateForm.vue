@@ -73,7 +73,7 @@ export default {
             invalidTexts,
             isAllValid: isPolicySectionValid,
         } = useFormValidator({
-            selectedPolicyList: [],
+            selectedPolicyList: [] as Policy[],
         }, {
             selectedPolicyList(value: Policy[]) { return value.length ? '' : i18n.t('IAM.ROLE.FORM.VALIDATION_API_POLICY'); },
         });
@@ -115,7 +115,7 @@ export default {
                 roleType: initialRoleData.role_type,
             };
             state.pageAccessFormData = props.initialRoleData.page_permissions;
-            setForm('selectedPolicyList', initialRoleData.policies?.map(p => p.policy_id));
+            setForm('selectedPolicyList', initialRoleData.policies);
         });
         return {
             ...toRefs(state),

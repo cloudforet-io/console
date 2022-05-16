@@ -1,21 +1,28 @@
-import { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
+import { PolicyTypes, POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
 import { KeyDataType, ValueHandler, ValueItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
+import { TimeStamp } from '@/models';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 
 export const policyTypeBadgeColorFormatter = (policyType: PolicyTypes) => {
     switch (policyType) {
-    case PolicyTypes.MANAGED: return 'gray';
-    case PolicyTypes.CUSTOM: return 'primary1';
+    case POLICY_TYPES.MANAGED: return 'gray';
+    case POLICY_TYPES.CUSTOM: return 'primary1';
     default: return '';
     }
 };
 
 export const policyTypeURIFormatter = (policyType: PolicyTypes) => {
     switch (policyType) {
-    case PolicyTypes.MANAGED: return 'repository';
-    case PolicyTypes.CUSTOM: return 'identity';
+    case POLICY_TYPES.MANAGED: return 'repository';
+    case POLICY_TYPES.CUSTOM: return 'identity';
     default: return '';
     }
+};
+
+export const policyCreatedAtFormatter = (createdAt: TimeStamp, selectedPolicyType: PolicyTypes, timezone: string): string => {
+    if (selectedPolicyType === POLICY_TYPES.MANAGED) return '--';
+    return iso8601Formatter(createdAt.toString(), timezone, 'YYYY-MM-DD hh:mm:ss');
 };
 
 export const makeCustomValueHandler = (policyList: PolicyDataModel[], distinct: string, dataType?: KeyDataType): ValueHandler|undefined => {

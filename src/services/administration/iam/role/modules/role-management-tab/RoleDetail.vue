@@ -75,7 +75,7 @@ import {
     DataTableField,
 } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { TranslateResult } from 'vue-i18n';
-import { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
+import { POLICY_TYPES, PolicyTypes } from '@/services/administration/iam/policy/lib/config';
 import {
     getPagePermissionMap, PAGE_PERMISSION_TYPE, PagePermissionType,
 } from '@/lib/access-control/page-permission-helper';
@@ -193,7 +193,7 @@ export default {
                 await Promise.all((baseInfoState.data.policies ?? []).map(async (policy) => {
                     try {
                         let res;
-                        if (policy.policy_type === PolicyTypes.MANAGED) {
+                        if (policy.policy_type === POLICY_TYPES.MANAGED) {
                             res = await SpaceConnector.client.repository.policy.get({
                                 policy_id: policy.policy_id,
                                 policy_type: policy.policy_type,

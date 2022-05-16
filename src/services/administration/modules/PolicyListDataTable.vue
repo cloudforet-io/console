@@ -3,7 +3,8 @@
         <p-toolbox-table
             :exportable="false"
             :sortable="false"
-            searchable
+            :searchable="!selectable"
+            :refreshable="!selectable"
             search-type="query"
             :loading="loading"
             :fields="fields"
@@ -12,11 +13,12 @@
             :key-item-sets="policySearchHandler.keyItemSets"
             :value-handler-map="policySearchHandler.valueHandlerMap"
             :selectable="selectable"
-            :select-index.sync="selectedIndices"
+            :select-index="selectedIndices"
             :pagination-visible="false"
             :page-size-changeable="false"
             @change="handleChange"
             @refresh="handleRefresh"
+            @update:selectIndex="handleUpdateSelectIndex"
         >
             <template #toolbox-top>
                 <slot name="panel-top" />
@@ -33,13 +35,11 @@
                     </p-select-status>
                 </div>
             </template>
-
-            <template #col-type-format="{ value }">
+            <template #col-policy_type-format="{ value }">
                 <p-badge outline :style-type="policyTypeBadgeColorFormatter(value)">
-                    {{ value }}
+                    {{ value ? value : POLICY_TYPES.MANAGED }}
                 </p-badge>
             </template>
-
             <template #col-policy_id-format="{ value, item }">
                 <template v-if="value">
                     <p-anchor
@@ -54,6 +54,9 @@
                         {{ value }}
                     </p-anchor>
                 </template>
+            </template>
+            <template #col-created_at-format="{ value }">
+                {{ policyCreatedAtFormatter(value, selectedType, timezone) }}
             </template>
             <template #toolbox-table-bottom>
                 <slot name="toolbox-table-bottom" />
@@ -70,27 +73,27 @@ import {
 import {
     computed, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
+import { POLICY_TYPES, PolicyTypes } from '@/services/administration/iam/policy/lib/config';
 import {
     makeCustomValueHandler,
+    policyCreatedAtFormatter,
     policyTypeBadgeColorFormatter,
 } from '@/services/administration/iam/policy/lib/helper';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { store } from '@/store';
-import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { administrationStore } from '@/services/administration/store';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
-import { PagePermission } from '@/lib/access-control/page-permission-helper';
+import { Policy } from '@/services/administration/iam/role/type';
 
 
 const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], selectedType: PolicyTypes): PolicyDataModel[] => {
     // 1. filter by type
-    const _typeFilteredItems = filter(policyList, selectedType === PolicyTypes.ALL ? {} : { policy_type: selectedType });
+    const _typeFilteredItems = filter(policyList, selectedType === POLICY_TYPES.ALL ? {} : { policy_type: selectedType });
 
     // 2. filter by query tags
     let _tagFilteredItems = [..._typeFilteredItems];
@@ -119,8 +122,8 @@ export default {
             default: true,
         },
         initialPolicyList: {
-            type: Array as PropType<PagePermission[]>,
-            default: () => [],
+            type: Array as PropType<Policy[]>,
+            default: () => ([]),
         },
     },
     setup(props, { emit }) {
@@ -129,33 +132,30 @@ export default {
             loading: computed(() => administrationStore.state.policy.policyListLoading),
             policyList: computed(() => administrationStore.state.policy.policyList),
             policyTypeList: [
-                { name: PolicyTypes.MANAGED, label: 'Managed' },
-                { name: PolicyTypes.CUSTOM, label: 'Custom' },
-                { name: PolicyTypes.ALL, label: 'All' },
+                { name: POLICY_TYPES.MANAGED, label: 'Managed' },
+                { name: POLICY_TYPES.CUSTOM, label: 'Custom' },
+                { name: POLICY_TYPES.ALL, label: 'All' },
             ],
-            selectedType: PolicyTypes.MANAGED,
+            selectedType: POLICY_TYPES.MANAGED as PolicyTypes,
             fields: [
                 { name: 'name', label: 'Name' },
-                { name: 'type', label: 'Type' },
+                { name: 'policy_type', label: 'Type' },
                 { name: 'policy_id', label: 'ID', sortable: false },
                 { name: 'tags.description', label: 'Description', sortable: false },
                 { name: 'created_at', label: 'Created' },
             ],
-            items: computed(() => {
+            items: computed<PolicyDataModel[]>(() => {
                 if (!state.policyList) return [];
-                const _filteredPolicyList = getFilteredItems(state.queryTags, state.policyList, state.selectedType);
-                return _filteredPolicyList.map(d => ({
-                    ...d,
-                    type: d?.policy_type ?? PolicyTypes.MANAGED,
-                    created_at: d?.policy_type === PolicyTypes.MANAGED
-                        ? '--'
-                        : iso8601Formatter(d.created_at.toString(), state.timezone, 'YYYY-MM-DD hh:mm:ss'),
-                }));
+                return getFilteredItems(state.queryTags, state.policyList, state.selectedType);
             }),
-            selectedIndices: [] as number[],
             timezone: computed(() => store.state.user.timezone),
             totalCount: computed(() => administrationStore.state.policy.totalCount),
             queryTags: [] as QueryTag[],
+            selectedIdMap: {} as Record<string, PolicyTypes>,
+            selectedIndices: computed(() => state.items.reduce((results, d, i) => {
+                if (state.selectedIdMap[d.policy_id]) results.push(i);
+                return results;
+            }, [] as number[])),
         });
         const policySearchHandler = reactive({
             keyItemSets: [{
@@ -171,10 +171,12 @@ export default {
             })),
         });
 
+        /* Api */
         const listPolicies = async () => {
             await administrationStore.dispatch('policy/fetchPolicyList', policyListApiQueryHelper.data);
         };
 
+        /* Event */
         const handleChange = (options: ToolboxOptions = {}) => {
             setApiQueryWithToolboxOptions(policyListApiQueryHelper, options);
             if (options.queryTags !== undefined) {
@@ -202,33 +204,63 @@ export default {
         // };
 
         const handleRefresh = () => {
+            state.selectedIdMap = [];
             listPolicies();
         };
 
         const handleChangePolicyType = () => {
-            state.selectedIndices = [];
             state.queryTags = [];
         };
 
-        watch(() => state.selectedIndices, (indices: number[]) => {
-            emit('update-selected-policy-list', indices.map(idx => ({
-                policy_id: state.items[idx]?.policy_id,
-                policy_type: state.items[idx]?.policy_type,
-            })));
+        const handleUpdateSelectIndex = (selectedIndices: number[]) => {
+            const selectedIdMap: Record<string, PolicyTypes> = {};
+            if (state.selectedType !== POLICY_TYPES.ALL) {
+                const currentPolicyType = state.selectedType;
+                Object.entries(state.selectedIdMap).forEach(([id, policyType]) => {
+                    if (policyType !== currentPolicyType) {
+                        selectedIdMap[id] = policyType as PolicyTypes;
+                    }
+                });
+            }
+            selectedIndices.forEach((idx) => {
+                const item = state.items[idx];
+                selectedIdMap[item.policy_id] = item.policy_type;
+            });
+            state.selectedIdMap = selectedIdMap;
+        };
+
+        /* Watcher */
+        watch(() => state.totalCount as number, (value: number) => {
+            emit('update-total-count', value);
+        });
+        watch(() => state.selectedIdMap, (selectedIdMap) => {
+            const selectedIdList = Object.keys(selectedIdMap);
+            const selectedPolicyList: Policy[] = [];
+            state.policyList.forEach((d) => {
+                if (selectedIdList.includes(d.policy_id)) {
+                    selectedPolicyList.push({ policy_id: d.policy_id, policy_type: d.policy_type });
+                }
+            });
+            emit('update-selected-policy-list', selectedPolicyList);
         });
 
+        /* Init */
         (async () => {
             await listPolicies();
+            state.selectedIdMap = props.initialPolicyList.map(d => ({ [d.policy_id]: d.policy_type }));
         })();
 
         return {
             ...toRefs(state),
             policySearchHandler,
             ADMINISTRATION_ROUTE,
+            POLICY_TYPES,
             policyTypeBadgeColorFormatter,
+            policyCreatedAtFormatter,
             handleChange,
             handleRefresh,
             handleChangePolicyType,
+            handleUpdateSelectIndex,
         };
     },
 };

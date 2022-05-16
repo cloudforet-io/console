@@ -6,14 +6,14 @@
             @goBack="$router.go(-1)"
         >
             <template #title-right-extra>
-                <span v-if="type === PolicyTypes.MANAGED" class="policy-managed-badge">
+                <span v-if="type === POLICY_TYPES.MANAGED" class="policy-managed-badge">
                     <p-badge style-type="gray200">{{ $t('IAM.POLICY.FORM.VIEW_ONLY') }}</p-badge>
                 </span>
-                <span v-if="type === PolicyTypes.CUSTOM" class="policy-edit-buttons">
+                <span v-if="type === POLICY_TYPES.CUSTOM" class="policy-edit-buttons">
                     <p-icon-button name="ic_trashcan" class="w-full delete-btn" @click="handleVisibleDeleteModal" />
                     <p-icon-button name="ic_edit-text" class="edit-btn" @click="handleVisibleTitleEditModal" />
                 </span>
-                <div v-if="type === PolicyTypes.CUSTOM" class="policy-modify-buttons">
+                <div v-if="type === POLICY_TYPES.CUSTOM" class="policy-modify-buttons">
                     <p-button :disabled="!isCodeModified" style-type="gray-border">
                         {{ $t('IAM.POLICY.FORM.CANCEL') }}
                     </p-button>
@@ -28,7 +28,7 @@
                 <p-label>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-label>
                 <br>
                 <div class="policy-detail-type-badge">
-                    <p-badge v-if="type === PolicyTypes.MANAGED" outline style-type="gray">
+                    <p-badge v-if="type === POLICY_TYPES.MANAGED" outline style-type="gray">
                         {{ $t('IAM.POLICY.FORM.MANAGED_POLICY') }}
                     </p-badge>
                     <p-badge v-else outline style-type="primary1">
@@ -61,7 +61,7 @@
             <div class="policy-detail-contents">
                 <p-label>{{ $t('IAM.POLICY.FORM.CONTENT') }}</p-label>
                 <p-text-editor
-                    :mode="type === PolicyTypes.MANAGED ? 'readOnly' : 'edit'"
+                    :mode="type === POLICY_TYPES.MANAGED ? 'readOnly' : 'edit'"
                     :code="code"
                     @update:code="handleCodeUpdate"
                 />
@@ -81,7 +81,7 @@ import {
     computed, reactive, toRefs, defineComponent,
 } from '@vue/composition-api';
 import { PolicyDetailPageProps } from '@/services/administration/iam/policy/lib/type';
-import { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
+import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
 import { SpaceRouter } from '@/router';
 import PolicyDeleteModal from '@/services/administration/iam/policy/modules/PolicyDeleteModal.vue';
 import PolicyNameEditModal from '@/services/administration/iam/policy/modules/PolicyNameEditModal.vue';
@@ -172,7 +172,7 @@ export default defineComponent<PolicyDetailPageProps>({
 
         return {
             ...toRefs(state),
-            PolicyTypes,
+            POLICY_TYPES,
             handleCodeUpdate,
             handleDescriptionUpdate,
             handleVisibleDeleteModal,
