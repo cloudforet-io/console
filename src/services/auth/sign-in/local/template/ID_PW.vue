@@ -7,7 +7,6 @@
                 <template #default="{invalid}">
                     <p-text-input v-model="userId"
                                   placeholder="User ID"
-                                  autocomplete="username"
                                   :invalid="invalid"
                                   block
                                   @input="checkUserId"
@@ -22,7 +21,6 @@
                     <p-text-input v-model="password"
                                   type="password"
                                   placeholder="Password"
-                                  autocomplete="current-password"
                                   :invalid="invalid"
                                   block
                                   @input="checkPassword"
@@ -143,6 +141,18 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
+.p-text-input::v-deep {
+    input:-webkit-autofill {
+        transition: background-color 5000s;
+        -webkit-box-shadow: 0 0 0 30px white inset !important;
+    }
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        transition: background-color 5000s;
+        -webkit-box-shadow: 0 0 0 30px theme('colors.blue.100') inset !important;
+    }
+}
 .local-wrapper {
     margin: auto;
     width: 100%;
