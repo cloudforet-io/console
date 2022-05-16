@@ -88,7 +88,7 @@ import { administrationStore } from '@/services/administration/store';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
-import { Policy } from '@/services/administration/iam/role/type';
+import { RoleData } from '@/services/administration/iam/role/type';
 
 
 const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], selectedType: PolicyTypes): PolicyDataModel[] => {
@@ -121,9 +121,9 @@ export default {
             type: Boolean,
             default: true,
         },
-        initialPolicyList: {
-            type: Array as PropType<Policy[]>,
-            default: () => ([]),
+        initialRoleData: {
+            type: Object as PropType<RoleData>,
+            default: () => ({}),
         },
     },
     setup(props, { emit }) {
@@ -205,6 +205,7 @@ export default {
 
         const handleRefresh = () => {
             state.selectedIdMap = [];
+            emit('update-selected-policy-list', []);
             listPolicies();
         };
 
@@ -227,27 +228,30 @@ export default {
                 selectedIdMap[item.policy_id] = item.policy_type;
             });
             state.selectedIdMap = selectedIdMap;
+
+            const selectedPolicyList = Object.entries(selectedIdMap).map(([id, policyType]) => ({
+                policy_id: id,
+                policy_type: policyType,
+            }));
+            emit('update-selected-policy-list', selectedPolicyList);
         };
 
         /* Watcher */
         watch(() => state.totalCount as number, (value: number) => {
             emit('update-total-count', value);
         });
-        watch(() => state.selectedIdMap, (selectedIdMap) => {
-            const selectedIdList = Object.keys(selectedIdMap);
-            const selectedPolicyList: Policy[] = [];
-            state.policyList.forEach((d) => {
-                if (selectedIdList.includes(d.policy_id)) {
-                    selectedPolicyList.push({ policy_id: d.policy_id, policy_type: d.policy_type });
-                }
+        watch(() => props.initialRoleData, (initialRoleData: RoleData) => {
+            if (!initialRoleData?.policies?.length) return;
+            const initialSelectedIdMap: Record<string, PolicyTypes> = {};
+            initialRoleData.policies.forEach((policy) => {
+                initialSelectedIdMap[policy.policy_id] = policy.policy_type as PolicyTypes;
             });
-            emit('update-selected-policy-list', selectedPolicyList);
+            state.selectedIdMap = initialSelectedIdMap;
         });
 
         /* Init */
         (async () => {
             await listPolicies();
-            state.selectedIdMap = props.initialPolicyList.map(d => ({ [d.policy_id]: d.policy_type }));
         })();
 
         return {

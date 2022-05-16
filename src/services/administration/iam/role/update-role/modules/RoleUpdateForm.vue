@@ -7,7 +7,7 @@
                                       @update-form="handleUpdatePageAccessForm"
         />
         <policy-list-data-table class="policy-list-data-table"
-                                :initial-ploicy-list="selectedPolicyList"
+                                :initial-role-data="initialRoleData"
                                 :selectable="true"
                                 :anchor-icon-visible="true"
                                 @update-selected-policy-list="handleUpdatePolicy"
@@ -81,6 +81,7 @@ export default {
             isBaseInformationValid: false,
             baseInfoFormData: {} as BaseInfoFormData,
             pageAccessFormData: [] as PagePermission[],
+            initialPolicyList: [] as Policy[],
             isAllValid: computed(() => isPolicySectionValid.value && state.isBaseInformationValid),
             formData: computed(() => ({
                 name: state.baseInfoFormData.roleName,
@@ -110,12 +111,12 @@ export default {
             const isObjectEmpty = !Object.keys(initialRoleData).length;
             if (isObjectEmpty) return;
             state.baseInfoFormData = {
-                roleName: initialRoleData.name,
-                roleDescription: initialRoleData.tags?.description,
-                roleType: initialRoleData.role_type,
+                roleName: initialRoleData?.name,
+                roleDescription: initialRoleData?.tags?.description,
+                roleType: initialRoleData?.role_type,
             };
-            state.pageAccessFormData = props.initialRoleData.page_permissions;
-            setForm('selectedPolicyList', initialRoleData.policies);
+            state.pageAccessFormData = props.initialRoleData?.page_permissions;
+            setForm('selectedPolicyList', initialRoleData?.policies);
         });
         return {
             ...toRefs(state),
