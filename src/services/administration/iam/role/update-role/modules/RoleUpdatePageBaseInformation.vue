@@ -53,11 +53,12 @@ import {
     PPaneLayout, PPanelTop, PFieldGroup, PLabel, PTextInput, PSelectCard,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs, watch,
+    computed, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { i18n } from '@/translations';
 import { ROLE_TYPE, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
+import { BaseInfoFormData } from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
 
 export default {
     name: 'RoleUpdatePageBaseInformation',
@@ -68,6 +69,12 @@ export default {
         PTextInput,
         PLabel,
         PSelectCard,
+    },
+    props: {
+        initialFormData: {
+            type: Object as PropType<BaseInfoFormData>,
+            default: () => ({}),
+        },
     },
     setup(props, { emit }) {
         const {
@@ -90,14 +97,19 @@ export default {
                 { label: ROLE_TYPE_BADGE_OPTION.PROJECT.label, key: ROLE_TYPE.PROJECT, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_PROJECT') },
                 { label: ROLE_TYPE_BADGE_OPTION.DOMAIN.label, key: ROLE_TYPE.DOMAIN, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_DOMAIN') },
             ]),
-            selectedRoleType: ROLE_TYPE.PROJECT as string,
+            selectedRoleType: ROLE_TYPE.PROJECT as ROLE_TYPE,
         });
         watch(() => isAllValid.value, (after) => {
             emit('update-validation', after);
         }, { immediate: true });
         watch([() => state.selectedRoleType, () => state.roleDescription, () => roleName.value], ([selectedRoleType, roleDescription, roleNameValue]) => {
             emit('update-form', { roleName: roleNameValue, roleDescription, roleType: selectedRoleType });
-        }, { immediate: true });
+        });
+        watch(() => props.initialFormData, (initialFormData) => {
+            setForm('roleName', initialFormData.roleName);
+            state.roleDescription = initialFormData.roleDescription;
+            state.selectedRoleType = initialFormData.roleType;
+        });
         return {
             ...toRefs(state),
             roleName,

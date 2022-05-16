@@ -34,7 +34,7 @@ import { find } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
@@ -44,7 +44,11 @@ import { EXCEPTION_MENU } from '@/services/administration/iam/role/config';
 import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
 import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
-import { PagePermission } from '@/lib/access-control/page-permission-helper';
+import {
+    getPagePermissionMap,
+    PAGE_PERMISSION_TYPE,
+    PagePermission,
+} from '@/lib/access-control/page-permission-helper';
 import { i18n } from '@/translations';
 
 const flattenSubMenuList = (subMenuList?: GNBMenu[], labels?: Array<string|TranslateResult>): PageAccessMenuItem[] => {
@@ -93,6 +97,12 @@ export default {
         PPaneLayout,
         PPanelTop,
     },
+    props: {
+        initialPagePermissions: {
+            type: Array as PropType<PagePermission[]>,
+            default: () => ([]),
+        },
+    },
     setup(props, { emit }) {
         const formState = reactive({
             menuItems: [] as PageAccessMenuItem[],
@@ -124,7 +134,7 @@ export default {
         };
 
         /* Event */
-        const handleUpdate = (menuId: string, key: string, val: boolean) => {
+        const handleUpdate = (menuId: string, key: 'isViewed' | 'isManaged', val: boolean) => {
             const item = find(formState.menuItems, { id: menuId });
             if (item) {
                 if (item.id === 'all') {
@@ -171,7 +181,16 @@ export default {
         }, { immediate: true });
         watch(() => state.pagePermissions, (after) => {
             emit('update-form', after);
-        }, { immediate: true });
+        });
+        watch(() => props.initialPagePermissions, (initialPagePermissions) => {
+            // init formState.menuItems
+            const pagePermissions = getPagePermissionMap(initialPagePermissions);
+            // eslint-disable-next-line no-restricted-syntax
+            for (const [itemId, key] of Object.entries(pagePermissions)) {
+                const itemAttribute = (key === PAGE_PERMISSION_TYPE.MANAGE) ? 'isManaged' : 'isViewed';
+                handleUpdate(itemId, itemAttribute, true);
+            }
+        });
 
         return {
             ...toRefs(state),

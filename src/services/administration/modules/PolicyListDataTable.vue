@@ -69,7 +69,7 @@ import {
     PAnchor, PBadge, PSelectStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs, watch,
+    computed, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
 import {
@@ -89,6 +89,7 @@ import { administrationStore } from '@/services/administration/store';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
+import { PagePermission } from '@/lib/access-control/page-permission-helper';
 
 
 // FIXME:: This is DUMMY, should be removed
@@ -123,6 +124,10 @@ export default {
         anchorIconVisible: {
             type: Boolean,
             default: true,
+        },
+        initialPolicyList: {
+            type: Array as PropType<PagePermission[]>,
+            default: () => [],
         },
     },
     setup(props, { emit }) {

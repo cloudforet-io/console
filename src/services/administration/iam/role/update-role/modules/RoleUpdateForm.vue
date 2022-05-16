@@ -1,10 +1,13 @@
 <template>
     <div class="role-update-form">
-        <role-update-page-base-information @update-validation="handleBaseInfoValidate"
+        <role-update-page-base-information :initial-form-data="baseInfoFormData" @update-validation="handleBaseInfoValidate"
                                            @update-form="handleUpdateBaseInfoForm"
         />
-        <role-update-page-access-form @update-form="handleUpdatePageAccessForm" />
+        <role-update-page-access-form :initial-page-permissions="pageAccessFormData"
+                                      @update-form="handleUpdatePageAccessForm"
+        />
         <policy-list-data-table class="policy-list-data-table"
+                                :initial-ploicy-list="selectedPolicyList"
                                 :selectable="true"
                                 :anchor-icon-visible="true"
                                 @update-selected-policy-list="handleUpdatePolicy"
@@ -34,15 +37,15 @@ import RoleUpdatePageAccessForm from '@/services/administration/iam/role/update-
 import PolicyListDataTable from '@/services/administration/modules/PolicyListDataTable.vue';
 import { PPanelTop } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs, watch,
+    computed, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { i18n } from '@/translations';
 import { ROLE_TYPE } from '@/services/administration/iam/role/config';
 import { PagePermission } from '@/lib/access-control/page-permission-helper';
-import { Policy } from '@/services/administration/iam/role/type';
+import { Policy, RoleData } from '@/services/administration/iam/role/type';
 
-interface BaseInformationFormData {
+export interface BaseInfoFormData {
     roleName: string;
     roleDescription?: string;
     roleType: ROLE_TYPE;
@@ -54,6 +57,12 @@ export default {
         RoleUpdatePageBaseInformation,
         PolicyListDataTable,
         PPanelTop,
+    },
+    props: {
+        initialRoleData: {
+            type: Object as PropType<RoleData>,
+            default: {},
+        },
     },
     setup(props, { emit }) {
         const {
@@ -70,16 +79,16 @@ export default {
         });
         const state = reactive({
             isBaseInformationValid: false,
-            baseInformationFormData: {} as BaseInformationFormData,
+            baseInfoFormData: {} as BaseInfoFormData,
             pageAccessFormData: [] as PagePermission[],
             isAllValid: computed(() => isPolicySectionValid.value && state.isBaseInformationValid),
             formData: computed(() => ({
-                name: state.baseInformationFormData.roleName,
-                role_type: state.baseInformationFormData.roleType,
+                name: state.baseInfoFormData.roleName,
+                role_type: state.baseInfoFormData.roleType,
                 policies: selectedPolicyList.value,
                 page_permissions: state.pageAccessFormData,
                 tags: {
-                    description: state.baseInformationFormData.roleDescription,
+                    description: state.baseInfoFormData.roleDescription,
                 },
             })),
         });
@@ -88,7 +97,7 @@ export default {
             state.isBaseInformationValid = value;
         };
 
-        const handleUpdateBaseInfoForm = (value) => { state.baseInformationFormData = value; };
+        const handleUpdateBaseInfoForm = (value) => { state.baseInfoFormData = value; };
         const handleUpdatePageAccessForm = (value) => { state.pageAccessFormData = value; };
 
         watch(() => state.isAllValid, (after) => {
@@ -96,6 +105,16 @@ export default {
         });
         watch(() => state.formData, (after) => {
             emit('update-form-data', after);
+        });
+        watch(() => props.initialRoleData, (initialRoleData) => {
+            if (!initialRoleData) return;
+            state.baseInfoFormData = {
+                roleName: initialRoleData.name,
+                roleDescription: initialRoleData.tags?.description,
+                roleType: initialRoleData.role_type,
+            };
+            state.pageAccessFormData = props.initialRoleData.page_permissions;
+            setForm('selectedPolicyList', initialRoleData.policies?.map(p => p.policy_id));
         });
         return {
             ...toRefs(state),
