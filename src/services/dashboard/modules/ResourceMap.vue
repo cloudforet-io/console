@@ -31,7 +31,7 @@
                               :style="{color: providers[selectedProvider] ? providers[selectedProvider].color : 'gray' }"
                         >
                             {{ providers[selectedProvider] ? providers[selectedProvider].label : '' }}</span>
-                        <span class="resource-info-region"> {{ selectedRegionLabel }}</span>
+                        <span class="resource-info-region">{{ selectedRegionLabel }}</span>
                     </div>
                     <div class="grid-cols-1 sm:grid-cols-2 lg:grid-cols-1
                                         progress-bar-wrapper"
@@ -462,6 +462,9 @@ export default {
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 3;
             white-space: normal;
+        }
+        .resource-info-region {
+            margin-left: 1ch;
         }
     }
     .progress-bar-wrapper {

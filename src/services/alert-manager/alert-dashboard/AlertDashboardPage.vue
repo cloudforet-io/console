@@ -69,8 +69,6 @@ export default {
 
 <style lang="postcss" scoped>
 .alert-dashboard-page {
-    max-width: 85.5rem;
-
     .widget-wrapper {
         @apply grid grid-cols-12 gap-4;
 
