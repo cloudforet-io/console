@@ -17,7 +17,6 @@
             :page-size-changeable="false"
             @change="handleChange"
             @refresh="handleRefresh"
-            @export="handleExport"
         >
             <template #toolbox-top>
                 <slot name="panel-top" />
@@ -75,14 +74,11 @@ import { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
 import {
     makeCustomValueHandler,
     policyTypeBadgeColorFormatter,
-    policyTypeURIFormatter,
 } from '@/services/administration/iam/policy/lib/helper';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { store } from '@/store';
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { administrationStore } from '@/services/administration/store';
@@ -91,9 +87,6 @@ import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-s
 import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 import { PagePermission } from '@/lib/access-control/page-permission-helper';
 
-
-// FIXME:: This is DUMMY, should be removed
-const DUMMY_REPO_ID = 'repo-d9e115714edc';
 
 const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], selectedType: PolicyTypes): PolicyDataModel[] => {
     // 1. filter by type
@@ -189,24 +182,24 @@ export default {
             }
         };
 
-        const handleExport = async () => {
-            await store.dispatch('file/downloadExcel', {
-                url: `/${policyTypeURIFormatter(state.selectedType)}/policy/list`,
-                param: {
-                    include_parent_member: true,
-                    repository_id: state.selectedType === PolicyTypes.MANAGED ? DUMMY_REPO_ID : '',
-                    query: policyListApiQueryHelper.data,
-                },
-                fields: [
-                    { name: 'Name', key: 'name' },
-                    { name: 'Type', key: 'type' },
-                    { name: 'ID', key: 'policy_id' },
-                    { name: 'Description', key: 'tags' },
-                    { name: 'Created', key: 'created_at' },
-                ],
-                file_name_prefix: FILE_NAME_PREFIX.policy,
-            });
-        };
+        // const handleExport = async () => {
+        //     await store.dispatch('file/downloadExcel', {
+        //         url: `/${policyTypeURIFormatter(state.selectedType)}/policy/list`,
+        //         param: {
+        //             include_parent_member: true,
+        //             repository_id: state.selectedType === PolicyTypes.MANAGED ? DUMMY_REPO_ID : '',
+        //             query: policyListApiQueryHelper.data,
+        //         },
+        //         fields: [
+        //             { name: 'Name', key: 'name' },
+        //             { name: 'Type', key: 'type' },
+        //             { name: 'ID', key: 'policy_id' },
+        //             { name: 'Description', key: 'tags' },
+        //             { name: 'Created', key: 'created_at' },
+        //         ],
+        //         file_name_prefix: FILE_NAME_PREFIX.policy,
+        //     });
+        // };
 
         const handleRefresh = () => {
             listPolicies();
@@ -216,10 +209,6 @@ export default {
             state.selectedIndices = [];
             state.queryTags = [];
         };
-
-        watch(() => state.totalCount as number, (value: number) => {
-            emit('update-total-count', value);
-        });
 
         watch(() => state.selectedIndices, (indices: number[]) => {
             emit('update-selected-policy-list', indices.map(idx => ({
@@ -238,7 +227,6 @@ export default {
             ADMINISTRATION_ROUTE,
             policyTypeBadgeColorFormatter,
             handleChange,
-            handleExport,
             handleRefresh,
             handleChangePolicyType,
         };
