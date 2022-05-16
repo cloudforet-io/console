@@ -26,7 +26,7 @@ import {
     CloudServiceTypeInfo,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-
+import config from '@/lib/config';
 
 export default defineComponent({
     name: 'AssetInventoryLNB',
@@ -77,13 +77,16 @@ export default defineComponent({
                     {
                         type: 'item', id: MENU_ID.ASSET_INVENTORY_SERVER, label: 'Server', to: { name: ASSET_INVENTORY_ROUTE.SERVER._NAME },
                     },
-                    {
-                        type: 'item', id: MENU_ID.ASSET_INVENTORY_COLLECTOR, label: 'Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME },
-                    },
-                    {
-                        type: 'item', id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT, label: 'Service Account', to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
-                    },
                 );
+                const disabledMenu = config.get('DISABLED_MENU') ?? [];
+                if (!disabledMenu.includes(MENU_ID.ASSET_INVENTORY_COLLECTOR)) {
+                    menuItems.push({
+                        type: 'item', id: MENU_ID.ASSET_INVENTORY_COLLECTOR, label: 'Collector', to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME },
+                    });
+                }
+                menuItems.push({
+                    type: 'item', id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT, label: 'Service Account', to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
+                });
                 return menuItems;
             }),
         });
