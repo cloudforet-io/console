@@ -6,10 +6,12 @@
         >
             <p class="title">
                 [{{ protocolNameFormatter(channel.protocol_id) }}] {{ channel.name }}
-                <p-i name="ic_bell" color="inherit" class="ml-1"
-                     width="1rem" height="1rem"
-                />
-                {{ channel.state === CHANNEL_STATE.ENABLED ? 'ON' : 'OFF' }}
+                <span class="on-off">
+                    <p-i name="ic_bell" color="inherit" class="ml-1"
+                         width="1rem" height="1rem"
+                    />
+                    {{ channel.state === CHANNEL_STATE.ENABLED ? 'ON' : 'OFF' }}
+                </span>
             </p>
             <p v-for="(user, uIdx) in channel.data.users" :key="`user-${uIdx}`" class="info">
                 {{ user }}
@@ -93,8 +95,10 @@ export default {
         .title {
             @apply text-blue-900;
             display: flex;
-            align-items: center;
             font-weight: bold;
+            .on-off {
+                flex-shrink: 0;
+            }
         }
         .info {
             @apply text-gray-700;

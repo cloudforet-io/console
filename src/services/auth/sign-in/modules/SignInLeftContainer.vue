@@ -1,9 +1,9 @@
 <template>
-    <div class="sign-in-left-container" :class="{ admin: isAdmin }">
+    <div class="sign-in-left-container" :class="{ admin: isDomainOwner }">
         <div class="lottie-wrapper">
             <img v-if="signInImage" :src="signInImage">
             <p-lottie v-else
-                      :name="isAdmin ? 'lottie_planet_signin' : 'lottie_floating-astronaut_signin'"
+                      :name="isDomainOwner ? 'lottie_planet_signin' : 'lottie_floating-astronaut_signin'"
                       auto
                       width="100%"
                       height="80%"
@@ -40,7 +40,7 @@ export default {
         PBadge,
     },
     props: {
-        isAdmin: {
+        isDomainOwner: {
             type: Boolean,
             default: false,
         },

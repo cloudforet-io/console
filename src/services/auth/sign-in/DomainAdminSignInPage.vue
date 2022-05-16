@@ -8,10 +8,10 @@
             <img v-else class="logo-text" src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg">
         </div>
         <sign-in-left-container
-            :is-admin="true"
+            is-domain-owner
         />
         <sign-in-right-container
-            :is-admin="true"
+            is-domain-owner
             :show-error-message="showErrorMessage"
         >
             <template #input>

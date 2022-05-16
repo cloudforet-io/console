@@ -1,12 +1,12 @@
 <template>
-    <div class="sign-in-right-container" :class="{ admin: isAdmin }">
+    <div class="sign-in-right-container" :class="{ admin: isDomainOwner }">
         <div class="form-wrapper">
             <div class="hidden xs:block">
                 <p class="title">
                     {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
                 </p>
                 <p class="subtitle">
-                    {{ isAdmin ? $t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT') : $t('COMMON.SIGN_IN.FOR_MEMBER_ACCOUNT') }}
+                    {{ isDomainOwner ? $t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT') : $t('COMMON.SIGN_IN.FOR_MEMBER_ACCOUNT') }}
                 </p>
             </div>
 
@@ -26,7 +26,7 @@
 
             <slot name="input" />
 
-            <template v-if="isAdmin">
+            <template v-if="isDomainOwner">
                 <span class="sign-in-button-wrapper" @click="goToUserSignIn">
                     <p-i name="ic_arrow_left_sm" width="0.5rem" height="0.5rem"
                          color="inherit"
@@ -65,7 +65,7 @@ export default {
         PI,
     },
     props: {
-        isAdmin: {
+        isDomainOwner: {
             type: Boolean,
             default: false,
         },

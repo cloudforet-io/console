@@ -41,7 +41,7 @@
                                    class="dropdown"
                 />
             </p-field-group>
-            <form v-if="isAdmin && item.backend === 'LOCAL' && item.user_type !== 'API Only'"
+            <form v-if="item.backend === 'LOCAL' && item.user_type !== 'API Only'"
                   class="form"
             >
                 <p-field-group
@@ -161,10 +161,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        isAdmin: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -252,7 +248,7 @@ export default {
         const confirm = async () => {
             await checkEmail();
             if (!validationState.isEmailValid || !validationState.isTagsValid) return;
-            if (props.isAdmin && props.item.backend === 'LOCAL' && props.item.user_type !== 'API Only') {
+            if (props.item.backend === 'LOCAL' && props.item.user_type !== 'API Only') {
                 if (state.password || state.passwordCheck) await checkPassword(state.password);
                 else {
                     validationState.isPasswordValid = true;

@@ -224,10 +224,6 @@ export default {
             type: Object,
             default: undefined,
         },
-        isAdmin: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props, { emit }) {
         const state = reactive({

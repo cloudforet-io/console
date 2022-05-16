@@ -29,7 +29,7 @@
                  @click.stop="toggleMenu('account')"
             >
                 <p-i v-if="userState.isDomainOwner" name="root-account" class="menu-icon" />
-                <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" name="admin" class="menu-icon"
+                <p-i v-else-if="!userState.isDomainOwner && userState.hasDomainRole" name="admin" class="menu-icon"
                      width="1.75rem" height="1.75rem"
                 />
                 <p-i v-else name="user" class="menu-icon" />
@@ -40,7 +40,7 @@
             >
                 <div class="user-info">
                     <p-i v-if="userState.isDomainOwner" name="root-account" />
-                    <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" name="admin" />
+                    <p-i v-else-if="!userState.isDomainOwner && userState.hasDomainRole" name="admin" />
                     <p-i v-else name="user" />
                     <span class="value">{{ userState.userId }}</span>
                 </div>
@@ -189,7 +189,7 @@ export default {
             language: computed(() => store.getters['user/languageLabel']),
             timezone: computed(() => store.state.user.timezone),
             userId: computed(() => store.state.user.userId),
-            isAdmin: computed((() => store.getters['user/isAdmin'])),
+            hasDomainRole: computed((() => store.getters['user/hasDomainRole'])),
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
         });
 

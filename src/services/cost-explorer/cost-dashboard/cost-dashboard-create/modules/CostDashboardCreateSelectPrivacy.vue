@@ -38,7 +38,6 @@ export default {
         const state = reactive({
             hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
             selectedPrivacy: DASHBOARD_PRIVACY_TYPE.USER as DashboardPrivacyType,
-            isAdmin: computed((() => store.getters['user/isAdmin'])),
             filteredPrivacyList: computed(() => (state.hasNoManagePermission ? privacyList.filter(item => item.name !== DASHBOARD_PRIVACY_TYPE.PUBLIC) : privacyList)),
         });
 

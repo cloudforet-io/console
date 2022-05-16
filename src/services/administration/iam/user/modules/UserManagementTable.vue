@@ -80,7 +80,6 @@
                            :header-title="userFormState.headerTitle"
                            :item="userFormState.item"
                            :visible.sync="userFormState.visible"
-                           :is-admin="userFormState.isAdmin"
                            @confirm="handleUserFormConfirm"
         />
         <user-update-modal v-if="userFormState.visible && userFormState.updateMode"
@@ -88,7 +87,6 @@
                            :update-mode="userFormState.updateMode"
                            :item="userFormState.item"
                            :visible.sync="userFormState.visible"
-                           :is-admin="userFormState.isAdmin"
                            @confirm="handleUserFormConfirm"
         />
     </section>
@@ -226,7 +224,6 @@ export default {
             roleOfSelectedUser: '',
             isCreateModalVisible: computed(() => administrationStore.getters['user/isCreateModalVisible']),
             isUpdateModalVisible: computed(() => administrationStore.getters['user/isUpdateModalVisible']),
-            isAdmin: computed(() => store.getters['user/isAdmin']).value,
         });
 
         const getArrayWithNotDuplicatedItem = array => [...new Set(array)];

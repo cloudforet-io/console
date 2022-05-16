@@ -122,7 +122,6 @@ export default defineComponent<Props>({
         const state = reactive({
             hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
             proxyVisible: props.visible,
-            isAdmin: computed((() => store.getters['user/isAdmin'])),
             filteredVisibilityList: computed(() => (state.hasNoManagePermission ? visibilityList.filter(item => item.name === DASHBOARD_PRIVACY_TYPE.USER) : visibilityList)),
             includesFilter: false,
         });
