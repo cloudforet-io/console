@@ -48,10 +48,12 @@
                     <br>
                     <p>{{ policyInfo.tags.description }}</p>
                 </div>
-                <p-field-group v-else>
+                <p-field-group
+                    v-else
+                    :label="$t('IAM.POLICY.FORM.DESCRIPTION')"
+                >
                     <p-text-input
                         v-model="description"
-                        :label="$t('IAM.POLICY.FORM.DESCRIPTION')"
                         @input="handleDescriptionUpdate"
                     />
                 </p-field-group>
@@ -73,7 +75,7 @@
 <script lang="ts">
 import { administrationStore } from '@/services/administration/store';
 import {
-    PPageTitle, PIconButton, PBadge, PPaneLayout, PLabel, PTextEditor, PButton, PTextInput,
+    PPageTitle, PIconButton, PBadge, PPaneLayout, PLabel, PTextEditor, PButton, PTextInput, PFieldGroup,
 } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs, defineComponent,
@@ -109,6 +111,7 @@ export default defineComponent<PolicyDetailPageProps>({
         PolicyDeleteModal,
         PolicyNameEditModal,
         deleteModal,
+        PFieldGroup,
     },
     setup(props) {
         const stringifyPermission = (permissions: Array<string>|undefined) => permissions?.toString().replace(/,/gi, '\n') ?? '';
@@ -154,8 +157,8 @@ export default defineComponent<PolicyDetailPageProps>({
         };
 
         const getPolicyStoreData = () => {
-            state.code = stringifyPermission(administrationStore.state.policy.policyData?.permissions);
-            state.description = administrationStore.state.policy.policyData?.tags?.description;
+            state.code = stringifyPermission(administrationStore.state.policy.policyData?.permissions) ?? '';
+            state.description = administrationStore.state.policy.policyData?.tags?.description ?? '';
         };
 
         (async () => {

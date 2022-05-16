@@ -16,7 +16,7 @@
 <script lang="ts">
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import { administrationStore } from '@/services/administration/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -47,7 +47,7 @@ export default {
         const state = reactive({
             loading: true,
             proxyVisible: useProxyValue('visible', props, emit),
-            policyNameInput: props.policyName,
+            policyNameInput: computed(() => props.policyName),
         });
 
         const handleNameEditInput = (nameEditInput: string) => { state.policyNameInput = nameEditInput; };
