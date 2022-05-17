@@ -1,6 +1,6 @@
 <template>
     <div class="general-page-layout">
-        <div class="header">
+        <div class="header" :class="{'without-breadcrumbs': !breadcrumbs.length}">
             <p-breadcrumbs v-if="breadcrumbs.length" :routes="breadcrumbs" :copiable="copiable" />
             <slot name="handbook" />
         </div>
@@ -50,6 +50,10 @@ export default {
 
     .header {
         @apply flex justify-between;
+        padding: 1.5rem 1.5rem 0.25rem 1.5rem;
+        &.without-breadcrumbs {
+            padding: 0;
+        }
     }
     .page-contents {
         width: 100%;

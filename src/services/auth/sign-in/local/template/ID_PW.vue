@@ -24,7 +24,7 @@
                                   :invalid="invalid"
                                   block
                                   @input="checkPassword"
-                                  @keyup.enter="signIn"
+                                  @keyup.enter.native="signIn"
                     />
                 </template>
             </p-field-group>
