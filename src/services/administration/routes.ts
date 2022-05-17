@@ -75,7 +75,7 @@ const administrationRoutes: RouteConfig = {
                         {
                             path: 'create',
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.CREATE._NAME,
-                            meta: { lnbVisible: false, accessLevel: 'MANAGE_PERMISSION' },
+                            meta: { lnbVisible: false, label: 'Create Policy', accessLevel: 'MANAGE_PERMISSION' },
                             props: true,
                             component: PolicyCreatePage,
                         },
