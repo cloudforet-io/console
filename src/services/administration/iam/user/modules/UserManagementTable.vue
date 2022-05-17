@@ -25,14 +25,14 @@
             <template slot="toolbox-left">
                 <p-button style-type="primary-dark"
                           icon="ic_plus_bold"
-                          :disabled="hasNoManagePermission"
+                          :disabled="!hasManagePermission"
                           @click="clickAdd"
                 >
                     {{ $t('IDENTITY.USER.MAIN.ADD') }}
                 </p-button>
                 <p-select-dropdown class="left-toolbox-item"
                                    :items="dropdownMenu"
-                                   :disabled="hasNoManagePermission"
+                                   :disabled="!hasManagePermission"
                                    @select="handleSelectDropdown"
                 >
                     {{ $t('IDENTITY.USER.MAIN.ACTION') }}
@@ -148,7 +148,7 @@ export default {
             .setFiltersAsRawQueryString(vm.$route.query.filters);
 
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             loading: false,
             users: [] as User[],
             timezone: computed(() => store.state.user.timezone || 'UTC'),

@@ -110,8 +110,8 @@ export default {
             viewFilterModalVisible: false,
             selectFilterModalVisible: false,
             isUserDashboard: computed(() => (props.dashboardId?.startsWith(DASHBOARD_TYPE.USER))),
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
-            showSetting: computed(() => ((state.hasNoManagePermission && state.isUserDashboard) || !state.hasNoManagePermission) && !props.printMode),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            showSetting: computed(() => ((!state.hasManagePermission && state.isUserDashboard) || state.hasManagePermission) && !props.printMode),
         });
 
         /* api */

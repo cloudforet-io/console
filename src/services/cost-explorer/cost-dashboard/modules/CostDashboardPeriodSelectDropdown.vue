@@ -99,7 +99,7 @@ export default {
         const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
 
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             selectedPeriod: {
                 start: props.printMode || props.periodType === 'FIXED' ? dayjs.utc(props.period.start).format('YYYY-MM')
                     : initialPeriodStart,
@@ -130,7 +130,7 @@ export default {
             ])),
             isFixedTypeSelected: props.periodType === 'FIXED',
             isUserDashboard: computed(() => (props.dashboardId?.startsWith(DASHBOARD_TYPE.USER))),
-            disableFixDate: computed(() => !state.isUserDashboard && state.hasNoManagePermission),
+            disableFixDate: computed(() => !state.isUserDashboard && !state.hasManagePermission),
             selectedMonthMenuItem: initialSelectedMonth,
             customRangeModalVisible: false,
             isCustomPeriod: computed<boolean>(() => {

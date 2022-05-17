@@ -6,7 +6,7 @@
             >
                 <template #title-right-extra>
                     <div class="title-button-group">
-                        <p-icon-button name="ic_trashcan" :disabled="hasNoManagePermission" @click="handleClickDelete" />
+                        <p-icon-button name="ic_trashcan" :disabled="!hasManagePermission" @click="handleClickDelete" />
                     </div>
                 </template>
             </p-page-title>
@@ -68,7 +68,7 @@ export default {
             budgetData: computed<Partial<BudgetData>|null>(() => costExplorerStore.state.budget.budgetData),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
         });
 
         const checkDeleteState = reactive({

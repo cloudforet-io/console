@@ -6,7 +6,7 @@
                 <p-select-dropdown
                     :items="alertStateList"
                     :selected="alertState"
-                    :disabled="hasNoManagePermission"
+                    :disabled="!hasManagePermission"
                     class="state-dropdown"
                     @select="changeAlertState"
                 >
@@ -25,7 +25,7 @@
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
             <p-select-dropdown :items="alertUrgencyList"
                                :selected="alertUrgency"
-                               :disabled="alertState === ALERT_STATE.ERROR || hasNoManagePermission"
+                               :disabled="alertState === ALERT_STATE.ERROR || !hasManagePermission"
                                class="state-dropdown"
                                @select="changeAlertUrgency"
             >
@@ -42,7 +42,7 @@
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.ASSIGNED_TO') }}
                 <p-button style-type="gray-border" :outline="true" size="sm"
                           class="ml-2"
-                          :disabled="hasNoManagePermission"
+                          :disabled="!hasManagePermission"
                           @click="onClickReassign"
                 >
                     {{ $t('MONITORING.ALERT.DETAIL.HEADER.ASSIGN') }}
@@ -130,7 +130,7 @@ export default {
     },
     setup(props: PropsType, { root }) {
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             alertInfo: computed(() => alertManagerStore.state.alert.alertData),
             alertState: computed(() => state.alertInfo?.state),
             alertUrgency: computed(() => state.alertInfo?.urgency),

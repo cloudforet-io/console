@@ -11,14 +11,14 @@
                     <template v-else>
                         <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.EDIT')"
                                        name="ic_edit-text" style-type="transparent" size="sm"
-                                       :disabled="hasNoManagePermission"
+                                       :disabled="!hasManagePermission"
                                        @click="startTreeEdit"
                         />
                         <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.CREATE')"
                                        name="ic_plus_thin" style-type="transparent" size="sm"
                                        color="inherit"
                                        class="ml-1"
-                                       :disabled="!hasRootProjectPermission || hasNoManagePermission"
+                                       :disabled="!hasManagePermission"
                                        @click="openProjectGroupCreateForm()"
                         />
                     </template>
@@ -79,12 +79,12 @@
                                        name="ic_delete" class="group-delete-btn"
                                        size="sm"
                                        color="inherit"
-                                       :disabled="hasNoManagePermission"
+                                       :disabled="!hasManagePermission"
                                        @click.stop="openProjectGroupDeleteCheckModal({node, path})"
                         />
                         <p-icon-button v-if="!treeEditMode && node.data.item_type !== 'PROJECT'" name="ic_plus" class="group-add-btn"
                                        size="sm"
-                                       :disabled="permissionInfo[node.data.id] !== true || hasNoManagePermission"
+                                       :disabled="permissionInfo[node.data.id] !== true || !hasManagePermission"
                                        @click.stop="openProjectGroupCreateForm({node, path})"
                         />
                     </template>
@@ -136,7 +136,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             loading: false,
             rootNode: computed(() => store.state.service.project.rootNode),
             permissionInfo: computed(() => store.state.service.project.permissionInfo),
@@ -148,9 +148,9 @@ export default {
                 setDataAfterEdit: false,
             })),
             dragOptions: computed(() => ({
-                disabled: !state.treeEditMode || state.hasNoManagePermission,
+                disabled: !state.treeEditMode,
                 dragValidator(node, dragNodeParent) {
-                    if (!dragNodeParent) return store.getters['user/hasDomainRole'];
+                    if (!dragNodeParent) return state.hasManagePermission;
                     return !!(state.permissionInfo[node.data.id] || node.data.has_permission);
                 },
                 dropValidator(node, oldParent, parent) {
@@ -158,7 +158,7 @@ export default {
 
                     if (!parent) {
                         if (node.data.item_type === 'PROJECT') return false;
-                        return store.getters['user/hasDomainRole'];
+                        return state.hasManagePermission;
                     }
                     if (parent.data.item_type === 'PROJECT') return false;
                     if (parent.children.some(child => child.data.name === node.data.name)) return false;
@@ -167,7 +167,6 @@ export default {
             })),
             allProjectRoot: null as any,
             allProjectNode: computed(() => ([vm.$t('PROJECT.LANDING.ALL_PROJECT')])),
-            hasRootProjectPermission: computed(() => store.getters['user/hasDomainRole']),
         });
 
         const toggleOptions = {

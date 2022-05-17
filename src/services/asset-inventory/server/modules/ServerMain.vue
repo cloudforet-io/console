@@ -51,7 +51,7 @@
                 <tags-panel :resource-id="tableState.selectedServerIds[0]"
                             resource-type="inventory.Server"
                             resource-key="server_id"
-                            :disabled="tableState.hasNoManagePermission"
+                            :disabled="!tableState.hasManagePermission"
                 />
             </template>
             <template #member>
@@ -256,7 +256,7 @@ export default {
             visibleCustomFieldModal: false,
             // eslint-disable-next-line no-use-before-define
             searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
         });
         const fetchOptionState = reactive({
             pageStart: 1,

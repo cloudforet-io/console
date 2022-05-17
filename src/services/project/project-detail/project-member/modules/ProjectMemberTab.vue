@@ -18,13 +18,13 @@
             <template #toolbox-left>
                 <p-button style-type="primary-dark" class="mr-4 add-btn"
                           icon="ic_plus_bold"
-                          :disabled="storeState.hasNoManagePermission"
+                          :disabled="!storeState.hasManagePermission"
                           @click="handleClickInviteMember"
                 >
                     {{ $t('PROJECT.DETAIL.MEMBER.INVITE') }}
                 </p-button>
                 <p-select-dropdown :items="dropdownMenu"
-                                   :disabled="storeState.hasNoManagePermission"
+                                   :disabled="!storeState.hasManagePermission"
                                    @select="handleSelectDropdown"
                 >
                     {{ $t('IDENTITY.USER.MAIN.ACTION') }}
@@ -145,7 +145,7 @@ export default {
             users: computed(() => store.state.reference.user.items),
             projects: computed(() => store.state.reference.project.items),
             projectGroups: computed(() => store.state.reference.projectGroup.items),
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
         });
         const state = reactive({
             searchText: apiQueryHelper.filters.map(d => d.v).join(' ') || '',

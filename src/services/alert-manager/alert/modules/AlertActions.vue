@@ -127,7 +127,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             timezone: computed(() => store.state.user.timezone),
             projects: computed(() => store.state.reference.project.items),
             selectedItemsState: computed(() => {
@@ -142,20 +142,20 @@ export default {
                     name: ALERT_ACTION.acknowledge,
                     styleType: 'secondary-dark',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.BUTTON_ACKNOWLEDGE'),
-                    disabled: state.hasNoManagePermission || state.isSelectedNone || (state.isSelectedOne && state.selectedItemsState.includes(ALERT_STATE.ACKNOWLEDGED)) || state.isSelectedError,
+                    disabled: !state.hasManagePermission || state.isSelectedNone || (state.isSelectedOne && state.selectedItemsState.includes(ALERT_STATE.ACKNOWLEDGED)) || state.isSelectedError,
                 },
                 {
                     name: ALERT_ACTION.resolve,
                     styleType: 'secondary-dark',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.BUTTON_RESOLVE'),
-                    disabled: state.hasNoManagePermission || state.isSelectedNone || (state.isSelectedOne && state.selectedItemsState.includes(ALERT_STATE.RESOLVED)) || state.isSelectedError,
+                    disabled: !state.hasManagePermission || state.isSelectedNone || (state.isSelectedOne && state.selectedItemsState.includes(ALERT_STATE.RESOLVED)) || state.isSelectedError,
 
                 },
                 {
                     name: ALERT_ACTION.delete,
                     styleType: 'alert',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.BUTTON_DELETE'),
-                    disabled: state.hasNoManagePermission || state.isSelectedNone,
+                    disabled: !state.hasManagePermission || state.isSelectedNone,
                 },
             ])),
             visibleDeleteModal: false,

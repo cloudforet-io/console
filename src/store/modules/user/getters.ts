@@ -58,4 +58,4 @@ export const pagePermissionList: Getter<UserState, any> = (state, getters): Page
     return Object.entries(getPagePermissionMap(permissions));
 };
 
-export const hasNoManagePermission: Getter<UserState, any> = (state): boolean => ACCESS_LEVEL[state.accessLevel] < ACCESS_LEVEL.MANAGE_PERMISSION;
+export const hasManagePermission: Getter<UserState, any> = (state): boolean => ACCESS_LEVEL[state.accessLevel] >= ACCESS_LEVEL.MANAGE_PERMISSION;

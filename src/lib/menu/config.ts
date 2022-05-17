@@ -43,9 +43,3 @@ export interface MenuInfo {
     isBeta?: boolean;
     accessLevel: AccessLevel;
 }
-
-interface RouteName {
-    name: string;
-}
-
-export type MenuRouter = Record<MenuId, RouteName>

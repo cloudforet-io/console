@@ -13,7 +13,7 @@
                 <p-tags-panel :resource-id="selectedUsers[0].user_id"
                               resource-type="identity.User"
                               resource-key="user_id"
-                              :disabled="hasNoManagePermission"
+                              :disabled="!hasManagePermission"
                 />
             </template>
             <template #assigned_role>
@@ -113,7 +113,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             loading: true,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             fields: computed(() => ([
