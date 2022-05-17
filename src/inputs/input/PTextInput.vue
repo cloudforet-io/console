@@ -181,8 +181,9 @@ export default {
         });
 
         const handleDeleteTag = (val, idx) => {
-            state.proxySelectedValue.splice(idx, 1);
-            state.proxySelectedValue = [...state.proxySelectedValue];
+            const _proxySelectedValue = [...state.proxySelectedValue];
+            _proxySelectedValue.splice(idx, 1);
+            state.proxySelectedValue = _proxySelectedValue;
             state.deleteTargetIdx = -1;
             state.deleteTarget = undefined;
             emit('delete-tag', val, idx);
