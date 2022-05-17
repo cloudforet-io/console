@@ -41,10 +41,14 @@
                     :invalid="invalidState.labels"
                     :invalid-text="invalidTexts.labels"
                 >
-                    <div>
-                        <!-- TODO: need tag input -->
-                        {{ labels }}
-                    </div>
+                    <template #default="{invalid}">
+                        <p-text-input :selected="labels"
+                                      :invalid="invalid"
+                                      multi-input
+                                      block
+                                      @update:selected="handleUpdateLabel"
+                        />
+                    </template>
                 </p-field-group>
             </div>
         </template>
@@ -57,7 +61,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PFieldGroup, PSearchDropdown,
+    PButtonModal, PFieldGroup, PSearchDropdown, PTextInput,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
@@ -68,6 +72,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MemberItem } from '@/services/project/project-detail/project-member/type';
 import { i18n } from '@/translations';
+import { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
 
 
 interface Props {
@@ -84,6 +89,7 @@ export default {
         PButtonModal,
         PFieldGroup,
         PSearchDropdown,
+        PTextInput,
     },
     directives: {
         focus: {
@@ -128,15 +134,16 @@ export default {
             invalidTexts,
             setForm, isAllValid,
         } = useFormValidator({
-            labels: [] as string[],
+            labels: [] as InputItem[],
             selectedRoleItems: [] as MenuItem[],
         }, {
             selectedRoleItems: (val: MenuItem[]) => {
                 if (!val.length) return i18n.t('PROJECT.DETAIL.MEMBER.MODAL_VALIDATION_REQUIRED');
                 return true;
             },
-            labels: (val: string[]) => {
-                if (val.includes(state.labelText)) return i18n.t('PROJECT.DETAIL.MEMBER.ALREADY_EXISTING');
+            labels: (val: InputItem[]) => {
+                const invalidItems = val.filter(d => d.invalid);
+                if (invalidItems.length) return invalidItems[invalidItems.length - 1]?.invalidText || '';
                 if (val.length > 5) return i18n.t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT');
                 return true;
             },
@@ -179,7 +186,7 @@ export default {
                 const params: any = {
                     role_id: selectedRoleItems.value[0].name,
                     users: [state.userId],
-                    labels: labels.value,
+                    labels: labels.value.map(d => d.value),
                 };
                 if (props.isProjectGroup) {
                     params.project_group_id = props.projectGroupId;
@@ -197,7 +204,7 @@ export default {
         const updateMember = async () => {
             const params: any = {
                 user_id: state.userId,
-                labels: labels.value,
+                labels: labels.value.map(d => d.value),
             };
             try {
                 if (props.isProjectGroup) {
@@ -215,6 +222,14 @@ export default {
         };
 
         /* Event */
+        const handleUpdateLabel = (inputLabels: InputItem[]) => {
+            const _labels = [...inputLabels];
+            _labels.forEach((label) => {
+                label.invalid = label.duplicated;
+                label.invalidText = i18n.t('PROJECT.DETAIL.MEMBER.DUPLICATED_VALUE');
+            });
+            setForm('labels', inputLabels);
+        };
         const handleConfirm = async () => {
             if (!isAllValid) return;
 
@@ -235,7 +250,7 @@ export default {
             state.userId = props.selectedMember.resource_id;
             const roleId = props.selectedMember.role_info?.role_id;
             setForm('selectedRoleItems', state.roleItems.filter(d => d.name === roleId));
-            setForm('labels', props.selectedMember?.labels || []);
+            setForm('labels', props.selectedMember?.labels?.map(label => ({ value: label, label })) || []);
         };
 
         (async () => {
@@ -254,6 +269,7 @@ export default {
             isAllValid,
             //
             handleConfirm,
+            handleUpdateLabel,
         };
     },
 };

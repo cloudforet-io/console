@@ -298,7 +298,7 @@ export default {
 
         const executeSpecificIDValidation = async () => {
             let res: Validation = { isValid: true, invalidText: '' };
-            if (formState.activeTab === 'local') res = await checkEmailFormat(formState.user_id);
+            if (formState.activeTab === 'local') res = checkEmailFormat(formState.user_id);
             else if (formState.activeTab === 'external') res = await checkOauth(formState.user_id);
             return res;
         };
