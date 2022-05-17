@@ -285,7 +285,6 @@ export default {
     row-gap: 1rem;
     min-width: 62.25rem;
     max-width: 117rem;
-    padding-right: 1.5rem;
     .left-part {
         display: inline-flex;
         align-items: center;
