@@ -278,6 +278,11 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.policy-list-data-table {
+    @apply mx-0;
+    max-width: 100%;
+}
+
 .filter {
     @apply flex items-center;
     margin: 1.625rem 1rem -0.375rem;

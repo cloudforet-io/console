@@ -124,6 +124,9 @@ export default {
 
 <style lang="postcss" scoped>
 .role-update-page-base-information {
+    @apply mx-0;
+    max-width: 100%;
+
     .input-wrapper {
         @apply mx-4 mb-8 flex flex-wrap gap-1 flex-col;
 
