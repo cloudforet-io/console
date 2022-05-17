@@ -1149,7 +1149,7 @@
 				"DELETE_TITLE": "選択した項目を削除しますか？",
 				"DELETE_TITLE_CANNOT": "このロールは削除できません。"
 			},
-			"ROLE": ""
+			"ROLE": "ロール"
 		}
 	},
 	"IDENTITY": {
@@ -1215,6 +1215,7 @@
 		"USER": {
 			"ACCOUNT": {
 				"ACCOUNT_N_PROFILE": "アカウント＆情報",
+				"BASE_INFORMATION": "基本情報",
 				"CHANGE_PASSWORD": "パスワード変更",
 				"SAVE_CHANGES": "変更事項を保存"
 			},

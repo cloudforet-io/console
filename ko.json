@@ -1149,7 +1149,7 @@
 				"DELETE_TITLE": "선택한 항목을 삭제하시겠습니까?",
 				"DELETE_TITLE_CANNOT": "해당 역할(Role)은 삭제가 불가합니다"
 			},
-			"ROLE": ""
+			"ROLE": "역할(Role)"
 		}
 	},
 	"IDENTITY": {
@@ -1215,6 +1215,7 @@
 		"USER": {
 			"ACCOUNT": {
 				"ACCOUNT_N_PROFILE": "계정 & 정보 ",
+				"BASE_INFORMATION": "기본 정보",
 				"CHANGE_PASSWORD": "비밀번호 변경 ",
 				"SAVE_CHANGES": "변경사항 저장 "
 			},

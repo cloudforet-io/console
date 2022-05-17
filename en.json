@@ -1215,6 +1215,7 @@
 		"USER": {
 			"ACCOUNT": {
 				"ACCOUNT_N_PROFILE": "Account & Profile",
+				"BASE_INFORMATION": "Base Information",
 				"CHANGE_PASSWORD": "Change Password",
 				"SAVE_CHANGES": "Save Changes"
 			},
