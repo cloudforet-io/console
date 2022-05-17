@@ -113,6 +113,7 @@ export default {
             userId: computed(() => ((vm.$route.params.userId) ? decodeURIComponent(vm.$route.params.userId) : store.state.user.userId)),
             channelList: undefined as unknown as ChannelItem[],
             protocolResp: [] as ProtocolItem[],
+            plugins: computed(() => store.state.reference.plugin.items),
         });
         const routeState = reactive({
             routes: computed(() => ([
@@ -120,31 +121,6 @@ export default {
                 { name: 'Notifications Channel' },
             ])),
         });
-
-        const repositoryIdApiQuery = new ApiQueryHelper();
-        const getRepositoryID = async () => {
-            repositoryIdApiQuery.setFilters([{ k: 'repository_type', v: 'remote', o: '=' }]);
-            const res = await SpaceConnector.client.repository.repository.list({
-                query: repositoryIdApiQuery.data,
-            });
-            const repositoryId = res.results[0].repository_id;
-            return repositoryId;
-        };
-
-        const pluginQuery = new ApiQueryHelper();
-        const getIcon = async (pluginId) => {
-            const repositoryId = await getRepositoryID();
-            pluginQuery.setFilters([{
-                k: 'plugin_id',
-                v: pluginId,
-                o: '=',
-            }]).setOnly('plugin_id', 'name', 'tags');
-            const { results } = await SpaceConnector.client.repository.plugin.list({
-                repository_id: repositoryId,
-                query: pluginQuery.data,
-            });
-            return results[0]?.tags?.icon || '';
-        };
 
         const enrichProtocol = async (protocolResp) => {
             const enrichedProtocolList: EnrichedProtocolItem[] = await Promise.all(protocolResp.map(async d => ({
@@ -166,7 +142,8 @@ export default {
                 },
                 protocolType: d.protocol_type,
                 tags: d.tags,
-                icon: await getIcon(d?.plugin_info?.plugin_id || '') || '',
+                plugin_info: d.plugin_info,
+                icon: state.plugins[d.plugin_info?.plugin_id]?.icon || '',
                 name: d.name,
             })));
             return enrichedProtocolList;
@@ -261,8 +238,8 @@ export default {
         };
 
         (async () => {
+            await Promise.allSettled([await store.dispatch('reference/user/load'), await store.dispatch('reference/plugin/load')]);
             await listProtocol();
-            await store.dispatch('reference/user/load');
             await listChannel();
         })();
 
