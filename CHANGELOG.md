@@ -1,3 +1,10 @@
+# [1.1.0-beta.300](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.299...v1.1.0-beta.300) (2022-05-17)
+
+
+### Bug Fixes
+
+* fix proxy bug in PTextInput ([#953](https://github.com/spaceone-dev/spaceone-design-system/issues/953)) ([91e623c](https://github.com/spaceone-dev/spaceone-design-system/commit/91e623c412884799a58266d56ba480f6e01021f3))
+
 # [1.1.0-beta.299](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.298...v1.1.0-beta.299) (2022-05-16)
 
 
