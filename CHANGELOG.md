@@ -1,3 +1,10 @@
+# [1.1.0-beta.301](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.300...v1.1.0-beta.301) (2022-05-17)
+
+
+### Bug Fixes
+
+* add type to PTextInput ([#954](https://github.com/spaceone-dev/spaceone-design-system/issues/954)) ([5ddbe8f](https://github.com/spaceone-dev/spaceone-design-system/commit/5ddbe8f3b136808dda87ccce15230470d9314896))
+
 # [1.1.0-beta.300](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.299...v1.1.0-beta.300) (2022-05-17)
 
 
