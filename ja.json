@@ -2194,6 +2194,7 @@
 				"BASE_INFORMATION": "基本情報",
 				"BASE_INFO_HELP_TEXT": "選択したメンバーのプロジェクト権限とラベルを設定します。",
 				"DELETE_ALL": "すべて削除",
+				"DUPLICATED_VALUE": "",
 				"ENTER_KEYWORD_TO_SEARCH": "キーワードを入力してください",
 				"EXISTING": "重複",
 				"GOOGLE_OAUTH2": "Google Oauth2",

@@ -2194,6 +2194,7 @@
 				"BASE_INFORMATION": "기본 정보",
 				"BASE_INFO_HELP_TEXT": "선택한 구성원의 프로젝트 권한과 라벨을 설정해주세요.",
 				"DELETE_ALL": "모두 삭제",
+				"DUPLICATED_VALUE": "중복된 값입니다.",
 				"ENTER_KEYWORD_TO_SEARCH": "검색어를 입력하세요.",
 				"EXISTING": "중복",
 				"GOOGLE_OAUTH2": "Google Oauth2",

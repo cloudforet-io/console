@@ -2194,6 +2194,7 @@
 				"BASE_INFORMATION": "Base Information",
 				"BASE_INFO_HELP_TEXT": "Set selected member’s project role and labels.",
 				"DELETE_ALL": "Delete All",
+				"DUPLICATED_VALUE": "Duplicated Value",
 				"ENTER_KEYWORD_TO_SEARCH": "↑ Enter keywords to search",
 				"EXISTING": "Existing",
 				"GOOGLE_OAUTH2": "Google Oauth2",
