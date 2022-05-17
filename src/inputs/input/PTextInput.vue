@@ -55,11 +55,12 @@
 <script lang="ts">
 import { inputTypes } from '@/inputs/input/config';
 import {
-    computed, reactive, toRefs, watch,
+    computed, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import { MenuItem } from '@/inputs/context-menu/type';
 import { SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
+import { SelectedItem } from '@/inputs/input/type';
 import { useProxyValue } from '@/hooks/proxy-state';
 import { focus } from 'vue-focus';
 import vClickOutside from 'v-click-outside';
@@ -113,7 +114,7 @@ export default {
             default: false,
         },
         selected: {
-            type: Array,
+            type: Array as PropType<SelectedItem[]>,
             default: () => [],
         },
         /* context menu fixed style props */
@@ -127,7 +128,7 @@ export default {
         },
         /* context menu props */
         menu: {
-            type: Array,
+            type: Array as PropType<MenuItem[]>,
             default: () => [],
         },
         loading: {
