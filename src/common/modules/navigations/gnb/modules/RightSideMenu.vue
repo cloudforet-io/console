@@ -232,6 +232,7 @@ export default {
         const signOut = async () => {
             const res: Location = {
                 name: AUTH_ROUTE.SIGN_OUT._NAME,
+                query: { nextPath: vm.$route.fullPath },
             };
             await vm.$router.push(res);
         };

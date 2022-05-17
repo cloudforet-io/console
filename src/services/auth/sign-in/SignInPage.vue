@@ -47,6 +47,9 @@ import { store } from '@/store';
 import config from '@/lib/config';
 import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightContainer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { isRouteAccessible } from '@/lib/access-control';
+import { SpaceRouter } from '@/router';
+import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 export default {
     name: 'SignInPage',
@@ -62,7 +65,7 @@ export default {
         },
         nextPath: {
             type: String,
-            default: '/',
+            default: undefined,
         },
         error: {
             type: String,
@@ -111,7 +114,18 @@ export default {
         });
         const onSignIn = async () => {
             try {
-                await vm.$router.push(props.nextPath);
+                if (!props.nextPath) {
+                    await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                    return;
+                }
+
+                const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
+                const isAccessible = isRouteAccessible(resolvedRoute.route, store.getters['user/pagePermissionList']);
+                if (isAccessible) {
+                    await vm.$router.push(props.nextPath);
+                } else {
+                    await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

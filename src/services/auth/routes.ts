@@ -33,7 +33,7 @@ export default [
 
                 },
                 props: route => ({
-                    nextPath: route.query.nextPath || '/',
+                    nextPath: route.query.nextPath,
                 }),
                 component: SignInPage,
             },
@@ -45,8 +45,8 @@ export default [
                 },
                 component: DomainAdminSignInPage,
                 props: route => ({
-                    admin: true,
-                    nextPath: route.query.nextPath || '/',
+                    isDomainOwner: true,
+                    nextPath: route.query.nextPath,
                 }),
             },
             {
@@ -56,7 +56,7 @@ export default [
                     isSignInPage: true,
                 },
                 props: route => ({
-                    nextPath: route.query.nextPath || '/',
+                    nextPath: route.query.nextPath,
                 }),
                 component: KeycloakPage,
             },
@@ -72,7 +72,7 @@ export default [
             secureToken: query.secureToken,
             secureSessionId: query.secureSessionId,
             resultCode: query.resultCode,
-            nextPath: query.nextPath || '/',
+            nextPath: query.nextPath,
         }),
         component: KB_SSO,
     },

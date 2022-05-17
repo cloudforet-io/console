@@ -7,6 +7,10 @@ import {
     ComponentRenderProxy, defineComponent, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 import { loadAuth } from '@/services/auth/authenticator/loader';
+import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
+import { SpaceRouter } from '@/router';
+import { isRouteAccessible } from '@/lib/access-control';
+import { store } from '@/store';
 
 export default defineComponent({
     name: 'KB_SSOPage',
@@ -27,14 +31,25 @@ export default defineComponent({
         },
         nextPath: {
             type: String,
-            default: '/',
+            default: undefined,
         },
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const onSignIn = async () => {
-            await vm.$router.push(props.nextPath);
+            if (!props.nextPath) {
+                await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                return;
+            }
+
+            const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
+            const isAccessible = isRouteAccessible(resolvedRoute.route, store.getters['user/pagePermissionList']);
+            if (isAccessible) {
+                await vm.$router.push(props.nextPath);
+            } else {
+                await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+            }
         };
 
         onMounted(async () => {

@@ -2,6 +2,7 @@ import { languages } from '@/store/modules/user/config';
 import { Getter } from 'vuex';
 import { getPagePermissionMap, PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { UserState } from './type';
 
 export const isDomainOwner = (state: UserState): boolean => state.userType === 'DOMAIN_OWNER';
@@ -18,7 +19,7 @@ export const roleNames = (state: UserState): Array<string> => {
             } else if (role.roleType === 'DOMAIN') {
                 domainRoleNames.push(role.name);
             } else {
-                projectRoleNames.push(role.name);
+                projectRoleNames.push(role.name); // 'PROJECT'
             }
         });
     }
@@ -45,7 +46,14 @@ export const hasDomainRole = (state: UserState): boolean => {
 
 export const hasPermission = (state: UserState): boolean => !!state.roles?.length;
 
-export const pagePermissionList: Getter<UserState, any> = (state): PagePermissionTuple[] => {
+export const pagePermissionList: Getter<UserState, any> = (state, getters): PagePermissionTuple[] => {
+    if (getters.isDomainOwner) {
+        return [
+            [MENU_ID.ADMINISTRATION_ROLE, 'MANAGE'],
+            [MENU_ID.ADMINISTRATION_POLICY, 'MANAGE'],
+            [MENU_ID.ADMINISTRATION_USER, 'MANAGE'],
+        ];
+    }
     const permissions = state.roles?.flatMap(role => role.pagePermissions) ?? [];
     return Object.entries(getPagePermissionMap(permissions));
 };

@@ -45,7 +45,6 @@ export default defineComponent({
             userName: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
             userId: computed(() => store.state.user.userId),
-            hasPermission: computed((() => store.getters['user/hasPermission'])),
             icon: computed(() => {
                 if (state.isDomainOwner) return 'root-account';
                 if (state.hasDomainRole) return 'admin';

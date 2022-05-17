@@ -65,7 +65,6 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: ':provider/:group',
                     meta: { label: ({ params }) => `[${upperCase(params.provider)}] ${params.group}` },
-                    redirect: '/asset-inventory/cloud-service/:provider/:group/:name?',
                     component: { template: '<router-view />' },
                     children: [
                         {

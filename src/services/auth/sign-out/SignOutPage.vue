@@ -19,7 +19,7 @@ export default {
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {
-                await SpaceRouter.router.push({ name: AUTH_ROUTE.SIGN_IN._NAME, query: { ...to.query, nextPath: to.query.nextPath, error: to.query.error } });
+                await SpaceRouter.router.push({ name: AUTH_ROUTE.SIGN_IN._NAME, query: { ...to.query } });
             }
         })();
     },

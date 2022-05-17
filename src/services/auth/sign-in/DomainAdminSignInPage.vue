@@ -38,6 +38,9 @@ import { store } from '@/store';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { SpaceRouter } from '@/router';
+import { isRouteAccessible } from '@/lib/access-control';
+import { MENU_ID } from '@/lib/menu/config';
 
 
 export default {
@@ -48,13 +51,13 @@ export default {
         IDPWSignIn,
     },
     props: {
-        admin: {
+        isDomainOwner: {
             type: Boolean,
             default: false,
         },
         nextPath: {
             type: String,
-            default: '/',
+            default: undefined,
         },
     },
     beforeRouteEnter(to, from, next) {
@@ -70,7 +73,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
+            userType: computed(() => (props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER')),
             authType: computed(() => store.state.domain.extendedAuthType),
             ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
             ciTextWithTypeImage: computed(() => config.get('DOMAIN_IMAGE.CI_TEXT_WITH_TYPE')),
@@ -89,7 +92,18 @@ export default {
         });
         const onSignIn = async () => {
             try {
-                await vm.$router.push(props.nextPath);
+                if (!props.nextPath) {
+                    await vm.$router.push({ name: MENU_ID.ADMINISTRATION_USER });
+                    return;
+                }
+
+                const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
+                const isAccessible = isRouteAccessible(resolvedRoute.route, store.getters['user/pagePermissionList']);
+                if (isAccessible) {
+                    await vm.$router.push(props.nextPath);
+                } else {
+                    await vm.$router.push({ name: MENU_ID.ADMINISTRATION_USER });
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 await store.dispatch('display/showSignInErrorMessage');
@@ -100,7 +114,7 @@ export default {
             store.dispatch('display/hideSignInErrorMessage');
         };
         const goToUserSignIn = () => {
-            if (props.admin) vm.$router.replace({ name: AUTH_ROUTE.SIGN_IN._NAME });
+            if (props.isDomainOwner) vm.$router.replace({ name: AUTH_ROUTE.SIGN_IN._NAME });
         };
         return {
             ...toRefs(state),

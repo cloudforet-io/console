@@ -8,6 +8,10 @@ import {
 } from '@vue/composition-api';
 import { PButton } from '@spaceone/design-system';
 import { loadAuth } from '@/services/auth/authenticator/loader';
+import { SpaceRouter } from '@/router';
+import { isRouteAccessible } from '@/lib/access-control';
+import { store } from '@/store';
+import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 export default defineComponent({
     name: 'KeycloakPage',
@@ -21,7 +25,7 @@ export default defineComponent({
         },
         nextPath: {
             type: String,
-            default: '/',
+            default: undefined,
         },
     },
     beforeRouteEnter(to, from, next) {
@@ -37,7 +41,18 @@ export default defineComponent({
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const onSignIn = async () => {
-            await vm.$router.push(props.nextPath);
+            if (!props.nextPath) {
+                await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                return;
+            }
+
+            const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
+            const isAccessible = isRouteAccessible(resolvedRoute.route, store.getters['user/pagePermissionList']);
+            if (isAccessible) {
+                await vm.$router.push(props.nextPath);
+            } else {
+                await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+            }
         };
 
         onMounted(async () => {
