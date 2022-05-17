@@ -2,7 +2,7 @@
     <delete-modal :visible.sync="proxyVisible"
                   size="lg"
                   :header-title="headerTitle"
-                  :only-show-footer-close-button="!isDeletable"
+                  :hide-footer="!isDeletable"
                   :loading="loading"
                   @confirm="handleDelete"
     >
@@ -10,6 +10,7 @@
             {{ $t('IAM.ROLE.MODAL.DELETE_HELP_TEXT') }}
         </div>
         <p-data-table v-if="isDeletable"
+                      class="role-data-table"
                       :items="roles"
                       :fields="fields"
                       :loading="loading"

@@ -6,8 +6,8 @@
                     :backdrop="true"
                     :visible.sync="proxyVisible"
                     :disabled="disabled"
-                    :hide-footer-close-button="onlyShowFooterCloseButton"
-                    :theme-color="onlyShowFooterCloseButton? 'gray-border': 'alert'"
+                    :hide-footer="hideFooter"
+                    theme-color="alert"
                     :loading="loading"
                     @confirm="handleConfirm"
     >
@@ -16,18 +16,24 @@
                 <slot>{{ contents }}</slot>
             </p>
             <slot name="delete-modal-body" />
+            <div class="content-footer">
+                <p-button v-if="hideFooter"
+                          class="close-button"
+                          style-type="gray-border"
+                          @click="handleClose"
+                >
+                    {{ $t('APP.MAIN.CLOSE') }}
+                </p-button>
+            </div>
         </template>
         <template v-if="confirmText" #confirm-button>
             {{ confirmText }}
-        </template>
-        <template v-if="onlyShowFooterCloseButton" #confirm-button>
-            close
         </template>
     </p-button-modal>
 </template>
 
 <script lang="ts">
-import { PButtonModal } from '@spaceone/design-system';
+import { PButtonModal, PButton } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { SIZE, Size } from '@/common/components/modals/config';
@@ -36,6 +42,7 @@ export default {
     name: 'DeleteModal',
     components: {
         PButtonModal,
+        PButton,
     },
     props: {
         visible: {
@@ -69,7 +76,7 @@ export default {
             },
             default: SIZE.sm,
         },
-        onlyShowFooterCloseButton: {
+        hideFooter: {
             type: Boolean,
             default: false,
         },
@@ -79,13 +86,15 @@ export default {
             proxyVisible: useProxyValue('visible', props, emit),
         });
         const handleConfirm = () => {
-            if (props.onlyShowFooterCloseButton) {
+            if (props.hideFooter) {
                 state.proxyVisible = false;
             } else emit('confirm');
         };
+        const handleClose = () => { state.proxyVisible = false; };
         return {
             ...toRefs(state),
             handleConfirm,
+            handleClose,
             SIZE,
         };
     },
@@ -93,16 +102,15 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.delete-modal::v-deep {
-    .modal-header {
-        @apply text-alert;
-        .header-lottie {
-            display: inline-block;
-            margin-right: 0.5rem;
-        }
-    }
-}
 .delete-modal-content {
+    max-height: 43.75rem;
+    overflow-y: scroll;
     line-height: 160%;
+}
+.content-footer {
+    text-align: right;
+    .close-button {
+        @apply mt-6;
+    }
 }
 </style>
