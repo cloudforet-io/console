@@ -72,6 +72,7 @@ export class SpaceRouter {
 
         SpaceRouter.router.afterEach((to) => {
             if (config.get('GTAG_ID') !== 'DISABLED') GTag.setPageView(to);
+            if (SpaceRouter.router.app.$store.state.error.visibleAuthorizationError) { SpaceRouter.router.app.$store.commit('error/setVisibleAuthorizationError', false); }
             const isDomainOwner = SpaceRouter.router.app.$store.getters['user/isDomainOwner'];
             if (!isDomainOwner) {
                 const recent = getRecentConfig(to);
