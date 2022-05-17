@@ -2,7 +2,7 @@
 import { Route } from 'vue-router';
 import { clone } from 'lodash';
 import { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/page-permission-helper';
-import { MENU_ID, MenuId } from '@/lib/menu/config';
+import { MenuId } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { AccessLevel, ACCESS_LEVEL } from '@/lib/access-control/config';
 
@@ -12,16 +12,17 @@ const getAccessTypeFromPermission = (permission?: string | PagePermissionType): 
     return 'AUTHENTICATED';
 };
 
-const menuIdList = Object.values(MENU_ID);
 const getMenuIdByRouteName = (routeName?: string|null): MenuId|undefined => {
     if (!routeName) return undefined;
 
-    const isSubMenu = routeName.includes('.');
-    return menuIdList.find((id) => {
-        if (id === routeName) return true;
-        if (isSubMenu && !id.includes('.')) return false;
-        return routeName.startsWith(`${id}.`);
+    if (MENU_INFO_MAP[routeName]) return routeName as MenuId;
+
+    let name = routeName;
+    const hasMenuId = routeName.split('.').reverse().some((d) => {
+        name = name.slice(0, name.length - d.length - 1);
+        return MENU_INFO_MAP[name];
     });
+    return hasMenuId ? name as MenuId : undefined;
 };
 
 export const getRouteAccessLevel = (route: Route): AccessLevel => {
