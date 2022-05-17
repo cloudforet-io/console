@@ -77,8 +77,7 @@ const getUserRoleBindings = async (userId: string): Promise<Array<UserRole>> => 
                     roleId,
                     name: role.name,
                     roleType: role.role_type,
-                    // pagePermissions: role.page_permissions,
-                    pagePermissions: [{ page: '*', permission: 'MANAGE' }], // this is temporary code
+                    pagePermissions: role.page_permissions,
                 };
             }
         });
