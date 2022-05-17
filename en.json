@@ -1149,7 +1149,7 @@
 				"DELETE_TITLE": "Are you sure you want to delete selected item?",
 				"DELETE_TITLE_CANNOT": "Cannot delete this role"
 			},
-			"ROLE": "ROLE"
+			"ROLE": "Role"
 		}
 	},
 	"IDENTITY": {
