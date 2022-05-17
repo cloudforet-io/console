@@ -36,9 +36,9 @@ export default {
     },
     setup() {
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             selectedPrivacy: DASHBOARD_PRIVACY_TYPE.USER as DashboardPrivacyType,
-            filteredPrivacyList: computed(() => (state.hasNoManagePermission ? privacyList.filter(item => item.name !== DASHBOARD_PRIVACY_TYPE.PUBLIC) : privacyList)),
+            filteredPrivacyList: computed(() => (!state.hasManagePermission ? privacyList.filter(item => item.name !== DASHBOARD_PRIVACY_TYPE.PUBLIC) : privacyList)),
         });
 
         const handleRadio = (value: DashboardPrivacyType) => {

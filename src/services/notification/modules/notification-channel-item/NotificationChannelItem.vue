@@ -3,43 +3,43 @@
         <div class="card-header">
             <div class="left-section">
                 <p-toggle-button :value="isActivated"
-                                 :disabled="hasNoManagePermission"
+                                 :disabled="!hasManagePermission"
                                  @change="onToggleChange"
                 />
                 <span class="card-title">{{ channelData.protocol_name }}</span>
             </div>
             <p-icon-button name="ic_trashcan" width="1.5rem" height="1.5rem"
-                           :disabled="hasNoManagePermission"
+                           :disabled="!hasManagePermission"
                            @click="onClickDelete"
             />
         </div>
         <ul class="card-body">
             <notification-channel-item-name :channel-data="channelData" :project-id="projectId"
-                                            :disable-edit="editTarget && editTarget !== EDIT_TYPE.NAME || hasNoManagePermission"
+                                            :disable-edit="(editTarget && editTarget !== EDIT_TYPE.NAME) || !hasManagePermission"
                                             @change="onChange"
                                             @edit="onEdit"
             />
             <p-divider />
             <notification-channel-item-data :channel-data="channelData" :project-id="projectId"
-                                            :disable-edit="editTarget && editTarget !== EDIT_TYPE.DATA || hasNoManagePermission"
+                                            :disable-edit="(editTarget && editTarget !== EDIT_TYPE.DATA) || !hasManagePermission"
                                             @change="onChange"
                                             @edit="onEdit"
             />
             <p-divider v-if="projectId" />
             <notification-channel-item-level :channel-data="channelData" :project-id="projectId"
-                                             :disable-edit="editTarget && editTarget !== EDIT_TYPE.LEVEL || hasNoManagePermission"
+                                             :disable-edit="(editTarget && editTarget !== EDIT_TYPE.LEVEL) || !hasManagePermission"
                                              @change="onChange"
                                              @edit="onEdit"
             />
             <p-divider />
             <notification-channel-item-schedule :channel-data="channelData" :project-id="projectId"
-                                                :disable-edit="editTarget && editTarget !== EDIT_TYPE.SCHEDULE || hasNoManagePermission"
+                                                :disable-edit="(editTarget && editTarget !== EDIT_TYPE.SCHEDULE) || !hasManagePermission"
                                                 @change="onChange"
                                                 @edit="onEdit"
             />
             <p-divider />
             <notification-channel-item-topic :channel-data="channelData" :project-id="projectId"
-                                             :disable-edit="editTarget && editTarget !== EDIT_TYPE.TOPIC || hasNoManagePermission"
+                                             :disable-edit="(editTarget && editTarget !== EDIT_TYPE.TOPIC) || !hasManagePermission"
                                              @change="onChange"
                                              @edit="onEdit"
             />
@@ -121,7 +121,7 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             isActivated: props.channelData?.state === STATE_TYPE.ENABLED,
             userChannelId: props.channelData?.user_channel_id,
             projectChannelId: props.channelData?.project_channel_id,

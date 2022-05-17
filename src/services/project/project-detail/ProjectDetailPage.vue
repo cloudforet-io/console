@@ -13,12 +13,12 @@
                             </span>
                             <p-icon-button name="ic_trashcan"
                                            class="delete-btn"
-                                           :disabled="hasNoManagePermission"
+                                           :disabled="!hasManagePermission"
                                            @click="openProjectDeleteForm"
                             />
                             <p-icon-button name="ic_edit-text"
                                            class="edit-btn"
-                                           :disabled="hasNoManagePermission"
+                                           :disabled="!hasManagePermission"
                                            @click="openProjectEditForm"
                             />
                         </div>
@@ -35,7 +35,7 @@
                                 icon="ic_state_manual" style-type="gray900"
                                 class="ml-3"
                                 :outline="true"
-                                :disabled="hasNoManagePermission"
+                                :disabled="!hasManagePermission"
                                 @click="maintenanceWindowFormVisible = true"
                             >
                                 {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CREATE') }}
@@ -164,7 +164,7 @@ export default {
         registerServiceStore<ProjectDetailState>('projectDetail', ProjectDetailStoreModule);
 
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             hasNoAlertPermission: computed<boolean>(() => isUserAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList'])),
             loading: true,
             item: null as null|ProjectModel,

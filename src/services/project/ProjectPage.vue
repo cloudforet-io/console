@@ -53,19 +53,19 @@
                                               style-type="primary-dark"
                                               :outline="true"
                                               icon="ic_plus_bold"
-                                              :disabled="!hasRootProjectPermission || hasNoManagePermission"
+                                              :disabled="!hasManagePermission"
                                               @click="openProjectGroupCreateForm"
                                     >
                                         {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
                                     </p-button>
-                                    <p-select-dropdown v-if="storeState.groupId && !isPermissionDenied || hasNoManagePermission"
+                                    <p-select-dropdown v-if="(storeState.groupId && !isPermissionDenied) || !hasManagePermission"
                                                        :items="settingMenu"
                                                        style-type="icon-button"
                                                        button-icon="ic_setting"
                                                        class="settings-button"
                                                        @select="onSelectSettingDropdown"
                                     />
-                                    <div v-if="storeState.groupId && !isPermissionDenied || hasNoManagePermission"
+                                    <div v-if="(storeState.groupId && !isPermissionDenied) || !hasManagePermission"
                                          v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
                                          class="project-group-member-button"
                                          :group-id="storeState.groupId"
@@ -202,7 +202,7 @@ export default {
         });
 
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             initGroupId: vm.$route.query.select_pg as string,
             favoriteItems: computed<FavoriteItem[]>(() => [
                 ...convertProjectGroupConfigToReferenceData(storeState.favoriteProjectGroups, storeState.projectGroups),
@@ -222,7 +222,6 @@ export default {
             groupMemberCount: 0 as number|undefined,
             groupMemberPageVisible: false,
             isPermissionDenied: computed(() => state.groupMemberCount === undefined),
-            hasRootProjectPermission: computed(() => store.getters['user/hasDomainRole']),
         });
 
 

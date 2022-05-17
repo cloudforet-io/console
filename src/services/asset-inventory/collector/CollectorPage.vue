@@ -34,14 +34,14 @@
                         <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }">
                             <p-button style-type="primary-dark"
                                       icon="ic_plus_bold"
-                                      :disabled="hasNoManagePermission"
+                                      :disabled="!hasManagePermission"
                             >
                                 {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
                             </p-button>
                         </router-link>
                         <p-select-dropdown class="left-toolbox-item"
                                            :items="dropdown"
-                                           :disabled="hasNoManagePermission"
+                                           :disabled="!hasManagePermission"
                                            @select="onSelectDropdown"
                         >
                             {{ $t('PLUGIN.COLLECTOR.MAIN.ACTION') }}
@@ -81,7 +81,7 @@
                 <tags-panel :resource-id="selectedItems[0].collector_id"
                             resource-type="inventory.Collector"
                             resource-key="collector_id"
-                            :disabled="hasNoManagePermission"
+                            :disabled="!hasManagePermission"
                 />
             </template>
             <template #credentials>
@@ -240,7 +240,7 @@ export default {
         const queryHelper = new QueryHelper();
 
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             timezone: computed(() => store.state.user.timezone),
             plugins: computed(() => store.state.reference.plugin.items),
             fields: computed(() => [

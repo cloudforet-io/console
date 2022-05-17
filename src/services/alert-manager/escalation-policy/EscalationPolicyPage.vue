@@ -20,7 +20,7 @@
                     <p-button class="create-button"
                               style-type="primary-dark"
                               icon="ic_plus_bold"
-                              :disabled="hasNoManagePermission"
+                              :disabled="!hasManagePermission"
                               @click="onSelectAction(ACTION.create)"
                     >
                         {{ $t('MONITORING.ALERT.ESCALATION_POLICY.CREATE') }}
@@ -28,7 +28,7 @@
                     <p-select-dropdown
                         :selected="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
                         :items="actionItems"
-                        :disabled="!selectedItem || hasNoManagePermission"
+                        :disabled="!selectedItem || !hasManagePermission"
                         @select="onSelectAction"
                     >
                         {{ $t('MONITORING.ALERT.ESCALATION_POLICY.ACTION') }}
@@ -128,7 +128,7 @@ export default {
             tags: escalationPolicyApiQueryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
         });
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             timezone: computed(() => store.state.user.timezone),
             pageTitle: computed(() => vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY')),
             actionItems: computed(() => ([

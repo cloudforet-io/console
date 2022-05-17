@@ -12,7 +12,7 @@
                 <!--                />-->
                 <p-button :outline="true" style-type="primary-dark"
                           icon="ic_plus_bold"
-                          :disabled="hasNoManagePermission"
+                          :disabled="!hasManagePermission"
                           @click="handleCreateBudgetSelect(createButtonItemList[0].name)"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
@@ -68,7 +68,7 @@ export default {
                 // },
             ]),
             filters: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).filters,
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
         });
 
         const handleCreateBudgetSelect = (name) => {

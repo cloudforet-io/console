@@ -4,7 +4,7 @@
             {{ title }}
             <template #extra>
                 <router-link :to="manageLink">
-                    <p-button style-type="primary-dark" :disabled="hasNoManagePermission">
+                    <p-button style-type="primary-dark" :disabled="!hasManagePermission">
                         {{ $t('IDENTITY.USER.NOTIFICATION.MANAGE') }}
                     </p-button>
                 </router-link>
@@ -88,7 +88,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             title: i18n.t('IDENTITY.USER.NOTIFICATION.NOTIFICATION_CHANNEL'),
             loading: true,
             fields: computed(() => [

@@ -120,9 +120,9 @@ export default defineComponent<Props>({
             visibility(value: DashboardPrivacyType) { return value.length ? '' : 'Required Field'; },
         });
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             proxyVisible: props.visible,
-            filteredVisibilityList: computed(() => (state.hasNoManagePermission ? visibilityList.filter(item => item.name === DASHBOARD_PRIVACY_TYPE.USER) : visibilityList)),
+            filteredVisibilityList: computed(() => (!state.hasManagePermission ? visibilityList.filter(item => item.name === DASHBOARD_PRIVACY_TYPE.USER) : visibilityList)),
             includesFilter: false,
         });
 

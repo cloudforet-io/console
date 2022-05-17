@@ -7,7 +7,7 @@
             <template #header>
                 <section class="header">
                     <span class="title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS') }}</span>
-                    <p-icon-button v-if="hasBudgetAlert" name="ic_trashcan" :disabled="hasNoManagePermission"
+                    <p-icon-button v-if="hasBudgetAlert" name="ic_trashcan" :disabled="!hasManagePermission"
                                    @click="handleDelete"
                     />
                 </section>
@@ -38,7 +38,7 @@
                                 </li>
                             </ul>
                             <p-button icon="ic_setting" style-type="gray900" :outline="true"
-                                      :disabled="hasNoManagePermission"
+                                      :disabled="!hasManagePermission"
                                       @click="handleSetNotifications"
                             >
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET') }}
@@ -69,7 +69,7 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_DESC') }}
                             </p>
                             <p-button icon="ic_setting" style-type="gray900" :outline="true"
-                                      :disabled="hasNoManagePermission"
+                                      :disabled="!hasManagePermission"
                                       @click="handleSetNotifications"
                             >
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_SET') }}
@@ -139,7 +139,7 @@ export default {
             budgetId: computed(() => costExplorerStore.state.budget.budgetData?.budget_id),
             budgetTargetId: computed(() => costExplorerStore.state.budget.budgetData?.project_id) || undefined,
             isBudgetLoading: computed(() => costExplorerStore.getters['budget/isBudgetLoading']),
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
         });
 
         const checkDeleteState = reactive({

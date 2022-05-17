@@ -1,6 +1,6 @@
 <template>
     <tags-panel :resource-id="id"
-                :disabled="hasNoManagePermission"
+                :disabled="!hasManagePermission"
                 resource-key="project_id"
                 resource-type="identity.Project"
                 class="tab-bg"
@@ -24,9 +24,9 @@ export default {
         },
     },
     setup() {
-        const hasNoManagePermission = ref(computed<boolean>(() => store.getters['user/hasNoManagePermission']));
+        const hasManagePermission = ref(computed<boolean>(() => store.getters['user/hasManagePermission']));
         return {
-            hasNoManagePermission,
+            hasManagePermission,
         };
     },
 };

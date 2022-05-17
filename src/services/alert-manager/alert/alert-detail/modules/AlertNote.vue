@@ -13,7 +13,7 @@
                         </p>
                         <p-select-dropdown style-type="icon-button" button-icon="ic_more" :items="menuItems"
                                            :menu-position="'left'"
-                                           :disabled="hasNoManagePermission"
+                                           :disabled="!hasManagePermission"
                                            @select="handleSelect(data.note_id)"
                         />
                     </div>
@@ -26,7 +26,7 @@
         <article class="add-note-wrapper">
             <p-textarea :value="noteInput" @input="changeNoteInput" />
             <p-button style-type="gray-border" size="md" class="add-btn"
-                      :disabled="(noteInput.trim()).length === 0 || hasNoManagePermission"
+                      :disabled="(noteInput.trim()).length === 0 || !hasManagePermission"
                       @click="createNote"
             >
                 {{ $t('MONITORING.ALERT.DETAIL.NOTE.ADD_NOTE') }}
@@ -82,7 +82,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             noteInput: '',
             noteList: [] as NoteModel[],
             loading: true,

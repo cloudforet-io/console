@@ -38,9 +38,9 @@ export class SpaceRouter {
                 const lastCheckedTime = localStorage.getItem(CHUNK_LOAD_REFRESH_STORAGE_KEY);
                 if (!lastCheckedTime) {
                     localStorage.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, getCurrentTime().toString());
-                    window.location.href = nextPath;
+                    window.location.href = nextPath ?? '/';
                 } else if (getCurrentTime() - parseInt(lastCheckedTime) < 10) {
-                    window.location.href = nextPath;
+                    window.location.href = nextPath ?? '/';
                 }
             }
         });
