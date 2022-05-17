@@ -73,7 +73,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
@@ -116,7 +115,6 @@ export default {
         const state = reactive({
             hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
             loading: true,
-            users: [] as User[],
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             fields: computed(() => ([
                 { name: 'user_id', label: 'User ID' },
