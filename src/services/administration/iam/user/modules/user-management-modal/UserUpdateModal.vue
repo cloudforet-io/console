@@ -212,7 +212,7 @@ export default {
 
         const checkEmail = async () => {
             if (state.email.trim().length > 0) {
-                const validation: Validation = await checkEmailFormat(state.email);
+                const validation: Validation = checkEmailFormat(state.email);
                 validationState.isEmailValid = validation.isValid;
                 validationState.emailInvalidText = validation.invalidText;
             } else {

@@ -52,7 +52,7 @@ export const checkOauth = async (userID: string) => {
     return validation;
 };
 
-export const checkEmailFormat = async (userID: string) => {
+export const checkEmailFormat = (userID: string) => {
     const validation = {
         isValid: true,
         invalidText: '' as TranslateResult,
