@@ -30,11 +30,13 @@
                                                :value="projectId"
                                 />
                             </p>
-                            <p-button icon="ic_state_manual" style-type="gray900"
-                                      class="ml-3"
-                                      :outline="true"
-                                      :disabled="hasNoManagePermission"
-                                      @click="maintenanceWindowFormVisible = true"
+                            <p-button
+                                v-if="!hasNoAlertPermission"
+                                icon="ic_state_manual" style-type="gray900"
+                                class="ml-3"
+                                :outline="true"
+                                :disabled="hasNoManagePermission"
+                                @click="maintenanceWindowFormVisible = true"
                             >
                                 {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CREATE') }}
                             </p-button>
@@ -163,6 +165,7 @@ export default {
 
         const state = reactive({
             hasNoManagePermission: computed<boolean>(() => store.getters['user/hasNoManagePermission']),
+            hasNoAlertPermission: computed<boolean>(() => isUserAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList'])),
             loading: true,
             item: null as null|ProjectModel,
             projectId: computed(() => store.state.service.projectDetail.projectId),
@@ -216,10 +219,10 @@ export default {
                     name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_MEMBER'),
                 },
-                ...(isUserAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList']) ? [{
+                ...(state.hasNoAlertPermission) ? [{
                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
-                }] : []),
+                }] : [],
                 {
                     name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
