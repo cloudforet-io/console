@@ -40,7 +40,9 @@
                 </p-badge>
             </template>
             <template #col-tags.description-format="{ value }">
-                {{ value ? value : '--' }}
+                <div class="description">
+                    {{ value ? value : '--' }}
+                </div>
             </template>
             <template #col-edit_button-format="{ item }">
                 <p-button size="sm"
@@ -269,5 +271,9 @@ export default defineComponent({
 <style lang="postcss" scoped>
 .left-toolbox-item-select-dropdown {
     margin-left: 1rem;
+}
+.description {
+    @apply truncate;
+    width: 25ch;
 }
 </style>
