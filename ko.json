@@ -1059,7 +1059,7 @@
 				"MANAGED_POLICY": "매니지드 정책(Policy)",
 				"SAVE": "변경사항 저장",
 				"TYPE": "타입",
-				"VALIDATION_NAME": "",
+				"VALIDATION_NAME": "2글자 이상 입력해주세요.",
 				"VIEW_ONLY": "읽기 전용"
 			},
 			"MODAL": {
@@ -1100,12 +1100,12 @@
 			"EDIT": "편집",
 			"FORM": {
 				"ALL": "전체",
-				"ALT_E_CREATE_ROLE": "",
-				"ALT_E_DELETE_ROLE": "",
-				"ALT_E_UPDATE_ROLE": "",
-				"ALT_S_CREATE_ROLE": "",
-				"ALT_S_DELETE_ROLE": "",
-				"ALT_S_UPDATE_ROLE": "",
+				"ALT_E_CREATE_ROLE": "역할(Role) 생성 실패",
+				"ALT_E_DELETE_ROLE": "역할(Role) 삭제 실패",
+				"ALT_E_UPDATE_ROLE": "역할(Role) 변경 실패",
+				"ALT_S_CREATE_ROLE": "역할(Role) 생성 완료",
+				"ALT_S_DELETE_ROLE": "역할(Role) 삭제 완료",
+				"ALT_S_UPDATE_ROLE": "역할(Role) 변경 완료",
 				"CANCEL": "취소",
 				"CREATE": "생성",
 				"CREATE_TITLE": "역할(Role) 생성",

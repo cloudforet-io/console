@@ -1059,7 +1059,7 @@
 				"MANAGED_POLICY": "マネジメントポリシー",
 				"SAVE": "変更事項保存",
 				"TYPE": "タイプ",
-				"VALIDATION_NAME": "",
+				"VALIDATION_NAME": "2文字以上入力してください。",
 				"VIEW_ONLY": "読み取り専用"
 			},
 			"MODAL": {
