@@ -1,3 +1,10 @@
+# [1.1.0-beta.303](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.302...v1.1.0-beta.303) (2022-05-17)
+
+
+### Bug Fixes
+
+* add duplicated field to SelectedItem in PTextInput ([#956](https://github.com/spaceone-dev/spaceone-design-system/issues/956)) ([4dccb13](https://github.com/spaceone-dev/spaceone-design-system/commit/4dccb1319da50b2eb44f7d5df79dd23b01b29439))
+
 # [1.1.0-beta.302](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.301...v1.1.0-beta.302) (2022-05-17)
 
 
