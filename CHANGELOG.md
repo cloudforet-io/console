@@ -1,3 +1,10 @@
+# [1.1.0-beta.302](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.301...v1.1.0-beta.302) (2022-05-17)
+
+
+### Bug Fixes
+
+* fix splice bug in PTextInput ([#955](https://github.com/spaceone-dev/spaceone-design-system/issues/955)) ([66cffe4](https://github.com/spaceone-dev/spaceone-design-system/commit/66cffe4f2057540187b440c69d95890f2f0980b6))
+
 # [1.1.0-beta.301](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.300...v1.1.0-beta.301) (2022-05-17)
 
 
