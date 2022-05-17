@@ -52,7 +52,7 @@ export default defineComponent({
             }),
             memberType: computed(() => {
                 if (state.isDomainOwner) return i18n.t('IDENTITY.USER.MAIN.ROOT_ACCOUNT');
-                return 'IDENTITY.USER.MAIN.SPACEONE_USER';
+                return i18n.t('IDENTITY.USER.MAIN.SPACEONE_USER');
             }),
             header: computed(() => MENU_INFO_MAP[MENU_ID.MY_PAGE].label),
             menuSet: computed<LNBMenu[]>(() => filterLNBMenuByPermission([
