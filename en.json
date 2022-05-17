@@ -1101,10 +1101,8 @@
 			"FORM": {
 				"ALL": "All",
 				"ALT_E_CREATE_ROLE": "Failed to create role",
-				"ALT_E_DELETE_ROLE": "Failed to delete role",
 				"ALT_E_UPDATE_ROLE": "Failed to update role",
 				"ALT_S_CREATE_ROLE": "Successfully created role",
-				"ALT_S_DELETE_ROLE": "Successfully deleted role",
 				"ALT_S_UPDATE_ROLE": "Successfully updated role",
 				"CANCEL": "Cancel",
 				"CREATE": "Create",

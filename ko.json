@@ -1101,10 +1101,8 @@
 			"FORM": {
 				"ALL": "전체",
 				"ALT_E_CREATE_ROLE": "역할(Role) 생성 실패",
-				"ALT_E_DELETE_ROLE": "역할(Role) 삭제 실패",
 				"ALT_E_UPDATE_ROLE": "역할(Role) 변경 실패",
 				"ALT_S_CREATE_ROLE": "역할(Role) 생성 완료",
-				"ALT_S_DELETE_ROLE": "역할(Role) 삭제 완료",
 				"ALT_S_UPDATE_ROLE": "역할(Role) 변경 완료",
 				"CANCEL": "취소",
 				"CREATE": "생성",
