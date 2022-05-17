@@ -76,7 +76,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.role-page {
+.role-create-page {
     @apply mx-0;
     max-width: 100%;
 }
