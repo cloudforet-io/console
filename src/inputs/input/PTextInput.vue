@@ -181,9 +181,14 @@ export default {
         });
 
         const handleDeleteTag = (val, idx) => {
-            const _proxySelectedValue = [...state.proxySelectedValue];
-            _proxySelectedValue.splice(idx, 1);
-            state.proxySelectedValue = _proxySelectedValue;
+            const _selectedItems: SelectedItem[] = [...state.proxySelectedValue];
+            _selectedItems.splice(idx, 1);
+
+            const _selectedValues = _selectedItems.map(d => d.value);
+            _selectedItems.forEach((selected, sIdx) => {
+                selected.duplicated = _selectedValues.slice(0, sIdx).includes(selected.value);
+            });
+            state.proxySelectedValue = _selectedItems;
             state.deleteTargetIdx = -1;
             state.deleteTarget = undefined;
             emit('delete-tag', val, idx);
@@ -240,7 +245,12 @@ export default {
         };
 
         const handleSelectMenuItem = ({ label, name }: SearchDropdownMenuItem) => {
-            state.proxySelectedValue = [...state.proxySelectedValue, { label, value: name }];
+            const _selectedItems = [...state.proxySelectedValue, { label, value: name }];
+            const _selectedValues = _selectedItems.map(d => d.value);
+            _selectedItems.forEach((selected, idx) => {
+                selected.duplicated = _selectedValues.slice(0, idx).includes(selected.value);
+            });
+            state.proxySelectedValue = _selectedItems;
             state.proxyValue = '';
             hideMenu();
         };
