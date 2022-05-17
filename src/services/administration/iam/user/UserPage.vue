@@ -2,14 +2,16 @@
     <section class="user-page">
         <p-page-title title="User"
                       use-selected-count
+                      use-total-count
+                      :total-count="totalCount"
                       :selected-count="selectedIndex.length"
         />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
-                <user-management-table :table-height="height" />
+                <user-management-table :table-height="height" @update-total-count="handleUpdateTotalCount" />
             </template>
         </p-horizontal-layout>
-        <user-management-tab :selected-index="selectedIndex" :selected-users="selectedUsers" />
+        <user-management-tab />
     </section>
 </template>
 
@@ -23,9 +25,9 @@ import {
 } from '@spaceone/design-system';
 
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-import { User } from '@/services/administration/iam/user/type';
 import UserManagementTab from '@/services/administration/iam/user/modules/user-management-tab/UserManagementTab.vue';
 import UserManagementTable from '@/services/administration/iam/user/modules/UserManagementTable.vue';
+import { administrationStore } from '@/services/administration/store';
 
 export default {
     name: 'UserPage',
@@ -37,19 +39,16 @@ export default {
     },
     setup() {
         const state = reactive({
-            // selected
-            selectedIndex: [],
-            selectedUsers: computed(() => {
-                const users = [] as User[];
-                state.selectedIndex.map(d => users.push(state.users[d]));
-                return users;
-            }),
-            isSelected: computed(() => state.selectedIndex.length > 0),
+            selectedIndex: computed<number[]>(() => administrationStore.state.user.selectedIndex),
+            totalCount: 0,
         });
+
+        const handleUpdateTotalCount = (value) => { state.totalCount = value; };
 
         return {
             ...toRefs(state),
             userStateFormatter,
+            handleUpdateTotalCount,
         };
     },
 

@@ -140,7 +140,7 @@ export default {
             default: 400,
         },
     },
-    setup() {
+    setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const userListApiQueryHelper = new ApiQueryHelper()
             .setPageStart(1).setPageLimit(15)
@@ -424,6 +424,10 @@ export default {
 
         watch(() => state.selectedIndex, (after) => {
             saveSelectedValueToStore(after);
+        });
+
+        watch(() => state.totalCount, (value: number) => {
+            emit('update-total-count', value);
         });
 
         return {
