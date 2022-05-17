@@ -7,7 +7,7 @@
                                       @update-form="handleUpdatePageAccessForm"
         />
         <policy-list-data-table class="policy-list-data-table"
-                                :initial-role-data="initialRoleData"
+                                :initial-policy-list="selectedPolicyList"
                                 :selectable="true"
                                 :anchor-icon-visible="true"
                                 @update-selected-policy-list="handleUpdatePolicy"
@@ -81,7 +81,6 @@ export default {
             isBaseInformationValid: false,
             baseInfoFormData: {} as BaseInfoFormData,
             pageAccessFormData: [] as PagePermission[],
-            initialPolicyList: [] as Policy[],
             isAllValid: computed(() => isPolicySectionValid.value && state.isBaseInformationValid),
             formData: computed(() => ({
                 name: state.baseInfoFormData.roleName,
