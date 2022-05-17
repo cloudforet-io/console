@@ -50,9 +50,9 @@ export default {
             dashboardListLoading: computed<boolean>(() => costExplorerStore.state?.dashboardListLoading ?? true),
             header: computed(() => MENU_INFO_MAP[MENU_ID.COST_EXPLORER].label),
             topTitle: computed(() => {
-                if (isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_DASHBOARD)) {
+                if (isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_DASHBOARD, store.getters['user/pagePermissionList'])) {
                     return {
-                        label: MENU_ID.COST_EXPLORER_DASHBOARD,
+                        label: MENU_INFO_MAP[MENU_ID.COST_EXPLORER_DASHBOARD].label,
                         visibleAddButton: true,
                         addButtonLink: { name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME },
                     };
