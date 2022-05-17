@@ -1,6 +1,6 @@
 <template>
     <section class="user-page">
-        <p-page-title title="User"
+        <p-page-title :title="$t('IDENTITY.USER.MAIN.TITLE')"
                       use-selected-count
                       use-total-count
                       :total-count="totalCount"
