@@ -13,18 +13,15 @@ export function useProxyValue<T = any>(
     const setProxyValue = (value: T) => {
         (proxyValue.value as T) = value;
         if (!extraEventNames) {
-            console.log('test1');
             emit(`update:${name}`, value);
             return;
         }
 
         if (Array.isArray(extraEventNames)) {
-            console.log('test3');
             extraEventNames.forEach((eventName) => {
                 emit(eventName, value);
             });
         } else {
-            console.log('test2');
             emit(extraEventNames, value);
         }
     };

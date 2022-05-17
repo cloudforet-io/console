@@ -238,7 +238,7 @@ export default {
         };
 
         const handleSelectMenuItem = ({ label, name }: SearchDropdownMenuItem) => {
-            state.proxySelectedValue.push({ label, value: name });
+            state.proxySelectedValue = [...state.proxySelectedValue, { label, value: name }];
             state.proxyValue = '';
             hideMenu();
         };
