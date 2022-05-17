@@ -93,7 +93,7 @@ export default {
         const checkDeleteState = reactive({
             visible: false,
             headerTitle: 'Are you sure you want to delete dashboard?',
-            loading: true,
+            loading: false,
         });
 
         const handleClickDeleteDashboard = () => {
