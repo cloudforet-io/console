@@ -120,6 +120,7 @@ export default defineComponent({
         height: 100%;
     }
     $max-height: 20rem;
+
     .sidebar-wrapper {
         @apply border-gray-200;
         position: fixed;
