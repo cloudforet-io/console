@@ -103,6 +103,9 @@ export default {
     font-size: 0.875rem;
     line-height: 1.3125rem;
     margin-bottom: 1.5rem;
+    .p-anchor {
+        line-height: 1.3125;
+    }
     &:last-child {
         margin-bottom: 0;
     }

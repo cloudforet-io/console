@@ -144,6 +144,9 @@ export default {
 
     .policy-create-contents {
         margin-bottom: 1.125rem;
+        .p-text-input {
+            width: 70%;
+        }
     }
 
     .policy-modify-buttons {
