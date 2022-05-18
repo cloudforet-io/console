@@ -31,7 +31,6 @@
 
 <script lang="ts">
 import { find } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
 
 import {
     computed, PropType, reactive, toRefs, watch,
@@ -42,36 +41,12 @@ import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
 import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 import {
-    getPagePermissionMap, getPermissionRequiredMenuIds, PAGE_PERMISSION_TYPE, PagePermission,
+    getPagePermissionMap, PAGE_PERMISSION_TYPE, PagePermission,
 } from '@/lib/access-control/page-permission-helper';
+import { getPageAccessMenuList } from '@/services/administration/iam/role/lib/page-access-helper';
 import { i18n } from '@/translations';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
-import { MENU_LIST } from '@/lib/menu/menu-architecture';
-import { Menu } from '@/lib/menu/config';
 
 
-const flattenSubMenuList = (subMenuList?: Menu[], labels?: Array<string|TranslateResult>): PageAccessMenuItem[] => {
-    if (!subMenuList) return [];
-    let results: PageAccessMenuItem[] = [];
-    subMenuList.forEach((subMenu) => {
-        const permissionRequiredMenuIdList = getPermissionRequiredMenuIds();
-        if (!permissionRequiredMenuIdList.includes(subMenu.id)) return;
-
-        const menuInfo = MENU_INFO_MAP[subMenu.id];
-        if (subMenu.subMenuList?.length) {
-            results = results.concat(flattenSubMenuList(subMenu.subMenuList, [...labels || [], menuInfo.label]));
-        } else {
-            results.push({
-                id: subMenu.id,
-                labels: [...labels || [], menuInfo.label],
-                isViewed: false,
-                isManaged: false,
-                hideMenu: false,
-            });
-        }
-    });
-    return results;
-};
 const getPagePermissions = (menuItems: PageAccessMenuItem[]): PagePermission[] => {
     const allItem = find(menuItems, { id: 'all' });
     if (allItem && allItem.isManaged) return [{ page: '*', permission: PAGE_PERMISSION_TYPE.MANAGE }];
@@ -111,24 +86,6 @@ export default {
             menuItems: [] as PageAccessMenuItem[],
         });
         const state = reactive({
-            allMenuList: computed<PageAccessMenuItem[]>(() => {
-                const permissionRequiredMenuIdList = getPermissionRequiredMenuIds();
-                const results: PageAccessMenuItem[] = [];
-                MENU_LIST.forEach((menu) => {
-                    if (permissionRequiredMenuIdList.includes(menu.id)) {
-                        const menuInfo = MENU_INFO_MAP[menu.id];
-                        results.push({
-                            id: menu.id,
-                            labels: [menuInfo.label],
-                            isViewed: false,
-                            isManaged: false,
-                            hideMenu: false,
-                            subMenuList: flattenSubMenuList(menu?.subMenuList),
-                        });
-                    }
-                });
-                return results;
-            }),
             hideAllMenu: computed(() => formState.menuItems.find(d => d.id === 'all')?.hideMenu),
             pagePermissions: computed<PagePermission[]>(() => getPagePermissions(formState.menuItems)),
         });
@@ -174,21 +131,22 @@ export default {
             }
         };
 
+        /* Init */
+        (async () => {
+            const pageAccessMenuList = getPageAccessMenuList();
+            formState.menuItems = [
+                {
+                    id: 'all',
+                    labels: [i18n.t('IAM.ROLE.FORM.ALL')],
+                    isViewed: false,
+                    isManaged: false,
+                    hideMenu: false,
+                },
+                ...pageAccessMenuList,
+            ];
+        })();
+
         /* Watcher */
-        watch(() => state.allMenuList, (menuList) => {
-            if (menuList.length) {
-                formState.menuItems = [
-                    {
-                        id: 'all',
-                        labels: [i18n.t('IAM.ROLE.FORM.ALL')],
-                        isViewed: false,
-                        isManaged: false,
-                        hideMenu: false,
-                    },
-                    ...state.allMenuList,
-                ];
-            }
-        }, { immediate: true });
         watch(() => state.pagePermissions, (after) => {
             emit('update-form', after);
         });

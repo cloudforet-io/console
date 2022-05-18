@@ -14,11 +14,11 @@
             </template>
         </p-definition-table>
         <p-panel-top>{{ pageAccessState.title }}</p-panel-top>
-        <div v-for="pagePermissionState in pageAccessState.pagePermissionStates" :key="pagePermissionState.id">
+        <div v-for="pageAccessData in pageAccessState.pageAccessDataList" :key="pageAccessData.label">
             <h4 class="definition-table-header">
-                {{ pagePermissionState.label }}
+                {{ pageAccessData.label }}
             </h4>
-            <p-definition-table :fields="pagePermissionState.fields" :data="pagePermissionState.data" :loading="pageAccessState.loading"
+            <p-definition-table :fields="pageAccessData.fields" :data="pageAccessData.data" :loading="pageAccessState.loading"
                                 :skeleton-rows="3" disable-copy class="page-access-table"
                                 v-on="$listeners"
             >
@@ -61,7 +61,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPanelTop, PDefinitionTable, PBadge, PDataTable, PAnchor,
+    PAnchor, PBadge, PDataTable, PDefinitionTable, PPanelTop,
 } from '@spaceone/design-system';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
@@ -69,33 +69,26 @@ import { i18n } from '@/translations';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
-import { EXCEPTION_MENU, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
-import { RoleData } from '@/services/administration/iam/role/type';
-import { MENU_ID, MenuId } from '@/lib/menu/config';
-import {
-    DataTableField,
-} from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
+import { PageAccessDefinitionTableData, RoleData } from '@/services/administration/iam/role/type';
+import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { TranslateResult } from 'vue-i18n';
 import { POLICY_TYPES, PolicyTypes } from '@/services/administration/iam/policy/lib/config';
 import {
-    getPagePermissionMap, PAGE_PERMISSION_TYPE, PagePermissionType,
+    getPagePermissionMap,
+    PAGE_PERMISSION_TYPE,
+    PagePermission,
 } from '@/lib/access-control/page-permission-helper';
 import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 import { policyTypeBadgeColorFormatter } from '@/services/administration/iam/policy/lib/helper';
-import { GNBMenu } from '@/store/modules/display/type';
-import { DefinitionField } from '@spaceone/design-system/dist/src/data-display/tables/definition-table/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { getPageAccessDefinitionTableData } from '@/services/administration/iam/role/lib/page-access-helper';
 
 type DataTableTranslationField = DataTableField | {
     label?: TranslateResult | string;
 }
 
-type PageAccessDataState = Record<string, PagePermissionType | '--'>;
 
-interface PageAccessState extends GNBMenu {
-    data?: PageAccessDataState;
-    fields?: DefinitionField[];
-}
 export default {
     name: 'UserDetail',
     components: {
@@ -125,15 +118,10 @@ export default {
             ]),
             data: {} as Partial<RoleData>,
         });
-
         const pageAccessState = reactive({
             title: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS'),
             loading: false,
-            allMenuList: computed<GNBMenu[]>(() => {
-                const allMenu = store.getters['display/allGnbMenuList'];
-                return (allMenu ?? []).filter(d => !EXCEPTION_MENU.includes(d.id));
-            }),
-            pagePermissionStates: [] as PageAccessState[],
+            pageAccessDataList: [] as PageAccessDefinitionTableData[],
         });
         const policyState = reactive({
             fields: [
@@ -145,48 +133,28 @@ export default {
             items: [] as (PolicyDataModel | { policy_type: PolicyTypes })[],
         });
 
-        const initPageAccessData = (pageAccessDataList: PageAccessState[]): PageAccessState[] => pageAccessDataList.map((pageAccessData) => {
-            const multiDepthMenuList = [MENU_ID.ADMINISTRATION] as MenuId[];
-            const subMenu = pageAccessData.subMenuList;
-            if (!pageAccessData?.data || !subMenu) return pageAccessData;
-            if (!subMenu.length) {
-                pageAccessData.data[pageAccessData?.id] = '--';
-                pageAccessData.fields = [{
-                    name: pageAccessData.id,
-                    label: pageAccessData.label,
-                }];
-            } else if (!multiDepthMenuList.includes(pageAccessData.id)) {
-                pageAccessData.data[subMenu[0]?.id] = '--';
-                pageAccessData.fields = (subMenu ?? []).map(menu => ({
-                    name: menu.id,
-                    label: menu.label,
-                }));
-            } else {
-                const grandChildMenu = subMenu[0].subMenuList;
-                if (!grandChildMenu) return pageAccessData;
-                pageAccessData.data[grandChildMenu[0].id] = '--';
-                pageAccessData.fields = grandChildMenu.map(menu => ({
-                    name: menu.id,
-                    label: `${subMenu[0].label} > ${menu.label}`,
-                }));
+        /* Api */
+        const getPolicy = async (policy) => {
+            try {
+                let res;
+                if (policy.policy_type === POLICY_TYPES.MANAGED) {
+                    res = await SpaceConnector.client.repository.policy.get({
+                        policy_id: policy.policy_id,
+                        policy_type: policy.policy_type,
+                    });
+                } else {
+                    res = await SpaceConnector.client.identity.policy.get({
+                        policy_id: policy.policy_id,
+                        policy_type: policy.policy_type,
+                    });
+                }
+                res.policy_type = policy.policy_type;
+                return res;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return undefined;
             }
-            return pageAccessData;
-        });
-        const convertPagePermissionData = () => {
-            const pageAccessDataInitialValue = pageAccessState.allMenuList.map(menuState => ({
-                ...menuState,
-                data: {},
-                fields: [],
-            })) as PageAccessState[];
-            const pageAccessData = initPageAccessData(pageAccessDataInitialValue);
-            const transFormedPagePermission = getPagePermissionMap(baseInfoState.data.page_permissions ?? []);
-            Object.keys(transFormedPagePermission).forEach((pagePermission) => {
-                const selectedPageAccessData = pageAccessData.find(gnb => gnb.id === pagePermission.split('.')[0]);
-                if (selectedPageAccessData?.data) selectedPageAccessData.data[pagePermission] = transFormedPagePermission[pagePermission];
-            });
-            return pageAccessData;
         };
-
         const getRoleDetailData = async (roleId) => {
             baseInfoState.loading = true;
             pageAccessState.loading = true;
@@ -194,29 +162,6 @@ export default {
                 baseInfoState.data = await SpaceConnector.client.identity.role.get({
                     role_id: roleId,
                 });
-
-                pageAccessState.pagePermissionStates = convertPagePermissionData();
-                policyState.items = [];
-                await Promise.all((baseInfoState.data.policies ?? []).map(async (policy) => {
-                    try {
-                        let res;
-                        if (policy.policy_type === POLICY_TYPES.MANAGED) {
-                            res = await SpaceConnector.client.repository.policy.get({
-                                policy_id: policy.policy_id,
-                                policy_type: policy.policy_type,
-                            });
-                        } else {
-                            res = await SpaceConnector.client.identity.policy.get({
-                                policy_id: policy.policy_id,
-                                policy_type: policy.policy_type,
-                            });
-                        }
-                        res.policy_type = policy.policy_type;
-                        policyState.items.push(res);
-                    } catch (e) {
-                        ErrorHandler.handleError(e);
-                    }
-                }));
             } catch (e) {
                 ErrorHandler.handleError(e);
                 baseInfoState.data = {};
@@ -235,9 +180,27 @@ export default {
                 return '--';
             }
         };
-        watch(() => props.roleId, () => {
+
+        /* Init */
+        const initPageAccessData = (pagePermissions: PagePermission[] = []) => {
+            const pagePermissionMap = getPagePermissionMap(pagePermissions);
+            pageAccessState.pageAccessDataList = getPageAccessDefinitionTableData(pagePermissionMap);
+        };
+        const initPolicy = async (policies) => {
+            policyState.items = [];
+            await Promise.all(policies.map(async (policy) => {
+                const result = await getPolicy(policy);
+                if (result) policyState.items.push(result);
+            }));
+        };
+
+        /* Watcher */
+        watch(() => props.roleId, async () => {
             const roleId = props.roleId;
-            getRoleDetailData(roleId);
+            await getRoleDetailData(roleId);
+            //
+            initPageAccessData(baseInfoState.data?.page_permissions);
+            await initPolicy(baseInfoState.data.policies ?? []);
         }, { immediate: true });
 
         return {
