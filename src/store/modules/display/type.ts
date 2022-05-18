@@ -26,4 +26,5 @@ export interface SidebarProps {
     styleType: string;
     disableButton: boolean;
     size: string;
+    disableScroll: boolean;
 }

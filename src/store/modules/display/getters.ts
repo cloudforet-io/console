@@ -22,9 +22,30 @@ export const isHandbookVisible: Getter<DisplayState, any> = (state): boolean => 
 export const currencySymbol: Getter<DisplayState, any> = (state): string => CURRENCY_SYMBOL[state.currency] ?? '$';
 
 export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarProps> => {
-    if (state.sidebarType === SIDEBAR_TYPE.info) return { styleType: 'primary', disableButton: false, size: 'md' };
-    if (state.sidebarType === SIDEBAR_TYPE.handbook) return { styleType: 'secondary', disableButton: false, size: 'md' };
-    if (state.sidebarType === SIDEBAR_TYPE.widget) return { styleType: 'primary', disableButton: true, size: 'sm' };
+    if (state.sidebarType === SIDEBAR_TYPE.info) {
+        return {
+            styleType: 'primary',
+            disableButton: false,
+            size: 'md',
+            disableScroll: false,
+        };
+    }
+    if (state.sidebarType === SIDEBAR_TYPE.handbook) {
+        return {
+            styleType: 'secondary',
+            disableButton: false,
+            size: 'md',
+            disableScroll: true,
+        };
+    }
+    if (state.sidebarType === SIDEBAR_TYPE.widget) {
+        return {
+            styleType: 'primary',
+            disableButton: true,
+            size: 'sm',
+            disableScroll: false,
+        };
+    }
     return { styleType: 'primary', disableButton: false, size: 'md' };
 };
 
