@@ -240,15 +240,10 @@ export default {
         watch(() => state.totalCount as number, (value: number) => {
             emit('update-total-count', value);
         });
-        watch(() => state.selectedIdMap, (selectedIdMap) => {
-            const selectedIdList = Object.keys(selectedIdMap);
-            const selectedPolicyList: Policy[] = [];
-            state.policyList.forEach((d) => {
-                if (selectedIdList.includes(d.policy_id)) {
-                    selectedPolicyList.push({ policy_id: d.policy_id, policy_type: d.policy_type });
-                }
-            });
-            emit('update-selected-policy-list', selectedPolicyList);
+        watch(() => props.initialPolicyList, (initialPolicyList: Policy[]) => {
+            if (initialPolicyList.length) {
+                emit('update-selected-policy-list', initialPolicyList);
+            }
         });
 
         /* Init */

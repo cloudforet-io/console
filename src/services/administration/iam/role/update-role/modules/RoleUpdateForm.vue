@@ -7,7 +7,7 @@
                                       @update-form="handleUpdatePageAccessForm"
         />
         <policy-list-data-table class="policy-list-data-table"
-                                :initial-policy-list="selectedPolicyList"
+                                :initial-policy-list="initialSelectedPolicyList"
                                 :selectable="true"
                                 :anchor-icon-visible="true"
                                 @update-selected-policy-list="handleUpdatePolicy"
@@ -22,7 +22,7 @@
             </template>
             <template #toolbox-table-bottom>
                 <div class="help-text-wrapper">
-                    <p v-if="!isPolicySectionValid" class="policy-list-invalid-text">
+                    <p v-if="invalidState.selectedPolicyList" class="policy-list-invalid-text">
                         {{ invalidTexts.selectedPolicyList }}
                     </p>
                 </div>
@@ -70,17 +70,22 @@ export default {
                 selectedPolicyList,
             },
             setForm,
+            invalidState,
             invalidTexts,
             isAllValid: isPolicySectionValid,
         } = useFormValidator({
             selectedPolicyList: [] as Policy[],
         }, {
-            selectedPolicyList(value: Policy[]) { return value.length ? '' : i18n.t('IAM.ROLE.FORM.VALIDATION_API_POLICY'); },
+            selectedPolicyList(val: Policy[]) {
+                if (!val.length) return i18n.t('IAM.ROLE.FORM.VALIDATION_API_POLICY');
+                return true;
+            },
         });
         const state = reactive({
             isBaseInformationValid: false,
             baseInfoFormData: {} as BaseInfoFormData,
             pageAccessFormData: [] as PagePermission[],
+            initialSelectedPolicyList: [] as Policy[],
             isAllValid: computed(() => isPolicySectionValid.value && state.isBaseInformationValid),
             formData: computed(() => ({
                 name: state.baseInfoFormData.roleName,
@@ -115,7 +120,10 @@ export default {
                 roleType: initialRoleData?.role_type,
             };
             state.pageAccessFormData = props.initialRoleData?.page_permissions;
-            setForm('selectedPolicyList', initialRoleData?.policies);
+            if (initialRoleData?.policies?.length) {
+                state.initialSelectedPolicyList = initialRoleData.policies;
+                setForm('selectedPolicyList', initialRoleData.policies);
+            }
         });
         return {
             ...toRefs(state),
@@ -125,6 +133,7 @@ export default {
             handleUpdatePageAccessForm,
             selectedPolicyList,
             invalidTexts,
+            invalidState,
             isPolicySectionValid,
         };
     },
