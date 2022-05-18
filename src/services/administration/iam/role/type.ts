@@ -2,7 +2,8 @@ import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 import { Tags } from '@/models';
 import { ROLE_TYPE } from '@/services/administration/iam/role/config';
 import { TranslateResult } from 'vue-i18n';
-import { PagePermission } from '@/lib/access-control/page-permission-helper';
+import { PagePermission, PagePermissionType } from '@/lib/access-control/page-permission-helper';
+import { DefinitionField } from '@spaceone/design-system/dist/src/data-display/tables/definition-table/type';
 
 export interface Policy {
     policy_id: string;
@@ -29,4 +30,9 @@ export interface PageAccessMenuItem {
     isManaged: boolean;
     hideMenu: boolean;
     subMenuList?: PageAccessMenuItem[];
+}
+export interface PageAccessDefinitionTableData {
+    label?: string;
+    data: Record<string, PagePermissionType | '--'>;
+    fields: DefinitionField[];
 }
