@@ -1,16 +1,18 @@
 <template>
-    <p-button-modal
-        :visible.sync="proxyVisible"
-        :header-title="$t('IAM.POLICY.MODAL.EDIT_TITLE')"
-        size="sm"
-        @confirm="handleConfirm"
-    >
-        <template #body>
-            <p-field-group :label="$t('IAM.POLICY.MODAL.NAME')" required>
-                <p-text-input :value="policyNameInput" @input="handleNameEditInput" />
-            </p-field-group>
-        </template>
-    </p-button-modal>
+    <section class="policy-name-edit-modal">
+        <p-button-modal
+            :visible.sync="proxyVisible"
+            :header-title="$t('IAM.POLICY.MODAL.EDIT_TITLE')"
+            size="sm"
+            @confirm="handleConfirm"
+        >
+            <template #body>
+                <p-field-group :label="$t('IAM.POLICY.MODAL.NAME')" required>
+                    <p-text-input :value="policyNameInput" @input="handleNameEditInput" />
+                </p-field-group>
+            </template>
+        </p-button-modal>
+    </section>
 </template>
 
 <script lang="ts">
@@ -83,3 +85,10 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.policy-name-edit-modal {
+    .p-text-input {
+        width: 100%;
+    }
+}
+</style>

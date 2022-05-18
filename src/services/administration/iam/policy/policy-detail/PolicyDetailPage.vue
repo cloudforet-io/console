@@ -203,6 +203,9 @@ export default defineComponent<PolicyDetailPageProps>({
     }
     .policy-detail-contents {
         margin-bottom: 1.125rem;
+        .p-text-input {
+            width: 70%;
+        }
         & p {
             @apply text-sm text-gray-900;
         }
