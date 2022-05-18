@@ -68,7 +68,7 @@
                           :key="`item-label--${text}-${i}`"
                           :class="{ 'selected': searchDropdownType === SEARCH_DROPDOWN_TYPE.default && item.name === selectedNames[0] }"
                     >
-                        <strong v-if="i !== 0">{{ getMatchText(item.label) }}</strong><span>{{ text }}</span>
+                        <span v-if="i !== 0" class="font-bold">{{ getMatchText(item.label) }}</span><span>{{ text }}</span>
                     </span>
                 </span>
             </template>
