@@ -19,7 +19,7 @@
             </div>
             <router-link
                 v-if="item.type === MENU_ITEM_TYPE.ITEM && showMenu" class="menu-item"
-                :class="[{'second-depth': depth === 2}, {'selected': checkSelectedMenu(item.to)}]"
+                :class="[{'second-depth': depth === 2}, {'selected': isSelectedMenu(item.to)}]"
                 :to="item.to"
                 @click.native="$event.stopImmediatePropagation()"
                 @mouseenter.native="hoveredItem = item.id"
@@ -55,14 +55,14 @@ import {
 } from '@vue/composition-api';
 import { LNBMenu, MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 import { Location } from 'vue-router';
-import { isEqual } from 'lodash';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { store } from '@/store';
+import { SpaceRouter } from '@/router';
 
 interface Props {
     menuData: LNBMenu;
-    currentRoute: Location|undefined;
+    currentPath: string;
 }
 
 export default defineComponent<Props>({
@@ -78,8 +78,8 @@ export default defineComponent<Props>({
         menuData: {
             type: [Object, Array] as PropType<LNBMenu>,
         },
-        currentRoute: {
-            type: Object as PropType<Location|undefined>,
+        currentPath: {
+            type: String,
             default: undefined,
         },
         depth: {
@@ -102,12 +102,18 @@ export default defineComponent<Props>({
             state.isFolded = !state.isFolded;
         };
 
-        const checkSelectedMenu = (selectedMenuRoute: Location) => {
-            const currentRoute = props.currentRoute;
-            if (currentRoute?.name !== selectedMenuRoute.name) return false;
-            if (selectedMenuRoute.params) {
-                return isEqual(currentRoute?.params, selectedMenuRoute.params);
-            } return true;
+        const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
+            let currentPath = props.currentPath;
+            if (!currentPath) return false;
+
+            const resolved = SpaceRouter.router.resolve(selectedMenuRoute);
+            if (!resolved) return false;
+
+            let resolvedHref = resolved.href;
+            if (!currentPath.endsWith('/')) currentPath += '/';
+            if (!resolvedHref.endsWith('/')) resolvedHref += '/';
+
+            return currentPath.startsWith(resolvedHref);
         };
 
         const getIsHovered = (itemId: string) => state.hoveredItem && state.hoveredItem === itemId;
@@ -115,7 +121,7 @@ export default defineComponent<Props>({
         return {
             ...toRefs(state),
             handleToggle,
-            checkSelectedMenu,
+            isSelectedMenu,
             FAVORITE_TYPE,
             MENU_ITEM_TYPE,
             getIsHovered,
