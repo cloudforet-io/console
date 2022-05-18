@@ -31,7 +31,7 @@
                 </router-link>
             </div>
             <l-n-b-menu-item v-for="(menuData, idx) in menuSet" :key="`${idx}-${getUUID()}`" :menu-data="menuData"
-                             :current-route="currentRoute"
+                             :current-path="currentPath"
                              :depth="Array.isArray(menuData) ? 2 : 1"
             >
                 <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -83,7 +83,7 @@ export default {
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            currentRoute: computed(() => ({ name: vm.$route.name, params: vm.$route.params })),
+            currentPath: computed(() => vm.$route.fullPath),
         });
 
         return {
