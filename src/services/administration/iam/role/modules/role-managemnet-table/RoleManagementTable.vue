@@ -96,7 +96,6 @@ import { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { i18n } from '@/translations';
-import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
 
 const DEFAULT_PAGE_LIMIT = 15;
 
@@ -143,12 +142,7 @@ export default defineComponent({
             },
         });
         const state = reactive({
-            pagePermissionList: computed<boolean>(() => store.getters['user/pagePermissionList']),
-            hasManagePermission: computed(() => {
-                const currentPermission = state.pagePermissionList.find(([permissionId]) => permissionId === currentRoute.name);
-                const type = currentPermission[1];
-                return type === PAGE_PERMISSION_TYPE.MANAGE;
-            }),
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             loading: false,
             totalCount: 0,
             dropdownMenu: computed(() => ([
