@@ -18,10 +18,10 @@ import {
 } from '@vue/composition-api';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
-import { get } from 'lodash';
 import {
     MarkdownDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/markdown/type';
+import { getValueByPath } from '@/data-display/dynamic/helper';
 
 
 export default {
@@ -57,7 +57,7 @@ export default {
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
             rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
-                    return get(props.data, props.options.root_path);
+                    return getValueByPath(props.data, props.options.root_path);
                 }
                 return props.data;
             }),

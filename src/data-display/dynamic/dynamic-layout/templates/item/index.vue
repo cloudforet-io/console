@@ -97,7 +97,7 @@ export default {
             }),
             rootData: computed<DefinitionData>(() => {
                 if (props.options.root_path) {
-                    return get(props.data, props.options.root_path, {});
+                    return getValueByPath(props.data, props.options.root_path) ?? {};
                 }
                 if (Array.isArray(props.data) || typeof props.data === 'string') return {};
                 return props.data;

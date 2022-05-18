@@ -18,10 +18,10 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { get } from 'lodash';
 import { HtmlDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/html/type';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 import DOMPurify from 'dompurify';
+import { getValueByPath } from '@/data-display/dynamic/helper';
 import { iframeStyle } from './style';
 
 
@@ -63,7 +63,7 @@ export default {
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
             rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
-                    return get(props.data, props.options.root_path, '');
+                    return getValueByPath(props.data, props.options.root_path) ?? '';
                 }
                 if (typeof props.data !== 'string') return '';
                 return props.data;

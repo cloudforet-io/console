@@ -65,7 +65,6 @@ import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import {
     TableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/table/type';
-import { get } from 'lodash';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { Options } from '@/data-display/tables/query-search-table/type';
@@ -147,10 +146,11 @@ export default {
             /** others */
             pageStart: 1,
             rootData: computed<any[]>(() => {
-                if (Array.isArray(props.data)) return props.data;
-                if (typeof props.data === 'object' && props.options.root_path) {
-                    return get(props.data, props.options.root_path, []);
+                if (props.options.root_path) {
+                    const rootData = getValueByPath(props.data, props.options.root_path) ?? [];
+                    return Array.isArray(rootData) ? rootData : [rootData];
                 }
+                if (Array.isArray(props.data)) return props.data;
                 return [];
             }),
             dynamicFieldHeaderSlots: computed(() => {

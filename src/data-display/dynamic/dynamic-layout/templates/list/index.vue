@@ -21,13 +21,14 @@
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import { map, replace, get } from 'lodash';
+import { map, replace } from 'lodash';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
 import {
     ListDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/list/type';
 import { makeByPassListeners } from '@/util/composition-helpers';
 import { DynamicLayout } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import { getValueByPath } from '@/data-display/dynamic/helper';
 
 export default {
     name: 'PDynamicLayoutList',
@@ -62,8 +63,10 @@ export default {
         const state = reactive({
             layouts: computed<DynamicLayout[]>(() => props.options.layouts || []),
             rootData: computed(() => {
-                if (!props.options.root_path) return props.data;
-                return get(props.data, props.options.root_path, undefined);
+                if (props.options.root_path) {
+                    return getValueByPath(props.data, props.options.root_path);
+                }
+                return props.data;
             }),
             slotNames: computed(() => (map(slots, (slot: string, name) => replace(name, `${props.name}-`, '')))),
         });

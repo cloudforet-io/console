@@ -32,7 +32,6 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { get } from 'lodash';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
@@ -97,10 +96,11 @@ export default {
                 }));
             }),
             rootData: computed<any[]>(() => {
-                if (Array.isArray(props.data)) return props.data;
-                if (typeof props.data === 'object' && props.options.root_path) {
-                    return get(props.data, props.options.root_path, []);
+                if (props.options.root_path) {
+                    const rootData = getValueByPath(props.data, props.options.root_path) ?? [];
+                    return Array.isArray(rootData) ? rootData : [rootData];
                 }
+                if (Array.isArray(props.data)) return props.data;
                 return [];
             }),
             loading: computed(() => (props.typeOptions?.loading || false)),

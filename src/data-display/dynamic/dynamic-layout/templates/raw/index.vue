@@ -14,10 +14,10 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { get } from 'lodash';
 import PRawData from '@/data-display/raw-data/PRawData.vue';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 import { RawDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw/type';
+import { getValueByPath } from '@/data-display/dynamic/helper';
 
 export default {
     name: 'PDynamicLayoutRaw',
@@ -51,7 +51,8 @@ export default {
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
             rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
-                    return get(props.data, props.options.root_path);
+                    const rootData = getValueByPath(props.data, props.options.root_path) ?? [];
+                    return Array.isArray(rootData) ? rootData : [rootData];
                 }
                 if (typeof props.data !== 'object') return {};
                 return props.data;
