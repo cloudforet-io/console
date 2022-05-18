@@ -18,4 +18,6 @@ export interface ProjectPageState {
     projectGroupFormUpdateMode: boolean;
     projectGroupDeleteCheckModalVisible: boolean;
     projectFormVisible: boolean;
+
+    isProjectGroupUpdated: boolean;
 }

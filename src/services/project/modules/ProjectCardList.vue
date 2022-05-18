@@ -204,6 +204,7 @@ export default {
                 { title: i18n.t('PROJECT.LANDING.DATABASE'), summaryType: SUMMARY_TYPE.DATABASE },
                 { title: i18n.t('PROJECT.LANDING.STORAGE'), summaryType: SUMMARY_TYPE.STORAGE },
             ]),
+            isProjectGroupUpdated: computed<boolean>(() => store.state.service.project.isProjectGroupUpdated),
         });
 
         const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
@@ -345,6 +346,16 @@ export default {
                 service: arrayToQueryString([serviceType]),
                 filters: queryHelper.setFilters([{ k: 'project_id', v: [projectId], o: '=' }]).rawQueryStrings[0],
             },
+        });
+
+        // When ProjectGroup has been updated
+        watch(() => state.isProjectGroupUpdated, () => {
+            if (state.isProjectGroupUpdated) {
+                getData()
+                    .then(() => {
+                        store.commit('service/project/setIsProjectGroupUpdated', false);
+                    });
+            }
         });
 
         /* Init */

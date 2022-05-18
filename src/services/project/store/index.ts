@@ -21,6 +21,8 @@ const state: ProjectPageState = {
     projectGroupFormUpdateMode: false,
     projectGroupDeleteCheckModalVisible: false,
     projectFormVisible: false,
+
+    isProjectGroupUpdated: false,
 };
 
 export default {

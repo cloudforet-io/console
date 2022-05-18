@@ -57,3 +57,7 @@ export const setProjectGroupDeleteCheckModalVisible: Mutation<ProjectPageState> 
 export const setProjectFormVisible: Mutation<ProjectPageState> = (state, projectFormVisible: boolean) => {
     state.projectFormVisible = projectFormVisible;
 };
+
+export const setIsProjectGroupUpdated: Mutation<ProjectPageState> = (state, isProjectGroupUpdated: boolean) => {
+    state.isProjectGroupUpdated = isProjectGroupUpdated;
+};
