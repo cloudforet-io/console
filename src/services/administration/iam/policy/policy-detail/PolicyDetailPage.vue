@@ -67,8 +67,8 @@
                 />
             </div>
         </p-pane-layout>
-        <policy-delete-modal :visible.sync="visibleDeleteModal" :policy-id="policyInfo.policy_id" />
-        <policy-name-edit-modal :visible.sync="visibleTitleEditModal" :policy-id="policyInfo.policy_id" :policy-name="policyInfo.name" />
+        <policy-delete-modal :visible.sync="visibleDeleteModal" :policy-id="id" />
+        <policy-name-edit-modal :visible.sync="visibleTitleEditModal" :policy-id="id" :policy-name="policyInfo.name" />
     </section>
 </template>
 
