@@ -1,3 +1,10 @@
+# [1.1.0-beta.307](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.306...v1.1.0-beta.307) (2022-05-18)
+
+
+### Bug Fixes
+
+* add css for anchor style in DynamicField badge type & remove p-anchor css custom in TextList ([#961](https://github.com/spaceone-dev/spaceone-design-system/issues/961)) ([4d9d360](https://github.com/spaceone-dev/spaceone-design-system/commit/4d9d360bb876b0a70960d6cedab5f6073a6c4f3e))
+
 # [1.1.0-beta.306](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.305...v1.1.0-beta.306) (2022-05-18)
 
 
