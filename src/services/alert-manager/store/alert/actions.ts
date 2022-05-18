@@ -11,7 +11,7 @@ export const getAlertData = async ({ commit }, alertId: string): Promise<void|Er
         commit('setAlertData', alert);
     } catch (e: any) {
         ErrorHandler.handleError(e);
-        throw new Error(e);
+        throw e;
     }
 };
 
@@ -24,6 +24,6 @@ export const updateAlertData = async ({ commit }, params: UpdateAlertParams): Pr
         commit('setAlertData', alert);
     } catch (e: any) {
         ErrorHandler.handleError(e);
-        throw new Error(e);
+        throw e;
     }
 };
