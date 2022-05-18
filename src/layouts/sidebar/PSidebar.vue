@@ -10,7 +10,7 @@
                  class="sidebar-wrapper"
                  :class="size"
             >
-                <div class="inner">
+                <div class="inner" :style="{'overflow-y': disableScroll ? 'unset' : 'auto'}">
                     <p class="title" :class="{'mb-4': !!title || !!$scopedSlots.title}">
                         <slot name="title">
                             {{ title }}
@@ -70,6 +70,10 @@ export default defineComponent({
             validator: value => Object.keys(SIDEBAR_SIZE).includes(value as string),
         },
         hideCloseButton: {
+            type: Boolean,
+            default: false,
+        },
+        disableScroll: {
             type: Boolean,
             default: false,
         },
@@ -133,7 +137,6 @@ export default defineComponent({
         overflow: hidden;
         .inner {
             padding: 0 1.5rem;
-            overflow-y: auto;
             height: 100%;
             width: 100%;
         }
