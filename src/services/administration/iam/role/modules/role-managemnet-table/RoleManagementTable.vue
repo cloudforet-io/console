@@ -23,12 +23,14 @@
             <template slot="toolbox-left">
                 <p-button style-type="primary-dark"
                           icon="ic_plus_bold"
+                          :disabled="!hasManagePermission"
                           @click="handleCreateRole"
                 >
                     {{ $t('IAM.ROLE.CREATE') }}
                 </p-button>
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
                                    :items="dropdownMenu"
+                                   :disabled="!hasManagePermission"
                                    @select="handleSelectDropdown"
                 >
                     {{ $t('IAM.ROLE.ACTION') }}
@@ -49,11 +51,13 @@
                           style-type="gray-border"
                           :outline="true"
                           font-weight="bold"
+                          :disabled="!hasManagePermission"
                           @click="handleEditRole(item.role_id)"
                 >
                     <p-i class="mr-1" name="ic_edit"
                          width="1rem" height="1rem"
-                    />Edit
+                         color="inherit"
+                    />{{ $t('IAM.ROLE.EDIT') }}
                 </p-button>
             </template>
         </p-toolbox-table>
@@ -66,8 +70,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
-    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -92,6 +95,8 @@ import RoleDeleteModal
 import { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { replaceUrlQuery } from '@/lib/router-query-string';
+import { i18n } from '@/translations';
+import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
 
 const DEFAULT_PAGE_LIMIT = 15;
 
@@ -114,12 +119,11 @@ export default defineComponent({
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
+        const currentRoute = SpaceRouter.router.currentRoute;
         const roleListApiQueryHelper = new ApiQueryHelper()
             .setPageStart(1).setPageLimit(DEFAULT_PAGE_LIMIT)
             .setSort('name', true)
-            .setFiltersAsRawQueryString(vm.$route.query.filters);
+            .setFiltersAsRawQueryString(currentRoute.query?.filters);
 
         const roleSearchHandler = reactive({
             keyItemSets: [{
@@ -139,17 +143,23 @@ export default defineComponent({
             },
         });
         const state = reactive({
+            pagePermissionList: computed<boolean>(() => store.getters['user/pagePermissionList']),
+            hasManagePermission: computed(() => {
+                const currentPermission = state.pagePermissionList.find(([permissionId]) => permissionId === currentRoute.name);
+                const type = currentPermission[1];
+                return type === PAGE_PERMISSION_TYPE.MANAGE;
+            }),
             loading: false,
             totalCount: 0,
             dropdownMenu: computed(() => ([
                 {
                     type: 'item',
                     name: 'edit',
-                    label: vm.$t('IAM.ROLE.EDIT'),
+                    label: i18n.t('IAM.ROLE.EDIT'),
                     disabled: state.selectedIndices.length > 1 || !state.isSelected,
                 },
                 {
-                    type: 'item', name: 'delete', label: vm.$t('IAM.ROLE.DELETE'), disabled: !state.isSelected,
+                    type: 'item', name: 'delete', label: i18n.t('IAM.ROLE.DELETE'), disabled: !state.isSelected,
                 },
             ] as MenuItem[])),
             roles: [] as RoleData[],
