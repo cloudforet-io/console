@@ -1,3 +1,10 @@
+# [1.1.0-beta.304](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.303...v1.1.0-beta.304) (2022-05-18)
+
+
+### Bug Fixes
+
+* change strong tag to span ([#959](https://github.com/spaceone-dev/spaceone-design-system/issues/959)) ([b22d667](https://github.com/spaceone-dev/spaceone-design-system/commit/b22d6671312f8cbf5b82a221bc5fa7d19bdb252f))
+
 # [1.1.0-beta.303](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.302...v1.1.0-beta.303) (2022-05-17)
 
 
