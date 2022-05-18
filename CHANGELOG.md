@@ -1,3 +1,10 @@
+# [1.1.0-beta.305](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.304...v1.1.0-beta.305) (2022-05-18)
+
+
+### Bug Fixes
+
+* commit for release ([#960](https://github.com/spaceone-dev/spaceone-design-system/issues/960)) ([305294a](https://github.com/spaceone-dev/spaceone-design-system/commit/305294aaf01d94c13f32255a57eb8679432ff34c))
+
 # [1.1.0-beta.304](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.303...v1.1.0-beta.304) (2022-05-18)
 
 
