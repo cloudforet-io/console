@@ -7,6 +7,7 @@ import config from '@/lib/config';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { ERROR_ROUTE } from '@/router/error-routes';
+// eslint-disable-next-line import/no-cycle
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 // import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';

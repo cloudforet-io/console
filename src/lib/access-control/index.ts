@@ -1,10 +1,11 @@
 /* eslint-disable import/no-cycle */
-import { Route } from 'vue-router';
+import { RawLocation, Route } from 'vue-router';
 import { clone } from 'lodash';
 import { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/page-permission-helper';
 import { MenuId } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { AccessLevel, ACCESS_LEVEL } from '@/lib/access-control/config';
+import { SpaceRouter } from '@/router';
 
 const getAccessTypeFromPermission = (permission?: string | PagePermissionType): AccessLevel => {
     if (permission === 'VIEW') return 'VIEW_PERMISSION';
@@ -25,12 +26,21 @@ const getMenuIdByRouteName = (routeName?: string|null): MenuId|undefined => {
     return hasMenuId ? name as MenuId : undefined;
 };
 
-export const getRouteAccessLevel = (route: Route): AccessLevel => {
+export const getRouteAccessLevel = (routeOrLocation: Route|RawLocation): AccessLevel => {
+    let route: Route;
+    if (!(routeOrLocation as any).matched) {
+        const resolved = SpaceRouter.router.resolve(routeOrLocation as RawLocation);
+        if (resolved) route = resolved.route;
+        else return 'AUTHENTICATED';
+    } else {
+        route = routeOrLocation as Route;
+    }
     const reversedMatched = clone(route.matched).reverse();
     const closestRoute = reversedMatched.find(d => d.meta?.accessLevel !== undefined);
     if (!closestRoute) return 'AUTHENTICATED';
     return closestRoute.meta.accessLevel ?? 'AUTHENTICATED';
 };
+
 
 export const getUserAccessLevel = (routeName?: string|null, pagePermissions: PagePermissionTuple[] = [], isTokenAlive = true): AccessLevel => {
     if (!isTokenAlive) return 'EXCLUDE_AUTH';
@@ -49,7 +59,7 @@ export const isUserAccessibleToMenu = (menuId: MenuId, pagePermissions: PagePerm
     return ACCESS_LEVEL[getAccessTypeFromPermission(permission)] >= ACCESS_LEVEL[getMenuAccessLevel(menuId)];
 };
 
-export const isRouteAccessible = (route: Route, accessLevel: AccessLevel): boolean => {
-    const routeAccessLevel = getRouteAccessLevel(route);
+export const isRouteAccessible = (routeOrLocation: Route, accessLevel: AccessLevel): boolean => {
+    const routeAccessLevel = getRouteAccessLevel(routeOrLocation);
     return ACCESS_LEVEL[routeAccessLevel] >= ACCESS_LEVEL[accessLevel];
 };
