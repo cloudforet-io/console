@@ -7,7 +7,7 @@
                    :href="to ? (toHref || href ): href"
                    @click.stop="navigate"
                 >
-                    <span class="text" :class="{disabled}">
+                    <span class="text">
                         <slot v-bind="{...$props}">
                             {{ text }}
                         </slot>
@@ -114,13 +114,13 @@ export default defineComponent<Props>({
     vertical-align: middle;
     line-height: inherit;
     font-size: 0.875rem;
-    .text {
+    > .text {
         font-weight: inherit;
         font-size: inherit;
         color: inherit;
         word-break: break-all;
     }
-    .icon {
+    > .icon {
         margin-left: 0.125rem;
         margin-bottom: 0.1rem;
     }
@@ -140,11 +140,14 @@ export default defineComponent<Props>({
     }
     &:not(.disabled).highlight {
         @apply text-blue-700;
-        &:hover {
-            @apply text-blue-800;
-        }
         &:active {
             @apply text-blue-700;
+        }
+
+        @media (hover: hover) {
+            &:hover {
+                @apply text-blue-800;
+            }
         }
     }
 
@@ -162,19 +165,16 @@ export default defineComponent<Props>({
     }
 
     @media (hover: hover) {
-        &:hover {
-            .text {
+        &:not(.disabled):hover {
+            > .text {
                 @apply underline;
-            }
-            .disabled {
-                text-decoration: none;
             }
         }
     }
 
     &:not(.disabled) {
         &:focus, &:active, &focus-within {
-            .text {
+            > .text {
                 @apply underline;
             }
         }

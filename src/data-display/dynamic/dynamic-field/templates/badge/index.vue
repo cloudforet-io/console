@@ -58,7 +58,15 @@ export default {
             }, badgeEl)];
         }
 
-        return h(PBadge, { props: badgeProps }, badgeEl);
+        return h(PBadge, { props: badgeProps, class: { 'p-dynamic-field-badge': true } }, badgeEl);
     },
 };
 </script>
+
+<style lang="postcss">
+.p-dynamic-field-badge {
+    .p-anchor {
+        font-size: inherit;
+    }
+}
+</style>

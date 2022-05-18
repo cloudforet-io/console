@@ -90,12 +90,7 @@ export default defineComponent({
 <style lang="postcss">
 .p-text-list {
     line-height: 1.8;
-    .list-item {
-        .p-anchor:hover {
-            @apply underline text-secondary cursor-pointer;
-        }
-    }
-    .delimiter {
+    > .delimiter {
         white-space: pre;
     }
 }

@@ -230,6 +230,18 @@ interface BadgeOptions extends CommonOptions {
             <div>
                 <p-dynamic-field type="badge" :options="{}" data="Basic badge type"></p-dynamic-field>
                 <br/><br/>
+                <p-dynamic-field type="badge" :options="{link: 'https://www.google.com'}" data="Basic badge type with link"></p-dynamic-field>
+                <br/><br/>
+                <p-dynamic-field type="list" :options="{
+                    sub_key: 'data',
+                    item: {
+                        options: {
+                            link: 'https://www.google.com'
+                        },
+                        type: 'badge'
+                    }
+                }" :data="'Basic badge type with link in list(list will be deprecated)'.split(' ').map(d => ({ data: d}))"></p-dynamic-field>
+                <br/><br/>
                 <p-dynamic-field type="badge" :options="{outline_color: 'yellow.700', link: 'https://www.google.com'}" data="Outlined badge type with link"></p-dynamic-field>
                 <br/><br/>
                 <p-dynamic-field type="badge" :options="{shape: 'SQUARE'}" data="Square badge type"></p-dynamic-field>
