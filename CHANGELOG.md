@@ -1,3 +1,10 @@
+# [1.1.0-beta.306](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.305...v1.1.0-beta.306) (2022-05-18)
+
+
+### Features
+
+* get list if upper data by path is array as dynamic layout root data ([#957](https://github.com/spaceone-dev/spaceone-design-system/issues/957)) ([4b86f8b](https://github.com/spaceone-dev/spaceone-design-system/commit/4b86f8baddaebf3e568cf1095b408c2bd137fb01))
+
 # [1.1.0-beta.305](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.304...v1.1.0-beta.305) (2022-05-18)
 
 
