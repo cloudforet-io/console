@@ -2,7 +2,7 @@
     <delete-modal
         :visible.sync="proxyVisible"
         :header-title="attachedRoles.length ? $t('IAM.POLICY.MODAL.DELETE_CANNOT_POLICY') : $t('IAM.POLICY.MODAL.DELETE_POLICY')"
-        :only-show-footer-close-button="!!attachedRoles.length"
+        :hide-footer="!!attachedRoles.length"
         class="policy-delete-modal"
         :size="attachedRoles.length ? 'md' : 'sm'"
         @confirm="handleConfirm"
