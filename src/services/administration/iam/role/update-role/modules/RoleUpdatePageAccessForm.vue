@@ -38,29 +38,32 @@ import {
 } from '@vue/composition-api';
 
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
-import { GNBMenu } from '@/store/modules/display/type';
-import { store } from '@/store';
-import { EXCEPTION_MENU } from '@/services/administration/iam/role/config';
 import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
 import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 import {
-    getPagePermissionMap,
-    PAGE_PERMISSION_TYPE,
-    PagePermission,
+    getPagePermissionMap, getPermissionRequiredMenuIds, PAGE_PERMISSION_TYPE, PagePermission,
 } from '@/lib/access-control/page-permission-helper';
 import { i18n } from '@/translations';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { MENU_LIST } from '@/lib/menu/menu-architecture';
+import { Menu } from '@/lib/menu/config';
 
-const flattenSubMenuList = (subMenuList?: GNBMenu[], labels?: Array<string|TranslateResult>): PageAccessMenuItem[] => {
+
+const flattenSubMenuList = (subMenuList?: Menu[], labels?: Array<string|TranslateResult>): PageAccessMenuItem[] => {
     if (!subMenuList) return [];
     let results: PageAccessMenuItem[] = [];
     subMenuList.forEach((subMenu) => {
+        const permissionRequiredMenuIdList = getPermissionRequiredMenuIds();
+        if (!permissionRequiredMenuIdList.includes(subMenu.id)) return;
+
+        const menuInfo = MENU_INFO_MAP[subMenu.id];
         if (subMenu.subMenuList?.length) {
-            results = results.concat(flattenSubMenuList(subMenu.subMenuList, [...labels || [], subMenu.label]));
+            results = results.concat(flattenSubMenuList(subMenu.subMenuList, [...labels || [], menuInfo.label]));
         } else {
             results.push({
                 id: subMenu.id,
-                labels: [...labels || [], subMenu.label],
+                labels: [...labels || [], menuInfo.label],
                 isViewed: false,
                 isManaged: false,
                 hideMenu: false,
@@ -108,9 +111,23 @@ export default {
             menuItems: [] as PageAccessMenuItem[],
         });
         const state = reactive({
-            allMenuList: computed<GNBMenu[]>(() => {
-                const allMenu = store.getters['display/allGnbMenuList'];
-                return allMenu.filter(d => !EXCEPTION_MENU.includes(d.id));
+            allMenuList: computed<PageAccessMenuItem[]>(() => {
+                const permissionRequiredMenuIdList = getPermissionRequiredMenuIds();
+                const results: PageAccessMenuItem[] = [];
+                MENU_LIST.forEach((menu) => {
+                    if (permissionRequiredMenuIdList.includes(menu.id)) {
+                        const menuInfo = MENU_INFO_MAP[menu.id];
+                        results.push({
+                            id: menu.id,
+                            labels: [menuInfo.label],
+                            isViewed: false,
+                            isManaged: false,
+                            hideMenu: false,
+                            subMenuList: flattenSubMenuList(menu?.subMenuList),
+                        });
+                    }
+                });
+                return results;
             }),
             hideAllMenu: computed(() => formState.menuItems.find(d => d.id === 'all')?.hideMenu),
             pagePermissions: computed<PagePermission[]>(() => getPagePermissions(formState.menuItems)),
@@ -168,14 +185,7 @@ export default {
                         isManaged: false,
                         hideMenu: false,
                     },
-                    ...menuList.map(menu => ({
-                        id: menu.id,
-                        labels: [menu.label],
-                        isViewed: false,
-                        isManaged: false,
-                        hideMenu: false,
-                        subMenuList: flattenSubMenuList(menu?.subMenuList),
-                    })),
+                    ...state.allMenuList,
                 ];
             }
         }, { immediate: true });

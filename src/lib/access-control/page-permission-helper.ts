@@ -24,7 +24,7 @@ const getProperPermissionType = (permissionA: PagePermissionType = 'VIEW', permi
 };
 
 const menuIdList = Object.keys(MENU_INFO_MAP) as MenuId[];
-const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter((id) => {
+export const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter((id) => {
     const info = MENU_INFO_MAP[id];
     return ACCESS_LEVEL[info.accessLevel] >= ACCESS_LEVEL.VIEW_PERMISSION;
 });
