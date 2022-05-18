@@ -21,4 +21,4 @@ export const ROLE_TYPE_BADGE_OPTION = Object.freeze({
     [ROLE_TYPE.PROJECT]: { label: 'User', styleType: 'gray' },
 });
 
-export const EXCEPTION_MENU = [MENU_ID.PROJECT, MENU_ID.MY_PAGE];
+export const EXCEPTION_MENU = [MENU_ID.MY_PAGE];

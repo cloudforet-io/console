@@ -19,7 +19,8 @@
                 {{ pagePermissionState.label }}
             </h4>
             <p-definition-table :fields="pagePermissionState.fields" :data="pagePermissionState.data" :loading="pageAccessState.loading"
-                                :skeleton-rows="3" disable-copy v-on="$listeners"
+                                :skeleton-rows="3" disable-copy class="page-access-table"
+                                v-on="$listeners"
             >
                 <template #data="{ data }">
                     {{ convertPagePermissionLabel(data) }}
@@ -118,7 +119,7 @@ export default {
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             fields: computed<DataTableTranslationField[]>(() => [
                 { name: 'name', label: i18n.t('IAM.ROLE.DETAIL.NAME') },
-                { name: 'tag.description', label: i18n.t('IAM.ROLE.DETAIL.DESCRIPTION') },
+                { name: 'tags.description', label: i18n.t('IAM.ROLE.DETAIL.DESCRIPTION') },
                 { name: 'role_type', label: i18n.t('IAM.ROLE.DETAIL.ROLE_TYPE'), disableCopy: true },
                 { name: 'created_at', label: i18n.t('IAM.ROLE.DETAIL.CREATED_AT') },
             ]),
@@ -148,8 +149,14 @@ export default {
             const multiDepthMenuList = [MENU_ID.ADMINISTRATION] as MenuId[];
             const subMenu = pageAccessData.subMenuList;
             if (!pageAccessData?.data || !subMenu) return pageAccessData;
-            if (!multiDepthMenuList.includes(pageAccessData.id)) {
-                pageAccessData.data[subMenu[0].id] = '--';
+            if (!subMenu.length) {
+                pageAccessData.data[pageAccessData?.id] = '--';
+                pageAccessData.fields = [{
+                    name: pageAccessData.id,
+                    label: pageAccessData.label,
+                }];
+            } else if (!multiDepthMenuList.includes(pageAccessData.id)) {
+                pageAccessData.data[subMenu[0]?.id] = '--';
                 pageAccessData.fields = (subMenu ?? []).map(menu => ({
                     name: menu.id,
                     label: menu.label,
@@ -250,5 +257,9 @@ export default {
 <style lang="postcss" scoped>
 .definition-table-header {
     @apply ml-4 mb-3 text-violet-700 font-bold;
+}
+.page-access-table {
+    min-height: unset;
+    margin-bottom: 1rem;
 }
 </style>

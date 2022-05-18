@@ -6,6 +6,7 @@
             <p-icon-button v-if="!isSubMenu"
                            :name="menu.hideMenu ? 'ic_tree_arrow' : 'ic_tree_arrow--opened'"
                            size="sm"
+                           :disabled="isDisabled"
                            @click="handleToggleMenuVisible"
             />
             <template v-for="(label, lIdx) in menu.labels">
@@ -82,6 +83,7 @@ export default {
                 ];
                 return `<b>${title}</b></br><ul>${features.map(d => `<li>&#8729; ${d}</li>`).join('')}</ul>`;
             }),
+            isDisabled: computed(() => ((props.menu?.id === 'all') ? false : !props.menu?.subMenuList?.length)),
         });
 
         /* Event */
