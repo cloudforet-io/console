@@ -31,7 +31,7 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: 'create',
                     name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME,
-                    meta: { label: 'Create Dashboard', accessLevel: 'MANAGE_PERMISSION' },
+                    meta: { label: 'Create Dashboard' },
                     props: true,
                     component: CostDashboardCreatePage as any,
                 },
