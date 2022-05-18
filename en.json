@@ -1241,7 +1241,7 @@
 			"FORM": {
 				"ADD_TITLE": "Add User",
 				"ALREADY_EXISTS": "Already exists",
-				"ASSIGN_DOMAIN_ROLE": "Assign Domain Role",
+				"ASSIGN_DOMAIN_ROLE": "Assign Admin Role",
 				"CHECK_USER_ID": "Check ID",
 				"DOMAIN_ADMIN": "Domain Admin",
 				"EMAIL": "E-mail",
@@ -1322,6 +1322,7 @@
 				"API_KEY": "API Key",
 				"API_TABLE_DESC": "Able to create API key up to 2.",
 				"ASSIGNED_ROLES": "Assigned Roles",
+				"CREATED_AT": "Created",
 				"CREATE_API_KEY": "Create API Key",
 				"DAYS": "days",
 				"DELETE": "Delete",

@@ -1322,6 +1322,7 @@
 				"API_KEY": "API Key",
 				"API_TABLE_DESC": "API Keyは2個まで作成できます。",
 				"ASSIGNED_ROLES": "割り当てられたロール",
+				"CREATED_AT": "作成日",
 				"CREATE_API_KEY": "API Key作成",
 				"DAYS": "日前",
 				"DELETE": "削除",
