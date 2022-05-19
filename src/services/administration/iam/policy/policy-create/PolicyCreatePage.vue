@@ -61,6 +61,7 @@
 </template>
 
 <script lang="ts">
+
 import { reactive, toRefs } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -75,8 +76,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+
 import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 
 export default {
