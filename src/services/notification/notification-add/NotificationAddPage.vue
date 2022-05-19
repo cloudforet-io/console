@@ -53,7 +53,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -94,10 +94,10 @@ export default {
             project: {} as any,
             //
             userId: decodeURIComponent(vm.$route.params.userId),
-            projectId: vm.$route.query.projectId,
-            protocolId: vm.$route.params.protocolId,
-            protocolType: vm.$route.query.protocolType,
-            supportedSchema: vm.$route.query.supported_schema,
+            projectId: computed(() => vm.$route.query.projectId),
+            protocolId: computed(() => vm.$route.params.protocolId),
+            protocolType: computed(() => vm.$route.query.protocolType),
+            supportedSchema: computed(() => vm.$route.query.supported_schema),
             //
             isDataValid: false,
             notificationLevel: 'LV1',
@@ -195,6 +195,11 @@ export default {
             const protocolLabel = decodeURIComponent(vm.$route.query?.protocolLabel as any);
             state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: protocolLabel })) as unknown as TranslateResult;
         })();
+
+        onActivated(() => {
+            const protocolLabel = decodeURIComponent(vm.$route.query?.protocolLabel as any);
+            state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: protocolLabel })) as unknown as TranslateResult;
+        });
 
         return {
             ...toRefs(state),
