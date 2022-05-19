@@ -55,7 +55,7 @@
                           name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
                       }"
             >
-                {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_HEARE') }}
+                {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_LINK') }}
             </p-anchor>
         </p>
     </section>
