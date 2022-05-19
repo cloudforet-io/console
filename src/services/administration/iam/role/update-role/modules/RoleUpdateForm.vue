@@ -1,6 +1,8 @@
 <template>
     <div class="role-update-form">
-        <role-update-page-base-information :initial-form-data="baseInfoFormData" @update-validation="handleBaseInfoValidate"
+        <role-update-page-base-information :initial-form-data="baseInfoFormData"
+                                           :role-type-input-disabled="formType===FORM_TYPE.UPDATE"
+                                           @update-validation="handleBaseInfoValidate"
                                            @update-form="handleUpdateBaseInfoForm"
         />
         <role-update-page-access-form :initial-page-permissions="pageAccessFormData"
@@ -41,7 +43,7 @@ import {
 } from '@vue/composition-api';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { i18n } from '@/translations';
-import { ROLE_TYPE } from '@/services/administration/iam/role/config';
+import { FORM_TYPE, ROLE_TYPE } from '@/services/administration/iam/role/config';
 import { PagePermission } from '@/lib/access-control/page-permission-helper';
 import { Policy, RoleData } from '@/services/administration/iam/role/type';
 
@@ -62,6 +64,10 @@ export default {
         initialRoleData: {
             type: Object as PropType<RoleData>,
             default: () => ({}),
+        },
+        formType: {
+            type: String,
+            default: FORM_TYPE.CREATE,
         },
     },
     setup(props, { emit }) {
@@ -135,6 +141,7 @@ export default {
             invalidTexts,
             invalidState,
             isPolicySectionValid,
+            FORM_TYPE,
         };
     },
 };
