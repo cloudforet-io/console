@@ -5,7 +5,7 @@
         centered
         fade
         backdrop
-        size="lg"
+        size="md"
         :loading="loading"
         :visible.sync="proxyVisible"
         @confirm="onClickEditConfirm"
@@ -15,7 +15,7 @@
                 <p-text-input v-model="formState.name" class="name" :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_PLACEHOLDER')" />
             </p-field-group>
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIMEZONE_LABEL')">
-                <p-select-dropdown v-model="formState.timezone" :items="timezones"
+                <p-search-dropdown :selected.sync="formState.timezone" :menu="timezones"
                                    class="timezone"
                                    use-fixed-menu-style
                                    @select="changeTimezone"
@@ -87,15 +87,16 @@
 
 <script lang="ts">
 
+
 import {
     reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PButtonModal, PSelectDropdown, PFieldGroup, PRadio, PButton, PTextInput, PI,
+    PButtonModal, PSearchDropdown, PFieldGroup, PRadio, PButton, PTextInput, PI,
 } from '@spaceone/design-system';
+import { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 import dayjs, { Dayjs } from 'dayjs';
 import {
     range, get, forEach, size, map,
@@ -133,7 +134,7 @@ export default {
         PRadio,
         PTextInput,
         PButton,
-        PSelectDropdown,
+        PSearchDropdown,
         PFieldGroup,
         PButtonModal,
     },
@@ -162,7 +163,11 @@ export default {
 
         const formState = reactive({
             name: '',
-            timezone: store.state.user.timezone || 'UTC',
+            timezone: ([{
+                type: 'item',
+                label: store.state.user.timezone === 'UTC' ? `${store.state.user.timezone} (default)` : store.state.user.timezone,
+                name: store.state.user.timezone,
+            }] || [{ type: 'item', label: 'UTC', name: 'UTC' }]) as SearchDropdownMenuItem[],
             selectedHours: {} as ScheduleHours,
             selectedUTCHoursList: computed(() => {
                 const utcHours = [] as number[];
@@ -190,7 +195,7 @@ export default {
             hoursMatrix: range(24),
             timezones: map(timezoneList, d => ({
                 type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
-            })),
+            })) as SearchDropdownMenuItem[],
             scheduleTypes: computed(() => {
                 const result: ScheduleType = {
                     hourly: i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_LABEL'),
@@ -239,7 +244,7 @@ export default {
             const res = {};
             get(state, 'schedule.schedule.hours', []).forEach((hour) => {
                 let time = dayjs().utc().hour(hour);
-                if (formState.timezone !== 'UTC') time = time.tz(formState.timezone);
+                if (formState.timezone[0].name !== 'UTC') time = time.tz(formState.timezone[0].name);
                 res[time.hour()] = time;
             });
             formState.selectedHours = res;
@@ -250,7 +255,7 @@ export default {
             const res = {};
             forEach(formState.selectedHours, (day) => {
                 let time = day.utc();
-                if (formState.timezone !== 'UTC') time = day.tz(formState.timezone);
+                if (formState.timezone[0].name !== 'UTC') time = day.tz(formState.timezone[0].name);
                 res[time.hour()] = time;
             });
             formState.selectedHours = { ...res };
@@ -346,7 +351,7 @@ export default {
                 delete formState.selectedHours[hour];
             } else {
                 let time = dayjs().utc().hour(hour);
-                if (formState.timezone !== 'UTC') time = dayjs().tz(formState.timezone).hour(hour);
+                if (formState.timezone[0].name !== 'UTC') time = dayjs().tz(formState.timezone[0].name).hour(hour);
                 formState.selectedHours[hour] = time;
             }
             formState.selectedHours = { ...formState.selectedHours };
@@ -356,7 +361,7 @@ export default {
             else {
                 state.hoursMatrix.forEach((hour) => {
                     let time = dayjs().utc().hour(hour);
-                    if (formState.timezone !== 'UTC') time = dayjs().tz(formState.timezone).hour(hour);
+                    if (formState.timezone[0].name !== 'UTC') time = dayjs().tz(formState.timezone[0].name).hour(hour);
                     formState.selectedHours[hour] = time;
                 });
                 formState.selectedHours = { ...formState.selectedHours };

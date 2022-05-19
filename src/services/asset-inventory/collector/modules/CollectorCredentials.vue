@@ -19,26 +19,20 @@
                               @change="onChange"
         >
             <template #col-service_account-format="{ item }">
-                <router-link :to="referenceRouter(
+                <p-anchor :to="referenceRouter(
                     item.service_account_id,
                     { resource_type: 'identity.ServiceAccount' })"
                 >
-                    <span class="reference-link">
-                        <span class="text">{{ item.name }}</span>
-                        <p-i name="ic_external-link" height="1em" width="1em" />
-                    </span>
-                </router-link>
+                    <span class="text">{{ item.name }}</span>
+                </p-anchor>
             </template>
             <template #col-project_id-format="{ item }">
-                <router-link :to="referenceRouter(
+                <p-anchor :to="referenceRouter(
                     item.project_id,
                     { resource_type: 'identity.Project' })"
                 >
-                    <span class="reference-link">
-                        <span class="text">{{ item.project_name }}</span>
-                        <p-i name="ic_external-link" height="1em" width="1em" />
-                    </span>
-                </router-link>
+                    <span class="text">{{ item.project_name }}</span>
+                </p-anchor>
             </template>
             <template #col-created_at-format="{value}">
                 <span>{{ iso8601Formatter(value, timezone) }}</span>
@@ -62,25 +56,25 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+
 import {
     reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
-
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PQuerySearchTable, PPanelTop, PButton, PI,
+    PQuerySearchTable, PPanelTop, PButton, PAnchor,
 } from '@spaceone/design-system';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+
 
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -104,10 +98,10 @@ interface SecretModel {
 export default {
     name: 'CollectorCredentials',
     components: {
-        PI,
         PQuerySearchTable,
         PPanelTop,
         PButton,
+        PAnchor,
         CollectDataModal,
     },
     props: {
@@ -246,15 +240,5 @@ export default {
 }
 .p-toolbox-table {
     border-width: 0;
-}
-.p-data-table {
-    .reference-link {
-        &:hover {
-            text-decoration: underline;
-        }
-        .text {
-            margin-right: 0.125rem;
-        }
-    }
 }
 </style>
