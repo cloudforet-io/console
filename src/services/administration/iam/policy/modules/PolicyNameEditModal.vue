@@ -16,7 +16,10 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
+
+import {
+    reactive, toRefs,
+} from '@vue/composition-api';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
@@ -55,7 +58,7 @@ export default {
         const state = reactive({
             loading: true,
             proxyVisible: useProxyValue('visible', props, emit),
-            policyNameInput: computed(() => props.policyName),
+            policyNameInput: props.policyName,
         });
 
         const handleNameEditInput = (nameEditInput: string) => { state.policyNameInput = nameEditInput; };
