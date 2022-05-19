@@ -30,8 +30,9 @@
 </template>
 
 <script lang="ts">
+
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -159,6 +160,10 @@ export default {
         (async () => {
             if (props.supportedSchema && props.protocolType === PROTOCOL_TYPE.EXTERNAL) await getSchema();
         })();
+
+        onActivated(() => {
+            if (props.supportedSchema && props.protocolType === PROTOCOL_TYPE.EXTERNAL) getSchema();
+        });
 
         return {
             protocol,
