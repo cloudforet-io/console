@@ -10,8 +10,12 @@
                     <p-badge style-type="gray200">{{ $t('IAM.POLICY.FORM.VIEW_ONLY') }}</p-badge>
                 </span>
                 <span v-if="type === POLICY_TYPES.CUSTOM" class="policy-edit-buttons">
-                    <p-icon-button name="ic_trashcan" class="w-full delete-btn" @click="handleVisibleDeleteModal" />
-                    <p-icon-button name="ic_edit-text" class="edit-btn" @click="handleVisibleTitleEditModal" />
+                    <p-icon-button name="ic_trashcan" :disabled="!hasManagePermission" class="w-full delete-btn"
+                                   @click="handleVisibleDeleteModal"
+                    />
+                    <p-icon-button name="ic_edit-text" :disabled="!hasManagePermission" class="edit-btn"
+                                   @click="handleVisibleTitleEditModal"
+                    />
                 </span>
                 <div v-if="type === POLICY_TYPES.CUSTOM" class="policy-modify-buttons">
                     <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="gray-border">
@@ -82,7 +86,9 @@ import {
     PPageTitle, PIconButton, PBadge, PPaneLayout, PLabel, PTextEditor, PButton, PTextInput, PFieldGroup,
 } from '@spaceone/design-system';
 
+
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -124,6 +130,7 @@ export default defineComponent<PolicyDetailPageProps>({
         const arrayifyPermission = (permissionsCode: string) => permissionsCode.split('\n');
 
         const state = reactive({
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             policyInfo: computed(() => administrationStore.state.policy.policyData),
             type: SpaceRouter.router.currentRoute.query.type,
             code: '',

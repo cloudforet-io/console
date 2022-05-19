@@ -238,8 +238,12 @@ export default {
         padding-right: 1.875rem;
         .condition {
             min-width: 7rem;
-            width: 30%;
+            width: 12.125rem;
             max-width: 12.25rem;
+
+            @screen mobile {
+                width: 7rem;
+            }
         }
     }
 }

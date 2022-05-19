@@ -28,6 +28,7 @@
                             </div>
                             <div class="left-divider">
                                 <p-button icon="ic_edit" style-type="gray-border" size="sm"
+                                          :disabled="!hasManagePermission && dashboardType === DASHBOARD_TYPE.PUBLIC"
                                           @click.stop="handleClickCustomize"
                                 >
                                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE') }}
@@ -79,7 +80,6 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
