@@ -35,6 +35,7 @@
                     <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME, params: { provider: selectedProvider}}">
                         <p-button style-type="primary" icon="ic_plus_bold"
                                   class="mx-auto text-center"
+                                  :disabled="!hasManagePermission"
                         >
                             {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.ADD_SERVICE_ACCOUNT') }}
                         </p-button>
@@ -133,6 +134,7 @@ export default {
 
         const searchQueryHelper = new QueryHelper();
         const state = reactive({
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             // references
             providers: computed(() => store.state.reference.provider.items),
             // asset inventory store

@@ -8,10 +8,12 @@
                 <span class="title-btn">
                     <p-icon-button name="ic_trashcan"
                                    class="w-full delete-btn"
+                                   :disabled="!hasManagePermission"
                                    @click="openAlertDeleteForm"
                     />
                     <p-icon-button name="ic_edit-text"
                                    class="edit-btn"
+                                   :disabled="!hasManagePermission"
                                    @click="openAlertEditForm"
                     />
                 </span>
@@ -71,6 +73,8 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PIconButton, PPageTitle } from '@spaceone/design-system';
 
+
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -117,6 +121,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             alertInfo: computed(() => alertManagerStore.state.alert.alertData),
             loading: true,
             //
