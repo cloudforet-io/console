@@ -49,7 +49,7 @@
                             </div>
                             <div class="top-button-box">
                                 <div>
-                                    <p-button v-if="!storeState.groupId"
+                                    <p-button v-if="!storeState.groupId && hasRootProjectGroupManagePermission"
                                               style-type="primary-dark"
                                               :outline="true"
                                               icon="ic_plus_bold"
@@ -58,14 +58,14 @@
                                     >
                                         {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
                                     </p-button>
-                                    <p-select-dropdown v-if="(storeState.groupId && !isPermissionDenied) || !hasManagePermission"
+                                    <p-select-dropdown v-if="storeState.groupId && hasManagePermission && !isPermissionDenied"
                                                        :items="settingMenu"
                                                        style-type="icon-button"
                                                        button-icon="ic_setting"
                                                        class="settings-button"
                                                        @select="onSelectSettingDropdown"
                                     />
-                                    <div v-if="(storeState.groupId && !isPermissionDenied) || !hasManagePermission"
+                                    <div v-if="storeState.groupId && hasManagePermission && !isPermissionDenied"
                                          v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
                                          class="project-group-member-button"
                                          :group-id="storeState.groupId"
@@ -79,7 +79,7 @@
                                             <span class="text">{{ groupMemberCount || 0 }}</span>
                                         </div>
                                     </div>
-                                    <p-button v-if="storeState.groupId && !isPermissionDenied"
+                                    <p-button v-if="storeState.groupId && hasManagePermission && !isPermissionDenied"
                                               style-type="primary-dark"
                                               icon="ic_plus_bold"
                                               @click="openProjectForm"
@@ -116,17 +116,22 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
+
+
+import {
+    isInstanceOfAuthorizationError,
+} from '@spaceone/console-core-lib/space-connector/error';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import {
     PI, PPageTitle, PBreadcrumbs, PButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
+import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 import ProjectGroupFormModal from '@/services/project/modules/ProjectGroupFormModal.vue';
 import ProjectSearch from '@/services/project/modules/ProjectSearch.vue';
 import ProjectTree from '@/services/project/modules/ProjectTree.vue';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     ProjectGroup,
 } from '@/services/project/type';
@@ -146,7 +151,6 @@ import {
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
-
 
 export default {
     name: 'ProjectGroupPage',
@@ -202,6 +206,7 @@ export default {
         });
 
         const state = reactive({
+            hasRootProjectGroupManagePermission: computed(() => state.hasManagePermission && store.getters['user/hasDomainRole']),
             hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             initGroupId: vm.$route.query.select_pg as string,
             favoriteItems: computed<FavoriteItem[]>(() => [
@@ -219,7 +224,7 @@ export default {
                 }
                 return [{ name: vm.$t('MENU.PROJECT.PROJECT'), data: null }, ...result];
             }),
-            groupMemberCount: 0 as number|undefined,
+            groupMemberCount: undefined as number|undefined,
             groupMemberPageVisible: false,
             isPermissionDenied: computed(() => state.groupMemberCount === undefined),
         });
@@ -283,12 +288,14 @@ export default {
                         project_group_id: groupId,
                     });
                     state.groupMemberCount = res.total_count;
-                } catch (e) {
+                } catch (e: any) {
+                    if (!isInstanceOfAuthorizationError(e)) {
+                        ErrorHandler.handleError(e);
+                    }
                     state.groupMemberCount = undefined;
-                    ErrorHandler.handleError(e);
                 }
             } else {
-                state.groupMemberCount = 0;
+                state.groupMemberCount = undefined;
             }
         };
 
@@ -370,8 +377,7 @@ export default {
 }
 
 .favorite-btn-wrapper {
-    @apply mx-2;
-    height: 1.6rem;
+    margin-right: 0.5rem;
     display: inline-flex;
 }
 .top-button-box {
