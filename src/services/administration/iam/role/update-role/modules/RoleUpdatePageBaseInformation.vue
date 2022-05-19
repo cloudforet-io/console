@@ -157,6 +157,12 @@ export default {
                         .marker {
                             display: block;
                         }
+                        .role-type-name {
+                            @apply text-blue-600;
+                        }
+                        .role-type-description {
+                            @apply text-blue-500;
+                        }
                     }
                 }
                 .role-type-description {

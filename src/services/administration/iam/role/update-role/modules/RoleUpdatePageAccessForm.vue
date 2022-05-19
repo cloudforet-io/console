@@ -197,7 +197,7 @@ export default {
             margin: 0.5rem 1rem;
             &.all {
                 @apply bg-transparent border-none;
-                margin: 1.5rem 1rem 1.5rem 0;
+                margin: 0.5rem 1rem 0.5rem 0;
             }
             .sub-menu-wrapper {
                 @apply bg-white rounded-md;
