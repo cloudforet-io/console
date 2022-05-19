@@ -75,6 +75,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
 
 
 export default {
@@ -120,7 +122,7 @@ export default {
                     permissions: permissionsParser(state.code),
                 });
                 showSuccessMessage(i18n.t('IAM.POLICY.MODAL.ALT_S_CREATE_POLICY'), '');
-                SpaceRouter.router.go(-1);
+                await SpaceRouter.router.push({ name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME, query: { policy_type: POLICY_TYPES.CUSTOM } });
             } catch (e: any) {
                 ErrorHandler.handleRequestError(e, i18n.t('IAM.POLICY.MODAL.ALT_E_CREATE_POLICY'));
             }
