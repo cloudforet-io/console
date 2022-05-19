@@ -10,7 +10,7 @@
             <h2 :class="{'has-left': !!$slots['title-left-extra'], 'has-right': useTotalCount || !!$slots['title-right-extra']}">
                 <slot>
                     <slot name="title">
-                        {{ title }}
+                        {{ title }}&zwnj;
                     </slot>
                 </slot>
             </h2>
