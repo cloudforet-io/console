@@ -59,6 +59,6 @@ export const setProjectFormVisible: Mutation<ProjectPageState> = (state, project
     state.projectFormVisible = projectFormVisible;
 };
 
-export const setIsProjectGroupUpdated: Mutation<ProjectPageState> = (state, isProjectGroupUpdated: boolean) => {
-    state.isProjectGroupUpdated = isProjectGroupUpdated;
+export const setShouldUpdateProjectList: Mutation<ProjectPageState> = (state, shouldUpdateProjectList: boolean) => {
+    state.shouldUpdateProjectList = shouldUpdateProjectList;
 };
