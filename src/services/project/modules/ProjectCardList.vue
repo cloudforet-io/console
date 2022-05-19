@@ -101,6 +101,7 @@
                             <strong>2.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_2') }}
                         </p>
                         <p-button style-type="primary-dark" class="mt-6" icon="ic_plus_bold"
+                                  :disabled="!hasRootProjectGroupManagePermission"
                                   @click="$emit('create-project-group')"
                         >
                             {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_CREATE_BTN') }}
@@ -179,6 +180,7 @@ export default {
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            hasRootProjectGroupManagePermission: computed(() => state.hasManagePermission && store.getters['user/hasDomainRole']),
             items: undefined,
             totalCount: 0,
             loading: true,
