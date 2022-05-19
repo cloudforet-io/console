@@ -17,13 +17,14 @@
         >
             <template #toolbox-left>
                 <p-button style-type="primary-dark" class="mr-4" :outline="true"
-                          :disabled="selectedItems.length !== 1 || selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED"
+                          :disabled="!hasManagePermission || selectedItems.length !== 1 || selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED"
                           @click="visibleUpdateModal = true"
                 >
                     {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.UPDATE') }}
                 </p-button>
                 <p-button style-type="primary-dark" :outline="true"
-                          :disabled="!selectedItems.length || selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED" @click="visibleCloseCheckModal = true"
+                          :disabled="!hasManagePermission || !selectedItems.length || selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED"
+                          @click="visibleCloseCheckModal = true"
                 >
                     {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CLOSE') }}
                 </p-button>
@@ -65,11 +66,12 @@
 </template>
 
 <script lang="ts">
+
+
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { makeDistinctValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search';
@@ -149,6 +151,7 @@ export default {
             .setSort('state', true);
 
         const state = reactive({
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             totalCount: 0,
             loading: false,
             items: [] as any[],
