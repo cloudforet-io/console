@@ -30,6 +30,7 @@
                 <p-button class="mr-4 add-btn"
                           style-type="primary-dark"
                           icon="ic_plus_bold"
+                          :disabled="!hasManagePermission"
                           @click="onClickAdd"
                 >
                     {{ $t('PROJECT.DETAIL.ADD') }}
@@ -211,6 +212,7 @@ export default {
             .setSort('created_at', true)
             .setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             loading: true,
             timezone: computed(() => store.state.user.timezone),
             plugins: computed(() => store.state.reference.plugin.items),
