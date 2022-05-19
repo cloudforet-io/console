@@ -11,7 +11,9 @@
                 <p-i v-if="notificationUrgency" :name="notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_bell' : 'ic_alert'" />
                 <span class="text">{{ notificationOptionFormatter(notificationUrgency) }}</span>
             </div>
-            <p-icon-button class="edit-button" name="ic_edit" @click="onClickUpdateNotificationPolicy" />
+            <p-icon-button class="edit-button" name="ic_edit" :disabled="!hasManagePermission"
+                           @click="onClickUpdateNotificationPolicy"
+            />
         </section>
         <section class="section auto-recovery-wrapper">
             <div class="section-title">
@@ -21,7 +23,9 @@
                 <p-i v-if="recoveryMode === RECOVERY_MODE.AUTO" name="ic_automation" />
                 <span class="text">{{ recoveryMode === RECOVERY_MODE.AUTO ? $t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : $t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
             </div>
-            <p-icon-button class="edit-button" name="ic_edit" @click="onClickUpdateAutoRecovery" />
+            <p-icon-button class="edit-button" name="ic_edit" :disabled="!hasManagePermission"
+                           @click="onClickUpdateAutoRecovery"
+            />
         </section>
         <section class="section event-rule-wrapper">
             <div class="section-title">
@@ -30,7 +34,9 @@
             <div class="content-wrapper">
                 <span class="text"><b>{{ eventRuleTotalCount }}</b> {{ $t('PROJECT.DETAIL.ALERT.RULES_ON_THIS_PROJECT') }}</span>
             </div>
-            <p-icon-button class="edit-button" name="ic_edit" @click="onClickEditEventRule" />
+            <p-icon-button class="edit-button" name="ic_edit" :disabled="!hasManagePermission"
+                           @click="onClickEditEventRule"
+            />
         </section>
         <section class="section escalation-policy-wrapper">
             <div class="section-title">
@@ -118,6 +124,7 @@ import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
 
 
 const NOTIFICATION_URGENCY = Object.freeze({
@@ -151,6 +158,7 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             notificationUrgencyList: computed(() => ([
                 {
                     name: NOTIFICATION_URGENCY.ALL,

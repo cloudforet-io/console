@@ -10,9 +10,7 @@
                 :invalid="isNameInvalid"
                 class="base-info-input"
             >
-                <p-text-input v-model="dataForEdit" :invalid="isNameInvalid"
-                              class="block"
-                />
+                <p-text-input v-model="dataForEdit" :invalid="isNameInvalid" />
             </p-field-group>
             <div class="button-group">
                 <p-button :outline="true" size="sm" class="cancel-button"
