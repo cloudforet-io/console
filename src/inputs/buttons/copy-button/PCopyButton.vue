@@ -94,7 +94,6 @@ export default defineComponent<Props>({
             hasText: false,
             showIcon: computed(() => {
                 if (!props.autoHideIcon) return true;
-                if (isNotEmpty(props.value)) return true;
                 return state.hasText;
             }),
             textObserver: null as null|MutationObserver,

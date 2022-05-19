@@ -1,6 +1,6 @@
 <template>
     <p-text-list :items="items"
-                 :delimiter="options.delimiter"
+                 :delimiter="options.delimiter === undefined ? '<br>' : options.delimiter"
                  :sub-key="options.sub_key"
                  :link="options.link"
     >
@@ -12,9 +12,6 @@
                              :extra-data="extraData"
                              :handler="handler"
             />
-        </template>
-        <template v-if="!options.delimiter" #delimiter>
-            <br>
         </template>
     </p-text-list>
 </template>

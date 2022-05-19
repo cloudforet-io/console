@@ -2,7 +2,8 @@
     <router-link :to="to || {}" class="p-anchor" custom>
         <template #default="{href: toHref, navigate}">
             <span>
-                <a class="p-anchor" :class="{disabled, highlight, [iconPosition]: true, [size]: true}"
+                <a ref="anchorRef" class="p-anchor"
+                   :class="{disabled, highlight, [iconPosition]: true, [size]: true}"
                    :target="validateTarget()"
                    :href="to ? (toHref || href ): href"
                    @click.stop="navigate"
@@ -12,7 +13,7 @@
                             {{ text }}
                         </slot>
                     </span>
-                    <p-i v-if="iconVisible"
+                    <p-i v-if="iconVisible && hasText"
                          :name="iconName"
                          height="1.1em" width="1.1em"
                          color="inherit"
@@ -27,7 +28,7 @@
 <script lang="ts">
 import PI from '@/foundation/icons/PI.vue';
 import { Location } from 'vue-router';
-import { defineComponent } from '@vue/composition-api';
+import { computed, defineComponent, ref } from '@vue/composition-api';
 import { AnchorSize, IconPosition } from '@/inputs/anchors/type';
 
 
@@ -101,8 +102,12 @@ export default defineComponent<Props>({
             if (iconName === 'ic_external-link' && iconVisible) return '_blank';
             return '_self';
         };
+        const anchorRef = ref<HTMLElement|null>(null);
+        const hasText = computed(() => !!anchorRef.value?.textContent);
         return {
             validateTarget,
+            anchorRef,
+            hasText,
         };
     },
 });
