@@ -10232,7 +10232,7 @@
                                                         </translations>
                                                     </concept_node>
                                                     <concept_node>
-                                                        <name>COST_PIE_FOR_SPC_USAGE</name>
+                                                        <name>COST_PIE_FOR_SPC_USAGE_DESC</name>
                                                         <definition_loaded>false</definition_loaded>
                                                         <description/>
                                                         <comment/>
@@ -20046,7 +20046,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>API_POLICY_HEARE</name>
+                                        <name>API_POLICY_LINK</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
