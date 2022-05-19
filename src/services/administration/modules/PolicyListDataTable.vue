@@ -80,7 +80,10 @@ import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-s
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { filter } from 'lodash';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+
+import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import { POLICY_TYPES, PolicyTypes } from '@/services/administration/iam/policy/lib/config';
 import {
@@ -92,12 +95,6 @@ import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 import { Policy } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { administrationStore } from '@/services/administration/store';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
-import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
-import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
-import { Policy } from '@/services/administration/iam/role/type';
-import { replaceUrlQuery } from '@/lib/router-query-string';
-import { SpaceRouter } from '@/router';
 
 
 const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], selectedType: PolicyTypes): PolicyDataModel[] => {

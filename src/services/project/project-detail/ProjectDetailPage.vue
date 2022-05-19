@@ -31,7 +31,7 @@
                                 />
                             </p>
                             <p-button
-                                v-if="!hasNoAlertPermission"
+                                v-if="hasAlertPermission"
                                 icon="ic_state_manual" style-type="gray900"
                                 class="ml-3"
                                 :outline="true"
@@ -168,7 +168,7 @@ export default {
 
         const state = reactive({
             hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
-            hasNoAlertPermission: computed<boolean>(() => isUserAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList'])),
+            hasAlertPermission: computed<boolean>(() => isUserAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList'])),
             loading: true,
             item: null as null|ProjectModel,
             projectId: computed(() => store.state.service.projectDetail.projectId),
@@ -222,7 +222,7 @@ export default {
                     name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_MEMBER'),
                 },
-                ...(state.hasNoAlertPermission) ? [{
+                ...(state.hasAlertPermission) ? [{
                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
                 }] : [],
