@@ -23,7 +23,7 @@ const state: ProjectPageState = {
     projectGroupDeleteCheckModalVisible: false,
     projectFormVisible: false,
 
-    isProjectGroupUpdated: false,
+    shouldUpdateProjectList: false,
 };
 
 export default {

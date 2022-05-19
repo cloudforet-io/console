@@ -211,7 +211,7 @@ export default {
                 { title: i18n.t('PROJECT.LANDING.DATABASE'), summaryType: SUMMARY_TYPE.DATABASE },
                 { title: i18n.t('PROJECT.LANDING.STORAGE'), summaryType: SUMMARY_TYPE.STORAGE },
             ]),
-            isProjectGroupUpdated: computed<boolean>(() => store.state.service.project.isProjectGroupUpdated),
+            shouldUpdateProjectList: computed<boolean>(() => store.state.service.project.shouldUpdateProjectList),
         });
 
         const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
@@ -355,13 +355,11 @@ export default {
             },
         });
 
-        // When ProjectGroup has been updated
-        watch(() => state.isProjectGroupUpdated, () => {
-            if (state.isProjectGroupUpdated) {
-                getData()
-                    .then(() => {
-                        store.commit('service/project/setIsProjectGroupUpdated', false);
-                    });
+        // When ProjectGroup has been updated | project has been created
+        watch(() => state.shouldUpdateProjectList, async () => {
+            if (state.shouldUpdateProjectList) {
+                await getData();
+                await store.commit('service/project/setShouldUpdateProjectList', false);
             }
         });
 

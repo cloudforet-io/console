@@ -165,6 +165,7 @@ export const createProject: Action<ProjectPageState, any> = async ({ state, comm
             ...projectInfo,
         });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
+        commit('setShouldUpdateProjectList', true);
 
         if (state.treeEditMode) {
             const newData: ProjectItemResp = {
