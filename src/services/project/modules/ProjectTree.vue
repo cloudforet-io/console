@@ -18,7 +18,7 @@
                                        name="ic_plus_thin" style-type="transparent" size="sm"
                                        color="inherit"
                                        class="ml-1"
-                                       :disabled="!hasManagePermission"
+                                       :disabled="!(hasRootProjectGroupManagePermission || hasCurrentProjectGroupManagePermission)"
                                        @click="openProjectGroupCreateForm()"
                         />
                     </template>
@@ -84,7 +84,7 @@
                         />
                         <p-icon-button v-if="!treeEditMode && node.data.item_type !== 'PROJECT'" name="ic_plus" class="group-add-btn"
                                        size="sm"
-                                       :disabled="permissionInfo[node.data.id] !== true || !hasManagePermission"
+                                       :disabled="!(hasManagePermission && permissionInfo[node.data.id])"
                                        @click.stop="openProjectGroupCreateForm({node, path})"
                         />
                     </template>
@@ -95,7 +95,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
@@ -136,6 +135,8 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
+            hasRootProjectGroupManagePermission: computed(() => state.hasManagePermission && store.getters['user/hasDomainRole']),
+            hasCurrentProjectGroupManagePermission: computed(() => state.hasManagePermission && state.permissionInfo[store.getters['service/project/groupId']]),
             hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             loading: false,
             rootNode: computed(() => store.state.service.project.rootNode),
