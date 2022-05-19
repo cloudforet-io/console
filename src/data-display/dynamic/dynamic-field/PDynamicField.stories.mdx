@@ -202,6 +202,16 @@ It's options are the same with the common options.
                 <p-dynamic-field type="text" :options="{}" data="Basic text type"></p-dynamic-field>
                 <br/><br/>
                 <p-dynamic-field type="text" :options="{link: 'https://www.google.com'}" data="Text type with link"></p-dynamic-field>
+                <br/><br/>
+                <p-dynamic-field type="list" :options="{
+                    sub_key: 'data',
+                    item: {
+                        options: {
+                            link: 'https://www.google.com'
+                        },
+                        type: 'text'
+                    }
+                }" :data="'Text type with link in list(list will be deprecated)'.split(' ').map(d => ({ data: d}))"></p-dynamic-field>
             </div>
     `,
         }}
