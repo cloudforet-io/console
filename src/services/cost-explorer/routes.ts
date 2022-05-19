@@ -1,7 +1,9 @@
 import { RouteConfig } from 'vue-router';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { getMenuLabel } from '@/lib/menu/menu-info';
+
 import { MENU_ID } from '@/lib/menu/config';
+import { getMenuLabel } from '@/lib/menu/menu-info';
+
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
 const CostExplorerContainer = () => import(/* webpackChunkName: "CostExplorerContainer" */ '@/services/cost-explorer/CostExplorerContainer.vue');
 

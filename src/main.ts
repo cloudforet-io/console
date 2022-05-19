@@ -1,15 +1,21 @@
-import Vue from 'vue';
 import VueCompositionApi from '@vue/composition-api';
-import { store } from '@/store';
-import { SpaceRouter } from '@/router';
-import directive from '@/directives';
-import { i18n } from '@/translations';
-import Fragment from 'vue-fragment';
-import VTooltip from 'v-tooltip';
+
 import SpaceDesignSystem from '@spaceone/design-system';
 import PortalVue from 'portal-vue';
+import VTooltip from 'v-tooltip';
+import Vue from 'vue';
+import Fragment from 'vue-fragment';
+
+import directive from '@/directives';
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+
 import { siteInit } from '@/lib/site-initializer';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import App from './App.vue';
 
 import '@/styles/style.pcss';

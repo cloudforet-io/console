@@ -1,7 +1,9 @@
 import { RouteConfig } from 'vue-router';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import { getMenuLabel } from '@/lib/menu/menu-info';
+
 import { MENU_ID } from '@/lib/menu/config';
+import { getMenuLabel } from '@/lib/menu/menu-info';
+
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 const AdministrationContainer = () => import(/* webpackChunkName: "AdministrationContainer" */ '@/services/administration/AdministrationContainer.vue');
 

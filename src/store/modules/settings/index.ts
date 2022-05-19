@@ -1,7 +1,7 @@
-import { SettingItem, SettingsState } from './type';
-import * as getters from './getters';
 import * as actions from './actions';
+import * as getters from './getters';
 import * as mutations from './mutations';
+import { SettingItem, SettingsState } from './type';
 
 export const STORAGE_KEY = 'store/settings';
 

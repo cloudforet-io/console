@@ -27,15 +27,20 @@
 <script lang="ts">
 import { reactive, toRefs } from '@vue/composition-api';
 
-import { PPageTitle, PButton } from '@spaceone/design-system';
-import RoleUpdateForm from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { RoleData } from '@/services/administration/iam/role/type';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { i18n } from '@/translations';
+import { PPageTitle, PButton } from '@spaceone/design-system';
+
 import { SpaceRouter } from '@/router';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { FORM_TYPE } from '@/services/administration/iam/role/config';
+import { RoleData } from '@/services/administration/iam/role/type';
+import RoleUpdateForm from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
+
 
 export default {
     name: 'RoleEditPage',

@@ -45,14 +45,15 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import { PCheckBox, PSelectButton, PSelectStatus } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
+import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
 import {
     AlertBottomFilters,
 } from '@/services/alert-manager/type';
-import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
 
 export default {
     name: 'AlertTableBottomFilters',

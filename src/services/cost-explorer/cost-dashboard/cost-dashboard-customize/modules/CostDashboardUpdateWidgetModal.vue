@@ -21,7 +21,9 @@ import {
     defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import { PButtonModal } from '@spaceone/design-system';
+
 import CostDashboardCustomizeWidgetConfig
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
 import {

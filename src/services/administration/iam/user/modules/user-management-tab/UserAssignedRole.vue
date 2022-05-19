@@ -40,17 +40,21 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPanelTop, PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
 
-import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { Tags } from '@/models';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { ProjectGroupReferenceItem } from '@/store/modules/reference/project-group/type';
 import { ProjectReferenceItem } from '@/store/modules/reference/project/type';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 
 interface UserRoleItem {
     labels?: string[]|string;

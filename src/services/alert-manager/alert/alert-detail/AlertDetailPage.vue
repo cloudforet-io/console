@@ -64,27 +64,32 @@
 </template>
 
 <script lang="ts">
-import { PIconButton, PPageTitle } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import AlertSummary from '@/services/alert-manager/alert/alert-detail/modules/alert-summary/AlertSummary.vue';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { PIconButton, PPageTitle } from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import { NoResourceError } from '@/common/composables/error/error';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import AlertKeyInfo from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/AlertKeyInfo.vue';
 import AlertResponder from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/AlertResponder.vue';
-import AlertTimelineAndEvent from '@/services/alert-manager/alert/alert-detail/modules/AlertTimelineAndEvent.vue';
+import AlertSummary from '@/services/alert-manager/alert/alert-detail/modules/alert-summary/AlertSummary.vue';
 import AlertNote from '@/services/alert-manager/alert/alert-detail/modules/AlertNote.vue';
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import AlertTitleEditModal from '@/services/alert-manager/alert/alert-detail/modules/AlertTitleEditModal.vue';
 import AlertProjectDependency
     from '@/services/alert-manager/alert/alert-detail/modules/AlertProjectDependency.vue';
-import { i18n } from '@/translations';
 import AlertStatusUpdate
     from '@/services/alert-manager/alert/alert-detail/modules/AlertStatusUpdate.vue';
+import AlertTimelineAndEvent from '@/services/alert-manager/alert/alert-detail/modules/AlertTimelineAndEvent.vue';
+import AlertTitleEditModal from '@/services/alert-manager/alert/alert-detail/modules/AlertTitleEditModal.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { NoResourceError } from '@/common/composables/error/error';
 import { alertManagerStore } from '@/services/alert-manager/store';
 
 export default {

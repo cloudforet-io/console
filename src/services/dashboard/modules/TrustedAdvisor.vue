@@ -91,30 +91,32 @@
 </template>
 
 <script lang="ts">
-import {
-    find, forEach, range, size,
-} from 'lodash';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PTextPagination, PI } from '@spaceone/design-system';
-import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
-
-import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
-
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { green, red, yellow } from '@/styles/colors';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { PTextPagination, PI } from '@spaceone/design-system';
+import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
+import {
+    find, forEach, range, size,
+} from 'lodash';
+
 import { store } from '@/store';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import config from '@/lib/config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
+import { green, red, yellow } from '@/styles/colors';
+
+import config from '@/lib/config';
+
+import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
 enum STATUS {

@@ -36,20 +36,21 @@
 </template>
 
 <script lang="ts">
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataLoader } from '@spaceone/design-system';
 
 import {
     violet, green, red, yellow, white, gray,
 } from '@/styles/colors';
+
 import config from '@/lib/config';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 

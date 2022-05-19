@@ -32,19 +32,20 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { Dayjs } from 'dayjs';
 
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     PCollapsiblePanel, PI, PAnchor,
 } from '@spaceone/design-system';
-import { iso8601Formatter } from '@spaceone/console-core-lib';
+import { Dayjs } from 'dayjs';
+
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
-import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationDateHeader.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-import { i18n } from '@/translations';
+import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationDateHeader.vue';
 
 const NOTIFICATION_TYPE_ICONS = {
     INFO: '',

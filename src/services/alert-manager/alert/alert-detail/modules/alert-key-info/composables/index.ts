@@ -1,11 +1,16 @@
 import {
     ComponentRenderProxy, getCurrentInstance, reactive,
 } from '@vue/composition-api';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { i18n } from '@/translations';
-import { EDIT_MODE, EditMode } from '@/services/alert-manager/lib/config';
+
 import { cloneDeep } from 'lodash';
+
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { EDIT_MODE, EditMode } from '@/services/alert-manager/lib/config';
 import { alertManagerStore } from '@/services/alert-manager/store';
 
 interface AlertDetailItemState {

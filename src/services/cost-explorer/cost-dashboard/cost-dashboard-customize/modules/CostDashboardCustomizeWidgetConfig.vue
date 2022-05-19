@@ -49,19 +49,23 @@
 </template>
 
 <script lang="ts">
-import { useFormValidator } from '@/common/composables/form-validator';
-import { i18n } from '@/translations';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import { PFieldGroup, PSelectDropdown, PTextInput } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
-import { GRANULARITY_ITEM_MAP, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { cloneDeep } from 'lodash';
-import { EDITABLE_WIDGET_OPTIONS, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { costExplorerStore } from '@/services/cost-explorer/store';
 import VueI18n from 'vue-i18n';
+
+import { i18n } from '@/translations';
+
+import { useFormValidator } from '@/common/composables/form-validator';
+
+import { EDITABLE_WIDGET_OPTIONS, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import { GRANULARITY_ITEM_MAP, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import { costExplorerStore } from '@/services/cost-explorer/store';
+import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 
 import TranslateResult = VueI18n.TranslateResult;
 

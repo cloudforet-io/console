@@ -1,5 +1,7 @@
 import { mount, createLocalVue } from '@vue/test-utils';
+
 import CompositionApi, { defineComponent, reactive, toRefs } from '@vue/composition-api';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 const localVue = createLocalVue();

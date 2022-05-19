@@ -56,19 +56,22 @@
 <script lang="ts">
 import { reactive, toRefs } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PAnchor, PDataLoader, PIconButton, PButton, PLabel,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { CostQuerySetModel } from '@/services/cost-explorer/type';
 import { store } from '@/store';
+
+import { getUUID } from '@/lib/component-util/getUUID';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { CHART_TYPE } from '@/services/cost-explorer/cost-analysis/type';
 import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { CHART_TYPE } from '@/services/cost-explorer/cost-analysis/type';
-import { getUUID } from '@/lib/component-util/getUUID';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 
 const LAYOUT = 100;

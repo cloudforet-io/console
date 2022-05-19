@@ -30,23 +30,28 @@
 </template>
 
 <script lang="ts">
-import { uniqBy } from 'lodash';
 
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
+import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { i18n } from '@/translations';
+import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
+import { uniqBy } from 'lodash';
+
 import { store } from '@/store';
-import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { ProjectMember } from '@/services/alert-manager/type';
-import { useProxyValue } from '@/common/composables/proxy-state';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 import { alertManagerStore } from '@/services/alert-manager/store';
+import { ProjectMember } from '@/services/alert-manager/type';
 
 
 export default {

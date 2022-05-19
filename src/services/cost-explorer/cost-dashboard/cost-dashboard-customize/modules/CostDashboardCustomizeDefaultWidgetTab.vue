@@ -61,19 +61,21 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import {
-    EDITABLE_WIDGET_OPTIONS,
-    EDITABLE_WIDGET_OPTIONS_TYPE,
-    WidgetInfo, ChartType,
-} from '@/services/cost-explorer/cost-dashboard/type';
-import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
+
 import { PRadio, PLabel, PTextPagination } from '@spaceone/design-system';
+
 import CostDashboardCustomizeWidgetConfig
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
 import DefaultWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/DefaultWidgetPreview.vue';
 import { chartTypeItemMap } from '@/services/cost-explorer/cost-dashboard/lib/config';
+import {
+    EDITABLE_WIDGET_OPTIONS,
+    EDITABLE_WIDGET_OPTIONS_TYPE,
+    WidgetInfo, ChartType,
+} from '@/services/cost-explorer/cost-dashboard/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 
 const PAGE_SIZE = 6;
 

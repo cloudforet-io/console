@@ -1,7 +1,7 @@
-import { DomainState } from './type';
-import * as getters from './getters';
 import * as actions from './actions';
+import * as getters from './getters';
 import * as mutations from './mutations';
+import { DomainState } from './type';
 
 const state: DomainState = {
     domainId: undefined,

@@ -42,13 +42,16 @@
 </template>
 
 <script lang="ts">
+import { computed, reactive, toRefs } from '@vue/composition-api';
+
 import {
     PButton, PI, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+
+import { i18n } from '@/translations';
+
 import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
 import { EDIT_TYPE, PARAM_KEY_TYPE } from '@/services/notification/modules/notification-channel-item/type';
-import { i18n } from '@/translations';
 
 
 export default {

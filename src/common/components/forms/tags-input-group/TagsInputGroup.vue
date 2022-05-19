@@ -57,7 +57,6 @@
 </template>
 
 <script lang="ts">
-import { some } from 'lodash';
 
 import {
     toRefs, reactive, getCurrentInstance, ComponentRenderProxy, computed, watch,
@@ -66,6 +65,7 @@ import {
 import {
     PButton, PFieldGroup, PIconButton, PTextInput,
 } from '@spaceone/design-system';
+import { some } from 'lodash';
 
 import {
     TagItem, TagValidation, TagsInputGroupProps, ValidationData, Tag,

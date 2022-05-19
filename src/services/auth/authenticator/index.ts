@@ -1,5 +1,5 @@
-import { store } from '@/store';
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
 type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
 

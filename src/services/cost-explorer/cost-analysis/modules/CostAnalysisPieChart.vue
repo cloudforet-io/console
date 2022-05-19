@@ -8,27 +8,28 @@
 </template>
 
 <script lang="ts">
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import { PieChart } from '@amcharts/amcharts4/charts';
-
 import {
     ComponentRenderProxy,
     getCurrentInstance,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import * as am4charts from '@amcharts/amcharts4/charts';
+import { PieChart } from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
 import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 
 import { CURRENCY } from '@/store/modules/display/config';
+import { gray } from '@/styles/colors';
+
+import config from '@/lib/config';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
 import {
     Legend, PieChartData, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { gray } from '@/styles/colors';
-import config from '@/lib/config';
 
 
 interface Props extends WidgetProps {

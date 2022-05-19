@@ -54,23 +54,26 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { range } from 'lodash';
-import dayjs from 'dayjs';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { PLottie, PSkeleton, PI } from '@spaceone/design-system';
-
-import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { COLLECT_MODE, CollectorModel } from '@/services/asset-inventory/collector/type';
+import { PLottie, PSkeleton, PI } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { range } from 'lodash';
+
+
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
+
+import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { COLLECT_MODE, CollectorModel } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 enum JOB_STATE {

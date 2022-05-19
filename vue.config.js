@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
-const webpackBundleAnalyzer = require('webpack-bundle-analyzer');
+
 const CompressionPlugin = require('compression-webpack-plugin');
+const webpackBundleAnalyzer = require('webpack-bundle-analyzer');
+
 const postcssConfig = require('./postcss.config');
 
 

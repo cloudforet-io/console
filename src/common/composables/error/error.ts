@@ -1,6 +1,7 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { CONSOLE_ERROR_CODE } from '@/common/composables/error/type';
 import { Location } from 'vue-router';
+
+import { CONSOLE_ERROR_CODE } from '@/common/composables/error/type';
 
 export class ConsoleError extends Error {
 	redirectUrl?: string | Location

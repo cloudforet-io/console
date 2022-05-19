@@ -15,6 +15,7 @@
 
 <script lang="ts">
 import { PI } from '@spaceone/design-system';
+
 import { SIDEBAR_STYLE } from '@/common/components/titles/sidebar-title/type';
 
 export default {

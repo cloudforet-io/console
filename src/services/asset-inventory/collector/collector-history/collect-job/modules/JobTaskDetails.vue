@@ -13,7 +13,9 @@
 import {
     ComponentRenderProxy, computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from '@vue/composition-api';
+
 import { PTab } from '@spaceone/design-system';
+
 import JobTaskErrorList from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskErrorList.vue';
 import { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
 

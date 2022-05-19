@@ -1,7 +1,7 @@
-import { UserStoreState } from './type';
-import * as getters from './getters';
 import * as actions from './actions';
+import * as getters from './getters';
 import * as mutations from './mutations';
+import { UserStoreState } from './type';
 
 const state: UserStoreState = {
     selectedIndex: [],

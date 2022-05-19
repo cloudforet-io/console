@@ -33,7 +33,9 @@ import {
     defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import { PI } from '@spaceone/design-system';
+
 import { i18n } from '@/translations';
 
 interface Props {

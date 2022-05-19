@@ -1,6 +1,7 @@
-import { ProjectDetailState } from '@/services/project/project-detail/store/type';
-import { Action } from 'vuex';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { Action } from 'vuex';
+
+import { ProjectDetailState } from '@/services/project/project-detail/store/type';
 
 export const getAlertCounts: Action<ProjectDetailState, any> = async ({ state, commit }): Promise<void> => {
     try {

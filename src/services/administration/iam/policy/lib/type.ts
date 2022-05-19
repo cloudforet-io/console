@@ -1,5 +1,6 @@
-import { PolicyTypes, PolicyState } from '@/services/administration/iam/policy/lib/config';
 import { Tags, TimeStamp } from '@/models';
+
+import { PolicyTypes, PolicyState } from '@/services/administration/iam/policy/lib/config';
 
 export interface PolicyListDataModel {
     results: PolicyDataModel[];

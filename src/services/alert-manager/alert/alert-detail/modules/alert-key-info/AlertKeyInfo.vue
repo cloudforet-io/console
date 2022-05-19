@@ -60,25 +60,31 @@
 
 <script lang="ts">
 import {
-    PPaneLayout, PDefinitionTable, PAnchor, PBadge,
-} from '@spaceone/design-system';
-import {
     computed, PropType, reactive, toRefs,
 } from '@vue/composition-api';
+
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+import {
+    PPaneLayout, PDefinitionTable, PAnchor, PBadge,
+} from '@spaceone/design-system';
+
+
 import { store } from '@/store';
-import { AlertDataModel } from '@/services/alert-manager/type';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { i18n } from '@/translations';
-import AlertInfoProject from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/modules/AlertInfoProject.vue';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import AlertInfoDescription
     from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/modules/AlertInfoDescription.vue';
-import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/alert-manager/lib/config';
+import AlertInfoProject from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/modules/AlertInfoProject.vue';
 import AlertTriggeredBy from '@/services/alert-manager/alert/modules/AlertTriggeredBy.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/alert-manager/lib/config';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { alertManagerStore } from '@/services/alert-manager/store';
+import { AlertDataModel } from '@/services/alert-manager/type';
 
 
 // const EDIT_MODE = {

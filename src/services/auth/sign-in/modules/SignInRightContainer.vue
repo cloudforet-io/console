@@ -49,14 +49,19 @@
 
 <script lang="ts">
 import {
-    PI,
-} from '@spaceone/design-system';
-import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { AUTH_ROUTE } from '@/services/auth/route-config';
+
+import {
+    PI,
+} from '@spaceone/design-system';
+
+
 import { store } from '@/store';
+
 import config from '@/lib/config';
+
+import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 
 export default {

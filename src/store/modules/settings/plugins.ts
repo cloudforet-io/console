@@ -1,4 +1,5 @@
 import { Store } from 'vuex';
+
 import { STORAGE_KEY } from '@/store/modules/settings';
 
 const localStoragePlugin = (store: Store<any>) => {

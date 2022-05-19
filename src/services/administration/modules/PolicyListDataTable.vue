@@ -66,29 +66,32 @@
 </template>
 
 <script lang="ts">
-import { filter } from 'lodash';
-import {
-    PAnchor, PBadge, PSelectStatus, PToolboxTable,
-} from '@spaceone/design-system';
 import {
     computed, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
+import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import {
+    PAnchor, PBadge, PSelectStatus, PToolboxTable,
+} from '@spaceone/design-system';
+import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { filter } from 'lodash';
+
+import { store } from '@/store';
+
 import { POLICY_TYPES, PolicyTypes } from '@/services/administration/iam/policy/lib/config';
 import {
     makeCustomValueHandler,
     policyCreatedAtFormatter,
     policyTypeBadgeColorFormatter,
 } from '@/services/administration/iam/policy/lib/helper';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
-import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { store } from '@/store';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import { administrationStore } from '@/services/administration/store';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
-import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 import { Policy } from '@/services/administration/iam/role/type';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { administrationStore } from '@/services/administration/store';
 
 
 const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], selectedType: PolicyTypes): PolicyDataModel[] => {

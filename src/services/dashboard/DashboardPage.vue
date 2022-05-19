@@ -37,19 +37,21 @@ import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 
-import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
-import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
-import ServiceAccounts from '@/services/dashboard/modules/ServiceAccounts.vue';
-import AllSummary from '@/services/dashboard/modules/AllSummary.vue';
-import TopProjects from '@/services/dashboard/modules/TopProjects.vue';
+import { store } from '@/store';
+
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import ResourceMap from '@/services/dashboard/modules/ResourceMap.vue';
+import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
+
+import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
+import AllSummary from '@/services/dashboard/modules/AllSummary.vue';
 import CollectorProgress from '@/services/dashboard/modules/CollectingProgress.vue';
 import FavoritesWidget from '@/services/dashboard/modules/FavoritesWidget.vue';
-import TrustedAdvisor from '@/services/dashboard/modules/TrustedAdvisor.vue';
 import PersonalHealthDashboard
     from '@/services/dashboard/modules/PersonalHealthDashboard.vue';
-import { store } from '@/store';
+import ResourceMap from '@/services/dashboard/modules/ResourceMap.vue';
+import ServiceAccounts from '@/services/dashboard/modules/ServiceAccounts.vue';
+import TopProjects from '@/services/dashboard/modules/TopProjects.vue';
+import TrustedAdvisor from '@/services/dashboard/modules/TrustedAdvisor.vue';
 
 
 export default {

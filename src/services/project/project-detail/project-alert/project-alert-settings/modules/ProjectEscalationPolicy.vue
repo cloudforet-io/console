@@ -54,25 +54,29 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get, filter } from 'lodash';
 
 import {
     computed, onActivated, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PBadge, PDivider, PI, PAnchor,
 } from '@spaceone/design-system';
-import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
+import { get, filter } from 'lodash';
 
-import { FINISH_CONDITION } from '@/services/alert-manager/lib/config';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+
 import { i18n } from '@/translations';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
+import { FINISH_CONDITION } from '@/services/alert-manager/lib/config';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 
 export default {

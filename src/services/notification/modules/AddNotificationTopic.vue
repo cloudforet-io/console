@@ -31,6 +31,7 @@
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
 import { PRadio, PCheckBox } from '@spaceone/design-system';
 
 const TOPIC_LIST = [

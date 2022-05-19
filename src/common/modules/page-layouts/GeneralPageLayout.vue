@@ -15,10 +15,13 @@
 </template>
 
 <script lang="ts">
-import FNB from '@/common/modules/navigations/FNB.vue';
 import { computed, PropType } from '@vue/composition-api';
-import { Breadcrumb } from '@/common/modules/page-layouts/type';
+
 import { PBreadcrumbs } from '@spaceone/design-system';
+
+import FNB from '@/common/modules/navigations/FNB.vue';
+import { Breadcrumb } from '@/common/modules/page-layouts/type';
+
 
 export default {
     name: 'GeneralPageLayout',

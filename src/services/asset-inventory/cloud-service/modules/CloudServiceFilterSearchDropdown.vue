@@ -47,11 +47,13 @@ import {
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 
 import { store } from '@/store';
-import { CLOUD_SERVICE_CATEGORY, CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
-import { SortedRegionReferenceItem } from '@/store/modules/reference/region/type';
 import { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
+import { SortedRegionReferenceItem } from '@/store/modules/reference/region/type';
+
 import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
+import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
+
+import { CLOUD_SERVICE_CATEGORY, CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
 import { getRegionFilterMenuItem, RegionMenuItem } from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
 

@@ -39,10 +39,13 @@
 </template>
 
 <script lang="ts">
-import { PPopover, PIconButton, PButton } from '@spaceone/design-system';
-import { i18n } from '@/translations';
-import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 import { defineComponent } from '@vue/composition-api';
+
+import { PPopover, PIconButton, PButton } from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
+
+import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
 interface Props {
     iconOnly?: boolean;

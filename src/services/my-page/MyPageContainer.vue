@@ -34,20 +34,21 @@
 import {
     ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive,
 } from '@vue/composition-api';
-import { PDivider, PI } from '@spaceone/design-system';
 
+import { PDivider, PI } from '@spaceone/design-system';
+import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+
+import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
-
-import MyPageLNB from '@/services/my-page/MyPageLNB.vue';
-import myPageStore from '@/services/my-page/store';
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
-import UserAPIKeyHandbook from '@/services/my-page/my-account/user-api-key/modules/APIKeyHandbook.vue';
 
-import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
+import UserAPIKeyHandbook from '@/services/my-page/my-account/user-api-key/modules/APIKeyHandbook.vue';
+import MyPageLNB from '@/services/my-page/MyPageLNB.vue';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import myPageStore from '@/services/my-page/store';
+
 
 export default defineComponent({
     name: 'MyPageContainer',

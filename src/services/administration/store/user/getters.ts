@@ -1,4 +1,5 @@
 import { Getter } from 'vuex';
+
 import { UserStoreState } from './type';
 
 export const isManagementModalVisible: Getter<UserStoreState, any> = ({ visibleManagementModal }): boolean => visibleManagementModal;

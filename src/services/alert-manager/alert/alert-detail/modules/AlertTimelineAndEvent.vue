@@ -13,13 +13,16 @@
 </template>
 
 <script lang="ts">
-import { PPanelTop, PTab } from '@spaceone/design-system';
 import {
     computed, reactive,
 } from '@vue/composition-api';
+
+import { PPanelTop, PTab } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import AlertPushedEvent from '@/services/alert-manager/alert/alert-detail/modules/alert-pushed-event/AlertPushedEvent.vue';
+
 import { i18n } from '@/translations';
+
+import AlertPushedEvent from '@/services/alert-manager/alert/alert-detail/modules/alert-pushed-event/AlertPushedEvent.vue';
 import AlertDetails from '@/services/alert-manager/alert/alert-detail/modules/AlertDetails.vue';
 
 export default {

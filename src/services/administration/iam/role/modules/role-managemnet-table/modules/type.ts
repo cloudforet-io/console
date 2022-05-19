@@ -1,6 +1,7 @@
 import { TimeStamp } from '@/models';
-import { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
+
 import { RoleData } from '@/services/administration/iam/role/type';
+import { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
 
 export interface RoleBindingType {
     created_at: TimeStamp;

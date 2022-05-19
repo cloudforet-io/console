@@ -47,18 +47,21 @@
 </template>
 
 <script lang="ts">
-import NewMark from '@/common/components/marks/NewMark.vue';
-import BetaMark from '@/common/components/marks/BetaMark.vue';
-import { PDivider, PI } from '@spaceone/design-system';
 import {
     computed, defineComponent, PropType, reactive, toRefs,
 } from '@vue/composition-api';
-import { LNBMenu, MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
+
+import { PDivider, PI } from '@spaceone/design-system';
 import { Location } from 'vue-router';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { store } from '@/store';
+
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
+import BetaMark from '@/common/components/marks/BetaMark.vue';
+import NewMark from '@/common/components/marks/NewMark.vue';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { LNBMenu, MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
 interface Props {
     menuData: LNBMenu;

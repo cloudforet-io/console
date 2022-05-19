@@ -1,5 +1,6 @@
-import { FavoriteState, FavoriteConfig, FavoriteHasLoaded } from '@/store/modules/favorite/type';
 import { Mutation } from 'vuex';
+
+import { FavoriteState, FavoriteConfig, FavoriteHasLoaded } from '@/store/modules/favorite/type';
 
 export const setIsLoading: Mutation<FavoriteState> = (state, isLoading: FavoriteHasLoaded): void => {
     state.isLoading = isLoading;

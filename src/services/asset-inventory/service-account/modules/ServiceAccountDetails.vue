@@ -11,10 +11,14 @@
 <script lang="ts">
 
 import { reactive, toRefs, watch } from '@vue/composition-api';
-import { PDynamicLayout } from '@spaceone/design-system';
+
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { PDynamicLayout } from '@spaceone/design-system';
+
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 export default {
     name: 'ServiceAccountDetails',

@@ -53,44 +53,45 @@
 </template>
 
 <script lang="ts">
-import { debounce, throttle } from 'lodash';
-import axios, { CancelTokenSource } from 'axios';
 
-import vClickOutside from 'v-click-outside';
 
 import {
     computed, defineComponent, onMounted, onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PI } from '@spaceone/design-system';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { PI } from '@spaceone/design-system';
 import { laptop } from '@spaceone/design-system/src/styles/screens';
+import axios, { CancelTokenSource } from 'axios';
+import { debounce, throttle } from 'lodash';
+import vClickOutside from 'v-click-outside';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { RecentConfig } from '@/store/modules/recent/type';
+import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 
-import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
-import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchDropdown.vue';
-import {
-    SUGGESTION_TYPE, SuggestionItem, SuggestionType,
-} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProxyValue } from '@/common/composables/proxy-state';
-
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { getAllSuggestionMenuList, SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
+import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
     convertCloudServiceConfigToReferenceData,
     convertMenuConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
-import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
-import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import { getAllSuggestionMenuList, SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
 import { MENU_ID, MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+
+import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
+import {
+    SUGGESTION_TYPE, SuggestionItem, SuggestionType,
+} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchDropdown.vue';
+import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
 import { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
-import { isUserAccessibleToMenu } from '@/lib/access-control';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
 interface CloudServiceData {

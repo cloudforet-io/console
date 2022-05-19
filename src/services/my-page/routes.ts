@@ -1,7 +1,9 @@
 import { RouteConfig } from 'vue-router';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
-import { getMenuLabel } from '@/lib/menu/menu-info';
+
 import { MENU_ID } from '@/lib/menu/config';
+import { getMenuLabel } from '@/lib/menu/menu-info';
+
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 const MyPageContainer = () => import(/* webpackChunkName: "MyPageContainer" */'@/services/my-page/MyPageContainer.vue');
 

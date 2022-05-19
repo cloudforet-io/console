@@ -5,11 +5,12 @@
 </template>
 
 <script lang="ts">
-import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
-
 import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
+import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
+
 
 export default {
     name: 'ProjectNotificationsPage',

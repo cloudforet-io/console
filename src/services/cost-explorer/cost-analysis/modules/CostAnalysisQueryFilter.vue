@@ -46,7 +46,6 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
@@ -54,16 +53,18 @@ import {
     PIconButton, PSelectDropdown, PToggleButton,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import dayjs from 'dayjs';
 
-import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
+
+import { i18n } from '@/translations';
+
+import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
-
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { i18n } from '@/translations';
-import { Period } from '@/services/cost-explorer/type';
-import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import { Period } from '@/services/cost-explorer/type';
 
 const CostAnalysisSetQueryModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSetQueryModal.vue');
 

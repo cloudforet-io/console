@@ -79,10 +79,13 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import { PAnchor } from '@spaceone/design-system';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 export default {
     name: 'EventRuleContent',

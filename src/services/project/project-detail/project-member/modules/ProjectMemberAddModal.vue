@@ -104,28 +104,30 @@
 </template>
 
 <script lang="ts">
-import { debounce } from 'lodash';
-
 import {
     reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PBoxTab, PSearchDropdown, PTooltip, PI, PTextInput,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
+import { debounce } from 'lodash';
+import { TranslateResult } from 'vue-i18n';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import { useFormValidator } from '@/common/composables/form-validator';
-import { AUTH_TYPE, MemberItem } from '@/services/project/project-detail/project-member/type';
-import { i18n } from '@/translations';
-import { store } from '@/store';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 import { checkEmailFormat } from '@/services/administration/iam/user/lib/user-form-validations';
-import { TranslateResult } from 'vue-i18n';
+import { AUTH_TYPE, MemberItem } from '@/services/project/project-detail/project-member/type';
 
 
 export default {

@@ -45,19 +45,20 @@ import {
 } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
-
-import { FAVORITE_TYPE, FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
 import { TranslateResult } from 'vue-i18n';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { i18n } from '@/translations';
+
 import { store } from '@/store';
+import { FAVORITE_TYPE, FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
 import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { i18n } from '@/translations';
+
 import {
     convertCloudServiceConfigToReferenceData,
     convertProjectConfigToReferenceData, convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 
 type Item = Record<string, {label: TranslateResult; favorites: FavoriteItem[]}>

@@ -1,6 +1,7 @@
 import { Store } from 'vuex';
-import { CloudServiceStoreState } from './cloud-service/type';
+
 import { CloudServiceDetailStoreState } from './cloud-service-detail/type';
+import { CloudServiceStoreState } from './cloud-service/type';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface AssetInventoryState {

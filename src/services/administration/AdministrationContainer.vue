@@ -28,19 +28,20 @@
 </template>
 
 <script lang="ts">
-import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import { registerServiceStore } from '@/common/composables/register-service-store';
-import { administrationStore, administrationStoreModule } from '@/services/administration/store';
-import AdministrationLNB from '@/services/administration/AdministrationLNB.vue';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, defineComponent,
 } from '@vue/composition-api';
-import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 
+import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
+import { registerServiceStore } from '@/common/composables/register-service-store';
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
+
+import AdministrationLNB from '@/services/administration/AdministrationLNB.vue';
 import RoleCreateEditHandbook from '@/services/administration/modules/RoleCreateEditHandbook.vue';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { administrationStore, administrationStoreModule } from '@/services/administration/store';
 
 
 export default defineComponent({

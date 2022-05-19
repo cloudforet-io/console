@@ -1,8 +1,11 @@
-import dayjs from 'dayjs';
 import {
     computed,
 } from '@vue/composition-api';
+
+import dayjs from 'dayjs';
+
 import { i18n } from '@/translations';
+
 import { dayjsLocaleMap } from '@/translations/vendors/dayjs';
 
 /**

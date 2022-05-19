@@ -42,11 +42,15 @@
 </template>
 
 <script lang="ts">
-import vClickOutside from 'v-click-outside';
-import { PI } from '@spaceone/design-system';
-import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import { PropType } from '@vue/composition-api';
+
+import { PI } from '@spaceone/design-system';
+import vClickOutside from 'v-click-outside';
+
 import { GNBMenu } from '@/store/modules/display/type';
+
+import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
+
 
 export default {
     name: 'GNBMenu',

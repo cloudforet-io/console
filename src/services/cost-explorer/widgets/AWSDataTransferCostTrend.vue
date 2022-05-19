@@ -27,48 +27,48 @@
 </template>
 
 <script lang="ts">
-import bytes from 'bytes';
-import dayjs from 'dayjs';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import { XYChart } from '@amcharts/amcharts4/charts';
-
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import * as am4charts from '@amcharts/amcharts4/charts';
+import { XYChart } from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { byteFormatter, commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-
-import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
-import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
+import bytes from 'bytes';
+import dayjs from 'dayjs';
+import { range } from 'lodash';
+import { TranslateResult } from 'vue-i18n';
 
 import { CURRENCY } from '@/store/modules/display/config';
 import {
-    getTooltipText, getXYChartData,
-} from '@/services/cost-explorer/widgets/lib/widget-data-helper';
-import { byteFormatter, commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-import {
     gray, green, red, yellow,
 } from '@/styles/colors';
+import { i18n } from '@/translations';
+
 import config from '@/lib/config';
-import { Period } from '@/services/cost-explorer/type';
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { range } from 'lodash';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { Period } from '@/services/cost-explorer/type';
+import {
+    getTooltipText, getXYChartData,
+} from '@/services/cost-explorer/widgets/lib/widget-data-helper';
+import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
+import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 import {
     ChartData, CostAnalyzeModel, Legend, TrafficWidgetTableData, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
-import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { i18n } from '@/translations';
-import { TranslateResult } from 'vue-i18n';
 
 
 const GROUP_BY = 'usage_type';

@@ -15,8 +15,10 @@
 </template>
 
 <script lang="ts">
-import { PNotificationBar } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
+
+import { PNotificationBar } from '@spaceone/design-system';
+
 import { store } from '@/store';
 
 export default {

@@ -31,20 +31,23 @@
 import {
     computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPageTitle,
 } from '@spaceone/design-system';
 
-import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/DashboardLayouts.vue';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { fetchDefaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import CostDashboardFilter from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardFilter.vue';
 import CostDashboardPeriodSelectDropdown
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
+import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/DashboardLayouts.vue';
 import { CustomLayout, DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { fetchDefaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/helper';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const HEADER_ELEMENT = 1;
 const DASHBOARD_LAYOUT = 1;

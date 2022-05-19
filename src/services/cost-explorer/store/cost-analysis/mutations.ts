@@ -1,4 +1,5 @@
 import { Mutation } from 'vuex';
+
 import {
     CostAnalysisStoreState,
 } from '@/services/cost-explorer/store/cost-analysis/type';

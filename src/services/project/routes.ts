@@ -1,4 +1,5 @@
 import { RouteConfig } from 'vue-router';
+
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 const ProjectPage = () => import(/* webpackChunkName: "ProjectPage" */ '@/services/project/ProjectPage.vue');

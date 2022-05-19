@@ -51,13 +51,18 @@
 
 <script lang="ts">
 import {
-    PPaneLayout, PPanelTop, PFieldGroup, PLabel, PTextInput, PSelectCard,
-} from '@spaceone/design-system';
-import {
     computed, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { useFormValidator } from '@/common/composables/form-validator';
+
+import {
+    PPaneLayout, PPanelTop, PFieldGroup, PLabel, PTextInput, PSelectCard,
+} from '@spaceone/design-system';
+
 import { i18n } from '@/translations';
+
+import { useFormValidator } from '@/common/composables/form-validator';
+
+
 import { ROLE_TYPE, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
 import { BaseInfoFormData } from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
 

@@ -69,20 +69,25 @@
 
 <script lang="ts">
 import {
-    PDivider, PI, PEmpty, PPaneLayout, PLazyImg, PDataLoader,
-} from '@spaceone/design-system';
-import {
     ComponentRenderProxy, computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from '@vue/composition-api';
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import NotificationChannelItem from '@/services/notification/modules/notification-channel-item/NotificationChannelItem.vue';
+
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import {
+    PDivider, PI, PEmpty, PPaneLayout, PLazyImg, PDataLoader,
+} from '@spaceone/design-system';
+
 import { store } from '@/store';
-import { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/administration/iam/user/type';
-import { PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/administration/iam/user/type';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import NotificationChannelItem from '@/services/notification/modules/notification-channel-item/NotificationChannelItem.vue';
+import { PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 export default {

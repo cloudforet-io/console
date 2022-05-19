@@ -8,37 +8,41 @@
 </template>
 
 <script lang="ts">
-import { cloneDeep } from 'lodash';
-import dayjs from 'dayjs';
-import * as am4core from '@amcharts/amcharts4/core';
-import { XYChart } from '@amcharts/amcharts4/charts';
-
 import {
     ComponentRenderProxy,
     getCurrentInstance,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { XYChart } from '@amcharts/amcharts4/charts';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { cloneDeep } from 'lodash';
+
 
 import { CURRENCY } from '@/store/modules/display/config';
+import { gray } from '@/styles/colors';
+
+import config from '@/lib/config';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { getTimeUnitByPeriod } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { Granularity } from '@/services/cost-explorer/type';
-import { getTimeUnitByPeriod } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import {
     getStackedChartData, getCurrencyAppliedChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import {
     Legend, XYChartData, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import config from '@/lib/config';
-import { gray } from '@/styles/colors';
-import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { useProxyValue } from '@/common/composables/proxy-state';
+
 
 const CATEGORY_KEY = 'date';
 

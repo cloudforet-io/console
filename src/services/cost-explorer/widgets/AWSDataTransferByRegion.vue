@@ -43,30 +43,36 @@
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import bytes from 'bytes';
-import { MapChart } from '@amcharts/amcharts4/maps';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4maps from '@amcharts/amcharts4/maps';
-import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import config from '@/lib/config';
-import { gray } from '@/styles/colors';
-import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
-import { PDataLoader } from '@spaceone/design-system';
-import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
-import { CURRENCY } from '@/store/modules/display/config';
-import { store } from '@/store';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import dayjs from 'dayjs';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import am4geodataContinentsLow from '@amcharts/amcharts4-geodata/continentsLow';
+import * as am4core from '@amcharts/amcharts4/core';
+import { MapChart } from '@amcharts/amcharts4/maps';
+import * as am4maps from '@amcharts/amcharts4/maps';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { PDataLoader } from '@spaceone/design-system';
+import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import bytes from 'bytes';
+import dayjs from 'dayjs';
+
+import { store } from '@/store';
+import { CURRENCY } from '@/store/modules/display/config';
+import { gray } from '@/styles/colors';
+import { i18n } from '@/translations';
+
+import config from '@/lib/config';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 import { TrafficWidgetTableData } from '@/services/cost-explorer/widgets/type';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { i18n } from '@/translations';
+
 
 const valueName = 'value';
 

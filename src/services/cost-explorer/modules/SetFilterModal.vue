@@ -56,8 +56,6 @@
 </template>
 
 <script lang="ts">
-import { sum } from 'lodash';
-
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -65,14 +63,17 @@ import {
 import {
     PButtonModal, PCollapsibleList, PTag,
 } from '@spaceone/design-system';
+import { sum } from 'lodash';
+
+
+import { store } from '@/store';
+import { ReferenceItem } from '@/store/modules/reference/type';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import CostAnalysisFilterItem from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFilterItem.vue';
-
 import { FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
-import { ReferenceItem } from '@/store/modules/reference/type';
-import { useProxyValue } from '@/common/composables/proxy-state';
-import { store } from '@/store';
 
 
 interface FilterItem {

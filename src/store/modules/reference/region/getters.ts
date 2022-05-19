@@ -1,4 +1,5 @@
 import { Getter } from 'vuex';
+
 import { RegionReferenceItem, RegionReferenceState, SortedRegionReferenceItem } from '@/store/modules/reference/region/type';
 
 

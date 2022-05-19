@@ -11,22 +11,24 @@
 </template>
 
 <script lang="ts">
-import { TranslateResult } from 'vue-i18n';
-
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import CostAnalysisChart from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChart.vue';
-import CostAnalysisQueryFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFilter.vue';
-import CostAnalysisGroupByFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilter.vue';
+import { TranslateResult } from 'vue-i18n';
 
-import CostAnalysisDataTable from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisDataTable.vue';
+
 import { i18n } from '@/translations';
-import { CostQuerySetModel } from '@/services/cost-explorer/type';
-import CostAnalysisHeader from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisHeader.vue';
+
 import { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
+
+import CostAnalysisChart from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChart.vue';
+import CostAnalysisDataTable from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisDataTable.vue';
+import CostAnalysisGroupByFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilter.vue';
+import CostAnalysisHeader from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisHeader.vue';
+import CostAnalysisQueryFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFilter.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 export default {
     name: 'CostAnalysisPreview',

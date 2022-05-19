@@ -32,21 +32,26 @@
 </template>
 
 <script lang="ts">
+import { computed, reactive, toRefs } from '@vue/composition-api';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PAnchor, PSelectCard, PDivider, PTextPagination,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+
+import { store } from '@/store';
+
 import { getUUID } from '@/lib/component-util/getUUID';
-import { defaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/config';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { defaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import {
     DashboardInfo,
     PublicDashboardInfo,
     UserDashboardInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { store } from '@/store';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const PAGE_SIZE = 8;

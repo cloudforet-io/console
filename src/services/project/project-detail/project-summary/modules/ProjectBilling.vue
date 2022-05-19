@@ -104,17 +104,16 @@
 </template>
 
 <script lang="ts">
-import { orderBy, range } from 'lodash';
-import dayjs from 'dayjs';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import { XYChart } from '@amcharts/amcharts4/charts';
-import { NumberFormatOptions } from 'vue-i18n';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { XYChart } from '@amcharts/amcharts4/charts';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton,
     PDataLoader,
@@ -124,18 +123,23 @@ import {
     PIconButton,
     PSkeleton,
 } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { orderBy, range } from 'lodash';
+import { NumberFormatOptions } from 'vue-i18n';
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
+
+import { CURRENCY } from '@/store/modules/display/config';
 import {
     gray, safe, secondary, secondary1, green, blue,
 } from '@/styles/colors';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
 import config from '@/lib/config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { CURRENCY } from '@/store/modules/display/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { primitiveToQueryString } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
 interface ChartData {

@@ -60,19 +60,22 @@ import {
     PropType, reactive, toRefs,
 } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PSearchDropdown, PTextInput,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
+
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { useProxyValue } from '@/common/composables/proxy-state';
-import { useFormValidator } from '@/common/composables/form-validator';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFormValidator } from '@/common/composables/form-validator';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 import { MemberItem } from '@/services/project/project-detail/project-member/type';
-import { i18n } from '@/translations';
-import { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
 
 
 interface Props {

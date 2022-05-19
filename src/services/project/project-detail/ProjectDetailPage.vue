@@ -97,41 +97,44 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { TranslateResult } from 'vue-i18n';
-import { find } from 'lodash';
 
+import { commaFormatter } from '@spaceone/console-core-lib';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PTab, PPageTitle, PButtonModal,
     PButton, PCopyButton, PBreadcrumbs, PIconButton, PBadge, PDataLoader,
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { find } from 'lodash';
+import Vue from 'vue';
+import { TranslateResult } from 'vue-i18n';
+
 
 import { store } from '@/store';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { i18n } from '@/translations';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-import { ALERT_STATE } from '@/services/alert-manager/lib/config';
-import MaintenanceWindowFormModal from '@/services/project/project-detail/modules/MaintenanceWindowFormModal.vue';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
-import { ProjectModel } from '@/services/project/type';
-import { commaFormatter } from '@spaceone/console-core-lib';
+import { isUserAccessibleToMenu } from '@/lib/access-control';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { MENU_ID } from '@/lib/menu/config';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
-import MaintenanceHappeningList from '@/services/project/project-detail/modules/MaintenanceHappeningList.vue';
-import Vue from 'vue';
-import { registerServiceStore } from '@/common/composables/register-service-store';
-import { ProjectDetailState } from '@/services/project/project-detail/store/type';
-import ProjectDetailStoreModule from '@/services/project/project-detail/store';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { NoResourceError } from '@/common/composables/error/error';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import { isUserAccessibleToMenu } from '@/lib/access-control';
-import { MENU_ID } from '@/lib/menu/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { registerServiceStore } from '@/common/composables/register-service-store';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+
+import { ALERT_STATE } from '@/services/alert-manager/lib/config';
+import MaintenanceHappeningList from '@/services/project/project-detail/modules/MaintenanceHappeningList.vue';
+import MaintenanceWindowFormModal from '@/services/project/project-detail/modules/MaintenanceWindowFormModal.vue';
+import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
+import ProjectDetailStoreModule from '@/services/project/project-detail/store';
+import { ProjectDetailState } from '@/services/project/project-detail/store/type';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { ProjectModel } from '@/services/project/type';
+
 
 export default {
     name: 'ProjectDetailPage',

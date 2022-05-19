@@ -22,13 +22,15 @@
 import {
     ComponentRenderProxy, computed, defineComponent, getCurrentInstance,
 } from '@vue/composition-api';
+
+import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
+import { registerServiceStore } from '@/common/composables/register-service-store';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
-import { registerServiceStore } from '@/common/composables/register-service-store';
-import { AssetInventoryState } from '@/services/asset-inventory/store/type';
-import { assetInventoryStoreModule, assetInventoryStore } from '@/services/asset-inventory/store';
+
 import AssetInventoryLNB from '@/services/asset-inventory/AssetInventoryLNB.vue';
-import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
+import { assetInventoryStoreModule, assetInventoryStore } from '@/services/asset-inventory/store';
+import { AssetInventoryState } from '@/services/asset-inventory/store/type';
 
 
 export default defineComponent({

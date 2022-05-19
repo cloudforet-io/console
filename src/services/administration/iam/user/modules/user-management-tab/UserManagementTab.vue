@@ -80,20 +80,21 @@ import {
 import {
     PEmpty, PStatus, PTab, PDataTable, PPanelTop,
 } from '@spaceone/design-system';
-
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
-import UserDetail from '@/services/administration/iam/user/modules/user-management-tab/UserDetail.vue';
-import UserAssignedRole from '@/services/administration/iam/user/modules/user-management-tab/UserAssignedRole.vue';
-import PTagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
-import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
-import UserNotifications from '@/services/administration/iam/user/modules/user-management-tab/UserNotifications.vue';
 
 import { store } from '@/store';
-import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import { i18n } from '@/translations';
+
+import PTagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
+
+import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
+import UserAssignedRole from '@/services/administration/iam/user/modules/user-management-tab/UserAssignedRole.vue';
+import UserDetail from '@/services/administration/iam/user/modules/user-management-tab/UserDetail.vue';
+import UserNotifications from '@/services/administration/iam/user/modules/user-management-tab/UserNotifications.vue';
 import { User } from '@/services/administration/iam/user/type';
 import { administrationStore } from '@/services/administration/store';
+import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
 
 export default {
     name: 'UserManagementTab',

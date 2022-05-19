@@ -22,35 +22,38 @@
 </template>
 
 <script lang="ts">
-import { sortBy } from 'lodash';
 
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PDataLoader } from '@spaceone/design-system';
+import { sortBy } from 'lodash';
 
-import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
-import { SUGGESTION_TYPE, SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+import { GNBMenu } from '@/store/modules/display/type';
 import { RECENT_TYPE, RecentConfig, RecentItem } from '@/store/modules/recent/type';
+import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+
+import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
     convertCloudServiceConfigToReferenceData,
     convertMenuConfigToReferenceData,
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
-import { GNBMenu } from '@/store/modules/display/type';
-import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import { MENU_ID, MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import { SUGGESTION_TYPE, SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
+
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { isUserAccessibleToMenu } from '@/lib/access-control';
 
 
 const RECENT_LIMIT = 30;

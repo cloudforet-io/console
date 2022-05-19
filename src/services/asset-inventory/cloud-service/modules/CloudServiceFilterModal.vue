@@ -55,8 +55,6 @@
 </template>
 
 <script lang="ts">
-import { sum } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -64,21 +62,24 @@ import {
 import {
     PButtonModal, PCollapsibleList, PTag,
 } from '@spaceone/design-system';
+import { sum } from 'lodash';
+import { TranslateResult } from 'vue-i18n';
 
-import { i18n } from '@/translations';
 import { store } from '@/store';
 import { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import { i18n } from '@/translations';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { CloudServiceFilterKey, CloudServiceFilterMap } from '@/services/asset-inventory/cloud-service/type';
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
 import CloudServiceFilterSearchDropdown from '@/services/asset-inventory/cloud-service/modules/CloudServiceFilterSearchDropdown.vue';
-import { assetInventoryStore } from '@/services/asset-inventory/store';
 import {
     getRegionFilterMenuItem,
     RegionMenuItem,
 } from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
+import { CloudServiceFilterKey, CloudServiceFilterMap } from '@/services/asset-inventory/cloud-service/type';
+import { assetInventoryStore } from '@/services/asset-inventory/store';
 
 interface FilterItem {
     name: string;

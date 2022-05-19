@@ -55,24 +55,25 @@
 </template>
 
 <script lang="ts">
-import {
-    camelCase, isEmpty, get,
-} from 'lodash';
 
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PIconButton, PPaneLayout, PButton,
 } from '@spaceone/design-system';
+import {
+    camelCase, isEmpty, get,
+} from 'lodash';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { Tag } from '@/common/components/forms/tags-input-group/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props {
     tags: Tag;

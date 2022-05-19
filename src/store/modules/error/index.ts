@@ -1,7 +1,7 @@
-import { ErrorState } from './type';
-import * as getters from './getters';
 import * as actions from './actions';
+import * as getters from './getters';
 import * as mutations from './mutations';
+import { ErrorState } from './type';
 
 const state: ErrorState = {
     visibleSessionExpiredError: false,

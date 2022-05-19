@@ -5,7 +5,6 @@
 </template>
 
 <script lang="ts">
-import { get } from 'lodash';
 import {
     ComponentRenderProxy,
     computed,
@@ -14,21 +13,27 @@ import {
     reactive, toRefs,
     watch,
 } from '@vue/composition-api';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
+import { get } from 'lodash';
+
+import { store } from '@/store';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
+import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
+import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import {
     BackLink, LNBItem, LNBMenu, TopTitle,
 } from '@/common/modules/navigations/lnb/type';
-import { MENU_ID } from '@/lib/menu/config';
-import { assetInventoryStore } from '@/services/asset-inventory/store';
+
 import {
     CloudServiceDetailPageParams,
     CloudServiceTypeInfo,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
-import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
-import { store } from '@/store';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { assetInventoryStore } from '@/services/asset-inventory/store';
 
 
 export default defineComponent({

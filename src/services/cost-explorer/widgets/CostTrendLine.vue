@@ -29,48 +29,49 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs';
-import { range } from 'lodash';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
-import * as am4core from '@amcharts/amcharts4/core';
 
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-
-import CostDashboardCardWidgetLayout
-    from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
-import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
-
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-
-import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-import { gray } from '@/styles/colors';
-import config from '@/lib/config';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import dayjs from 'dayjs';
+import { range } from 'lodash';
+
 import { CURRENCY } from '@/store/modules/display/config';
-import {
-    ChartData, CostAnalyzeModel, Legend, WidgetProps,
-} from '@/services/cost-explorer/widgets/type';
+import { gray } from '@/styles/colors';
+import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
+
+import { toggleSeries } from '@/lib/amcharts/helper';
+import config from '@/lib/config';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { Period } from '@/services/cost-explorer/type';
 import {
     getCurrencyAppliedChartData,
     getLegends, getTooltipText,
     getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { Period } from '@/services/cost-explorer/type';
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
-import { toggleSeries } from '@/lib/amcharts/helper';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import CostDashboardCardWidgetLayout
+    from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
+import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
+import {
+    ChartData, CostAnalyzeModel, Legend, WidgetProps,
+} from '@/services/cost-explorer/widgets/type';
 
 
 const PAGE_SIZE = 5;

@@ -1,4 +1,5 @@
 import { RouteConfig } from 'vue-router';
+
 import ErrorPage from '@/common/pages/ErrorPage.vue';
 
 export const ERROR_ROUTE = Object.freeze({

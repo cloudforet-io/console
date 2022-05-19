@@ -30,10 +30,13 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
+
 import { PSelectDropdown, PLazyImg } from '@spaceone/design-system';
+
 import { store } from '@/store';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import { i18n } from '@/translations';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 export default {
     name: 'ServiceProviderDropdown',

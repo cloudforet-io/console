@@ -28,41 +28,44 @@
 </template>
 
 <script lang="ts">
-import bytes from 'bytes';
-import dayjs from 'dayjs';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import { XYChart } from '@amcharts/amcharts4/charts';
 
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
-import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
-import { CURRENCY } from '@/store/modules/display/config';
-
-import {
-    ChartData, CostAnalyzeModel, Legend, WidgetProps,
-} from '@/services/cost-explorer/widgets/type';
+import { XYChart } from '@amcharts/amcharts4/charts';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import config from '@/lib/config';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import bytes from 'bytes';
+import dayjs from 'dayjs';
+
+import { CURRENCY } from '@/store/modules/display/config';
 import { gray } from '@/styles/colors';
+import { i18n } from '@/translations';
+
+import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import {
     getCurrencyAppliedChartData,
     getReferenceLabel, getTooltipText,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
+import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
-import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { i18n } from '@/translations';
+import {
+    ChartData, CostAnalyzeModel, Legend, WidgetProps,
+} from '@/services/cost-explorer/widgets/type';
 
 // interface Data {
 //     project_id: string;

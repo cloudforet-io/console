@@ -52,8 +52,10 @@ import {
 import { PI, PIconButton } from '@spaceone/design-system';
 
 import { FAVORITE_TYPE, FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
-import { FavoriteListProps } from '@/common/modules/favorites/favorite-list/type';
+
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import { FavoriteListProps } from '@/common/modules/favorites/favorite-list/type';
 
 const LIMIT_COUNT = 5;
 export default {

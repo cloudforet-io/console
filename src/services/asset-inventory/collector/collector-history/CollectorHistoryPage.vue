@@ -99,37 +99,40 @@
 </template>
 
 <script lang="ts">
-import { capitalize } from 'lodash';
 
 import {
     computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
+
+import { iso8601Formatter, durationFormatter, numberFormatter } from '@spaceone/console-core-lib';
+import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
+import {
+    makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
+} from '@spaceone/console-core-lib/component-util/query-search';
+import { KeyItemSet, QueryTag, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
+import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PPageTitle, PPagination, PButtonModal, PLazyImg,
     PButton, PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
-import { KeyItemSet, QueryTag, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
-
-import PCollectorHistoryChart from '@/services/asset-inventory/collector/collector-history/modules/CollectorHistoryChart.vue';
-
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { iso8601Formatter, durationFormatter, numberFormatter } from '@spaceone/console-core-lib';
-import { replaceUrlQuery } from '@/lib/router-query-string';
-import {
-    makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
-} from '@spaceone/console-core-lib/component-util/query-search';
-import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
-import { store } from '@/store';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { peacock, green, red } from '@/styles/colors';
-import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
-import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
+import { capitalize } from 'lodash';
+
+import { store } from '@/store';
+import { peacock, green, red } from '@/styles/colors';
 import { i18n } from '@/translations';
+
+import { replaceUrlQuery } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
+import PCollectorHistoryChart from '@/services/asset-inventory/collector/collector-history/modules/CollectorHistoryChart.vue';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
 const PROGRESS_BAR_COLOR = peacock[500];

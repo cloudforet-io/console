@@ -1,16 +1,20 @@
-import config from '@/lib/config';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { store } from '@/store';
-import { SpaceRouter } from '@/router';
-import { GTag } from '@/lib/gtag';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { computed } from '@vue/composition-api';
-import { serviceRoutes } from '@/router/service-routes';
+
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+import { initI18n } from '@/translations';
+
 import { adminDomainServiceRoutes } from '@/router/admin-domain-service-routes';
 import { errorRoutes } from '@/router/error-routes';
+import { serviceRoutes } from '@/router/service-routes';
+
 import { addAmchartsLicense, applyAmchartsGlobalSettings } from '@/lib/amcharts/global-settings';
+import config from '@/lib/config';
+import { GTag } from '@/lib/gtag';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
-import { initI18n } from '@/translations';
 
 
 const initConfig = async () => {

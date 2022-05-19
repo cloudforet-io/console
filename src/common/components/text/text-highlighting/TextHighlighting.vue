@@ -12,6 +12,7 @@
 import {
     computed, defineComponent, PropType, reactive, toRefs,
 } from '@vue/composition-api';
+
 import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
 
 const STYLE_TYPE = ['primary', 'secondary'] as const;

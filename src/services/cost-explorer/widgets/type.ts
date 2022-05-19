@@ -1,6 +1,8 @@
+import { TranslateResult } from 'vue-i18n';
+
 import { Currency } from '@/store/modules/display/config';
 import { CurrencyRates } from '@/store/modules/display/type';
-import { TranslateResult } from 'vue-i18n';
+
 import { Period } from '@/services/cost-explorer/type';
 
 /* widget spec */

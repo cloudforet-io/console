@@ -61,15 +61,21 @@
 </template>
 
 <script lang="ts">
+import { computed, reactive, toRefs } from '@vue/composition-api';
+
 import {
     PButton, PAnchor, PButtonModal, PCopyButton,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+
+import { store } from '@/store';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
 import { useAlertInfoItem } from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/composables';
 import { EDIT_MODE } from '@/services/alert-manager/lib/config';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { store } from '@/store';
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
 
 export default {
     name: 'AlertInfoProject',

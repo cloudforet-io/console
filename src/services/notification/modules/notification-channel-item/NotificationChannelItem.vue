@@ -55,30 +55,34 @@
 
 <script lang="ts">
 import {
-    PDivider, PIconButton, PPaneLayout, PToggleButton,
-} from '@spaceone/design-system';
-import {
     computed,
     reactive, toRefs,
 } from '@vue/composition-api';
+
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import {
+    PDivider, PIconButton, PPaneLayout, PToggleButton,
+} from '@spaceone/design-system';
+
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import NotificationChannelItemName
-    from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemName.vue';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import NotificationChannelItemData
     from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemData.vue';
 import NotificationChannelItemLevel
     from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemLevel.vue';
+import NotificationChannelItemName
+    from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemName.vue';
 import NotificationChannelItemSchedule
     from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemSchedule.vue';
 import NotificationChannelItemTopic
     from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemTopic.vue';
 import { EDIT_TYPE, PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { store } from '@/store';
 
 
 // interface ParamType {

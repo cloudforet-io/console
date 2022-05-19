@@ -45,12 +45,14 @@
 import {
     computed, PropType, reactive, toRefs,
 } from '@vue/composition-api';
+
 import {
     PCheckBox, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
 
-import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 import { i18n } from '@/translations';
+
+import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 
 
 export default {

@@ -1,6 +1,8 @@
 import { Location } from 'vue-router';
-import { MenuId } from '@/lib/menu/config';
+
 import { FavoriteType } from '@/store/modules/favorite/type';
+
+import { MenuId } from '@/lib/menu/config';
 
 export const MENU_ITEM_TYPE = Object.freeze({
     TITLE: 'title',

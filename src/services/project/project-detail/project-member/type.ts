@@ -1,6 +1,7 @@
 import { RouteQueryString } from '@/lib/router-query-string';
-import { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
+
 import { RoleData } from '@/services/administration/iam/role/type';
+import { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
 
 export type ProjectMemberPageUrlQuery = Partial<Record<'filters', RouteQueryString>>
 

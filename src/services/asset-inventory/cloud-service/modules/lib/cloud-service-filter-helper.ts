@@ -1,6 +1,7 @@
-import { RegionReferenceMap } from '@/store/modules/reference/region/type';
-import { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
+
+import { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 
 export interface RegionMenuItem extends SearchDropdownMenuItem {

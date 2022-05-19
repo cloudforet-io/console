@@ -24,14 +24,18 @@
 
 <script lang="ts">
 import {
-    PAnchor, PEmpty, PPaneLayout, PPanelTop,
-} from '@spaceone/design-system';
-import { AlertDataModel } from '@/services/alert-manager/type';
-import {
     computed, PropType, reactive, toRefs,
 } from '@vue/composition-api';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import {
+    PAnchor, PEmpty, PPaneLayout, PPanelTop,
+} from '@spaceone/design-system';
+
 import { store } from '@/store';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import { AlertDataModel } from '@/services/alert-manager/type';
 
 
 export default {

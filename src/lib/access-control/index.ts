@@ -1,11 +1,14 @@
 /* eslint-disable import/no-cycle */
-import { RawLocation, Route } from 'vue-router';
 import { clone } from 'lodash';
+import { RawLocation, Route } from 'vue-router';
+
+import { SpaceRouter } from '@/router';
+
+import { AccessLevel, ACCESS_LEVEL } from '@/lib/access-control/config';
 import { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/page-permission-helper';
 import { MenuId } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
-import { AccessLevel, ACCESS_LEVEL } from '@/lib/access-control/config';
-import { SpaceRouter } from '@/router';
+
 
 const getAccessTypeFromPermission = (permission?: string | PagePermissionType): AccessLevel => {
     if (permission === 'VIEW') return 'VIEW_PERMISSION';

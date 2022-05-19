@@ -57,27 +57,29 @@
 </template>
 
 <script lang="ts">
-import { capitalize, find } from 'lodash';
-import dayjs from 'dayjs';
-
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PAnchor, PSelectStatus, PStatus, PSkeleton,
 } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { capitalize, find } from 'lodash';
 
-import Top5ProjectActivityTooltip from '@/services/alert-manager/alert-dashboard/modules/top-5-project-activity-widget/Top5ProjectActivityTooltip.vue';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 import { red, yellow } from '@/styles/colors';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import Top5ProjectActivityTooltip from '@/services/alert-manager/alert-dashboard/modules/top-5-project-activity-widget/Top5ProjectActivityTooltip.vue';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 
 const ACTIVITY = Object.freeze({

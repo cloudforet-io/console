@@ -76,36 +76,40 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PI, PIconButton, PButton, PPageTitle,
 } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
-import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/DashboardLayouts.vue';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { gray } from '@/styles/colors';
+
+import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
+import PdfDownloadOverlay, { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
+import { getDashboardLayout } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import CostDashboardFilter from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardFilter.vue';
 import CostDashboardMoreMenu from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardMoreMenu.vue';
 import CostDashboardPeriodSelectDropdown
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
-import { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { CostQueryFilters, Period } from '@/services/cost-explorer/type';
-import { SpaceRouter } from '@/router';
-import PdfDownloadOverlay, { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import CostDashboardPreview from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardPreview.vue';
-import { getDashboardLayout } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import CostDashboardUpdateModal
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardUpdateModal.vue';
-import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
-import { gray } from '@/styles/colors';
-import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
+import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/DashboardLayouts.vue';
+import { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import { CostQueryFilters, Period } from '@/services/cost-explorer/type';
 
 const PUBLIC_ICON_COLOR = gray[500];
 

@@ -19,13 +19,15 @@
 </template>
 
 <script lang="ts">
-import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import AlertManagerLNB from '@/services/alert-manager/AlertManagerLNB.vue';
-import { registerServiceStore } from '@/common/composables/register-service-store';
-import { alertManagerStoreModule, alertManagerStore } from '@/services/alert-manager/store';
 import { ComponentRenderProxy, computed, getCurrentInstance } from '@vue/composition-api';
+
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
+import { registerServiceStore } from '@/common/composables/register-service-store';
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
+
+import AlertManagerLNB from '@/services/alert-manager/AlertManagerLNB.vue';
+import { alertManagerStoreModule, alertManagerStore } from '@/services/alert-manager/store';
 
 
 export default {

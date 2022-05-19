@@ -1,8 +1,10 @@
 import { RouteConfig } from 'vue-router';
-import authRoutes from '@/services/auth/routes';
+
 import { errorRoutes } from '@/router/error-routes';
+
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import administrationRoute from '@/services/administration/routes';
+import authRoutes from '@/services/auth/routes';
 
 const TotalDashboardPage = () => import(/* webpackChunkName: "TotalDashboardPage" */ '@/services/total-dashboard/TotalDashboardPage.vue');
 

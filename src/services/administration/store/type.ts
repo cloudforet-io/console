@@ -1,7 +1,8 @@
 import { Store } from 'vuex';
-import { UserStoreState } from '@/services/administration/store/user/type';
-import { RoleStoreState } from '@/services/administration/store/role/type';
+
 import { PolicyState } from '@/services/administration/store/policy/type';
+import { RoleStoreState } from '@/services/administration/store/role/type';
+import { UserStoreState } from '@/services/administration/store/user/type';
 
 // eslint-disable-next-line  @typescript-eslint/no-empty-interface
 export interface AdministrationState {}

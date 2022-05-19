@@ -19,17 +19,17 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPageTitle,
 } from '@spaceone/design-system';
 
-import AlertStateWidget from '@/services/alert-manager/alert-dashboard/modules/AlertStateWidget.vue';
 import AlertHistoryWidget from '@/services/alert-manager/alert-dashboard/modules/alert-history-widget/AlertHistoryWidget.vue';
+import AlertStateWidget from '@/services/alert-manager/alert-dashboard/modules/AlertStateWidget.vue';
 import CurrentProjectStatusWidget from '@/services/alert-manager/alert-dashboard/modules/CurrentProjectStatusWidget.vue';
-import Top5ProjectActivityWidget from '@/services/alert-manager/alert-dashboard/modules/top-5-project-activity-widget/Top5ProjectActivityWidget.vue';
 import ProjectSearchWidget from '@/services/alert-manager/alert-dashboard/modules/project-search-widget/ProjectSearchWidget.vue';
+import Top5ProjectActivityWidget from '@/services/alert-manager/alert-dashboard/modules/top-5-project-activity-widget/Top5ProjectActivityWidget.vue';
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 export default {
     name: 'AlertDashboardPage',

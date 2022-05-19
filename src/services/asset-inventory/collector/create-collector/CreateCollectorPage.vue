@@ -63,24 +63,25 @@
 </template>
 
 <script lang="ts">
-import { get, some } from 'lodash';
-
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PProgressWizard, PSelectDropdown, PLazyImg, PFieldGroup, PTextInput, PPageTitle, PToggleButton,
 } from '@spaceone/design-system';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { get, some } from 'lodash';
+
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ConfirmCredentials from '@/services/asset-inventory/collector/create-collector/modules/ConfirmCredentials.vue';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {

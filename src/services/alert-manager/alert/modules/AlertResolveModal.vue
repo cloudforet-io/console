@@ -23,16 +23,22 @@
 import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PTextarea, PFieldGroup,
 } from '@spaceone/design-system';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ALERT_STATE } from '@/services/alert-manager/lib/config';
+
 import { i18n } from '@/translations';
-import { AlertStateUpdateParams } from '@/services/alert-manager/type';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { ALERT_STATE } from '@/services/alert-manager/lib/config';
+import { AlertStateUpdateParams } from '@/services/alert-manager/type';
+
 
 export default {
     name: 'AlertResolveModal',

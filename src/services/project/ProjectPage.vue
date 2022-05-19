@@ -117,40 +117,43 @@ import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     isInstanceOfAuthorizationError,
 } from '@spaceone/console-core-lib/space-connector/error';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-
 import {
     PI, PPageTitle, PBreadcrumbs, PButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
-import ProjectGroupFormModal from '@/services/project/modules/ProjectGroupFormModal.vue';
-import ProjectSearch from '@/services/project/modules/ProjectSearch.vue';
-import ProjectTree from '@/services/project/modules/ProjectTree.vue';
-import {
-    ProjectGroup,
-} from '@/services/project/type';
-import ProjectCardList from '@/services/project/modules/ProjectCardList.vue';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
-import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
-import ProjectGroupMember from '@/services/project/project-detail/project-member/modules/ProjectGroupMember.vue';
 import { store } from '@/store';
-import ProjectPageStoreModule from '@/services/project/store';
-import { ProjectPageState } from '@/services/project/store/type';
-import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
-import ProjectGroupDeleteCheckModal from '@/services/project/modules/ProjectGroupDeleteCheckModal.vue';
-import { registerServiceStore } from '@/common/composables/register-service-store';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
+
 import {
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
+
+import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { registerServiceStore } from '@/common/composables/register-service-store';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
+import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
+
+
+import ProjectCardList from '@/services/project/modules/ProjectCardList.vue';
+import ProjectGroupDeleteCheckModal from '@/services/project/modules/ProjectGroupDeleteCheckModal.vue';
+import ProjectGroupFormModal from '@/services/project/modules/ProjectGroupFormModal.vue';
+import ProjectSearch from '@/services/project/modules/ProjectSearch.vue';
+import ProjectTree from '@/services/project/modules/ProjectTree.vue';
+import ProjectGroupMember from '@/services/project/project-detail/project-member/modules/ProjectGroupMember.vue';
+import ProjectPageStoreModule from '@/services/project/store';
+import { ProjectPageState } from '@/services/project/store/type';
+import {
+    ProjectGroup,
+} from '@/services/project/type';
+
 
 export default {
     name: 'ProjectGroupPage',

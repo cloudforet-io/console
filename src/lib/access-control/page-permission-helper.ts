@@ -1,7 +1,8 @@
 /* eslint-disable import/no-cycle */
+import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
+
 import { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 
 export const PAGE_PERMISSION_TYPE = Object.freeze({

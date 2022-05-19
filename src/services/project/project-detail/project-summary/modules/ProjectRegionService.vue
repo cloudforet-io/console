@@ -39,31 +39,35 @@
 </template>
 
 <script lang="ts">
-import { range, orderBy } from 'lodash';
-import bytes from 'bytes';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
 
-import {
-    PSkeleton, PDataLoader,
-} from '@spaceone/design-system';
 
 import {
     reactive, toRefs, watch, onUnmounted, computed,
 } from '@vue/composition-api';
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import {
+    PSkeleton, PDataLoader,
+} from '@spaceone/design-system';
+import bytes from 'bytes';
+import Color from 'color';
+import { range, orderBy } from 'lodash';
+import { Location } from 'vue-router';
+
+import { store } from '@/store';
 import {
     gray, violet, white, coral, yellow, secondary1,
 } from '@/styles/colors';
-import Color from 'color';
-import { store } from '@/store';
-import { Location } from 'vue-router';
+
 import config from '@/lib/config';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
 interface Data {

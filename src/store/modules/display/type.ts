@@ -1,5 +1,7 @@
-import { SidebarType, Currency } from '@/store/modules/display/config';
 import { Location } from 'vue-router';
+
+import { SidebarType, Currency } from '@/store/modules/display/config';
+
 import { Menu, MenuInfo } from '@/lib/menu/config';
 
 export interface GNBMenu extends Menu, MenuInfo {

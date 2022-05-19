@@ -1,7 +1,10 @@
-import { store } from '@/store';
-import { Authenticator } from '@/services/auth/authenticator';
 import { loadGapiInsideDOM } from 'gapi-script';
+
+import { store } from '@/store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { Authenticator } from '@/services/auth/authenticator';
 
 let { gapi } = window as any;
 

@@ -1,5 +1,7 @@
 import { Mutation } from 'vuex';
+
 import { AccessLevel } from '@/lib/access-control/config';
+
 import { UserState, UserRole } from './type';
 
 export const setUser = (state: UserState, userInfo: UserState): void => {

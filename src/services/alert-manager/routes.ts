@@ -1,7 +1,9 @@
 import { RouteConfig } from 'vue-router';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-import { getMenuLabel } from '@/lib/menu/menu-info';
+
 import { MENU_ID } from '@/lib/menu/config';
+import { getMenuLabel } from '@/lib/menu/menu-info';
+
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 const AlertManagerContainer = () => import(/* webpackChunkName: "AlertManagerContainer" */ '@/services/alert-manager/AlertManagerContainer.vue');
 

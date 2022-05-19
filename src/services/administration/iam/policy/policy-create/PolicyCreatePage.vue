@@ -61,16 +61,21 @@
 </template>
 
 <script lang="ts">
+import { reactive, toRefs } from '@vue/composition-api';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPageTitle, PPaneLayout, PBadge, PLabel, PFieldGroup, PTextInput, PTextEditor, PButton,
 } from '@spaceone/design-system';
-import { reactive, toRefs } from '@vue/composition-api';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import { SpaceRouter } from '@/router';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+
 
 export default {
     name: 'PolicyCreatePage',

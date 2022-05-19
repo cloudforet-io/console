@@ -41,19 +41,23 @@
 </template>
 
 <script lang="ts">
-import { capitalize } from 'lodash';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
     PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { capitalize } from 'lodash';
 
-import { computed, reactive, toRefs } from '@vue/composition-api';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { alertStateBadgeStyleTypeFormatter, alertScopeBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
-import { useProxyValue } from '@/common/composables/proxy-state';
+
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { alertStateBadgeStyleTypeFormatter, alertScopeBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
 
 
 export default {

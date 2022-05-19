@@ -31,10 +31,11 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PDataTable, PI } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { PDataTable, PI } from '@spaceone/design-system';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {

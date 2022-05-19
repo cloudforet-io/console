@@ -60,16 +60,18 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PI, PButtonModal, PRadio, PTree,
 } from '@spaceone/design-system';
-
-import { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ProjectGroup } from '@/services/asset-inventory/service-account/type';
 import Vue from 'vue';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { ProjectGroup } from '@/services/asset-inventory/service-account/type';
+import { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/type';
 
 
 interface Props {

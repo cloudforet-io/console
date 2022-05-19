@@ -27,14 +27,16 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import { PButtonModal, PTab } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/type';
 
-import CostDashboardCustomizeDefaultWidgetTab
-    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeDefaultWidgetTab.vue';
+import { i18n } from '@/translations';
+
 import CostDashboardCustomizeCustomWidgetTab
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeCustomWidgetTab.vue';
-import { i18n } from '@/translations';
+import CostDashboardCustomizeDefaultWidgetTab
+    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeDefaultWidgetTab.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
 interface Props {

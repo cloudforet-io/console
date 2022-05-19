@@ -15,6 +15,7 @@
 
 <script lang="ts">
 import { PCard } from '@spaceone/design-system';
+
 import BudgetSummaryChart
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-summary/BudgetSummaryChart.vue';
 import BudgetSummaryTable

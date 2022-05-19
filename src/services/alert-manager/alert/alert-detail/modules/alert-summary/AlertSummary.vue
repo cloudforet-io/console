@@ -64,23 +64,29 @@
 
 <script lang="ts">
 import {
-    PButton, PPaneLayout, PSelectDropdown, PI, PBadge,
-} from '@spaceone/design-system';
-import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import { AlertDataModel } from '@/services/alert-manager/type';
-import AlertReassignModal from '@/services/alert-manager/alert/alert-detail/modules/alert-summary/modules/AlertReassignModal.vue';
-import dayjs from 'dayjs';
+
 import { iso8601Formatter } from '@spaceone/console-core-lib';
+import {
+    PButton, PPaneLayout, PSelectDropdown, PI, PBadge,
+} from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import AlertReassignModal from '@/services/alert-manager/alert/alert-detail/modules/alert-summary/modules/AlertReassignModal.vue';
 import {
     ALERT_STATE, ALERT_URGENCY, AlertState, AlertUrgency,
 } from '@/services/alert-manager/lib/config';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { i18n } from '@/translations';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { alertManagerStore } from '@/services/alert-manager/store';
-import { store } from '@/store';
+import { AlertDataModel } from '@/services/alert-manager/type';
 
 
 // interface HeaderState {

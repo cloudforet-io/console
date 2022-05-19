@@ -38,12 +38,15 @@
 
 <script lang="ts">
 import {
-    PI, PCheckBox, PTab,
-} from '@spaceone/design-system';
-import {
     computed, reactive, toRefs, watch, onMounted, onUnmounted, defineComponent,
 } from '@vue/composition-api';
+
+import {
+    PI, PCheckBox, PTab,
+} from '@spaceone/design-system';
+
 import { store } from '@/store';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {

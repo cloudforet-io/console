@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
 import { ExtendedAuthType } from './type';
 
 const EXTENDED_AUTH_TYPE_MAP = {
