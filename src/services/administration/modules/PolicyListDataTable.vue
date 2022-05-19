@@ -10,7 +10,7 @@
             :fields="fields"
             :items="items"
             :query-tags="queryTags"
-            :key-item-sets="policySearchHandler.keyItemSets"
+            :key-item-sets="keyItemSets"
             :value-handler-map="policySearchHandler.valueHandlerMap"
             :selectable="selectable"
             :select-index="selectedIndices"
@@ -92,6 +92,12 @@ import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 import { Policy } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { administrationStore } from '@/services/administration/store';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
+import { Policy } from '@/services/administration/iam/role/type';
+import { replaceUrlQuery } from '@/lib/router-query-string';
+import { SpaceRouter } from '@/router';
 
 
 const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], selectedType: PolicyTypes): PolicyDataModel[] => {
@@ -130,7 +136,15 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const policyListApiQueryHelper = new ApiQueryHelper();
+        const currentRoute = SpaceRouter.router.currentRoute;
+        const policyListApiQueryHelper = new ApiQueryHelper().setFiltersAsRawQueryString(currentRoute.query?.filters);
+        const keyItemSets: KeyItemSet[] = [{
+            title: 'Properties',
+            items: [
+                { name: 'name', label: 'Name' },
+                { name: 'policy_id', label: 'ID' },
+            ],
+        }];
         const state = reactive({
             loading: computed(() => administrationStore.state.policy.policyListLoading),
             policyList: computed(() => administrationStore.state.policy.policyList),
@@ -139,7 +153,7 @@ export default {
                 { name: POLICY_TYPES.CUSTOM, label: 'Custom' },
                 { name: POLICY_TYPES.ALL, label: 'All' },
             ],
-            selectedType: POLICY_TYPES.MANAGED as PolicyTypes,
+            selectedType: currentRoute?.query?.policy_type ?? POLICY_TYPES.MANAGED as PolicyTypes,
             fields: [
                 { name: 'name', label: 'Name' },
                 { name: 'policy_type', label: 'Type' },
@@ -153,7 +167,7 @@ export default {
             }),
             timezone: computed(() => store.state.user.timezone),
             totalCount: computed(() => administrationStore.state.policy.totalCount),
-            queryTags: [] as QueryTag[],
+            queryTags: policyListApiQueryHelper.setKeyItemSets(keyItemSets).queryTags as QueryTag[],
             selectedIdMap: {} as Record<string, PolicyTypes>,
             selectedIndices: computed(() => state.items.reduce((results, d, i) => {
                 if (state.selectedIdMap[d.policy_id]) results.push(i);
@@ -161,13 +175,6 @@ export default {
             }, [] as number[])),
         });
         const policySearchHandler = reactive({
-            keyItemSets: [{
-                title: 'Properties',
-                items: [
-                    { name: 'name', label: 'Name' },
-                    { name: 'policy_id', label: 'ID' },
-                ],
-            }] as KeyItemSet[],
             valueHandlerMap: computed(() => ({
                 name: makeCustomValueHandler(state.items, 'name'),
                 policy_id: makeCustomValueHandler(state.items, 'policy_id'),
@@ -180,9 +187,10 @@ export default {
         };
 
         /* Event */
-        const handleChange = (options: ToolboxOptions = {}) => {
+        const handleChange = async (options: ToolboxOptions = {}) => {
             setApiQueryWithToolboxOptions(policyListApiQueryHelper, options);
             if (options.queryTags !== undefined) {
+                await replaceUrlQuery('filters', policyListApiQueryHelper.rawQueryStrings);
                 state.queryTags = options.queryTags;
             }
         };
@@ -212,8 +220,9 @@ export default {
             listPolicies();
         };
 
-        const handleChangePolicyType = () => {
+        const handleChangePolicyType = async () => {
             state.queryTags = [];
+            await replaceUrlQuery('policy_type', state.selectedType);
         };
 
         const handleUpdateSelectIndex = (selectedIndices: number[]) => {
@@ -270,6 +279,7 @@ export default {
             handleRefresh,
             handleChangePolicyType,
             handleUpdateSelectIndex,
+            keyItemSets,
         };
     },
 };
