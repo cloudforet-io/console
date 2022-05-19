@@ -20,7 +20,6 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { get } from 'lodash';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable.vue';
 import { DefinitionData, DefinitionField } from '@/data-display/tables/definition-table/type';
@@ -29,7 +28,7 @@ import {
 } from '@/data-display/dynamic/dynamic-layout/templates/item/type';
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import { DynamicField, ListOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 
 export default {
@@ -78,20 +77,6 @@ export default {
                         label: d.options?.translation_id ? vm.$t(d.options.translation_id as string, locale) : d.name,
                         name: d.key,
                     } as DefinitionField;
-
-                    // in case of type 'list', it generate html elements recursively.
-                    // it can cause definition's 'showCopy'(flag for showing or not copy button) works wrong.
-                    // so should check there is copiable value, and give the result to each field's 'disableCopy' property.
-                    if (d.type === 'list') {
-                        // eslint-disable-next-line camelcase
-                        const subKey = (d.options as ListOptions)?.sub_key as string;
-                        const matchedData = get(state.rootData, d.key);
-                        if (Array.isArray(matchedData)) {
-                            res.disableCopy = matchedData.some(data => !get(data, subKey));
-                        } else {
-                            res.disableCopy = !get(matchedData, subKey);
-                        }
-                    }
                     return res;
                 });
             }),
