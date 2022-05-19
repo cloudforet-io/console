@@ -1,3 +1,13 @@
+# [1.1.0-beta.308](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.307...v1.1.0-beta.308) (2022-05-19)
+
+
+### Bug Fixes
+
+* add zwnj to page title ([c9c7a31](https://github.com/spaceone-dev/spaceone-design-system/commit/c9c7a313ab2c235dd52b4aca3c8b4303134602d4))
+* make CopyButton not check value with auto hide icon mode ([1417723](https://github.com/spaceone-dev/spaceone-design-system/commit/14177239b0aa6e24328df9f25a2258dc73729cf2))
+* remove direct insertion of br tag from TextList, DynamicField ([9503af3](https://github.com/spaceone-dev/spaceone-design-system/commit/9503af36d0bbf7a041439e8d08255235437161f0))
+* show icon only if Anchor has text content ([7906b0c](https://github.com/spaceone-dev/spaceone-design-system/commit/7906b0c00027d4b68978081d86034959ee9bf848))
+
 # [1.1.0-beta.307](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.306...v1.1.0-beta.307) (2022-05-18)
 
 
