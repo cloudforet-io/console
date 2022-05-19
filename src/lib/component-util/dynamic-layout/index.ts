@@ -62,7 +62,7 @@ export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema
  * @description returns action name that match with dynamic layout type with camelcase.
  * @param type
  */
-export const getApiActionByLayoutType = (type: DynamicLayoutType): string => {
+export const getApiActionByLayoutType = (type: DynamicLayoutType): 'getData'|'get' => {
     if (['raw-table', 'table', 'query-search-table'].includes(type)) return 'getData';
     return 'get';
 };

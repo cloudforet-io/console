@@ -6,7 +6,9 @@
         >
             <template v-for="(layout, i) in layouts" :slot="layout.name">
                 <div :key="`${layout.name}-${i}`">
-                    <p-dynamic-layout v-bind="layout" :data="data"
+                    <p-dynamic-layout :type="layout.type"
+                                      :options="layoutOptions"
+                                      :data="data"
                                       :type-options="{
                                           loading,
                                           totalCount,
@@ -114,6 +116,14 @@ export default {
                 return res;
             }),
             currentLayout: computed<DynamicLayout>(() => state.layoutMap[state.activeTab] || {}),
+            apiType: computed(() => getApiActionByLayoutType(state.currentLayout.type)),
+            layoutOptions: computed(() => {
+                if (!state.currentLayout.options) return {};
+                if (state.apiType === 'getData') {
+                    return { ...state.currentLayout.options, root_path: undefined };
+                }
+                return state.currentLayout.options;
+            }),
             fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
         });
 
@@ -181,11 +191,12 @@ export default {
         const getData = async () => {
             state.data = dataMap[state.fetchOptionKey];
             try {
-                const api = SpaceConnector.client.inventory.server[getApiActionByLayoutType(state.currentLayout.type)];
+                const api = SpaceConnector.client.inventory.server[state.apiType];
                 const res = await api(getParams(state.currentLayout.type));
 
                 if (res.total_count !== undefined) state.totalCount = res.total_count;
-                state.data = res.results || res;
+
+                state.data = state.apiType === 'getData' ? res.results : res;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.data = undefined;
