@@ -5,6 +5,7 @@
                       @goBack="$router.go(-1)"
         />
         <role-update-form :initial-role-data="initialRoleData"
+                          :form-type="FORM_TYPE.UPDATE"
                           @update-validation="handleFormValidate"
                           @update-form-data="handleUpdateForm"
         />
@@ -34,6 +35,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { SpaceRouter } from '@/router';
+import { FORM_TYPE } from '@/services/administration/iam/role/config';
 
 export default {
     name: 'RoleEditPage',
@@ -86,6 +88,7 @@ export default {
             handleClickConfirm,
             handleFormValidate,
             handleUpdateForm,
+            FORM_TYPE,
         };
     },
 

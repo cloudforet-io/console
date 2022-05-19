@@ -29,7 +29,7 @@
                 </template>
             </p-field-group>
             <p-label :label="$t('IAM.ROLE.DETAIL.ROLE_TYPE')" />
-            <div class="select-card-wrapper">
+            <div v-if="!roleTypeInputDisabled" class="select-card-wrapper">
                 <p-select-card v-for="roleType in roleTypes" :key="roleType.key"
                                v-model="selectedRoleType"
                                class="card"
@@ -44,6 +44,7 @@
                     </p>
                 </p-select-card>
             </div>
+            <span v-else class="role-type-saved-text">{{ `${savedRoleType.label} (${savedRoleType.description})` }}</span>
         </div>
     </p-pane-layout>
 </template>
@@ -75,6 +76,10 @@ export default {
             type: Object as PropType<BaseInfoFormData>,
             default: () => ({}),
         },
+        roleTypeInputDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const {
@@ -98,6 +103,10 @@ export default {
                 { label: ROLE_TYPE_BADGE_OPTION.DOMAIN.label, key: ROLE_TYPE.DOMAIN, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_DOMAIN') },
             ]),
             selectedRoleType: ROLE_TYPE.PROJECT as ROLE_TYPE,
+            savedRoleType: computed(() => {
+                const roleType = props.initialFormData?.roleType;
+                return state.roleTypes.find(type => type.key === roleType);
+            }),
         });
         watch(() => isAllValid.value, (after) => {
             emit('update-validation', after);
@@ -155,6 +164,10 @@ export default {
                     font-size: 0.75rem;
                 }
             }
+        }
+        .role-type-saved-text {
+            font-size: 0.875rem;
+            line-height: 1.3125rem;
         }
     }
 }
