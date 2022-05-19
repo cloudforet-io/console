@@ -12,8 +12,10 @@ import {
     computed, defineComponent,
     reactive, toRefs,
 } from '@vue/composition-api';
+
 import { PTag } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+
 import { Period } from '@/services/cost-explorer/type';
 
 interface Props {

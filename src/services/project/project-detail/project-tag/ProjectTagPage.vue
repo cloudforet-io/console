@@ -8,9 +8,11 @@
 </template>
 
 <script lang="ts">
-import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 import { computed, ref } from '@vue/composition-api';
+
 import { store } from '@/store';
+
+import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
 export default {
     name: 'ProjectTagPage',

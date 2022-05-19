@@ -1,5 +1,6 @@
-import dayjs from 'dayjs';
 import { TimeUnit } from '@amcharts/amcharts4/core';
+import dayjs from 'dayjs';
+import { isEqual } from 'lodash';
 
 import { store } from '@/store';
 import { Currency } from '@/store/modules/display/config';
@@ -7,8 +8,11 @@ import { CurrencyRates } from '@/store/modules/display/type';
 
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
+import { getTimeUnitByPeriod } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
+import { DATE_FORMAT } from '@/services/cost-explorer/widgets/lib/config';
 import {
     ChartData,
     CostAnalyzeModel,
@@ -16,10 +20,6 @@ import {
     PieChartData,
     XYChartData,
 } from '@/services/cost-explorer/widgets/type';
-import { getTimeUnitByPeriod } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { DATE_FORMAT } from '@/services/cost-explorer/widgets/lib/config';
-import { isEqual } from 'lodash';
-import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 
 
 /**

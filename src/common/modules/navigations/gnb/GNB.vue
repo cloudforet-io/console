@@ -30,22 +30,24 @@
 </template>
 
 <script lang="ts">
-import vClickOutside from 'v-click-outside';
-import { includes } from 'lodash';
-
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import SiteMap from '@/common/modules/navigations/gnb/modules/SiteMap.vue';
-import RightSideMenu from '@/common/modules/navigations/gnb/modules/RightSideMenu.vue';
+import { includes } from 'lodash';
+import vClickOutside from 'v-click-outside';
+
+
+import { store } from '@/store';
+import { GNBMenu as GNBMenuType } from '@/store/modules/display/type';
+
 import GNBMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBMenu.vue';
 import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';
+import RightSideMenu from '@/common/modules/navigations/gnb/modules/RightSideMenu.vue';
+import SiteMap from '@/common/modules/navigations/gnb/modules/SiteMap.vue';
 
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
-import { GNBMenu as GNBMenuType } from '@/store/modules/display/type';
-import { store } from '@/store';
 
 const ALLOWED_MENUS_FOR_ALL_USERS = ['support', 'account', 'notifications'];
 

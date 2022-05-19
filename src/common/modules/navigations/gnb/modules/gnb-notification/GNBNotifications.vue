@@ -46,23 +46,26 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import {
     computed, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PSkeleton,
 } from '@spaceone/design-system';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import dayjs from 'dayjs';
+import Vue from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import GNBNotificationItem from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationItem.vue';
-import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationDateHeader.vue';
-import dayjs from 'dayjs';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationDateHeader.vue';
+import GNBNotificationItem from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationItem.vue';
+
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 
 export default {

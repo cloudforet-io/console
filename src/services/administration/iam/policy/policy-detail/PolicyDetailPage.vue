@@ -73,23 +73,29 @@
 </template>
 
 <script lang="ts">
-import { administrationStore } from '@/services/administration/store';
-import {
-    PPageTitle, PIconButton, PBadge, PPaneLayout, PLabel, PTextEditor, PButton, PTextInput, PFieldGroup,
-} from '@spaceone/design-system';
 import {
     computed, reactive, toRefs, defineComponent,
 } from '@vue/composition-api';
-import { PolicyDetailPageProps } from '@/services/administration/iam/policy/lib/type';
-import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import {
+    PPageTitle, PIconButton, PBadge, PPaneLayout, PLabel, PTextEditor, PButton, PTextInput, PFieldGroup,
+} from '@spaceone/design-system';
+
 import { SpaceRouter } from '@/router';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import deleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
+import { PolicyDetailPageProps } from '@/services/administration/iam/policy/lib/type';
 import PolicyDeleteModal from '@/services/administration/iam/policy/modules/PolicyDeleteModal.vue';
 import PolicyNameEditModal from '@/services/administration/iam/policy/modules/PolicyNameEditModal.vue';
-import deleteModal from '@/common/components/modals/DeleteModal.vue';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { i18n } from '@/translations';
+import { administrationStore } from '@/services/administration/store';
+
 
 export default defineComponent<PolicyDetailPageProps>({
     name: 'PolicyDetailPage',

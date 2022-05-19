@@ -51,20 +51,23 @@
 </template>
 
 <script lang="ts">
-import { get } from 'lodash';
-import dayjs from 'dayjs';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
 
 import {
     defineComponent, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { MetricChartProps, MonitoringResourceType, Unit } from '@/common/components/charts/metric-chart/type';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
+import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { get } from 'lodash';
+
 import { gray } from '@/styles/colors';
+
 import config from '@/lib/config';
+
+import { MetricChartProps, MonitoringResourceType, Unit } from '@/common/components/charts/metric-chart/type';
 
 
 interface ChartData {

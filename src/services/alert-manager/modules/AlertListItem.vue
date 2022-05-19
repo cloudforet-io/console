@@ -42,19 +42,23 @@
 </template>
 
 <script lang="ts">
-import { capitalize } from 'lodash';
-import dayjs from 'dayjs';
+
+
+import {
+    computed, PropType, reactive, toRefs,
+} from '@vue/composition-api';
 
 import {
     PI, PBadge, PAnchor,
 } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { capitalize } from 'lodash';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import {
-    computed, PropType, reactive, toRefs,
-} from '@vue/composition-api';
 import { store } from '@/store';
 import { ReferenceItem } from '@/store/modules/reference/type';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 

@@ -6,6 +6,7 @@ declare module 'vue-router' {
       Route as OriginRoute,
       RouteRecord as OriginRouteRecord,
   } from 'vue-router/types/router';
+
     import { AccessLevel } from '@/lib/access-control/config';
 
   interface RouteLabelFormatter {

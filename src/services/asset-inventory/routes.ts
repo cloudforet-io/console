@@ -1,8 +1,10 @@
 import { upperCase } from 'lodash';
-import { getMenuLabel } from '@/lib/menu/menu-info';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { RouteConfig } from 'vue-router';
+
 import { MENU_ID } from '@/lib/menu/config';
+import { getMenuLabel } from '@/lib/menu/menu-info';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const AssetInventoryContainer = () => import(/* webpackChunkName: "AssetInventoryContainer" */ '@/services/asset-inventory/AssetInventoryContainer.vue');
 

@@ -1,5 +1,6 @@
-import { STORAGE_KEY } from '@/store/modules/display';
 import { Store } from 'vuex';
+
+import { STORAGE_KEY } from '@/store/modules/display';
 
 const DISPLAY_MUTATIONS = ['display/setCurrency'];
 

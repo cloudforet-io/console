@@ -66,23 +66,25 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButton, PDataLoader } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import AllSummary from '@/services/dashboard/modules/AllSummary.vue';
-import ResourceMap from '@/services/dashboard/modules/ResourceMap.vue';
-import PersonalHealthDashboard from '@/services/dashboard/modules/PersonalHealthDashboard.vue';
-import TrustedAdvisor from '@/services/dashboard/modules/TrustedAdvisor.vue';
-import TopProjects from '@/services/dashboard/modules/TopProjects.vue';
-import FavoritesWidget from '@/services/dashboard/modules/FavoritesWidget.vue';
-import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
-import ServiceAccounts from '@/services/dashboard/modules/ServiceAccounts.vue';
-import CollectorProgress from '@/services/dashboard/modules/CollectingProgress.vue';
-import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
+
+import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
+import AllSummary from '@/services/dashboard/modules/AllSummary.vue';
+import CollectorProgress from '@/services/dashboard/modules/CollectingProgress.vue';
+import FavoritesWidget from '@/services/dashboard/modules/FavoritesWidget.vue';
+import PersonalHealthDashboard from '@/services/dashboard/modules/PersonalHealthDashboard.vue';
+import ResourceMap from '@/services/dashboard/modules/ResourceMap.vue';
+import ServiceAccounts from '@/services/dashboard/modules/ServiceAccounts.vue';
+import TopProjects from '@/services/dashboard/modules/TopProjects.vue';
+import TrustedAdvisor from '@/services/dashboard/modules/TrustedAdvisor.vue';
 
 interface ExtraParams {
     domain_id?: string;

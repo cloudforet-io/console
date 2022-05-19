@@ -1,7 +1,7 @@
-import { RoleStoreState } from './type';
-import * as getters from './getters';
 import * as actions from './actions';
+import * as getters from './getters';
 import * as mutations from './mutations';
+import { RoleStoreState } from './type';
 
 const state: RoleStoreState = {
     selectedIndices: [],

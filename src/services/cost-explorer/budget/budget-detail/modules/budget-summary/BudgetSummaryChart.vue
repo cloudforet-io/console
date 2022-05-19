@@ -13,19 +13,24 @@ import {
     onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import * as am4core from '@amcharts/amcharts4/core';
+
 import * as am4charts from '@amcharts/amcharts4/charts';
-import config from '@/lib/config';
+import { XYChart } from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
 import {
     gray, indigo, red,
 } from '@/styles/colors';
-import { XYChart } from '@amcharts/amcharts4/charts';
-import { getStackedChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
+
+import config from '@/lib/config';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import dayjs from 'dayjs';
+
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
-import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import { getStackedChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 
 const categoryKey = 'date';
 const columnChartValueName = 'usd_cost';

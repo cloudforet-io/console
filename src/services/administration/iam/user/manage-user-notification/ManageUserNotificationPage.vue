@@ -9,13 +9,16 @@
 </template>
 
 <script lang="ts">
-import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
+
 import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+
 import { i18n } from '@/translations';
+
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
 
 export default {
     name: 'ManageNotificationPage',

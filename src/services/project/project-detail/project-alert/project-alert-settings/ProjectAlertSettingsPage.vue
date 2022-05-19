@@ -99,32 +99,33 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get } from 'lodash';
-
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, onActivated, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import ProjectEscalationPolicy from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectEscalationPolicy.vue';
-import ProjectNotificationPolicyUpdateModal
-    from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectNotificationPolicyUpdateModal.vue';
-import ProjectAutoRecoveryUpdateModal
-    from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectAutoRecoveryUpdateModal.vue';
-import ProjectEscalationPolicyChangeModal
-    from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectEscalationPolicyChangeModal.vue';
-import EscalationPolicyFormModal from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
-
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PI, PIconButton, PPaneLayout, PButton,
 } from '@spaceone/design-system';
+import { get } from 'lodash';
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { i18n } from '@/translations';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import EscalationPolicyFormModal from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
+import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
+import ProjectAutoRecoveryUpdateModal
+    from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectAutoRecoveryUpdateModal.vue';
+import ProjectEscalationPolicy from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectEscalationPolicy.vue';
+import ProjectEscalationPolicyChangeModal
+    from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectEscalationPolicyChangeModal.vue';
+import ProjectNotificationPolicyUpdateModal
+    from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectNotificationPolicyUpdateModal.vue';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 
 const NOTIFICATION_URGENCY = Object.freeze({

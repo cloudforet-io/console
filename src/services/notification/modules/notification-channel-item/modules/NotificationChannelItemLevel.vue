@@ -59,17 +59,19 @@
 </template>
 
 <script lang="ts">
+import { toRefs } from '@vue/composition-api';
+
 import {
     PBadge, PButton, PI,
 } from '@spaceone/design-system';
-import { toRefs } from '@vue/composition-api';
+
+import AddNotificationLevel from '@/services/notification/modules/AddNotificationLevel.vue';
 import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
 import {
     EDIT_TYPE,
     PARAM_KEY_TYPE,
     PROTOCOL_TYPE,
 } from '@/services/notification/modules/notification-channel-item/type';
-import AddNotificationLevel from '@/services/notification/modules/AddNotificationLevel.vue';
 
 export default {
     name: 'NotificationChannelItemLevel',

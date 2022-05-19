@@ -36,24 +36,25 @@
 </template>
 
 <script lang="ts">
-import { capitalize } from 'lodash';
-
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
     PButton, PAnchor, PLabel,
 } from '@spaceone/design-system';
+import { capitalize } from 'lodash';
+
+
+import { i18n } from '@/translations';
+
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import CostDashboardCustomizeWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetPreview.vue';
-
-import { CostQuerySetModel } from '@/services/cost-explorer/type';
+import { getFiltersText } from '@/services/cost-explorer/cost-dashboard/lib/helper';
+import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { getFiltersText } from '@/services/cost-explorer/cost-dashboard/lib/helper';
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { i18n } from '@/translations';
+import { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 
 const LAYOUT = 100;

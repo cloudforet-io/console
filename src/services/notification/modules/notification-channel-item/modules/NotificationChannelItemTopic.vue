@@ -45,20 +45,26 @@
 </template>
 
 <script lang="ts">
+import { reactive, toRefs } from '@vue/composition-api';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PBadge, PButton, PI,
 } from '@spaceone/design-system';
-import { reactive, toRefs } from '@vue/composition-api';
+
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import AddNotificationTopic from '@/services/notification/modules/AddNotificationTopic.vue';
 import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
 import {
     EDIT_TYPE,
     PROTOCOL_TYPE,
 } from '@/services/notification/modules/notification-channel-item/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { i18n } from '@/translations';
-import AddNotificationTopic from '@/services/notification/modules/AddNotificationTopic.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {

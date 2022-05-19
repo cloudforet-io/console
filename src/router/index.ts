@@ -1,15 +1,21 @@
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { getRecentConfig } from '@/lib/helper/router-recent-helper';
-import { GTag } from '@/lib/gtag';
-import config from '@/lib/config';
-import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
-import { AUTH_ROUTE } from '@/services/auth/route-config';
+
 import { ERROR_ROUTE } from '@/router/error-routes';
+
 // eslint-disable-next-line import/no-cycle
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
+import config from '@/lib/config';
+import { GTag } from '@/lib/gtag';
+import { getRecentConfig } from '@/lib/helper/router-recent-helper';
+
+import { AUTH_ROUTE } from '@/services/auth/route-config';
+import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
+
+
+// eslint-disable-next-line import/no-cycle
 // import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';

@@ -29,18 +29,22 @@ import {
     toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
+
+import { TranslateResult } from 'vue-i18n';
+
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+
+import { isRouteAccessible } from '@/lib/access-control';
+import config from '@/lib/config';
+import { MENU_ID } from '@/lib/menu/config';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { AUTH_ROUTE } from '@/services/auth/route-config';
 import IDPWSignIn from '@/services/auth/sign-in/local/template/ID_PW.vue';
 import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftContainer.vue';
 import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightContainer.vue';
-
-import { TranslateResult } from 'vue-i18n';
-import { store } from '@/store';
-import { AUTH_ROUTE } from '@/services/auth/route-config';
-import config from '@/lib/config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { SpaceRouter } from '@/router';
-import { isRouteAccessible } from '@/lib/access-control';
-import { MENU_ID } from '@/lib/menu/config';
 
 
 export default {

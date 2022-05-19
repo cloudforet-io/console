@@ -27,7 +27,6 @@
 </template>
 
 <script lang="ts">
-import { startCase } from 'lodash';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
@@ -35,6 +34,7 @@ import {
 import {
     PLottie, PButton, PBreadcrumbs, PPageTitle,
 } from '@spaceone/design-system';
+import { startCase } from 'lodash';
 
 import FNB from '@/common/modules/navigations/FNB.vue';
 

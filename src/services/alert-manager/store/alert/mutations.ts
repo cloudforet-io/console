@@ -1,4 +1,5 @@
 import { Mutation } from 'vuex';
+
 import { AlertState } from '@/services/alert-manager/store/alert/type';
 import { AlertDataModel } from '@/services/alert-manager/type';
 

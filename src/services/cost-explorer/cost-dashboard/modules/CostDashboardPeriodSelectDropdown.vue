@@ -41,24 +41,29 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { range } from 'lodash';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import dayjs from 'dayjs';
-import { Period } from '@/services/cost-explorer/type';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PBadge, PSelectDropdown, PCheckBox, PI, PTooltip,
 } from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
+import dayjs from 'dayjs';
+import { range } from 'lodash';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+
+import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import CostManagementCustomRangeModal
     from '@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue';
-import { i18n } from '@/translations';
-import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
-import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
-import { store } from '@/store';
+import { Period } from '@/services/cost-explorer/type';
+
 
 const initialPeriodStart = dayjs.utc().startOf('month').format('YYYY-MM-DD');
 const initialPeriodEnd = dayjs.utc().endOf('month').format('YYYY-MM-DD');

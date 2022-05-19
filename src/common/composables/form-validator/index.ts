@@ -1,8 +1,9 @@
 import {
     computed, ComputedRef, ref, UnwrapRef,
 } from '@vue/composition-api';
-import { TranslateResult } from 'vue-i18n';
+
 import { clone } from 'lodash';
+import { TranslateResult } from 'vue-i18n';
 
 
 type ValidatorResult = boolean|TranslateResult

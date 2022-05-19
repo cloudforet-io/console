@@ -1,11 +1,13 @@
-import { AdministrationState, AdministrationStore } from '@/services/administration/store/type';
 import { Module } from 'vuex';
-import * as getters from './getters';
+
+import { AdministrationState, AdministrationStore } from '@/services/administration/store/type';
+
 import * as actions from './actions';
+import * as getters from './getters';
 import * as mutations from './mutations';
-import user from './user';
-import role from './role';
 import policy from './policy';
+import role from './role';
+import user from './user';
 
 const state: AdministrationState = {};
 

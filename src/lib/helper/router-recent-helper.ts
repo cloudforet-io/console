@@ -1,9 +1,13 @@
-import { RECENT_TYPE, RecentConfig } from '@/store/modules/recent/type';
 import { Route } from 'vue-router';
+
+import { RECENT_TYPE, RecentConfig } from '@/store/modules/recent/type';
+
+import { MenuId } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
-import { MenuId } from '@/lib/menu/config';
+
 
 export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     /* ClOUD SERVICE */

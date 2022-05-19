@@ -1,5 +1,5 @@
-import { PagePermission } from '@/lib/access-control/page-permission-helper';
 import { AccessLevel } from '@/lib/access-control/config';
+import { PagePermission } from '@/lib/access-control/page-permission-helper';
 
 type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
 type UserBackend = 'LOCAL' | 'EXTERNAL';

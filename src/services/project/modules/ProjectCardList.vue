@@ -130,27 +130,32 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PSkeleton, PI, PButton, PToolbox, PDataLoader,
 } from '@spaceone/design-system';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
-
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { range, uniq } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { store } from '@/store';
-import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { i18n } from '@/translations';
 import bytes from 'bytes';
-import { SUMMARY_TYPE, SummaryType } from '@/services/project/type';
-import { arrayToQueryString } from '@/lib/router-query-string';
+import { range, uniq } from 'lodash';
+
+import { store } from '@/store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { i18n } from '@/translations';
+
+import { arrayToQueryString } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { SUMMARY_TYPE, SummaryType } from '@/services/project/type';
+
 
 interface CardSummary {
     [projectId: string]: {

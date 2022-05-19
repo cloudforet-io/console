@@ -38,25 +38,29 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import bytes from 'bytes';
-import { Location } from 'vue-router';
-
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDataTable,
 } from '@spaceone/design-system';
-import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import bytes from 'bytes';
+import { Location } from 'vue-router';
+
 
 import { store } from '@/store';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { primitiveToQueryString } from '@/lib/router-query-string';
+
+import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
 
 enum DATA_TYPE {
     compute = 'compute',

@@ -21,11 +21,14 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { commaFormatter, getNumberFromString } from '@spaceone/console-core-lib';
+import { PFieldGroup, PTextInput } from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
+
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-import { i18n } from '@/translations';
+
 
 interface Props {
     amount: number|undefined;

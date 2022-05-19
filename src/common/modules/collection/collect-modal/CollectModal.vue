@@ -58,23 +58,26 @@
 </template>
 
 <script lang="ts">
-import { keys, forEach, get } from 'lodash';
 
 import {
     toRefs, reactive, computed, watch, SetupContext, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PButtonModal, PDataTable, PSelectableList, PBadge,
 } from '@spaceone/design-system';
+import { keys, forEach, get } from 'lodash';
 
-import { CollectModalProps } from '@/common/modules/collection/collect-modal/type';
+import { i18n } from '@/translations';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { i18n } from '@/translations';
+import { CollectModalProps } from '@/common/modules/collection/collect-modal/type';
 
 export default {
     name: 'CollectModal',

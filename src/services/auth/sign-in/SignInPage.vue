@@ -35,20 +35,24 @@
 </template>
 
 <script lang="ts">
-import { isEmpty } from 'lodash';
-
 import {
     toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
+import { isEmpty } from 'lodash';
+
+
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+
+import { isRouteAccessible } from '@/lib/access-control';
+import config from '@/lib/config';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import IDPWSignIn from '@/services/auth/sign-in/local/template/ID_PW.vue';
 import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftContainer.vue';
-import { store } from '@/store';
-import config from '@/lib/config';
 import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightContainer.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { isRouteAccessible } from '@/lib/access-control';
-import { SpaceRouter } from '@/router';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 export default {

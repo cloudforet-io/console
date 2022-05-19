@@ -63,9 +63,16 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PRadio, PTextPagination, PButton, PLabel, PDataLoader,
 } from '@spaceone/design-system';
+
+import { store } from '@/store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CostDashboardCustomizeCostQuery
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeCostQuery.vue';
@@ -73,17 +80,11 @@ import CostDashboardCustomizeWidgetConfig
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
 import CustomWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CustomWidgetPreview.vue';
-
-import { store } from '@/store';
-import { WidgetInfo, ChartType } from '@/services/cost-explorer/cost-dashboard/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { CostQuerySetModel } from '@/services/cost-explorer/type';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
 import { chartTypeItemMap } from '@/services/cost-explorer/cost-dashboard/lib/config';
+import { WidgetInfo, ChartType } from '@/services/cost-explorer/cost-dashboard/type';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 
 const PAGE_SIZE = 6;

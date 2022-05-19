@@ -109,23 +109,25 @@
 
 
 <script lang="ts">
-import { i18n } from '@/translations';
-
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPageTitle, PBreadcrumbs, PCard, PI, PButton,
 } from '@spaceone/design-system';
 
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+import { i18n } from '@/translations';
+
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+
 import EventRuleContent from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleContent.vue';
 import EventRuleForm from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleForm.vue';
-import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
-
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const EDIT_MODE = Object.freeze({

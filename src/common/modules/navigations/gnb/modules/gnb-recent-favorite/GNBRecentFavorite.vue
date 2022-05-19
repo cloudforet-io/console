@@ -26,18 +26,19 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import vClickOutside from 'v-click-outside';
+
 
 import {
     PI, PTab,
 } from '@spaceone/design-system';
+import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import vClickOutside from 'v-click-outside';
 
-import GNBRecent from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBRecent.vue';
-import GNBFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBFavorite.vue';
+import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import { i18n } from '@/translations';
+import GNBFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBFavorite.vue';
+import GNBRecent from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBRecent.vue';
 
 
 export default {

@@ -1,4 +1,5 @@
 import { Mutation } from 'vuex';
+
 import { CostExplorerState } from '@/services/cost-explorer/store/type';
 
 export const setPublicDashboard: Mutation<CostExplorerState> = (state, dashboardList) => {

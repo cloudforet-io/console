@@ -52,11 +52,12 @@ import {
 import {
     PPaneLayout, PButton, PRadio,
 } from '@spaceone/design-system';
+
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
+import { ProjectGroup } from '@/services/asset-inventory/service-account/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { ProjectGroupTreeItem } from '@/services/project/type';
-import { ProjectGroup } from '@/services/asset-inventory/service-account/type';
 
 
 export default {

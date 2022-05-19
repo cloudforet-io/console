@@ -28,16 +28,19 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 
-import { PButtonModal } from '@spaceone/design-system';
-import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { EscalationPolicyFormModel } from '@/services/alert-manager/type';
-import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
+import { PButtonModal } from '@spaceone/design-system';
+
 import { i18n } from '@/translations';
-import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
+import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
+import { EscalationPolicyFormModel } from '@/services/alert-manager/type';
 
 
 export default {

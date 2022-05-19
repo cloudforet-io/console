@@ -20,15 +20,21 @@
 
 <script lang="ts">
 import { reactive, toRefs, watch } from '@vue/composition-api';
-import { PButtonModal, PCheckBox } from '@spaceone/design-system';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ALERT_STATE } from '@/services/alert-manager/lib/config';
-import { i18n } from '@/translations';
+import { PButtonModal, PCheckBox } from '@spaceone/design-system';
+
 import { store } from '@/store';
-import { AlertStateUpdateParams } from '@/services/alert-manager/type';
-import { useProxyValue } from '@/common/composables/proxy-state';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { ALERT_STATE } from '@/services/alert-manager/lib/config';
+import { AlertStateUpdateParams } from '@/services/alert-manager/type';
+
 
 export default {
     name: 'AlertAcknowledgeModalModal',

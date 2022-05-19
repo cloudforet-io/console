@@ -50,23 +50,29 @@
 </template>
 
 <script lang="ts">
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import { PDataTable, PBadge, PAnchor } from '@spaceone/design-system';
 import {
     computed, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { useProxyValue } from '@/common/composables/proxy-state';
-import { RoleData } from '@/services/administration/iam/role/type';
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
+
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { i18n } from '@/translations';
-import { store } from '@/store';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { SpaceRouter } from '@/router';
+import { PDataTable, PBadge, PAnchor } from '@spaceone/design-system';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
 import { RoleBindingType } from '@/services/administration/iam/role/modules/role-managemnet-table/modules/type';
+import { RoleData } from '@/services/administration/iam/role/type';
 import { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
 
 interface UnDeletableRole {

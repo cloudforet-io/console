@@ -41,15 +41,17 @@
 </template>
 
 <script lang="ts">
+import { computed, reactive, toRefs } from '@vue/composition-api';
+
 import {
     PCollapsibleToggle, PSelectCard,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
 import { flattenDeep, startCase } from 'lodash';
+
 import { defaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import { DefaultLayout, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 
 const getNamesOfWidgetList = (widgetList) => {
     const flattenWidgetList: WidgetInfo[] = flattenDeep(widgetList);

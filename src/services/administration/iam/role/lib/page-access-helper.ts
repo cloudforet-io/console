@@ -1,9 +1,11 @@
-import { Menu } from '@/lib/menu/config';
 import { TranslateResult } from 'vue-i18n';
-import { PageAccessDefinitionTableData, PageAccessMenuItem } from '@/services/administration/iam/role/type';
+
 import { getPermissionRequiredMenuIds, PagePermissionMap } from '@/lib/access-control/page-permission-helper';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { Menu } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+
+import { PageAccessDefinitionTableData, PageAccessMenuItem } from '@/services/administration/iam/role/type';
 
 // Page Access Form
 const flattenSubMenuList = (subMenuList?: Menu[], labels?: Array<string|TranslateResult>): PageAccessMenuItem[] => {

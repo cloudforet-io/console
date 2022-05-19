@@ -1,11 +1,13 @@
 import { find } from 'lodash';
-import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
+
+import { GNBMenu } from '@/store/modules/display/type';
 import { FAVORITE_TYPE, FavoriteConfig, FavoriteItem } from '@/store/modules/favorite/type';
 import { RecentConfig, RecentItem } from '@/store/modules/recent/type';
-import { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import { GNBMenu } from '@/store/modules/display/type';
+import { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
+
+import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
 
 interface ConfigData extends FavoriteConfig, RecentConfig {

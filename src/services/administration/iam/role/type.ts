@@ -1,9 +1,12 @@
-import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
-import { Tags } from '@/models';
-import { ROLE_TYPE } from '@/services/administration/iam/role/config';
-import { TranslateResult } from 'vue-i18n';
-import { PagePermission, PagePermissionType } from '@/lib/access-control/page-permission-helper';
 import { DefinitionField } from '@spaceone/design-system/dist/src/data-display/tables/definition-table/type';
+import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
+import { TranslateResult } from 'vue-i18n';
+
+import { Tags } from '@/models';
+
+import { PagePermission, PagePermissionType } from '@/lib/access-control/page-permission-helper';
+
+import { ROLE_TYPE } from '@/services/administration/iam/role/config';
 
 export interface Policy {
     policy_id: string;

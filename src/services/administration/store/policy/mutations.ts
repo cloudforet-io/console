@@ -1,6 +1,7 @@
 import { Mutation } from 'vuex';
-import { PolicyState } from '@/services/administration/store/policy/type';
+
 import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
+import { PolicyState } from '@/services/administration/store/policy/type';
 
 export const setPolicyList: Mutation<PolicyState> = (state, policyList: PolicyDataModel[]) => {
     state.policyList = policyList;

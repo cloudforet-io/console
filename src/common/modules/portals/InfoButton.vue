@@ -23,7 +23,6 @@
 </template>
 
 <script lang="ts">
-import { PI, PAnchor } from '@spaceone/design-system';
 import {
     ComponentRenderProxy,
     computed,
@@ -32,6 +31,8 @@ import {
     reactive,
     toRefs, watch,
 } from '@vue/composition-api';
+
+import { PI, PAnchor } from '@spaceone/design-system';
 
 export default {
     name: 'InfoButton',

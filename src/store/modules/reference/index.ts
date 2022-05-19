@@ -1,16 +1,16 @@
+import * as actions from './actions';
+import cloudServiceType from './cloud-service-type';
+import collector from './collector';
+import plugin from './plugin';
 import project from './project';
 import projectGroup from './project-group';
-import serviceAccount from './service-account';
-import cloudServiceType from './cloud-service-type';
-import secret from './secret';
-import collector from './collector';
+import protocol from './protocol';
 import provider from './provider';
 import region from './region';
-import plugin from './plugin';
+import secret from './secret';
+import serviceAccount from './service-account';
 import user from './user';
-import protocol from './protocol';
 import webhook from './webhook';
-import * as actions from './actions';
 
 export default {
     namespaced: true,

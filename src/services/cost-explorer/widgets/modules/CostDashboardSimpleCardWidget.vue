@@ -33,12 +33,14 @@
 </template>
 
 <script lang="ts">
-import { PDivider, PPaneLayout, PSkeleton } from '@spaceone/design-system';
-import { CURRENCY_SYMBOL, CurrencySymbol } from '@/store/modules/display/config';
 import {
     computed, defineComponent, PropType, reactive, toRefs,
 } from '@vue/composition-api';
+
+import { PDivider, PPaneLayout, PSkeleton } from '@spaceone/design-system';
 import { Location } from 'vue-router';
+
+import { CURRENCY_SYMBOL, CurrencySymbol } from '@/store/modules/display/config';
 
 
 const UNIT_TYPE = Object.freeze({

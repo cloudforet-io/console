@@ -5,12 +5,15 @@
 </template>
 
 <script lang="ts">
-import ProjectMemberTab from '@/services/project/project-detail/project-member/modules/ProjectMemberTab.vue';
 import {
     ComponentRenderProxy, getCurrentInstance, onActivated, reactive, toRefs,
 } from '@vue/composition-api';
+
 import { QueryHelper } from '@spaceone/console-core-lib/query';
+
 import { replaceUrlQuery } from '@/lib/router-query-string';
+
+import ProjectMemberTab from '@/services/project/project-detail/project-member/modules/ProjectMemberTab.vue';
 
 export default {
     name: 'ProjectMemberPage',

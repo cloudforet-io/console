@@ -18,28 +18,33 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs';
-import CostDashboardSimpleCardWidget
-    from '@/services/cost-explorer/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import {
     onUnmounted, computed, reactive, toRefs, watch, defineComponent,
 } from '@vue/composition-api';
+
 import { XYChart } from '@amcharts/amcharts4/charts';
-import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import config from '@/lib/config';
-import { gray, violet } from '@/styles/colors';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { CURRENCY, CURRENCY_SYMBOL, Currency } from '@/store/modules/display/config';
-import { WidgetProps, XYChartData } from '@/services/cost-explorer/widgets/type';
-import { getXYChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import dayjs from 'dayjs';
+
+import { CURRENCY, CURRENCY_SYMBOL, Currency } from '@/store/modules/display/config';
+import { gray, violet } from '@/styles/colors';
+
+import config from '@/lib/config';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { getXYChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
+import CostDashboardSimpleCardWidget
+    from '@/services/cost-explorer/widgets/modules/CostDashboardSimpleCardWidget.vue';
+import { WidgetProps, XYChartData } from '@/services/cost-explorer/widgets/type';
 
 
 const CATEGORY_KEY = 'date';

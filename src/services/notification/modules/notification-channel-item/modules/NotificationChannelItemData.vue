@@ -82,20 +82,24 @@
 </template>
 
 <script lang="ts">
+import { computed, reactive, toRefs } from '@vue/composition-api';
+
 import {
     PBadge, PButton, PI, PJsonSchemaForm,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
 import { cloneDeep } from 'lodash';
+
+import { store } from '@/store';
+
+import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
+
+import AddNotificationMemberGroup from '@/services/notification/modules/AddNotificationMemberGroup.vue';
 import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
 import {
     EDIT_TYPE,
     PARAM_KEY_TYPE,
     PROTOCOL_TYPE,
 } from '@/services/notification/modules/notification-channel-item/type';
-import AddNotificationMemberGroup from '@/services/notification/modules/AddNotificationMemberGroup.vue';
-import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
-import { store } from '@/store';
 
 
 export default {

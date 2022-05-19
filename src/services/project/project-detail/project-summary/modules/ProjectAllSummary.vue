@@ -93,40 +93,44 @@
 </template>
 
 <script lang="ts">
-import {
-    forEach, orderBy, range,
-} from 'lodash';
-import { Unit } from 'bytes';
-import dayjs from 'dayjs';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import { XYChart } from '@amcharts/amcharts4/charts';
-import { TranslateResult } from 'vue-i18n';
-import { Location } from 'vue-router';
 
 import {
     reactive, toRefs, watch, computed, onUnmounted,
 } from '@vue/composition-api';
 
-import ProjectRegionService from '@/services/project/project-detail/project-summary/modules/ProjectRegionService.vue';
+import { XYChart } from '@amcharts/amcharts4/charts';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { byteFormatter, commaFormatter } from '@spaceone/console-core-lib';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDataLoader, PSkeleton, PButton, PBalloonTab,
 } from '@spaceone/design-system';
+import { Unit } from 'bytes';
+import dayjs from 'dayjs';
+import {
+    forEach, orderBy, range,
+} from 'lodash';
+import { TranslateResult } from 'vue-i18n';
+import { Location } from 'vue-router';
 
-import { byteFormatter, commaFormatter } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+
+import { store } from '@/store';
+import { gray, primary1, primary2 } from '@/styles/colors';
+import { i18n } from '@/translations';
+
+import config from '@/lib/config';
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import {
     CLOUD_SERVICE_LABEL, DATE_TYPE, SERVICE_CATEGORY,
 } from '@/services/project/project-detail/project-summary/modules/config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { gray, primary1, primary2 } from '@/styles/colors';
-import { store } from '@/store';
-import { i18n } from '@/translations';
-import config from '@/lib/config';
+import ProjectRegionService from '@/services/project/project-detail/project-summary/modules/ProjectRegionService.vue';
 
 
 interface ChartData {

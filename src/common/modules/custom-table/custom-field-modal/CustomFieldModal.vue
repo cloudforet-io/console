@@ -77,28 +77,30 @@
 </template>
 
 <script lang="ts">
-import draggable from 'vuedraggable';
-import { camelCase, unionBy, uniq } from 'lodash';
 
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PButton, PButtonModal, PCheckBox, PDataLoader, PSearch,
 } from '@spaceone/design-system';
-
-import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
-import SelectTagColumns from '@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue';
-
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { camelCase, unionBy, uniq } from 'lodash';
+import draggable from 'vuedraggable';
+
 import { i18n } from '@/translations';
-import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
+import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
+import SelectTagColumns from '@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue';
 
 interface Props {
     visible: boolean;

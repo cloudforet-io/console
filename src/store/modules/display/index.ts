@@ -1,8 +1,9 @@
 import { DEFAULT_CURRENCY_RATES, SIDEBAR_TYPE } from '@/store/modules/display/config';
-import { DisplayState } from './type';
-import * as getters from './getters';
+
 import * as actions from './actions';
+import * as getters from './getters';
 import * as mutations from './mutations';
+import { DisplayState } from './type';
 
 export const STORAGE_KEY = 'store/display';
 

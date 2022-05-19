@@ -77,33 +77,35 @@
 </template>
 
 <script lang="ts">
-import { orderBy, range } from 'lodash';
-import bytes from 'bytes';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import { Location } from 'vue-router';
-
 import {
     ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDataLoader, PDataTable, PButton, PSkeleton, PI,
 } from '@spaceone/design-system';
+import bytes from 'bytes';
+import { orderBy, range } from 'lodash';
+import { Location } from 'vue-router';
 
-import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     gray, peacock, secondary,
 } from '@/styles/colors';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
+
+import config from '@/lib/config';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { arrayToQueryString } from '@/lib/router-query-string';
+
+import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-import config from '@/lib/config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { arrayToQueryString } from '@/lib/router-query-string';
 
 
 enum CLOUD_SERVICE_LABEL {

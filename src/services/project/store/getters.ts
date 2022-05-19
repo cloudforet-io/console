@@ -1,6 +1,7 @@
-import { Getter } from 'vuex';
-import { ProjectPageState } from '@/services/project/store/type';
 import { reverse } from 'lodash';
+import { Getter } from 'vuex';
+
+import { ProjectPageState } from '@/services/project/store/type';
 import { ProjectGroup, ProjectItemResp } from '@/services/project/type';
 
 

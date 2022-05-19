@@ -72,19 +72,21 @@ import {
     computed, PropType, reactive, toRefs,
 } from '@vue/composition-api';
 
+import { byteFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import {
     PDataTable, PTextPagination, PStatus, PI,
 } from '@spaceone/design-system';
 import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
+import { store } from '@/store';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
-import { GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { store } from '@/store';
-import { byteFormatter, numberFormatter } from '@spaceone/console-core-lib';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 
 
 interface Field extends DataTableFieldType {

@@ -65,18 +65,23 @@ import {
 import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar, PLottie,
 } from '@spaceone/design-system';
-
-import GNB from '@/common/modules/navigations/gnb/GNB.vue';
 import { Location } from 'vue-router';
 
-import TopNotification from '@/common/modules/portals/TopNotification.vue';
-import { SIDEBAR_TYPE } from '@/store/modules/display/config';
-import { AUTH_ROUTE } from '@/services/auth/route-config';
-// import SurveyModal from '@/common/modules/survey/SurveyModal.vue';
-import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
-import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 import { store } from '@/store';
+import { SIDEBAR_TYPE } from '@/store/modules/display/config';
+
 import { isRouteAccessible } from '@/lib/access-control';
+import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
+
+import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
+import GNB from '@/common/modules/navigations/gnb/GNB.vue';
+import TopNotification from '@/common/modules/portals/TopNotification.vue';
+
+
+import { AUTH_ROUTE } from '@/services/auth/route-config';
+
+// import SurveyModal from '@/common/modules/survey/SurveyModal.vue';
+
 
 export default defineComponent({
     name: 'App',

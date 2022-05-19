@@ -1,7 +1,10 @@
 import { computed, ComputedRef } from '@vue/composition-api';
-import { Breadcrumb } from '@/common/modules/page-layouts/type';
+
 import { Location, Route, RouteRecord } from 'vue-router';
+
 import { i18n } from '@/translations';
+
+import { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 interface LocationFormatter {
     (r: RouteRecord): Location

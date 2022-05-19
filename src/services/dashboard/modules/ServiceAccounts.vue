@@ -47,29 +47,31 @@
 </template>
 
 <script lang="ts">
-import { forEach, range } from 'lodash';
-import { Location } from 'vue-router';
-import Color from 'color';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-
 import {
     computed, reactive, toRefs, watch,
     getCurrentInstance, ComponentRenderProxy, onUnmounted,
 } from '@vue/composition-api';
 
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDataTable, PDataLoader, PSkeleton, PI,
 } from '@spaceone/design-system';
+import Color from 'color';
+import { forEach, range } from 'lodash';
+import { Location } from 'vue-router';
 
-import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 
 import {
     gray, violet, white,
 } from '@/styles/colors';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
 import config from '@/lib/config';
+
+import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 

@@ -1,7 +1,7 @@
-import { ProjectDetailState } from '@/services/project/project-detail/store/type';
-import * as getters from '@/services/project/project-detail/store/getters';
 import * as actions from '@/services/project/project-detail/store/actions';
+import * as getters from '@/services/project/project-detail/store/getters';
 import * as mutations from '@/services/project/project-detail/store/mutations';
+import { ProjectDetailState } from '@/services/project/project-detail/store/type';
 
 const state: ProjectDetailState = {
     projectId: '',

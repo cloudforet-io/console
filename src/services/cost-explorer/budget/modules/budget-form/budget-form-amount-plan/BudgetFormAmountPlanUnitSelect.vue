@@ -22,9 +22,9 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 
+import { PLabel, PSelectCard } from '@spaceone/design-system';
 import { TranslateResult } from 'vue-i18n';
 
-import { PLabel, PSelectCard } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 

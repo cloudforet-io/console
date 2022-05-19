@@ -1,7 +1,9 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { AlertDataModel } from '@/services/alert-manager/type';
-import { UpdateAlertParams } from '@/services/alert-manager/store/alert/type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { UpdateAlertParams } from '@/services/alert-manager/store/alert/type';
+import { AlertDataModel } from '@/services/alert-manager/type';
 
 export const getAlertData = async ({ commit }, alertId: string): Promise<void|Error> => {
     try {

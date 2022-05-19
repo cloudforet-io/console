@@ -20,15 +20,20 @@
 import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
+
 import { PDivider, PI } from '@spaceone/design-system';
+
 import { store } from '@/store';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
-import { LNBMenu } from '@/common/modules/navigations/lnb/type';
-import LNB from '@/common/modules/navigations/lnb/LNB.vue';
-import { MENU_ID } from '@/lib/menu/config';
 import { i18n } from '@/translations';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
+import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+
+import LNB from '@/common/modules/navigations/lnb/LNB.vue';
+import { LNBMenu } from '@/common/modules/navigations/lnb/type';
+
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 export default defineComponent({
     name: 'MyPageLNB',

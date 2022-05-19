@@ -72,6 +72,12 @@
 </template>
 
 <script lang="ts">
+import { computed, reactive, toRefs } from '@vue/composition-api';
+
+import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
+import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PAnchor,
     PBadge,
@@ -81,26 +87,21 @@ import {
     PTableCheckModal,
     PToolboxTable,
 } from '@spaceone/design-system';
-
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { computed, reactive, toRefs } from '@vue/composition-api';
-
+import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import ProjectMemberAddModal from '@/services/project/project-detail/project-member/modules/ProjectMemberAddModal.vue';
 import ProjectMemberUpdateModal
     from '@/services/project/project-detail/project-member/modules/ProjectMemberUpdateModal.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { i18n } from '@/translations';
-import { store } from '@/store';
-import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
-import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { MemberItem } from '@/services/project/project-detail/project-member/type';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 
 interface MemberDataTableItem extends MemberItem {

@@ -59,16 +59,19 @@ import {
     defineComponent, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
+
 import { PDataLoader, PDivider } from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
 import {
     SuggestionItem, SUGGESTION_TYPE, SuggestionType,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import {
     DropdownItem, FocusingDirection,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
-import { i18n } from '@/translations';
-import { useProxyValue } from '@/common/composables/proxy-state';
+import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 interface Props {
     inputText: string;

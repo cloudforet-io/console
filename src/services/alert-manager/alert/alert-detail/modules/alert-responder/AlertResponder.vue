@@ -46,23 +46,27 @@
 
 <script lang="ts">
 import {
+    computed, reactive, toRefs,
+} from '@vue/composition-api';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import {
     PBadge, PCollapsibleList, PPaneLayout, PPanelTop, PSearchDropdown,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 import { difference } from 'lodash';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import VueI18n from 'vue-i18n';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
 import {
     AlertDataModel,
 } from '@/services/alert-manager/type';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
-import { i18n } from '@/translations';
-import { store } from '@/store';
-import VueI18n from 'vue-i18n';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import TranslateResult = VueI18n.TranslateResult;
 

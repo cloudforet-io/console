@@ -29,18 +29,19 @@
 </template>
 
 <script lang="ts">
-import { get } from 'lodash';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, watch,
 } from '@vue/composition-api';
 
-import {
-    PPanelTop, PDefinitionTable, PLazyImg, PDataTable, PStatus, PTextList,
-} from '@spaceone/design-system';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import {
+    PPanelTop, PDefinitionTable, PLazyImg, PDataTable, PStatus, PTextList,
+} from '@spaceone/design-system';
+import { get } from 'lodash';
+
 import { store } from '@/store';
 
 export default {

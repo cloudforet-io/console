@@ -46,10 +46,13 @@ import {
     computed,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
-import { useFormValidator } from '@/common/composables/form-validator';
+
 import { commaFormatter, getNumberFromString } from '@spaceone/console-core-lib';
+import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
+
 import { i18n } from '@/translations';
+
+import { useFormValidator } from '@/common/composables/form-validator';
 
 interface Props {
     visible: boolean;

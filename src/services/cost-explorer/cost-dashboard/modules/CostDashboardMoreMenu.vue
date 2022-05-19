@@ -20,20 +20,25 @@
 </template>
 
 <script lang="ts">
-import { PSelectDropdown } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { PSelectDropdown } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
+
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
-import { cloneDeep } from 'lodash';
+
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import CostDashboardDashboardDuplicateModal
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardDuplicateModal.vue';
 import { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { SpaceRouter } from '@/router';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const MENU = Object.freeze({

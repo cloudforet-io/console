@@ -1,8 +1,10 @@
-import VueGtag, { VueGtag as VueGtagType } from 'vue-gtag';
 import Hashids from 'hashids';
-import config from '@/lib/config';
-import { Route } from 'vue-router';
 import Vue from 'vue';
+import VueGtag, { VueGtag as VueGtagType } from 'vue-gtag';
+import { Route } from 'vue-router';
+
+import config from '@/lib/config';
+
 
 export class GTag {
     private static _gtag: VueGtagType|null;

@@ -52,12 +52,16 @@
 </template>
 
 <script lang="ts">
-import { PDataTable, PPanelTop, PCollapsibleToggle } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { JobTaskData, JobTaskError } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
+
+import { PDataTable, PPanelTop, PCollapsibleToggle } from '@spaceone/design-system';
+
 import { resourceTypeLabels } from '@/lib/reference/type';
+
+import { JobTaskData, JobTaskError } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
+
 
 interface Props {
     selectedItem: JobTaskData;

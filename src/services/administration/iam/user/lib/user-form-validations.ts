@@ -1,7 +1,8 @@
-import { i18n } from '@/translations';
-import VueI18n from 'vue-i18n';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import VueI18n from 'vue-i18n';
+
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import TranslateResult = VueI18n.TranslateResult;
 

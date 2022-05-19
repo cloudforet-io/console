@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const postcss = require('postcss');
 const fs = require('fs');
+
+const postcss = require('postcss');
+
 const postcssConfig = require('../postcss.config');
 
 console.log('processing...');

@@ -20,19 +20,20 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
+
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { PPageTitle } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
 
-import NewAssignedAlertListCard from '@/services/alert-manager/alert/modules/NewAssignedAlertListCard.vue';
 import AlertDataTable from '@/services/alert-manager/alert/modules/AlertDataTable.vue';
 import AssignedAlertInfoPanel from '@/services/alert-manager/alert/modules/AssignedAlertInfoPanel.vue';
-
+import NewAssignedAlertListCard from '@/services/alert-manager/alert/modules/NewAssignedAlertListCard.vue';
+import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
 import {
     AlertListPageUrlQuery, AlertListTableFilters,
 } from '@/services/alert-manager/type';
-import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
 
 export default {
     name: 'AlertPage',

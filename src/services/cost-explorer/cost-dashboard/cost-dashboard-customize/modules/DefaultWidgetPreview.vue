@@ -19,12 +19,16 @@
 </template>
 
 <script lang="ts">
+import { computed, reactive, toRefs } from '@vue/composition-api';
+
+import { PAnchor, PLabel, PLazyImg } from '@spaceone/design-system';
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
 import CostDashboardCustomizeWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetPreview.vue';
 import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { PAnchor, PLabel, PLazyImg } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
 
 export default {
     name: 'DefaultWidgetPreview',

@@ -63,21 +63,23 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { range } from 'lodash';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
-import { PSelectableItem, PSkeleton, PI } from '@spaceone/design-system';
 
-import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
-
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { PSelectableItem, PSkeleton, PI } from '@spaceone/design-system';
+import { range } from 'lodash';
+
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
+import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
 interface Value {

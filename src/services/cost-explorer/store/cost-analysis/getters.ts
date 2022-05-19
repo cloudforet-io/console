@@ -1,11 +1,13 @@
 import { Getter } from 'vuex';
+
+import { store } from '@/store';
+import { ReferenceItem } from '@/store/modules/reference/type';
+
+import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import {
     CostAnalysisStoreState, GroupByItem,
 } from '@/services/cost-explorer/store/cost-analysis/type';
-import { ReferenceItem } from '@/store/modules/reference/type';
-import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { CostQueryFilterItemsMap, CostQuerySetModel } from '@/services/cost-explorer/type';
-import { store } from '@/store';
 
 
 export const filterItemsMap: Getter<CostAnalysisStoreState, any> = ({ filters }): CostQueryFilterItemsMap => {

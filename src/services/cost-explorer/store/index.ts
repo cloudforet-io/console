@@ -1,12 +1,14 @@
-import { PublicDashboardInfo, UserDashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { Module } from 'vuex';
-import { CostExplorerState, CostExplorerStore } from './type';
-import * as getters from './getters';
+
+import { PublicDashboardInfo, UserDashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
+
 import * as actions from './actions';
-import * as mutations from './mutations';
-import dashboard from './dashboard';
-import costAnalysis from './cost-analysis';
 import budget from './budget';
+import costAnalysis from './cost-analysis';
+import dashboard from './dashboard';
+import * as getters from './getters';
+import * as mutations from './mutations';
+import { CostExplorerState, CostExplorerStore } from './type';
 
 const state: CostExplorerState = {
     publicDashboardList: [] as PublicDashboardInfo[],

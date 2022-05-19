@@ -1,6 +1,7 @@
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { CustomLayout, DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { FILTER } from '@/services/cost-explorer/lib/config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
 export const fetchDefaultLayoutData = async (layoutId: string) => {

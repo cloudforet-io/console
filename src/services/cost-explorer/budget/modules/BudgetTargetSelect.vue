@@ -16,12 +16,16 @@
 </template>
 
 <script lang="ts">
-import { PFieldGroup } from '@spaceone/design-system';
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 import { defineComponent, watch } from '@vue/composition-api';
-import { useFormValidator } from '@/common/composables/form-validator';
-import { i18n } from '@/translations';
+
+import { PFieldGroup } from '@spaceone/design-system';
 import { debounce } from 'lodash';
+
+import { i18n } from '@/translations';
+
+import { useFormValidator } from '@/common/composables/form-validator';
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
 
 interface Props {
     targets: string[];

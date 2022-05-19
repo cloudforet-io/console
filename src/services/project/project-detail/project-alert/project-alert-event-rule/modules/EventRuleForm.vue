@@ -28,17 +28,19 @@
 /* eslint-disable camelcase */
 import { reactive, toRefs, watch } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton,
 } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import EventRuleActionForm from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleActionForm.vue';
 import EventRuleConditionForm from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleConditionForm.vue';
-
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { i18n } from '@/translations';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const CONDITIONS_POLICY = Object.freeze({

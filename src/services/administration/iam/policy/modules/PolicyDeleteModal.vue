@@ -24,17 +24,24 @@
 </template>
 
 <script lang="ts">
-import { PAnchor, PDataTable } from '@spaceone/design-system';
-import { useProxyValue } from '@/common/composables/proxy-state';
+
 import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import deleteModal from '@/common/components/modals/DeleteModal.vue';
+
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { PAnchor, PDataTable } from '@spaceone/design-system';
+
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import deleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+
 
 export default {
     name: 'PolicyDeleteModal',

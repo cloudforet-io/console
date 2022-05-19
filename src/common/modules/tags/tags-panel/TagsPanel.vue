@@ -30,18 +30,18 @@
 </template>
 
 <script lang="ts">
-import { get, camelCase } from 'lodash';
 
 import {
     computed, reactive, toRefs, watch, ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 
-import { PDataTable, PPanelTop, PButton } from '@spaceone/design-system';
-
-import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { PDataTable, PPanelTop, PButton } from '@spaceone/design-system';
+import { get, camelCase } from 'lodash';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 
 interface Props {
     resourceKey: string;

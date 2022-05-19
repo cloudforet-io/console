@@ -30,6 +30,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import {
     PLottie, PAnchor, PBadge,
 } from '@spaceone/design-system';
+
 import config from '@/lib/config';
 
 export default {

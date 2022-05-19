@@ -1,9 +1,10 @@
+import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { CostAnalysisStoreState } from '@/services/cost-explorer/store/cost-analysis/type';
-import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
+
 import * as actions from './actions';
-import * as mutations from './mutations';
 import * as getters from './getters';
+import * as mutations from './mutations';
 
 
 const state: CostAnalysisStoreState = {

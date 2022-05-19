@@ -104,7 +104,6 @@
 </template>
 
 <script lang="ts">
-import { i18n } from '@/translations';
 
 import {
     computed, reactive, toRefs,
@@ -115,11 +114,13 @@ import {
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { store } from '@/store';
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 
 const URGENCY = Object.freeze({

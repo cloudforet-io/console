@@ -53,19 +53,23 @@
 
 <script lang="ts">
 import {
-    PBreadcrumbs, PButton, PPageTitle, PPaneLayout,
-} from '@spaceone/design-system';
-import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import AddNotificationData from '@/services/notification/notification-add/modules/AddNotificationData.vue';
-import AddNotificationTopic from '@/services/notification/modules/AddNotificationTopic.vue';
-import AddNotificationSchedule from '@/services/notification/modules/AddNotificationSchedule.vue';
-import VueI18n from 'vue-i18n';
+
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import {
+    PBreadcrumbs, PButton, PPageTitle, PPaneLayout,
+} from '@spaceone/design-system';
+import VueI18n from 'vue-i18n';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+
+import AddNotificationSchedule from '@/services/notification/modules/AddNotificationSchedule.vue';
+import AddNotificationTopic from '@/services/notification/modules/AddNotificationTopic.vue';
+import AddNotificationData from '@/services/notification/notification-add/modules/AddNotificationData.vue';
 
 import TranslateResult = VueI18n.TranslateResult;
 

@@ -42,18 +42,22 @@
 </template>
 
 <script lang="ts">
-import draggable from 'vuedraggable';
-
-import { PButton, PI } from '@spaceone/design-system';
 import {
     computed,
     onUnmounted, reactive, toRefs,
 } from '@vue/composition-api';
+
+import { PButton, PI } from '@spaceone/design-system';
+import draggable from 'vuedraggable';
+
+
 import { store } from '@/store';
+
+import { getUUID } from '@/lib/component-util/getUUID';
+
 import CostDashboardCustomizeWidgetModal
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetModal.vue';
 import { CustomLayout } from '@/services/cost-explorer/cost-dashboard/type';
-import { getUUID } from '@/lib/component-util/getUUID';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
 export default {

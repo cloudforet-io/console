@@ -65,23 +65,28 @@
 </template>
 
 <script lang="ts">
-import DynamicWidget from '@/services/cost-explorer/cost-dashboard/modules/DynamicWidget.vue';
-import { CURRENCY } from '@/store/modules/display/config';
-import { PDataLoader, PIconButton, PButton } from '@spaceone/design-system';
-import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import { PDataLoader, PIconButton, PButton } from '@spaceone/design-system';
+
+import { CURRENCY } from '@/store/modules/display/config';
+import { i18n } from '@/translations';
+
 import { getUUID } from '@/lib/component-util/getUUID';
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+
 import CostDashboardCustomizeWidgetModal
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetModal.vue';
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import CostDashboardUpdateWidgetModal
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardUpdateWidgetModal.vue';
+import DynamicWidget from '@/services/cost-explorer/cost-dashboard/modules/DynamicWidget.vue';
 import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { i18n } from '@/translations';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 
 
 export default {

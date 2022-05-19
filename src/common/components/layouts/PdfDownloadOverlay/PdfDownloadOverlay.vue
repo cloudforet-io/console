@@ -45,14 +45,16 @@ import {
     defineComponent, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { PButton, PI } from '@spaceone/design-system';
 
+import { PButton, PI } from '@spaceone/design-system';
 import { toPng } from 'html-to-image';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import { TCreatedPdf } from 'pdfmake/build/pdfmake';
 // eslint-disable-next-line import/extensions,import/no-unresolved
 import { Content, Table, TableCell } from 'pdfmake/interfaces';
+
 import { gray, black, white } from '@/styles/colors';
+
 import {
     pdfFontInfoMap, PdfFontFamily, Language, fontLanguages, pdfFontFamily,
 } from '@/common/components/layouts/PdfDownloadOverlay/fonts';

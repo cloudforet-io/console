@@ -1,6 +1,7 @@
 /* eslint-disable import/no-cycle */
-import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { MENU_ID, MenuId, MenuInfo } from '@/lib/menu/config';
+
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     [MENU_ID.PROJECT]: {

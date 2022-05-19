@@ -27,18 +27,20 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 
-import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
-import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
-import ProjectPersonalHealthDashboard from '@/services/project/project-detail/project-summary/modules/ProjectPersonalHealthDashboard.vue';
-import ProjectAllSummary from '@/services/project/project-detail/project-summary/modules/ProjectAllSummary.vue';
-import ProjectBilling from '@/services/project/project-detail/project-summary/modules/ProjectBilling.vue';
-import ProjectServiceAccounts from '@/services/project/project-detail/project-summary/modules/ProjectServiceAccounts.vue';
-import ProjectTrustedAdvisor from '@/services/project/project-detail/project-summary/modules/ProjectTrustedAdvisor.vue';
-import ProjectAlertWidget from '@/services/project/project-detail/project-summary/modules/ProjectAlertWidget.vue';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import { store } from '@/store';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
+
+import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
+import ProjectAlertWidget from '@/services/project/project-detail/project-summary/modules/ProjectAlertWidget.vue';
+import ProjectAllSummary from '@/services/project/project-detail/project-summary/modules/ProjectAllSummary.vue';
+import ProjectBilling from '@/services/project/project-detail/project-summary/modules/ProjectBilling.vue';
+import ProjectPersonalHealthDashboard from '@/services/project/project-detail/project-summary/modules/ProjectPersonalHealthDashboard.vue';
+import ProjectServiceAccounts from '@/services/project/project-detail/project-summary/modules/ProjectServiceAccounts.vue';
+import ProjectTrustedAdvisor from '@/services/project/project-detail/project-summary/modules/ProjectTrustedAdvisor.vue';
 
 
 export default {

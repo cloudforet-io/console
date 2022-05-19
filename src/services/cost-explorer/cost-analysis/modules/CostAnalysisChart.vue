@@ -110,48 +110,51 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs';
-import {
-    cloneDeep, debounce, sum, isEmpty,
-} from 'lodash';
-import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
-import axios, { CancelTokenSource } from 'axios';
-
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton, PIconButton, PSelectDropdown, PStatus, PTag, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
+import axios, { CancelTokenSource } from 'axios';
+import dayjs from 'dayjs';
+import {
+    cloneDeep, debounce, sum, isEmpty,
+} from 'lodash';
 
-import CostAnalysisStackedColumnChart
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
-import CostAnalysisPieChart
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue';
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
+import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import {
     getConvertedFilter,
 } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import {
-    Legend, PieChartData, XYChartData,
-} from '@/services/cost-explorer/widgets/type';
+import CostAnalysisPieChart
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue';
+import CostAnalysisStackedColumnChart
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
 import {
     FILTER_ITEM_MAP, GRANULARITY,
 } from '@/services/cost-explorer/lib/config';
+import { costExplorerStore } from '@/services/cost-explorer/store';
 import { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
 import {
     getLegends,
     getPieChartData,
     getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
-import { store } from '@/store';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import {
+    Legend, PieChartData, XYChartData,
+} from '@/services/cost-explorer/widgets/type';
+
 
 const SetFilterModal = () => import('@/services/cost-explorer/modules/SetFilterModal.vue');
 

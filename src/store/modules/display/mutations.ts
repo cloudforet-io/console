@@ -1,5 +1,7 @@
 import { Mutation } from 'vuex';
+
 import { Currency, SidebarType } from '@/store/modules/display/config';
+
 import { CurrencyRates, DisplayState } from './type';
 
 export const setVisibleSidebar: Mutation<DisplayState> = (state, visible: boolean): void => {

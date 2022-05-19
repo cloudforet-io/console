@@ -16,15 +16,16 @@
 </template>
 
 <script lang="ts">
-import CostDashboardCreateWithLayout
-    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateWithLayout.vue';
-import CostDashboardCreateWithDashboard
-    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateWithDashboard.vue';
+import { PPaneLayout } from '@spaceone/design-system';
+
 import CostDashboardCreateDefaultFilter
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateDefaultFilter.vue';
-import { PPaneLayout } from '@spaceone/design-system';
 import CostDashboardCreateSelectPrivacy
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateSelectPrivacy.vue';
+import CostDashboardCreateWithDashboard
+    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateWithDashboard.vue';
+import CostDashboardCreateWithLayout
+    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateWithLayout.vue';
 
 export default {
     name: 'CostDashboardCreateForm',

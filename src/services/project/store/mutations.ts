@@ -1,4 +1,5 @@
 import { Mutation } from 'vuex';
+
 import { ProjectPageState } from '@/services/project/store/type';
 import { ProjectGroupTreeItem } from '@/services/project/type';
 

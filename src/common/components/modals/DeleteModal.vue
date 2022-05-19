@@ -33,10 +33,12 @@
 </template>
 
 <script lang="ts">
-import { PButtonModal, PButton } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
-import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { PButtonModal, PButton } from '@spaceone/design-system';
+
 import { SIZE, Size } from '@/common/components/modals/config';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 export default {
     name: 'DeleteModal',

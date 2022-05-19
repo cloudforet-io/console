@@ -116,10 +116,6 @@
 </template>
 
 <script lang="ts">
-import ejs from 'ejs';
-import vClickOutside from 'v-click-outside';
-import { Location } from 'vue-router';
-
 import {
     ComponentRenderProxy, computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -127,19 +123,26 @@ import {
 import {
     PI, PDivider, PButton,
 } from '@spaceone/design-system';
+import ejs from 'ejs';
+import vClickOutside from 'v-click-outside';
+import { Location } from 'vue-router';
 
-import GNBNotifications from '@/common/modules/navigations/gnb/modules/gnb-notification/GNBNotifications.vue';
-import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
-import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
 
-import { store } from '@/store';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { languages } from '@/store/modules/user/config';
-import config from '@/lib/config';
-import { AUTH_ROUTE } from '@/services/auth/route-config';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+import { languages } from '@/store/modules/user/config';
+
+import config from '@/lib/config';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import GNBNotifications from '@/common/modules/navigations/gnb/modules/gnb-notification/GNBNotifications.vue';
+import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
+import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
+
+
+import { AUTH_ROUTE } from '@/services/auth/route-config';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 
 export default {

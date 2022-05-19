@@ -144,18 +144,18 @@
 <script lang="ts">
 import { reactive, toRefs, watch } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PAnchor, PBadge, PIconButton, PSelectDropdown, PI, PButton, PTextInput, PRadio,
 } from '@spaceone/design-system';
 
-import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
-
-import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { SCOPE } from '@/services/alert-manager/lib/config';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
+import { SCOPE } from '@/services/alert-manager/lib/config';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 
 const NOTIFICATION_LEVELS = Object.freeze([

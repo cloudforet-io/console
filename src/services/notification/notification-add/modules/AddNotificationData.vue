@@ -31,16 +31,19 @@
 
 <script lang="ts">
 import {
-    PFieldGroup, PTextInput, PJsonSchemaForm,
-} from '@spaceone/design-system';
-import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import AddNotificationLevel from '@/services/notification/modules/AddNotificationLevel.vue';
-import AddNotificationMemberGroup from '@/services/notification/modules/AddNotificationMemberGroup.vue';
+
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import {
+    PFieldGroup, PTextInput, PJsonSchemaForm,
+} from '@spaceone/design-system';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import AddNotificationLevel from '@/services/notification/modules/AddNotificationLevel.vue';
+import AddNotificationMemberGroup from '@/services/notification/modules/AddNotificationMemberGroup.vue';
 
 const CHANNEL_TYPE = {
     AWS_SNS: 'AWSSNS',

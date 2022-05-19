@@ -27,45 +27,45 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
-
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import dayjs from 'dayjs';
 
-import CostDashboardDataTable
-    from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
+import { store } from '@/store';
+import { CURRENCY } from '@/store/modules/display/config';
+import { gray } from '@/styles/colors';
+
+import { toggleSeries } from '@/lib/amcharts/helper';
+import config from '@/lib/config';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { gray } from '@/styles/colors';
-import config from '@/lib/config';
 
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import { GroupBy, Period } from '@/services/cost-explorer/type';
 import {
     getCurrencyAppliedChartData, getLegends, getTooltipText, getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import { CURRENCY } from '@/store/modules/display/config';
+import CostDashboardDataTable
+    from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 import {
     ChartData, CostAnalyzeModel, Legend, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { toggleSeries } from '@/lib/amcharts/helper';
-import { store } from '@/store';
-import { GroupBy, Period } from '@/services/cost-explorer/type';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
 const widgetTypes = ['SHORT', 'LONG'] as const;

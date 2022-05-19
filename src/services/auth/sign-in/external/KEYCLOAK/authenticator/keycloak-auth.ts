@@ -1,7 +1,10 @@
 import Keycloak from 'keycloak-js';
+
 import { store } from '@/store';
-import { Authenticator } from '@/services/auth/authenticator';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { Authenticator } from '@/services/auth/authenticator';
 
 const BASE_URL = window.location.origin;
 

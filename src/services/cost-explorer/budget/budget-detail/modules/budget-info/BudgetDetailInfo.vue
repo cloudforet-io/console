@@ -47,18 +47,22 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
+
 import { PPaneLayout, PAnchor } from '@spaceone/design-system';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+
 import { store } from '@/store';
+import { CURRENCY } from '@/store/modules/display/config';
+
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import AmountPlanningTypePopover
+    from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
+import BudgetCostTypePopover
+    from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetCostTypePopover.vue';
 import {
     BUDGET_TIME_UNIT, BudgetData, CostType,
 } from '@/services/cost-explorer/budget/type';
-import BudgetCostTypePopover
-    from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetCostTypePopover.vue';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { CURRENCY } from '@/store/modules/display/config';
-import AmountPlanningTypePopover
-    from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];

@@ -16,9 +16,11 @@ import {
 } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
-import { FavoriteButtonProps } from '@/common/modules/favorites/favorite-button/type';
+
 import { store } from '@/store';
 import { FAVORITE_TYPE, FavoriteConfig } from '@/store/modules/favorite/type';
+
+import { FavoriteButtonProps } from '@/common/modules/favorites/favorite-button/type';
 
 const FAVORITE_TYPE_TO_STATE_NAME = {
     [FAVORITE_TYPE.MENU]: 'menuItems',

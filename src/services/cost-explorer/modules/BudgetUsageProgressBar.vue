@@ -8,8 +8,10 @@
 </template>
 
 <script lang="ts">
-import { PProgressBar } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
+
+import { PProgressBar } from '@spaceone/design-system';
+
 import { indigo, red, yellow } from '@/styles/colors';
 
 const getColor = (rate) => {

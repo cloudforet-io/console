@@ -1,6 +1,9 @@
-import { store } from '@/store';
 import { onMounted, onUnmounted } from '@vue/composition-api';
+
 import { Module } from 'vuex';
+
+import { store } from '@/store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 type Path = string[]|string;

@@ -50,31 +50,33 @@
 </template>
 
 <script lang="ts">
-import { find } from 'lodash';
-import { Location } from 'vue-router';
-
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { commaFormatter } from '@spaceone/console-core-lib';
+import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PListCard, PSelectButton, PTextPagination,
 } from '@spaceone/design-system';
+import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
+import { find } from 'lodash';
+import { Location } from 'vue-router';
 
-import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
+
+import { store } from '@/store';
+import { alert, secondary } from '@/styles/colors';
+import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
+import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
 import { AlertListPageUrlQuery } from '@/services/alert-manager/type';
-import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
-import { i18n } from '@/translations';
-import { alert, secondary } from '@/styles/colors';
-import { store } from '@/store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { commaFormatter } from '@spaceone/console-core-lib';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 const ASSIGNED_STATE = Object.freeze({
     ALL: 'ALL',

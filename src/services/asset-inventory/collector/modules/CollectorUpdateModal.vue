@@ -72,24 +72,29 @@
 </template>
 
 <script lang="ts">
-import { get } from 'lodash';
 
 import {
     toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
-import {
-    PButtonModal, PSelectDropdown, PLazyImg, PFieldGroup, PButton, PTextInput, PToggleButton,
-} from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { CollectorPluginModel, CollectorUpdateParameter, UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
+import {
+    PButtonModal, PSelectDropdown, PLazyImg, PFieldGroup, PButton, PTextInput, PToggleButton,
+} from '@spaceone/design-system';
+import { get } from 'lodash';
+
+
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { CollectorPluginModel, CollectorUpdateParameter, UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 
 
 interface Props {

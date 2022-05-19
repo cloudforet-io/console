@@ -12,10 +12,13 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { DASHBOARD_PRIVACY_TYPE, DashboardPrivacyType } from '@/services/cost-explorer/cost-dashboard/type';
+
 import { PRadio } from '@spaceone/design-system';
+
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { DASHBOARD_PRIVACY_TYPE, DashboardPrivacyType } from '@/services/cost-explorer/cost-dashboard/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const privacyList = [

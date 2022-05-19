@@ -88,32 +88,34 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    debounce, find, capitalize, chain, range, sortBy, get,
-} from 'lodash';
-import dayjs from 'dayjs';
-
-import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import MetricChart from '@/common/components/charts/metric-chart/MetricChart.vue';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PSelectButtonGroup, PSelectDropdown, PIconButton, PLottie, PButton, PAnchor,
 } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import {
+    debounce, find, capitalize, chain, range, sortBy, get,
+} from 'lodash';
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
+import { store } from '@/store';
+
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+
+import MetricChart from '@/common/components/charts/metric-chart/MetricChart.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import {
+    COLORS, MONITORING_TYPE, STATISTICS_TYPE, TIME_RANGE,
+} from '@/common/modules/monitoring/config';
 import {
     AvailableResource,
     Metric, MetricChartData, MonitoringProps, StatisticsType, StatItem,
 } from '@/common/modules/monitoring/type';
-import {
-    COLORS, MONITORING_TYPE, STATISTICS_TYPE, TIME_RANGE,
-} from '@/common/modules/monitoring/config';
-import { store } from '@/store';
 
 
 interface DataToolType {

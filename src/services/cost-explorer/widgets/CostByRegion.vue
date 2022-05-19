@@ -49,34 +49,40 @@
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import am4geodataContinentsLow from '@amcharts/amcharts4-geodata/continentsLow';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { MapChart } from '@amcharts/amcharts4/maps';
+import * as am4maps from '@amcharts/amcharts4/maps';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 import {
     groupBy, sum,
 } from 'lodash';
-import { MapChart } from '@amcharts/amcharts4/maps';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import * as am4maps from '@amcharts/amcharts4/maps';
-import am4geodataContinentsLow from '@amcharts/amcharts4-geodata/continentsLow';
-import config from '@/lib/config';
-import { gray } from '@/styles/colors';
+
 import { store } from '@/store';
+import { CURRENCY } from '@/store/modules/display/config';
+import { gray } from '@/styles/colors';
+
+import config from '@/lib/config';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
+
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { RegionMap } from '@/services/cost-explorer/widgets/lib/config';
+import { getTooltipText } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 import { WidgetProps } from '@/services/cost-explorer/widgets/type';
-import { CURRENCY } from '@/store/modules/display/config';
-import dayjs from 'dayjs';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { getTooltipText } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 
 
 const CATEGORY_KEY = 'category';

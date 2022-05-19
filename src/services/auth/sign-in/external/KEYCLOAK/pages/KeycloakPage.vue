@@ -6,11 +6,15 @@
 import {
     ComponentRenderProxy, defineComponent, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
+
 import { PButton } from '@spaceone/design-system';
-import { loadAuth } from '@/services/auth/authenticator/loader';
+
 import { SpaceRouter } from '@/router';
-import { isRouteAccessible } from '@/lib/access-control';
 import { store } from '@/store';
+
+import { isRouteAccessible } from '@/lib/access-control';
+
+import { loadAuth } from '@/services/auth/authenticator/loader';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 export default defineComponent({

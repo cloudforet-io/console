@@ -66,28 +66,31 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import {
     PButton, PI, PIconButton, PDataLoader,
 } from '@spaceone/design-system';
+import { TranslateResult } from 'vue-i18n';
 
-import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
-
-import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
-import { SUGGESTION_TYPE, SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
+import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { i18n } from '@/translations';
+
+
+import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
     convertCloudServiceConfigToReferenceData,
     convertMenuConfigToReferenceData, convertProjectConfigToReferenceData, convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
-import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import { i18n } from '@/translations';
-import { TranslateResult } from 'vue-i18n';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { MENU_ID, MenuInfo } from '@/lib/menu/config';
-import { isUserAccessibleToMenu } from '@/lib/access-control';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import { SUGGESTION_TYPE, SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 const FAVORITE_LIMIT = 5;
 

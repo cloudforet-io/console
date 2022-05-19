@@ -62,23 +62,26 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { find } from 'lodash';
-import dayjs from 'dayjs';
 
 import {
     computed, reactive, toRefs,
     ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 
-import { PDataTable, PI } from '@spaceone/design-system';
-
-import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { PDataTable, PI } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { find } from 'lodash';
+
+
 import { store } from '@/store';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const EVENT_PERIOD = 7;

@@ -63,6 +63,7 @@
 
 <script lang="ts">
 import { PAnchor, PDivider } from '@spaceone/design-system';
+
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 export default {

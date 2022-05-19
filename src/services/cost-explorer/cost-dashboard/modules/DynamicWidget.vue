@@ -17,9 +17,12 @@
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import { WidgetProps } from '@/services/cost-explorer/widgets/type';
+
 import { CURRENCY } from '@/store/modules/display/config';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { WidgetProps } from '@/services/cost-explorer/widgets/type';
 
 interface Props extends WidgetProps {
     widgetId: string;

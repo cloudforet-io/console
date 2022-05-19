@@ -1,8 +1,9 @@
 /* eslint-disable camelcase */
-import { Tags, TimeStamp } from '@/models';
+import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 import VueI18n from 'vue-i18n';
 import { Location } from 'vue-router';
-import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
+
+import { Tags, TimeStamp } from '@/models';
 
 import TranslateResult = VueI18n.TranslateResult;
 

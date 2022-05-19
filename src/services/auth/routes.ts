@@ -1,4 +1,5 @@
 import { RouteConfig } from 'vue-router';
+
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 const SignOutPage = () => import(/* webpackChunkName: "SignOutPage" */ '@/services/auth/sign-out/SignOutPage.vue');

@@ -21,12 +21,15 @@
 </template>
 
 <script lang="ts">
-import { PPageTitle, PButton } from '@spaceone/design-system';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import PolicyListDataTable from '@/services/administration/modules/PolicyListDataTable.vue';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { administrationStore } from '@/services/administration/store';
+
+import { PPageTitle, PButton } from '@spaceone/design-system';
+
 import { store } from '@/store';
+
+import PolicyListDataTable from '@/services/administration/modules/PolicyListDataTable.vue';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { administrationStore } from '@/services/administration/store';
 
 export default {
     name: 'PolicyPage',

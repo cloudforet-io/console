@@ -43,18 +43,22 @@
 </template>
 
 <script lang="ts">
-import LNBMenuItem from '@/common/modules/navigations/lnb/modules/LNBMenuItem.vue';
-import {
-    PDivider, PI, PLazyImg,
-} from '@spaceone/design-system';
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
+import {
+    PDivider, PI, PLazyImg,
+} from '@spaceone/design-system';
+
+import { getUUID } from '@/lib/component-util/getUUID';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
+import LNBMenuItem from '@/common/modules/navigations/lnb/modules/LNBMenuItem.vue';
 import {
     BackLink, LNBMenu, TopTitle,
 } from '@/common/modules/navigations/lnb/type';
-import { getUUID } from '@/lib/component-util/getUUID';
+
 
 export default {
     name: 'LNB',

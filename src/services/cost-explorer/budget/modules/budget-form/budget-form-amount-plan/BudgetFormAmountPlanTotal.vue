@@ -25,10 +25,12 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PFieldGroup, PTextInput } from '@spaceone/design-system';
-import { useFormValidator } from '@/common/composables/form-validator';
 import { commaFormatter, getNumberFromString } from '@spaceone/console-core-lib';
+import { PFieldGroup, PTextInput } from '@spaceone/design-system';
+
 import { i18n } from '@/translations';
+
+import { useFormValidator } from '@/common/composables/form-validator';
 
 export default {
     name: 'BudgetFormAmountPlanTotal',

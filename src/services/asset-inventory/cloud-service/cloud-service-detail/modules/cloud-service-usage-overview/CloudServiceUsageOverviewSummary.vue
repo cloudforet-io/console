@@ -27,14 +27,17 @@
 import {
     reactive, toRefs,
 } from '@vue/composition-api';
+
 import { PDataLoader, PDynamicWidget, PSkeleton } from '@spaceone/design-system';
 import { DynamicWidgetFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
 
-import { Reference } from '@/lib/reference/type';
-import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { gray } from '@/styles/colors';
-import { getUUID } from '@/lib/component-util/getUUID';
 import { store } from '@/store';
+import { gray } from '@/styles/colors';
+
+import { getUUID } from '@/lib/component-util/getUUID';
+import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import { Reference } from '@/lib/reference/type';
+
 
 export default {
     name: 'CloudServiceUsageOverviewSummary',

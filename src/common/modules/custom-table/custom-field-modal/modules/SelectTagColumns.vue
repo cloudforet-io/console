@@ -34,10 +34,10 @@ import {
 import {
     PAutocompleteSearch, PCheckBox, PTag,
 } from '@spaceone/design-system';
-
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 
 interface Props {
     selectedKeys: string[];

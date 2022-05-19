@@ -56,8 +56,10 @@ import {
     PAutocompleteSearch,
     PTag,
 } from '@spaceone/design-system';
-import { i18n } from '@/translations';
 import { TranslateResult } from 'vue-i18n';
+
+import { i18n } from '@/translations';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Tag {

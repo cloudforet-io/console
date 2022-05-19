@@ -1,19 +1,22 @@
-import {
-    DisplayState, GNBMenu, SidebarProps,
-} from '@/store/modules/display/type';
+import VueRouter from 'vue-router';
 import { Getter } from 'vuex';
+
+import { SpaceRouter } from '@/router';
 import {
     CURRENCY_SYMBOL, SIDEBAR_TYPE,
 } from '@/store/modules/display/config';
-import VueRouter from 'vue-router';
+import {
+    DisplayState, GNBMenu, SidebarProps,
+} from '@/store/modules/display/type';
+
+
+import { PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
 import config from '@/lib/config';
-import { SpaceRouter } from '@/router';
 import {
     Menu, MENU_ID, MenuInfo,
 } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
-import { PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
 
 export const hasUncheckedNotifications: Getter<DisplayState, any> = (state): boolean => state.uncheckedNotificationCount > 0;
 

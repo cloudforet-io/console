@@ -10,6 +10,8 @@ module.exports = {
         'plugin:vue/recommended',
         '@vue/airbnb',
         '@vue/typescript',
+        'plugin:import/recommended',
+        'plugin:import/typescript',
     ],
 
     rules: {
@@ -112,7 +114,66 @@ module.exports = {
         '@typescript-eslint/explicit-function-return-type': ['off'],
         "@typescript-eslint/explicit-module-boundary-types": ['off'],
         '@typescript-eslint/no-explicit-any': ['off'],
-        '@typescript-eslint/no-unused-vars': ['error']
+        '@typescript-eslint/no-unused-vars': ['error'],
+
+        // eslint-plugin-import rules
+        'import/order': [
+            'error',
+            {
+                groups: ['builtin', 'external', 'internal', 'index'],
+                pathGroups: [
+                    {
+                        pattern: "@vue/test-utils",
+                        group: 'builtin',
+                        position: 'before',
+                    },
+                    {
+                        pattern: '@vue/composition-api',
+                        group: 'builtin',
+                    },
+                    {
+                        pattern: '@spaceone/design-system/**',
+                        group: 'external',
+                    },
+                    {
+                        pattern: '@spaceone/console-core-lib/**',
+                        group: 'external',
+                    },
+                    {
+                        pattern: '@/router/**',
+                        group: 'internal',
+                        position: 'after'
+                    },
+                    {
+                        pattern: '@/translations/**',
+                        group: 'internal',
+                        position: 'after'
+                    },
+                    {
+                        pattern: '@/lib/**',
+                        group: 'internal',
+                        position: 'after'
+                    },
+                    {
+                        pattern: '@/common/**',
+                        group: 'internal',
+                        position: 'after'
+                    },
+                    {
+                        pattern: '@/services/**',
+                        group: 'internal',
+                        position: 'after'
+                    }
+                ],
+                "pathGroupsExcludedImportTypes": ["@vue/composition-api", "@vue/test-utils"],
+                alphabetize: {
+                    order: 'asc',
+                    caseInsensitive: true,
+                },
+                'newlines-between': 'always',
+            },
+        ],
+        "import/namespace": [0, { allowComputed: true }]
     },
     ignorePatterns: ['src/assets/**', '**/node_modules/**', 'translations/language-pack/**', 'public/lottie.js'],
     parserOptions: {
@@ -124,6 +185,9 @@ module.exports = {
     settings: {
         'import/resolver': {
             typescript: {},
+        },
+        'import/parsers': {
+            '@typescript-eslint/parser': ['.ts']
         },
     },
 

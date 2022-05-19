@@ -1,10 +1,13 @@
-import styles from '@/styles/colors';
 import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
-import { USER_STATE, USER_TYPE_LABEL } from '@/services/administration/iam/user/type';
 import { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
+
+import styles from '@/styles/colors';
+
+import { USER_STATE, USER_TYPE_LABEL } from '@/services/administration/iam/user/type';
+
 
 export const userSearchHandlers = {
     keyItemSets: [{

@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import tz from 'dayjs/plugin/timezone';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import tz from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 
 export const initDayjs = () => {
     dayjs.extend(utc);

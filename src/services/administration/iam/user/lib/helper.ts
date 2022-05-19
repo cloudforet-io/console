@@ -1,6 +1,7 @@
-import { pluginStateColor, userStateColor } from '@/services/administration/iam/user/lib/config';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import dayjs from 'dayjs';
+
+import { pluginStateColor, userStateColor } from '@/services/administration/iam/user/lib/config';
 
 const colorBindFactory = (colorMapping, textFnc) => value => ({
     text: textFnc(value),

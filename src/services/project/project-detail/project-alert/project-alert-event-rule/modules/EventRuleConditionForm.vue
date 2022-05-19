@@ -52,13 +52,14 @@
 </template>
 
 <script lang="ts">
-import { i18n } from '@/translations';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
     PButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
 } from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

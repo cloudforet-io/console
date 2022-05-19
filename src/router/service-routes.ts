@@ -1,16 +1,17 @@
 import { RouteConfig } from 'vue-router';
 
 // Routes
-import authRoutes from '@/services/auth/routes';
-import dashboardRoute from '@/services/dashboard/routes';
-import administrationRoute from '@/services/administration/routes';
-import assetInventoryRoute from '@/services/asset-inventory/routes';
-import projectRoute from '@/services/project/routes';
-import alertManagerRoute from '@/services/alert-manager/routes';
-import costExplorerRoute from '@/services/cost-explorer/routes';
-import myPageRoute from '@/services/my-page/routes';
 import { errorRoutes } from '@/router/error-routes';
+
+import administrationRoute from '@/services/administration/routes';
+import alertManagerRoute from '@/services/alert-manager/routes';
+import assetInventoryRoute from '@/services/asset-inventory/routes';
+import authRoutes from '@/services/auth/routes';
+import costExplorerRoute from '@/services/cost-explorer/routes';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
+import dashboardRoute from '@/services/dashboard/routes';
+import myPageRoute from '@/services/my-page/routes';
+import projectRoute from '@/services/project/routes';
 
 
 export const ROOT_ROUTE = Object.freeze({

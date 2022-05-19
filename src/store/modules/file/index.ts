@@ -1,7 +1,7 @@
-import { FileState } from './type';
-import * as getters from './getters';
 import * as actions from './actions';
+import * as getters from './getters';
 import * as mutations from './mutations';
+import { FileState } from './type';
 
 const state: FileState = {
     downloadSource: undefined,

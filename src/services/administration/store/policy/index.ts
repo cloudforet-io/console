@@ -1,6 +1,7 @@
 import { PolicyState } from '@/services/administration/store/policy/type';
-import * as getters from './getters';
+
 import * as actions from './actions';
+import * as getters from './getters';
 import * as mutations from './mutations';
 
 const state: PolicyState = {

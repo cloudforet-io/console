@@ -88,8 +88,6 @@
 </template>
 
 <script lang="ts">
-import { cloneDeep } from 'lodash';
-
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -97,17 +95,21 @@ import {
 import {
     PAnchor, PFieldGroup, PRadio, PTextInput,
 } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
-import EscalationRulesInputForm from '@/services/alert-manager/escalation-policy/modules/EscalationRulesInputForm.vue';
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { EscalationPolicyFormModel } from '@/services/alert-manager/type';
-import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { useProxyValue } from '@/common/composables/proxy-state';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
+import EscalationRulesInputForm from '@/services/alert-manager/escalation-policy/modules/EscalationRulesInputForm.vue';
+import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
+import { EscalationPolicyFormModel } from '@/services/alert-manager/type';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 
 const DEFAULT_REPEAT_COUNT = 0;

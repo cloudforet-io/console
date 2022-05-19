@@ -1,9 +1,11 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { Action } from 'vuex';
+
 import {
     FAVORITE_TYPE, FavoriteConfig, FavoriteState, FavoriteType,
 } from '@/store/modules/favorite/type';
-import { Action } from 'vuex';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const createFavorite = async (itemType: FavoriteType, itemId: string) => {

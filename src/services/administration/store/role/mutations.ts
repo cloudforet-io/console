@@ -1,4 +1,5 @@
 import { Mutation } from 'vuex';
+
 import { RoleStoreState } from './type';
 
 export const setSelectedIndices: Mutation<RoleStoreState> = (state, selectedIndices: number[]): void => {

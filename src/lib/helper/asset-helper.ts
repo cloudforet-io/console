@@ -1,5 +1,6 @@
-import config from '@/lib/config';
 import { isEmpty, some } from 'lodash';
+
+import config from '@/lib/config';
 
 /**
  * @function

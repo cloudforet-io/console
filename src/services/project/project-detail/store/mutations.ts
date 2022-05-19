@@ -1,5 +1,6 @@
-import { AlertCount, ProjectDetailState } from '@/services/project/project-detail/store/type';
 import { Mutation } from 'vuex';
+
+import { AlertCount, ProjectDetailState } from '@/services/project/project-detail/store/type';
 
 export const setProjectId: Mutation<ProjectDetailState> = (state, projectId: string) => {
     state.projectId = projectId;
