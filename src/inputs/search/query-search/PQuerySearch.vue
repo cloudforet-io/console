@@ -53,9 +53,6 @@
                             @select="onMenuSelect"
                             @blur="focus"
             >
-                <template #no-data>
-                    <div />
-                </template>
                 <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
                     <slot :name="`menu-${slot}`" v-bind="{...scope}" />
                 </template>
@@ -249,6 +246,7 @@ export default defineComponent({
             else if (state.menuType === 'KEY') state.menu = getKeyMenuForm(res, state.selectedKeys, state.subPath);
             else if (state.menuType === 'VALUE') state.menu = getValueMenuForm(res, state.selectedKeys, state.operator, state.subPath);
             else state.menu = res.results.map(d => ({ ...d, type: 'item', data: d }));
+            if (!state.menu.length) hideMenu();
         };
 
         const updateLoader = debounce(() => {
