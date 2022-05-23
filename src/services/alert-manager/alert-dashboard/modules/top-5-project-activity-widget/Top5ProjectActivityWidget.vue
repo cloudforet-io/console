@@ -39,6 +39,7 @@
                     <div class="col-activity">
                         <div v-for="(activity, aIdx) in activity[projectId]" :key="`activity-${aIdx}`"
                              class="box-wrapper"
+                             :class="activity.status ? activity.status : 'empty'"
                         >
                             <div class="box" :class="activity.status ? activity.status : 'empty'" @click="onClickBox(projectId, activity.date)">
                                 <top5-project-activity-tooltip
@@ -314,6 +315,10 @@ export default {
                     position: relative;
                     width: 100%;
                     height: 1.25rem;
+
+                    &:hover:not(.empty) {
+                        cursor: pointer;
+                    }
 
                     .box {
                         width: 100%;
