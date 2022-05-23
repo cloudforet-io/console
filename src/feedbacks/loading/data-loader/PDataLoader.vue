@@ -25,7 +25,7 @@
                          backgroundColor: loaderBackdropColor
                      }"
                 />
-                <div class="loader" :class="loaderType">
+                <div class="loader" :class="{[loaderType]: !$scopedSlots.loader}">
                     <slot name="loader">
                         <template v-if="loaderType === LOADER_TYPES.spinner">
                             <p-lottie name="thin-spinner" :size="spinnerSize"
