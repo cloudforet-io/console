@@ -46,7 +46,7 @@ import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 
 import UserAPIKeyHandbook from '@/services/my-page/my-account/user-api-key/modules/APIKeyHandbook.vue';
 import MyPageLNB from '@/services/my-page/MyPageLNB.vue';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+// import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 import myPageStore from '@/services/my-page/store';
 
 
@@ -64,7 +64,10 @@ export default defineComponent({
     setup() {
         registerServiceStore('myPage', myPageStore);
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const { breadcrumbs } = useBreadcrumbs(computed(() => vm.$route), [MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME]);
+        const { breadcrumbs } = useBreadcrumbs(
+            computed(() => vm.$route),
+            // [MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME]
+        );
         const handbookState = reactive({
             tabs: [{ name: 'spacectl', label: 'Spacectl', keepAlive: true }] as TabItem[],
             activeTab: 'spacectl',

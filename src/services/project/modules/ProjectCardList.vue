@@ -63,25 +63,19 @@
                         </div>
                         <div class="card-bottom-wrapper">
                             <div class="project-summary">
-                                <template v-if="cardSummaryLoading">
-                                    <div v-for="v in skeletons" :key="v" class="skeleton-loading">
-                                        <p-skeleton />
+                                <div v-for="{ title, summaryType } in projectSummaryList" :key="`summary-${title}-${item.project_id}`" class="project-summary-item">
+                                    <div class="summary-item-text">
+                                        {{ title }}
                                     </div>
-                                </template>
-                                <template v-else>
-                                    <div v-for="{ title, summaryType } in projectSummaryList" :key="`summary-${title}-${item.project_id}`" class="project-summary-item">
-                                        <div class="summary-item-text">
-                                            {{ title }}
-                                        </div>
-                                        <router-link v-if="cardSummary[item.project_id]"
-                                                     class="summary-item-num"
-                                                     :to="getLocation(summaryType, ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME, item.project_id)"
-                                        >
-                                            {{ getItemSummaryCount(summaryType, item.project_id) }}
-                                        </router-link>
-                                        <span v-else class="summary-item-num none">N/A</span>
-                                    </div>
-                                </template>
+                                    <p-skeleton v-if="cardSummaryLoading" />
+                                    <router-link v-else-if="cardSummary[item.project_id]"
+                                                 class="summary-item-num"
+                                                 :to="getLocation(summaryType, ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME, item.project_id)"
+                                    >
+                                        {{ getItemSummaryCount(summaryType, item.project_id) }}
+                                    </router-link>
+                                    <span v-else class="summary-item-num none">N/A</span>
+                                </div>
                             </div>
                         </div>
                     </router-link>
@@ -548,7 +542,7 @@ export default {
         @apply flex-shrink-0 flex w-full;
         padding: 0.75rem 1rem;
         .project-summary-item {
-            @apply flex-grow border-gray-100 border-r mr-2;
+            @apply flex-grow border-gray-100 border-r mr-2 pr-2;
             .summary-item-text {
                 @apply text-left;
                 font-size: 0.625rem;
@@ -569,9 +563,6 @@ export default {
             &:last-child {
                 @apply border-0;
             }
-        }
-        .skeleton-loading {
-            @apply flex items-center pb-2 pr-15;
         }
     }
 }

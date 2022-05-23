@@ -12,7 +12,7 @@ const UserAPIKeyPage = () => import(/* webpackChunkName: "UserAPIKeyPage" */ '@/
 const UserNotificationPage = () => import(/* webpackChunkName: "UserNotificationPage" */ '@/services/my-page/my-account/user-notification/UserNotificationPage.vue');
 const NotificationAddPage = () => import(/* webpackChunkName: "NotificationAddPage" */ '@/services/notification/notification-add/NotificationAddPage.vue');
 // eslint-disable-next-line max-len
-const ManageUserNotificationPage = () => import(/* webpackChunkName: "ManageUserNotificationPage" */ '@/services/administration/iam/user/manage-user-notification/ManageUserNotificationPage.vue');
+// const ManageUserNotificationPage = () => import(/* webpackChunkName: "ManageUserNotificationPage" */ '@/services/administration/iam/user/manage-user-notification/ManageUserNotificationPage.vue');
 
 const myPageRoutes: RouteConfig = {
     path: 'my-page',
@@ -51,13 +51,13 @@ const myPageRoutes: RouteConfig = {
                             meta: { lnbVisible: true },
                             component: UserNotificationPage as any,
                         },
-                        {
-                            path: ':userId',
-                            name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME,
-                            meta: { label: ({ params }) => params.userId },
-                            component: ManageUserNotificationPage as any,
-                            props: true,
-                        },
+                        // {
+                        //     path: ':userId',
+                        //     name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME,
+                        //     meta: { label: ({ params }) => params.userId },
+                        //     component: ManageUserNotificationPage as any,
+                        //     props: true,
+                        // },
                         {
                             path: ':protocol/:protocolId/:userId',
                             name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
