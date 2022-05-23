@@ -53,9 +53,10 @@
                 <confirm-credentials :provider="provider" :supported-schema="supportedSchema" class="mt-8" />
             </template>
             <template #contents-tags>
-                <tags-input-group :tags.sync="tags"
-                                  :show-validation="true"
+                <tags-input-group :tags="tags"
+                                  show-validation
                                   :is-valid.sync="isTagsValid"
+                                  @update-tags="handleUpdateTags"
                 />
             </template>
         </p-progress-wizard>
@@ -77,6 +78,7 @@ import { get, some } from 'lodash';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
+import { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ConfirmCredentials from '@/services/asset-inventory/collector/create-collector/modules/ConfirmCredentials.vue';
@@ -254,6 +256,9 @@ export default {
                 tabState.loading = false;
             }
         };
+        const handleUpdateTags = (tags: Tag) => {
+            state.tags = tags;
+        };
 
         const init = async () => {
             await getPlugin();
@@ -269,6 +274,7 @@ export default {
             onClickCancel,
             onClickConfirm,
             onChangeAutoUpgrade,
+            handleUpdateTags,
         };
     },
 };

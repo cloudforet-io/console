@@ -6,7 +6,7 @@
                     <p-icon-button name="ic_back"
                                    size="lg"
                                    class="go-back-button mr-2"
-                                   @click="goBack()"
+                                   @click="$emit('close')"
                     />
                     <div class="title">
                         {{ $t('COMMON.TAGS.TITLE') }}
@@ -23,30 +23,19 @@
                     <span class="highlight">{{ $t('COMMON.TAGS.ADD_TAG_DESC') }}</span><br>
                     {{ $t('COMMON.TAGS.KEY_VALUE_DESC') }}
                 </div>
-                <tags-input-group ref="tagsRef"
-                                  :tags.sync="newTags"
+                <tags-input-group :tags="newTags"
                                   :disabled="loading"
                                   show-validation
                                   :is-valid.sync="isTagsValid"
                                   :show-header="showHeader"
-                >
-                    <template #addButton="scope">
-                        <p-button
-                            style-type="primary-dark" :disabled="scope.disabled"
-                            :outline="true"
-                            icon="ic_plus_bold"
-                            @click="scope.addPair($event)"
-                        >
-                            {{ $t('COMMON.TAGS.ADD_TAG') }}
-                        </p-button>
-                    </template>
-                </tags-input-group>
+                                  @update-tags="handleUpdateTags"
+                />
             </p-pane-layout>
             <div class="buttons">
-                <p-button style-type="gray900" :outline="true" @click="goBack">
+                <p-button style-type="gray900" :outline="true" @click="$emit('close')">
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
-                <p-button style-type="primary-dark" :disabled="!isTagsValid" @click="onSave">
+                <p-button style-type="primary-dark" :disabled="!isTagsValid" @click="handleSaveTags">
                     {{ $t('COMMON.TAGS.SAVE') }}
                 </p-button>
             </div>
@@ -57,9 +46,8 @@
 <script lang="ts">
 
 import {
-    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy, watch,
+    reactive, toRefs, computed, onMounted,
 } from '@vue/composition-api';
-
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
@@ -68,6 +56,8 @@ import {
 import {
     camelCase, isEmpty, get,
 } from 'lodash';
+
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -112,42 +102,34 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-        const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
-        const api = computed(() => get(SpaceConnector.client, apiKeys.value));
-
         const state = reactive({
             loading: false,
             showHeader: computed(() => state.newTags.length > 0),
             newTags: { ...props.tags },
             isTagsValid: false,
             noItem: computed(() => isEmpty(state.newTags)),
-            tagsRef: null as any,
         });
 
-        /* util */
-        const goBack = () => {
-            emit('close');
-        };
-
-
-        /* api */
-        const onSave = async () => {
+        /* Api */
+        const handleSaveTags = async () => {
             if (!state.isTagsValid) return;
-            if (!api.value) {
-                ErrorHandler.handleRequestError(new Error(), vm.$t('COMMON.TAGS.ALT_E_UPDATE'));
+
+            const apiKeys = props.resourceType.split('.').map(d => camelCase(d));
+            const api = get(SpaceConnector.client, apiKeys);
+            if (!api) {
+                ErrorHandler.handleRequestError(new Error(), i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
                 return;
             }
 
             try {
                 state.loading = true;
-                await api.value.update({
+                await api.update({
                     [props.resourceKey]: props.resourceId,
                     tags: state.newTags,
                 });
-                showSuccessMessage(vm.$t('COMMON.TAGS.ALT_S_UPDATE'), '', vm.$root);
+                showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('COMMON.TAGS.ALT_E_UPDATE'));
+                ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
             } finally {
                 state.loading = false;
             }
@@ -155,15 +137,20 @@ export default {
             emit('update');
         };
 
-        watch(() => props.tags, () => {
+        /* Event */
+        const handleUpdateTags = (tags?: Tag) => {
+            state.newTags = tags;
+        };
+
+        /* Init */
+        onMounted(() => {
             state.newTags = { ...props.tags };
-            if (state.tagsRef) state.tagsRef.init();
         });
 
         return {
             ...toRefs(state),
-            goBack,
-            onSave,
+            handleSaveTags,
+            handleUpdateTags,
         };
     },
 };

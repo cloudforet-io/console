@@ -1,11 +1,13 @@
 <template>
     <div class="tags-input-group">
-        <slot name="addButton" :disabled="disabled" :addPair="addPair">
-            <p-button style-type="primary-dark"
-                      class="add-btn" icon="ic_plus_bold"
-                      @click="addPair"
+        <slot name="add-button" :disabled="disabled" :handle-add-pair="handleAddPair">
+            <p-button class="add-button"
+                      style-type="primary-dark"
+                      :outline="true"
+                      icon="ic_plus_bold"
+                      @click="handleAddPair"
             >
-                <span>{{ $t('COMMON.COMPONENTS.TAGS.ADD') }}</span>
+                <span>{{ $t('COMMON.TAGS.ADD_TAG') }}</span>
             </p-button>
         </slot>
         <div v-if="showHeader" class="tag-header">
@@ -17,40 +19,35 @@
             </div>
         </div>
         <div>
-            <div v-for="(d, idx) in items" :key="idx" class="tags-group">
-                <template v-if="validations[idx]">
-                    <p-field-group :invalid-text="validations[idx].key.message"
-                                   :invalid="showValidation && !validations[idx].key.isValid"
-                                   class="input-box key"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input v-model="d.key"
-                                          v-focus.lazy="focused"
-                                          :invalid="invalid"
-                                          :placeholder="$t('COMMON.COMPONENTS.TAGS.KEY')"
-                                          :disabled="disabled"
-                                          @blur="$emit('blur:key')"
-                                          @focus="$emit('focus:key')"
-                                          @input="handleInputKey"
-                            />
-                        </template>
-                    </p-field-group>
-                    <span class="split">:</span>
-                    <p-field-group :invalid-text="validations[idx].value.message"
-                                   :invalid="showValidation && !validations[idx].value.isValid"
-                                   class="input-box value"
-                    >
-                        <p-text-input v-model="d.value"
-                                      :invalid="showValidation && !validations[idx].value.isValid"
+            <div v-for="(item, idx) in items" :key="idx" class="tags-group">
+                <p-field-group :invalid-text="keyValidations[idx].message"
+                               :invalid="showValidation && !keyValidations[idx].isValid"
+                               class="input-box key"
+                >
+                    <template #default="{invalid}">
+                        <p-text-input :value="item.key"
+                                      :invalid="invalid"
+                                      :placeholder="$t('COMMON.COMPONENTS.TAGS.KEY')"
+                                      :disabled="disabled"
+                                      @input="handleInputKey(idx, ...arguments)"
+                        />
+                    </template>
+                </p-field-group>
+                <span class="split">:</span>
+                <p-field-group :invalid-text="valueValidations[idx].message"
+                               :invalid="showValidation && !valueValidations[idx].isValid"
+                               class="input-box value"
+                >
+                    <template #default="{invalid}">
+                        <p-text-input :value="item.value"
+                                      :invalid="invalid"
                                       :placeholder="$t('COMMON.COMPONENTS.TAGS.VALUE')"
                                       :disabled="disabled"
-                                      @blur="$emit('blur:value')"
-                                      @focus="$emit('focus:value')"
-                                      @input="handleInputValue(d.value, idx)"
+                                      @input="handleInputValue(idx, ...arguments)"
                         />
-                    </p-field-group>
-                    <p-icon-button name="ic_delete" :disabled="disabled" @click="deletePair(idx)" />
-                </template>
+                    </template>
+                </p-field-group>
+                <p-icon-button name="ic_delete" :disabled="disabled" @click="handleDeletePair(idx)" />
             </div>
         </div>
     </div>
@@ -59,19 +56,22 @@
 <script lang="ts">
 
 import {
-    toRefs, reactive, getCurrentInstance, ComponentRenderProxy, computed, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
     PButton, PFieldGroup, PIconButton, PTextInput,
 } from '@spaceone/design-system';
-import { some } from 'lodash';
+import { isEmpty } from 'lodash';
+
+import { i18n } from '@/translations';
 
 import {
-    TagItem, TagValidation, TagsInputGroupProps, ValidationData, Tag,
+    Tag, TagItem, TagsInputGroupProps, ValidationData,
 } from '@/common/components/forms/tags-input-group/type';
 
-const dictToArray = (dict): TagItem[] => Object.keys(dict).sort().map(k => ({ key: k, value: dict[k] }));
+
+const dictToArray = (dict): TagItem[] => Object.keys(dict).map(k => ({ key: k, value: dict[k] }));
 
 const arrayToDict = (arr: TagItem[]): Tag => {
     const dict = {};
@@ -108,10 +108,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        showEmptyInput: {
-            type: Boolean,
-            default: false,
-        },
         showHeader: {
             type: Boolean,
             default: false,
@@ -122,131 +118,79 @@ export default {
         },
     },
     setup(props: TagsInputGroupProps, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
-            items: [] as TagItem[],
-            validations: [] as TagValidation[],
-            isAllValid: computed(() => state.validations.every(d => d.key.isValid && d.value.isValid)),
+            items: dictToArray(props.tags) as TagItem[],
+            keyValidations: computed<ValidationData[]>(() => {
+                const keys = state.items.map(item => item.key);
+                return state.items.map((item) => {
+                    const validation: ValidationData = { isValid: true, message: '' };
+                    if (!item.key || !item.key.toString().length) {
+                        validation.isValid = false;
+                        validation.message = i18n.t('COMMON.COMPONENTS.TAGS.INVALID_NO_KEY');
+                    } else {
+                        const isDuplicated = keys.filter(k => k === item.key).length > 1;
+                        if (isDuplicated) {
+                            validation.isValid = false;
+                            validation.message = i18n.t('COMMON.COMPONENTS.TAGS.INVALID_DUPLICATED_KEY');
+                        }
+                    }
+                    return validation;
+                });
+            }),
+            valueValidations: computed<ValidationData[]>(() => state.items.map((item) => {
+                const validation: ValidationData = { isValid: true, message: '' };
+                if (!item.value || !item.value.toString().length) {
+                    validation.isValid = false;
+                    validation.message = i18n.t('COMMON.COMPONENTS.TAGS.INVALID_NO_VALUE');
+                }
+                return validation;
+            })),
+            isAllValid: computed(() => {
+                const isKeyValid = state.keyValidations.every(d => d.isValid);
+                const isValueValid = state.valueValidations.every(d => d.isValid);
+                return isKeyValid && isValueValid;
+            }),
         });
 
-        const setTags = (tags: Tag) => {
-            emit('update:tags', tags);
+        /* Event */
+        const handleAddPair = () => {
+            state.items = [...state.items, { key: '', value: '' }];
+        };
+        const handleDeletePair = (idx: number) => {
+            const _items = [...state.items];
+            _items.splice(idx, 1);
+            state.items = _items;
         };
 
-        /* util */
-        const validateKey = () => {
-            const keys = state.items.map(d => d.key);
-
-            state.items.forEach((item, idx) => {
-                const validation: ValidationData = {
-                    isValid: true,
-                    message: '',
-                };
-                if (item.key.length === 0) {
-                    validation.isValid = false;
-                    validation.message = vm.$t('COMMON.COMPONENTS.TAGS.INVALID_NO_KEY');
-                } else {
-                    let isDuplicated = false;
-                    some(keys, (k, kIdx) => {
-                        if (item.key === k && idx !== kIdx) isDuplicated = true;
-                        return isDuplicated || idx <= kIdx;
-                    });
-                    if (isDuplicated) {
-                        validation.isValid = false;
-                        validation.message = vm.$t('COMMON.COMPONENTS.TAGS.INVALID_DUPLICATED_KEY');
-                    }
-                }
-                state.validations[idx].key = validation;
-            });
-
-            state.validations = [...state.validations];
+        const handleInputKey = (idx, val) => {
+            const _items = [...state.items];
+            _items[idx].key = val;
+            state.items = _items;
         };
-        const validateValue = (value, idx) => {
-            const validation: ValidationData = {
-                isValid: true,
-                message: '',
-            };
-            if (value.length === 0) {
-                validation.isValid = false;
-                validation.message = vm.$t('COMMON.COMPONENTS.TAGS.INVALID_NO_VALUE');
-            }
-            state.validations[idx].value = validation;
-
-            state.validations = [...state.validations];
-        };
-        const addPair = () => {
-            const pair: TagItem = { key: '', value: '' };
-            state.items = [...state.items, pair];
-            state.validations.push({
-                key: { isValid: false, message: vm.$t('COMMON.COMPONENTS.TAGS.INVALID_NO_KEY') },
-                value: { isValid: false, message: vm.$t('COMMON.COMPONENTS.TAGS.INVALID_NO_VALUE') },
-            });
-        };
-        const deletePair = (idx: number) => {
-            state.items.splice(idx, 1);
-            state.items = [...state.items];
-
-            state.validations.splice(idx, 1);
-
-            validateKey();
-            setTags(arrayToDict(state.items));
+        const handleInputValue = (idx, val) => {
+            const _items = [...state.items];
+            _items[idx].value = val;
+            state.items = _items;
         };
 
-        const initValidations = () => {
-            state.validations = state.items.map(() => ({
-                key: { isValid: true, message: '' },
-                value: { isValid: true, message: '' },
-            }));
-
-            validateKey();
-
-            state.items.forEach((d, i) => {
-                validateValue(d.value, i);
-            });
-        };
-
-        const handleInputKey = () => {
-            validateKey();
-            setTags(arrayToDict(state.items));
-        };
-
-        const handleInputValue = (value, idx) => {
-            validateValue(value, idx);
-            setTags(arrayToDict(state.items));
-        };
-
+        /* Watcher */
         watch(() => state.isAllValid, (after) => {
             emit('update:is-valid', after);
         }, { immediate: true });
-
-
-        const init = () => {
-            state.items = dictToArray(props.tags);
-
-            if (props.showEmptyInput) {
-                state.items = [...state.items, { key: '', value: '' }];
-            }
-
-            vm.$nextTick(() => {
-                initValidations();
-            });
-        };
-
-        watch(() => props.tags, (tags) => {
-            if (tags !== state._tags) init();
-        }, { immediate: true });
-
+        watch(() => state.items, (items) => {
+            emit('update-tags', arrayToDict(items));
+        });
+        const stopTagInit = watch(() => props.tags, (tags) => {
+            if (!isEmpty(tags)) state.items = dictToArray(tags);
+            if (stopTagInit) stopTagInit();
+        });
 
         return {
             ...toRefs(state),
-            addPair,
-            deletePair,
-            validateKey,
-            validateValue,
+            handleAddPair,
+            handleDeletePair,
             handleInputKey,
             handleInputValue,
-            init,
         };
     },
 };
@@ -254,9 +198,8 @@ export default {
 
 <style lang="postcss" scoped>
 .tags-input-group {
-    .add-btn {
-        @apply text-white;
-        margin-bottom: 0.5rem;
+    .add-button {
+        margin: 0.5rem 0;
         .p-i-icon {
             margin-right: 0.5rem;
         }

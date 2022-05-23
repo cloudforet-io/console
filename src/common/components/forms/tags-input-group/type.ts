@@ -14,16 +14,10 @@ export type ValidationData = {
     message: string | TranslateResult;
 }
 
-export interface TagValidation {
-    key: ValidationData;
-    value: ValidationData;
-}
-
 export interface TagsInputGroupProps {
     tags: Tag;
     disabled: boolean;
     isValid: boolean;
-    showEmptyInput: boolean;
     showValidation: boolean;
     showHeader: boolean;
     focused: boolean;

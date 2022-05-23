@@ -76,16 +76,17 @@
             </div>
             <div class="form-box additional-information">
                 <tags-input-group show-header
-                                  :tags.sync="additionalInfoTags"
+                                  :tags="additionalInfoTags"
+                                  @update-tags="handleUpdateAdditionalInformation"
                 >
-                    <template #addButton="{addPair}">
+                    <template #add-button="{handleAddPair}">
                         <div class="top-part">
                             <p>{{ $t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') }}</p>
                             <p-button style-type="gray900"
                                       :outline="true"
                                       icon="ic_plus_bold"
                                       class="mb-2"
-                                      @click="addPair($event)"
+                                      @click="handleAddPair($event)"
                             >
                                 {{ $t('PROJECT.EVENT_RULE.ADD') }}
                             </p-button>
@@ -114,11 +115,11 @@ import {
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
+import { Tag } from '@/common/components/forms/tags-input-group/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
@@ -254,11 +255,15 @@ export default {
                 no_notification: value,
             };
         };
+        const handleUpdateAdditionalInformation = (tags: Tag) => {
+            state.additionalInfoTags = tags;
+        };
 
 
         return {
             ...toRefs(state),
             onToggleChange,
+            handleUpdateAdditionalInformation,
         };
     },
 };
