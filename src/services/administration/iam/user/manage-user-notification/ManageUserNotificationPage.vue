@@ -4,17 +4,18 @@
         <p-page-title child :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')"
                       @goBack="goToUserManagement"
         />
-        <notification-channel-list />
+        <notification-channel-list :disabled="!isManageable" />
     </div>
 </template>
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
@@ -27,6 +28,9 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const state = reactive({
+            isManageable: computed(() => store.getters['user/isDomainOwner'] || store.getters['user/hasDomainRole']),
+        });
         const routeState = reactive({
             routes: computed(() => ([
                 { name: 'Administration', to: { name: ADMINISTRATION_ROUTE._NAME } },
@@ -39,6 +43,7 @@ export default {
             vm.$router.push({ name: ADMINISTRATION_ROUTE.IAM.USER._NAME });
         };
         return {
+            ...toRefs(state),
             routeState,
             goToUserManagement,
         };
