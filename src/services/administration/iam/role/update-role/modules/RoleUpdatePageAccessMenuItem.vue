@@ -27,7 +27,7 @@
             <p-check-box :selected="menu.isManaged" @change="handleChangeManage">
                 <span>Manage</span>
             </p-check-box>
-            <p-tooltip v-if="isSubMenu"
+            <p-tooltip v-if="tooltipText"
                        class="help-icon"
                        :contents="tooltipText"
                        :position="'bottom'"
@@ -50,9 +50,9 @@ import {
     PCheckBox, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
 
-
 import { i18n } from '@/translations';
 
+import { MANAGE_FEATURE_MAP } from '@/services/administration/iam/role/config';
 import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 
 
@@ -77,14 +77,9 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             tooltipText: computed(() => {
-                const title = i18n.t('IAM.ROLE.FORM.TOOLTIP_ADMIN_FEATURES');
-                const features = [
-                    i18n.t('IAM.ROLE.FORM.TOOLTIP_COLLECTING_DATA'),
-                    i18n.t('IAM.ROLE.FORM.TOOLTIP_CHANGE_PROJECT'),
-                    i18n.t('IAM.ROLE.FORM.TOOLTIP_CONNECT_TO_CONSOLE'),
-                    i18n.t('IAM.ROLE.FORM.TOOLTIP_TAG_EDIT'),
-                ];
-                return `<b>${title}</b></br><ul>${features.map(d => `<li>&#8729; ${d}</li>`).join('')}</ul>`;
+                const { title, features } = MANAGE_FEATURE_MAP[props.menu?.id] ?? {};
+                if (!title) return null;
+                return `<b>${i18n.t(title)}</b></br><ul>${features.map(d => `<li>&#8729; ${i18n.t(d)}</li>`).join('')}</ul>`;
             }),
             isDisabled: computed(() => ((props.menu?.id === 'all') ? false : !props.menu?.subMenuList?.length)),
         });
