@@ -12,3 +12,5 @@ export const DEFAULT_CHART_COLORS = [
 ];
 
 export const DISABLED_LEGEND_COLOR = gray[300];
+
+export const BACKGROUND_COLOR = gray[100];

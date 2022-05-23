@@ -3,6 +3,7 @@
         <p-data-loader :loading="loading" :data="layout"
                        :min-loading-time="printMode ? 0 : 1000"
                        :lazy-loading-time="printMode ? 0 : 1000"
+                       :loader-backdrop-color="BACKGROUND_COLOR"
                        :class="{responsive: !printMode}"
         >
             <template #no-data>
@@ -79,6 +80,8 @@ import { CURRENCY } from '@/store/modules/display/config';
 import { getUUID } from '@/lib/component-util/getUUID';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+
+import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import CostDashboardCustomizeWidgetModal
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetModal.vue';
@@ -225,6 +228,7 @@ export default {
             getAddWidgetColumnByLayout,
             getUUID,
             getWidgetFileName,
+            BACKGROUND_COLOR,
         };
     },
 };
