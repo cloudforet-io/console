@@ -31,6 +31,7 @@ export interface PageAccessMenuItem {
     labels: string[] | TranslateResult[];
     isViewed: boolean;
     isManaged: boolean;
+    isParent?: boolean;
     hideMenu: boolean;
     subMenuList?: PageAccessMenuItem[];
 }
