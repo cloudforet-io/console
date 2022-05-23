@@ -3,9 +3,7 @@
         <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
                       :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')" class="page-title"
         />
-        <user-a-p-i-key-table
-            :user-id="userId"
-        />
+        <user-a-p-i-key-table :user-id="userId" />
         <p-pane-layout class="sub-table-wrapper">
             <div class="sub-table-header">
                 {{ $t('IDENTITY.USER.MAIN.ENDPOINTS') }}

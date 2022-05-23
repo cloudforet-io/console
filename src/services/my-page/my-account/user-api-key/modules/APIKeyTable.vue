@@ -13,7 +13,7 @@
                     </p-button>
                     <p-select-dropdown class="dropdown-btn"
                                        :items="dropdownMenu"
-                                       :disabled="!hasManagePermission"
+                                       :disabled="disabled"
                                        @select="onSelectDropdown"
                     >
                         {{ $t('IDENTITY.USER.MAIN.ACTION') }}
@@ -135,11 +135,14 @@ export default {
             type: String,
             default: '',
         },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             loading: false,
             fields: [
                 { name: 'api_key_id', label: 'API Key ID' },
@@ -165,7 +168,7 @@ export default {
             visible: false,
             user: props.userId || '',
             timezone: computed(() => store.state.user.timezone),
-            disableCreateBtn: computed(() => state.items.length >= 2 || !state.hasManagePermission),
+            disableCreateBtn: computed(() => state.items.length >= 2 || props.disabled),
         });
 
         const modalState: UnwrapRef<ModalItem> = reactive({
