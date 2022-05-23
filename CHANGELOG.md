@@ -1,3 +1,11 @@
+# [1.1.0-beta.314](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.313...v1.1.0-beta.314) (2022-05-23)
+
+
+### Bug Fixes
+
+* do not attach loader type to class if slot exists ([2fa074a](https://github.com/spaceone-dev/spaceone-design-system/commit/2fa074aeccc93336fe2e5e8e521c0102ce6166af))
+* restructure hierarchy of html and css in DataLoader ([b66a703](https://github.com/spaceone-dev/spaceone-design-system/commit/b66a7033534dc58591a9641becb89b8dbfa80d57))
+
 # [1.1.0-beta.313](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.312...v1.1.0-beta.313) (2022-05-23)
 
 
