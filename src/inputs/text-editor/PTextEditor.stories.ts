@@ -6,7 +6,7 @@ import {
 import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { modes } from '@/inputs/text-editor/config';
+import { textEditorModes } from '@/inputs/text-editor/config';
 
 export default {
     title: 'Inputs/TextEditor',
@@ -74,7 +74,7 @@ export const textEditor = () => ({
             default: object('item', { ...value }),
         },
         mode: {
-            default: select('mode', modes, 'readOnly'),
+            default: select('mode', textEditorModes, 'readOnly'),
         },
         loading: {
             default: boolean('loading', false),
