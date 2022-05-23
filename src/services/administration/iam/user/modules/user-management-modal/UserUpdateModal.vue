@@ -82,21 +82,11 @@
                     {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT2') }}
                 </div>
             </p-field-group>
-            <tags-input-group :tags.sync="tags"
-                              :show-validation="true"
+            <tags-input-group :tags="tags"
+                              show-validation
                               :is-valid.sync="validationState.isTagsValid"
-            >
-                <template #addButton="scope">
-                    <p-button
-                        :outline="true" style-type="primary" :disabled="scope.disabled"
-                        icon="ic_plus_bold"
-                        class="mb-4"
-                        @click="scope.addPair($event)"
-                    >
-                        {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_ADD') }}
-                    </p-button>
-                </template>
-            </tags-input-group>
+                              @update-tags="handleUpdateTags"
+            />
         </template>
     </p-button-modal>
 </template>
@@ -108,7 +98,7 @@ import {
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PButtonModal, PSelectDropdown, PFieldGroup, PTextInput, PButton, PDivider,
+    PButtonModal, PSelectDropdown, PFieldGroup, PTextInput, PDivider,
 } from '@spaceone/design-system';
 import { TranslateResult } from 'vue-i18n';
 
@@ -116,6 +106,7 @@ import { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
+import { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
@@ -139,7 +130,6 @@ export default {
         PFieldGroup,
         PTextInput,
         PSelectDropdown,
-        PButton,
         PDivider,
         TagsInputGroup,
     },
@@ -279,6 +269,9 @@ export default {
         const handleClose = () => {
             state.visible = false;
         };
+        const handleUpdateTags = (tags: Tag) => {
+            state.tags = tags;
+        };
 
         /* Set(Initialize) Form */
         const getRoleList = async () => {
@@ -328,6 +321,7 @@ export default {
             validationState,
             confirm,
             handleClose,
+            handleUpdateTags,
         };
     },
 };

@@ -59,20 +59,11 @@
                 <br>
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_DESC_2') }}
             </div>
-            <tags-input-group :tags.sync="tags"
-                              :show-validation="true"
+            <tags-input-group :tags="tags"
+                              show-validation
                               :is-valid.sync="isTagsValid"
-            >
-                <template #addButton="scope">
-                    <p-button :outline="true" style-type="primary" :disabled="scope.disabled"
-                              icon="ic_plus_bold"
-                              class="mb-2"
-                              @click="scope.addPair($event)"
-                    >
-                        {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_ADD') }}
-                    </p-button>
-                </template>
-            </tags-input-group>
+                              @update-tags="handleUpdateTags"
+            />
         </p-pane-layout>
 
         <project-tree-panel class="tree-panel"
@@ -153,9 +144,11 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
+import { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import InfoButton from '@/common/modules/portals/InfoButton.vue';
 
@@ -389,6 +382,9 @@ export default {
             else SpaceRouter.router.back();
         };
         const handleSelectedProject = (selectedProject) => { formState.selectedProject = selectedProject; };
+        const handleUpdateTags = (tags: Tag) => {
+            formState.tags = tags;
+        };
 
         watch(() => state.selectedSecretType, async (after, before) => {
             if (after && after !== before) {
@@ -412,6 +408,7 @@ export default {
             handleSave,
             handleGoBack,
             handleSelectedProject,
+            handleUpdateTags,
         };
     },
 };

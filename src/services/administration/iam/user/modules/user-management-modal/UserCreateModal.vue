@@ -122,31 +122,20 @@
                     </div>
                 </p-field-group>
 
-                <tags-input-group :tags.sync="formState.tags"
-                                  :show-validation="true"
+                <tags-input-group :tags="formState.tags"
+                                  show-validation
                                   :is-valid.sync="validationState.isTagsValid"
-                >
-                    <template #addButton="scope">
-                        <p-button :outline="true" style-type="primary" :disabled="scope.disabled"
-                                  icon="ic_plus_bold"
-                                  class="mb-4"
-                                  @click="scope.addPair($event)"
-                        >
-                            {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_ADD') }}
-                        </p-button>
-                    </template>
-                </tags-input-group>
+                                  @update-tags="handleUpdateTags"
+                />
             </p-box-tab>
         </template>
     </p-button-modal>
 </template>
 
 <script lang="ts">
-
 import {
     reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
-
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
@@ -167,6 +156,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
+import { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
@@ -411,6 +401,9 @@ export default {
         const handleClose = () => {
             state.visible = false;
         };
+        const handleUpdateTags = (tags?: Tag) => {
+            formState.tags = tags;
+        };
 
         /* External Users */
         const setExternalMenuItems = (users) => {
@@ -521,6 +514,7 @@ export default {
             onSelectExternalUser,
             onDeleteSelectedExternalUser,
             onSearchExternalUser,
+            handleUpdateTags,
         };
     },
 };
