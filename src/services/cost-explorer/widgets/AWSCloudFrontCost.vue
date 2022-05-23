@@ -30,7 +30,7 @@
 <script lang="ts">
 
 import {
-    computed, onUnmounted, reactive, toRefs, watch,
+    computed, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { XYChart } from '@amcharts/amcharts4/charts';
@@ -415,8 +415,12 @@ export default {
             }
         }, { immediate: true });
 
+        onMounted(() => {
+            am4core.options.onlyShowOnViewport = false;
+        });
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
+            am4core.options.onlyShowOnViewport = true;
         });
 
         return {
