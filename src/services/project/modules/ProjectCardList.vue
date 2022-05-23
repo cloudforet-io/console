@@ -6,7 +6,9 @@
                    @change="onChange"
                    @refresh="getData()"
         />
-        <p-data-loader class="flex-grow" :data="items" :loading="loading">
+        <p-data-loader class="flex-grow" :data="items" :loading="loading"
+                       :loader-backdrop-color="BACKGROUND_COLOR"
+        >
             <div class="project-cards">
                 <div v-for="(item, i) in items" :key="i" class="project-card-container">
                     <router-link class="card"
@@ -151,6 +153,8 @@ import { arrayToQueryString } from '@/lib/router-query-string';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
+
+import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
@@ -392,6 +396,7 @@ export default {
             getItemSummaryCount,
             SUMMARY_TYPE,
             FAVORITE_TYPE,
+            BACKGROUND_COLOR,
         };
     },
 };

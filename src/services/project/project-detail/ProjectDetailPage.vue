@@ -1,6 +1,6 @@
 <template>
     <general-page-layout>
-        <p-data-loader class="page-inner" :loading="loading">
+        <p-data-loader class="page-inner" :loading="loading" :loader-backdrop-color="BACKGROUND_COLOR">
             <p-breadcrumbs :routes="pageNavigation" />
             <div v-if="item" class="top-wrapper">
                 <p-page-title :title="item.name" child @goBack="$router.go(-1)">
@@ -126,6 +126,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+
+import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import MaintenanceHappeningList from '@/services/project/project-detail/modules/MaintenanceHappeningList.vue';
@@ -331,6 +333,7 @@ export default {
             ALERT_STATE,
             FAVORITE_TYPE,
             commaFormatter,
+            BACKGROUND_COLOR,
         };
     },
 };

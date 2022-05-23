@@ -33,7 +33,7 @@
         <p v-if="keyword" class="mb-2 text-sm">
             {{ totalCount }} plugins for <strong>[{{ keyword }}]</strong>
         </p>
-        <p-data-loader :data="plugins" :loading="loading">
+        <p-data-loader :data="plugins" :loading="loading" :loader-backdrop-color="BACKGROUND_COLOR">
             <ul class="plugin-card-list">
                 <li v-for="item in plugins" :key="item.name">
                     <p-card-item :icon="item.icon"
@@ -91,6 +91,8 @@ import { TimeStamp } from '@/models';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import CollectorPluginsToolbox from '@/services/asset-inventory/collector/collector-plugins/modules/CollectorPluginsToolbox.vue';
 import PluginFilter from '@/services/asset-inventory/collector/collector-plugins/modules/PluginFilter.vue';
@@ -266,6 +268,7 @@ export default {
             handleToolbox,
             handleDeleteResourceSearchTag,
             isBeta: item => get(item, 'tags.beta', ''),
+            BACKGROUND_COLOR,
         };
     },
 };

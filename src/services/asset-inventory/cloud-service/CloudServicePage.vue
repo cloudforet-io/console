@@ -17,7 +17,9 @@
                                @update-pagination="handlePaginationUpdate"
         />
 
-        <p-data-loader class="flex-grow" :data="items" :loading="loading">
+        <p-data-loader class="flex-grow" :data="items" :loading="loading"
+                       :loader-backdrop-color="BACKGROUND_COLOR"
+        >
             <div class="cloud-service-type-wrapper">
                 <cloud-service-list-card v-for="(item, idx) in items" :key="`${item.provider}-${item.cloud_service_group}-${idx}`"
                                          :item="item"
@@ -83,6 +85,8 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
+
+import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import CloudServiceListCard
     from '@/services/asset-inventory/cloud-service/modules/cloud-service-list/CloudServiceListCard.vue';
@@ -257,6 +261,7 @@ export default {
             handleProviderSelect,
             handlePaginationUpdate,
             ASSET_INVENTORY_ROUTE,
+            BACKGROUND_COLOR,
         };
     },
 };
