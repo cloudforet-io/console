@@ -43,12 +43,12 @@
                     {{ $t('PROJECT.DETAIL.WEBHOOK_ACTION') }}
                 </p-select-dropdown>
             </template>
-            <template #col-plugin_info.plugin_id-format="{index, field, item}">
-                <p-lazy-img :src="item.plugin_icon"
+            <template #col-plugin_info.plugin_id-format="{index, field, item, value}">
+                <p-lazy-img :src="plugins[value] ? plugins[value].icon : 'ic_webhook'"
                             error-icon="ic_webhook"
                             width="1.5rem" height="1.5rem" class="mr-2"
                 />
-                {{ item.plugin_name }}
+                {{ plugins[value] ? plugins[value].label : value }}
             </template>
             <template #col-state-format="{ value }">
                 <p-status
@@ -77,12 +77,12 @@
             :items="selectedItem"
             @confirm="checkModalConfirm"
         >
-            <template #col-plugin_info.plugin_id-format="{index, field, item}">
-                <p-lazy-img :src="item.plugin_icon"
+            <template #col-plugin_info.plugin_id-format="{index, field, item, value}">
+                <p-lazy-img :src="plugins[value] ? plugins[value].icon : 'ic_webhook'"
                             error-icon="ic_webhook"
                             width="1.5rem" height="1.5rem" class="mr-2"
                 />
-                {{ item.plugin_name }}
+                {{ plugins[value] ? plugins[value].label : value }}
             </template>
             <template #col-state-format="{ value }">
                 <p-status
@@ -287,12 +287,7 @@ export default {
                     project_id: props.id,
                     query: webhookListApiQuery,
                 });
-                state.items = results.map(d => ({
-                    ...d,
-                    plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
-                    plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
-                    created_at: iso8601Formatter(d.created_at, state.timezone),
-                }));
+                state.items = results;
                 state.totalCount = total_count;
                 state.selectIndex = [];
             } catch (e) {
@@ -409,7 +404,10 @@ export default {
 
         /* init */
         (async () => {
-            await listWebhooks();
+            await Promise.allSettled([
+                store.dispatch('reference/webhook/load'),
+                listWebhooks(),
+            ]);
         })();
 
         onActivated(() => {
@@ -429,6 +427,7 @@ export default {
             onExport,
             onChange,
             checkModalConfirm,
+            iso8601Formatter,
         };
     },
 };

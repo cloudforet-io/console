@@ -15,8 +15,6 @@
             <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
             >
-                <favorites-widget v-if="!isDomainOwner" class="hidden lg:block col-span-12" />
-
                 <daily-updates class="col-span-12 daily-updates"
                                :providers="providers"
                 />
@@ -45,7 +43,6 @@ import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
 import AllSummary from '@/services/dashboard/modules/AllSummary.vue';
 import CollectorProgress from '@/services/dashboard/modules/CollectingProgress.vue';
-import FavoritesWidget from '@/services/dashboard/modules/FavoritesWidget.vue';
 import PersonalHealthDashboard
     from '@/services/dashboard/modules/PersonalHealthDashboard.vue';
 import ResourceMap from '@/services/dashboard/modules/ResourceMap.vue';
@@ -59,7 +56,6 @@ export default {
     components: {
         PersonalHealthDashboard,
         TrustedAdvisor,
-        FavoritesWidget,
         CollectorProgress,
         ResourceMap,
         GeneralPageLayout,
@@ -71,7 +67,6 @@ export default {
     },
     setup() {
         const state = reactive({
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             providers: computed(() => store.state.reference.provider.items),
             timezone: computed(() => store.state.user.timezone || 'UTC'),
         });
