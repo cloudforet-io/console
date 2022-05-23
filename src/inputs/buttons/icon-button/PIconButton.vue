@@ -119,9 +119,6 @@ export default defineComponent({
         max-width: 1.5rem;
         max-height: 1.5rem;
     }
-    &:focus, &:active {
-        @apply text-secondary;
-    }
 
     /* style types */
     &.transparent {
