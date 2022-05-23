@@ -118,13 +118,14 @@ import { Location } from 'vue-router';
 
 
 import { store } from '@/store';
-import { gray, primary1, primary2 } from '@/styles/colors';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { gray, primary1, primary2 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import {

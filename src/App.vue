@@ -68,6 +68,7 @@ import {
 import { Location } from 'vue-router';
 
 import { store } from '@/store';
+
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
 import { isRouteAccessible } from '@/lib/access-control';

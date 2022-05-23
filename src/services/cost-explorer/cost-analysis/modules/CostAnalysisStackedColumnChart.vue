@@ -26,12 +26,14 @@ import { cloneDeep } from 'lodash';
 
 
 import { CURRENCY } from '@/store/modules/display/config';
-import { gray } from '@/styles/colors';
+
 
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { gray } from '@/styles/colors';
 
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';

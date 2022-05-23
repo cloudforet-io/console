@@ -40,11 +40,13 @@ import { PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { CURRENCY, Currency } from '@/store/modules/display/config';
-import { indigo, red } from '@/styles/colors';
+
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { indigo, red } from '@/styles/colors';
 
 
 import {

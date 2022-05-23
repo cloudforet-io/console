@@ -56,6 +56,7 @@ import { Location } from 'vue-router';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';

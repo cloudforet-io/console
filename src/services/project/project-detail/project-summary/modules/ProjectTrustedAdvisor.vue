@@ -64,10 +64,12 @@ import { PI } from '@spaceone/design-system';
 import { findKey } from 'lodash';
 
 import { store } from '@/store';
-import { green, red, yellow } from '@/styles/colors';
+
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { green, red, yellow } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 

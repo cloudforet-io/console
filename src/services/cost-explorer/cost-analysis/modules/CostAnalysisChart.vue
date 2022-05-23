@@ -128,11 +128,13 @@ import {
 
 
 import { store } from '@/store';
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+
 
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import {
     getConvertedFilter,

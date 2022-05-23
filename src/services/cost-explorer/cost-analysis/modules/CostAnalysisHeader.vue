@@ -81,8 +81,9 @@ import { TranslateResult } from 'vue-i18n';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { CURRENCY } from '@/store/modules/display/config';
 import { i18n } from '@/translations';
+
+import { CURRENCY } from '@/store/modules/display/config';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 

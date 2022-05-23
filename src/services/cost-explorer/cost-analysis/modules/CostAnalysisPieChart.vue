@@ -22,10 +22,12 @@ import {
 } from '@spaceone/design-system';
 
 import { CURRENCY } from '@/store/modules/display/config';
-import { gray } from '@/styles/colors';
+
 
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
+import { gray } from '@/styles/colors';
 
 import {
     Legend, PieChartData, WidgetProps,

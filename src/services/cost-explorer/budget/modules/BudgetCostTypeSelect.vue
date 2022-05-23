@@ -43,8 +43,9 @@ import { debounce } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
-import { ReferenceMap } from '@/store/modules/reference/type';
 import { i18n } from '@/translations';
+
+import { ReferenceMap } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';

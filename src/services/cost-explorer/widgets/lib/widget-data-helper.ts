@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 
 import { store } from '@/store';
+
 import { Currency } from '@/store/modules/display/config';
 import { CurrencyRates } from '@/store/modules/display/type';
 

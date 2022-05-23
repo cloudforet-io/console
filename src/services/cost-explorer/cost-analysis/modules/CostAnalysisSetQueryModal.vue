@@ -61,8 +61,9 @@ import {
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { store } from '@/store';
-import { Currency, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { i18n } from '@/translations';
+
+import { Currency, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

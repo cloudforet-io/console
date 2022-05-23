@@ -72,8 +72,9 @@ import {
 
 import { PDataLoader, PIconButton, PButton } from '@spaceone/design-system';
 
-import { CURRENCY } from '@/store/modules/display/config';
 import { i18n } from '@/translations';
+
+import { CURRENCY } from '@/store/modules/display/config';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 

@@ -209,12 +209,6 @@ export default {
             listCloudServiceType();
         };
 
-        /* Watchers */
-        watch(() => state.urlQueryString, (urlQueryString) => {
-            replaceUrlQuery(urlQueryString);
-            listCloudServiceType();
-        });
-
         /* Init */
         const init = async () => {
             /* load references */
@@ -235,6 +229,12 @@ export default {
             assetInventoryStore.dispatch('cloudService/setSelectedCategories', urlQueryValue.service);
             assetInventoryStore.dispatch('cloudService/setPeriod', urlQueryValue.period);
             assetInventoryStore.dispatch('cloudService/setSearchFilters', searchQueryHelper.filters);
+
+            /* register urlQueryString watcher after initiating states from url query */
+            watch(() => state.urlQueryString, (urlQueryString) => {
+                replaceUrlQuery(urlQueryString);
+                listCloudServiceType();
+            });
 
             /* list data */
             await listCloudServiceType();

@@ -56,9 +56,9 @@ import { PSkeleton, PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
-import { CURRENCY } from '@/store/modules/display/config';
-import { gray } from '@/styles/colors';
 import { i18n } from '@/translations';
+
+import { CURRENCY } from '@/store/modules/display/config';
 
 import { toggleSeries } from '@/lib/amcharts/helper';
 import config from '@/lib/config';
@@ -66,6 +66,8 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { gray } from '@/styles/colors';
 
 import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { CHART_TYPE } from '@/services/cost-explorer/cost-analysis/type';

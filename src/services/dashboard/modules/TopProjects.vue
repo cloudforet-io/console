@@ -93,16 +93,16 @@ import { orderBy, range } from 'lodash';
 import { Location } from 'vue-router';
 
 
-import {
-    gray, peacock, secondary,
-} from '@/styles/colors';
-
 import config from '@/lib/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { arrayToQueryString } from '@/lib/router-query-string';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import {
+    gray, peacock, secondary,
+} from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';

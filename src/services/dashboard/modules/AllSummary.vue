@@ -119,12 +119,14 @@ import { NumberFormatOptions } from 'vue-i18n';
 import { Location } from 'vue-router';
 
 import { store } from '@/store';
-import { gray, primary, primary1 } from '@/styles/colors';
+
 
 import config from '@/lib/config';
 import { primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { gray, primary, primary1 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 

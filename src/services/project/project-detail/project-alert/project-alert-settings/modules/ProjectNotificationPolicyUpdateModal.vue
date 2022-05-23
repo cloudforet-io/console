@@ -32,13 +32,14 @@ import {
 } from '@spaceone/design-system';
 
 
-import { red } from '@/styles/colors';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { red } from '@/styles/colors';
 
 export default {
     name: 'ProjectNotificationPolicyUpdateModal',

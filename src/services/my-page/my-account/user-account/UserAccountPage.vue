@@ -108,6 +108,7 @@ import { map } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
+
 import { languages, timezoneList } from '@/store/modules/user/config';
 import { LanguageCode, UpdateUserRequest } from '@/store/modules/user/type';
 

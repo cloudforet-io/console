@@ -108,13 +108,16 @@ import {
 } from 'lodash';
 
 import { store } from '@/store';
+
 import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
-import { green, red, yellow } from '@/styles/colors';
+
 
 import config from '@/lib/config';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { green, red, yellow } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 

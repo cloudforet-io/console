@@ -20,13 +20,14 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import {
-    gray, indigo, red,
-} from '@/styles/colors';
 
 import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import {
+    gray, indigo, red,
+} from '@/styles/colors';
 
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';

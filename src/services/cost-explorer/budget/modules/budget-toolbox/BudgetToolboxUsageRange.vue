@@ -17,8 +17,9 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 
-import { red, yellow, indigo } from '@/styles/colors';
 import { i18n } from '@/translations';
+
+import { red, yellow, indigo } from '@/styles/colors';
 
 import { BudgetUsageRange } from '@/services/cost-explorer/budget/type';
 

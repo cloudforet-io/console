@@ -20,12 +20,12 @@ import dayjs from 'dayjs';
 import { capitalize } from 'lodash';
 
 
-import { gray, red } from '@/styles/colors';
-
 import config from '@/lib/config';
 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { gray, red } from '@/styles/colors';
 
 
 interface ChartData {

@@ -96,7 +96,7 @@ export default {
         @apply text-gray-500;
         line-height: $gnb-height;
         cursor: pointer;
-        margin-left: 1.5rem;
+        margin-left: 1.25rem;
 
         &.opened {
             @apply text-violet-400;

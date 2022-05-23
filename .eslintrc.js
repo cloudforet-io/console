@@ -145,6 +145,11 @@ module.exports = {
                         position: 'after'
                     },
                     {
+                        pattern: '@/store/**',
+                        group: 'internal',
+                        position: 'after'
+                    },
+                    {
                         pattern: '@/translations/**',
                         group: 'internal',
                         position: 'after'
@@ -156,6 +161,11 @@ module.exports = {
                     },
                     {
                         pattern: '@/common/**',
+                        group: 'internal',
+                        position: 'after'
+                    },
+                    {
+                        pattern: '@/styles/**',
                         group: 'internal',
                         position: 'after'
                     },

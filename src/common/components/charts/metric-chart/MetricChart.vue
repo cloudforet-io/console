@@ -63,11 +63,12 @@ import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 
-import { gray } from '@/styles/colors';
 
 import config from '@/lib/config';
 
 import { MetricChartProps, MonitoringResourceType, Unit } from '@/common/components/charts/metric-chart/type';
+
+import { gray } from '@/styles/colors';
 
 
 interface ChartData {

@@ -33,6 +33,7 @@ import { sortBy } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+
 import { GNBMenu } from '@/store/modules/display/type';
 import { RECENT_TYPE, RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';

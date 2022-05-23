@@ -53,14 +53,16 @@ import { TranslateResult } from 'vue-i18n';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { CURRENCY } from '@/store/modules/display/config';
-import { yellow, red, gray } from '@/styles/colors';
 import { i18n } from '@/translations';
+
+import { CURRENCY } from '@/store/modules/display/config';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { yellow, red, gray } from '@/styles/colors';
 
 import { getConvertedBudgetFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';

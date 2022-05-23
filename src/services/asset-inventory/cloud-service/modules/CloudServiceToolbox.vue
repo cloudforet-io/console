@@ -60,9 +60,10 @@ import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/tool
 
 // global
 import { store } from '@/store';
+import { i18n } from '@/translations';
+
 import { ExcelPayload } from '@/store/modules/file/actions';
 import { ExcelDataField } from '@/store/modules/file/type';
-import { i18n } from '@/translations';
 
 import {
     dynamicFieldsToExcelDataFields,

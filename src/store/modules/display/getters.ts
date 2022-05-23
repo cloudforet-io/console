@@ -2,6 +2,7 @@ import VueRouter from 'vue-router';
 import { Getter } from 'vuex';
 
 import { SpaceRouter } from '@/router';
+
 import {
     CURRENCY_SYMBOL, SIDEBAR_TYPE,
 } from '@/store/modules/display/config';

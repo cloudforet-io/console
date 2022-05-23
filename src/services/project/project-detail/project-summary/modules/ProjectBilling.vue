@@ -129,15 +129,17 @@ import { NumberFormatOptions } from 'vue-i18n';
 
 
 import { CURRENCY } from '@/store/modules/display/config';
-import {
-    gray, safe, secondary, secondary1, green, blue,
-} from '@/styles/colors';
+
 
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import {
+    gray, safe, secondary, secondary1, green, blue,
+} from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
