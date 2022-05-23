@@ -128,7 +128,11 @@ export const queryStringToString = (queryString: RouteQueryString): string|undef
     let value = queryString;
     if (Array.isArray(value)) value = value[0];
     if (typeof value === 'string') {
-        return JSON.parse(value) || undefined;
+        try {
+            return JSON.parse(value) || undefined;
+        } catch (e) {
+            return value || undefined;
+        }
     }
 
     return undefined;

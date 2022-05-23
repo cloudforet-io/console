@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -210,6 +210,7 @@ export default {
         };
 
         /* Init */
+        let urlQueryStringWatcherStop;
         const init = async () => {
             /* load references */
             await store.dispatch('reference/provider/load');
@@ -231,7 +232,7 @@ export default {
             assetInventoryStore.dispatch('cloudService/setSearchFilters', searchQueryHelper.filters);
 
             /* register urlQueryString watcher after initiating states from url query */
-            watch(() => state.urlQueryString, (urlQueryString) => {
+            urlQueryStringWatcherStop = watch(() => state.urlQueryString, (urlQueryString) => {
                 replaceUrlQuery(urlQueryString);
                 listCloudServiceType();
             });
@@ -243,6 +244,11 @@ export default {
         (async () => {
             await init();
         })();
+
+        onUnmounted(() => {
+            // urlQueryString watcher is referencing assetInventoryStore which is destroyed on unmounted. so urlQueryString watcher must be destroyed on unmounted too.
+            if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
+        });
 
         return {
             ...toRefs(state),
