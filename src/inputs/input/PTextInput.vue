@@ -364,6 +364,9 @@ export default {
         }
         &.focused, &:focus-within:not(.disabled):not(.invalid) {
             @apply border-secondary bg-blue-100;
+            > input {
+                padding-right: 1rem;
+            }
             > .right-extra {
                 padding-right: 1rem;
             }

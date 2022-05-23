@@ -6,7 +6,7 @@ import { getSearchDropdownArgTypes } from '@/inputs/dropdown/search-dropdown/sto
 import { getSearchDropdownMenu, getSearchDropdownMenuWithMultiTypes } from '@/inputs/dropdown/search-dropdown/mock';
 
 
-<Meta title='Inputs/InputNew' parameters={{
+<Meta title='Inputs/Input' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5191%3A2'
@@ -413,7 +413,7 @@ export const Template = (args, { argTypes }) => ({
         {{
             components: { PTextInput },
             template: `
-                <p-text-input style="width: 80px;" multi-input v-model="value" >
+                <p-text-input style="width: 96px;" type="number" multi-input v-model="value" >
                     <template #right-extra>%</template>
                 </p-text-input>
             `,
