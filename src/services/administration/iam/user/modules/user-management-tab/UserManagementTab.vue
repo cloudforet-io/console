@@ -28,6 +28,7 @@
                     </p-panel-top>
                     <user-a-p-i-key-table class="api-key-table"
                                           :user-id="selectedUsers[0].user_id"
+                                          :disabled="!hasManagePermission"
                     />
                 </section>
             </template>
