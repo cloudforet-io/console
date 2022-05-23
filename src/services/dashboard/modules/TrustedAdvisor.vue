@@ -6,32 +6,9 @@
                 <span>{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.TITLE') }}</span>
             </div>
         </template>
-        <div class="content-wrapper grid grid-cols-12 gap-6">
-            <div class="overall-wrapper col-span-12 xs:col-span-2 lg:col-span-3 grid grid-cols-12">
-                <div class="title col-span-12">
-                    <span class="text">{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.SUB_TITLE_OVERALL') }}</span>
-                </div>
-                <div class="chart-wrapper col-span-4 xs:col-span-12">
-                    <div ref="chartRef" class="chart" />
-                </div>
-                <div class="legend-wrapper col-span-8 xs:col-span-12">
-                    <template v-for="([k, v]) of Object.entries(legendData)">
-                        <router-link :key="k"
-                                     :to="overallLinkFormatter(v.name)"
-                                     class="legend-row" :class="v.name"
-                        >
-                            <div class="left-part">
-                                <span class="legend-circle" :style="{ 'background-color': v.color }" />
-                                <span class="legend-text inline-block xs:hidden lg:inline-block" :class="v.name">{{ v.label }}</span>
-                            </div>
-                            <div class="right-part relative lg:absolute">
-                                <span :style="{ 'color': v.color }">{{ v.count }}</span>
-                            </div>
-                        </router-link>
-                    </template>
-                </div>
-            </div>
-            <div class="project-summary-wrapper col-span-12 xs:col-span-10 lg:col-span-9">
+        <div class="content-wrapper">
+            <trusted-advisor-overall :extra-params="extraParams" />
+            <div class="project-summary-wrapper">
                 <div class="title">
                     <span class="text">{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.SUB_TITLE_PROJECT_SUMMARY') }}</span>
                     <p-text-pagination
@@ -91,13 +68,10 @@
 </template>
 
 <script lang="ts">
-
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
-import * as am4charts from '@amcharts/amcharts4/charts';
-import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -108,18 +82,15 @@ import {
 } from 'lodash';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
-
-
-import config from '@/lib/config';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { green, red, yellow } from '@/styles/colors';
-
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import TrustedAdvisorOverall from '@/services/dashboard/modules/trusted-advisor/TrustedAdvisorOverall.vue';
 
 
 enum STATUS {
@@ -135,11 +106,6 @@ enum CATEGORY {
     service_limits,
 }
 
-interface OverallData {
-    status: keyof typeof STATUS;
-    count: number;
-}
-
 interface ProjectSummaryData {
     projectId: string;
     projectName: string;
@@ -151,13 +117,11 @@ interface ProjectSummaryData {
 
 const CLOUD_SERVICE_GROUP = 'TrustedAdvisor';
 const CLOUD_SERVICE_NAME = 'Check';
-const ERROR_COLOR = red[500];
-const WARNING_COLOR = yellow[500];
-const OK_COLOR = green[600];
 
 export default {
     name: 'TrustedAdvisor',
     components: {
+        TrustedAdvisorOverall,
         PTextPagination,
         WidgetLayout,
         PI,
@@ -169,66 +133,33 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
-
-        const chartState = reactive({
-            loading: true,
-            data: [] as OverallData[],
-            colors: {
-                error: ERROR_COLOR,
-                warning: WARNING_COLOR,
-                ok: OK_COLOR,
-            },
-        });
         const state = reactive({
-            loading: false,
-            chart: null as null | any,
+            loading: true,
             providers: computed(() => store.state.reference.provider.items),
-            favoriteProjects: computed<FavoriteItem[]>(() => store.state.favorite.projectItems),
             projects: computed(() => store.state.reference.project.items),
-            chartRef: null as HTMLElement | null,
+            favoriteProjects: computed<FavoriteItem[]>(() => store.state.favorite.projectItems),
             thisPage: 1,
             allPage: 1,
-            legendData: computed(() => ({
-                error: {
-                    name: STATUS.error,
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_ERROR'),
-                    color: ERROR_COLOR,
-                    count: chartState.data.find(d => d.status === STATUS.error)?.count,
-                },
-                warning: {
-                    name: STATUS.warning,
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_WARNING'),
-                    color: WARNING_COLOR,
-                    count: chartState.data.find(d => d.status === STATUS.warning)?.count,
-                },
-                ok: {
-                    name: STATUS.ok,
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_OK'),
-                    color: OK_COLOR,
-                    count: chartState.data.find(d => d.status === STATUS.ok)?.count,
-                },
-            })),
             tableData: computed(() => ([
                 {
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_COST_OPTIMIZATION'),
+                    label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_COST_OPTIMIZATION'),
                     icon: 'ic_cost_optimization',
                 },
                 {
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_PERFORMANCE'),
+                    label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_PERFORMANCE'),
                     icon: 'ic_performance',
                 },
                 {
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_SECURITY'),
+                    label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_SECURITY'),
                     icon: 'ic_security',
                 },
                 {
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_FAULT_TOLERANCE'),
+                    label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_FAULT_TOLERANCE'),
                     icon: 'ic_fault_tolerance',
                 },
                 {
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_SERVICE_LIMITS'),
+                    label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_SERVICE_LIMITS'),
                     icon: 'ic_service_limits',
                 },
             ])),
@@ -236,37 +167,6 @@ export default {
         });
 
         /* util */
-        const drawChart = (chartContext) => {
-            const chart = am4core.create(chartContext, am4charts.PieChart);
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-            chart.paddingTop = 12;
-            chart.data = chartState.data;
-
-            const series = chart.series.push(new am4charts.PieSeries());
-            series.labels.template.disabled = true;
-            series.ticks.template.disabled = true;
-            series.dataFields.value = 'count';
-            series.dataFields.category = 'status';
-
-            const slice: any = series.slices.template;
-            slice.togglable = false;
-            slice.clickable = false;
-            slice.stroke = am4core.color('#fff');
-            slice.tooltipText = '';
-            slice.strokeWidth = 1;
-            slice.states.getKey('hover').properties.scale = 1;
-            slice.adapter.add('fill', (fill, target) => {
-                if (target.dataItem) return am4core.color(chartState.colors[target.dataItem.category]);
-                return fill;
-            });
-
-            // animation
-            series.hiddenState.properties.opacity = 1;
-            series.hiddenState.properties.endAngle = -90;
-            series.hiddenState.properties.startAngle = -90;
-
-            state.chart = chart;
-        };
         const changePageNumber = (page) => {
             state.thisPage = page;
         };
@@ -281,22 +181,6 @@ export default {
             return 'empty';
         };
         const getProjectBoxCount = (rowNum, colNum) => (state.projectSummaryData[colNum] ? state.projectSummaryData[colNum].counts[rowNum][1] : 0);
-        const overallLinkFormatter = (status) => {
-            const filters: QueryStoreFilter[] = [];
-            filters.push({ k: 'data.status', o: '=', v: status });
-
-            return {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                query: {
-                    filters: queryHelper.setFilters(filters).rawQueryStrings,
-                },
-                params: {
-                    provider: 'aws',
-                    group: CLOUD_SERVICE_GROUP,
-                    name: CLOUD_SERVICE_NAME,
-                },
-            };
-        };
         const projectSummaryLinkFormatter = (rowNum, colNum) => {
             const status = getProjectBoxStatus(rowNum, colNum);
             const category = CATEGORY[rowNum];
@@ -321,18 +205,6 @@ export default {
         };
 
         /* api */
-        const getOverallData = async () => {
-            chartState.loading = true;
-            try {
-                const res = await SpaceConnector.client.statistics.topic.trustedAdvisorSummary(props.extraParams);
-                chartState.data = res.results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                chartState.data = [];
-            } finally {
-                chartState.loading = false;
-            }
-        };
         const getProjectSummary = async () => {
             state.loading = true;
             try {
@@ -363,7 +235,7 @@ export default {
                         projectName: state.projects[projectId]?.name,
                         tooltipText: state.projects[projectId]?.label,
                         counts,
-                        isFavorite: !!find(state.favoriteProjects, { resourceId: projectId }),
+                        isFavorite: !!find(state.favoriteProjects, { itemId: projectId }),
                     });
                 });
                 state.projectSummaryData = projectSummaryData.sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
@@ -375,9 +247,6 @@ export default {
             }
         };
 
-        const init = () => {
-            getOverallData();
-        };
         const asyncInit = async () => {
             await Promise.allSettled([
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
@@ -387,27 +256,14 @@ export default {
             ]);
             await getProjectSummary();
         };
-        init();
         asyncInit();
-
-        watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
-            if (!loading && chartContext) {
-                drawChart(chartContext);
-            }
-        }, { immediate: false });
-
-        onUnmounted(() => {
-            if (state.chart) state.chart.dispose();
-        });
 
         return {
             ...toRefs(state),
-            chartState,
             changePageNumber,
             range,
             getProjectBoxStatus,
             getProjectBoxCount,
-            overallLinkFormatter,
             projectSummaryLinkFormatter,
         };
     },
@@ -423,6 +279,7 @@ export default {
     }
 }
 .content-wrapper {
+    @apply grid grid-cols-12 gap-6;
     margin-top: 0.625rem;
     .title {
         position: relative;
@@ -440,74 +297,11 @@ export default {
             font-weight: normal;
         }
     }
-    .legend-wrapper {
-        @media screen and (width < 1024px) {
-            width: 50%;
-            margin: auto;
-        }
+    .project-summary-wrapper {
+        @apply col-span-9;
 
-        @media screen and (width < 478px) {
-            width: 90%;
-            margin: auto;
-        }
-        .legend-row {
-            position: relative;
-            display: flex;
-            height: 1.75rem;
-            font-size: 0.875rem;
-            cursor: pointer;
-            padding: 0.25rem 0;
-            &:hover {
-                @apply bg-secondary2;
-                .legend-text {
-                    text-decoration: underline;
-                    &.error {
-                        @apply text-red-500;
-                    }
-                    &.warning {
-                        @apply text-yellow-500;
-                    }
-                    &.ok {
-                        @apply text-green-600;
-                    }
-                }
-                .right-part {
-                    text-decoration: underline;
-                }
-            }
-            &.error {
-                @apply text-red-500;
-            }
-            &.warning {
-                @apply text-yellow-500;
-            }
-            &.ok {
-                @apply text-green-600;
-            }
-            .left-part {
-                display: inline-flex;
-                width: 90%;
-                .legend-circle {
-                    @apply rounded-full;
-                    display: inline-block;
-                    width: 0.5rem;
-                    height: 0.5rem;
-                    margin: auto 0.25rem auto 0;
-                }
-                .legend-text {
-                    @apply text-gray-700;
-                    line-height: 1.4;
-                    width: 95%;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
-            }
-            .right-part {
-                position: absolute;
-                right: 0;
-                vertical-align: text-bottom;
-            }
+        @screen mobile {
+            @apply col-span-12;
         }
     }
     .table-wrapper {
@@ -523,11 +317,11 @@ export default {
             .left-part {
                 width: 20%;
 
-                @media screen and (576px < width < 1024px) {
+                @screen tablet {
                     width: 4%;
                 }
 
-                @media screen and (width < 576px) {
+                @screen mobile {
                     width: 8%;
                 }
                 .label-wrapper {
@@ -545,11 +339,11 @@ export default {
             .right-part {
                 width: 80%;
 
-                @media screen and (576px < width < 1024px) {
+                @screen tablet {
                     width: 96%;
                 }
 
-                @media screen and (width < 576px) {
+                @screen mobile {
                     width: 92%;
                 }
                 font-size: 0.75rem;
