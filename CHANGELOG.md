@@ -1,3 +1,10 @@
+# [1.1.0-beta.315](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.314...v1.1.0-beta.315) (2022-05-23)
+
+
+### Bug Fixes
+
+* remove focus,active at PIconButton ([#969](https://github.com/spaceone-dev/spaceone-design-system/issues/969)) ([4654a2e](https://github.com/spaceone-dev/spaceone-design-system/commit/4654a2e69d25284cfdd820afaa2165e1da6ade96))
+
 # [1.1.0-beta.314](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.313...v1.1.0-beta.314) (2022-05-23)
 
 
