@@ -170,7 +170,7 @@ export default {
 
     .p-text-editor {
         & .CodeMirror {
-            min-height: 480px;
+            min-height: 30rem;
         }
     }
 }
