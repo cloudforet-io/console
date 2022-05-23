@@ -62,6 +62,12 @@ export const isUserAccessibleToMenu = (menuId: MenuId, pagePermissions: PagePerm
     return ACCESS_LEVEL[getAccessTypeFromPermission(permission)] >= ACCESS_LEVEL[getMenuAccessLevel(menuId)];
 };
 
+export const isUserAccessibleToRoute = (routeOrLocation: Route|RawLocation, pagePermissions: PagePermissionTuple[] = []): boolean => {
+    const routeAccessLevel = getRouteAccessLevel(routeOrLocation);
+    const userAccessLevel = getUserAccessLevel(typeof routeOrLocation !== 'string' ? (routeOrLocation as Route).name : null, pagePermissions);
+    return ACCESS_LEVEL[userAccessLevel] >= ACCESS_LEVEL[routeAccessLevel];
+};
+
 export const isRouteAccessible = (routeOrLocation: Route, accessLevel: AccessLevel): boolean => {
     const routeAccessLevel = getRouteAccessLevel(routeOrLocation);
     return ACCESS_LEVEL[routeAccessLevel] >= ACCESS_LEVEL[accessLevel];
