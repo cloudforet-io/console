@@ -1,6 +1,6 @@
 <template>
     <div class="role-create-page-access-menu-item"
-         :class="[menu.subMenuList && menu.subMenuList.length ? 'parent' : '', menu.id]"
+         :class="[menu.isParent ? 'parent' : '', menu.id]"
     >
         <div class="left-part">
             <p-icon-button v-if="!isSubMenu"
@@ -49,6 +49,7 @@ import {
 import {
     PCheckBox, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
+
 
 import { i18n } from '@/translations';
 

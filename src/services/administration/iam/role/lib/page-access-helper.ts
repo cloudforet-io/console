@@ -42,6 +42,7 @@ export const getPageAccessMenuList = (): PageAccessMenuItem[] => {
                 isViewed: false,
                 isManaged: false,
                 hideMenu: false,
+                isParent: true,
                 subMenuList: flattenSubMenuList(menu?.subMenuList),
             });
         }

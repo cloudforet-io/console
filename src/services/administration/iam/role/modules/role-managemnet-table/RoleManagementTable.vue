@@ -69,6 +69,7 @@
 </template>
 
 <script lang="ts">
+
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -136,14 +137,14 @@ export default defineComponent({
                     { name: 'name', label: 'Name' },
                     { name: 'tags.description', label: 'Description' },
                     { name: 'role_type', label: 'Role Type' },
-                    { name: 'created_at', label: 'Created' },
+                    { name: 'created_at', label: 'Created', dataType: 'datetime' },
                 ] as KeyItem[],
             }],
             valueHandlerMap: {
                 name: makeDistinctValueHandler('identity.Role', 'name'),
                 role_type: makeEnumValueHandler(ROLE_TYPE_LABEL),
                 'tags.description': makeDistinctValueHandler('identity.Role', 'tags.description'),
-                created_at: makeDistinctValueHandler('identity.Role', 'created_at'),
+                created_at: makeDistinctValueHandler('identity.Role', 'created_at', 'datetime'),
             },
         });
         const state = reactive({
