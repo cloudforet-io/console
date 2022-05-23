@@ -1,3 +1,10 @@
+# [1.1.0-beta.309](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.308...v1.1.0-beta.309) (2022-05-23)
+
+
+### Bug Fixes
+
+* input padding style ([#963](https://github.com/spaceone-dev/spaceone-design-system/issues/963)) ([cdd984a](https://github.com/spaceone-dev/spaceone-design-system/commit/cdd984a196a7524165009d4c0d447c32b939bd2d))
+
 # [1.1.0-beta.308](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.307...v1.1.0-beta.308) (2022-05-19)
 
 
