@@ -1,3 +1,10 @@
+# [1.1.0-beta.310](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.309...v1.1.0-beta.310) (2022-05-23)
+
+
+### Bug Fixes
+
+* remove 'No Item' if there is no suggested menu ([#965](https://github.com/spaceone-dev/spaceone-design-system/issues/965)) ([76ae727](https://github.com/spaceone-dev/spaceone-design-system/commit/76ae727a944c8d120b46000f69c95b92afb67676))
+
 # [1.1.0-beta.309](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.308...v1.1.0-beta.309) (2022-05-23)
 
 
