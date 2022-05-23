@@ -22,7 +22,7 @@
             <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
             >
-                <service-accounts class="col-span-12" :providers="providers" />
+                <service-accounts class="col-span-12" />
                 <collector-progress class="col-span-12 collector-progress" />
                 <cloud-services class="col-span-12 cloud-services" :more-info="true" />
             </div>
