@@ -10,22 +10,28 @@
                    @change="onChange"
                    @refresh="onChange()"
         />
-        <div class="box-group">
-            <div v-for="(item, idx) in items" :key="`box-${idx}`" class="box"
-                 @click="onClickProjectBox(item)"
-            >
-                <p class="sub-title">
-                    {{ projectGroupNameFormatter(item.project_id) }}
-                </p>
-                <p class="title">
-                    {{ projectNameFormatter(item.project_id) }}
-                </p>
-                <div class="content-wrapper" :class="{'multiple-items': item.alert_count > 0 && item.maintenance_window_count > 0}">
-                    <project-maintenance-window-list-item v-if="item.maintenance_window_count > 0" :project-id="item.project_id" />
-                    <project-alert-list-item v-if="item.alert_count > 0" :project-id="item.project_id" />
+        <p-data-loader
+            :data="items"
+            :loading="loading"
+            :loader-backdrop-color="BACKGROUND_COLOR"
+        >
+            <div class="box-group">
+                <div v-for="(item, idx) in items" :key="`box-${idx}`" class="box"
+                     @click="onClickProjectBox(item)"
+                >
+                    <p class="sub-title">
+                        {{ projectGroupNameFormatter(item.project_id) }}
+                    </p>
+                    <p class="title">
+                        {{ projectNameFormatter(item.project_id) }}
+                    </p>
+                    <div class="content-wrapper" :class="{'multiple-items': item.alert_count > 0 && item.maintenance_window_count > 0}">
+                        <project-maintenance-window-list-item v-if="item.maintenance_window_count > 0" :project-id="item.project_id" />
+                        <project-alert-list-item v-if="item.alert_count > 0" :project-id="item.project_id" />
+                    </div>
                 </div>
             </div>
-        </div>
+        </p-data-loader>
         <p-pane-layout v-if="isHealthy" class="project-healthy">
             <p-i name="smile-face"
                  width="3rem"
@@ -47,12 +53,16 @@ import { makeReferenceValueHandler } from '@spaceone/console-core-lib/component-
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { PPaneLayout, PToolbox, PI } from '@spaceone/design-system';
+import {
+    PPaneLayout, PToolbox, PI, PDataLoader,
+} from '@spaceone/design-system';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import ProjectAlertListItem from '@/services/alert-manager/alert-dashboard/modules/project-search-widget/ProjectAlertListItem.vue';
 import ProjectMaintenanceWindowListItem from '@/services/alert-manager/alert-dashboard/modules/project-search-widget/ProjectMaintenanceWindowListItem.vue';
@@ -62,6 +72,7 @@ import { PROJECT_ROUTE } from '@/services/project/route-config';
 export default {
     name: 'ProjectSearchWidget',
     components: {
+        PDataLoader,
         PToolbox,
         PPaneLayout,
         PI,
@@ -82,7 +93,7 @@ export default {
             pageLimit: 12,
             items: [],
             tags: [],
-            loading: true,
+            loading: false,
             isHealthy: computed(() => {
                 if (state.totalCount === 0 && props.activatedProjects.length > 0 && !state.loading) return true;
                 return false;
@@ -118,6 +129,7 @@ export default {
             .setPageStart(1).setPageLimit(state.pageLimit);
         let AlertByProjectApiQuery = AlertByProjectApiQueryHelper.data;
         const listAlertByProject = async () => {
+            state.loading = true;
             try {
                 const { results, total_count } = await SpaceConnector.client.monitoring.dashboard.alertByProject({
                     // eslint-disable-next-line camelcase
@@ -168,6 +180,7 @@ export default {
             projectGroupNameFormatter,
             projectNameFormatter,
             countFormatter,
+            BACKGROUND_COLOR,
         };
     },
 };
