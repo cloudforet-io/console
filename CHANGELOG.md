@@ -1,3 +1,10 @@
+# [1.1.0-beta.313](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.312...v1.1.0-beta.313) (2022-05-23)
+
+
+### Bug Fixes
+
+* make inherit min height of parent element in TextEditor ([7a8349d](https://github.com/spaceone-dev/spaceone-design-system/commit/7a8349da79aacb0020a3b0b63465c50b9af65960))
+
 # [1.1.0-beta.312](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.311...v1.1.0-beta.312) (2022-05-23)
 
 
