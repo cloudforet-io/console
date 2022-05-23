@@ -1,3 +1,10 @@
+# [1.1.0-beta.311](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.310...v1.1.0-beta.311) (2022-05-23)
+
+
+### Bug Fixes
+
+* update toggle button ([#964](https://github.com/spaceone-dev/spaceone-design-system/issues/964)) ([ac2546a](https://github.com/spaceone-dev/spaceone-design-system/commit/ac2546a358422f4c3651e7837dabc4cbacfd492b))
+
 # [1.1.0-beta.310](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.309...v1.1.0-beta.310) (2022-05-23)
 
 
