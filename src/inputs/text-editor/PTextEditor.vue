@@ -57,7 +57,6 @@ interface Props {
     mode: TextEditorMode;
     loading: boolean;
     folded: boolean;
-    minHeight?: number;
 }
 
 export default defineComponent({
@@ -100,10 +99,6 @@ export default defineComponent({
         folded: {
             type: Boolean,
             default: false,
-        },
-        minHeight: {
-            type: Number,
-            default: undefined,
         },
     },
     setup(props, { emit }) {
