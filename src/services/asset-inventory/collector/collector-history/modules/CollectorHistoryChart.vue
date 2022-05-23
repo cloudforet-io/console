@@ -34,13 +34,15 @@ import {
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
-import {
-    gray, green, coral,
-} from '@/styles/colors';
+
 
 import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import {
+    gray, green, coral,
+} from '@/styles/colors';
 
 
 interface ChartData {

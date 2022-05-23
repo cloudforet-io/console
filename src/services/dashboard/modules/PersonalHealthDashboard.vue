@@ -76,6 +76,7 @@ import { find } from 'lodash';
 
 
 import { store } from '@/store';
+
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';

@@ -58,14 +58,16 @@ import { range, orderBy } from 'lodash';
 import { Location } from 'vue-router';
 
 import { store } from '@/store';
-import {
-    gray, violet, white, coral, yellow, secondary1,
-} from '@/styles/colors';
+
 
 import config from '@/lib/config';
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import {
+    gray, violet, white, coral, yellow, secondary1,
+} from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 

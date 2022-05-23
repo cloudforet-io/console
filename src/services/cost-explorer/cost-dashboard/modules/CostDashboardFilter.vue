@@ -38,8 +38,9 @@ import { isEmpty } from 'lodash';
 
 
 import { store } from '@/store';
-import { ReferenceItem } from '@/store/modules/reference/type';
 import { i18n } from '@/translations';
+
+import { ReferenceItem } from '@/store/modules/reference/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 

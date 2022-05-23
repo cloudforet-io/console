@@ -19,6 +19,7 @@ import { PSelectDropdown } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { store } from '@/store';
+
 import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 export default {

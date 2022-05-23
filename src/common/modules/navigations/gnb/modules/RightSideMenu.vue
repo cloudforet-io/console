@@ -130,6 +130,7 @@ import { Location } from 'vue-router';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+
 import { languages } from '@/store/modules/user/config';
 
 import config from '@/lib/config';

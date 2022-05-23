@@ -56,14 +56,16 @@ import bytes from 'bytes';
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
-import { CURRENCY } from '@/store/modules/display/config';
-import { gray } from '@/styles/colors';
 import { i18n } from '@/translations';
+
+import { CURRENCY } from '@/store/modules/display/config';
 
 import config from '@/lib/config';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { gray } from '@/styles/colors';
 
 import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';

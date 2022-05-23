@@ -18,6 +18,7 @@ import {
 import { PI } from '@spaceone/design-system';
 
 import { store } from '@/store';
+
 import { FAVORITE_TYPE, FavoriteConfig } from '@/store/modules/favorite/type';
 
 import { FavoriteButtonProps } from '@/common/modules/favorites/favorite-button/type';

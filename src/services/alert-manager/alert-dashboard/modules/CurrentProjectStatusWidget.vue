@@ -45,13 +45,14 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataLoader } from '@spaceone/design-system';
 
-import {
-    violet, green, red, yellow, white, gray,
-} from '@/styles/colors';
 
 import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import {
+    violet, green, red, yellow, white, gray,
+} from '@/styles/colors';
 
 
 enum PROJECT_STATUS {

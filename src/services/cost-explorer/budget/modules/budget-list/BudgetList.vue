@@ -13,7 +13,7 @@
                      class="budget-stat"
         />
         <div class="budget-list-card-box">
-            <budget-list-card v-for="budgetUsage in budgetUsages" :key="budgetUsage.budget_id"
+            <budget-list-card v-for="(budgetUsage, i) in budgetUsages" :key="`${budgetUsage.budget_id}-${i}`"
                               :budget-usage="budgetUsage"
                               :budget-loading="loading"
             />
@@ -106,7 +106,7 @@ export default {
         const fetchBudgetUsages = async () => {
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
-
+                console.debug('fetchBudgetUsages', results);
                 state.budgetUsages = results;
             } catch (e) {
                 ErrorHandler.handleError(e);

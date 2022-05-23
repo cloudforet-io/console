@@ -1,10 +1,11 @@
 <template>
     <div>
         <section class="page-title-wrapper">
-            <p-page-title v-if="!loading" child :title="budgetData.name"
+            <p-page-title :child="!loading"
+                          :title="loading ? '' : budgetData.name"
                           @goBack="$router.go(-1)"
             >
-                <template #title-right-extra>
+                <template v-if="!loading" #title-right-extra>
                     <div class="title-button-group">
                         <p-icon-button name="ic_trashcan" :disabled="!hasManagePermission" @click="handleClickDelete" />
                     </div>

@@ -123,12 +123,13 @@ import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/tool
 import { capitalize } from 'lodash';
 
 import { store } from '@/store';
-import { peacock, green, red } from '@/styles/colors';
 import { i18n } from '@/translations';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { peacock, green, red } from '@/styles/colors';
 
 import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
 import PCollectorHistoryChart from '@/services/asset-inventory/collector/collector-history/modules/CollectorHistoryChart.vue';

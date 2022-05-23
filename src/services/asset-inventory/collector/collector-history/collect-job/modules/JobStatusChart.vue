@@ -48,9 +48,10 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { coral, green } from '@/styles/colors';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
 

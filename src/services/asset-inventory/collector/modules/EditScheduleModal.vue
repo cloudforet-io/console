@@ -104,8 +104,9 @@ import {
 import { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
-import { timezoneList } from '@/store/modules/user/config';
 import { i18n } from '@/translations';
+
+import { timezoneList } from '@/store/modules/user/config';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 

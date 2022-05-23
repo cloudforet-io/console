@@ -17,6 +17,7 @@ import {
 import { get } from 'lodash';
 
 import { store } from '@/store';
+
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';

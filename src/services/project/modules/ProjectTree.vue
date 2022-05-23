@@ -107,6 +107,7 @@ import {
 
 
 import { store } from '@/store';
+
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

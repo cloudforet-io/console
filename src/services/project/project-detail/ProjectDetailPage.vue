@@ -112,8 +112,9 @@ import { TranslateResult } from 'vue-i18n';
 
 
 import { store } from '@/store';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { i18n } from '@/translations';
+
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -295,25 +296,20 @@ export default {
             if (state.maintenanceHappeningListRef) state.maintenanceHappeningListRef.reload();
         };
 
-        /** Init */
+        /* Watchers */
         watch(() => state.projectId, async (projectId) => {
-            if (projectId) await getProject(projectId);
-            // else forceRouteToProjectPage();
+            if (projectId) {
+                await Promise.allSettled([
+                    getProject(projectId),
+                    store.dispatch('service/projectDetail/getAlertCounts'),
+                ]);
+            }
         }, { immediate: true });
-
-        (async () => {
-            const exactRoute = vm.$route.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
-            singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
-            await Promise.allSettled([
-                // getPageNavigation(),
-                store.dispatch('service/projectDetail/getAlertCounts'),
-            ]);
-        })();
 
         watch(() => vm.$route.name, () => {
             const exactRoute = vm.$route.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
             singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
-        });
+        }, { immediate: true });
 
         watch(() => props.id, (after, before) => {
             if (after !== before) {

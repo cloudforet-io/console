@@ -53,11 +53,12 @@ import { TCreatedPdf } from 'pdfmake/build/pdfmake';
 // eslint-disable-next-line import/extensions,import/no-unresolved
 import { Content, Table, TableCell } from 'pdfmake/interfaces';
 
-import { gray, black, white } from '@/styles/colors';
-
 import {
     pdfFontInfoMap, PdfFontFamily, Language, fontLanguages, pdfFontFamily,
 } from '@/common/components/layouts/PdfDownloadOverlay/fonts';
+
+import { gray, black, white } from '@/styles/colors';
+
 
 const paperSizes = ['A4'] as const;
 const modes = ['ELEMENT_EMBED', 'PDF_EMBED', 'PDF_NEW_TAB'] as const;

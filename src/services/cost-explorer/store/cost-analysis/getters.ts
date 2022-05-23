@@ -1,6 +1,7 @@
 import { Getter } from 'vuex';
 
 import { store } from '@/store';
+
 import { ReferenceItem } from '@/store/modules/reference/type';
 
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';

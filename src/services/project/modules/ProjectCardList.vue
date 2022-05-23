@@ -142,8 +142,9 @@ import bytes from 'bytes';
 import { range, uniq } from 'lodash';
 
 import { store } from '@/store';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { i18n } from '@/translations';
+
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { arrayToQueryString } from '@/lib/router-query-string';
 

@@ -47,6 +47,7 @@ import {
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 
 import { store } from '@/store';
+
 import { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { SortedRegionReferenceItem } from '@/store/modules/reference/region/type';
 

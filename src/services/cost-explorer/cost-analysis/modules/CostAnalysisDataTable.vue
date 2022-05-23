@@ -74,9 +74,10 @@ import { Table } from 'pdfmake/interfaces';
 import { Location } from 'vue-router';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
+
 import { ExcelDataField } from '@/store/modules/file/type';
 import { ReferenceMap } from '@/store/modules/reference/type';
-import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';

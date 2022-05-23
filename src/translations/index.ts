@@ -5,12 +5,13 @@ import Vue from 'vue';
 import VueI18n, { IVueI18n, LocaleMessageObject } from 'vue-i18n';
 import { Store } from 'vuex';
 
-import { loadFonts } from '@/styles/fonts';
 
 import en from '@/translations/language-pack/en.json';
 import ja from '@/translations/language-pack/ja.json';
 import ko from '@/translations/language-pack/ko.json';
 import { loadDayjsLocale } from '@/translations/vendors/dayjs';
+
+import { loadFonts } from '@/styles/fonts';
 
 
 Vue.use(VueI18n);

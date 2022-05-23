@@ -127,6 +127,7 @@ import {
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { store } from '@/store';
+
 import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
 
 import {

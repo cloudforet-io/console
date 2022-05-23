@@ -51,10 +51,11 @@ import dayjs from 'dayjs';
 import { range } from 'lodash';
 import { Location } from 'vue-router';
 
-import { indigo, yellow, red } from '@/styles/colors';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { indigo, yellow, red } from '@/styles/colors';
 
 import {
     getConvertedBudgetFilter,

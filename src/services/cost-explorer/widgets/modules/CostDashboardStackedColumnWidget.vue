@@ -46,14 +46,17 @@ import dayjs from 'dayjs';
 
 
 import { store } from '@/store';
+
 import { CURRENCY } from '@/store/modules/display/config';
-import { gray } from '@/styles/colors';
+
 
 import { toggleSeries } from '@/lib/amcharts/helper';
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { gray } from '@/styles/colors';
 
 import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';

@@ -51,6 +51,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { PPaneLayout, PAnchor } from '@spaceone/design-system';
 
 import { store } from '@/store';
+
 import { CURRENCY } from '@/store/modules/display/config';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';

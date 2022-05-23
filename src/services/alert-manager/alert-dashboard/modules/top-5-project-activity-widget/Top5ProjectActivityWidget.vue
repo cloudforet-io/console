@@ -72,11 +72,13 @@ import { capitalize, find } from 'lodash';
 
 
 import { store } from '@/store';
-import { red, yellow } from '@/styles/colors';
+
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { red, yellow } from '@/styles/colors';
 
 import Top5ProjectActivityTooltip from '@/services/alert-manager/alert-dashboard/modules/top-5-project-activity-widget/Top5ProjectActivityTooltip.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';

@@ -69,6 +69,7 @@ import vClickOutside from 'v-click-outside';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+
 import { RecentConfig } from '@/store/modules/recent/type';
 import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 

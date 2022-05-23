@@ -78,11 +78,13 @@ import {
 import { capitalize } from 'lodash';
 
 import { store } from '@/store';
-import { green, primaryDark, red } from '@/styles/colors';
+
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { green, primaryDark, red } from '@/styles/colors';
 
 import { JOB_TASK_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
 

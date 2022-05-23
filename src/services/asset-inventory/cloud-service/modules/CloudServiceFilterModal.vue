@@ -66,9 +66,10 @@ import { sum } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
+
 import { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { RegionReferenceMap } from '@/store/modules/reference/region/type';
-import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

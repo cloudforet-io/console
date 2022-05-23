@@ -79,12 +79,15 @@ import {
 import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { store } from '@/store';
+
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 

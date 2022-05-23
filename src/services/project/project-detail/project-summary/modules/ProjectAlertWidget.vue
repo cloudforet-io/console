@@ -67,10 +67,11 @@ import { Location } from 'vue-router';
 
 
 import { store } from '@/store';
-import { alert, secondary } from '@/styles/colors';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { alert, secondary } from '@/styles/colors';
 
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
