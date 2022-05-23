@@ -13,14 +13,16 @@
             </div>
         </template>
         <div class="chart-container">
-            <p-data-loader :loading="loading" class="chart">
+            <p-data-loader :loading="loading" :data="data" class="chart">
                 <template #loader>
                     <div ref="loaderRef" class="w-full h-full" />
                 </template>
-                <div v-if="data.length === 0">
-                    <img src="@/assets/images/illust_ghost.svg" class="no-data-img">
-                </div>
-                <div v-else ref="chartRef" class="w-full h-full" />
+                <template #no-data>
+                    <div class="no-data-wrapper">
+                        <img src="@/assets/images/illust_ghost.svg">
+                    </div>
+                </template>
+                <div ref="chartRef" class="w-full h-full" />
             </p-data-loader>
         </div>
         <div class="legends">
@@ -37,7 +39,7 @@
                           :bordered="false"
             >
                 <template #col-provider-format="{ index, field, item }">
-                    <router-link :to="goToServiceAccountPage(item)">
+                    <router-link :to="getLink(item)">
                         <span :style="{color: data[index].color}" class="provider-label">{{ item.providerLabel }}</span>
                     </router-link>
                 </template>
@@ -48,20 +50,22 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
-    getCurrentInstance, ComponentRenderProxy, onUnmounted,
+    computed, reactive, toRefs, watch, onUnmounted,
 } from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PDataTable, PDataLoader, PSkeleton, PI,
+    PDataLoader, PDataTable, PI, PSkeleton,
 } from '@spaceone/design-system';
 import Color from 'color';
 import { forEach, range } from 'lodash';
 import { Location } from 'vue-router';
 
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import config from '@/lib/config';
 
@@ -71,6 +75,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import {
     gray, violet, white,
 } from '@/styles/colors';
+
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
@@ -95,45 +100,28 @@ export default {
         PDataLoader,
     },
     props: {
-        providers: {
-            type: Object,
-            default: () => ({}),
-        },
         extraParams: {
             type: Object,
             default: () => ({}),
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
+            providers: computed(() => store.state.reference.provider.items),
             skeletons: range(4),
             loading: true,
             loaderRef: null,
             chartRef: null as HTMLElement | null,
             data: [] as Data[],
             chart: null as null | any,
-            chartRegistry: {},
             fields: computed(() => [
-                { name: 'provider', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
-                { name: 'service_account_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
+                { name: 'provider', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
+                { name: 'service_account_count', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
             ]),
         });
 
-        const disposeChart = (ctx) => {
-            if (state.chartRegistry[ctx]) {
-                state.chartRegistry[ctx].dispose();
-                delete state.chartRegistry[ctx];
-            }
-        };
         const drawChart = (ctx, isLoading = false) => {
-            const createChart = () => {
-                disposeChart(ctx);
-                state.chartRegistry[ctx] = am4core.create(ctx, am4charts.PieChart);
-                return state.chartRegistry[ctx];
-            };
-            const chart = createChart();
+            const chart = am4core.create(ctx, am4charts.PieChart);
             chart.responsive.enabled = true;
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.innerRadius = am4core.percent(63);
@@ -184,64 +172,53 @@ export default {
             state.chart = chart;
         };
 
-        const getLink = (data) => {
-            const link = {
-                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-                params: {
-                    provider: data.provider,
-                },
-            };
-            return link;
-        };
+        const getLink = (data): Location => ({
+            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+            params: {
+                provider: data.provider,
+            },
+        });
 
+
+        /* Api */
         const getData = async () => {
             state.loading = true;
-            state.data = [];
+            const data: Data[] = [];
             try {
-                const res = await SpaceConnector.client.statistics.topic.serviceAccountByProvider(props.extraParams);
-
-                if (res.results.length > 0) {
-                    forEach(res.results, (d) => {
-                        if (props.providers[d.provider]) {
-                            state.data.push({
-                                providerLabel: props.providers[d.provider].label || d.provider,
-                                provider: d.provider,
-                                // icon: providers[d.provider].icon || '',
-                                color: props.providers[d.provider].color || '',
-                                href: getLink(d),
-                                service_account_count: d.service_account_count,
-                                ...d,
-                            });
-                        }
-                        // else others.count += d.count;
-                    });
-                } else {
-                    state.data = [];
-                }
-                // state.data.push(others);
+                const { results } = await SpaceConnector.client.statistics.topic.serviceAccountByProvider(props.extraParams);
+                forEach(results, (d) => {
+                    if (state.providers[d.provider]) {
+                        data.push({
+                            providerLabel: state.providers[d.provider].label || d.provider,
+                            provider: d.provider,
+                            color: state.providers[d.provider].color || '',
+                            href: getLink(d),
+                            service_account_count: d.service_account_count,
+                            ...d,
+                        });
+                    }
+                });
+                state.data = data;
             } catch (e) {
+                state.data = [];
                 ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }
         };
 
-        const goToServiceAccountPage = (item) => {
-            const res: Location = {
-                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-                query: {
-                    provider: item.provider,
-                },
-            };
-            return res;
-        };
 
-        const init = async () => {
+        /* Init */
+        (async () => {
+            await Promise.allSettled([
+                // LOAD REFERENCE STORE
+                store.dispatch('reference/provider/load'),
+            ]);
             await getData();
-        };
-        init();
+        })();
 
-        // draw loader chart or data chart
+
+        /* Watcher */
         watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
             if (loading && loaderCtx) {
                 drawChart(loaderCtx, true);
@@ -256,8 +233,8 @@ export default {
 
         return {
             ...toRefs(state),
-            goToServiceAccountPage,
             ASSET_INVENTORY_ROUTE,
+            getLink,
         };
     },
 };
@@ -291,9 +268,15 @@ export default {
 }
 .chart-container {
     @apply flex justify-center items-center mb-4;
-}
-.no-data-img {
-    @apply mx-auto;
+    .p-data-loader::v-deep {
+        .no-data-wrapper {
+            display: flex;
+            height: 100%;
+            img {
+                margin: auto;
+            }
+        }
+    }
 }
 .p-data-table::v-deep {
     @apply rounded-xs;
