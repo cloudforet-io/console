@@ -32,9 +32,9 @@
                     />
                 </section>
             </template>
-            <template #notifications>
-                <user-notifications :user-id="selectedUsers[0].user_id" />
-            </template>
+            <!--            <template #notifications>-->
+            <!--                <user-notifications :user-id="selectedUsers[0].user_id" />-->
+            <!--            </template>-->
         </p-tab>
         <p-tab v-else-if="selectedIndex.length > 1" :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
@@ -92,7 +92,7 @@ import PTagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import UserAssignedRole from '@/services/administration/iam/user/modules/user-management-tab/UserAssignedRole.vue';
 import UserDetail from '@/services/administration/iam/user/modules/user-management-tab/UserDetail.vue';
-import UserNotifications from '@/services/administration/iam/user/modules/user-management-tab/UserNotifications.vue';
+// import UserNotifications from '@/services/administration/iam/user/modules/user-management-tab/UserNotifications.vue';
 import { User } from '@/services/administration/iam/user/type';
 import { administrationStore } from '@/services/administration/store';
 import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
@@ -105,7 +105,7 @@ export default {
         UserDetail,
         UserAssignedRole,
         UserAPIKeyTable,
-        UserNotifications,
+        // UserNotifications,
         PTab,
         PTagsPanel,
         PDataTable,
@@ -140,7 +140,7 @@ export default {
                 { label: i18n.t('IDENTITY.USER.MAIN.TAG'), name: 'tag', keepAlive: true },
                 { label: i18n.t('IDENTITY.USER.MAIN.ASSIGNED_ROLES'), name: 'assigned_role', keepAlive: true },
                 { label: i18n.t('IDENTITY.USER.MAIN.API_KEY'), name: 'api_key', keepAlive: true },
-                { label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION'), name: 'notifications', keepAlive: true },
+                // { label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION'), name: 'notifications', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'detail',
         });
