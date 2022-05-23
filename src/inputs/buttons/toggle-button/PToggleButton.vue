@@ -1,14 +1,16 @@
 <template>
-    <toggle-button
-        :value="value"
-        :sync="sync"
-        :color="colors"
-        :width="32"
-        :height="16"
-        :margin="2"
-        :disabled="disabled"
-        v-on="$listeners"
-    />
+    <span class="toggle-button" :class="{'disabled': disabled}">
+        <toggle-button
+            :value="value"
+            :sync="sync"
+            :color="colors"
+            :width="32"
+            :height="16"
+            :margin="2"
+            :disabled="disabled"
+            v-on="$listeners"
+        />
+    </span>
 </template>
 
 <script lang="ts">
@@ -40,7 +42,7 @@ export default defineComponent<ToggleButtonProps>({
             type: Boolean,
             default: false,
         },
-        theme: {
+        styleType: {
             type: String,
             default: TOGGLE_BUTTON_THEME.secondary,
             validator(theme: TOGGLE_BUTTON_THEME) {
@@ -56,8 +58,8 @@ export default defineComponent<ToggleButtonProps>({
     setup(props: ToggleButtonProps) {
         const state = reactive({
             colors: computed(() => {
-                if (props.theme === 'secondary') return { checked: color.blue[500], unchecked: color.gray[300] };
-                if (props.theme === 'peacock500') return { checked: color.peacock[400], unchecked: color.gray[300] };
+                if (props.styleType === 'secondary') return { checked: color.blue[500], unchecked: color.gray[300] };
+                if (props.styleType === 'peacock500') return { checked: color.peacock[400], unchecked: color.gray[300] };
                 return { checked: color.blue[500], unchecked: color.gray[300] };
             }),
         });
@@ -67,3 +69,10 @@ export default defineComponent<ToggleButtonProps>({
     },
 });
 </script>
+<style lang="scss">
+.toggle-button {
+    &.disabled {
+        cursor: not-allowed;
+    }
+}
+</style>

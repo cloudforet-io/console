@@ -39,8 +39,8 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    theme: {
-        name: 'theme',
+    styleType: {
+        name: 'styleType',
         type: { name: 'string' },
         description: 'Style theme of toggle button.',
         defaultValue: TOGGLE_BUTTON_THEME.secondary,
