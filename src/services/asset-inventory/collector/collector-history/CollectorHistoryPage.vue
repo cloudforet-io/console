@@ -89,6 +89,7 @@
             <template #confirm-button>
                 <p-button class="create-collector-button"
                           icon="ic_plus_bold"
+                          :disabled="!hasManagePermission"
                           @click="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
                 >
                     {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_CREATE_COLLECTOR') }}
@@ -196,6 +197,7 @@ export default {
 
         const searchQueryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
+            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             timezone: computed(() => store.state.user.timezone),
             loading: true,
             modalVisible: false,

@@ -210,7 +210,7 @@ export default {
 
             .input {
                 min-width: calc((100% - 1rem) / 3);
-                width: calc((100% - 1rem) / 3);
+                width: inherit;
                 flex-basis: 0;
                 flex-grow: 1;
             }

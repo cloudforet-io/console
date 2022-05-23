@@ -51,9 +51,9 @@
                                   :min="0"
                                   class="rule-input"
                     >
-                        <template #right-extra>
-                            {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}
-                        </template>
+                        <!--                        <template #right-extra>-->
+                        <!--                            {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}-->
+                        <!--                        </template>-->
                     </p-text-input>
                 </template>
             </i18n>
@@ -88,9 +88,9 @@
                                       :min="0"
                                       class="rule-input"
                         >
-                            <template #right-extra>
-                                {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}
-                            </template>
+                            <!--                            <template #right-extra>-->
+                            <!--                                {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}-->
+                            <!--                            </template>-->
                         </p-text-input>
                     </template>
                 </i18n>
@@ -115,9 +115,9 @@
                               :min="0"
                               class="repeat-input"
                 >
-                    <template #right-extra>
-                        {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.TIME') }}
-                    </template>
+                    <!--                    <template #right-extra>-->
+                    <!--                        {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.TIME') }}-->
+                    <!--                    </template>-->
                 </p-text-input>
             </span>
             <span class="col-label">
@@ -455,7 +455,7 @@ export default {
                     justify-content: space-between;
                     .rule-input {
                         width: 50%;
-                        min-width: 5.5rem;
+                        min-width: 6rem;
                     }
                 }
             }
