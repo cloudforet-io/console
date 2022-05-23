@@ -14,10 +14,10 @@
                 </p>
                 <div>
                     <span v-if="proxyActions.no_notification" class="toggle-text">ON</span>
-                    <p-toggle-button theme="secondary"
-                                     sync
-                                     :value="proxyActions.no_notification"
-                                     @change="onToggleChange"
+                    <p-toggle-button
+                        sync
+                        :value="proxyActions.no_notification"
+                        @change="onToggleChange"
                     />
                 </div>
             </div>
