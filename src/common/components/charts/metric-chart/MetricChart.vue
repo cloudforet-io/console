@@ -5,21 +5,21 @@
             <span class="text-sm text-gray flex-grow">&nbsp; {{ unit.y ? `(${unit.y})` : '' }}</span>
             <p-lottie v-if="loading && chart" name="thin-spinner" auto />
         </div>
-        <p-data-loader :loading="loading && !chart" class="chart">
+        <p-data-loader :loading="loading && !chart" :data="data" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
             <div ref="chartRef" class="chart" />
             <transition name="fade-in">
-                <div v-if="error || (loading && chart)" class="shade">
-                    <p v-if="error">
-                        {{ $t('COMMON.COMPONENTS.METRIC_CHART.UNAVAILABLE') }}
-                    </p>
-                </div>
-                <div v-if="!loading && data.length === 0" class="no-data-text">
-                    {{ $t('COMMON.COMPONENTS.METRIC_CHART.NO_DATA') }}
+                <div v-if="error" class="shade">
+                    <span>{{ $t('COMMON.COMPONENTS.METRIC_CHART.UNAVAILABLE') }}</span>
                 </div>
             </transition>
+            <template #no-data>
+                <span class="no-data-text">
+                    {{ $t('COMMON.COMPONENTS.METRIC_CHART.NO_DATA') }}
+                </span>
+            </template>
         </p-data-loader>
         <transition name="fade">
             <div class="tooltip-wrapper" :class="{ 'tooltip-visible': visibleTooltip }">
@@ -53,10 +53,11 @@
 <script lang="ts">
 
 import {
-    defineComponent, PropType, reactive, toRefs, watch,
+    defineComponent, onMounted, onUnmounted, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
+import { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
@@ -130,10 +131,9 @@ export default defineComponent<MetricChartProps>({
     },
     setup(props) {
         const state = reactive({
-            chartRef: null,
-            chart: null as null | any,
+            chartRef: null as null | HTMLElement,
+            chart: null as null | XYChart,
             data: [] as ChartData[],
-            chartRegistry: {},
             //
             visibleTooltip: false,
             tooltip: {
@@ -155,19 +155,8 @@ export default defineComponent<MetricChartProps>({
             state.data = chartDataList;
         };
 
-        const disposeChart = (ctx) => {
-            if (state.chartRegistry[ctx]) {
-                state.chartRegistry[ctx].dispose();
-                delete state.chartRegistry[ctx];
-            }
-        };
         const drawChart = (ctx) => {
-            const createChart = () => {
-                disposeChart(ctx);
-                state.chartRegistry[ctx] = am4core.create(ctx, am4charts.XYChart);
-                return state.chartRegistry[ctx];
-            };
-            const chart = createChart();
+            const chart: any = am4core.create(ctx, am4charts.XYChart);
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
@@ -242,6 +231,8 @@ export default defineComponent<MetricChartProps>({
                 chart.cursor.lineX.strokeDasharray = '';
                 chart.cursor.lineX.strokeOpacity = 1;
             }
+
+            state.chart = chart;
         };
 
         watch([() => state.chartRef, () => props.loading], async ([ctx, loading]) => {
@@ -249,6 +240,14 @@ export default defineComponent<MetricChartProps>({
                 await convertChartData();
                 drawChart(ctx);
             }
+        });
+
+        onMounted(() => {
+            am4core.options.onlyShowOnViewport = false;
+        });
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
+            am4core.options.onlyShowOnViewport = true;
         });
 
         return {
@@ -267,11 +266,14 @@ export default defineComponent<MetricChartProps>({
     box-shadow: 0 2px 4px rgba(theme('colors.black'), 0.06);
     padding: 1.25rem;
 
-    .chart {
+    .chart-wrapper {
         position: relative;
         height: 12.5rem;
         margin-top: 1.25rem;
-
+        .chart {
+            height: 100%;
+            width: 100%;
+        }
         .no-data-text {
             @apply text-gray-400;
             position: absolute;
