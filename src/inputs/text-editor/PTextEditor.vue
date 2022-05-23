@@ -11,12 +11,11 @@
                 </slot>
             </div>
         </transition>
-        <div v-if="!loading">
-            <textarea ref="textarea"
-                      name="codemirror"
-                      placeholder=""
-            />
-        </div>
+        <textarea v-if="!loading"
+                  ref="textareaRef"
+                  name="codemirror"
+                  placeholder=""
+        />
     </div>
 </template>
 
@@ -26,18 +25,20 @@
   * Used library: codemirror
   * https://github.com/surmon-china/vue-codemirror#readme
 * */
-
 import {
-    ComponentRenderProxy, computed,
-    getCurrentInstance, onBeforeUnmount,
+    ComponentRenderProxy, computed, defineComponent,
+    getCurrentInstance, onBeforeUnmount, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import CodeMirror, { EditorConfiguration } from 'codemirror';
+
 import { forEach } from 'lodash';
 import PLottie from '@/foundation/lottie/PLottie.vue';
-import { modes } from '@/inputs/text-editor/config';
+
+import { textEditorModes, TextEditorMode } from './config';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const CodeMirror = require('codemirror');
 require('codemirror/mode/javascript/javascript');
 require('codemirror/addon/fold/brace-fold');
 require('codemirror/addon/fold/comment-fold');
@@ -50,8 +51,15 @@ require('codemirror/addon/lint/json-lint');
 require('codemirror/addon/edit/closebrackets');
 require('codemirror/addon/edit/closetag');
 
+interface Props {
+    code: string;
+    options: EditorConfiguration;
+    mode: TextEditorMode;
+    loading: boolean;
+    folded: boolean;
+}
 
-export default {
+export default defineComponent({
     name: 'PTextEditor',
     components: { PLottie },
     props: {
@@ -61,7 +69,7 @@ export default {
             required: true,
         },
         options: {
-            type: Object,
+            type: Object as PropType<EditorConfiguration>,
             default: () => ({
                 tabSize: 4,
                 styleActiveLine: true,
@@ -78,10 +86,10 @@ export default {
             }),
         },
         mode: {
-            type: String,
+            type: String as PropType<TextEditorMode>,
             default: 'edit',
-            validator(mode) {
-                return modes.includes(mode);
+            validator(mode: TextEditorMode) {
+                return textEditorModes.includes(mode);
             },
         },
         loading: {
@@ -98,7 +106,7 @@ export default {
         const state = reactive({
             content: '',
             cminstance: null as any,
-            textarea: null as any,
+            textareaRef: null as HTMLTextAreaElement|null,
             mergedOptions: computed(() => ({ ...props.options, readOnly: props.mode === 'readOnly' })),
         });
 
@@ -140,7 +148,8 @@ export default {
         };
 
         const init = async () => {
-            state.cminstance = CodeMirror.fromTextArea(state.textarea, state.mergedOptions);
+            if (!state.textareaRef) return;
+            state.cminstance = CodeMirror.fromTextArea(state.textareaRef, state.mergedOptions);
 
             watch(() => state.mergedOptions, (options) => {
                 if (options && state.cminstance) {
@@ -166,7 +175,7 @@ export default {
         };
 
 
-        watch(() => state.textarea, async (after, before) => {
+        watch(() => state.textareaRef, async (after, before) => {
             if (after) {
                 await init();
             } else {
@@ -184,7 +193,7 @@ export default {
             ...toRefs(state),
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
@@ -193,15 +202,19 @@ export default {
 @import 'codemirror/addon/lint/lint.css';
 @import 'codemirror/addon/fold/foldgutter.css';
 .p-text-editor {
+    position: relative;
     height: 100%;
     min-height: 5rem;
-    .CodeMirror {
+    > .CodeMirror {
         font-family: Inconsolata, monospace;
         line-height: 1.5;
         height: fit-content;
         padding: 1rem;
+        min-height: inherit;
+        > .CodeMirror-scroll {
+            min-height: inherit;
+        }
     }
-    position: relative;
     .loader {
         position: absolute;
         padding-top: 2rem;

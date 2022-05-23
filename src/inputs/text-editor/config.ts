@@ -1,1 +1,2 @@
-export const modes = ['readOnly', 'edit'];
+export const textEditorModes = ['readOnly', 'edit'] as const;
+export type TextEditorMode = typeof textEditorModes[number]
