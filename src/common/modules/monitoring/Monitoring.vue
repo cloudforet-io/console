@@ -97,6 +97,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PSelectButtonGroup, PSelectDropdown, PIconButton, PLottie, PButton, PAnchor,
 } from '@spaceone/design-system';
+import axios, { CancelTokenSource } from 'axios';
 import dayjs from 'dayjs';
 import {
     debounce, find, capitalize, chain, range, sortBy, get,
@@ -245,7 +246,13 @@ export default {
                 state.dataTools = [];
             }
         };
+        let resourceToken: CancelTokenSource | undefined;
         const listMetrics = async () => {
+            if (resourceToken) {
+                resourceToken.cancel('Next request has been called.');
+                resourceToken = undefined;
+            }
+            resourceToken = axios.CancelToken.source();
             try {
                 state.metrics = [];
 
@@ -253,11 +260,16 @@ export default {
                     resource_type: props.resourceType,
                     data_source_id: state.selectedToolId,
                     resources: props.resources.map(d => d.id),
+                }, {
+                    cancelToken: resourceToken.token,
                 });
+                resourceToken = undefined;
                 state.metrics = sortBy(res.metrics, m => m.name);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.metrics = [];
+            } catch (e: any) {
+                if (!axios.isCancel(e.axiosError)) {
+                    ErrorHandler.handleError(e);
+                    state.metrics = [];
+                }
             }
         };
 
