@@ -45,7 +45,7 @@ import { isEmpty } from 'lodash';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import { isRouteAccessible } from '@/lib/access-control';
+import { isUserAccessibleToRoute } from '@/lib/access-control';
 import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -124,7 +124,7 @@ export default {
                 }
 
                 const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
-                const isAccessible = isRouteAccessible(resolvedRoute.route, store.getters['user/pagePermissionList']);
+                const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/pagePermissionList']);
                 if (isAccessible) {
                     await vm.$router.push(props.nextPath);
                 } else {

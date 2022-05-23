@@ -10,7 +10,7 @@ import {
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import { isRouteAccessible } from '@/lib/access-control';
+import { isUserAccessibleToRoute } from '@/lib/access-control';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
@@ -48,7 +48,7 @@ export default defineComponent({
             }
 
             const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
-            const isAccessible = isRouteAccessible(resolvedRoute.route, store.getters['user/pagePermissionList']);
+            const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/pagePermissionList']);
             if (isAccessible) {
                 await vm.$router.push(props.nextPath);
             } else {
