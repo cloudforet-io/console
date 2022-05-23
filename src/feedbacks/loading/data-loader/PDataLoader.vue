@@ -25,15 +25,15 @@
                          backgroundColor: loaderBackdropColor
                      }"
                 />
-                <div class="loader">
+                <div class="loader" :class="{[loaderType]: !$scopedSlots.loader}">
                     <slot name="loader">
                         <template v-if="loaderType === LOADER_TYPES.spinner">
                             <p-lottie name="thin-spinner" :size="spinnerSize"
-                                      auto class="spinner"
+                                      auto
                             />
                         </template>
                         <template v-else-if="loaderType === LOADER_TYPES.skeleton">
-                            <p-skeleton class="skeleton" />
+                            <p-skeleton />
                         </template>
                     </slot>
                 </div>
@@ -244,53 +244,53 @@ export default defineComponent<Props>({
 <style lang="postcss">
 .p-data-loader {
     @apply w-full;
-    .data-loader-container {
+    > .data-loader-container {
         @apply relative w-full h-full overflow-hidden;
         min-height: inherit;
-    }
-    .loader-wrapper {
-        @apply absolute w-full h-full overflow-hidden;
-        top: 0;
-        z-index: 1;
-        &.no-empty-case {
-            @apply static;
-        }
-        &.fade-out {
-            transition: opacity 0.2s;
-        }
-        &.fade-out-from {
-            opacity: 1;
-        }
-        &.fade-out-to {
-            opacity: 0;
-        }
-        .loader-backdrop {
-            @apply w-full h-full;
-        }
-        .loader {
-            @apply absolute flex w-full h-full justify-center items-center;
+        > .loader-wrapper {
+            @apply absolute w-full h-full overflow-hidden;
             top: 0;
             z-index: 1;
-            .spinner {
-                max-height: 16.875rem;
+            &.no-empty-case {
+                @apply static;
             }
-            .skeleton {
-                height: 100%;
+            &.fade-out {
+                transition: opacity 0.2s;
+            }
+            &.fade-out-from {
+                opacity: 1;
+            }
+            &.fade-out-to {
+                opacity: 0;
+            }
+            > .loader-backdrop {
+                @apply w-full h-full;
+            }
+            > .loader {
+                @apply absolute flex w-full h-full justify-center items-center;
+                top: 0;
+                z-index: 1;
+                &.spinner {
+                    max-height: 16.875rem;
+                }
+                &.skeleton {
+                    height: 100%;
+                }
             }
         }
-    }
 
-    .no-data-wrapper {
-        @apply justify-center items-center flex w-full text-gray-300 text-center;
-        line-height: 120%;
-        font-size: 1rem;
-        height: calc(100% - 2rem);
-        max-height: 16.875rem;
-        min-height: inherit;
-    }
+        > .no-data-wrapper {
+            @apply justify-center items-center flex w-full text-gray-300 text-center;
+            line-height: 120%;
+            font-size: 1rem;
+            height: calc(100% - 2rem);
+            max-height: 16.875rem;
+            min-height: inherit;
+        }
 
-    .data-wrapper {
-        @apply overflow-y-auto h-full;
+        > .data-wrapper {
+            @apply overflow-y-auto h-full;
+        }
     }
 }
 </style>
