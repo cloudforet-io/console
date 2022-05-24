@@ -78,7 +78,9 @@
             size="md"
             :fade="true"
             :backdrop="true"
+            :disabled="!hasManagePermission"
             :visible.sync="modalVisible"
+            @confirm="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
         >
             <template #body>
                 <p class="modal-content">
@@ -87,13 +89,12 @@
                 </p>
             </template>
             <template #confirm-button>
-                <p-button class="create-collector-button"
-                          icon="ic_plus_bold"
-                          :disabled="!hasManagePermission"
-                          @click="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
-                >
-                    {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_CREATE_COLLECTOR') }}
-                </p-button>
+                <p-i class="create-collector-button"
+                     width="1.25rem"
+                     height="1.25rem"
+                     name="ic_plus_bold"
+                     color="inherit"
+                />{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_CREATE_COLLECTOR') }}
             </template>
         </p-button-modal>
     </div>
@@ -117,8 +118,8 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PPageTitle, PPagination, PButtonModal, PLazyImg,
-    PButton, PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
+    PPageTitle, PPagination, PButtonModal, PLazyImg, PI,
+    PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 import { capitalize } from 'lodash';
@@ -166,7 +167,6 @@ export default {
     components: {
         // HandbookButton,
         PLazyImg,
-        PButton,
         PButtonModal,
         PPagination,
         PToolboxTable,
@@ -175,6 +175,7 @@ export default {
         PProgressBar,
         PStatus,
         PCollectorHistoryChart,
+        PI,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -418,6 +419,7 @@ export default {
         .modal-button {
             .create-collector-button {
                 padding: 0;
+                margin-right: 0.3125rem;
             }
         }
     }
