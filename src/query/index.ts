@@ -1,3 +1,10 @@
+import { ComputedRef } from '@vue/composition-api';
+
+import dayjs from 'dayjs';
+import tz from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import { flatten, forEach } from 'lodash';
+
 import {
     QueryTag as Tag,
     KeyItem,
@@ -5,21 +12,15 @@ import {
     OperatorType,
     QueryItem
 } from '@src/component-util/query-search/type';
-
-import { Filter, FilterOperator } from '@src/space-connector/type';
-import {
-    QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator
-} from '@src/query/type';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import tz from 'dayjs/plugin/timezone';
 import {
     datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,
     rawQueryOperatorToPluralApiQueryOperatorMap
 } from '@src/query/config';
 import { convertDatetimeQueryStoreFilterToFilters } from '@src/query/helper';
-import { flatten, forEach } from 'lodash';
-import { ComputedRef } from '@vue/composition-api';
+import {
+    QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator
+} from '@src/query/type';
+import { Filter, FilterOperator } from '@src/space-connector/type';
 
 dayjs.extend(utc);
 dayjs.extend(tz);

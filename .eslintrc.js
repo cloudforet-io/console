@@ -2,7 +2,9 @@ module.exports = {
     root: true,
     extends: [
         'airbnb-base',
-        'plugin:@typescript-eslint/eslint-recommended'
+        'plugin:@typescript-eslint/eslint-recommended',
+        'plugin:import/recommended',
+        'plugin:import/typescript'
     ],
     parser: '@typescript-eslint/parser',
     parserOptions: {
@@ -22,6 +24,9 @@ module.exports = {
     settings: {
         'import/resolver': {
             typescript: {} // this loads <root dir>/tsconfig.json to eslint
+        },
+        'import/parsers': {
+            '@typescript-eslint/parser': ['.ts']
         }
     },
     rules: {
@@ -85,6 +90,49 @@ module.exports = {
         '@typescript-eslint/no-empty-function': ['off'], // use eslint no-empty-function rule
         '@typescript-eslint/no-use-before-define': ['off'], // use eslint no-use-before-define rule
         '@typescript-eslint/ban-ts-ignore': ['off'],
-        '@typescript-eslint/explicit-function-return-type': ['off']
+        '@typescript-eslint/explicit-function-return-type': ['off'],
+
+        // eslint-plugin-import rules
+        'import/order': [
+            'error',
+            {
+                groups: ['builtin', 'external', 'internal', 'index'],
+                pathGroups: [
+                    {
+                        pattern: 'vue',
+                        group: 'builtin'
+                    },
+                    {
+                        pattern: '@vue/test-utils',
+                        group: 'builtin'
+                    },
+                    {
+                        pattern: '@vue/composition-api',
+                        group: 'builtin'
+                    },
+                    {
+                        pattern: 'vue/types/**',
+                        group: 'builtin'
+                    },
+                    {
+                        pattern: '@/translations/**',
+                        group: 'internal',
+                        position: 'after'
+                    },
+                    {
+                        pattern: '@/styles/**',
+                        group: 'internal',
+                        position: 'after'
+                    }
+                ],
+                pathGroupsExcludedImportTypes: ['@vue/composition-api', '@vue/test-utils', 'vue/types'],
+                alphabetize: {
+                    order: 'asc',
+                    caseInsensitive: true
+                },
+                'newlines-between': 'always'
+            }
+        ],
+        'import/namespace': [0, { allowComputed: true }]
     }
 };

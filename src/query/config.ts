@@ -1,6 +1,6 @@
+import { OperatorType } from '@src/component-util/query-search/type';
 import { RawQueryOperator } from '@src/query/type';
 import { FilterOperator } from '@src/space-connector/type';
-import { OperatorType } from '@src/component-util/query-search/type';
 
 export const rawQueryOperatorToApiQueryOperatorMap: Record<RawQueryOperator, FilterOperator> = {
     '': 'contain',

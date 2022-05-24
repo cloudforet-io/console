@@ -1,6 +1,7 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 /* eslint-disable no-tabs */
 import { AxiosError } from 'axios';
+
 import { RESPONSE } from '@src/space-connector/type';
 
 export class APIError extends Error {

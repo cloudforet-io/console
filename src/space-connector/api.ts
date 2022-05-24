@@ -2,15 +2,16 @@ import axios, {
     AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse
 } from 'axios';
 import jwt from 'jsonwebtoken';
-import {
-    AxiosPostResponse,
-    SessionTimeoutCallback
-} from '@src/space-connector/type';
+
 import {
     APIError, AuthenticationError,
     AuthorizationError, BadRequestError,
     NotFoundError
 } from '@src/space-connector/error';
+import {
+    AxiosPostResponse,
+    SessionTimeoutCallback
+} from '@src/space-connector/type';
 
 const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
