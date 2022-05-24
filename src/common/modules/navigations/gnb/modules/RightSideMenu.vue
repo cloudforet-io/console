@@ -10,7 +10,7 @@
                                @update:visibleDropdown="toggleMenu('recentFavorite')"
         />
         <div v-if="!userState.isDomainOwner" class="menu-wrapper">
-            <div class="menu-button notifications"
+            <div class="menu-button notifications" tabindex="0"
                  :class="{opened: openedMenu === 'notifications'}"
                  @click.stop="toggleMenu('notifications')"
             >
@@ -25,7 +25,7 @@
             />
         </div>
         <div class="menu-wrapper account">
-            <div class="menu-button account"
+            <div class="menu-button account" tabindex="0"
                  @click.stop="toggleMenu('account')"
             >
                 <p-i v-if="userState.isDomainOwner" name="root-account" class="menu-icon" />
