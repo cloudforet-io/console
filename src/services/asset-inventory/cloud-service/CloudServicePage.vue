@@ -30,11 +30,17 @@
             </div>
             <template #no-data>
                 <div class="text-center empty-cloud-service">
-                    <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
+                    <img v-if="!Object.keys(serviceAccounts).length" class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
+                    <img v-else class="empty-cloud-service-img" src="@/assets/images/illust_microscope.svg">
                     <p class="text-primary2 mb-12">
-                        {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.EMPTY_CLOUD_SERVICE') }}
+                        {{ Object.keys(serviceAccounts).length ? $t('COMMON.WIDGETS.CLOUD_SERVICE.NO_DATA')
+                            : $t('INVENTORY.CLOUD_SERVICE.MAIN.EMPTY_CLOUD_SERVICE')
+                        }}
                     </p>
-                    <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME, params: { provider: selectedProvider}}">
+                    <router-link
+                        v-if="!Object.keys(serviceAccounts).length"
+                        :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME, params: { provider: selectedProvider}}"
+                    >
                         <p-button style-type="primary" icon="ic_plus_bold"
                                   class="mx-auto text-center"
                                   :disabled="!hasManagePermission"
@@ -141,6 +147,7 @@ export default {
             hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             // references
             providers: computed(() => store.state.reference.provider.items),
+            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
             // asset inventory store
             selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
             period: computed(() => assetInventoryStore.state.cloudService.period),
@@ -217,7 +224,7 @@ export default {
         let urlQueryStringWatcherStop;
         const init = async () => {
             /* load references */
-            await store.dispatch('reference/provider/load');
+            await Promise.allSettled([store.dispatch('reference/provider/load'), store.dispatch('reference/serviceAccount/load')]);
 
 
             /* init states from url query */
