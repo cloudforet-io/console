@@ -62,6 +62,8 @@ module.exports = {
         'prefer-template': ['error'],
         'no-plusplus': ['off'],
         'no-tabs': ['off'],
+        'no-shadow': ['off'],
+        'no-use-before-define': ['off'],
 
         // typescript rules
         '@typescript-eslint/explicit-member-accessibility': [
@@ -115,6 +117,7 @@ module.exports = {
         "@typescript-eslint/explicit-module-boundary-types": ['off'],
         '@typescript-eslint/no-explicit-any': ['off'],
         '@typescript-eslint/no-unused-vars': ['error'],
+        '@typescript-eslint/no-shadow': ['error'],
 
         // eslint-plugin-import rules
         'import/order': [

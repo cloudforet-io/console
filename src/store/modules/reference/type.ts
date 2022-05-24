@@ -17,6 +17,6 @@ export interface ReferenceItem<Data = Record<string, any>> {
 
 export type ReferenceMap<Item extends ReferenceItem = ReferenceItem> = Record<string, Item>;
 
-export interface ReferenceState<ReferenceMap = Record<string, any>> {
-    items: ReferenceMap;
+export interface ReferenceState<Items = Record<string, any>> {
+    items: Items;
 }

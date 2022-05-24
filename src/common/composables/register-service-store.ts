@@ -56,7 +56,7 @@ const prepareParentModules = (path: string[], serviceStore) => {
 };
 
 
-function getGetters<T>(path: string) {
+function getGetters(path: string) {
     const result = {};
     Object.keys(store.getters)
         .filter(k => k.startsWith(path))
@@ -72,8 +72,8 @@ function getGetters<T>(path: string) {
 
 export function defineServiceStore<T>(servicePathList: string[], serviceStore = {}): any {
     const pathStr = servicePathList.join('/');
-    const _getters = getGetters<T>(pathStr);
-    let _state = store.state;
+    const _getters = getGetters(pathStr);
+    let _state: T = store.state;
     servicePathList.forEach((p) => {
         if (_state) _state = _state[p];
     });
@@ -101,5 +101,5 @@ export function registerServiceStore<T>(path: Path, storeModule: Module<T, any>,
 
     registerStore(paths, storeModule, serviceStore);
 
-    defineServiceStore(paths, serviceStore);
+    defineServiceStore<T>(paths, serviceStore);
 }

@@ -2,9 +2,12 @@ import { Tags, TimeStamp } from '@/models';
 
 import { PolicyTypes, PolicyState } from '@/services/administration/iam/policy/lib/config';
 
-export interface PolicyListDataModel {
-    results: PolicyDataModel[];
-    total_count: number;
+
+interface RepositoryInfoDataModel {
+    repository_id: string;
+    name: string;
+    repository_type: string;
+    endpoint: string;
 }
 
 export interface PolicyDataModel {
@@ -22,11 +25,9 @@ export interface PolicyDataModel {
     updated_at?: TimeStamp;
 }
 
-interface RepositoryInfoDataModel {
-    repository_id: string;
-    name: string;
-    repository_type: string;
-    endpoint: string;
+export interface PolicyListDataModel {
+    results: PolicyDataModel[];
+    total_count: number;
 }
 
 export interface PolicyDetailPageProps {

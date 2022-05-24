@@ -63,7 +63,7 @@ import { i18n } from '@/translations';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 
-import { ROLE_TYPE, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
+import { ROLE_TYPE, RoleType, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
 import { BaseInfoFormData } from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
 
 export default {
@@ -107,7 +107,7 @@ export default {
                 { label: ROLE_TYPE_BADGE_OPTION.PROJECT.label, key: ROLE_TYPE.PROJECT, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_PROJECT') },
                 { label: ROLE_TYPE_BADGE_OPTION.DOMAIN.label, key: ROLE_TYPE.DOMAIN, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_DOMAIN') },
             ]),
-            selectedRoleType: ROLE_TYPE.PROJECT as ROLE_TYPE,
+            selectedRoleType: ROLE_TYPE.PROJECT as RoleType,
             savedRoleType: computed(() => {
                 const roleType = props.initialFormData?.roleType;
                 return state.roleTypes.find(type => type.key === roleType);
