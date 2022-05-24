@@ -13,11 +13,13 @@
 import {
     computed, defineComponent, PropType, reactive, toRefs,
 } from '@vue/composition-api';
+
 import {
     TEXT_HIGHLIGHTING_STYLE_TYPE,
     TextHighlightingProps,
     TextHighlightingStyleType,
 } from '@/data-display/text-highlighting/type';
+
 import { getTextHighlightRegex } from './helper';
 
 interface TextItem {

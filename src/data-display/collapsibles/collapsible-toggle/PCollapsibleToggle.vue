@@ -25,13 +25,13 @@ import {
     defineComponent, reactive, toRefs, ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 
-import PI from '@/foundation/icons/PI.vue';
-import { makeOptionalProxy } from '@/util/composition-helpers';
 import {
     CollapsibleToggleProps,
     COLLAPSIBLE_TOGGLE_TYPE,
 } from '@/data-display/collapsibles/collapsible-toggle/type';
+import PI from '@/foundation/icons/PI.vue';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton.vue';
+import { makeOptionalProxy } from '@/util/composition-helpers';
 
 export default defineComponent<CollapsibleToggleProps>({
     name: 'PCollapsibleToggle',

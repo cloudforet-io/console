@@ -1,6 +1,7 @@
-import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
-import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import { ArgTypes } from '@storybook/addons';
+
+import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
+import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
 
 const extraArgTypes: ArgTypes = {
     /* props */

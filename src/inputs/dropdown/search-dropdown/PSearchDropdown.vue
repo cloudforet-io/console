@@ -84,21 +84,22 @@ import {
     ComponentRenderProxy,
     computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import { reduce } from 'lodash';
 
-import { makeOptionalProxy } from '@/util/composition-helpers';
-import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 
-import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import PSearch from '@/inputs/search/search/PSearch.vue';
-import PI from '@/foundation/icons/PI.vue';
 import PTag from '@/data-display/tags/PTag.vue';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import PI from '@/foundation/icons/PI.vue';
+import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import PButton from '@/inputs/buttons/button/PButton.vue';
-
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import {
     SEARCH_DROPDOWN_TYPE, SearchDropdownProps, SearchDropdownMenuItem,
 } from '@/inputs/dropdown/search-dropdown/type';
+import PSearch from '@/inputs/search/search/PSearch.vue';
+import { makeOptionalProxy } from '@/util/composition-helpers';
+
 
 export default defineComponent<SearchDropdownProps>({
     name: 'PSearchDropdown',

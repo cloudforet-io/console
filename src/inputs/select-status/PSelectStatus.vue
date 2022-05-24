@@ -12,10 +12,11 @@
 </template>
 
 <script lang="ts">
-import { SelectProps, useSelect } from '@/hooks/select';
 import { computed, defineComponent } from '@vue/composition-api';
+
 import PStatus from '@/data-display/status/PStatus.vue';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
+import { SelectProps, useSelect } from '@/hooks/select';
 
 interface Props extends SelectProps {
     icon?: string;

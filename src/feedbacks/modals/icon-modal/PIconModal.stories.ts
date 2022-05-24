@@ -1,7 +1,9 @@
 import { reactive, toRefs } from '@vue/composition-api';
+
+import { withKnobs } from '@storybook/addon-knobs';
+
 import PIconModal from '@/feedbacks/modals/icon-modal/PIconModal.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
-import { withKnobs } from '@storybook/addon-knobs';
 
 export default {
     title: 'Feedbacks/Modals/Icon Modal',

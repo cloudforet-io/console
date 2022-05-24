@@ -14,13 +14,15 @@
 </template>
 
 <script lang="ts">
-import { ToggleButton } from 'vue-js-toggle-button';
-
 import {
     defineComponent, computed, reactive, toRefs,
 } from '@vue/composition-api';
+
+import { ToggleButton } from 'vue-js-toggle-button';
+
 import { TOGGLE_BUTTON_THEME } from '@/inputs/buttons/toggle-button/config';
 import { ToggleButtonProps } from '@/inputs/buttons/toggle-button/type';
+
 import color from '@/styles/colors';
 
 /**

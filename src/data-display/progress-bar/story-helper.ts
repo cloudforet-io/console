@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+
 import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
 
 export const getProgressBarArgTypes = (): ArgTypes => ({

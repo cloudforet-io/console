@@ -63,17 +63,18 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, PropType, reactive, toRefs,
 } from '@vue/composition-api';
-import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
+
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { DynamicFieldHandler, DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
-import { KeyItemSet } from '@/inputs/search/query-search/type';
 import {
     QuerySearchTableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
-import { Options } from '@/data-display/tables/query-search-table/type';
-import { DataTableFieldType } from '@/data-display/tables/data-table/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
+import { DataTableFieldType } from '@/data-display/tables/data-table/type';
+import { Options } from '@/data-display/tables/query-search-table/type';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
+import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
+import { KeyItemSet } from '@/inputs/search/query-search/type';
 
 
 export default {

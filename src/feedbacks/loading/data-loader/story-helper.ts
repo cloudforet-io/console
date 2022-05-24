@@ -1,6 +1,7 @@
 import { ArgTypes } from '@storybook/addons';
-import { range } from 'lodash';
 import faker from 'faker';
+import { range } from 'lodash';
+
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 
 export const getDataLoaderArgTypes = (): ArgTypes => ({

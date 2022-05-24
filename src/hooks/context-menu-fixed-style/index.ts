@@ -2,10 +2,12 @@ import {
     ComponentRenderProxy,
     computed, ComputedRef, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { throttle } from 'lodash';
 import { Vue } from 'vue/types/vue';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+
 import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
+import { throttle } from 'lodash';
+
+import { makeOptionalProxy } from '@/util/composition-helpers';
 
 export interface ContextMenuFixedStyleProps {
     useFixedMenuStyle?: boolean;

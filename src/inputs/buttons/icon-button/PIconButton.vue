@@ -27,13 +27,13 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
+import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import PI from '@/foundation/icons/PI.vue';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
+import PButton from '@/inputs/buttons/button/PButton.vue';
 import {
     ICON_BUTTON_SIZE, ICON_BUTTON_STYLE_TYPE, IconButtonProps,
 } from '@/inputs/buttons/icon-button/type';
-import { ANIMATION_TYPE } from '@/foundation/icons/config';
 
 
 export default defineComponent({

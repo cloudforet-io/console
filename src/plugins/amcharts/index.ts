@@ -1,5 +1,6 @@
 import * as am4core from '@amcharts/amcharts4/core';
 import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
+
 import { BASIC_CHART_COLORS } from '@/styles/colorsets';
 
 

@@ -7,10 +7,12 @@ module.exports = {
     },
 
     extends: [
-        'plugin:@typescript-eslint/recommended',
-        'plugin:vue/recommended',
         '@vue/airbnb',
         '@vue/typescript',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:vue/recommended',
+        'plugin:import/recommended',
+        'plugin:import/typescript',
     ],
 
     rules: {
@@ -53,7 +55,7 @@ module.exports = {
         'import/no-extraneous-dependencies': [
             'error',
             {
-                "devDependencies": true,
+                'devDependencies': true,
             }
         ],
         'import/prefer-default-export': ['off'],
@@ -80,12 +82,12 @@ module.exports = {
             'error',
             { allows: ['protected', 'public'] },
         ],
-        "@typescript-eslint/camelcase": ["error", {
-            properties: "never",
+        '@typescript-eslint/camelcase': ['error', {
+            properties: 'never',
             allow: [
-                "_id$",
-                "_at$",
-                "total_count",
+                '_id$',
+                '_at$',
+                'total_count',
             ]
         }
         ],
@@ -94,10 +96,53 @@ module.exports = {
         '@typescript-eslint/ban-ts-ignore': ['off'],
         '@typescript-eslint/explicit-function-return-type': ['off'],
         '@typescript-eslint/no-explicit-any': ['off'],
-        '@typescript-eslint/no-unused-vars': ['error', { 'args': "after-used" }],
+        '@typescript-eslint/no-unused-vars': ['error', { 'args': 'after-used' }],
+
+        // eslint-plugin-import rules
+        'import/order': [
+            'error',
+            {
+                groups: ['builtin', 'external', 'internal', 'index'],
+                pathGroups: [
+                    {
+                        pattern: 'vue',
+                        group: 'builtin',
+                    },
+                    {
+                        pattern: '@vue/test-utils',
+                        group: 'builtin',
+                    },
+                    {
+                        pattern: '@vue/composition-api',
+                        group: 'builtin',
+                    },
+                    {
+                        pattern: 'vue/types/**',
+                        group: 'builtin',
+                    },
+                    {
+                        pattern: '@/translations/**',
+                        group: 'internal',
+                        position: 'after',
+                    },
+                    {
+                        pattern: '@/styles/**',
+                        group: 'internal',
+                        position: 'after',
+                    },
+                ],
+                'pathGroupsExcludedImportTypes': ['@vue/composition-api', '@vue/test-utils', 'vue/types'],
+                alphabetize: {
+                    order: 'asc',
+                    caseInsensitive: true,
+                },
+                'newlines-between': 'always',
+            },
+        ],
+        'import/namespace': [0, { allowComputed: true }]
     },
     ignorePatterns: ['src/assets/**', '**/node_modules/**',
-        "dist/**", ".out/**"],
+        'dist/**', '.out/**'],
     parserOptions: {
         parser: '@typescript-eslint/parser',
         sourceType: 'module',
@@ -106,6 +151,9 @@ module.exports = {
     settings: {
         'import/resolver': {
             typescript: {},
+        },
+        'import/parsers': {
+            '@typescript-eslint/parser': ['.ts']
         },
     },
 };

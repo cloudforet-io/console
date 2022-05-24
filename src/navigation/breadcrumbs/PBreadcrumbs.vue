@@ -46,8 +46,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType, reactive } from '@vue/composition-api';
-import PI from '@/foundation/icons/PI.vue';
+
 import { Location } from 'vue-router';
+
+import PI from '@/foundation/icons/PI.vue';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 
 interface Route {

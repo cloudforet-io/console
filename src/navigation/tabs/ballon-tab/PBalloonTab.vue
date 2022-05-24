@@ -30,7 +30,6 @@ import {
     reactive, toRefs, computed, onMounted, onUnmounted, onUpdated,
 } from '@vue/composition-api';
 
-import screens from '@/styles/screens';
 
 import { useTab } from '@/hooks/tab';
 import {
@@ -38,6 +37,8 @@ import {
 } from '@/navigation/tabs/ballon-tab/config';
 import { BalloonTabProps } from '@/navigation/tabs/ballon-tab/type';
 import { TabItem } from '@/navigation/tabs/tab/type';
+
+import screens from '@/styles/screens';
 
 
 export default {

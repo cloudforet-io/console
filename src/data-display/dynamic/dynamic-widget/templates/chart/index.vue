@@ -25,17 +25,18 @@ import {
     defineComponent, PropType,
     reactive, toRefs,
 } from '@vue/composition-api';
+
+import { DYNAMIC_CHART_LIMIT_MAP, DYNAMIC_CHART_THEMES } from '@/data-display/dynamic/dynamic-chart/config';
+import PDynamicChart from '@/data-display/dynamic/dynamic-chart/PDynamicChart.vue';
+import { DynamicChartTheme, DynamicChartType } from '@/data-display/dynamic/dynamic-chart/type';
 import {
     DynamicWidgetFieldHandler,
     DynamicWidgetProps,
     DynamicWidgetSchemaOptions,
     DynamicWidgetViewOptions,
 } from '@/data-display/dynamic/dynamic-widget/type';
-import PDynamicChart from '@/data-display/dynamic/dynamic-chart/PDynamicChart.vue';
-import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
-import { DYNAMIC_CHART_LIMIT_MAP, DYNAMIC_CHART_THEMES } from '@/data-display/dynamic/dynamic-chart/config';
-import { DynamicChartTheme, DynamicChartType } from '@/data-display/dynamic/dynamic-chart/type';
+import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 
 type DynamicWidgetChartProps = Exclude<DynamicWidgetProps, 'type'>
 

@@ -1,10 +1,12 @@
 <script lang="ts">
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
-import { SizeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/size/type';
-import { SizeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import bytes from 'bytes';
 import { RenderContext } from 'vue/types/options';
 import { VNode } from 'vue/types/vnode';
+
+import bytes from 'bytes';
+
+import { SizeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/size/type';
+import { SizeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import PAnchor from '@/inputs/anchors/PAnchor.vue';
 
 const unitMap: Record<string, bytes.Unit> = {
     BYTES: 'B',

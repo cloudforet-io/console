@@ -15,13 +15,15 @@
 </template>
 
 <script lang="ts">
-import vueFilePond from 'vue-filepond';
-import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import {
     ComponentRenderProxy, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+import vueFilePond from 'vue-filepond';
+
 import { FileUploaderProps } from '@/inputs/file-uploader/type';
+import { makeOptionalProxy } from '@/util/composition-helpers';
 
 
 const FilePond = vueFilePond(

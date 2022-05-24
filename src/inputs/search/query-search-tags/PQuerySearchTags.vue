@@ -41,21 +41,23 @@
 </template>
 
 <script lang="ts">
+import {
+    computed, defineComponent, PropType, ref, watch,
+} from '@vue/composition-api';
+
+import { VTooltip } from 'v-tooltip';
+
 import PTag from '@/data-display/tags/PTag.vue';
+import PI from '@/foundation/icons/PI.vue';
+import PButton from '@/inputs/buttons/button/PButton.vue';
+import { defaultConverter, defaultValidator } from '@/inputs/search/query-search-tags/helper';
 import {
     QuerySearchTagsFunctions,
     QuerySearchTagsProps,
     QueryTag, QueryTagConverter, QueryTagValidator,
 } from '@/inputs/search/query-search-tags/type';
-import {
-    computed, defineComponent, PropType, ref, watch,
-} from '@vue/composition-api';
 import { QueryItem } from '@/inputs/search/query-search/type';
-import PI from '@/foundation/icons/PI.vue';
-import { VTooltip } from 'v-tooltip';
-import { defaultConverter, defaultValidator } from '@/inputs/search/query-search-tags/helper';
 import { i18n } from '@/translations';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 
 
 export default defineComponent<QuerySearchTagsProps>({

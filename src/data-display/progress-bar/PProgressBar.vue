@@ -20,8 +20,9 @@
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { ProgressBarProps } from '@/data-display/progress-bar/type';
+
 import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
+import { ProgressBarProps } from '@/data-display/progress-bar/type';
 
 
 export default defineComponent<ProgressBarProps>({

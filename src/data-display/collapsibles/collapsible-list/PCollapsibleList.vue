@@ -47,15 +47,15 @@ import {
     defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import PCollapsiblePanel from '@/data-display/collapsibles/collapsible-panel/PCollapsiblePanel.vue';
-import PCollapsibleToggle from '@/data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
-import { makeOptionalProxy } from '@/util/composition-helpers';
 import {
     COLLAPSIBLE_LIST_THEME,
     COLLAPSIBLE_LIST_TOGGLE_POSITION,
 } from '@/data-display/collapsibles/collapsible-list/config';
-import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';
 import { CollapsibleItem, CollapsibleListProps } from '@/data-display/collapsibles/collapsible-list/type';
+import PCollapsiblePanel from '@/data-display/collapsibles/collapsible-panel/PCollapsiblePanel.vue';
+import PCollapsibleToggle from '@/data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
+import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';
+import { makeOptionalProxy } from '@/util/composition-helpers';
 
 
 export default defineComponent<CollapsibleListProps>({

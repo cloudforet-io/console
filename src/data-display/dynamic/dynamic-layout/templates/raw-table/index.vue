@@ -19,7 +19,9 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
+
 import { map } from 'lodash';
+
 import { RawTableDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw-table/type';
 import PDynamicLayoutTable from '@/data-display/dynamic/dynamic-layout/templates/table/index.vue';
 import { getValueByPath } from '@/data-display/dynamic/helper';

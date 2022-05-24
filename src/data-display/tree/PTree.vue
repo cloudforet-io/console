@@ -70,10 +70,14 @@
 import {
     computed, defineComponent, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import { unionBy } from 'lodash';
-import PI from '@/foundation/icons/PI.vue';
-import PTextInput from '@/inputs/input/PTextInput.vue';
 import { focus } from 'vue-focus';
+
+import {
+    CloneTreeDataOptions, HeTree, Store, WalkTreeDataCallback,
+} from '@/data-display/tree/he-tree-vue/types';
+import { getDefaultNode } from '@/data-display/tree/helper';
 import {
     TreeNode,
     Tree,
@@ -87,10 +91,9 @@ import {
     DataSetter,
     GetClassNames, DataFetcher,
 } from '@/data-display/tree/type';
-import { getDefaultNode } from '@/data-display/tree/helper';
-import {
-    CloneTreeDataOptions, HeTree, Store, WalkTreeDataCallback,
-} from '@/data-display/tree/he-tree-vue/types';
+import PI from '@/foundation/icons/PI.vue';
+import PTextInput from '@/inputs/input/PTextInput.vue';
+
 import OriginTree from './he-tree-vue/components/Tree.vue';
 import DraggablePlugin from './he-tree-vue/plugins/draggable/Draggable.vue';
 import FoldPlugin from './he-tree-vue/plugins/fold';

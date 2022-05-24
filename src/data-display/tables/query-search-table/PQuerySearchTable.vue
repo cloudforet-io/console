@@ -34,15 +34,16 @@
 </template>
 
 <script lang="ts">
-import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 import {
     ComponentRenderProxy,
     getCurrentInstance, reactive,
 } from '@vue/composition-api';
+
+import { Options, QuerySearchTableProps } from '@/data-display/tables/query-search-table/type';
+import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 import {
     QueryTag,
 } from '@/inputs/search/query-search-tags/type';
-import { Options, QuerySearchTableProps } from '@/data-display/tables/query-search-table/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
 export default {

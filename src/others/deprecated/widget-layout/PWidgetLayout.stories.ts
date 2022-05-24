@@ -1,4 +1,5 @@
 import { text, object } from '@storybook/addon-knobs';
+
 import PWidgetLayout from '@/others/deprecated/widget-layout/PWidgetLayout.vue';
 
 export default {

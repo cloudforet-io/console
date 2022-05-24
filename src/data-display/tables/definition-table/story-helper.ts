@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+
 import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
 
 export const getDefinitionTableArgTypes = (): ArgTypes => ({

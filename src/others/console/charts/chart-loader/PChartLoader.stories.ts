@@ -1,9 +1,11 @@
 import {
     toRefs, reactive, watch,
 } from '@vue/composition-api';
+
 import {
     boolean,
 } from '@storybook/addon-knobs';
+
 import PChartLoader from './PChartLoader.vue';
 
 export default {

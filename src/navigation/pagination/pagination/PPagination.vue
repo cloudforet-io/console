@@ -25,11 +25,12 @@
     </nav>
 </template>
 <script lang="ts">
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
+
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
 export default {

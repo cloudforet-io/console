@@ -8,10 +8,12 @@
     </div>
 </template>
 <script lang="ts">
-import lottie from 'lottie-web';
 import {
     defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import lottie from 'lottie-web';
+
 import { LottieProps } from '@/foundation/lottie/type';
 
 /** <Default rendererSettings>

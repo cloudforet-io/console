@@ -8,6 +8,7 @@
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
+
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 
 export default {

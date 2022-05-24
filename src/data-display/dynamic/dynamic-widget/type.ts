@@ -1,6 +1,6 @@
-import { DynamicField, DynamicFieldOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { DynamicChartType } from '@/data-display/dynamic/dynamic-chart/type';
 import { DynamicFieldHandler, DynamicFieldTypeOptions } from '@/data-display/dynamic/dynamic-field/type';
+import { DynamicField, DynamicFieldOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 export const DYNAMIC_WIDGET_TYPE = ['summary', 'chart'] as const;
 export type DynamicWidgetType = typeof DYNAMIC_WIDGET_TYPE[number];

@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+
 import { DATA_TYPE, SELECT_MODE, STYLE_TYPE } from '@/inputs/datetime-picker/type';
 
 export const getDatetimePickerArtTypes = (): ArgTypes => ({

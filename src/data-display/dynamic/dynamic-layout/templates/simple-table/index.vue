@@ -32,15 +32,16 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
+
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
+import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import {
     SimpleTableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/simple-table/type';
-import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
+import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
+import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 
 
 export default {

@@ -1,5 +1,6 @@
-import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 import { ArgTypes } from '@storybook/addons';
+
+import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 
 export const getSelectButtonArgTypes = (): ArgTypes => ({
     /* props */

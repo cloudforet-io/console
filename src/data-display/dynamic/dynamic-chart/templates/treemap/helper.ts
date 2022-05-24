@@ -2,9 +2,11 @@ import {
     LabelBullet, TreeMap, TreeMapSeries,
 } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import { palette } from '@/styles/colors';
+
 import { drawSeriesTooltip } from '@/data-display/dynamic/dynamic-chart/helper';
+import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+
+import { palette } from '@/styles/colors';
 
 const drawSeriesLabelBullet = (series: TreeMapSeries, nameOptions: DynamicField, totalValue: number): LabelBullet => {
     const labelBullet = series.bullets.push(new LabelBullet());

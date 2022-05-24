@@ -28,6 +28,7 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
+
 import PLabel from '@/data-display/label/PLabel.vue';
 
 export default defineComponent({

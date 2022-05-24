@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 
 export const getSelectStatusArgTypes = (): ArgTypes => ({

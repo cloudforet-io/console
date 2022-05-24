@@ -14,6 +14,7 @@
 <script lang="ts">
 import '@/foundation/icons/p-icons';
 import { defineComponent } from '@vue/composition-api';
+
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 /* https://www.npmjs.com/package/vue-svgicon */
 interface Props {

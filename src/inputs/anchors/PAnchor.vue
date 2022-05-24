@@ -26,9 +26,11 @@
 </template>
 
 <script lang="ts">
-import PI from '@/foundation/icons/PI.vue';
-import { Location } from 'vue-router';
 import { computed, defineComponent, ref } from '@vue/composition-api';
+
+import { Location } from 'vue-router';
+
+import PI from '@/foundation/icons/PI.vue';
 import { AnchorSize, IconPosition } from '@/inputs/anchors/type';
 
 

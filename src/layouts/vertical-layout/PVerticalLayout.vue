@@ -37,6 +37,7 @@
 import {
     toRefs, reactive, computed, onMounted, onUnmounted,
 } from '@vue/composition-api';
+
 import PI from '@/foundation/icons/PI.vue';
 
 const SCREEN_WIDTH_SM = 767;

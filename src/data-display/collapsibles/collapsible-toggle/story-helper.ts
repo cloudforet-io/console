@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';
 
 

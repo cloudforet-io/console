@@ -33,12 +33,13 @@
 </template>
 
 <script lang="ts">
-import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 import {
     ComponentRenderProxy,
     getCurrentInstance, reactive,
 } from '@vue/composition-api';
+
 import { Options, SearchTableProps } from '@/data-display/tables/search-table/type';
+import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
 

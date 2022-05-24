@@ -1,6 +1,7 @@
 import { ArgTypes } from '@storybook/addons';
-import { DYNAMIC_WIDGET_TYPE } from '@/data-display/dynamic/dynamic-widget/type';
+
 import { getDynamicChartArgTypes } from '@/data-display/dynamic/dynamic-chart/story-helper';
+import { DYNAMIC_WIDGET_TYPE } from '@/data-display/dynamic/dynamic-widget/type';
 
 export const getDynamicWidgetArgTypes = (): ArgTypes => {
     const dynamicWidgetArgTypes: ArgTypes = {

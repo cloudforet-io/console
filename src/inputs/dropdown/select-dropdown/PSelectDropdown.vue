@@ -63,9 +63,6 @@
 </template>
 
 <script lang="ts">
-import { groupBy, reduce } from 'lodash';
-import vClickOutside from 'v-click-outside';
-
 import {
     ComponentRenderProxy,
     computed,
@@ -75,20 +72,22 @@ import {
     toRefs,
 } from '@vue/composition-api';
 
-import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import PButton from '@/inputs/buttons/button/PButton.vue';
+import { groupBy, reduce } from 'lodash';
+import vClickOutside from 'v-click-outside';
 
-import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 
-import { MenuItem } from '@/inputs/context-menu/type';
-import { makeOptionalProxy } from '@/util/composition-helpers';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PI from '@/foundation/icons/PI.vue';
+import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
+import PButton from '@/inputs/buttons/button/PButton.vue';
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import { MenuItem } from '@/inputs/context-menu/type';
 import {
     SELECT_DROPDOWN_STYLE_TYPE,
     CONTEXT_MENU_POSITION,
     SelectDropdownProps,
 } from '@/inputs/dropdown/select-dropdown/type';
+import { makeOptionalProxy } from '@/util/composition-helpers';
 
 
 export default defineComponent<SelectDropdownProps>({

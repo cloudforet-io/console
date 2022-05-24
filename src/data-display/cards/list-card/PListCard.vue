@@ -32,10 +32,11 @@
 import {
     defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import PCard from '@/data-display/cards/card/PCard.vue';
+
 import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
-import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
+import PCard from '@/data-display/cards/card/PCard.vue';
 import { CardProps } from '@/data-display/cards/card/type';
+import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
 interface Props extends CardProps {
     items: any[];

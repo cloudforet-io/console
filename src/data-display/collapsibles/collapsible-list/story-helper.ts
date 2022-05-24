@@ -1,6 +1,6 @@
 import { ArgTypes } from '@storybook/addons';
-import { range } from 'lodash';
 import faker from 'faker';
+import { range } from 'lodash';
 
 import {
     COLLAPSIBLE_LIST_THEME,

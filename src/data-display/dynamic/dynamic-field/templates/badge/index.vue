@@ -1,10 +1,10 @@
 <script lang="ts">
 import PBadge from '@/data-display/badges/PBadge.vue';
-import { BadgeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import { BadgeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/badge/type';
 import { Badge, BADGE_SHAPE } from '@/data-display/badges/type';
-import { commaFormatter, getColor } from '@/util/helpers';
+import { BadgeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/badge/type';
+import { BadgeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import { commaFormatter, getColor } from '@/util/helpers';
 
 export default {
     name: 'PDynamicFieldBadge',

@@ -1,4 +1,5 @@
 import faker from 'faker';
+
 import { TEXT_HIGHLIGHTING_STYLE_TYPE, TextHighlightingProps } from '@/data-display/text-highlighting/type';
 
 export const getTextHighlightingProps = (): TextHighlightingProps => {

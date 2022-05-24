@@ -1,6 +1,8 @@
-import PBackToTopButton from '@/navigation/scrolls/back-to-top-button/PBackToTopButton.vue';
-import { select, text, withKnobs } from '@storybook/addon-knobs';
 import { ref } from '@vue/composition-api';
+
+import { select, text, withKnobs } from '@storybook/addon-knobs';
+
+import PBackToTopButton from '@/navigation/scrolls/back-to-top-button/PBackToTopButton.vue';
 
 export default {
     title: 'Navigation/Scrolls',

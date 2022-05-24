@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+
 import { getQuerySearchTags } from '@/inputs/search/query-search-tags/mock';
 
 export const getQuerySearchTagsArgTypes = (): ArgTypes => ({

@@ -1,7 +1,9 @@
 import { ref } from '@vue/composition-api';
+
 import { action } from '@storybook/addon-actions';
 import { object, boolean, withKnobs } from '@storybook/addon-knobs';
 import { VTooltip } from 'v-tooltip';
+
 import PProgressWizard from '@/navigation/wizards/progress-wizard/PProgressWizard.vue';
 
 

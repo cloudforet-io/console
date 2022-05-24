@@ -117,16 +117,18 @@
 import {
     toRefs, reactive, computed,
 } from '@vue/composition-api';
-import { makeProxy } from '@/util/composition-helpers';
 
-import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
+
+import { size } from 'lodash';
+
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
+import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import {
     ProgressWizardProps,
 } from '@/navigation/wizards/progress-wizard/type';
-import { size } from 'lodash';
 import PTooltipButton from '@/others/deprecated/tooltip-button/PTooltipButton.vue';
+import { makeProxy } from '@/util/composition-helpers';
 
 
 export default {

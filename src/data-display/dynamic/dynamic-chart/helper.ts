@@ -2,6 +2,7 @@ import {
     PieSeries, PieSeriesDataItem,
     TreeMapSeries, TreeMapSeriesDataItem,
 } from '@amcharts/amcharts4/charts';
+
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 export const drawSeriesTooltip = (series: TreeMapSeries|PieSeries, nameOptions: DynamicField): TreeMapSeries|PieSeries => {

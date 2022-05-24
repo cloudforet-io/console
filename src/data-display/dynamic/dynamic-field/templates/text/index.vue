@@ -1,8 +1,9 @@
 <script lang="ts">
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
-import { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import { TextDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/text/type';
 import { TranslateResult } from 'vue-i18n';
+
+import { TextDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/text/type';
+import { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import PAnchor from '@/inputs/anchors/PAnchor.vue';
 import { commaFormatter } from '@/util/helpers';
 
 export default {

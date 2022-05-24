@@ -1,10 +1,13 @@
 import {
     toRefs, reactive,
 } from '@vue/composition-api';
+
 import {
     text, object, array, withKnobs,
 } from '@storybook/addon-knobs';
+
 import casual, { arrayOf } from '@/util/casual';
+
 import PTextList from './PTextList.vue';
 
 export default {

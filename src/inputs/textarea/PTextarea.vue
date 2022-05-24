@@ -10,6 +10,7 @@
 import {
     ComponentRenderProxy, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
 export default defineComponent({

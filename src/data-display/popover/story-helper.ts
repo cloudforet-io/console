@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+
 import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type';
 
 export const getPopoverArgTypes = () => {

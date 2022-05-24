@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+
 import { BADGE_SHAPE, BADGE_STYLE } from '@/data-display/badges/type';
 
 

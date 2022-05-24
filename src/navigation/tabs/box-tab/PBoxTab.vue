@@ -24,10 +24,9 @@
 import { computed, defineComponent } from '@vue/composition-api';
 
 import PI from '@/foundation/icons/PI.vue';
-
-import { BoxTabProps } from '@/navigation/tabs/box-tab/type';
-import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
 import { useTab } from '@/hooks/tab';
+import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
+import { BoxTabProps } from '@/navigation/tabs/box-tab/type';
 import { TabItem } from '@/navigation/tabs/tab/type';
 
 

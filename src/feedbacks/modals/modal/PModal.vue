@@ -10,6 +10,7 @@
 
 <script lang="ts">
 import { computed } from '@vue/composition-api';
+
 import { ModalProps, sizeMapping } from '@/feedbacks/modals/type';
 
 

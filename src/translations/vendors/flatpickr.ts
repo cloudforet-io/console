@@ -1,10 +1,11 @@
-import { SupportLanguage } from '@/translations';
 
-import { CustomLocale, Locale } from 'flatpickr/dist/types/locale';
 
 import { english } from 'flatpickr/dist/l10n/default.js';
-import { Korean } from 'flatpickr/dist/l10n/ko.js';
 import { Japanese } from 'flatpickr/dist/l10n/ja.js';
+import { Korean } from 'flatpickr/dist/l10n/ko.js';
+import { CustomLocale, Locale } from 'flatpickr/dist/types/locale';
+
+import { SupportLanguage } from '@/translations';
 
 
 const localeFiles: Record<SupportLanguage, Locale|CustomLocale> = {

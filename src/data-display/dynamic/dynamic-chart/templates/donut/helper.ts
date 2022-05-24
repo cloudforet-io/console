@@ -1,7 +1,8 @@
-import * as am4core from '@amcharts/amcharts4/core';
 import { PieSeries, PieChart } from '@amcharts/amcharts4/charts';
-import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import * as am4core from '@amcharts/amcharts4/core';
+
 import { drawSeriesTooltip } from '@/data-display/dynamic/dynamic-chart/helper';
+import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 const drawPieSeries = (chart: PieChart, nameOptions: DynamicField, valueOptions: DynamicField, colors: string[]): PieSeries => {
     const series = chart.series.push(new PieSeries());

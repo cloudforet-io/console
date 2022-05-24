@@ -1,12 +1,14 @@
-import { PluginFunction, VueConstructor } from 'vue';
-import VueI18n from 'vue-i18n';
-import velocity from 'velocity-animate';
-import SvgIcon from 'vue-svgicon';
 import VueCompositionApi from '@vue/composition-api';
-import Notifications, { NotificationOptions } from 'vue-notification';
-import Fragment from 'vue-fragment';
+import { PluginFunction, VueConstructor } from 'vue';
+
 import VTooltip from 'v-tooltip';
+import velocity from 'velocity-animate';
+import Fragment from 'vue-fragment';
+import VueI18n from 'vue-i18n';
+import Notifications, { NotificationOptions } from 'vue-notification';
 import VueRouter from 'vue-router';
+import SvgIcon from 'vue-svgicon';
+
 import { applyAmchartsGlobalSettings } from './plugins/amcharts';
 
 export interface SpaceoneDSOptions {

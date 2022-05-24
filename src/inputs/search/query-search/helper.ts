@@ -1,8 +1,9 @@
+import { find } from 'lodash';
+
 import {
     HandlerResponse,
     KeyItem, KeyItemSet, KeyMenuItem, OperatorType, ValueHandler, ValueItem, ValueMenuItem,
 } from '@/inputs/search/query-search/type';
-import { find } from 'lodash';
 
 
 export const getRootKeyItemHandler = (keyItemSets: KeyItemSet[]): ValueHandler => (val: string) => {

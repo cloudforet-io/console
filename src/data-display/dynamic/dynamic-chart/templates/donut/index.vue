@@ -31,25 +31,25 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import * as am4core from '@amcharts/amcharts4/core';
 import { PieChart } from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
 
 import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_LIMIT_MAP,
     DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
-
+import { drawPieChart } from '@/data-display/dynamic/dynamic-chart/templates/donut/helper';
 import {
     DynamicChartFieldHandler,
     DynamicChartTemplateProps,
     DynamicChartTheme,
 } from '@/data-display/dynamic/dynamic-chart/type';
-import { drawPieChart } from '@/data-display/dynamic/dynamic-chart/templates/donut/helper';
-import PStatus from '@/data-display/status/PStatus.vue';
-import { getValueByPath } from '@/data-display/dynamic/helper';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
+import { getValueByPath } from '@/data-display/dynamic/helper';
+import PStatus from '@/data-display/status/PStatus.vue';
 import { getContextKey } from '@/util/helpers';
+
 import { BASIC_CHART_COLORS } from '@/styles/colorsets';
 
 

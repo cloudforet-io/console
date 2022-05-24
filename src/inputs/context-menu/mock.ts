@@ -1,4 +1,5 @@
 import faker from 'faker';
+
 import { MenuItem } from '@/inputs/context-menu/type';
 
 export const menuItems: MenuItem[] = [

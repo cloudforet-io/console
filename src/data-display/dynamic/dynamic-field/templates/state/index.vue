@@ -1,12 +1,14 @@
 <script lang="ts">
 import { get } from 'lodash';
+import { TranslateResult } from 'vue-i18n';
+
+import { StateDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/state/type';
+import { StateOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PStatus from '@/data-display/status/PStatus.vue';
 import { StatusProps } from '@/data-display/status/type';
-import { StateOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import { StateDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/state/type';
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
 import { getColor } from '@/util/helpers';
-import { TranslateResult } from 'vue-i18n';
+
 
 export default {
     name: 'PDynamicFieldState',

@@ -1,7 +1,9 @@
-import { ArgTypes } from '@storybook/addons';
-import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
 import { reactive, toRefs } from '@vue/composition-api';
+
+import { ArgTypes } from '@storybook/addons';
+
 import PButton from '@/inputs/buttons/button/PButton.vue';
+import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
 
 export const getBoxTabArgTypes = (): ArgTypes => ({
     /* props */

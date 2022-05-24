@@ -25,8 +25,8 @@
 </template>
 
 <script lang="ts">
-import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
+import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 
 export default {
     name: 'PCardItem',

@@ -34,9 +34,9 @@ import {
     onUnmounted, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import { max } from 'lodash';
 
-import { getContextKey } from '@/util/helpers';
 import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_LIMIT_MAP,
@@ -47,9 +47,11 @@ import {
     DynamicChartTemplateProps,
     DynamicChartTheme,
 } from '@/data-display/dynamic/dynamic-chart/type';
-import PProgressBar from '@/data-display/progress-bar/PProgressBar.vue';
-import { getValueByPath } from '@/data-display/dynamic/helper';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
+import { getValueByPath } from '@/data-display/dynamic/helper';
+import PProgressBar from '@/data-display/progress-bar/PProgressBar.vue';
+import { getContextKey } from '@/util/helpers';
+
 import { palette } from '@/styles/colors';
 
 const themeColorMap: Record<DynamicChartTheme, string> = {

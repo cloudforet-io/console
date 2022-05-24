@@ -1,5 +1,6 @@
-import { camelCase } from 'lodash';
 import { ArgTypes } from '@storybook/addons';
+import { camelCase } from 'lodash';
+
 import { menuItems } from '@/inputs/context-menu/mock';
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import { SELECT_DROPDOWN_STYLE_TYPE, CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';

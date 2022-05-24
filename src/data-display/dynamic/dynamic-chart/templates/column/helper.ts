@@ -2,7 +2,9 @@ import {
     CategoryAxis, ValueAxis, ColumnSeries, LabelBullet, XYChart,
 } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
+
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+
 import { palette } from '@/styles/colors';
 
 

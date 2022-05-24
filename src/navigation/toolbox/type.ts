@@ -1,6 +1,6 @@
+import { MenuItem } from '@/inputs/context-menu/type';
 import { QueryTag } from '@/inputs/search/query-search-tags/type';
 import { KeyItemSet, ValueHandlerMap } from '@/inputs/search/query-search/type';
-import { MenuItem } from '@/inputs/context-menu/type';
 
 export interface ToolboxOptions {
     pageStart?: number;

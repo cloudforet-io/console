@@ -1,6 +1,8 @@
 <script lang="ts">
 import * as hp from 'helper-js';
+
 import { Draggable, Store } from '@/data-display/tree/he-tree-vue/types';
+
 import * as ut from '../../utils';
 import makeTreeDraggable from './draggable';
 

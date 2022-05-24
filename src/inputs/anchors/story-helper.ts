@@ -1,5 +1,6 @@
 import { ArgTypes } from '@storybook/addons';
 import VueRouter from 'vue-router';
+
 import { AnchorSize, IconPosition } from '@/inputs/anchors/type';
 
 export const getAnchorsArgTypes = (): ArgTypes => ({

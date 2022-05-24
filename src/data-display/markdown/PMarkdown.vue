@@ -7,11 +7,14 @@
 import {
     computed,
 } from '@vue/composition-api';
+
+import DOMPurify from 'dompurify';
 import { render } from 'ejs';
 import { get } from 'lodash';
-import DOMPurify from 'dompurify';
-import { MarkdownProps } from '@/data-display/markdown/type';
 import { marked } from 'marked';
+
+import { MarkdownProps } from '@/data-display/markdown/type';
+
 
 marked.setOptions({
     gfm: true,

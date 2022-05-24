@@ -1,6 +1,6 @@
 <script lang="ts">
-import { getBindClass } from '@/util/functional-helpers';
 import { inputTypes } from '@/inputs/input/config';
+import { getBindClass } from '@/util/functional-helpers';
 
 export default {
     name: 'PTextInput',

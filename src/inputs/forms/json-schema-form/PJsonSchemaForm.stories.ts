@@ -1,8 +1,9 @@
-import PJsonSchemaForm from '@/inputs/forms/json-schema-form/PJsonSchemaForm.vue';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 import {
     toRefs, reactive,
 } from '@vue/composition-api';
+
+import PButton from '@/inputs/buttons/button/PButton.vue';
+import PJsonSchemaForm from '@/inputs/forms/json-schema-form/PJsonSchemaForm.vue';
 
 export default {
     title: 'Inputs/Forms/Json Schema Form',

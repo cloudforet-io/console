@@ -1,6 +1,7 @@
 import { ArgTypes } from '@storybook/addons';
-import { getToolboxArgTypes } from '@/navigation/toolbox/story-helper';
+
 import { getDataTableArgsType } from '@/data-display/tables/data-table/story-helper';
+import { getToolboxArgTypes } from '@/navigation/toolbox/story-helper';
 
 export const getToolboxTableArgTypes = (): ArgTypes => {
     const argTypes: ArgTypes = {

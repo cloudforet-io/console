@@ -30,11 +30,12 @@
 import {
     computed, defineComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
+import { AsyncComponent } from 'vue';
+import { AsyncComponentPromise } from 'vue/types/options';
+
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import { DynamicFieldType, dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PTextList from '@/others/console/text-list/PTextList.vue';
-import { AsyncComponent } from 'vue';
-import { AsyncComponentPromise } from 'vue/types/options';
 
 
 interface State {
@@ -72,6 +73,7 @@ const componentMap: Record<DynamicFieldType, AsyncComponent> = {
 
 export default defineComponent<DynamicFieldProps>({
     name: 'PDynamicField',
+    // eslint-disable-next-line import/no-self-import
     components: { PTextList, PDynamicField: () => import('@/data-display/dynamic/dynamic-field/PDynamicField.vue') },
     props: {
         type: {

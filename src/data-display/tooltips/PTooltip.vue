@@ -7,9 +7,10 @@
 </template>
 
 <script lang="ts">
+import { computed, reactive, toRefs } from '@vue/composition-api';
+
 import { merge } from 'lodash';
 import { VTooltip } from 'v-tooltip';
-import { computed, reactive, toRefs } from '@vue/composition-api';
 
 export default {
     name: 'PTooltip',

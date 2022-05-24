@@ -1,10 +1,12 @@
 <script lang="ts">
-import { DatetimeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import { DatetimeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/datetime/type';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
 import dayjs, { Dayjs } from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
+import { DatetimeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/datetime/type';
+import { DatetimeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import PAnchor from '@/inputs/anchors/PAnchor.vue';
+
 
 dayjs.extend(utc);
 dayjs.extend(tz);

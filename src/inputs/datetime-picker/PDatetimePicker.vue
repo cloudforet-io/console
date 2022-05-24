@@ -23,24 +23,24 @@
 </template>
 
 <script lang="ts">
-import Flatpickr from 'flatpickr';
-import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import tz from 'dayjs/plugin/timezone';
-
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import dayjs from 'dayjs';
+import tz from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import Flatpickr from 'flatpickr';
+import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect';
+
 
 import PI from '@/foundation/icons/PI.vue';
 import {
     DatetimePickerProps, DATA_TYPE, SELECT_MODE, STYLE_TYPE,
 } from '@/inputs/datetime-picker/type';
-
+import { i18n } from '@/translations';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
-import { i18n } from '@/translations';
 import { getLocaleFile } from '@/translations/vendors/flatpickr';
 
 import Instance = Flatpickr.Instance;

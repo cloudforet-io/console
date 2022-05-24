@@ -1,5 +1,7 @@
 import Vue from 'vue';
+
 import { text, select, withKnobs } from '@storybook/addon-knobs';
+
 import PNoticeAlert from '@/feedbacks/alert/notice/PNoticeAlert.vue';
 
 export default {

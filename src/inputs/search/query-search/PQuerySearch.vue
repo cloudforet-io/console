@@ -65,18 +65,27 @@
 import {
     computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch, WatchStopHandle,
 } from '@vue/composition-api';
-import {
-    throttle, reduce, cloneDeep, debounce,
-} from 'lodash';
+
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-
-/* Components, Directives */
+import {
+    throttle, reduce, cloneDeep, debounce,
+} from 'lodash';
 import { focus as vFocus } from 'vue-focus';
-import PI from '@/foundation/icons/PI.vue';
 
-/* Types */
+import PI from '@/foundation/icons/PI.vue';
+import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import {
+    defaultHandlerMap,
+    formatterMap, inputTypeMap, inputValidatorMap, menuTypeMap,
+    placeholderMap, supportOperatorMap,
+} from '@/inputs/search/query-search/config';
+import {
+    findKey,
+    getRootKeyItemHandler, getKeyMenuForm,
+    getValueMenuForm,
+} from '@/inputs/search/query-search/helper';
 import {
     HandlerResponse,
     KeyItem,
@@ -88,20 +97,7 @@ import {
     ValueItem,
     ValueMenuItem, MenuType, QueryItem, KeyDataType, OPERATOR,
 } from '@/inputs/search/query-search/type';
-
-/* Configs, Helpers */
-import {
-    defaultHandlerMap,
-    formatterMap, inputTypeMap, inputValidatorMap, menuTypeMap,
-    placeholderMap, supportOperatorMap,
-} from '@/inputs/search/query-search/config';
 import PSearch from '@/inputs/search/search/PSearch.vue';
-import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import {
-    findKey,
-    getRootKeyItemHandler, getKeyMenuForm,
-    getValueMenuForm,
-} from '@/inputs/search/query-search/helper';
 
 
 dayjs.extend(utc);

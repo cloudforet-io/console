@@ -1,6 +1,8 @@
-import { ArgTypes } from '@storybook/addons';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 import { reactive, toRefs } from '@vue/composition-api';
+
+import { ArgTypes } from '@storybook/addons';
+
+import PButton from '@/inputs/buttons/button/PButton.vue';
 
 export const getTabArgTypes = (): ArgTypes => ({
     /* props */

@@ -3,7 +3,6 @@
 </template>
 
 <script lang="ts">
-import { maxBy, minBy, sum } from 'lodash';
 import {
     computed,
     defineComponent,
@@ -11,8 +10,9 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import * as am4core from '@amcharts/amcharts4/core';
 import { TreeMap } from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { maxBy, minBy, sum } from 'lodash';
 
 import {
     DEFAULT_NAME_OPTIONS,
@@ -25,8 +25,9 @@ import {
     DynamicChartTemplateProps,
     DynamicChartTheme,
 } from '@/data-display/dynamic/dynamic-chart/type';
-import { palette } from '@/styles/colors';
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+
+import { palette } from '@/styles/colors';
 
 const getColoredData = (chartData: any[], theme: DynamicChartTheme, valueOptions: DynamicField): any[] => {
     const results: any[] = [];

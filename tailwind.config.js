@@ -1,9 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const plugin = require('tailwindcss/plugin');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultTheme = require('tailwindcss/defaultTheme');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const plugin = require('tailwindcss/plugin');
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const colors = require('./src/styles/colors').tailwindColors;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const screens = require('./src/styles/screens');

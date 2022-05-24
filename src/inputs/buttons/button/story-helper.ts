@@ -1,5 +1,6 @@
 import { ArgTypes } from '@storybook/addons';
 import icon from 'vue-svgicon';
+
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 export const getButtonArgTypes = (): ArgTypes => ({

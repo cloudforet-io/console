@@ -23,8 +23,8 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
-import PI from '@/foundation/icons/PI.vue';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
+import PI from '@/foundation/icons/PI.vue';
 import {
     SelectProps, useSelect,
 } from '@/hooks/select';

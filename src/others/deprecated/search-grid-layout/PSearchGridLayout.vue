@@ -49,23 +49,24 @@
 </template>
 
 <script lang="ts">
-import PQuerySearch from '@/inputs/search/query-search/PQuerySearch.vue';
-import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
 import { forEach } from 'lodash';
-import { QueryItem } from '@/inputs/search/query-search/type';
+
+import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
 import {
     QuerySearchTagsFunctions,
     QuerySearchTagsListeners,
     QueryTag,
 } from '@/inputs/search/query-search-tags/type';
-
-import { makeOptionalProxy } from '@/util/composition-helpers';
-import PToolboxGridLayout from '@/others/deprecated/toolbox-grid-layout/PToolboxGridLayout.vue';
+import PQuerySearch from '@/inputs/search/query-search/PQuerySearch.vue';
+import { QueryItem } from '@/inputs/search/query-search/type';
 import { SearchGridLayoutProps, Options } from '@/others/deprecated/search-grid-layout/type';
+import PToolboxGridLayout from '@/others/deprecated/toolbox-grid-layout/PToolboxGridLayout.vue';
+import { makeOptionalProxy } from '@/util/composition-helpers';
 
 export default {
     name: 'PSearchGridLayout',

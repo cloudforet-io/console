@@ -1,5 +1,6 @@
 import faker from 'faker';
 import { range } from 'lodash';
+
 import { getQuerySearchTags } from '@/inputs/search/query-search-tags/mock';
 
 export const getHandler = items => async (inputText) => {

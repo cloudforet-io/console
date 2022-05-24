@@ -31,13 +31,14 @@
 </template>
 
 <script lang="ts">
-import PI from '@/foundation/icons/PI.vue';
 import { computed } from '@vue/composition-api';
-import { StatusProps } from '@/data-display/status/type';
-import { getColor } from '@/util/helpers';
-import PLottie from '@/foundation/lottie/PLottie.vue';
+
 import { themes } from '@/data-display/status/config';
+import { StatusProps } from '@/data-display/status/type';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
+import PI from '@/foundation/icons/PI.vue';
+import PLottie from '@/foundation/lottie/PLottie.vue';
+import { getColor } from '@/util/helpers';
 
 export default {
     name: 'PStatus',

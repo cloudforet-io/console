@@ -36,9 +36,10 @@ import {
 } from '@vue/composition-api';
 import Vue from 'vue';
 
-import { copyAnyData, isNotEmpty } from '@/util/helpers';
 
 import PI from '@/foundation/icons/PI.vue';
+import { copyAnyData, isNotEmpty } from '@/util/helpers';
+
 
 interface Props {
     value?: string;

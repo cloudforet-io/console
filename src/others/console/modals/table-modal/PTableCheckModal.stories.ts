@@ -1,9 +1,12 @@
-import { select, text, boolean } from '@storybook/addon-knobs';
+import { ref } from '@vue/composition-api';
+
 import { action } from '@storybook/addon-actions';
+import { select, text, boolean } from '@storybook/addon-knobs';
+
+import { sizeMapping } from '@/feedbacks/modals/type';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PTableCheckModel from '@/others/console/modals/table-modal/PTableCheckModal.vue';
-import { sizeMapping } from '@/feedbacks/modals/type';
-import { ref } from '@vue/composition-api';
+
 
 export default {
     title: 'Others/Console/Table Check Modal',

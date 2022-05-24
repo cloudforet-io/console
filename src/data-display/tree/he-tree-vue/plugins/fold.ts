@@ -1,7 +1,9 @@
 import Vue from 'vue';
+
 import {
     Fold, Node, Path, UnfoldOptions,
 } from '@/data-display/tree/he-tree-vue/types';
+
 import { walkTreeData } from '../utils';
 
 export function foldAll(treeData) {

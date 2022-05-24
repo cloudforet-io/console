@@ -151,17 +151,18 @@
 import {
     toRefs, computed, reactive, watch, getCurrentInstance, ComponentRenderProxy, defineComponent,
 } from '@vue/composition-api';
-import { get, range } from 'lodash';
-import { copyAnyData } from '@/util/helpers';
-import { makeOptionalProxy } from '@/util/composition-helpers';
-import { DataTableField, DataTableFieldType, DataTableProps } from '@/data-display/tables/data-table/type';
 
+import { get, range } from 'lodash';
+
+import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
+import { DataTableField, DataTableFieldType, DataTableProps } from '@/data-display/tables/data-table/type';
+import PI from '@/foundation/icons/PI.vue';
+import PLottie from '@/foundation/lottie/PLottie.vue';
+import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 import PCheckBox from '@/inputs/checkbox/PCheckBox.vue';
 import PRadio from '@/inputs/radio/PRadio.vue';
-import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
-import PLottie from '@/foundation/lottie/PLottie.vue';
-import PI from '@/foundation/icons/PI.vue';
-import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
+import { makeOptionalProxy } from '@/util/composition-helpers';
+import { copyAnyData } from '@/util/helpers';
 
 interface TableField extends DataTableFieldType {
     depth?: number;

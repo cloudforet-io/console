@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+
 import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
 
 export const getQuerySearchArgTypes = (): ArgTypes => {

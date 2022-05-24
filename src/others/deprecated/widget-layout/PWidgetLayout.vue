@@ -35,8 +35,8 @@
 </template>
 
 <script lang="ts">
-import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import PI from '@/foundation/icons/PI.vue';
+import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import PTooltipButton from '@/others/deprecated/tooltip-button/PTooltipButton.vue';
 
 export default {

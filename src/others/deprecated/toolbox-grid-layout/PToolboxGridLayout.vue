@@ -74,18 +74,20 @@
 </template>
 
 <script lang="ts">
-import { flatMap } from 'lodash';
-import PGridLayout from '@/others/deprecated/grid-layout/PGridLayout.vue';
-import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+
+import { flatMap } from 'lodash';
+
 import PLottie from '@/foundation/lottie/PLottie.vue';
-import { ToolboxGridLayoutProps } from '@/others/deprecated/toolbox-grid-layout/type';
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
+import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
+import PGridLayout from '@/others/deprecated/grid-layout/PGridLayout.vue';
+import { ToolboxGridLayoutProps } from '@/others/deprecated/toolbox-grid-layout/type';
+import { makeOptionalProxy } from '@/util/composition-helpers';
 
 export default {
     name: 'PToolboxGridLayout',

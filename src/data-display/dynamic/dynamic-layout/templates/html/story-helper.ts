@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+
 import { getDynamicLayoutArgTypes } from '@/data-display/dynamic/dynamic-layout/story-helper';
 
 export const getDynamicLayoutHtmlArgTypes = (): ArgTypes => {

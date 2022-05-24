@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+
 import {
     DEFAULT_NAME_OPTIONS, DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_TYPE, DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';

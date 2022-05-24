@@ -1,7 +1,8 @@
-import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
-import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import { ArgTypes } from '@storybook/addons';
+
+import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import { SEARCH_DROPDOWN_TYPE } from '@/inputs/dropdown/search-dropdown/type';
+import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
 
 
 const extraArgTypes: ArgTypes = {

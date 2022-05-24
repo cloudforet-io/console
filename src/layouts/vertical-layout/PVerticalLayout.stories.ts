@@ -1,4 +1,5 @@
 import { withKnobs } from '@storybook/addon-knobs';
+
 import PVerticalLayout from '@/layouts/vertical-layout/PVerticalLayout.vue';
 
 export default {

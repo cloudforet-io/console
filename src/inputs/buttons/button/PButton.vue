@@ -1,9 +1,11 @@
 <script lang="ts">
-import { getBindClass } from '@/util/functional-helpers';
-import { ButtonProps, ButtonSize } from '@/inputs/buttons/button/type';
-import PLottie from '@/foundation/lottie/PLottie.vue';
-import PI from '@/foundation/icons/PI.vue';
 import { VNode } from 'vue/types/vnode';
+
+import PI from '@/foundation/icons/PI.vue';
+import PLottie from '@/foundation/lottie/PLottie.vue';
+import { ButtonProps, ButtonSize } from '@/inputs/buttons/button/type';
+import { getBindClass } from '@/util/functional-helpers';
+
 
 const getClass = (attrs: ButtonProps) => {
     const cls = {

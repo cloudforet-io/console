@@ -1,6 +1,7 @@
 import Vue from 'vue';
-import * as dh from 'draggable-helper';
 import { CombinedVueInstance } from 'vue/types/vue';
+
+import * as dh from 'draggable-helper';
 
 export type Path = number[]
 export interface Store extends dh.Store {

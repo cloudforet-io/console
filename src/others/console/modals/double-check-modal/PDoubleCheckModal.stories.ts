@@ -1,7 +1,9 @@
-import { text } from '@storybook/addon-knobs';
-import { action } from '@storybook/addon-actions';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 import { ref } from '@vue/composition-api';
+
+import { action } from '@storybook/addon-actions';
+import { text } from '@storybook/addon-knobs';
+
+import PButton from '@/inputs/buttons/button/PButton.vue';
 import PDoubleCheckModal from '@/others/console/modals/double-check-modal/PDoubleCheckModal.vue';
 
 export default {

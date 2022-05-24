@@ -46,11 +46,13 @@
 import {
     computed, ComputedRef, defineComponent, PropType, reactive, toRefs, watch, WatchStopHandle,
 } from '@vue/composition-api';
+
+import { isEmpty } from 'lodash';
+
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
+import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import { i18n } from '@/translations';
-import { isEmpty } from 'lodash';
-import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 
 interface Props {
     loading: boolean;

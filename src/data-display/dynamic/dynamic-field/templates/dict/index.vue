@@ -1,8 +1,8 @@
 <script lang="ts">
-import PDictList from '@/data-display/dynamic/dynamic-field/templates/list/dict-list/PDictList.vue';
 import { DictDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/dict/type';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import PDictList from '@/data-display/dynamic/dynamic-field/templates/list/dict-list/PDictList.vue';
 import { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import PAnchor from '@/inputs/anchors/PAnchor.vue';
 
 export default {
     name: 'PDynamicFieldDict',

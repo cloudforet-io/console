@@ -15,10 +15,11 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import PButton from '@/inputs/buttons/button/PButton.vue';
+
 import PLottie from '@/foundation/lottie/PLottie.vue';
-import { LoadingButtonProps } from '@/others/deprecated/loading-button/type';
+import PButton from '@/inputs/buttons/button/PButton.vue';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
+import { LoadingButtonProps } from '@/others/deprecated/loading-button/type';
 
 export default {
     name: 'PLoadingButton',

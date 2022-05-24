@@ -1,6 +1,7 @@
 import { select, text, number } from '@storybook/addon-knobs';
-import PLottie from './PLottie.vue';
+
 import { names } from './p-lotties/names';
+import PLottie from './PLottie.vue';
 
 
 export default {

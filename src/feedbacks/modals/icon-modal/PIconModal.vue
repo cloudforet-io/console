@@ -46,15 +46,15 @@
 <script lang="ts">
 import { reactive, toRefs } from '@vue/composition-api';
 
-import PLottie from '@/foundation/lottie/PLottie.vue';
-import PI from '@/foundation/icons/PI.vue';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 import { IconModalProps } from '@/feedbacks/modals/icon-modal/type';
+import PI from '@/foundation/icons/PI.vue';
+import PLottie from '@/foundation/lottie/PLottie.vue';
+import PButton from '@/inputs/buttons/button/PButton.vue';
 import '../modal.pcss';
-
 import { makeProxy } from '@/util/composition-helpers';
 
 import { primaryDark } from '@/styles/colors';
+
 
 export default {
     name: 'PIconModal',

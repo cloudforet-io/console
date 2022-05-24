@@ -42,11 +42,12 @@
 </template>
 <script lang="ts">
 import { reactive, toRefs } from '@vue/composition-api';
+
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
-import { makeProxy } from '@/util/composition-helpers';
-import PTextInput from '@/inputs/input/PTextInput.vue';
-import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import { sizeMapping } from '@/feedbacks/modals/type';
+import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
+import PTextInput from '@/inputs/input/PTextInput.vue';
+import { makeProxy } from '@/util/composition-helpers';
 
 
 export default {

@@ -1,12 +1,14 @@
 /* eslint-disable camelcase */
-import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
-import {
-    object, select, boolean, withKnobs,
-} from '@storybook/addon-knobs';
 import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import {
+    object, select, boolean, withKnobs,
+} from '@storybook/addon-knobs';
+
 import { textEditorModes } from '@/inputs/text-editor/config';
+import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 
 export default {
     title: 'Inputs/TextEditor',

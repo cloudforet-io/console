@@ -1,6 +1,7 @@
 import { ArgTypes } from '@storybook/addons';
-import { TEXT_HIGHLIGHTING_STYLE_TYPE } from '@/data-display/text-highlighting/type';
+
 import { getTextHighlightingProps } from '@/data-display/text-highlighting/mock';
+import { TEXT_HIGHLIGHTING_STYLE_TYPE } from '@/data-display/text-highlighting/type';
 
 export const getTextHighlightingArgTypes = (): ArgTypes => {
     const { text, term } = getTextHighlightingProps();

@@ -1,8 +1,8 @@
 <script lang="ts">
-import { getBindClass } from '@/util/functional-helpers';
-import { getColor } from '@/util/helpers';
 import { BADGE_STYLE } from '@/data-display/badges/type';
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import { getBindClass } from '@/util/functional-helpers';
+import { getColor } from '@/util/helpers';
 
 export default {
     name: 'PBadge',

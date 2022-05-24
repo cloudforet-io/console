@@ -17,11 +17,12 @@ import {
     ComponentRenderProxy,
     defineComponent, getCurrentInstance, onMounted, onUnmounted, onUpdated, reactive, toRefs,
 } from '@vue/composition-api';
+
 import { debounce } from 'lodash';
 
+import { CollapsiblePanelProps } from '@/data-display/collapsibles/collapsible-panel/type';
 import PCollapsibleToggle from '@/data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import { CollapsiblePanelProps } from '@/data-display/collapsibles/collapsible-panel/type';
 
 
 export default defineComponent({

@@ -39,11 +39,14 @@
 import {
     reactive, computed, toRefs, defineComponent,
 } from '@vue/composition-api';
-import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
-import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
-import { makeByEvent, makeProxy } from '@/util/composition-helpers';
-import { sizeMapping } from '@/feedbacks/modals/type';
+
 import { orderBy } from 'lodash';
+
+import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
+import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
+import { sizeMapping } from '@/feedbacks/modals/type';
+import { makeByEvent, makeProxy } from '@/util/composition-helpers';
+
 
 export default defineComponent({
     name: 'PTableCheckModal',

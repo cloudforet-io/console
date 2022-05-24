@@ -1,5 +1,6 @@
-import mock, { getQueryTags } from '@/data-display/dynamic/dynamic-layout/mock';
 import { ArgTypes } from '@storybook/addons';
+
+import mock, { getQueryTags } from '@/data-display/dynamic/dynamic-layout/mock';
 
 export const getDynamicLayoutArgTypes = (): ArgTypes => ({
     name: {

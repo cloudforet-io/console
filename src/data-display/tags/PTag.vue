@@ -22,8 +22,9 @@
 </template>
 
 <script lang="ts">
-import PI from '@/foundation/icons/PI.vue';
 import { defineComponent } from '@vue/composition-api';
+
+import PI from '@/foundation/icons/PI.vue';
 
 interface Props {
     deletable?: boolean;

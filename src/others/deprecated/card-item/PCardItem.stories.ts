@@ -1,6 +1,7 @@
 import { withKnobs, text } from '@storybook/addon-knobs';
-import PCardItem from '@/others/deprecated/card-item/PCardItem.vue';
+
 import PBadge from '@/data-display/badges/PBadge.vue';
+import PCardItem from '@/others/deprecated/card-item/PCardItem.vue';
 
 export default {
     title: 'Others/Deprecated/Card Item',

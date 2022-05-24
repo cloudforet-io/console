@@ -1,8 +1,9 @@
 import {
     select, color, text, boolean,
 } from '@storybook/addon-knobs';
-import PSelectableItem from '@/others/deprecated/selectable-item/PSelectableItem.vue';
+
 import { themes } from '@/others/deprecated/selectable-item/config';
+import PSelectableItem from '@/others/deprecated/selectable-item/PSelectableItem.vue';
 
 export default {
     title: 'Others/Deprecated/Selectable Item',

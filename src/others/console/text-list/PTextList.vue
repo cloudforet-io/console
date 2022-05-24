@@ -17,10 +17,12 @@
 </template>
 
 <script lang="ts">
-import { get } from 'lodash';
 import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
+
+import { get } from 'lodash';
+
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
 import { TextListItem, TextListProps } from '@/others/console/text-list/type';
 import { isNotEmpty } from '@/util/helpers';

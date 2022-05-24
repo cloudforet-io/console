@@ -72,23 +72,25 @@
 </template>
 
 <script lang="ts">
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 import {
     ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeOptionalProxy } from '@/util/composition-helpers';
-import PQuerySearch from '@/inputs/search/query-search/PQuerySearch.vue';
+
+import { groupBy } from 'lodash';
+
+import { useProxyValue } from '@/hooks/proxy-state';
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import { MenuItem } from '@/inputs/context-menu/type';
+import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
+import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
 import { QueryTag } from '@/inputs/search/query-search-tags/type';
+import PQuerySearch from '@/inputs/search/query-search/PQuerySearch.vue';
 import { QueryItem } from '@/inputs/search/query-search/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
-import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
+import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/type';
-import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
-import { MenuItem } from '@/inputs/context-menu/type';
-import { groupBy } from 'lodash';
-import { useProxyValue } from '@/hooks/proxy-state';
+import { makeOptionalProxy } from '@/util/composition-helpers';
 
 
 export default defineComponent<ToolboxProps>({

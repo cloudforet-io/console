@@ -40,15 +40,17 @@
 </template>
 
 <script lang="ts">
-import { Location } from 'vue-router';
-import { TranslateResult } from 'vue-i18n';
 import {
     computed,
     defineComponent, PropType, reactive, toRefs,
 } from '@vue/composition-api';
+
+import { TranslateResult } from 'vue-i18n';
+import { Location } from 'vue-router';
+
+import PTextHighlighting from '@/data-display/text-highlighting/PTextHighlighting.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { SELECT_MARKERS } from '@/inputs/context-menu/context-menu-item/config';
-import PTextHighlighting from '@/data-display/text-highlighting/PTextHighlighting.vue';
 
 
 export type SelectMarker = typeof SELECT_MARKERS[number];

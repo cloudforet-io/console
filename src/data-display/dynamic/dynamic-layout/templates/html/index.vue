@@ -18,10 +18,13 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { HtmlDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/html/type';
-import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
+
 import DOMPurify from 'dompurify';
+
+import { HtmlDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/html/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
+import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
+
 import { iframeStyle } from './style';
 
 

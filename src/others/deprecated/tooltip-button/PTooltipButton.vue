@@ -22,6 +22,7 @@
 
 <script lang="ts">
 import { merge } from 'lodash';
+
 import PTooltip from '@/data-display/tooltips/PTooltip.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 

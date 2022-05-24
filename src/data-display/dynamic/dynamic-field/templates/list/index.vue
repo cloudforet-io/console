@@ -17,11 +17,12 @@
 </template>
 
 <script lang="ts">
-import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import PTextList from '@/others/console/text-list/PTextList.vue';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { isNotEmpty } from '@/util/helpers';
+
+import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { ListDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/list/type';
+import PTextList from '@/others/console/text-list/PTextList.vue';
+import { isNotEmpty } from '@/util/helpers';
 
 export default {
     name: 'PDynamicFieldList',

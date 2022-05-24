@@ -1,6 +1,6 @@
-import { DynamicField, DynamicFieldOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { DYNAMIC_CHART_TYPE, DYNAMIC_CHART_THEMES } from '@/data-display/dynamic/dynamic-chart/config';
 import { DynamicFieldHandler, DynamicFieldTypeOptions } from '@/data-display/dynamic/dynamic-field/type';
+import { DynamicField, DynamicFieldOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 
 export type DynamicChartType = typeof DYNAMIC_CHART_TYPE[number]

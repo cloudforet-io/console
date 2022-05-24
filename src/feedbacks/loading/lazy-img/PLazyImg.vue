@@ -32,8 +32,9 @@ import {
     defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import PI from '@/foundation/icons/PI.vue';
+
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
+import PI from '@/foundation/icons/PI.vue';
 
 interface Props {
     height?: string;

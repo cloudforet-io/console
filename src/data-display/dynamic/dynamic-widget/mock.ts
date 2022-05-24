@@ -1,11 +1,12 @@
 import faker from 'faker';
+
+import { DYNAMIC_CHART_THEMES, DYNAMIC_CHART_TYPE } from '@/data-display/dynamic/dynamic-chart/config';
+import { getDynamicChartMockData } from '@/data-display/dynamic/dynamic-chart/mock';
+import { DynamicChartType } from '@/data-display/dynamic/dynamic-chart/type';
+import { DEFAULT_NAME_OPTIONS, DEFAULT_VALUE_OPTIONS } from '@/data-display/dynamic/dynamic-widget/config';
 import {
     DYNAMIC_WIDGET_TYPE, DynamicWidgetProps, DynamicWidgetSchemaOptions, DynamicWidgetType,
 } from '@/data-display/dynamic/dynamic-widget/type';
-import { DYNAMIC_CHART_THEMES, DYNAMIC_CHART_TYPE } from '@/data-display/dynamic/dynamic-chart/config';
-import { getDynamicChartMockData } from '@/data-display/dynamic/dynamic-chart/mock';
-import { DEFAULT_NAME_OPTIONS, DEFAULT_VALUE_OPTIONS } from '@/data-display/dynamic/dynamic-widget/config';
-import { DynamicChartType } from '@/data-display/dynamic/dynamic-chart/type';
 
 interface DynamicWidgetMockData {
     schemaOptions: DynamicWidgetSchemaOptions;

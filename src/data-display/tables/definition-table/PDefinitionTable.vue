@@ -55,20 +55,21 @@
 </template>
 
 <script lang="ts">
-import { every, range, get } from 'lodash';
-
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { every, range, get } from 'lodash';
+
+
+import PEmpty from '@/data-display/empty/PEmpty.vue';
+import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
+import PDefinition from '@/data-display/tables/definition-table/definition/PDefinition.vue';
+import { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
 import {
     DefinitionTableProps, DefinitionData, DefinitionField,
 } from '@/data-display/tables/definition-table/type';
-import PDefinition from '@/data-display/tables/definition-table/definition/PDefinition.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
-import PEmpty from '@/data-display/empty/PEmpty.vue';
-import { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
-import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
 
 const makeDefItems = (fields: DefinitionField[], data?: DefinitionData): DefinitionProps[] => fields.map(field => ({
     ...field,

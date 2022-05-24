@@ -1,5 +1,6 @@
 <script lang="ts">
 import { getBindClass } from '@/util/functional-helpers';
+
 import { gray } from '@/styles/colors';
 
 const isEmptyVNode = (nodes) => {

@@ -1,9 +1,11 @@
 <script lang="ts">
-import { get } from 'lodash';
-import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { VNodeData } from 'vue';
-import { EnumItem } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+
+import { get } from 'lodash';
+
+import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { EnumDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/enum/type';
+import { EnumItem } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 export default {
     name: 'PDynamicFieldEnum',

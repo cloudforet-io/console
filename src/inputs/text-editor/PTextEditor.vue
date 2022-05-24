@@ -32,8 +32,8 @@ import {
 } from '@vue/composition-api';
 
 import CodeMirror, { EditorConfiguration } from 'codemirror';
-
 import { forEach } from 'lodash';
+
 import PLottie from '@/foundation/lottie/PLottie.vue';
 
 import { textEditorModes, TextEditorMode } from './config';

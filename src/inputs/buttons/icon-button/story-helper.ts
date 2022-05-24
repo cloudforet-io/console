@@ -1,5 +1,6 @@
 import { ArgTypes } from '@storybook/addons';
 import icon from 'vue-svgicon';
+
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import { ICON_BUTTON_STYLE_TYPE } from '@/inputs/buttons/icon-button/type';
 

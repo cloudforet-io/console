@@ -1,4 +1,5 @@
 import faker from 'faker';
+
 import { DEFAULT_NAME_OPTIONS, DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_TYPE } from '@/data-display/dynamic/dynamic-chart/config';
 import { DynamicChartType } from '@/data-display/dynamic/dynamic-chart/type';
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';

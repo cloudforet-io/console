@@ -25,16 +25,16 @@ import {
 import { AsyncComponent } from 'vue';
 import { AsyncComponentPromise } from 'vue/types/options';
 
-import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
-import {
-    DynamicChartFieldHandler,
-    DynamicChartProps, DynamicChartTheme, DynamicChartType,
-} from '@/data-display/dynamic/dynamic-chart/type';
 import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_TYPE,
     DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
+import {
+    DynamicChartFieldHandler,
+    DynamicChartProps, DynamicChartTheme, DynamicChartType,
+} from '@/data-display/dynamic/dynamic-chart/type';
+import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
 
 const componentMap: Record<DynamicChartType, AsyncComponent> = {

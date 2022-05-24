@@ -25,11 +25,13 @@
 import {
     onMounted, onUnmounted, reactive, toRefs,
 } from '@vue/composition-api';
-import { createPopper, Instance } from '@popperjs/core';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type';
-import vClickOutside from 'v-click-outside';
 import { PropType } from 'vue';
+
+import { createPopper, Instance } from '@popperjs/core';
+import vClickOutside from 'v-click-outside';
+
+import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type';
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
 interface PopoverProps {
     tag: string;

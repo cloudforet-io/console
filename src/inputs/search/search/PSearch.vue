@@ -28,16 +28,19 @@
 </template>
 
 <script lang="ts">
-import { focus } from 'vue-focus';
 import {
     ComponentRenderProxy,
     computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
+import { focus } from 'vue-focus';
+import { TranslateResult } from 'vue-i18n';
+
 import PI from '@/foundation/icons/PI.vue';
-import { makeByPassListeners, makeOptionalProxy } from '@/util/composition-helpers';
 import { SearchProps } from '@/inputs/search/search/type';
 import { i18n } from '@/translations';
-import { TranslateResult } from 'vue-i18n';
+import { makeByPassListeners, makeOptionalProxy } from '@/util/composition-helpers';
+
 
 export default defineComponent<SearchProps>({
     name: 'PSearch',

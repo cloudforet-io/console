@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+
 import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
 import { getUserFields, getUsers } from '@/data-display/tables/data-table/mock';
 

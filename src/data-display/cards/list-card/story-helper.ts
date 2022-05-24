@@ -1,6 +1,7 @@
 import { ArgTypes } from '@storybook/addons';
 import faker from 'faker';
 import { range } from 'lodash';
+
 import { getCardArgTypes } from '@/data-display/cards/card/story-helper';
 import { getDataLoaderArgTypes } from '@/feedbacks/loading/data-loader/story-helper';
 

@@ -16,6 +16,9 @@ import {
     defineComponent, PropType,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { AsyncComponent } from 'vue';
+import { AsyncComponentPromise } from 'vue/types/options';
+
 import {
     DYNAMIC_WIDGET_TYPE,
     DynamicWidgetFieldHandler,
@@ -23,8 +26,6 @@ import {
 } from '@/data-display/dynamic/dynamic-widget/type';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
-import { AsyncComponent } from 'vue';
-import { AsyncComponentPromise } from 'vue/types/options';
 
 const componentMap: Record<DynamicWidgetType, AsyncComponent> = {
     summary: () => ({

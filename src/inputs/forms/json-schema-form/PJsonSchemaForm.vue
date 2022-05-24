@@ -12,20 +12,21 @@
 </template>
 
 <script lang="ts">
-import { flatMap, sortBy } from 'lodash';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { flatMap, sortBy } from 'lodash';
 import VueFormJsonSchema from 'vue-form-json-schema/dist/vue-form-json-schema.esm';
-import PTextInput from '@/inputs/input/PTextInput.vue';
-import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 
+
+import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
+import { getFormUiSchema, getDefaultInputValue } from '@/inputs/forms/json-schema-form/helper';
 import {
     JsonSchema, JsonSchemaFormProps, UiSchema,
 } from '@/inputs/forms/json-schema-form/type';
+import PTextInput from '@/inputs/input/PTextInput.vue';
 import { makeProxy } from '@/util/composition-helpers';
-import { getFormUiSchema, getDefaultInputValue } from '@/inputs/forms/json-schema-form/helper';
 
 
 export default {

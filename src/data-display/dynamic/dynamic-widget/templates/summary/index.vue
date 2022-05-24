@@ -22,16 +22,17 @@ import {
     defineComponent, PropType,
     reactive, toRefs,
 } from '@vue/composition-api';
+
+import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
+import { DEFAULT_VALUE_OPTIONS } from '@/data-display/dynamic/dynamic-widget/config';
 import {
     DynamicWidgetFieldHandler,
     DynamicWidgetProps,
     DynamicWidgetSchemaOptions,
     DynamicWidgetViewOptions,
 } from '@/data-display/dynamic/dynamic-widget/type';
-import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
-import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import { DEFAULT_VALUE_OPTIONS } from '@/data-display/dynamic/dynamic-widget/config';
 import { getValueByPath } from '@/data-display/dynamic/helper';
+import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 
 type DynamicWidgetSummaryProps = Exclude<DynamicWidgetProps, 'type'&'index'>
 

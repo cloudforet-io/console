@@ -21,8 +21,9 @@
     </nav>
 </template>
 <script lang="ts">
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { watch } from '@vue/composition-api';
+
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
 export default {
     name: 'PTextPagination',

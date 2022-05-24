@@ -70,16 +70,17 @@
 </template>
 
 <script lang="ts">
-import PButton from '@/inputs/buttons/button/PButton.vue';
-import { sizeMapping } from '@/feedbacks/modals/type';
 import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeProxy } from '@/util/composition-helpers';
+
 import { ButtonModalProps, THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
-import '../modal.pcss';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import { sizeMapping } from '@/feedbacks/modals/type';
+import '@/feedbacks/modals/modal.pcss';
 import PLottie from '@/foundation/lottie/PLottie.vue';
+import PButton from '@/inputs/buttons/button/PButton.vue';
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import { makeProxy } from '@/util/composition-helpers';
 
 
 export default defineComponent<ButtonModalProps>({

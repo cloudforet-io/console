@@ -35,6 +35,7 @@
 import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
+
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import {
     STYLE_TYPE as SIDEBAR_STYLE_TYPE,
