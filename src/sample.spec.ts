@@ -1,5 +1,6 @@
-import { describe, it } from 'mocha';
 import * as assert from 'assert';
+
+import { describe, it } from 'mocha';
 
 describe('Array', () => {
     describe('#indexOf()', () => {

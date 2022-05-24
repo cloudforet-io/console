@@ -1,6 +1,8 @@
 import {
     map, size, flatMap, flatten, uniq, cloneDeep
 } from 'lodash';
+
+import { SearchEnumItem, SearchEnums } from '@src/component-util/dynamic-layout/layout-schema';
 import {
     KeyDataType,
     KeyItem, KeyItemSet,
@@ -8,9 +10,8 @@ import {
     ValueHandlerMap,
     ValueItem
 } from '@src/component-util/query-search/type';
-import { Filter } from '@src/space-connector/type';
 import { SpaceConnector } from '@src/space-connector';
-import { SearchEnumItem, SearchEnums } from '@src/component-util/dynamic-layout/layout-schema';
+import { Filter } from '@src/space-connector/type';
 
 type KeyTuple = [string, string|undefined, KeyDataType|undefined] // name, label, dataType
 type KeyParam = Array<KeyTuple | string | KeyItemSet>
