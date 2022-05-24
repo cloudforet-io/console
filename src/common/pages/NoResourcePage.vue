@@ -1,9 +1,5 @@
 <template>
     <div class="wrap">
-        <p-breadcrumbs :routes="route" class="page-navigation" />
-        <p-page-title :title="$t('COMMON.ERROR.NO_RESOURCE_TITLE')" child class="page-title"
-                      @goBack="$router.go(-1)"
-        />
         <div class="error">
             <div class="error-contents">
                 <p-lottie class="flex items-center justify-center"
@@ -20,9 +16,6 @@
                 </router-link>
             </div>
         </div>
-        <div class="fnb">
-            <f-n-b />
-        </div>
     </div>
 </template>
 
@@ -32,20 +25,15 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PLottie, PButton, PBreadcrumbs, PPageTitle,
+    PLottie, PButton,
 } from '@spaceone/design-system';
 import { startCase } from 'lodash';
-
-import FNB from '@/common/modules/navigations/FNB.vue';
 
 export default {
     name: 'NoResource',
     components: {
-        PPageTitle,
-        PBreadcrumbs,
         PButton,
         PLottie,
-        FNB,
     },
     props: {
     },
@@ -77,13 +65,6 @@ export default {
     @apply flex flex-col;
     height: 100%;
 }
-.page-navigation {
-    margin-top: 2rem;
-    margin-left: 1.5rem;
-}
-.page-title {
-    margin-left: 1.5rem;
-}
 .error {
     @apply m-auto flex-1 text-center;
     .error-contents {
@@ -99,8 +80,5 @@ export default {
             margin-top: 2rem;
         }
     }
-}
-.fnb {
-    width: 100%;
 }
 </style>
