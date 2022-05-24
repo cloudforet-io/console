@@ -6,7 +6,7 @@ import { Tags } from '@/models';
 
 import { PagePermission, PagePermissionType } from '@/lib/access-control/page-permission-helper';
 
-import { ROLE_TYPE } from '@/services/administration/iam/role/config';
+import { RoleType } from '@/services/administration/iam/role/config';
 
 export interface Policy {
     policy_id: string;
@@ -21,7 +21,7 @@ export interface RoleData {
     policies?: Policy[];
     page_permissions: PagePermission[];
     role_id: string;
-    role_type: ROLE_TYPE;
+    role_type: RoleType;
     tags?: Tags; // [ description: string ]
 }
 

@@ -5,7 +5,7 @@ export const ROLE_TYPE = Object.freeze({
     PROJECT: 'PROJECT',
     DOMAIN: 'DOMAIN',
 } as const);
-export type ROLE_TYPE = typeof ROLE_TYPE[keyof typeof ROLE_TYPE];
+export type RoleType = typeof ROLE_TYPE[keyof typeof ROLE_TYPE];
 
 export const ROLE_TYPE_LABEL = Object.freeze({
     DOMAIN: {

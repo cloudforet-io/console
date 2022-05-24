@@ -1,14 +1,14 @@
 import { computed, ComputedRef } from '@vue/composition-api';
 
-import { Location, Route, RouteRecord } from 'vue-router';
+import { Location, Route } from 'vue-router';
 
 import { i18n } from '@/translations';
 
 import { Breadcrumb } from '@/common/modules/page-layouts/type';
 
-interface LocationFormatter {
-    (r: RouteRecord): Location
-}
+// interface LocationFormatter {
+//     (r: RouteRecord): Location
+// }
 export const useBreadcrumbs = (route: ComputedRef<Route>, disableRouteNames: string[] = []) => ({
     breadcrumbs: computed(() => {
         if (disableRouteNames.includes(route.value.name ?? '')) return [];
