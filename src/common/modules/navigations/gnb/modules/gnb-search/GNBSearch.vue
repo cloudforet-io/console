@@ -10,7 +10,7 @@
         />
 
         <span v-else
-              class="menu-button"
+              class="menu-button" tabindex="0"
         >
             <p-i v-if="dataState.proxyVisibleSuggestion"
                  name="ic_delete--bold"

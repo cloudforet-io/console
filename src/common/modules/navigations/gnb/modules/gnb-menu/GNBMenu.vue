@@ -7,7 +7,7 @@
              }]"
              @click.stop="emitToggle"
         >
-            <span v-if="subMenuList.length > 0">
+            <span v-if="subMenuList.length > 0" tabindex="0">
                 <span>{{ label }}</span>
                 <p-i class="arrow-button"
                      :name="isOpened ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
@@ -20,6 +20,7 @@
                        v-else
                        :to="to"
                        class="block"
+                       tabindex="0"
             >
                 <span>{{ label }}</span>
             </component>
