@@ -1,14 +1,13 @@
-/* eslint-disable import/no-cycle */
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 
-export const PAGE_PERMISSION_TYPE = Object.freeze({
+export const PAGE_PERMISSION_TYPE = {
     VIEW: 'VIEW',
     MANAGE: 'MANAGE',
-} as const);
+} as const;
 
 export type PagePermissionType = typeof PAGE_PERMISSION_TYPE[keyof typeof PAGE_PERMISSION_TYPE];
 
@@ -17,9 +16,9 @@ export interface PagePermission {
     permission: PagePermissionType
 }
 export type PagePermissionMap = Record<string, PagePermissionType>
-export type PagePermissionTuple = Array<string|PagePermissionType>
+export type PagePermissionTuple = [page: string, permission: PagePermissionType];
 
-const getProperPermissionType = (permissionA: PagePermissionType = 'VIEW', permissionB: PagePermissionType = 'VIEW'): PagePermissionType => {
+const getProperPermissionType = (permissionA: PagePermissionType = PAGE_PERMISSION_TYPE.VIEW, permissionB: PagePermissionType = PAGE_PERMISSION_TYPE.VIEW): PagePermissionType => {
     if (permissionA === PAGE_PERMISSION_TYPE.MANAGE || permissionB === PAGE_PERMISSION_TYPE.MANAGE) return PAGE_PERMISSION_TYPE.MANAGE;
     return PAGE_PERMISSION_TYPE.VIEW;
 };
@@ -27,7 +26,7 @@ const getProperPermissionType = (permissionA: PagePermissionType = 'VIEW', permi
 const menuIdList = Object.keys(MENU_INFO_MAP) as MenuId[];
 export const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter((id) => {
     const info = MENU_INFO_MAP[id];
-    return ACCESS_LEVEL[info.accessLevel] >= ACCESS_LEVEL.VIEW_PERMISSION;
+    return info.accessLevel >= ACCESS_LEVEL.VIEW_PERMISSION;
 });
 
 const permissionRequiredMenuIds: MenuId[] = getPermissionRequiredMenuIds();
@@ -60,7 +59,7 @@ const getPermissionRequiredMenuInfo = (): Partial<Record<MenuId, MenuInfo>> => {
     const result: Partial<Record<MenuId, MenuInfo>> = {};
     menuIdList.forEach((id) => {
         const info = MENU_INFO_MAP[id];
-        if (ACCESS_LEVEL[info.accessLevel] >= ACCESS_LEVEL.VIEW_PERMISSION) {
+        if (info.accessLevel >= ACCESS_LEVEL.VIEW_PERMISSION) {
             result[id] = info;
         }
     });

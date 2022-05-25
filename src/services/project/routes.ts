@@ -1,5 +1,7 @@
 import { RouteConfig } from 'vue-router';
 
+import { ACCESS_LEVEL } from '@/lib/access-control/config';
+
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 const ProjectPage = () => import(/* webpackChunkName: "ProjectPage" */ '@/services/project/ProjectPage.vue');
@@ -28,7 +30,7 @@ export default {
         {
             path: '/',
             name: PROJECT_ROUTE._NAME,
-            meta: { accessLevel: 'VIEW_PERMISSION' },
+            meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
             props: true,
             component: ProjectPage,
         },

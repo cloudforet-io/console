@@ -1,6 +1,7 @@
 import { upperCase } from 'lodash';
 import { RouteConfig } from 'vue-router';
 
+import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { getMenuLabel } from '@/lib/menu/menu-info';
 
@@ -31,7 +32,7 @@ const CollectJobPage = () => import(/* webpackChunkName: "CollectorHistory" */ '
 const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.ASSET_INVENTORY), accessLevel: 'VIEW_PERMISSION' },
+    meta: { label: getMenuLabel(MENU_ID.ASSET_INVENTORY), accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: '/asset-inventory/cloud-service',
     component: AssetInventoryContainer,
     children: [
@@ -106,13 +107,13 @@ const assetInventoryRoute: RouteConfig = {
                         {
                             path: '/',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
-                            meta: { lnbVisible: true, accessLevel: 'MANAGE_PERMISSION' },
+                            meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                             component: CollectorPluginPage as any,
                         },
                         {
                             path: ':pluginId',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE.STEPS._NAME,
-                            meta: { label: ({ params }) => params.pluginId, copiable: true, accessLevel: 'MANAGE_PERMISSION' },
+                            meta: { label: ({ params }) => params.pluginId, copiable: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                             props: true,
                             component: CreateCollectorPage as any,
                         },
@@ -161,7 +162,7 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: 'add/:provider',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
-                    meta: { label: 'Add Service Account', accessLevel: 'MANAGE_PERMISSION' },
+                    meta: { label: 'Add Service Account', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                     props: true,
                     component: ServiceAccountAddPage as any,
                 },

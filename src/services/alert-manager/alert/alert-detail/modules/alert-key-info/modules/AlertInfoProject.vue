@@ -13,7 +13,7 @@
                 </p-copy-button>
             </span>
             <p-button style-type="gray-border" size="sm" class="add-button ml-2"
-                      :disabled="!hasManagePermission"
+                      :disabled="manageDisabled"
                       @click="startEdit(alertData.project_id)"
             >
                 {{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE') }}
@@ -95,6 +95,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props) {
         const {
@@ -110,7 +114,6 @@ export default {
         });
 
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             projects: computed(() => store.state.reference.project.items),
             isModalLoading: true,
             modalVisible: false,

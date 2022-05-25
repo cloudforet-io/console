@@ -6,7 +6,7 @@
             <p-empty v-else>
                 {{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NO_UPDATE') }}
             </p-empty>
-            <button class="new-button" :class="{'disabled':!hasManagePermission}" @click="openStatusUpdateModal">
+            <button class="new-button" :class="{'disabled': manageDisabled}" @click="openStatusUpdateModal">
                 {{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NEW_UPDATE') }}
             </button>
         </p>
@@ -36,12 +36,9 @@ import {
     PButtonModal, PPaneLayout, PTextarea, PFieldGroup, PEmpty,
 } from '@spaceone/design-system';
 
-
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -65,10 +62,13 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { root }) {
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             modalVisible: false,
             status: computed(() => alertManagerStore.state.alert.alertData?.status_message),
             statusInput: '',

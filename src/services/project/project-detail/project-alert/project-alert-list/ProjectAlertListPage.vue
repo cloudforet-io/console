@@ -6,6 +6,7 @@
             :urgency="urgency"
             :assigned="assigned"
             :filters="filters"
+            :manage-disabled="!hasManagePermission"
             keep-alive
             @update="onUpdateTable"
             @change-list="onChangeList"
@@ -23,6 +24,8 @@ import {
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 
 import { store } from '@/store';
+
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import AlertDataTable from '@/services/alert-manager/alert/modules/AlertDataTable.vue';
 import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
@@ -47,6 +50,7 @@ export default {
             urgency: vm.$route.query.urgency ?? ALERT_URGENCY.ALL,
             assigned: vm.$route.query.assigned ?? ASSIGNED_STATE.ALL,
             filters: tagQueryHelper.filters,
+            hasManagePermission: useManagePermissionState(),
         });
 
         /* util */

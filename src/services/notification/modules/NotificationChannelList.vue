@@ -9,7 +9,7 @@
                     <div v-for="item in protocolList"
                          :key="item.protocol_id"
                          class="channel-item-wrapper"
-                         :class="{disabled}"
+                         :class="{disabled: manageDisabled}"
                     >
                         <router-link :to="item.link">
                             <li class="channel-item">
@@ -24,7 +24,7 @@
                                             height="2.25rem"
                                             class="service-img"
                                 />
-                                <span class="text" :class="{disabled}">
+                                <span class="text" :class="{disabled: manageDisabled}">
                                     <p-i name="ic_plus_bold"
                                          width="1rem" height="1rem"
                                          color="inherit transparent"
@@ -51,6 +51,7 @@
                     <ul v-for="item in channelList" :key="`${item.name}-${item.created_at}`">
                         <li class="mb-4">
                             <notification-channel-item :channel-data="item" :project-id="projectId"
+                                                       :manage-disabled="manageDisabled"
                                                        @change="onChangeChannelItem"
                                                        @confirm="listChannel"
                             />
@@ -106,7 +107,7 @@ export default {
             type: String,
             default: '',
         },
-        disabled: {
+        manageDisabled: {
             type: Boolean,
             default: false,
         },

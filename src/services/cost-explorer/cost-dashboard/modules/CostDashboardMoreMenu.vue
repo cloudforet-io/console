@@ -7,9 +7,10 @@
                            :menu-position="'left'"
                            @select="handleSelectMoreMenu"
         />
-        <cost-dashboard-dashboard-duplicate-modal
+        <cost-dashboard-duplicate-modal
             :visible.sync="duplicateModalVisible"
             :dashboard="dashboard"
+            :manage-disabled="manageDisabled"
         />
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
@@ -27,15 +28,13 @@ import { PSelectDropdown } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import { i18n } from '@/translations';
-
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
-import CostDashboardDashboardDuplicateModal
+import CostDashboardDuplicateModal
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardDuplicateModal.vue';
 import { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -50,7 +49,7 @@ const MENU = Object.freeze({
 export default {
     name: 'CostDashboardMoreMenu',
     components: {
-        CostDashboardDashboardDuplicateModal,
+        CostDashboardDuplicateModal,
         PSelectDropdown,
         DeleteModal,
     },
@@ -62,6 +61,10 @@ export default {
         dashboardId: {
             type: String,
             default: undefined,
+        },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props) {
@@ -79,7 +82,7 @@ export default {
                     menuItems[2].disabled = true;
                     return menuItems;
                 }
-                if (state.dashboardType === DASHBOARD_TYPE.PUBLIC && !state.hasManagePermission) {
+                if (state.dashboardType === DASHBOARD_TYPE.PUBLIC && props.manageDisabled) {
                     if (state.homeDashboardId === props.dashboardId) {
                         menuItems[1].disabled = true;
                         menuItems[2].disabled = true;
@@ -91,7 +94,6 @@ export default {
             }),
             homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
             duplicateModalVisible: false,
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(props.dashboard, 'public_dashboard_id') ? DASHBOARD_TYPE.PUBLIC : DASHBOARD_TYPE.USER)),
         });
 

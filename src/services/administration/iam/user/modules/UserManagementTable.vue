@@ -25,14 +25,14 @@
             <template slot="toolbox-left">
                 <p-button style-type="primary-dark"
                           icon="ic_plus_bold"
-                          :disabled="!hasManagePermission"
+                          :disabled="manageDisabled"
                           @click="clickAdd"
                 >
                     {{ $t('IDENTITY.USER.MAIN.ADD') }}
                 </p-button>
                 <p-select-dropdown class="left-toolbox-item"
                                    :items="dropdownMenu"
-                                   :disabled="!hasManagePermission"
+                                   :disabled="manageDisabled"
                                    @select="handleSelectDropdown"
                 >
                     {{ $t('IDENTITY.USER.MAIN.ACTION') }}
@@ -144,6 +144,10 @@ export default {
             type: Number,
             default: 400,
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -153,7 +157,6 @@ export default {
             .setFiltersAsRawQueryString(vm.$route.query.filters);
 
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             loading: false,
             users: [] as User[],
             timezone: computed(() => store.state.user.timezone || 'UTC'),

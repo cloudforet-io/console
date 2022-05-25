@@ -51,7 +51,6 @@ import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/ty
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -97,6 +96,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const { i18nDayjs } = useI18nDayjs();
@@ -104,7 +107,6 @@ export default {
         const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
 
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             selectedPeriod: {
                 start: props.printMode || props.periodType === 'FIXED' ? dayjs.utc(props.period.start).format('YYYY-MM')
                     : initialPeriodStart,
@@ -135,7 +137,7 @@ export default {
             ])),
             isFixedTypeSelected: props.periodType === 'FIXED',
             isUserDashboard: computed(() => (props.dashboardId?.startsWith(DASHBOARD_TYPE.USER))),
-            disableFixDate: computed(() => !state.isUserDashboard && !state.hasManagePermission),
+            disableFixDate: computed(() => !state.isUserDashboard && props.manageDisabled),
             selectedMonthMenuItem: initialSelectedMonth,
             customRangeModalVisible: false,
             isCustomPeriod: computed<boolean>(() => {

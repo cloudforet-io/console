@@ -1,5 +1,7 @@
 import { RouteConfig } from 'vue-router';
 
+import { ACCESS_LEVEL } from '@/lib/access-control/config';
+
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 const SignOutPage = () => import(/* webpackChunkName: "SignOutPage" */ '@/services/auth/sign-out/SignOutPage.vue');
@@ -15,14 +17,14 @@ export default [
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         component: SignOutPage,
         meta: {
-            label: '', isSignInPage: false, accessLevel: 'EXCLUDE_AUTH',
+            label: '', isSignInPage: false, accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
         },
     },
     {
         path: '/sign-in',
         meta: {
             isSignInPage: true,
-            accessLevel: 'EXCLUDE_AUTH',
+            accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
         },
         component: { template: '<router-view />' },
         children: [

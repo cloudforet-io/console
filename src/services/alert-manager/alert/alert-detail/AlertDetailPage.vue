@@ -23,13 +23,16 @@
             <div class="left-wrapper">
                 <alert-summary :id="id" class="header"
                                :alert-data="alertInfo"
+                               :manage-disabled="!hasManagePermission"
                 />
 
                 <alert-key-info :id="id" class="info"
                                 :alert-data="alertInfo"
+                                :manage-disabled="!hasManagePermission"
                 />
                 <alert-status-update :id="id"
                                      :alert-data="alertInfo"
+                                     :manage-disabled="!hasManagePermission"
                                      class="status-update"
                 />
                 <alert-timeline-and-event :id="id" :alert-data="alertInfo"
@@ -39,8 +42,9 @@
             <div class="right-wrapper">
                 <alert-responder :id="id" class="responder"
                                  :alert-data="alertInfo"
+                                 :manage-disabled="!hasManagePermission"
                 />
-                <alert-note :id="id" class="note" />
+                <alert-note :id="id" :manage-disabled="!hasManagePermission" class="note" />
                 <alert-project-dependency :id="id" :alert-data="alertInfo"
                                           class="project-dependency"
                 />
@@ -73,8 +77,6 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PIconButton, PPageTitle } from '@spaceone/design-system';
 
-
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -82,6 +84,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import AlertKeyInfo from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/AlertKeyInfo.vue';
 import AlertResponder from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/AlertResponder.vue';
@@ -121,7 +124,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
             alertInfo: computed(() => alertManagerStore.state.alert.alertData),
             loading: true,
             //

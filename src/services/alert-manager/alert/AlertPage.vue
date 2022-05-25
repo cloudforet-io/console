@@ -8,6 +8,7 @@
                               :urgency="urgency"
                               :assigned="assigned"
                               :filters="filters"
+                              :manage-disabled="!hasManagePermission"
                               class="grid grid-cols-12 col-span-12 gap-4"
                               @update="onUpdateTable"
             />
@@ -26,6 +27,8 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { PPageTitle } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
+
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import AlertDataTable from '@/services/alert-manager/alert/modules/AlertDataTable.vue';
 import AssignedAlertInfoPanel from '@/services/alert-manager/alert/modules/AssignedAlertInfoPanel.vue';
@@ -52,6 +55,7 @@ export default {
             urgency: vm.$route.query.urgency ?? ALERT_URGENCY.ALL,
             assigned: vm.$route.query.assigned ?? ASSIGNED_STATE.ALL,
             filters: tagQueryHelper.filters,
+            hasManagePermission: useManagePermissionState(),
         });
 
         const replaceAlertListPageUrlQuery = (query: AlertListPageUrlQuery) => {

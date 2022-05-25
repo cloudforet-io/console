@@ -88,7 +88,7 @@
                 <collector-credentials :collector-id="selectedItems[0].collector_id" :provider="selectedItems[0].plugin_info.provider" />
             </template>
             <template #schedules>
-                <collector-schedules :collector="selectedItems[0]" />
+                <collector-schedules :collector="selectedItems[0]" :manage-disabled="!hasManagePermission" />
             </template>
             <!--            <template #collectionRule>-->
             <!--                <collection-rule />-->
@@ -204,6 +204,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { CollectorModel } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
@@ -243,7 +244,7 @@ export default {
         const queryHelper = new QueryHelper();
 
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
             timezone: computed(() => store.state.user.timezone),
             plugins: computed(() => store.state.reference.plugin.items),
             fields: computed(() => [

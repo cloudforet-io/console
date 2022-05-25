@@ -18,13 +18,13 @@
             <template #toolbox-left>
                 <p-button style-type="primary-dark" class="mr-4 add-btn"
                           icon="ic_plus_bold"
-                          :disabled="!storeState.hasManagePermission"
+                          :disabled="manageDisabled"
                           @click="handleClickInviteMember"
                 >
                     {{ $t('PROJECT.DETAIL.MEMBER.INVITE') }}
                 </p-button>
                 <p-select-dropdown :items="dropdownMenu"
-                                   :disabled="!storeState.hasManagePermission"
+                                   :disabled="manageDisabled"
                                    @select="handleSelectDropdown"
                 >
                     {{ $t('IDENTITY.USER.MAIN.ACTION') }}
@@ -139,6 +139,10 @@ export default {
             type: Array,
             default: () => [],
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { root, emit }) {
         const apiQueryHelper = new ApiQueryHelper().setPageLimit(15).setFilters(props.filters);
@@ -146,7 +150,6 @@ export default {
             users: computed(() => store.state.reference.user.items),
             projects: computed(() => store.state.reference.project.items),
             projectGroups: computed(() => store.state.reference.projectGroup.items),
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
         });
         const state = reactive({
             searchText: apiQueryHelper.filters.map(d => d.v).join(' ') || '',

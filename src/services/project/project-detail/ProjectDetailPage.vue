@@ -123,6 +123,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -170,7 +171,7 @@ export default {
         registerServiceStore<ProjectDetailState>('projectDetail', ProjectDetailStoreModule);
 
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
             hasAlertPermission: computed<boolean>(() => isUserAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList'])),
             loading: true,
             item: null as null|ProjectModel,

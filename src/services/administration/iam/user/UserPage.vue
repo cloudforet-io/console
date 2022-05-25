@@ -8,10 +8,13 @@
         />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
-                <user-management-table :table-height="height" @update-total-count="handleUpdateTotalCount" />
+                <user-management-table :table-height="height"
+                                       :manage-disabled="!hasManagePermission"
+                                       @update-total-count="handleUpdateTotalCount"
+                />
             </template>
         </p-horizontal-layout>
-        <user-management-tab />
+        <user-management-tab :manage-disabled="!hasManagePermission" />
     </section>
 </template>
 
@@ -23,6 +26,8 @@ import {
 import {
     PHorizontalLayout, PPageTitle,
 } from '@spaceone/design-system';
+
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import UserManagementTab from '@/services/administration/iam/user/modules/user-management-tab/UserManagementTab.vue';
@@ -41,6 +46,7 @@ export default {
         const state = reactive({
             selectedIndex: computed<number[]>(() => administrationStore.state.user.selectedIndex),
             totalCount: 0,
+            hasManagePermission: useManagePermissionState(),
         });
 
         const handleUpdateTotalCount = (value) => { state.totalCount = value; };

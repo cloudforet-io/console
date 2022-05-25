@@ -59,6 +59,7 @@ interface Props {
     dashboardId: string;
     filters: CostQueryFilters;
     printMode: boolean;
+    manageDisabled: boolean;
 }
 
 export default {
@@ -80,6 +81,10 @@ export default {
             default: () => ({}),
         },
         printMode: {
+            type: Boolean,
+            default: false,
+        },
+        manageDisabled: {
             type: Boolean,
             default: false,
         },
@@ -116,8 +121,7 @@ export default {
             viewFilterModalVisible: false,
             selectFilterModalVisible: false,
             isUserDashboard: computed(() => (props.dashboardId?.startsWith(DASHBOARD_TYPE.USER))),
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
-            showSetting: computed(() => ((!state.hasManagePermission && state.isUserDashboard) || state.hasManagePermission) && !props.printMode),
+            showSetting: computed(() => ((props.manageDisabled && state.isUserDashboard) || !props.manageDisabled) && !props.printMode),
         });
 
         /* api */

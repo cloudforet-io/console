@@ -8,11 +8,9 @@
 </template>
 
 <script lang="ts">
-import { computed, ref } from '@vue/composition-api';
-
-import { store } from '@/store';
-
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
+
 
 export default {
     name: 'ProjectTagPage',
@@ -26,9 +24,8 @@ export default {
         },
     },
     setup() {
-        const hasManagePermission = ref(computed<boolean>(() => store.getters['user/hasManagePermission']));
         return {
-            hasManagePermission,
+            hasManagePermission: useManagePermissionState(),
         };
     },
 };

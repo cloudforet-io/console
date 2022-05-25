@@ -130,6 +130,7 @@ import { i18n } from '@/translations';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { peacock, green, red } from '@/styles/colors';
 
@@ -198,7 +199,7 @@ export default {
 
         const searchQueryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
             timezone: computed(() => store.state.user.timezone),
             loading: true,
             modalVisible: false,

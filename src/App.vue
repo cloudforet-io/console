@@ -59,7 +59,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy, computed,
-    defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -71,7 +71,8 @@ import { store } from '@/store';
 
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
-import { isRouteAccessible } from '@/lib/access-control';
+import { getRouteAccessLevel } from '@/lib/access-control';
+import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
@@ -80,7 +81,6 @@ import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
-
 // import SurveyModal from '@/common/modules/survey/SurveyModal.vue';
 
 
@@ -102,7 +102,7 @@ export default defineComponent({
 
         const state = reactive({
             showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
-            isExpired: computed(() => vm.$store.state.error.visibleSessionExpiredError && isRouteAccessible(vm.$route, 'AUTHENTICATED')),
+            isExpired: computed(() => vm.$store.state.error.visibleSessionExpiredError && getRouteAccessLevel(vm.$route) >= ACCESS_LEVEL.AUTHENTICATED),
         });
 
         const goToSignIn = () => {
@@ -114,10 +114,6 @@ export default defineComponent({
             store.commit('error/setVisibleSessionExpiredError', false);
         };
         const showsBrowserRecommendation = () => !supportsBrowser() && !window.localStorage.getItem('showBrowserRecommendation');
-
-        watch(() => vm.$route, (route) => {
-            store.dispatch('user/updateAccessLevel', route.name);
-        }, { immediate: true });
 
         return {
             ...toRefs(state),

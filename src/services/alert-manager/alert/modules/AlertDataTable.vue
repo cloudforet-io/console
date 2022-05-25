@@ -30,6 +30,7 @@
                         >
                             <template #extra>
                                 <alert-actions :selected-items="selectedItems"
+                                               :manage-disabled="manageDisabled"
                                                @refresh="getAlerts()"
                                 />
                             </template>
@@ -40,7 +41,7 @@
                     <p-button class="mr-4"
                               style-type="primary-dark"
                               icon="ic_plus_bold"
-                              :disabled="!hasManagePermission"
+                              :disabled="manageDisabled"
                               @click="visibleAlertFormModal = true"
                     >
                         {{ $t('MONITORING.ALERT.ALERT_LIST.CREATE') }}
@@ -200,6 +201,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const tagQueryHelper = new ApiQueryHelper().setFilters(props.filters);
@@ -251,7 +256,6 @@ export default {
         });
 
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             timezone: computed(() => store.state.user.timezone),
             projects: computed(() => store.state.reference.project.items),
             webhooks: computed(() => store.state.reference.webhook.items),

@@ -2,7 +2,6 @@ import { Getter } from 'vuex';
 
 import { languages } from '@/store/modules/user/config';
 
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getPagePermissionMap, PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -60,5 +59,3 @@ export const pagePermissionList: Getter<UserState, any> = (state, getters): Page
     const permissions = state.roles?.flatMap(role => role.pagePermissions) ?? [];
     return Object.entries(getPagePermissionMap(permissions));
 };
-
-export const hasManagePermission: Getter<UserState, any> = (state): boolean => ACCESS_LEVEL[state.accessLevel] >= ACCESS_LEVEL.MANAGE_PERMISSION;

@@ -50,7 +50,6 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -69,6 +68,7 @@ import { costExplorerStore } from '@/services/cost-explorer/store';
 interface Props {
     visible: boolean;
     dashboard: DashboardInfo;
+    manageDisabled: boolean;
 }
 
 const visibilityList = [
@@ -103,6 +103,10 @@ export default defineComponent<Props>({
             type: Object as () => DashboardInfo,
             default: {},
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const {
@@ -124,9 +128,8 @@ export default defineComponent<Props>({
             visibility(value: DashboardPrivacyType) { return value.length ? '' : 'Required Field'; },
         });
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             proxyVisible: props.visible,
-            filteredVisibilityList: computed(() => (!state.hasManagePermission ? visibilityList.filter(item => item.name === DASHBOARD_PRIVACY_TYPE.USER) : visibilityList)),
+            filteredVisibilityList: computed(() => (props.manageDisabled ? visibilityList.filter(item => item.name === DASHBOARD_PRIVACY_TYPE.USER) : visibilityList)),
             includesFilter: false,
         });
 

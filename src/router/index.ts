@@ -4,7 +4,6 @@ import VueRouter, { RouteConfig } from 'vue-router';
 
 import { ERROR_ROUTE } from '@/router/error-routes';
 
-// eslint-disable-next-line import/no-cycle
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import config from '@/lib/config';
@@ -13,10 +12,6 @@ import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
-
-
-// eslint-disable-next-line import/no-cycle
-// import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
@@ -63,17 +58,18 @@ export class SpaceRouter {
             const userAccessLevel = getUserAccessLevel(to.name, SpaceRouter.router.app.$store.getters['user/pagePermissionList'], isTokenAlive);
             let nextLocation;
 
-            if (ACCESS_LEVEL[userAccessLevel] >= ACCESS_LEVEL.AUTHENTICATED) {
+            if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
                 if (to.meta?.isSignInPage) {
                     nextLocation = { name: DASHBOARD_ROUTE._NAME };
-                } else if (ACCESS_LEVEL[userAccessLevel] < ACCESS_LEVEL[routeAccessLevel]) {
+                } else if (userAccessLevel < routeAccessLevel) {
                     nextLocation = { name: ERROR_ROUTE._NAME };
                 }
-            } else if (ACCESS_LEVEL[routeAccessLevel] >= ACCESS_LEVEL.AUTHENTICATED) {
+            } else if (routeAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
                 const res = await SpaceConnector.refreshAccessToken(false);
                 if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
                 else nextLocation = { name: to.name, params: to.params };
             }
+
             next(nextLocation);
         });
 

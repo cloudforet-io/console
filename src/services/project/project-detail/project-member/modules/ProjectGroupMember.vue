@@ -14,6 +14,7 @@
             </div>
             <project-member-tab :is-project-group="true"
                                 :project-group-id="groupId"
+                                :manage-disabled="manageDisabled"
                                 class="mt-8"
             />
         </p-pane-layout>
@@ -40,6 +41,10 @@ export default {
         groupId: {
             type: String,
             required: true,
+        },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {

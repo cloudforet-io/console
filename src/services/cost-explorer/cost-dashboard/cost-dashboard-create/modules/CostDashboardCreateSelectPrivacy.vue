@@ -15,7 +15,6 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { PRadio } from '@spaceone/design-system';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { DASHBOARD_PRIVACY_TYPE, DashboardPrivacyType } from '@/services/cost-explorer/cost-dashboard/type';
@@ -37,11 +36,16 @@ export default {
     components: {
         PRadio,
     },
-    setup() {
+    props: {
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props) {
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             selectedPrivacy: DASHBOARD_PRIVACY_TYPE.USER as DashboardPrivacyType,
-            filteredPrivacyList: computed(() => (!state.hasManagePermission ? privacyList.filter(item => item.name !== DASHBOARD_PRIVACY_TYPE.PUBLIC) : privacyList)),
+            filteredPrivacyList: computed(() => (!props.manageDisabled ? privacyList.filter(item => item.name !== DASHBOARD_PRIVACY_TYPE.PUBLIC) : privacyList)),
         });
 
         const handleRadio = (value: DashboardPrivacyType) => {

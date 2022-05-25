@@ -14,8 +14,6 @@ import { i18n } from '@/translations';
 
 import { siteInit } from '@/lib/site-initializer';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import App from './App.vue';
 
 import '@/styles/style.pcss';
@@ -32,19 +30,8 @@ directive(Vue);
 
 Vue.use(SpaceDesignSystem);
 
-Vue.config.errorHandler = error => ErrorHandler.handleError(error);
 
 (async () => {
-    ErrorHandler.init({
-        authenticationErrorHandler: () => {
-            store.dispatch('error/showSessionExpiredError');
-            store.dispatch('user/setIsSessionExpired', true);
-        },
-        authorizationErrorHandler: () => {
-            store.dispatch('error/showAuthorizationError');
-        },
-    });
-
     await siteInit();
 
     new Vue({

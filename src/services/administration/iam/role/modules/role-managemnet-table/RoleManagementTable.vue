@@ -23,14 +23,14 @@
             <template slot="toolbox-left">
                 <p-button style-type="primary-dark"
                           icon="ic_plus_bold"
-                          :disabled="!hasManagePermission"
+                          :disabled="manageDisabled"
                           @click="handleCreateRole"
                 >
                     {{ $t('IAM.ROLE.CREATE') }}
                 </p-button>
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
                                    :items="dropdownMenu"
-                                   :disabled="!hasManagePermission"
+                                   :disabled="manageDisabled"
                                    @select="handleSelectDropdown"
                 >
                     {{ $t('IAM.ROLE.ACTION') }}
@@ -51,7 +51,7 @@
                           style-type="gray-border"
                           :outline="true"
                           font-weight="bold"
-                          :disabled="!hasManagePermission"
+                          :disabled="manageDisabled"
                           @click="handleEditRole(item.role_id)"
                 >
                     <p-i class="mr-1" name="ic_edit"
@@ -122,6 +122,10 @@ export default defineComponent({
             type: Number,
             default: 400,
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const currentRoute = SpaceRouter.router.currentRoute;
@@ -148,7 +152,6 @@ export default defineComponent({
             },
         });
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             loading: false,
             totalCount: 0,
             dropdownMenu: computed(() => ([

@@ -4,7 +4,7 @@
         <p-page-title child :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')"
                       @goBack="goToUserManagement"
         />
-        <notification-channel-list :disabled="!isManageable" />
+        <notification-channel-list :manage-disabled="!isManageable" />
     </div>
 </template>
 

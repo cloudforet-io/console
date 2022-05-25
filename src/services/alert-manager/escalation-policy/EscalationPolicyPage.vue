@@ -83,6 +83,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import EscalationPolicyDataTable from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyDataTable.vue';
 import EscalationPolicyFormModal from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
@@ -132,7 +133,7 @@ export default {
             tags: escalationPolicyApiQueryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
         });
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
             timezone: computed(() => store.state.user.timezone),
             pageTitle: computed(() => vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY')),
             actionItems: computed(() => ([

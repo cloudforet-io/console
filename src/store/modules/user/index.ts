@@ -23,7 +23,6 @@ const state: UserState = {
     language: storedUserState.language || 'en',
     timezone: storedUserState.timezone,
     roles: storedUserState.roles,
-    accessLevel: 'EXCLUDE_AUTH',
 };
 
 export default {

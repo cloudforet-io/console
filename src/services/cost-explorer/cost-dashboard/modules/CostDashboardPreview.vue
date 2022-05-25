@@ -8,12 +8,15 @@
                                                                :period="period"
                                                                :period-type="periodType"
                                                                print-mode
+                                                               manage-disabled
                         />
                     </div>
                 </template>
             </p-page-title>
 
-            <cost-dashboard-filter :dashboard-id="dashboardId" :filters="filters" print-mode />
+            <cost-dashboard-filter :dashboard-id="dashboardId" :filters="filters" print-mode
+                                   manage-disabled
+            />
         </div>
         <dashboard-layouts :loading="loading"
                            :layout="layout"

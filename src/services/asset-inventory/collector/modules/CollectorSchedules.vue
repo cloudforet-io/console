@@ -27,7 +27,7 @@
             <template slot="toolbox-left">
                 <p-button style-type="primary-dark"
                           icon="ic_plus_bold"
-                          :disabled="!hasManagePermission"
+                          :disabled="manageDisabled"
                           @click="openEditModal(false)"
                 >
                     {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_ADD') }}
@@ -35,7 +35,7 @@
 
                 <p-select-dropdown :items="dropdown"
                                    class="ml-4"
-                                   :disabled="!hasManagePermission"
+                                   :disabled="manageDisabled"
                                    @select="onSelectDropdown"
                 >
                     {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_ACTION') }}
@@ -126,11 +126,14 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props) {
         const vm: any = getCurrentInstance();
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             timezone: computed(() => store.state.user.timezone),
             totalCount: 0,
             items: [],

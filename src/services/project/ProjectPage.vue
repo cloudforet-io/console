@@ -24,7 +24,7 @@
                     </div>
 
                     <div class="sidebar-item-wrapper">
-                        <project-tree :init-group-id="initGroupId" />
+                        <project-tree :init-group-id="initGroupId" :manage-disabled="!hasManagePermission" />
                     </div>
                 </div>
             </template>
@@ -103,6 +103,7 @@
 
                     <project-group-member v-if="groupMemberPageVisible && storeState.groupId"
                                           :group-id="storeState.groupId"
+                                          :manage-disabled="!hasManagePermission"
                                           @close="groupMemberPageVisible = false"
                     />
                 </div>
@@ -137,6 +138,7 @@ import {
 
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
@@ -211,7 +213,7 @@ export default {
 
         const state = reactive({
             hasRootProjectGroupManagePermission: computed(() => state.hasManagePermission && store.getters['user/hasDomainRole']),
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
             initGroupId: vm.$route.query.select_pg as string,
             favoriteItems: computed<FavoriteItem[]>(() => [
                 ...convertProjectGroupConfigToReferenceData(storeState.favoriteProjectGroups, storeState.projectGroups),

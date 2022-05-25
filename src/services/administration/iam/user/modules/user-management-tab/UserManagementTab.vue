@@ -13,7 +13,7 @@
                 <p-tags-panel :resource-id="selectedUsers[0].user_id"
                               resource-type="identity.User"
                               resource-key="user_id"
-                              :disabled="!hasManagePermission"
+                              :disabled="manageDisabled"
                 />
             </template>
             <template #assigned_role>
@@ -28,7 +28,7 @@
                     </p-panel-top>
                     <user-a-p-i-key-table class="api-key-table"
                                           :user-id="selectedUsers[0].user_id"
-                                          :disabled="!hasManagePermission"
+                                          :disabled="manageDisabled"
                     />
                 </section>
             </template>
@@ -111,11 +111,16 @@ export default {
         PDataTable,
         PPanelTop,
     },
+    props: {
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
+    },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             loading: true,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             fields: computed(() => ([

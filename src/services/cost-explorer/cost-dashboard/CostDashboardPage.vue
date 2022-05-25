@@ -15,13 +15,16 @@
                                        :disabled="!hasManagePermission && dashboardType === DASHBOARD_TYPE.PUBLIC"
                                        @click.stop="handleClickEditDashboard"
                         />
-                        <cost-dashboard-more-menu :dashboard-id="dashboardId" :dashboard="dashboard" />
+                        <cost-dashboard-more-menu :dashboard-id="dashboardId" :dashboard="dashboard"
+                                                  :manage-disabled="!hasManagePermission"
+                        />
                     </div>
                     <div class="right-part">
                         <div>
                             <cost-dashboard-period-select-dropdown :dashboard-id="dashboardId"
                                                                    :period.sync="period"
                                                                    :period-type.sync="periodType"
+                                                                   :manage-disabled="!hasManagePermission"
                             />
                             <div class="left-divider download-pdf">
                                 <pdf-download-button icon-only @click="handleClickPdfDownload" />
@@ -38,7 +41,7 @@
                     </div>
                 </template>
             </p-page-title>
-            <cost-dashboard-filter :dashboard-id="dashboardId" :filters.sync="filters" />
+            <cost-dashboard-filter :dashboard-id="dashboardId" :filters.sync="filters" :manage-disabled="!hasManagePermission" />
         </div>
         <div v-if="!loading && !dashboardListLoading">
             <dashboard-layouts
@@ -95,6 +98,7 @@ import { store } from '@/store';
 import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
 import PdfDownloadOverlay, { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { gray } from '@/styles/colors';
 
@@ -158,7 +162,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
             dashboard: {} as DashboardInfo,
             loading: true,
             layout: [] as any[],

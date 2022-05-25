@@ -86,7 +86,6 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertAcknowledgeModal from '@/services/alert-manager/alert/modules/AlertAcknowledgeModal.vue';
@@ -129,10 +128,13 @@ export default {
             type: Array,
             default: () => [],
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             timezone: computed(() => store.state.user.timezone),
             projects: computed(() => store.state.reference.project.items),
             selectedItemsState: computed(() => {
@@ -147,20 +149,20 @@ export default {
                     name: ALERT_ACTION.acknowledge,
                     styleType: 'secondary-dark',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.BUTTON_ACKNOWLEDGE'),
-                    disabled: !state.hasManagePermission || state.isSelectedNone || (state.isSelectedOne && state.selectedItemsState.includes(ALERT_STATE.ACKNOWLEDGED)) || state.isSelectedError,
+                    disabled: props.manageDisabled || state.isSelectedNone || (state.isSelectedOne && state.selectedItemsState.includes(ALERT_STATE.ACKNOWLEDGED)) || state.isSelectedError,
                 },
                 {
                     name: ALERT_ACTION.resolve,
                     styleType: 'secondary-dark',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.BUTTON_RESOLVE'),
-                    disabled: !state.hasManagePermission || state.isSelectedNone || (state.isSelectedOne && state.selectedItemsState.includes(ALERT_STATE.RESOLVED)) || state.isSelectedError,
+                    disabled: props.manageDisabled || state.isSelectedNone || (state.isSelectedOne && state.selectedItemsState.includes(ALERT_STATE.RESOLVED)) || state.isSelectedError,
 
                 },
                 {
                     name: ALERT_ACTION.delete,
                     styleType: 'alert',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.BUTTON_DELETE'),
-                    disabled: !state.hasManagePermission || state.isSelectedNone,
+                    disabled: props.manageDisabled || state.isSelectedNone,
                 },
             ])),
             visibleDeleteModal: false,

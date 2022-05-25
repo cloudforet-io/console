@@ -2,6 +2,7 @@ import { computed } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import Vue from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -15,6 +16,8 @@ import { addAmchartsLicense, applyAmchartsGlobalSettings } from '@/lib/amcharts/
 import config from '@/lib/config';
 import { GTag } from '@/lib/gtag';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const initConfig = async () => {
@@ -108,6 +111,18 @@ const initAmcharts = () => {
     applyAmchartsGlobalSettings();
 };
 
+const initErrorHandler = () => {
+    Vue.config.errorHandler = error => ErrorHandler.handleError(error);
+    ErrorHandler.init({
+        authenticationErrorHandler: () => {
+            store.dispatch('error/showSessionExpiredError');
+            store.dispatch('user/setIsSessionExpired', true);
+        },
+        authorizationErrorHandler: () => {
+            store.dispatch('error/showAuthorizationError');
+        },
+    });
+};
 
 const removeInitializer = () => {
     const el = document.getElementById('site-loader-wrapper');
@@ -127,6 +142,7 @@ const init = async () => {
         initQueryHelper();
         initGtag();
         initAmcharts();
+        initErrorHandler();
     } else {
         initRouter();
         throw new Error('Site initialization failed: No matched domain');

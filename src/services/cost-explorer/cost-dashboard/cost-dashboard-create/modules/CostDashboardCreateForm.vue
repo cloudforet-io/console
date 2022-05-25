@@ -10,7 +10,7 @@
         </p-pane-layout>
         <p-pane-layout>
             <h2>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.VISIBILITY') }}</h2>
-            <cost-dashboard-create-select-privacy />
+            <cost-dashboard-create-select-privacy :manage-disabled="manageDisabled" />
         </p-pane-layout>
     </div>
 </template>
@@ -36,7 +36,12 @@ export default {
         CostDashboardCreateSelectPrivacy,
         PPaneLayout,
     },
-
+    props: {
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
+    },
     setup() {
         return {
         };

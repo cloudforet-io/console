@@ -9,6 +9,7 @@
         <p-horizontal-layout class="role-toolbox-layout">
             <template #container="{ height }">
                 <role-management-table :table-height="height"
+                                       :manage-disabled="!hasManagePermission"
                                        @update-selected-indices="handleUpdate"
                                        @update-total-count="handleUpdate"
                 />
@@ -27,6 +28,8 @@ import {
     PHorizontalLayout, PPageTitle, PToolboxTable, PSelectDropdown,
 } from '@spaceone/design-system';
 
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+
 import RoleManagementTab from '@/services/administration/iam/role/modules/role-management-tab/RoleManagementTab.vue';
 import RoleManagementTable from '@/services/administration/iam/role/modules/role-managemnet-table/RoleManagementTable.vue';
 
@@ -44,6 +47,7 @@ export default defineComponent({
         const state = reactive({
             totalCount: 0,
             selectedIndices: [] as number[],
+            hasManagePermission: useManagePermissionState(),
         });
         const handleUpdate = (value: number[] | number) => {
             if (Array.isArray(value)) {

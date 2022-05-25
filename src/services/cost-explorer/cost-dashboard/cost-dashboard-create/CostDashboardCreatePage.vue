@@ -3,7 +3,7 @@
         <nav>
             <p-page-title :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.CREATE_DASHBOARD')" child @goBack="$router.go(-1)" />
         </nav>
-        <cost-dashboard-create-form />
+        <cost-dashboard-create-form :manage-disabled="!hasManagePermission" />
         <div class="button-group">
             <p-button style-type="gray900" :outline="true" @click="$router.go(-1)">
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CANCEL') }}
@@ -25,6 +25,7 @@ import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import CostDashboardCreateForm
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateForm.vue';
@@ -54,6 +55,7 @@ export default {
             defaultFilter: computed<Record<string, string[]>>(() => costExplorerStore.state.dashboard.defaultFilter),
             includesFilter: computed<boolean>(() => costExplorerStore.state.dashboard.includesFilter),
             selectedPrivacy: computed<DashboardPrivacyType>(() => costExplorerStore.state.dashboard.selectedDashboardPrivacy),
+            hasManagePermission: useManagePermissionState(),
         });
 
         const getCustomLayouts = async () => {

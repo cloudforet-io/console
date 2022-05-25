@@ -6,7 +6,7 @@
                 <p-select-dropdown
                     :items="alertStateList"
                     :selected="alertState"
-                    :disabled="!hasManagePermission"
+                    :disabled="manageDisabled"
                     class="state-dropdown"
                     @select="changeAlertState"
                 >
@@ -25,7 +25,7 @@
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
             <p-select-dropdown :items="alertUrgencyList"
                                :selected="alertUrgency"
-                               :disabled="alertState === ALERT_STATE.ERROR || !hasManagePermission"
+                               :disabled="alertState === ALERT_STATE.ERROR || manageDisabled"
                                class="state-dropdown"
                                @select="changeAlertUrgency"
             >
@@ -42,7 +42,7 @@
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.ASSIGNED_TO') }}
                 <p-button style-type="gray-border" :outline="true" size="sm"
                           class="ml-2"
-                          :disabled="!hasManagePermission"
+                          :disabled="manageDisabled"
                           @click="onClickReassign"
                 >
                     {{ $t('MONITORING.ALERT.DETAIL.HEADER.ASSIGN') }}
@@ -73,8 +73,6 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -101,6 +99,7 @@ import { AlertDataModel } from '@/services/alert-manager/type';
 interface PropsType {
     id: string;
     alertData: AlertDataModel;
+    manageDisabled: boolean;
 }
 
 const calculateTime = (time) => {
@@ -133,10 +132,13 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: PropsType, { root }) {
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
             alertInfo: computed(() => alertManagerStore.state.alert.alertData),
             alertState: computed(() => state.alertInfo?.state),
             alertUrgency: computed(() => state.alertInfo?.urgency),

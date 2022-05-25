@@ -24,7 +24,10 @@
                 </p-anchor>
             </template>
             <template #data-project_id>
-                <alert-info-project :id="id" :alert-data="data" @update="$emit('update')" />
+                <alert-info-project :id="id" :alert-data="data"
+                                    :manage-disabled="manageDisabled"
+                                    @update="$emit('update')"
+                />
             </template>
             <template #data-triggered_by="{ value }">
                 <alert-triggered-by :value="value" :project-id="data.project_id"
@@ -111,6 +114,10 @@ export default {
         alertData: {
             type: Object,
             default: () => ({}) as PropType<AlertDataModel>,
+        },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
         },
     },
     setup() {

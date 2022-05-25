@@ -1,8 +1,10 @@
 <template>
-    <server-main />
+    <server-main :manage-disabled="!hasManagePermission" />
 </template>
 
 <script lang="ts">
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+
 import ServerMain from '@/services/asset-inventory/server/modules/ServerMain.vue';
 
 export default {
@@ -12,6 +14,7 @@ export default {
     },
     setup() {
         return {
+            hasManagePermission: useManagePermissionState(),
         };
     },
 };

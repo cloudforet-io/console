@@ -1,7 +1,3 @@
-import { Mutation } from 'vuex';
-
-import { AccessLevel } from '@/lib/access-control/config';
-
 import { UserState, UserRole } from './type';
 
 export const setUser = (state: UserState, userInfo: UserState): void => {
@@ -28,8 +24,4 @@ export const setTimezone = (state: UserState, timezone: string): void => {
 
 export const setRoles = (state: UserState, roles: Array<UserRole>): void => {
     state.roles = roles;
-};
-
-export const setAccessLevel: Mutation<UserState> = (state, accessLevel: AccessLevel) => {
-    state.accessLevel = accessLevel;
 };

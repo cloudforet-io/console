@@ -1,5 +1,6 @@
 import { RouteConfig } from 'vue-router';
 
+import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { getMenuLabel } from '@/lib/menu/menu-info';
 
@@ -17,7 +18,7 @@ const NotificationAddPage = () => import(/* webpackChunkName: "NotificationAddPa
 const myPageRoutes: RouteConfig = {
     path: 'my-page',
     name: MY_PAGE_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.MY_PAGE), accessLevel: 'AUTHENTICATED' },
+    meta: { label: getMenuLabel(MENU_ID.MY_PAGE), accessLevel: ACCESS_LEVEL.AUTHENTICATED },
     redirect: '/my-page/account',
     component: MyPageContainer,
     children: [

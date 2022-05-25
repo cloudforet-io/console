@@ -17,7 +17,7 @@
             <budget-summary :budget-loading="loading" :currency="currency" :currency-rates="currencyRates"
                             class="summary"
             />
-            <budget-notifications class="alert" />
+            <budget-notifications class="alert" :manage-disabled="!hasManagePermission" />
             <!--            <budget-billing-admin class="budget" />-->
         </section>
         <budget-delete-modal v-if="!loading"
@@ -39,6 +39,7 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import BudgetDetailInfo
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetDetailInfo.vue';
@@ -73,7 +74,7 @@ export default {
             budgetData: computed<Partial<BudgetData>|null>(() => costExplorerStore.state.budget.budgetData),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
         });
 
         const checkDeleteState = reactive({

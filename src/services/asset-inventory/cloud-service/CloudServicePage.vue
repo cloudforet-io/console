@@ -90,6 +90,7 @@ import {
 } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
@@ -144,7 +145,7 @@ export default {
 
         const searchQueryHelper = new QueryHelper();
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
             // references
             providers: computed(() => store.state.reference.provider.items),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),

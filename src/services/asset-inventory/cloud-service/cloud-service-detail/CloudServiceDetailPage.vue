@@ -8,6 +8,7 @@
                      :cloud-service-group="group"
                      :period="overviewState.period"
                      :min-height="TABLE_MIN_HEIGHT"
+                     :manage-disabled="!tableState.hasManagePermission"
         >
             <template #period-filter>
                 <cloud-service-period-filter :period="overviewState.period"
@@ -189,6 +190,7 @@ import { Reference } from '@/lib/reference/type';
 import { objectToQueryString, queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 import { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
@@ -278,7 +280,7 @@ export default {
 
         const tableHeight = store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX) ?? 0;
         const tableState = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
             schema: null as null|DynamicLayout,
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),

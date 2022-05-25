@@ -35,7 +35,7 @@
             </p>
             <p-search-dropdown :menu="responderState.allMemberItems"
                                :selected.sync="responderState.selectedMemberItems"
-                               :disabled="!hasManagePermission"
+                               :disabled="manageDisabled"
                                multi-selectable
                                @hide-menu="onHideMenu"
                                @delete-tag="onDeleteTag"
@@ -98,6 +98,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: PropsType) {
         const state = reactive({
@@ -109,7 +113,6 @@ export default {
             escalationRuleItems: [] as Rule[],
             loading: true,
             projectChannels: [],
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
         });
 
         const responderState = reactive({

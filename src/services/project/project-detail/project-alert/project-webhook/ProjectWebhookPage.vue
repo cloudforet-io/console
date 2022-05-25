@@ -159,6 +159,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import { WEBHOOK_STATE, WebhookState } from '@/services/alert-manager/lib/config';
@@ -214,7 +215,7 @@ export default {
             .setSort('created_at', true)
             .setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
             loading: true,
             timezone: computed(() => store.state.user.timezone),
             plugins: computed(() => store.state.reference.plugin.items),

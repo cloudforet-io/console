@@ -36,8 +36,9 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import BudgetList from '@/services/cost-explorer/budget/modules/budget-list/BudgetList.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -69,7 +70,7 @@ export default {
                 // },
             ]),
             filters: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).filters,
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
         });
 
         const handleCreateBudgetSelect = (name) => {

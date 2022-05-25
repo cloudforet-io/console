@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-cycle
 import { MENU_ID } from '@/lib/menu/config';
 
 export const PROJECT_ROUTE = Object.freeze({

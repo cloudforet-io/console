@@ -110,11 +110,10 @@ import {
 } from '@spaceone/design-system';
 import { get } from 'lodash';
 
-
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import EscalationPolicyFormModal from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
 import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
@@ -159,7 +158,7 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
             notificationUrgencyList: computed(() => ([
                 {
                     name: NOTIFICATION_URGENCY.ALL,

@@ -1,8 +1,5 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import jwt from 'jsonwebtoken';
-import { Action } from 'vuex';
-
-import { getUserAccessLevel } from '@/lib/access-control';
 
 import {
     UserState, SignInRequest, UpdateUserRequest, UserRole,
@@ -150,9 +147,4 @@ export const getUser = async ({ commit, state }, userId): Promise<void> => {
         const userInfo = await getUserInfo(userId);
         commit('setUser', userInfo);
     }
-};
-
-export const updateAccessLevel: Action<UserState, any> = ({ commit, getters }, routeName?: string|null) => {
-    const accessLevel = getUserAccessLevel(routeName, getters.pagePermissionList, SpaceConnector.isTokenAlive);
-    commit('setAccessLevel', accessLevel);
 };

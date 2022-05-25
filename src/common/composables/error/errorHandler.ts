@@ -7,7 +7,8 @@ import { TranslateResult } from 'vue-i18n';
 
 import { SpaceRouter } from '@/router';
 
-import { isRouteAccessible } from '@/lib/access-control';
+import { getRouteAccessLevel } from '@/lib/access-control';
+import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import { isInstanceOfNoResourceError, isInstanceOfNoSearchResourceError } from '@/common/composables/error/error';
@@ -33,7 +34,7 @@ export default class ErrorHandler {
             const isTokenAlive = SpaceConnector.isTokenAlive;
 
             if (!isTokenAlive
-                && isRouteAccessible(SpaceRouter.router.currentRoute, 'AUTHENTICATED')) {
+                && getRouteAccessLevel(SpaceRouter.router.currentRoute) >= ACCESS_LEVEL.AUTHENTICATED) {
                 ErrorHandler.authenticationErrorHandler();
             }
         } else if (isInstanceOfAuthorizationError(error)) {

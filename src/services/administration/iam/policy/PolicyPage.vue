@@ -25,7 +25,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { PPageTitle, PButton } from '@spaceone/design-system';
 
-import { store } from '@/store';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import PolicyListDataTable from '@/services/administration/modules/PolicyListDataTable.vue';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
@@ -41,7 +41,7 @@ export default {
     setup() {
         const state = reactive({
             totalCount: computed(() => administrationStore.state.policy.totalCount),
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
         });
 
         return {

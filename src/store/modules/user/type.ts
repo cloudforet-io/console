@@ -1,4 +1,3 @@
-import { AccessLevel } from '@/lib/access-control/config';
 import { PagePermission } from '@/lib/access-control/page-permission-helper';
 
 type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
@@ -24,7 +23,6 @@ export interface UserState {
     language?: string;
     timezone?: string;
     roles?: Array<UserRole>;
-    accessLevel: AccessLevel;
 }
 
 export interface SignInRequest {

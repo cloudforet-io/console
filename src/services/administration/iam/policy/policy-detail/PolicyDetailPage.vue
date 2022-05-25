@@ -88,13 +88,13 @@ import {
 
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import deleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
 import { PolicyDetailPageProps } from '@/services/administration/iam/policy/lib/type';
@@ -130,7 +130,7 @@ export default defineComponent<PolicyDetailPageProps>({
         const arrayifyPermission = (permissionsCode: string) => permissionsCode.split('\n');
 
         const state = reactive({
-            hasManagePermission: computed<boolean>(() => store.getters['user/hasManagePermission']),
+            hasManagePermission: useManagePermissionState(),
             policyInfo: computed(() => administrationStore.state.policy.policyData),
             type: SpaceRouter.router.currentRoute.query.type,
             code: '',
