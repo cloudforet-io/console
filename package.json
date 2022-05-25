@@ -140,8 +140,8 @@
     "not ie <= 9"
   ],
   "engines": {
-    "node": ">= 8.10.x",
-    "npm": ">= 5.6.0"
+    "node": ">= 16.13.0",
+    "npm": ">= 8.1.0"
   },
   "license": "Apache-2.0",
   "types": "dist/src/index.d.ts"
