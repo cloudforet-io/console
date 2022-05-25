@@ -93,28 +93,28 @@ module.exports = {
                     regex: '(total_count)',
                     match: false,
                 },
-                leadingUnderscore: 'allow'
+                leadingUnderscore: 'allow',
             },
             {
                 selector: 'memberLike',
                 format: ['camelCase', 'snake_case', 'PascalCase', 'UPPER_CASE'],
-                leadingUnderscore: 'allow'
+                leadingUnderscore: 'allow',
             },
             {
                 selector: 'parameter',
                 format: ['camelCase'],
-                leadingUnderscore: 'allow'
+                leadingUnderscore: 'allow',
             },
             {
                 selector: 'typeLike',
-                format: ['PascalCase', 'UPPER_CASE']
+                format: ['PascalCase', 'UPPER_CASE'],
             },
         ],
         '@typescript-eslint/no-empty-function': ['off'], // use eslint no-empty-function rule
         '@typescript-eslint/no-use-before-define': ['off'], // use eslint no-use-before-define rule
         '@typescript-eslint/ban-ts-ignore': ['off'],
         '@typescript-eslint/explicit-function-return-type': ['off'],
-        "@typescript-eslint/explicit-module-boundary-types": ['off'],
+        '@typescript-eslint/explicit-module-boundary-types': ['off'],
         '@typescript-eslint/no-explicit-any': ['off'],
         '@typescript-eslint/no-unused-vars': ['error'],
         '@typescript-eslint/no-shadow': ['error'],
@@ -126,7 +126,7 @@ module.exports = {
                 groups: ['builtin', 'external', 'internal', 'index'],
                 pathGroups: [
                     {
-                        pattern: "@vue/test-utils",
+                        pattern: '@vue/test-utils',
                         group: 'builtin',
                         position: 'before',
                     },
@@ -145,40 +145,40 @@ module.exports = {
                     {
                         pattern: '@/router/**',
                         group: 'internal',
-                        position: 'after'
+                        position: 'after',
                     },
                     {
                         pattern: '@/store/**',
                         group: 'internal',
-                        position: 'after'
+                        position: 'after',
                     },
                     {
                         pattern: '@/translations/**',
                         group: 'internal',
-                        position: 'after'
+                        position: 'after',
                     },
                     {
                         pattern: '@/lib/**',
                         group: 'internal',
-                        position: 'after'
+                        position: 'after',
                     },
                     {
                         pattern: '@/common/**',
                         group: 'internal',
-                        position: 'after'
+                        position: 'after',
                     },
                     {
                         pattern: '@/styles/**',
                         group: 'internal',
-                        position: 'after'
+                        position: 'after',
                     },
                     {
                         pattern: '@/services/**',
                         group: 'internal',
-                        position: 'after'
-                    }
+                        position: 'after',
+                    },
                 ],
-                "pathGroupsExcludedImportTypes": ["@vue/composition-api", "@vue/test-utils"],
+                pathGroupsExcludedImportTypes: ['@vue/composition-api', '@vue/test-utils'],
                 alphabetize: {
                     order: 'asc',
                     caseInsensitive: true,
@@ -186,7 +186,7 @@ module.exports = {
                 'newlines-between': 'always',
             },
         ],
-        "import/namespace": [0, { allowComputed: true }]
+        'import/namespace': [0, { allowComputed: true }],
     },
     ignorePatterns: ['src/assets/**', '**/node_modules/**', 'translations/language-pack/**', 'public/lottie.js'],
     parserOptions: {
@@ -200,7 +200,7 @@ module.exports = {
             typescript: {},
         },
         'import/parsers': {
-            '@typescript-eslint/parser': ['.ts']
+            '@typescript-eslint/parser': ['.ts'],
         },
     },
 

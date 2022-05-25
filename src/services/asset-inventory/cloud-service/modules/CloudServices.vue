@@ -88,8 +88,7 @@ interface Value {
     icon: string;
     name: string;
     count: number;
-    /* parsing error in TypeScript version 4 */
-    href: any[]; // [string, object];
+    href: [string, object];
 }
 const DATA_LENGTH = 8;
 

@@ -75,6 +75,7 @@ declare module 'vue/types/vue' {
 }
 
 declare module 'vue/types/options' {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ComponentOptions<V extends Vue> {
         i18n?: {
             messages?: VueI18n.LocaleMessages;
