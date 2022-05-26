@@ -4,6 +4,7 @@
                   :header-title="headerTitle"
                   :hide-footer="!isDeletable"
                   :loading="loading"
+                  :enable-scroll="true"
                   @confirm="handleDelete"
     >
         <div v-if="!isDeletable" class="mb-4">

@@ -12,7 +12,10 @@
                     @confirm="handleConfirm"
     >
         <template #body>
-            <p v-if="contents || $scopedSlots.default" class="delete-modal-content">
+            <p
+                v-if="contents || $scopedSlots.default"
+                :class="{'delete-modal-content': true, 'enable-scroll': enableScroll}"
+            >
                 <slot>{{ contents }}</slot>
             </p>
             <slot name="delete-modal-body" />
@@ -82,6 +85,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        enableScroll: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -105,8 +112,6 @@ export default {
 
 <style lang="postcss" scoped>
 .delete-modal-content {
-    max-height: 43.75rem;
-    overflow-y: scroll;
     line-height: 160%;
 }
 .content-footer {
@@ -114,5 +119,9 @@ export default {
     .close-button {
         @apply mt-6;
     }
+}
+.enable-scroll {
+    overflow-y: scroll;
+    max-height: 43.75rem;
 }
 </style>
