@@ -162,39 +162,30 @@ export default {
             }
         };
         const createEscalationPolicy = async () => {
-            try {
-                const res = await SpaceConnector.client.monitoring.escalationPolicy.create({
-                    ...formState.inputModel,
-                    project_id: props.projectId,
-                });
-                state.changedEscalationPolicyId = res.escalation_policy_id;
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_ESCALATION_POLICY'));
-            }
+            const res = await SpaceConnector.client.monitoring.escalationPolicy.create({
+                ...formState.inputModel,
+                project_id: props.projectId,
+            });
+            state.changedEscalationPolicyId = res.escalation_policy_id;
         };
         const updateEscalationPolicy = async () => {
-            try {
-                await SpaceConnector.client.monitoring.projectAlertConfig.update({
-                    project_id: props.projectId,
-                    escalation_policy_id: state.changedEscalationPolicyId,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+            await SpaceConnector.client.monitoring.projectAlertConfig.update({
+                project_id: props.projectId,
+                escalation_policy_id: state.changedEscalationPolicyId,
+            });
         };
 
         /* event */
         const onClickConfirm = async () => {
-            if (state.activeTab === FORM_MODE.create) {
-                formState.showValidation = true;
-                if (!formState.isAllValid) return;
-                await createEscalationPolicy();
-            } else {
-                state.changedEscalationPolicyId = tableState.items[tableState.selectIndex[0]].escalation_policy_id;
-            }
-
             try {
-                await updateEscalationPolicy();
+                if (state.activeTab === FORM_MODE.create) {
+                    formState.showValidation = true;
+                    if (!formState.isAllValid) return;
+                    await createEscalationPolicy();
+                } else {
+                    state.changedEscalationPolicyId = tableState.items[tableState.selectIndex[0]].escalation_policy_id;
+                    await updateEscalationPolicy();
+                }
                 emit('confirm');
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_ESCALATION_POLICY'), '', root);
             } catch (e) {
