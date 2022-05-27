@@ -1,3 +1,10 @@
+# [1.1.0-beta.318](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.317...v1.1.0-beta.318) (2022-05-27)
+
+
+### Bug Fixes
+
+* catch error when getting parent node in Tree ([4ed5efd](https://github.com/spaceone-dev/spaceone-design-system/commit/4ed5efd6404f0ed0cba089cfbea989fd598b0473))
+
 # [1.1.0-beta.317](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.316...v1.1.0-beta.317) (2022-05-27)
 
 
