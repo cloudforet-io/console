@@ -310,15 +310,23 @@ export default defineComponent<Props>({
             if (getSelectState(e.startPath ?? [])) {
                 setSelectItem(e.dragNode as TreeNode, targetPath);
             }
-            const oldParent = e.startPath ? e.startTree?.getNodeParentByPath(e.startPath) as TreeNode : null;
+
+            let oldParent: TreeNode|null = null;
+            if (e.startPath) {
+                try {
+                    oldParent = e.startTree?.getNodeParentByPath(e.startPath) as TreeNode;
+                } catch (error) {}
+            }
+
             const parent = e.targetTree?.getNodeParentByPath(targetPath) as TreeNode;
+
             emit('drop', e.dragNode, oldParent, parent, rollback);
         };
 
         const eachDraggable = (path: number[], tree: HeTree, e: Store) => {
             const dragValidator = props.dragOptions.dragValidator;
             if (dragValidator
-                && !dragValidator(e.dragNode as TreeNode, tree.getNodeParentByPath(path) as TreeNode)) {
+                && !dragValidator(e.dragNode as TreeNode, path ? tree.getNodeParentByPath(path) as TreeNode : undefined)) {
                 return false;
             }
             return true;
