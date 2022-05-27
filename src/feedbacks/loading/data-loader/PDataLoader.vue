@@ -277,6 +277,9 @@ export default defineComponent<Props>({
                 }
                 &.skeleton {
                     height: 100%;
+                    > .p-skeleton {
+                        height: 100%;
+                    }
                 }
             }
         }
