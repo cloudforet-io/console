@@ -568,7 +568,7 @@
 						"COST_ANALYSIS_QUERY": "Cost Analysis Query",
 						"COST_BY_REGION_DESC": "Displays the top list of 15 highest spending throughout the whole period of filtered date, aggregated by Region.",
 						"COST_DONUT_DESC": "Displays the top list of 15 highest spending throughout the whole period of filtered date, aggregated by selected Group-By.",
-						"COST_MAP_DESC": "Displays the top list of 15 highest spending throughout the whole period of filtered date, aggregated by selected Group-By.",
+						"COST_MAP_DESC": "Displays the top list of 10 highest spending throughout the whole period of filtered date, aggregated by selected Group-By.",
 						"COST_PIE_FOR_SPC_USAGE_DESC": "Displays the top 20 accumulated cost throughout the whole period of filtered date, aggregated by selected Group-By.",
 						"COST_TREND_A_DESC": "Displays the top list of 15 highest spending in last 4 months of filtered date, aggregated by selected Group-By.",
 						"COST_TREND_B_DESC": "Displays the top list of 15 highest spending throughout the whole period of filtered date, aggregated by selected Group-By.",

@@ -568,7 +568,7 @@
 						"COST_ANALYSIS_QUERY": "비용분석 쿼리",
 						"COST_BY_REGION_DESC": "Region을 기준으로 조회 기간동안 발생한 상위 15개 비용 데이터를 보여주는 위젯.",
 						"COST_DONUT_DESC": "선택한 Group-By를 기준으로 조회 기간동안 발생한 상위 15개 비용 데이터를 보여주는 위젯.",
-						"COST_MAP_DESC": "선택한 Group-By를 기준으로 조회 기간동안 발생한 상위 15개 비용 데이터를 보여주는 위젯.",
+						"COST_MAP_DESC": "선택한 Group-By를 기준으로 조회 기간동안 발생한 상위 10개 비용 데이터를 보여주는 위젯.",
 						"COST_PIE_FOR_SPC_USAGE_DESC": "선택한 Group-By를 기준으로 조회 기간동안 발생한 상위 20개 누적 비용 데이터를 보여주는 위젯.",
 						"COST_TREND_A_DESC": "선택한 Group-By를 기준으로 조회 기간내 최근 4개월 동안 발생한 상위 15개 비용 데이터를 보여주는 위젯.",
 						"COST_TREND_B_DESC": "선택한 Group-By를 기준으로 조회 기간동안 발생한 상위 15개 비용 트렌드를 보여주는 위젯.",
