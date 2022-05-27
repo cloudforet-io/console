@@ -1,3 +1,10 @@
+# [1.1.0-beta.319](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.318...v1.1.0-beta.319) (2022-05-27)
+
+
+### Bug Fixes
+
+*  add queryTags initialization function in Toolbox ([#972](https://github.com/spaceone-dev/spaceone-design-system/issues/972)) ([21828e3](https://github.com/spaceone-dev/spaceone-design-system/commit/21828e3db9f10e6d2d90d9968f2e77cb34517d24))
+
 # [1.1.0-beta.318](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.317...v1.1.0-beta.318) (2022-05-27)
 
 
