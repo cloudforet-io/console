@@ -84,14 +84,16 @@
                         </router-link>
                     </div>
                 </div>
-                <p-divider class="divider" />
-                <div class="sub-menu-list">
-                    <div class="sub-menu">
-                        <router-link :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}">
-                            Access with API & CLI
-                        </router-link>
+                <fragment v-if="!userState.isDomainOwner">
+                    <p-divider class="divider" />
+                    <div class="sub-menu-list">
+                        <div class="sub-menu">
+                            <router-link :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}">
+                                Access with API & CLI
+                            </router-link>
+                        </div>
                     </div>
-                </div>
+                </fragment>
                 <p-divider class="divider" />
                 <div class="sub-menu-list">
                     <div v-for="{ link, label} in supportMenu" :key="label" class="sub-menu">
