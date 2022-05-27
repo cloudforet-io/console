@@ -28,6 +28,7 @@ export interface ValueItem {
 export interface KeyItem {
     label: string;
     name: any;
+    valueSet?: Record<string, ValueItem>;
     dataType?: KeyDataType;
     operators?: OperatorType[];
 }

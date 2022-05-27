@@ -73,7 +73,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { groupBy } from 'lodash';
@@ -200,7 +200,7 @@ export default defineComponent<ToolboxProps>({
             pageSize: makeOptionalProxy<number>('pageSize', vm, initPageSize),
             sortBy: useProxyValue('sortBy', props, emit),
             searchText: makeOptionalProxy<string>('searchText', vm, ''),
-            queryTags: makeOptionalProxy<QueryTag[]>('queryTags', vm, []),
+            queryTags: props.queryTags ?? [],
         });
         const sortByOptionsData = (props.sortable ? groupBy(props.sortByOptions, 'name') : undefined);
         const state = reactive({
@@ -214,6 +214,13 @@ export default defineComponent<ToolboxProps>({
             }),
             selectedSortBy: computed(() => ((sortByOptionsData && props.sortable) ? sortByOptionsData[proxyState.sortBy][0]?.label : proxyState.sortBy)),
             tagRef: null as any,
+            valueSetMap: computed(() => {
+                const valueSetMap = {};
+                (props.keyItemSets ?? []).forEach(keyItemSet => keyItemSet.items.forEach((item) => {
+                    if (item.valueSet) valueSetMap[item.name] = item.valueSet;
+                }));
+                return valueSetMap;
+            }),
         });
 
 
@@ -240,6 +247,11 @@ export default defineComponent<ToolboxProps>({
             }
         };
 
+        const setQueryTags = (value: QueryItem[]) => {
+            proxyState.queryTags = value;
+            emit('update:query-tags', proxyState.queryTags);
+        };
+
         const onSearch = (val?: string|QueryItem) => {
             if (!val) {
                 proxyState.searchText = '';
@@ -257,6 +269,7 @@ export default defineComponent<ToolboxProps>({
                 state.tagRef.addTag(val);
             } else {
                 proxyState.queryTags.push(val);
+                emit('update:query-tags', proxyState.queryTags);
             }
         };
 
@@ -272,7 +285,7 @@ export default defineComponent<ToolboxProps>({
 
         const onQueryTagsChange = (tags: QueryTag[]) => {
             if (proxyState.queryTags !== tags) {
-                proxyState.queryTags = tags;
+                setQueryTags(tags);
                 proxyState.thisPage = 1;
                 vm.$nextTick(() => {
                     emitChange({ queryTags: tags, pageStart: state.pageStart });
@@ -280,6 +293,21 @@ export default defineComponent<ToolboxProps>({
             }
         };
 
+        const initQueryTags = () => {
+            const queryTags = props.queryTags ?? [];
+            queryTags.forEach((queryTag: QueryItem) => {
+                const { key, value } = queryTag;
+                if (!key || !value) return;
+                queryTag.value.label = (state.valueSetMap[key.name]) ? state.valueSetMap[key.name][value.name]?.label : value.name;
+            });
+            setQueryTags(queryTags);
+        };
+
+        watch([() => state.valueSetMap, () => props.queryTags], () => {
+            initQueryTags();
+        }, {
+            immediate: true,
+        });
         return {
             SEARCH_TYPES,
             proxyState,
