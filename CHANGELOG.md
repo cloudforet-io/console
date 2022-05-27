@@ -1,3 +1,10 @@
+# [1.1.0-beta.317](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.316...v1.1.0-beta.317) (2022-05-27)
+
+
+### Bug Fixes
+
+* make skeleton loader height full in DataLoader ([0672184](https://github.com/spaceone-dev/spaceone-design-system/commit/0672184ae5e10510637c8f83e7ff4e4cfaf59e4f))
+
 # [1.1.0-beta.316](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.315...v1.1.0-beta.316) (2022-05-23)
 
 
