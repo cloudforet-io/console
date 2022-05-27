@@ -1,6 +1,7 @@
 <template>
     <div class="right-side-menu" @click.stop>
-        <g-n-b-search v-click-outside="hideMenu"
+        <g-n-b-search v-if="!userState.isDomainOwner"
+                      v-click-outside="hideMenu"
                       :visible-suggestion="openedMenu === 'search'"
                       @update:visibleSuggestion="toggleMenu('search')"
         />
