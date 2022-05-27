@@ -65,7 +65,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { Period } from '@/services/cost-explorer/type';
 import {
     getCurrencyAppliedChartData,
-    getLegends, getTooltipText,
+    getLegends,
     getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardCardWidgetLayout
@@ -248,13 +248,22 @@ export default {
                 series.tooltip.getFillFromObject = false;
                 series.tooltip.background.fill = am4core.color(seriesColor);
 
+                series.tooltip.getFillFromObject = false;
+                series.tooltip.background.fill = am4core.color('white');
+                series.tooltip.label.fill = am4core.color('black');
+                series.tooltip.defaultState.transitionDuration = 0;
+                series.tooltip.hiddenState.transitionDuration = 0;
                 series.adapter.add('tooltipText', (tooltipText, target) => {
-                    if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                        const cost = Number(target.tooltipDataItem.dataContext[legend.name] ?? 0);
-                        const currencyMoney = currencyMoneyFormatter(cost, props.currency, undefined, true);
-                        return getTooltipText('name', undefined, currencyMoney);
-                    }
-                    return tooltipText;
+                    const dateText = dayjs.utc(target.tooltipDataItem.dataContext.date).format('MMM');
+                    let text = `${dateText}\n`;
+                    chart.series.each((item) => {
+                        if (!item.isHidden) {
+                            const cost = Number(target.tooltipDataItem.dataContext[item.dataFields.valueY] ?? 0);
+                            const currencyMoney = currencyMoneyFormatter(cost, props.currency, undefined, true);
+                            text += `[${item.stroke.hex}]●[/] ${item.name}: [bold]${currencyMoney}[/]\n`;
+                        }
+                    });
+                    return text;
                 });
 
                 if (legend.name !== 'dummy') {
@@ -278,6 +287,7 @@ export default {
             }
 
             chart.cursor = new am4charts.XYCursor();
+            chart.cursor.maxTooltipDistance = 0;
             chart.cursor.lineX.disabled = true;
             chart.cursor.lineY.disabled = true;
             chart.cursor.behavior = 'none';
