@@ -1,7 +1,7 @@
 <template>
     <cost-dashboard-card-widget-layout
         :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_BY_PROJECT')"
-        :data-range="15"
+        :data-range="DATA_LIMIT"
         :widget-link="widgetLink"
         :no-data="!loading && data.length === 0"
         :print-mode="printMode"
@@ -86,6 +86,7 @@ import { CostAnalyzeModel, PieChartData, WidgetProps } from '@/services/cost-exp
 const CATEGORY_KEY = 'category';
 const VALUE_KEY = 'value';
 const MAX_TABLE_COLUMN = 8;
+const DATA_LIMIT = 10;
 
 interface CostTreeMapData extends PieChartData {
     backgroundColor?: string;
@@ -212,7 +213,7 @@ export default defineComponent<WidgetProps>({
             seriesBullet.label.adapter.add('text', (text, target) => {
                 if (target.dataItem?.value) {
                     const percentage = (100 * target.dataItem.value) / totalCost;
-                    if (percentage >= 5) {
+                    if (percentage >= 2.5) {
                         return `[font-size: 14px; {textColor};]{${CATEGORY_KEY}}[/]`;
                     }
                 }
@@ -256,7 +257,7 @@ export default defineComponent<WidgetProps>({
                     group_by: [props.options.group_by],
                     start: dayjs.utc(props.period?.start).format('YYYY-MM'),
                     end: dayjs.utc(props.period?.end).format('YYYY-MM'),
-                    limit: 15,
+                    limit: DATA_LIMIT,
                     ...costQueryHelper.apiQuery,
                 });
                 return results;
@@ -296,6 +297,7 @@ export default defineComponent<WidgetProps>({
 
         return {
             ...toRefs(state),
+            DATA_LIMIT,
             getConvertedIndex,
             currencyMoneyFormatter,
         };
