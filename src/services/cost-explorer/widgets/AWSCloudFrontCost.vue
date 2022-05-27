@@ -2,7 +2,7 @@
     <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.AWS_CLOUD_FRONT_COST')"
                                        class="aws-cloud-front-cost"
                                        :widget-link="widgetLink"
-                                       :data-range="15"
+                                       :data-range="DATA_LIMIT"
                                        :print-mode="printMode"
     >
         <p-data-loader :loading="loading" class="chart-wrapper">
@@ -13,7 +13,7 @@
         </p-data-loader>
         <div class="table-wrapper">
             <cost-dashboard-data-table :fields="tableState.fields"
-                                       :items="tableState.items"
+                                       :items="items"
                                        :loading="loading"
                                        :this-page.sync="tableState.thisPage"
                                        :page-size="5"
@@ -33,8 +33,8 @@ import {
     computed, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
+import { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -42,6 +42,7 @@ import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import bytes from 'bytes';
 import dayjs from 'dayjs';
+import { sortBy } from 'lodash';
 
 import { i18n } from '@/translations';
 
@@ -61,51 +62,38 @@ import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explor
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import {
     getCurrencyAppliedChartData,
-    getReferenceLabel, getTooltipText,
+    getReferenceLabel,
+    getTooltipText,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 import {
-    ChartData, CostAnalyzeModel, Legend, WidgetProps,
+    CostAnalyzeModel, Legend, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
 
-// interface Data {
-//     project_id: string;
-//     usage_quantity: number;
-//     usage_type: 'data-transfer.out'|'requests.http'|'requests.https';
-//     usd_cost: number;
-// }
 
+interface TableData {
+    trafficOut?: TableItem;
+    httpRequest?: TableItem;
+    httpsRequest?: TableItem;
+}
+interface ChartData {
+    'data-transfer.out'?: number;
+    'requests.http'?: number;
+    'requests.https'?: number;
+}
+interface Item extends TableData, ChartData {
+    resourceId: string;
+    groupBy: string;
+    totalCost: number;
+}
 interface TableItem {
     usd_cost: number;
     usage_quantity: number;
 }
 
-interface ConvertedTableData {
-    [key: string]: {
-        trafficOut: TableItem;
-        httpRequest: TableItem;
-        httpsRequest: TableItem;
-    };
-}
-
-interface TableData {
-    groupBy: string;
-    trafficOutCost?: number;
-    trafficOutSize?: number;
-    httpReqCost?: number;
-    httpReq?: number;
-    httpsReqCost?: number;
-    httpsReq?: number;
-}
-interface CloudFrontChartData {
-    category: string;
-    'data-transfer.out'?: number;
-    'requests.http'?: number;
-    'requests.https'?: number;
-}
-
-const CATEGORY_KEY = 'category';
+const CATEGORY_KEY = 'groupBy';
+const DATA_LIMIT = 15;
 
 export default {
     name: 'AWSCloudFrontCost',
@@ -163,7 +151,7 @@ export default {
                 };
             }),
             //
-            items: [] as CostAnalyzeModel[],
+            items: [] as Item[],
             chart: null as XYChart | null,
             chartRef: null as HTMLElement | null,
             chartData: [] as ChartData[],
@@ -188,25 +176,6 @@ export default {
             'requests.http': 'httpRequest',
             'requests.https': 'httpsRequest',
         };
-        const getConvertedTableData = (): ConvertedTableData => {
-            const temp = {};
-            state.items.forEach((item: CostAnalyzeModel) => {
-                if (temp[item[state.groupBy]]) {
-                    temp[item[state.groupBy]][usageType[item.usage_type]] = {
-                        usd_cost: item.usd_cost,
-                        usage_quantity: item.usage_quantity,
-                    };
-                } else {
-                    temp[item[state.groupBy]] = {
-                        [usageType[item.usage_type]]: {
-                            usd_cost: item.usd_cost,
-                            usage_quantity: item.usage_quantity,
-                        },
-                    };
-                }
-            });
-            return temp;
-        };
 
         const tableState = reactive({
             fields: computed<DataTableFieldType[]>(() => [
@@ -216,44 +185,28 @@ export default {
                     label: 'Transfer-Out',
                     tooltipText: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.TOOLTIP_AWS_DATA_COST_2'),
                     children: [
-                        { name: 'trafficOutSize', type: 'size', invisible: true },
-                        { name: 'trafficOutCost', invisible: true },
+                        { name: 'trafficOut.usage_quantity', type: 'size', invisible: true },
+                        { name: 'trafficOut.usd_cost', invisible: true },
                     ],
                 },
                 {
-                    name: 'http',
+                    name: 'httpRequest',
                     label: 'Requests (HTTP)',
                     children: [
-                        { name: 'httpReq', type: 'number', invisible: true },
-                        { name: 'httpReqCost', invisible: true },
+                        { name: 'httpRequest.usage_quantity', type: 'number', invisible: true },
+                        { name: 'httpRequest.usd_cost', invisible: true },
                     ],
                 },
                 {
-                    name: 'http',
+                    name: 'httpsRequest',
                     label: 'Requests (HTTPS)',
                     children: [
-                        { name: 'httpsReq', type: 'number', invisible: true },
-                        { name: 'httpsReqCost', invisible: true },
+                        { name: 'httpsRequest.usage_quantity', type: 'number', invisible: true },
+                        { name: 'httpsRequest.usd_cost', invisible: true },
                     ],
                 },
 
             ]),
-            items: computed<TableData[]>(() => {
-                const convertedTableData = getConvertedTableData();
-                const tableItems = Object.keys(convertedTableData).map((item) => {
-                    const groupLabel = getReferenceLabel(item, state.groupBy);
-                    return ({
-                        groupBy: groupLabel,
-                        trafficOutCost: convertedTableData[item]?.trafficOut?.usd_cost,
-                        trafficOutSize: convertedTableData[item]?.trafficOut?.usage_quantity,
-                        httpReqCost: convertedTableData[item]?.httpRequest?.usd_cost,
-                        httpReq: convertedTableData[item]?.httpRequest?.usage_quantity,
-                        httpsReqCost: convertedTableData[item]?.httpsRequest?.usd_cost,
-                        httpsReq: convertedTableData[item]?.httpsRequest?.usage_quantity,
-                    });
-                });
-                return tableItems;
-            }),
             thisPage: 1,
         });
 
@@ -268,7 +221,7 @@ export default {
             series.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
                     const cost = Number(target.tooltipDataItem.dataContext[legend.name] ?? 0);
-                    let currencyMoney: string|number = cost;
+                    let currencyMoney: string | number = cost;
                     if (cost !== 0) {
                         currencyMoney = currencyMoneyFormatter(cost, props.currency, undefined, true);
                     }
@@ -306,6 +259,7 @@ export default {
             categoryAxis.renderer.cellStartLocation = 0.3;
             categoryAxis.renderer.cellEndLocation = 0.7;
             categoryAxis.fontSize = 12;
+
             categoryAxis.renderer.labels.template.adapter.add('text', (label, target) => {
                 if (target.dataItem && (target.dataItem.category)) {
                     return getReferenceLabel(target.dataItem.category, state.groupBy);
@@ -314,7 +268,7 @@ export default {
             });
 
             const valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
-            if (state.items.every(d => d.usd_cost === 0)) valueAxis.min = 0;
+            if (state.items.every(d => d.totalCost === 0)) valueAxis.min = 0;
             valueAxis.tooltip.disabled = true;
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.adapter.add('stroke', (stroke, target) => {
@@ -344,20 +298,36 @@ export default {
 
             return chart;
         };
-        const getConvertedChartData = (rawData: CostAnalyzeModel[]): CloudFrontChartData[] => {
-            const results: CloudFrontChartData[] = [];
-            rawData.forEach((data) => {
-                const existData = results.find(d => d.category === data[state.groupBy]);
+        const getConvertedData = (rawData: CostAnalyzeModel[]): Item[] => {
+            const results: Item[] = [];
+            rawData.forEach((item) => {
+                let usageQuantity = item.usage_quantity;
+                if (item.usage_type === 'data-transfer.out') {
+                    usageQuantity = bytes.parse(`${item.usage_quantity}GB`);
+                }
+                const resourceId = item[state.groupBy];
+                const existData = results.find(d => d.resourceId === resourceId);
                 if (existData) {
-                    existData[data.usage_type] = data.usd_cost;
+                    existData[item.usage_type] = item.usd_cost;
+                    existData[usageType[item.usage_type]] = {
+                        usd_cost: item.usd_cost,
+                        usage_quantity: usageQuantity,
+                    };
+                    existData.totalCost += Number(item.usd_cost);
                 } else {
                     results.push({
-                        category: data[state.groupBy],
-                        [data.usage_type]: data.usd_cost,
+                        resourceId,
+                        groupBy: getReferenceLabel(resourceId, state.groupBy),
+                        [item.usage_type]: item.usd_cost,
+                        [usageType[item.usage_type]]: {
+                            usd_cost: item.usd_cost,
+                            usage_quantity: usageQuantity,
+                        },
+                        totalCost: Number(item.usd_cost),
                     });
                 }
             });
-            return results;
+            return sortBy(results, 'totalCost').slice(0, DATA_LIMIT);
         };
 
         /* Api */
@@ -380,17 +350,7 @@ export default {
                     end: dayjs.utc(period.end).format('YYYY-MM'),
                     ...queryHelper.apiQuery,
                 });
-                const convertedResults = results.map((d) => {
-                    let usageQuantity = d.usage_quantity;
-                    if (d.usage_type === 'data-transfer.out') {
-                        usageQuantity = bytes.parse(`${d.usage_quantity}GB`);
-                    }
-                    return {
-                        ...d,
-                        usage_quantity: usageQuantity,
-                    };
-                });
-                return convertedResults;
+                return results;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
@@ -407,10 +367,12 @@ export default {
         });
         watch([() => props.period, () => props.filters, () => state.chartRef], async ([period, filters, chartContext]) => {
             if (chartContext) {
-                state.items = await listData(period, filters);
+                const rawData = await listData(period, filters);
                 if (state.items.length === 0) emit('rendered');
 
-                state.chartData = getConvertedChartData(state.items);
+                const convertedItems = getConvertedData(rawData);
+                state.items = [...convertedItems].reverse();
+                state.chartData = convertedItems;
                 state.chart = drawChart(state.chartRef, state.chartData, state.legends);
             }
         }, { immediate: true });
@@ -426,6 +388,7 @@ export default {
         return {
             ...toRefs(state),
             tableState,
+            DATA_LIMIT,
         };
     },
 };
