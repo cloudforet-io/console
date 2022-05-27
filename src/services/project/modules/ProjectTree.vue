@@ -168,7 +168,7 @@ export default {
                         return state.hasManagePermission;
                     }
                     if (parent.data.item_type === 'PROJECT') return false;
-                    if (parent.children.some(child => child.data.name === node.data.name)) return false;
+                    if (parent.children?.some(child => child.data.name === node.data.name)) return false;
                     return !!(state.permissionInfo[parent.data.id] || parent.data.has_permission);
                 },
             })),
@@ -359,10 +359,9 @@ export default {
         const onDrop = async (node, oldParent, parent, rollback) => {
             if (!state.rootNode) return;
             if (oldParent?.data.id === parent?.data.id) return;
-
             if (oldParent?.data.has_child && oldParent?.children.length === 1) {
-                state.rootNode.updateNode(d => d.id === state.oldParent.data.id, {
-                    ...state.oldParent.data,
+                state.rootNode.updateNode(d => d.id === oldParent.data.id, {
+                    ...oldParent.data,
                     has_child: false,
                 });
             }
