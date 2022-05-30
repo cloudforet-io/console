@@ -25,6 +25,7 @@ class KbAuth extends Authenticator {
 
             if (onSignInCallback) onSignInCallback();
         } catch (e) {
+            console.error('KB Authenticator Error: ', e);
             await KbAuth.onSignInFail();
         }
     }

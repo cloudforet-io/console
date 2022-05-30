@@ -44,6 +44,7 @@ export default defineComponent({
                 secureToken: props.secureToken,
                 secureSessionId: props.secureSessionId,
             };
+            console.log('kb sso page mounted');
             await loadAuth('KB_SSO').signIn(onSignIn, param);
         });
     },
