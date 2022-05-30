@@ -11,8 +11,8 @@
                 search-type="query"
                 :total-count="tableState.totalCount"
                 :query-tags="tableState.tags"
-                :key-item-sets="handlers.keyItemSets"
-                :value-handler-map="handlers.valueHandlerMap"
+                :key-item-sets="handlerState.keyItemSets"
+                :value-handler-map="handlerState.valueHandlerMap"
                 @change="onChange"
                 @refresh="onChange()"
             >
@@ -60,7 +60,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, ComponentRenderProxy, getCurrentInstance, computed,
+    reactive, toRefs, computed,
 } from '@vue/composition-api';
 
 
@@ -76,7 +76,9 @@ import {
 } from '@spaceone/design-system';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -101,24 +103,27 @@ export default {
         PSelectDropdown,
         PToolbox,
     },
-    setup(props, { root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+    setup() {
+        const currentQuery = SpaceRouter.router.currentRoute.query;
         const escalationPolicyApiQueryHelper = new ApiQueryHelper()
             .setSort('created_at', true)
             .setPage(1, 15)
-            .setFiltersAsRawQueryString(vm.$route.query.filters);
-        const handlers = {
-            keyItemSets: [{
+            .setFiltersAsRawQueryString(currentQuery.filters);
+        const storeState = reactive({
+            projects: computed(() => store.state.reference.project.items),
+        });
+        const handlerState = reactive({
+            keyItemSets: computed<KeyItemSet[]>(() => [{
                 title: 'Properties',
                 items: [
                     { name: 'escalation_policy_id', label: 'Escalation Policy' },
                     { name: 'name', label: 'Name' },
                     { name: 'finish_condition', label: 'Finish Condition' },
                     { name: 'scope', label: 'Scope' },
-                    { name: 'project_id', label: 'Project' },
+                    { name: 'project_id', label: 'Project', valueSet: storeState.projects },
                     { name: 'created_at', label: 'Created', dataType: 'datetime' },
                 ],
-            }] as KeyItemSet[],
+            }]),
             valueHandlerMap: {
                 escalation_policy_id: makeDistinctValueHandler('monitoring.EscalationPolicy', 'escalation_policy_id'),
                 name: makeDistinctValueHandler('monitoring.EscalationPolicy', 'name'),
@@ -126,32 +131,32 @@ export default {
                 scope: makeEnumValueHandler(SCOPE),
                 project_id: makeReferenceValueHandler('identity.Project'),
             },
-        };
+        });
         const tableState = reactive({
             loading: true,
             totalCount: 0,
-            tags: escalationPolicyApiQueryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
+            tags: computed(() => escalationPolicyApiQueryHelper.setKeyItemSets(handlerState.keyItemSets).queryTags),
         });
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
             timezone: computed(() => store.state.user.timezone),
-            pageTitle: computed(() => vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY')),
+            pageTitle: computed(() => i18n.t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY')),
             actionItems: computed(() => ([
                 {
                     type: 'item',
                     name: 'update',
-                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.UPDATE'),
+                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.UPDATE'),
                 },
                 {
                     type: 'item',
                     name: 'delete',
-                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.DELETE'),
+                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.DELETE'),
                     disabled: state.selectedItem?.is_default,
                 },
                 {
                     type: 'item',
                     name: 'default',
-                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.SET_AS_DEFAULT'),
+                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.SET_AS_DEFAULT'),
                     disabled: state.selectedItem?.scope === SCOPE.project,
                 },
             ])),
@@ -194,10 +199,10 @@ export default {
                 await SpaceConnector.client.monitoring.escalationPolicy.setDefault({
                     escalation_policy_id: state.selectedItem.escalation_policy_id,
                 });
-                showSuccessMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_S_SET_AS_DEFAULT'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.ALT_S_SET_AS_DEFAULT'), '');
                 await listEscalationPolicies();
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_SET_AS_DEFAULT'));
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_SET_AS_DEFAULT'));
             }
         };
         const deleteEscalationPolicy = async () => {
@@ -205,11 +210,11 @@ export default {
                 await SpaceConnector.client.monitoring.escalationPolicy.delete({
                     escalation_policy_id: state.selectedItem.escalation_policy_id,
                 });
-                showSuccessMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_S_DELETE_POLICY'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.ALT_S_DELETE_POLICY'), '');
                 state.selectIndex = [];
                 await listEscalationPolicies();
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_DELETE_POLICY'));
+                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_DELETE_POLICY'));
             } finally {
                 state.deleteModalVisible = false;
             }
@@ -239,13 +244,15 @@ export default {
         /* init */
         (async () => {
             await listEscalationPolicies();
+            // LOAD REFERENCE STORE
+            await store.dispatch('reference/project/load');
         })();
 
         return {
             ...toRefs(state),
             ACTION,
             tableState,
-            handlers,
+            handlerState,
             onSelectAction,
             onChange,
             listEscalationPolicies,

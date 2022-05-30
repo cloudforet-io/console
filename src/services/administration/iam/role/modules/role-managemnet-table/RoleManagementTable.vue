@@ -140,7 +140,7 @@ export default defineComponent({
                 items: [
                     { name: 'name', label: 'Name' },
                     { name: 'tags.description', label: 'Description' },
-                    { name: 'role_type', label: 'Role Type' },
+                    { name: 'role_type', label: 'Role Type', valueSet: ROLE_TYPE_LABEL },
                     { name: 'created_at', label: 'Created', dataType: 'datetime' },
                 ] as KeyItem[],
             }],

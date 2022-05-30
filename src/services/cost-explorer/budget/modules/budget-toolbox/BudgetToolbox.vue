@@ -25,8 +25,8 @@
                    :page-size-options="pageSizeOptions"
                    :page-size="24"
                    :query-tags="queryTags"
-                   :key-item-sets="keyItemSets"
-                   :value-handler-map="valueHandlerMap"
+                   :key-item-sets="handlerState.keyItemSets"
+                   :value-handler-map="handlerState.valueHandlerMap"
                    @change="handleChangeToolbox"
                    @refresh="$emit('refresh')"
                    @export="$emit('export')"
@@ -74,6 +74,7 @@ import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/tool
 import dayjs from 'dayjs';
 import { TranslateResult } from 'vue-i18n';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import BudgetToolboxUsageRange
@@ -113,34 +114,41 @@ export default {
     setup(props, { emit }) {
         const pageSizeOptions = [12, 24, 36];
 
-        const keyItemSets: KeyItemSet[] = [{
-            title: 'Properties',
-            items: [
-                { name: 'budget_id', label: 'Budget ID' },
-                { name: 'name', label: 'Name' },
-                { name: 'project_id', label: 'Project' },
-                { name: 'project_group_id', label: 'Project Group' },
-                { name: 'time_unit', label: 'Time Unit' },
-                { name: 'cost_types.provider', label: '[Cost Type] Provider' },
-                { name: 'cost_types.service_account_id', label: '[Cost Type] Service Account' },
-                { name: 'cost_types.region_code', label: '[Cost Type] Region' },
-                { name: 'cost_types.product', label: '[Cost Type] Product' },
-            ],
-        }];
+        const storeState = reactive({
+            projects: computed(() => store.state.reference.project.items),
+            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+        });
 
-        const valueHandlerMap: ValueHandlerMap = {
-            budget_id: makeDistinctValueHandler('cost_analysis.Budget', 'budget_id'),
-            name: makeDistinctValueHandler('cost_analysis.Budget', 'name'),
-            project_id: makeReferenceValueHandler('identity.Project'),
-            project_group_id: makeReferenceValueHandler('identity.ProjectGroup'),
-            time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit'),
-            'cost_types.provider': makeReferenceValueHandler('identity.Provider'),
-            'cost_types.service_account_id': makeReferenceValueHandler('identity.ServiceAccount'),
-            'cost_types.region_code': makeReferenceValueHandler('inventory.Region'),
-            'cost_types.product': makeDistinctValueHandler('cost_analysis.Budget', 'cost_types.product'),
-        };
+        const handlerState = reactive({
+            keyItemSets: computed<KeyItemSet[]>(() => [{
+                title: 'Properties',
+                items: [
+                    { name: 'budget_id', label: 'Budget ID' },
+                    { name: 'name', label: 'Name' },
+                    { name: 'project_id', label: 'Project', valueSet: storeState.projects },
+                    { name: 'project_group_id', label: 'Project Group', valueSet: storeState.projectGroups },
+                    { name: 'time_unit', label: 'Time Unit' },
+                    { name: 'cost_types.provider', label: '[Cost Type] Provider' },
+                    { name: 'cost_types.service_account_id', label: '[Cost Type] Service Account', valueSet: storeState.serviceAccounts },
+                    { name: 'cost_types.region_code', label: '[Cost Type] Region' },
+                    { name: 'cost_types.product', label: '[Cost Type] Product' },
+                ],
+            }]),
+            valueHandlerMap: {
+                budget_id: makeDistinctValueHandler('cost_analysis.Budget', 'budget_id'),
+                name: makeDistinctValueHandler('cost_analysis.Budget', 'name'),
+                project_id: makeReferenceValueHandler('identity.Project'),
+                project_group_id: makeReferenceValueHandler('identity.ProjectGroup'),
+                time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit'),
+                'cost_types.provider': makeReferenceValueHandler('identity.Provider'),
+                'cost_types.service_account_id': makeReferenceValueHandler('identity.ServiceAccount'),
+                'cost_types.region_code': makeReferenceValueHandler('inventory.Region'),
+                'cost_types.product': makeDistinctValueHandler('cost_analysis.Budget', 'cost_types.product'),
+            } as ValueHandlerMap,
+        });
 
-        const filtersHelper = new QueryHelper().setKeyItemSets(keyItemSets);
+        const filtersHelper = new QueryHelper().setKeyItemSets(handlerState.keyItemSets);
 
         const state = reactive({
             selectedPeriod: ['total'] as string[],
@@ -220,12 +228,19 @@ export default {
         });
         watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 
+        (async () => {
+            // LOAD REFERENCE STORE
+            await Promise.allSettled([
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/serviceAccount/load'),
+            ]);
+        })();
 
         return {
             ...toRefs(state),
             pageSizeOptions,
-            keyItemSets,
-            valueHandlerMap,
+            handlerState,
             handleUpdateUsageRange,
             handleSelectStatus,
             handleChangeToolbox,

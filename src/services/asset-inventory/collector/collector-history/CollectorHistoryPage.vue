@@ -103,7 +103,7 @@
 <script lang="ts">
 
 import {
-    computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 
@@ -124,6 +124,7 @@ import {
 import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 import { capitalize } from 'lodash';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -179,25 +180,28 @@ export default {
         PI,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-        const handlers = {
-            keyItemSets: [{
+        const currentQuery = SpaceRouter.router.currentRoute.query;
+        const storeState = reactive({
+            collectors: computed(() => store.state.reference.collector.items),
+        });
+        const handlers = reactive({
+            keyItemSets: computed<KeyItemSet[]>(() => [{
                 title: 'Properties',
                 items: [
                     { name: 'job_id', label: 'Job ID' },
                     { name: 'status', label: 'Status' },
-                    { name: 'collector_id', label: 'Collector', reference: 'inventory.Collector' },
+                    { name: 'collector_id', label: 'Collector', valueSet: storeState.collectors },
                     { dataType: 'datetime', name: 'created_at', label: 'Created Time' },
                 ],
-            }] as KeyItemSet[],
+            }]),
             valueHandlerMap: {
                 job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
                 status: makeEnumValueHandler(JOB_STATUS),
                 collector_id: makeReferenceValueHandler('inventory.Collector'),
             } as ValueHandlerMap,
-        };
+        });
 
-        const searchQueryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters);
+        const searchQueryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters);
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
             timezone: computed(() => store.state.user.timezone),
@@ -282,7 +286,7 @@ export default {
 
         /* event */
         const onSelect = (item) => {
-            vm.$router.push({
+            SpaceRouter.router.push({
                 name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
                 params: { jobId: item.job_id },
             }).catch(() => {});
@@ -303,10 +307,8 @@ export default {
             await getJobs();
         };
         const handleChangePagination = () => {
-            vm.$nextTick(() => {
-                state.pageStart = getPageStart(state.thisPage, state.pageSize);
-                getJobs();
-            });
+            state.pageStart = getPageStart(state.thisPage, state.pageSize);
+            getJobs();
         };
         const handleClickDate = async (data) => {
             state.selectedStatus = data.type;

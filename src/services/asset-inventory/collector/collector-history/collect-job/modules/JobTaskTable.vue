@@ -70,6 +70,7 @@ import {
 
 import { iso8601Formatter, durationFormatter } from '@spaceone/console-core-lib';
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
+import { KeyItemSet } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
@@ -175,30 +176,32 @@ export default {
             projects: computed(() => store.state.reference.project.items),
         });
 
-        const querySearchHandlers = {
-            keyItemSets: [{
+        const querySearchHandlers = reactive({
+            keyItemSets: computed<KeyItemSet[]>(() => [{
                 title: 'Properties',
                 items: [
                     {
                         name: 'service_account_id',
                         label: 'Service Account',
+                        valueSet: state.serviceAccounts,
                     },
                     {
                         name: 'project_id',
                         label: 'Project',
+                        valueSet: state.projects,
                     },
                     {
                         name: 'status',
                         label: 'Status',
                     },
                 ],
-            }],
+            }]),
             valueHandlerMap: {
                 service_account_id: makeReferenceValueHandler('identity.ServiceAccount'),
                 project_id: makeReferenceValueHandler('identity.Project'),
                 status: makeEnumValueHandler(JOB_TASK_STATUS),
             },
-        };
+        });
 
         /* api */
         const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);

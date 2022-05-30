@@ -86,13 +86,13 @@
                 <template #col-project_id-format="{ value }">
                     <template v-if="value">
                         <p-anchor :to="referenceRouter(value,{ resource_type: 'identity.Project' })">
-                            {{ projects[value] ? projects[value].label : value }}
+                            {{ storeState.projects[value] ? storeState.projects[value].label : value }}
                         </p-anchor>
                     </template>
                 </template>
                 <template #col-created_at-format="{value, field}">
                     <template v-if="field.label === 'Created'">
-                        {{ iso8601Formatter(value, timezone) }}
+                        {{ iso8601Formatter(value, storeState.timezone) }}
                     </template>
                     <template v-else>
                         {{ alertDurationFormatter(value) }}
@@ -120,7 +120,7 @@ import {
 
 import { durationFormatter, iso8601Formatter, commaFormatter } from '@spaceone/console-core-lib';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
-import { KeyItemSet, KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
+import { KeyItemSet } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -213,18 +213,27 @@ export default {
             { k: 'project_id', v: props.projectId, o: '=' },
         ]).apiQuery.filter;
 
+        const storeState = reactive({
+            timezone: computed(() => store.state.user.timezone),
+            projects: computed(() => store.state.reference.project.items),
+            webhooks: computed(() => store.state.reference.webhook.items),
+        });
 
         const querySearchHandlerState = reactive({
             keyItemSets: computed<KeyItemSet[]>(() => {
-                const items: KeyItem[] = [
+                const items = [
                     // { name: 'alert_number', label: 'Alert Number', dataType: 'integer' },
                     { name: 'alert_id', label: 'Alert ID' },
                     { name: 'assignee', label: 'Assignee' },
                     { name: 'resource.resource_type', label: 'Resource Name' },
-                    { name: 'project_id', label: 'Project', reference: 'identity.Project' },
+                    {
+                        name: 'project_id', label: 'Project', reference: 'identity.Project', valueSet: storeState.projects,
+                    },
                     { name: 'created_at', label: 'Created Time', dataType: 'datetime' },
                     { name: 'resolved_at', label: 'Resolved Time', dataType: 'datetime' },
-                    { name: 'webhook_id', label: 'Webhook', reference: 'monitoring.Webhook' },
+                    {
+                        name: 'webhook_id', label: 'Webhook', reference: 'monitoring.Webhook', valueSet: storeState.webhooks,
+                    },
                 ];
 
                 if (props.projectId) items.splice(2, 1);
@@ -256,9 +265,6 @@ export default {
         });
 
         const state = reactive({
-            timezone: computed(() => store.state.user.timezone),
-            projects: computed(() => store.state.reference.project.items),
-            webhooks: computed(() => store.state.reference.webhook.items),
             loading: true,
             selectIndex: [] as number[],
             selectedItems: computed(() => state.selectIndex.map(d => state.items[d])),
@@ -314,7 +320,7 @@ export default {
         });
 
         /* formatters & autocomplete handlers */
-        const alertDurationFormatter = value => durationFormatter(value, dayjs().format(DATE_TIME_FORMAT), state.timezone) || '--';
+        const alertDurationFormatter = value => durationFormatter(value, dayjs().format(DATE_TIME_FORMAT), storeState.timezone) || '--';
 
 
         /* event emitter */
@@ -449,6 +455,7 @@ export default {
         return {
             ...toRefs(state),
             querySearchHandlerState,
+            storeState,
             ALERT_STATE,
             ALERT_URGENCY,
             ALERT_STATE_FILTER,

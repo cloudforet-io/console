@@ -141,6 +141,7 @@ export default defineComponent<Props>({
                 }
                 return countLabels.join(', ');
             }),
+            keyItemSets: computed(() => props.handlers?.keyItemSets ?? []),
         });
 
         /* excel */
@@ -304,7 +305,6 @@ export default defineComponent<Props>({
             handleClickSet,
             handleChange,
             handleExport,
-            keyItemSets: props.handlers?.keyItemSets ?? [],
             valueHandlerMap: props.handlers?.valueHandlerMap ?? {},
         };
     },

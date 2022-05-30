@@ -13,7 +13,7 @@
         </p-page-title>
         <p-divider class="cloud-service-divider" />
         <cloud-service-toolbox :total-count="totalCount"
-                               :handlers="handlers"
+                               :handlers="handlerState"
                                @update-pagination="handlePaginationUpdate"
         />
 
@@ -119,19 +119,24 @@ export default {
         PDataLoader,
     },
     setup() {
-        const handlers = {
-            keyItemSets: [{
+        const storeState = reactive({
+            projects: computed(() => store.state.reference.project.items),
+            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+        });
+        const handlerState = reactive({
+            keyItemSets: computed<KeyItemSet[]>(() => [{
                 title: 'Properties',
                 items: [
                     { name: 'cloud_service_type', label: 'Cloud Service Type' },
                     { name: 'cloud_service_group', label: 'Cloud Service Group' },
                     { name: 'service_code', label: 'Product' },
-                    { name: 'project_group_id', label: 'Project Group' },
-                    { name: 'project_id', label: 'Project' },
-                    { name: 'collection_info.service_accounts', label: 'Service Account' },
+                    { name: 'project_group_id', label: 'Project Group', valueSet: storeState.projectGroups },
+                    { name: 'project_id', label: 'Project', valueSet: storeState.projects },
+                    { name: 'collection_info.service_accounts', label: 'Service Account', valueSet: storeState.serviceAccounts },
                     { name: 'account', label: 'Account ID' },
                 ],
-            }] as KeyItemSet[],
+            }]),
             valueHandlerMap: {
                 cloud_service_type: makeDistinctValueHandler('inventory.CloudService', 'cloud_service_type'),
                 cloud_service_group: makeDistinctValueHandler('inventory.CloudService', 'cloud_service_group'),
@@ -141,7 +146,7 @@ export default {
                 'collection_info.service_accounts': makeReferenceValueHandler('identity.ServiceAccount'),
                 account: makeDistinctValueHandler('inventory.CloudService', 'account'),
             } as ValueHandlerMap,
-        };
+        });
 
         const searchQueryHelper = new QueryHelper();
         const state = reactive({
@@ -235,13 +240,20 @@ export default {
                 region: queryStringToArray(currentQuery.region),
                 service: queryStringToArray<CloudServiceCategory>(currentQuery.service),
                 period: queryStringToObject<Period>(currentQuery.period),
-                filters: searchQueryHelper.setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
+                filters: searchQueryHelper.setKeyItemSets(handlerState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
             };
             assetInventoryStore.dispatch('cloudService/setSelectedProvider', urlQueryValue.provider);
             assetInventoryStore.dispatch('cloudService/setSelectedRegions', urlQueryValue.region);
             assetInventoryStore.dispatch('cloudService/setSelectedCategories', urlQueryValue.service);
             assetInventoryStore.dispatch('cloudService/setPeriod', urlQueryValue.period);
             assetInventoryStore.dispatch('cloudService/setSearchFilters', searchQueryHelper.filters);
+
+            // LOAD REFERENCE STORE
+            await Promise.allSettled([
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/serviceAccount/load'),
+            ]);
 
             /* register urlQueryString watcher after initiating states from url query */
             urlQueryStringWatcherStop = watch(() => state.urlQueryString, (urlQueryString) => {
@@ -264,7 +276,7 @@ export default {
 
         return {
             ...toRefs(state),
-            handlers,
+            handlerState,
             assetUrlConverter,
             handleProviderSelect,
             handlePaginationUpdate,

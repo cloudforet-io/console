@@ -10,9 +10,11 @@ export type RoleType = typeof ROLE_TYPE[keyof typeof ROLE_TYPE];
 export const ROLE_TYPE_LABEL = Object.freeze({
     DOMAIN: {
         label: 'Admin',
+        name: 'DOMAIN',
     },
     PROJECT: {
         label: 'User',
+        name: 'PROJECT',
     },
 } as const);
 
