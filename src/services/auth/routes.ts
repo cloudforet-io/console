@@ -68,6 +68,7 @@ export default [
         name: AUTH_ROUTE.SIGN_IN.KB._NAME,
         meta: {
             isSignInPage: true,
+            accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
         },
         props: ({ query }) => ({
             secureToken: query.secureToken,
