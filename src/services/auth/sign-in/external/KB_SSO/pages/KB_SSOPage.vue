@@ -7,7 +7,13 @@ import {
     ComponentRenderProxy, defineComponent, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+
+import { isUserAccessibleToRoute } from '@/lib/access-control';
+
 import { loadAuth } from '@/services/auth/authenticator/loader';
+import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 
 export default defineComponent({
@@ -29,14 +35,25 @@ export default defineComponent({
         },
         nextPath: {
             type: String,
-            default: '/',
+            default: undefined,
         },
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const onSignIn = async () => {
-            await vm.$router.push(props.nextPath);
+            if (!props.nextPath) {
+                await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                return;
+            }
+
+            const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
+            const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/pagePermissionList']);
+            if (isAccessible) {
+                await vm.$router.push(props.nextPath);
+            } else {
+                await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+            }
         };
 
         onMounted(async () => {
@@ -44,7 +61,6 @@ export default defineComponent({
                 secureToken: props.secureToken,
                 secureSessionId: props.secureSessionId,
             };
-            console.log('kb sso page mounted');
             await loadAuth('KB_SSO').signIn(onSignIn, param);
         });
     },
