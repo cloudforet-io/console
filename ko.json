@@ -1601,31 +1601,52 @@
 		}
 	},
 	"MENU": {
-		"ADMINISTRATION": "관리",
-		"ADMINISTRATION_IAM": "접근 제어",
-		"ADMINISTRATION_POLICY": "정책",
-		"ADMINISTRATION_ROLE": "역할",
-		"ADMINISTRATION_USER": "사용자",
-		"ALERT_MANAGER": "얼럿 매니저",
-		"ALERT_MANAGER_ALERT": "얼럿",
-		"ALERT_MANAGER_DASHBOARD": "대시보드",
-		"ALERT_MANAGER_ESCALATION_POLICY": "에스컬레이션 정책",
-		"ASSET_INVENTORY": "자산 인벤토리",
-		"ASSET_INVENTORY_CLOUD_SERVICE": "클라우드 서비스 ",
-		"ASSET_INVENTORY_COLLECTOR": "컬렉터 ",
-		"ASSET_INVENTORY_SERVER": "서버 ",
-		"ASSET_INVENTORY_SERVICE_ACCOUNT": "서비스 계정 ",
-		"COST_EXPLORER": "비용",
-		"COST_EXPLORER_BUDGET": "예산",
-		"COST_EXPLORER_COST_ANALYSIS": "비용 분석",
-		"COST_EXPLORER_DASHBOARD": "대시보드",
-		"DASHBOARD": "대시보드 ",
-		"MY_PAGE": "마이 페이지",
-		"MY_PAGE_ACCOUNT": "내 계정",
-		"MY_PAGE_ACCOUNT_PROFILE": "계정 & 프로필",
-		"MY_PAGE_API_KEY": "API & CLI 접속",
-		"MY_PAGE_NOTIFICATIONS": "알림 채널",
-		"PROJECT": "프로젝트 "
+		"AUTOMATION": {
+			"AUTOMATION": "자동화 ",
+			"POWER_SCHEDULER": "파워 스케줄러",
+			"SPOT_AUTOMATION": "스팟 자동화",
+			"SPOT_GROUP": "스팟그룹"
+		},
+		"BILLING": {
+			"BILLING": "비용",
+			"BUDGET": "예산",
+			"COST_ANALYSIS": "비용 분석",
+			"COST_MANAGEMENT": "비용 관리",
+			"DASHBOARD": "대시보드"
+		},
+		"DASHBOARD": {
+			"DASHBOARD": "대시보드 "
+		},
+		"IDENTITY": {
+			"IDENTITY": "인증 ",
+			"ROLE": "역할 ",
+			"SERVICE_ACCOUNT": "서비스 계정 ",
+			"SERVICE_ACCOUNT_ADD_ACCOUNT": "계정 추가 ",
+			"USER": "사용자 "
+		},
+		"INVENTORY": {
+			"CLOUD_SERVICE": "클라우드 서비스 ",
+			"INVENTORY": "인벤토리 ",
+			"SERVER": "서버 "
+		},
+		"MANAGEMENT": {
+			"COLLECTOR_HISTORY": "수집 내역 ",
+			"COLLECTOR_HISTORY_JOB_MANAGEMENT": "작업 정보",
+			"MANAGEMENT": "관리 ",
+			"PLUGIN": "플러그인 관리"
+		},
+		"MONITORING": {
+			"ALERT_MANAGER": "얼럿 매니저",
+			"MONITORING": "모니터링"
+		},
+		"PLUGIN": {
+			"COLLECTOR": "컬렉터 ",
+			"CREATE_COLLECTOR": "컬렉터 생성 ",
+			"PLUGIN": "플러그인 "
+		},
+		"PROJECT": {
+			"PROJECT": "프로젝트 "
+		}
 	},
 	"MONITORING": {
 		"ALERT": {

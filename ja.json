@@ -1601,31 +1601,52 @@
 		}
 	},
 	"MENU": {
-		"ADMINISTRATION": "",
-		"ADMINISTRATION_IAM": "",
-		"ADMINISTRATION_POLICY": "",
-		"ADMINISTRATION_ROLE": "役割",
-		"ADMINISTRATION_USER": "ユーザー",
-		"ALERT_MANAGER": "アラートマネージャー",
-		"ALERT_MANAGER_ALERT": "",
-		"ALERT_MANAGER_DASHBOARD": "ダッシュボード",
-		"ALERT_MANAGER_ESCALATION_POLICY": "",
-		"ASSET_INVENTORY": "",
-		"ASSET_INVENTORY_CLOUD_SERVICE": "クラウドサービス",
-		"ASSET_INVENTORY_COLLECTOR": "コレクター",
-		"ASSET_INVENTORY_SERVER": "サーバ",
-		"ASSET_INVENTORY_SERVICE_ACCOUNT": "サービスアカウント",
-		"COST_EXPLORER": "",
-		"COST_EXPLORER_BUDGET": "予算",
-		"COST_EXPLORER_COST_ANALYSIS": "コスト分析",
-		"COST_EXPLORER_DASHBOARD": "ダッシュボード",
-		"DASHBOARD": "ダッシュボード",
-		"MY_PAGE": "",
-		"MY_PAGE_ACCOUNT": "",
-		"MY_PAGE_ACCOUNT_PROFILE": "",
-		"MY_PAGE_API_KEY": "",
-		"MY_PAGE_NOTIFICATIONS": "",
-		"PROJECT": "プロジェクト"
+		"AUTOMATION": {
+			"AUTOMATION": "オートメーション",
+			"POWER_SCHEDULER": "パワースケジューラ",
+			"SPOT_AUTOMATION": "スポット自動化",
+			"SPOT_GROUP": "スポットグループ"
+		},
+		"BILLING": {
+			"BILLING": "費用",
+			"BUDGET": "予算",
+			"COST_ANALYSIS": "コスト分析",
+			"COST_MANAGEMENT": "コスト管理",
+			"DASHBOARD": "ダッシュボード"
+		},
+		"DASHBOARD": {
+			"DASHBOARD": "ダッシュボード"
+		},
+		"IDENTITY": {
+			"IDENTITY": "認証",
+			"ROLE": "役割",
+			"SERVICE_ACCOUNT": "サービスアカウント",
+			"SERVICE_ACCOUNT_ADD_ACCOUNT": "アカウント追加",
+			"USER": "ユーザー"
+		},
+		"INVENTORY": {
+			"CLOUD_SERVICE": "クラウドサービス",
+			"INVENTORY": "インベントリ",
+			"SERVER": "サーバ"
+		},
+		"MANAGEMENT": {
+			"COLLECTOR_HISTORY": "収集内容",
+			"COLLECTOR_HISTORY_JOB_MANAGEMENT": "作業情報",
+			"MANAGEMENT": "管理",
+			"PLUGIN": "プラグイン管理"
+		},
+		"MONITORING": {
+			"ALERT_MANAGER": "アラートマネージャー",
+			"MONITORING": "モニタリング"
+		},
+		"PLUGIN": {
+			"COLLECTOR": "コレクター",
+			"CREATE_COLLECTOR": "コレクター作成",
+			"PLUGIN": "プラグイン"
+		},
+		"PROJECT": {
+			"PROJECT": "プロジェクト"
+		}
 	},
 	"MONITORING": {
 		"ALERT": {
