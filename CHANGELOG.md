@@ -1,3 +1,10 @@
+# [1.1.0-beta.320](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.319...v1.1.0-beta.320) (2022-05-30)
+
+
+### Bug Fixes
+
+* update eslint, typescript-eslint, typescript version ([#975](https://github.com/spaceone-dev/spaceone-design-system/issues/975)) ([48df6f2](https://github.com/spaceone-dev/spaceone-design-system/commit/48df6f26755dd4825cd4a716c52b51c8e350f124))
+
 # [1.1.0-beta.319](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.318...v1.1.0-beta.319) (2022-05-27)
 
 
