@@ -93,7 +93,7 @@ interface TableItem {
 }
 
 const CATEGORY_KEY = 'groupBy';
-const DATA_LIMIT = 15;
+const DATA_LIMIT = 10;
 
 export default {
     name: 'AWSCloudFrontCost',
@@ -327,7 +327,7 @@ export default {
                     });
                 }
             });
-            return sortBy(results, 'totalCost').slice(0, DATA_LIMIT);
+            return sortBy(results, 'totalCost').reverse().slice(0, DATA_LIMIT);
         };
 
         /* Api */
@@ -371,8 +371,8 @@ export default {
                 if (state.items.length === 0) emit('rendered');
 
                 const convertedItems = getConvertedData(rawData);
-                state.items = [...convertedItems].reverse();
-                state.chartData = convertedItems;
+                state.items = [...convertedItems];
+                state.chartData = [...convertedItems].reverse();
                 state.chart = drawChart(state.chartRef, state.chartData, state.legends);
             }
         }, { immediate: true });
