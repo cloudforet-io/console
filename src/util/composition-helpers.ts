@@ -8,7 +8,7 @@ import {
  * @param name
  * @param event params
  */
-export const makeByPassListeners = (listeners: Record<string, Function | Function[]>, name: string, ...args: any[]) => {
+export const makeByPassListeners = (listeners: Record<string, any | any[]>, name: string, ...args: any[]) => {
     // @ts-ignore
     if (Array.isArray(listeners[name])) listeners[name].forEach(f => f(...args));
     // @ts-ignore
@@ -33,7 +33,7 @@ export const makeByEvent = (emit: any, name: string) => (...event: any) => {
  * @param emit
  * @return {Ref<*>}
  */
-export const makeProxy = <T extends any>(name: string, props: any, emit: any): Ref<T> => computed({
+export const makeProxy = <T>(name: string, props: any, emit: any): Ref<T> => computed({
     get: () => props[name],
     set: (val) => {
         emit(`update:${name}`, val);

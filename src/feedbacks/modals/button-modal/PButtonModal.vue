@@ -75,7 +75,7 @@ import {
 } from '@vue/composition-api';
 
 import { ButtonModalProps, THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
-import { sizeMapping } from '@/feedbacks/modals/type';
+import { SizeMapping } from '@/feedbacks/modals/type';
 import '@/feedbacks/modals/modal.pcss';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
@@ -106,7 +106,7 @@ export default defineComponent<ButtonModalProps>({
         size: {
             type: String,
             default: 'md',
-            validator: (value: string) => Object.keys(sizeMapping).includes(value),
+            validator: (value: string) => Object.keys(SizeMapping).includes(value),
         },
         backdrop: {
             type: Boolean,

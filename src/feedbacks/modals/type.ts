@@ -1,10 +1,10 @@
-export enum sizeMapping {
+export enum SizeMapping {
     sm = 'modal-sm',
     md = '',
     lg = 'modal-lg',
     xl = 'modal-xl',
 }
-export type ModalSizeType = keyof typeof sizeMapping;
+export type ModalSizeType = keyof typeof SizeMapping;
 
 export interface ModalProps {
     fade: boolean;

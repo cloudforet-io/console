@@ -38,10 +38,6 @@ import { DynamicFieldType, dynamicFieldTypes } from '@/data-display/dynamic/dyna
 import PTextList from '@/others/console/text-list/PTextList.vue';
 
 
-interface State {
-    component: any;
-    loader: () => Promise<any>;
-}
 const RECURSIVE_TYPE = ['list', 'enum'];
 
 const componentMap: Record<DynamicFieldType, AsyncComponent> = {

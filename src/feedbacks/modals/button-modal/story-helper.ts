@@ -1,7 +1,7 @@
 import { ArgTypes } from '@storybook/addons';
 
 import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
-import { sizeMapping } from '@/feedbacks/modals/type';
+import { SizeMapping } from '@/feedbacks/modals/type';
 
 export const getButtonModalArgTypes = (): ArgTypes => ({
     visible: {
@@ -61,7 +61,7 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     size: {
         name: 'size',
         type: { name: 'string' },
-        description: `Modal size. ${Object.keys(sizeMapping).map(d => `\`${d}\``).join(', ')} are available.`,
+        description: `Modal size. ${Object.keys(SizeMapping).map(d => `\`${d}\``).join(', ')} are available.`,
         defaultValue: 'md',
         table: {
             type: {
@@ -74,7 +74,7 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'select',
-            options: Object.keys(sizeMapping),
+            options: Object.keys(SizeMapping),
         },
     },
     themeColor: {

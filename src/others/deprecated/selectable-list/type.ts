@@ -9,8 +9,8 @@ interface MapperType {
     icon?: MapperKeyType;
 }
 
-export interface SelectableListProps<item=any> {
-    items: item[];
+export interface SelectableListProps<Item=any> {
+    items: Item[];
     mapper?: MapperType;
     multiSelectable?: boolean;
     mustSelect?: boolean;

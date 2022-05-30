@@ -15,7 +15,6 @@ const actions = {
     shown: action('shown'),
     hidden: action('hidden'),
     cancel: action('cancel'),
-    close: action('close'),
     confirm: action('confirm'),
 };
 
@@ -59,6 +58,7 @@ export const modal = () => ({
             },
             close() {
                 visible.value = false;
+                action('close');
             },
             ...actions,
         };

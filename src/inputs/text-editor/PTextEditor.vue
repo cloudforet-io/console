@@ -51,13 +51,13 @@ require('codemirror/addon/lint/json-lint');
 require('codemirror/addon/edit/closebrackets');
 require('codemirror/addon/edit/closetag');
 
-interface Props {
-    code: string;
-    options: EditorConfiguration;
-    mode: TextEditorMode;
-    loading: boolean;
-    folded: boolean;
-}
+// interface Props {
+//     code: string;
+//     options: EditorConfiguration;
+//     mode: TextEditorMode;
+//     loading: boolean;
+//     folded: boolean;
+// }
 
 export default defineComponent({
     name: 'PTextEditor',

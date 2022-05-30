@@ -115,7 +115,7 @@ export default {
                 const path = tree.getPathByBranchEl(branchEl);
                 const findPath = hp.arrayWithoutEnd(path, 1);
                 let cur = path;
-                // eslint-disable-next-line no-restricted-syntax,no-shadow
+                // eslint-disable-next-line no-restricted-syntax,@typescript-eslint/no-shadow
                 for (const { node, path } of tree.iteratePath(findPath, { reverse: true })) {
                     if (tree.isNodeDroppable(node, path)) {
                         return tree.getBranchElByPath(cur);
@@ -256,13 +256,13 @@ export default {
 
                     const rollback = () => {
                         // remove inserted node from target position
-                        // eslint-disable-next-line no-shadow
+                        // eslint-disable-next-line @typescript-eslint/no-shadow
                         const targetParentPath = hp.arrayWithoutEnd(targetPath, 1);
-                        // eslint-disable-next-line no-shadow
+                        // eslint-disable-next-line @typescript-eslint/no-shadow
                         const targetParent = targetTree.getNodeByPath(targetParentPath);
-                        // eslint-disable-next-line no-shadow
+                        // eslint-disable-next-line @typescript-eslint/no-shadow
                         const targetSiblings = targetParentPath.length === 0 ? targetTree.treeData : targetParent.children;
-                        // eslint-disable-next-line no-shadow
+                        // eslint-disable-next-line @typescript-eslint/no-shadow
                         const targetIndex = hp.arrayLast(targetPath);
                         targetSiblings.splice(targetIndex, 1);
 
@@ -297,6 +297,7 @@ export default {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     return new Promise((resolve, reject) => {
                         targetTree.$nextTick(() => {
+                            // @ts-ignore
                             resolve();
                         });
                     });
@@ -304,7 +305,7 @@ export default {
             },
         };
         // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/camelcase,no-multi-assign
+        // eslint-disable-next-line @typescript-eslint/naming-convention,no-multi-assign
         const _makeTreeDraggable_obj = this._makeTreeDraggable_obj = makeTreeDraggable(this.$el, options);
         // watch props and update options
         ['indent',
@@ -328,6 +329,7 @@ export default {
     // computed: {},
     // watch: {},
     methods: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         _Draggable_unfoldTargetNodeByEl(branchEl, store) {
             const { targetTree } = store;
             const path = targetTree.getPathByBranchEl(branchEl);
@@ -337,6 +339,7 @@ export default {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             return new Promise((resolve, reject) => {
                 targetTree.$nextTick(() => {
+                    // @ts-ignore
                     resolve();
                 });
             });
@@ -348,7 +351,7 @@ export default {
             const allNodes = this.getAllNodesByPath(path);
             // @ts-ignore
             allNodes.unshift(this.rootNode);
-            // eslint-disable-next-line no-restricted-syntax,no-shadow
+            // eslint-disable-next-line @typescript-eslint/no-shadow,no-restricted-syntax
             for (const { value: node, index } of hp.iterateAll(allNodes, { reverse: true })) {
                 const currentPath = path.slice(0, (index ?? 0) + 1);
                 // @ts-ignore
@@ -373,7 +376,7 @@ export default {
             allNodes.unshift(this.rootNode);
             let droppableFinal; let
                 resolved;
-            // eslint-disable-next-line no-shadow,no-restricted-syntax
+            // eslint-disable-next-line @typescript-eslint/no-shadow,no-restricted-syntax
             for (const { value: node, index } of hp.iterateAll(allNodes, { reverse: true })) {
                 const currentPath = path.slice(0, (index ?? 0) + 1);
                 // @ts-ignore

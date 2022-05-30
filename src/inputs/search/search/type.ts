@@ -9,8 +9,8 @@ export interface SearchProps {
 }
 
 export interface InputListeners {
-    input: Function;
-    blur: Function;
-    focus: Function;
-    keyup: Function;
+    input: any;
+    blur: any;
+    focus: any;
+    keyup: any;
 }

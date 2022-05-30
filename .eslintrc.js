@@ -55,14 +55,16 @@ module.exports = {
         'import/no-extraneous-dependencies': [
             'error',
             {
-                'devDependencies': true,
-            }
+                devDependencies: true,
+            },
         ],
         'import/prefer-default-export': ['off'],
         'no-new': ['off'],
         'prefer-template': ['error'],
         'no-plusplus': ['off'],
         'no-tabs': ['off'],
+        'no-shadow': ['off'],
+        'no-use-before-define': ['off'],
 
         // typescript rules
         '@typescript-eslint/explicit-member-accessibility': [
@@ -82,21 +84,37 @@ module.exports = {
             'error',
             { allows: ['protected', 'public'] },
         ],
-        '@typescript-eslint/camelcase': ['error', {
-            properties: 'never',
-            allow: [
-                '_id$',
-                '_at$',
-                'total_count',
-            ]
-        }
+        '@typescript-eslint/camelcase': ['off'],
+        '@typescript-eslint/naming-convention': [
+            'error',
+            {
+                selector: 'variable',
+                format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
+                leadingUnderscore: 'allow',
+            },
+            {
+                selector: 'memberLike',
+                format: ['camelCase', 'snake_case', 'PascalCase', 'UPPER_CASE'],
+                leadingUnderscore: 'allow',
+            },
+            {
+                selector: 'parameter',
+                format: ['camelCase'],
+                leadingUnderscore: 'allow',
+            },
+            {
+                selector: 'typeLike',
+                format: ['PascalCase', 'UPPER_CASE'],
+            },
         ],
         '@typescript-eslint/no-empty-function': ['off'], // use eslint no-empty-function rule
         '@typescript-eslint/no-use-before-define': ['off'], // use eslint no-use-before-define rule
         '@typescript-eslint/ban-ts-ignore': ['off'],
         '@typescript-eslint/explicit-function-return-type': ['off'],
         '@typescript-eslint/no-explicit-any': ['off'],
-        '@typescript-eslint/no-unused-vars': ['error', { 'args': 'after-used' }],
+        '@typescript-eslint/no-unused-vars': ['error', { args: 'after-used' }],
+        '@typescript-eslint/no-shadow': ['error'],
+        '@typescript-eslint/ban-ts-comment': ['off'],
 
         // eslint-plugin-import rules
         'import/order': [
@@ -131,7 +149,7 @@ module.exports = {
                         position: 'after',
                     },
                 ],
-                'pathGroupsExcludedImportTypes': ['@vue/composition-api', '@vue/test-utils', 'vue/types'],
+                pathGroupsExcludedImportTypes: ['@vue/composition-api', '@vue/test-utils', 'vue/types'],
                 alphabetize: {
                     order: 'asc',
                     caseInsensitive: true,
@@ -139,7 +157,7 @@ module.exports = {
                 'newlines-between': 'always',
             },
         ],
-        'import/namespace': [0, { allowComputed: true }]
+        'import/namespace': [0, { allowComputed: true }],
     },
     ignorePatterns: ['src/assets/**', '**/node_modules/**',
         'dist/**', '.out/**'],
@@ -153,7 +171,7 @@ module.exports = {
             typescript: {},
         },
         'import/parsers': {
-            '@typescript-eslint/parser': ['.ts']
+            '@typescript-eslint/parser': ['.ts'],
         },
     },
 };

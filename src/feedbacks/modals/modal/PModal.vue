@@ -11,7 +11,7 @@
 <script lang="ts">
 import { computed } from '@vue/composition-api';
 
-import { ModalProps, sizeMapping } from '@/feedbacks/modals/type';
+import { ModalProps, SizeMapping } from '@/feedbacks/modals/type';
 
 
 export default {
@@ -28,7 +28,7 @@ export default {
         size: {
             type: String,
             default: 'md',
-            validator: value => Object.keys(sizeMapping).includes(value),
+            validator: value => Object.keys(SizeMapping).includes(value),
         },
         backdrop: {
             type: Boolean,

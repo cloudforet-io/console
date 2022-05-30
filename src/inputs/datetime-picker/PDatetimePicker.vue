@@ -59,7 +59,7 @@ const FLATPICKR_MODE = Object.freeze({
     range: 'range',
     time: 'time',
 } as const);
-type FLATPICKR_MODE = typeof FLATPICKR_MODE[keyof typeof FLATPICKR_MODE]
+type FlatpickrMode = typeof FLATPICKR_MODE[keyof typeof FLATPICKR_MODE]
 
 export default {
     name: 'PDatetimePicker',
@@ -135,10 +135,10 @@ export default {
                 if (localeFile) return { ...localeFile, rangeSeparator: ' ~ ' };
                 return { rangeSeparator: ' ~ ' };
             }),
-            mode: computed<FLATPICKR_MODE>(() => {
+            mode: computed<FlatpickrMode>(() => {
                 if (props.dataType === DATA_TYPE.time) return FLATPICKR_MODE.time;
                 if (props.dataType === DATA_TYPE.yearToMonth) return FLATPICKR_MODE.single;
-                return props.selectMode as FLATPICKR_MODE;
+                return props.selectMode as FlatpickrMode;
             }),
             enableTime: computed(() => props.dataType === DATA_TYPE.time || props.dataType === DATA_TYPE.yearToTime),
         });

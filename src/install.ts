@@ -37,23 +37,23 @@ export class SpaceDSInstaller {
         return SpaceDSInstaller._options;
     }
 
-    private static _install(_Vue: VueConstructor) {
+    private static _install(vueConstructor: VueConstructor) {
         const options = SpaceDSInstaller._options;
-        if (options?.installVueRouter) _Vue.use(VueRouter);
-        if (options?.installVueI18n) _Vue.use(VueI18n);
-        if (options?.installVueCompositionApi) _Vue.use(VueCompositionApi);
-        if (options?.installFragment) _Vue.use(Fragment.Plugin);
-        _Vue.use(Notifications, { velocity });
-        _Vue.use(SvgIcon, {
+        if (options?.installVueRouter) vueConstructor.use(VueRouter);
+        if (options?.installVueI18n) vueConstructor.use(VueI18n);
+        if (options?.installVueCompositionApi) vueConstructor.use(VueCompositionApi);
+        if (options?.installFragment) vueConstructor.use(Fragment.Plugin);
+        vueConstructor.use(Notifications, { velocity });
+        vueConstructor.use(SvgIcon, {
             tagName: 'svgicon',
             classPrefix: 'p-i',
         });
-        _Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
+        vueConstructor.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
         applyAmchartsGlobalSettings(options?.amchartsLicenses);
     }
 
-    static install: PluginFunction<SpaceoneDSOptions> = (_Vue: VueConstructor, options: SpaceoneDSOptions = {}) => {
+    static install: PluginFunction<SpaceoneDSOptions> = (vueConstructor: VueConstructor, options: SpaceoneDSOptions = {}) => {
         SpaceDSInstaller._options = options;
-        SpaceDSInstaller._install(_Vue);
+        SpaceDSInstaller._install(vueConstructor);
     }
 }

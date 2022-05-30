@@ -9,7 +9,7 @@ type Casual = typeof casual;
  * @param args : parameters for generator function
  * @returns {[]}
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any,func-names
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,func-names,@typescript-eslint/no-shadow
 export function arrayOf<T=any>(times: number, generator: (...args) => T, ...args): Array<T | undefined> {
     const result: Array<T | undefined> = [];
     for (let i = 0; i < times; ++i) {
@@ -42,7 +42,6 @@ export function dictOf<T=any>(times, generator, ...args): T {
 
 interface ProviderInterface {
     make_id(name: string): string;
-    // eslint-disable-next-line @typescript-eslint/camelcase
     ip_list(): Array<string | undefined>;
     label(): string;
     labels(): Array<string | undefined>;
@@ -52,7 +51,6 @@ interface ProviderInterface {
     };
     cidr(): string;
     nanos(): number;
-    // eslint-disable-next-line @typescript-eslint/camelcase
     security_group_name(): string;
     tags(): object;
     defaultImg(): string;

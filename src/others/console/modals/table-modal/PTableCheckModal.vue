@@ -44,7 +44,7 @@ import { orderBy } from 'lodash';
 
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
-import { sizeMapping } from '@/feedbacks/modals/type';
+import { SizeMapping } from '@/feedbacks/modals/type';
 import { makeByEvent, makeProxy } from '@/util/composition-helpers';
 
 
@@ -63,7 +63,7 @@ export default defineComponent({
         size: {
             type: String,
             default: 'md',
-            validator: (value: any) => Object.keys(sizeMapping).includes(value),
+            validator: (value: any) => Object.keys(SizeMapping).includes(value),
         },
         backdrop: {
             type: Boolean,

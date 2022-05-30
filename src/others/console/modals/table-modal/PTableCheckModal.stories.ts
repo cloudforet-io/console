@@ -3,7 +3,7 @@ import { ref } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
 import { select, text, boolean } from '@storybook/addon-knobs';
 
-import { sizeMapping } from '@/feedbacks/modals/type';
+import { SizeMapping } from '@/feedbacks/modals/type';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PTableCheckModel from '@/others/console/modals/table-modal/PTableCheckModal.vue';
 
@@ -28,7 +28,6 @@ const actions = {
     shown: action('shown'),
     hidden: action('hidden'),
     cancel: action('cancel'),
-    close: action('close'),
     confirm: action('confirm'),
 
 };
@@ -66,7 +65,7 @@ export const modal = () => ({
             default: select('color', ['primary', 'alert', 'safe'], 'primary'),
         },
         size: {
-            default: select('size', [null, ...Object.keys(sizeMapping)], null),
+            default: select('size', [null, ...Object.keys(SizeMapping)], null),
         },
         okDisabled: {
             default: boolean('ok disabled', false),
@@ -89,10 +88,10 @@ export const modal = () => ({
         };
         const close = () => {
             visible.value = false;
+            action('close');
         };
         return {
             visible,
-
             click,
             close,
             ...actions,

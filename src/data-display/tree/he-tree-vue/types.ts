@@ -3,6 +3,7 @@ import { CombinedVueInstance } from 'vue/types/vue';
 
 import * as dh from 'draggable-helper';
 
+
 export type Path = number[]
 export interface Store extends dh.Store {
     startTreeEl?: HTMLElement;
@@ -47,9 +48,9 @@ export interface CloneTreeDataOptions {
     afterNodeCreated(newNode: object, info: {oldNode: object; index: number; parent: object; path: Path}): void;
 }
 
-type walkTreeDataCallbackReturn = void|false|'skip children'|'skip siblings'
+type WalkTreeDataCallbackReturn = void|false|'skip children'|'skip siblings'
 export interface WalkTreeDataCallback {
-    (node: Node, index: number, parent: object|null, path: number[]): walkTreeDataCallbackReturn;
+    (node: Node, index: number, parent: object|null, path: number[]): WalkTreeDataCallbackReturn;
 }
 
 /* Component Type */
@@ -91,25 +92,25 @@ export type Tree = CombinedVueInstance<Vue, {
 export interface UnfoldOptions {
     foldOthers?: boolean;
 }
-export type Fold = CombinedVueInstance<Vue, {}, {
+export type Fold = CombinedVueInstance<Vue, any, {
     fold(node: Node, path: Path): void;
     unfold(node: Node, path: Path, opt?: UnfoldOptions): void;
     toggleFold(node: Node, path: Path, opt?: UnfoldOptions): void;
     foldAll(): void;
     unfoldAll(): void;
-}, {}, {
+}, any, {
     foldingTransitionName: string;
     foldingTransition: HeTree;
     foldAllAfterMounted: boolean;
 }>
 
 // Check
-export type Check = CombinedVueInstance<Vue, {}, {
+export type Check = CombinedVueInstance<Vue, any, {
     // methods
     check(node: Node, path: Path): void;
     uncheck(node: Node, path: Path): void;
     toggleCheck(node: Node, path: Path): void;
-}, {}, {}>
+}, any, any>
 
 
 // Draggable
@@ -125,7 +126,7 @@ interface PropOndragstartOndragend{
 }
 export type Draggable = CombinedVueInstance<Vue, {
     treesStore: {store: Store};
-}, {}, {}, {
+}, any, any, {
     triggerClass: string;
     triggerBySelf: boolean;
     draggable: boolean | PropDraggableDroppable;

@@ -44,7 +44,7 @@
 import { reactive, toRefs } from '@vue/composition-api';
 
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
-import { sizeMapping } from '@/feedbacks/modals/type';
+import { SizeMapping } from '@/feedbacks/modals/type';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/inputs/input/PTextInput.vue';
 import { makeProxy } from '@/util/composition-helpers';
@@ -65,7 +65,7 @@ export default {
         size: {
             type: String,
             default: 'md',
-            validator: value => Object.keys(sizeMapping).includes(value),
+            validator: value => Object.keys(SizeMapping).includes(value),
         },
         backdrop: {
             type: Boolean,
