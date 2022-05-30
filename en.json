@@ -1601,52 +1601,31 @@
 		}
 	},
 	"MENU": {
-		"AUTOMATION": {
-			"AUTOMATION": "Automation",
-			"POWER_SCHEDULER": "Power Scheduler",
-			"SPOT_AUTOMATION": "Spot Automation",
-			"SPOT_GROUP": "Spot Group"
-		},
-		"BILLING": {
-			"BILLING": "Billing",
-			"BUDGET": "Budget",
-			"COST_ANALYSIS": "Cost Analysis",
-			"COST_MANAGEMENT": "Cost Management",
-			"DASHBOARD": "Dashboard"
-		},
-		"DASHBOARD": {
-			"DASHBOARD": "Dashboard"
-		},
-		"IDENTITY": {
-			"IDENTITY": "Identity",
-			"ROLE": "Role",
-			"SERVICE_ACCOUNT": "Service Account",
-			"SERVICE_ACCOUNT_ADD_ACCOUNT": "Add Account",
-			"USER": "User"
-		},
-		"INVENTORY": {
-			"CLOUD_SERVICE": "Cloud Service",
-			"INVENTORY": "Inventory",
-			"SERVER": "Server"
-		},
-		"MANAGEMENT": {
-			"COLLECTOR_HISTORY": "Collector History",
-			"COLLECTOR_HISTORY_JOB_MANAGEMENT": "Job Information",
-			"MANAGEMENT": "Management",
-			"PLUGIN": "Plugin Management"
-		},
-		"MONITORING": {
-			"ALERT_MANAGER": "Alert Manager",
-			"MONITORING": "Monitoring"
-		},
-		"PLUGIN": {
-			"COLLECTOR": "Collector",
-			"CREATE_COLLECTOR": "Create Collector",
-			"PLUGIN": "Plugin"
-		},
-		"PROJECT": {
-			"PROJECT": "Project"
-		}
+		"ADMINISTRATION": "Administration",
+		"ADMINISTRATION_IAM": "IAM",
+		"ADMINISTRATION_POLICY": "Policy",
+		"ADMINISTRATION_ROLE": "Role",
+		"ADMINISTRATION_USER": "User",
+		"ALERT_MANAGER": "Alert Manager",
+		"ALERT_MANAGER_ALERT": "Alert",
+		"ALERT_MANAGER_DASHBOARD": "Dashboard",
+		"ALERT_MANAGER_ESCALATION_POLICY": "Escalation Policy",
+		"ASSET_INVENTORY": "Asset Inventory",
+		"ASSET_INVENTORY_CLOUD_SERVICE": "Cloud Service",
+		"ASSET_INVENTORY_COLLECTOR": "Collector",
+		"ASSET_INVENTORY_SERVER": "Server",
+		"ASSET_INVENTORY_SERVICE_ACCOUNT": "Service Account",
+		"COST_EXPLORER": "Cost Explorer",
+		"COST_EXPLORER_BUDGET": "Budget",
+		"COST_EXPLORER_COST_ANALYSIS": "Cost Analysis",
+		"COST_EXPLORER_DASHBOARD": "Dashboard",
+		"DASHBOARD": "Dashboard",
+		"MY_PAGE": "My Page",
+		"MY_PAGE_ACCOUNT": "My Account",
+		"MY_PAGE_ACCOUNT_PROFILE": "Account & Profile",
+		"MY_PAGE_API_KEY": "Access with API & CLI",
+		"MY_PAGE_NOTIFICATIONS": "Notifications Channel",
+		"PROJECT": "Project"
 	},
 	"MONITORING": {
 		"ALERT": {
