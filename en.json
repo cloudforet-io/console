@@ -558,7 +558,7 @@
 						"ACCUMULATED": "Accumulated",
 						"ADD_TO_CUSTOM_WIDGET": "Add to Custom Widget",
 						"ALL": "All",
-						"AWS_CLOUDFRONT_COST_DESC": "Displays the top list of 15 highest spending on AWS CloudFront throughout the whole period of filtered date, aggregated by selected Group-By.",
+						"AWS_CLOUDFRONT_COST_DESC": "Displays the top list of 10 highest spending on AWS CloudFront throughout the whole period of filtered date, aggregated by selected Group-By.",
 						"AWS_DATA_TRANSFER_BY_REGION_DESC": "Displays the top list of 15 highest spending on AWS Data-Transfer throughout the whole period of filtered date, aggregated by Region.",
 						"AWS_DATA_TRANSFER_COST_TREND_DESC": "Displays AWS Data-Transfer spending in last 6 months of filtered date.",
 						"BUDGET_STATUS_DESC": "Displays the top 200 highest budget usage throughout the whole period of filtered date.",

@@ -558,7 +558,7 @@
 						"ACCUMULATED": "누적 데이터",
 						"ADD_TO_CUSTOM_WIDGET": "커스텀 위젯에 추가",
 						"ALL": "전체",
-						"AWS_CLOUDFRONT_COST_DESC": "선택한 Group-By를 기준으로 조회 기간동안 발생한 상위 15개 AWS CloudFront 사용 상태를 보여주는 위젯.",
+						"AWS_CLOUDFRONT_COST_DESC": "선택한 Group-By를 기준으로 조회 기간동안 발생한 상위 10개 AWS CloudFront 사용 상태를 보여주는 위젯.",
 						"AWS_DATA_TRANSFER_BY_REGION_DESC": "Region을 기준으로 조회 기간동안 발생한 상위 15개 AWS Data-Transfer 비용 데이터를 보여주는 위젯.",
 						"AWS_DATA_TRANSFER_COST_TREND_DESC": "조회 기간내 최근 6개월 동안의 AWS Data-Transfer 사용 상태를 보여주는 위젯.",
 						"BUDGET_STATUS_DESC": "조회 기간동안의 상위 200개의 예산 사용률을 보여주는 위젯.",

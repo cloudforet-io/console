@@ -558,7 +558,7 @@
 						"ACCUMULATED": "累積データ",
 						"ADD_TO_CUSTOM_WIDGET": "カスタムウィジェットに追加する",
 						"ALL": "すべて",
-						"AWS_CLOUDFRONT_COST_DESC": "選択したGroup-Byを基準に照会期間中に発生した上位15個のAWSCloudFront使用状況を示すウィジェット。",
+						"AWS_CLOUDFRONT_COST_DESC": "選択したGroup-Byを基準に照会期間中に発生した上位10個のAWSCloudFront使用状況を示すウィジェット。",
 						"AWS_DATA_TRANSFER_BY_REGION_DESC": "Regionを基準に照会期間中に発生した上位15個のAWS　Data-Transfer費用データを表示するウィジェット。",
 						"AWS_DATA_TRANSFER_COST_TREND_DESC": "照会期間内に最近6ヵ月間のAWS　Data-Transferの使用状況を示すウィジェット",
 						"BUDGET_STATUS_DESC": "照会期間中の上位200個の予算使用率を示すウィジェット。",
