@@ -15,6 +15,7 @@ import { serviceRoutes } from '@/router/service-routes';
 import { addAmchartsLicense, applyAmchartsGlobalSettings } from '@/lib/amcharts/global-settings';
 import config from '@/lib/config';
 import { GTag } from '@/lib/gtag';
+import { Gtm } from '@/lib/gtm';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -85,6 +86,13 @@ const initGtag = () => {
     }, { immediate: true });
 };
 
+const initGtm = () => {
+    if (config.get('GTM_ID')) {
+        Gtm.init();
+        console.log('GTM INITIALIZED', config.get('GTM_ID'));
+    }
+};
+
 
 const initQueryHelper = () => {
     QueryHelper.init(computed(() => store.state.user.timezone));
@@ -141,6 +149,7 @@ const init = async () => {
         initDayjs();
         initQueryHelper();
         initGtag();
+        initGtm();
         initAmcharts();
         initErrorHandler();
     } else {
