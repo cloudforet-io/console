@@ -666,6 +666,7 @@
 				"CREATE": "Create",
 				"DASHBOARD": "Dashboard",
 				"DUPLICATE": "Duplicate",
+				"FILTER_NONE": "None",
 				"MONTH": "Month",
 				"NO_SELECTED_FILTER": "No selected filters.",
 				"OVERSPENT": "Overspent",
