@@ -418,12 +418,14 @@
 					"COST_TYPE": "Cost Type",
 					"CREATE": "Create",
 					"CREATE_BUDGET": "Create Budget",
+					"CREATE_BULK_BUDGET": "Create Bulk Budget",
 					"DESC": "Desc",
 					"OVERSPENT": "Overspent",
 					"PERIOD": "Period",
 					"SINGLE_BUDGET": "Single Budget",
 					"THIS_MONTH": "This Month",
 					"TOTAL": "Total",
+					"UPDATE_BUDGET": "Update Budget",
 					"USAGE": "{symbol} Amount used"
 				},
 				"STAT": {
@@ -1898,6 +1900,11 @@
 				"DASHBOARD": "Dashboard",
 				"ESCALATION_POLICY": "Escalation Policy"
 			}
+		}
+	},
+	"MY_PAGE": {
+		"NOTIFICATION": {
+			"ADD_CHANNEL": "Add Notifications Channel"
 		}
 	},
 	"PAGE_SCHEMA": {
