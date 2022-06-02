@@ -735,8 +735,7 @@
 		"ERROR": {
 			"404_GO_BACK_1": "前のページに戻る",
 			"404_MSG": "内容が見つかりません",
-			"NO_RESOURCE_GO_BACK_1": "前のページに戻る",
-			"NO_RESOURCE_GO_BACK_2": "メインページに移動してください",
+			"NO_RESOURCE_GO_MAIN": "",
 			"NO_RESOURCE_MSG": "リソースが見つかりません",
 			"NO_RESOURCE_TITLE": "リソースがありません。"
 		},
@@ -1476,6 +1475,7 @@
 				"AUTO_PERIOD": "自動（全期間）",
 				"CHECK_MODAL_DELETE_DESC": "本当に削除しますか？",
 				"CHECK_MODAL_DELETE_TITLE": "クラウドサービス削除",
+				"CLOSE": "",
 				"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
 				"FAVORITES": "お気に入り",
 				"FILTER": "フィルター",
@@ -1500,7 +1500,8 @@
 				"SHOW_MAJOR": "主なサービスを見る",
 				"TITLE": "{provider} クラウドサービス",
 				"TOTAL_RESULT": "検索結果",
-				"USAGE_OVERVIEW": "利用概要"
+				"USAGE_OVERVIEW": "利用概要",
+				"USAGE_OVERVIEW_OF_RESOURCE": ""
 			},
 			"PAGE": {
 				"ACTION": "作業",

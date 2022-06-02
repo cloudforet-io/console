@@ -734,11 +734,10 @@
 		},
 		"ERROR": {
 			"404_GO_BACK_1": "이전 페이지로 돌아가기 >> 버튼으로 처리 (108번 라인과 동일하게)",
-			"404_MSG": "이런, 내용을 찾을 수 없습니다.",
-			"NO_RESOURCE_GO_BACK_1": "이전 페이지로 돌아가기  >> 버튼으로 처리  (108번 라인과 동일하게)",
-			"NO_RESOURCE_GO_BACK_2": "메인 페이지로 이동하세요.",
+			"404_MSG": "요청한 페이지를 찾을 수 없습니다.",
+			"NO_RESOURCE_GO_MAIN": "{service} 메인으로 이동",
 			"NO_RESOURCE_MSG": "리소스를 찾을 수 없습니다.",
-			"NO_RESOURCE_TITLE": "리소스가 없습니다. "
+			"NO_RESOURCE_TITLE": "리소스 없음"
 		},
 		"EXCEL": {
 			"ALT_E_DOWNLOAD": "엑셀 다운로드 실패",
@@ -1242,7 +1241,7 @@
 		},
 		"USER": {
 			"ACCOUNT": {
-				"ACCOUNT_N_PROFILE": "계정 & 프로",
+				"ACCOUNT_N_PROFILE": "계정 & 프로필",
 				"BASE_INFORMATION": "기본 정보",
 				"CHANGE_PASSWORD": "비밀번호 변경 ",
 				"SAVE_CHANGES": "변경사항 저장 "
@@ -1476,6 +1475,7 @@
 				"AUTO_PERIOD": "자동 (전체 기간)",
 				"CHECK_MODAL_DELETE_DESC": "정말 삭제하시겠습니까?",
 				"CHECK_MODAL_DELETE_TITLE": "클라우드 서비스 삭제",
+				"CLOSE": "닫기",
 				"EMPTY_CLOUD_SERVICE": "클라우드 서비스를 이용하려면 서비스 계정을 추가해주세요. ",
 				"FAVORITES": "즐겨찾기",
 				"FILTER": "필터",
@@ -1500,7 +1500,8 @@
 				"SHOW_MAJOR": "주요 서비스 보기 ",
 				"TITLE": "{provider} 클라우드 서비스 ",
 				"TOTAL_RESULT": "검색 결과",
-				"USAGE_OVERVIEW": "이용 현황"
+				"USAGE_OVERVIEW": "이용 현황",
+				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}의 이용 현황"
 			},
 			"PAGE": {
 				"ACTION": "작업",

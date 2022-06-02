@@ -735,10 +735,9 @@
 		"ERROR": {
 			"404_GO_BACK_1": "Try going",
 			"404_MSG": "Oops, nothing is here.",
-			"NO_RESOURCE_GO_BACK_1": "Click here",
-			"NO_RESOURCE_GO_BACK_2": "to go back home.",
+			"NO_RESOURCE_GO_MAIN": "Go To {service} Main",
 			"NO_RESOURCE_MSG": "There are no matching resources. ",
-			"NO_RESOURCE_TITLE": "No Resources"
+			"NO_RESOURCE_TITLE": "No Resource"
 		},
 		"EXCEL": {
 			"ALT_E_DOWNLOAD": "Failed to Downloaded Excel",
@@ -1476,6 +1475,7 @@
 				"AUTO_PERIOD": "Auto (Overall period)",
 				"CHECK_MODAL_DELETE_DESC": "Are you sure you want to Delete selected item?",
 				"CHECK_MODAL_DELETE_TITLE": "Delete Cloud Service",
+				"CLOSE": "Close",
 				"EMPTY_CLOUD_SERVICE": "Please, register Service Account first to collect cloud service resouces. ",
 				"FAVORITES": "Favorites",
 				"FILTER": "Filter",
@@ -1500,7 +1500,8 @@
 				"SHOW_MAJOR": "Show Major Services ",
 				"TITLE": "{provider} Cloud Service",
 				"TOTAL_RESULT": "Total Result",
-				"USAGE_OVERVIEW": "Usage Overview"
+				"USAGE_OVERVIEW": "Usage Overview",
+				"USAGE_OVERVIEW_OF_RESOURCE": "Usage Overview of {resource}"
 			},
 			"PAGE": {
 				"ACTION": "Action",
