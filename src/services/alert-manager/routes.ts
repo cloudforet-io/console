@@ -2,7 +2,6 @@ import { RouteConfig } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { getMenuLabel } from '@/lib/menu/menu-info';
 
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
@@ -16,19 +15,19 @@ const AlertDetailPage = () => import(/* webpackChunkName: "AlertDetailPage" */ '
 const alertManagerRoutes: RouteConfig = {
     path: 'alert-manager',
     name: ALERT_MANAGER_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.ALERT_MANAGER), accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+    meta: { menuId: MENU_ID.ALERT_MANAGER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: '/alert-manager/dashboard',
     component: AlertManagerContainer,
     children: [
         {
             path: 'dashboard',
             name: ALERT_MANAGER_ROUTE.DASHBOARD._NAME,
-            meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.ALERT_MANAGER_DASHBOARD) },
+            meta: { lnbVisible: true, menuId: MENU_ID.ALERT_MANAGER_DASHBOARD },
             component: AlertDashboardPage as any,
         },
         {
             path: 'alert',
-            meta: { label: getMenuLabel(MENU_ID.ALERT_MANAGER_ALERT) },
+            meta: { menuId: MENU_ID.ALERT_MANAGER_ALERT },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -49,7 +48,7 @@ const alertManagerRoutes: RouteConfig = {
         {
             path: 'escalation-policy',
             name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
-            meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.ALERT_MANAGER_ESCALATION_POLICY) },
+            meta: { lnbVisible: true, menuId: MENU_ID.ALERT_MANAGER_ESCALATION_POLICY },
             component: EscalationPolicyPage as any,
         },
     ],

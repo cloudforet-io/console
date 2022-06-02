@@ -2,6 +2,7 @@ import VueRouter from 'vue-router';
 import { Getter } from 'vuex';
 
 import { SpaceRouter } from '@/router';
+import { i18n } from '@/translations';
 
 import {
     CURRENCY_SYMBOL, SIDEBAR_TYPE,
@@ -89,7 +90,7 @@ const getGnbMenuList = (menuList: Menu[]): GNBMenu[] => menuList.map((d) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
     return {
         ...d,
-        label: menuInfo.label,
+        label: i18n.t(menuInfo.translationId),
         icon: menuInfo.icon,
         isNew: menuInfo.isNew,
         isBeta: menuInfo.isBeta,

@@ -28,7 +28,7 @@ export interface RoleData {
 // Page Access
 export interface PageAccessMenuItem {
     id: string;
-    labels: string[] | TranslateResult[];
+    translationIds: string[];
     isViewed: boolean;
     isManaged: boolean;
     isParent?: boolean;
@@ -36,7 +36,7 @@ export interface PageAccessMenuItem {
     subMenuList?: PageAccessMenuItem[];
 }
 export interface PageAccessDefinitionTableData {
-    label?: string;
+    label?: TranslateResult;
     data: Record<string, PagePermissionType | '--'>;
     fields: DefinitionField[];
 }

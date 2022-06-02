@@ -73,9 +73,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import {
-    getPagePermissionMap,
     PAGE_PERMISSION_TYPE,
-    PagePermission,
 } from '@/lib/access-control/page-permission-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -83,9 +81,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { POLICY_TYPES, PolicyTypes } from '@/services/administration/iam/policy/lib/config';
 import { policyTypeBadgeColorFormatter } from '@/services/administration/iam/policy/lib/helper';
 import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
+import {
+    usePageAccessDefinitionTableData,
+} from '@/services/administration/iam/role/composables/page-access-definition-table-data';
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
-import { getPageAccessDefinitionTableData } from '@/services/administration/iam/role/lib/page-access-helper';
-import { PageAccessDefinitionTableData, RoleData } from '@/services/administration/iam/role/type';
+import { RoleData } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 
@@ -126,7 +126,7 @@ export default {
         const pageAccessState = reactive({
             title: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS'),
             loading: false,
-            pageAccessDataList: [] as PageAccessDefinitionTableData[],
+            pageAccessDataList: usePageAccessDefinitionTableData(baseInfoState.data?.page_permissions),
         });
         const policyState = reactive({
             fields: [
@@ -187,10 +187,6 @@ export default {
         };
 
         /* Init */
-        const initPageAccessData = (pagePermissions: PagePermission[] = []) => {
-            const pagePermissionMap = getPagePermissionMap(pagePermissions);
-            pageAccessState.pageAccessDataList = getPageAccessDefinitionTableData(pagePermissionMap);
-        };
         const initPolicy = async (policies) => {
             policyState.items = [];
             await Promise.all(policies.map(async (policy) => {
@@ -204,7 +200,6 @@ export default {
             const roleId = props.roleId;
             await getRoleDetailData(roleId);
             //
-            initPageAccessData(baseInfoState.data?.page_permissions);
             await initPolicy(baseInfoState.data.policies ?? []);
         }, { immediate: true });
 

@@ -20,7 +20,7 @@
             @update:model="onChangeModel"
         />
         <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER">
-            <p-field-group :label="$t('MENU.IDENTITY.USER')" required>
+            <p-field-group :label="$t('MENU.ADMINISTRATION_USER')" required>
                 <template #default>
                     <add-notification-member-group :project-id="projectId" @change="onChangeMember" />
                 </template>

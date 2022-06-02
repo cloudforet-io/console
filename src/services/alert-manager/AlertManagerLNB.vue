@@ -6,6 +6,7 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -22,11 +23,11 @@ export default {
     },
     setup() {
         const state = reactive({
-            header: computed(() => MENU_INFO_MAP[MENU_ID.ALERT_MANAGER].label),
+            header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.ALERT_MANAGER].translationId)),
             menuSet: computed<LNBMenu[]>(() => filterLNBMenuByPermission(lnbMenuIds.map((id) => {
                 const menuInfo = MENU_INFO_MAP[id];
                 return ({
-                    type: 'item', id, label: menuInfo.label, to: { name: id },
+                    type: 'item', id, label: i18n.t(menuInfo.translationId), to: { name: id },
                 });
             }), store.getters['user/pagePermissionList'])),
         });

@@ -43,29 +43,6 @@ export default defineComponent({
         LNB,
     },
     setup() {
-        const menuSetByUserType = () => {
-            const defaultMenuSet = [
-                {
-                    type: 'title', label: MENU_INFO_MAP[MENU_ID.MY_PAGE_ACCOUNT].label, id: MENU_ID.MY_PAGE_ACCOUNT, foldable: false,
-                },
-                {
-                    type: 'item', label: MENU_INFO_MAP[MENU_ID.MY_PAGE_ACCOUNT_PROFILE].label, id: MENU_ID.MY_PAGE_ACCOUNT_PROFILE, to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME },
-                },
-            ];
-            return state.isDomainOwner ? defaultMenuSet : [
-                ...defaultMenuSet,
-                {
-                    type: 'item', label: MENU_INFO_MAP[MENU_ID.MY_PAGE_API_KEY].label, id: MENU_ID.MY_PAGE_API_KEY, to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME },
-                },
-                {
-                    type: 'item',
-                    label: MENU_INFO_MAP[MENU_ID.MY_PAGE_NOTIFICATIONS].label,
-                    id: MENU_ID.MY_PAGE_NOTIFICATIONS,
-                    to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME },
-                    isBeta: true,
-                },
-            ];
-        };
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             hasDomainRole: computed(() => store.getters['user/hasDomainRole']),
@@ -82,8 +59,40 @@ export default defineComponent({
                 if (state.isDomainOwner) return i18n.t('IDENTITY.USER.MAIN.ROOT_ACCOUNT');
                 return i18n.t('IDENTITY.USER.MAIN.SPACEONE_USER');
             }),
-            header: computed(() => MENU_INFO_MAP[MENU_ID.MY_PAGE].label),
-            menuSet: computed<LNBMenu[]>(() => filterLNBMenuByPermission(menuSetByUserType(), store.getters['user/pagePermissionList'])),
+            header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId)),
+            menuSet: computed<LNBMenu[]>(() => {
+                const defaultMenuSet: LNBMenu[] = [
+                    {
+                        type: 'title',
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_ACCOUNT].translationId),
+                        id: MENU_ID.MY_PAGE_ACCOUNT,
+                        foldable: false,
+                    },
+                    {
+                        type: 'item',
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_ACCOUNT_PROFILE].translationId),
+                        id: MENU_ID.MY_PAGE_ACCOUNT_PROFILE,
+                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME },
+                    },
+                ];
+                const allLnbMenu: LNBMenu[] = state.isDomainOwner ? defaultMenuSet : [
+                    ...defaultMenuSet,
+                    {
+                        type: 'item',
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_API_KEY].translationId),
+                        id: MENU_ID.MY_PAGE_API_KEY,
+                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME },
+                    },
+                    {
+                        type: 'item',
+                        label: MENU_INFO_MAP[MENU_ID.MY_PAGE_NOTIFICATIONS].translationId,
+                        id: MENU_ID.MY_PAGE_NOTIFICATIONS,
+                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME },
+                        isBeta: true,
+                    },
+                ];
+                return filterLNBMenuByPermission(allLnbMenu, store.getters['user/pagePermissionList']);
+            }),
         });
 
         return {

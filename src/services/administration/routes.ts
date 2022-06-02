@@ -2,7 +2,6 @@ import { RouteConfig } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { getMenuLabel } from '@/lib/menu/menu-info';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
@@ -19,26 +18,26 @@ const PolicyDetailPage = () => import(/* webpackChunkName: "PolicyDetailPage" */
 const administrationRoutes: RouteConfig = {
     path: 'administration',
     name: ADMINISTRATION_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.ADMINISTRATION), accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+    meta: { menuId: MENU_ID.ADMINISTRATION, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: '/administration/iam/user',
     component: AdministrationContainer,
     children: [
         {
             path: 'iam',
             name: ADMINISTRATION_ROUTE.IAM._NAME,
-            meta: { label: getMenuLabel(MENU_ID.ADMINISTRATION_IAM) },
+            meta: { menuId: MENU_ID.ADMINISTRATION_IAM },
             redirect: '/administration/iam/user',
             component: { template: '<router-view />' },
             children: [
                 {
                     path: 'user',
                     name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
-                    meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.ADMINISTRATION_USER) },
+                    meta: { lnbVisible: true, menuId: MENU_ID.ADMINISTRATION_USER },
                     component: UserPage as any,
                 },
                 {
                     path: 'role',
-                    meta: { label: getMenuLabel(MENU_ID.ADMINISTRATION_ROLE) },
+                    meta: { menuId: MENU_ID.ADMINISTRATION_ROLE },
                     component: { template: '<router-view />' },
                     children: [
                         {
@@ -65,7 +64,7 @@ const administrationRoutes: RouteConfig = {
                 },
                 {
                     path: 'policy',
-                    meta: { label: getMenuLabel(MENU_ID.ADMINISTRATION_POLICY) },
+                    meta: { menuId: MENU_ID.ADMINISTRATION_POLICY },
                     component: { template: '<router-view />' },
                     children: [
                         {

@@ -25,6 +25,7 @@ import { PI } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
@@ -53,11 +54,11 @@ export default {
             userDashboardList: computed<UserDashboardInfo[]>(() => costExplorerStore.state.userDashboardList ?? []),
             loading: true,
             dashboardListLoading: computed<boolean>(() => costExplorerStore.state?.dashboardListLoading ?? true),
-            header: computed(() => MENU_INFO_MAP[MENU_ID.COST_EXPLORER].label),
+            header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId)),
             topTitle: computed(() => {
                 if (isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_DASHBOARD, store.getters['user/pagePermissionList'])) {
                     return {
-                        label: MENU_INFO_MAP[MENU_ID.COST_EXPLORER_DASHBOARD].label,
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_DASHBOARD].translationId),
                         visibleAddButton: true,
                         addButtonLink: { name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME },
                     };
@@ -98,10 +99,16 @@ export default {
             menuSet: computed<LNBMenu[]>(() => filterLNBMenuByPermission([
                 ...state.dashboardMenuSet,
                 {
-                    type: 'item', id: MENU_ID.COST_EXPLORER_COST_ANALYSIS, label: 'Cost Analysis', to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
+                    type: 'item',
+                    id: MENU_ID.COST_EXPLORER_COST_ANALYSIS,
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
+                    to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
                 },
                 {
-                    type: 'item', id: MENU_ID.COST_EXPLORER_BUDGET, label: 'Budget', to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
+                    type: 'item',
+                    id: MENU_ID.COST_EXPLORER_BUDGET,
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_BUDGET].translationId),
+                    to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
                 },
             ], store.getters['user/pagePermissionList'])),
             selectedMenu: {} as LNBItem,

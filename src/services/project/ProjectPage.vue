@@ -228,7 +228,7 @@ export default {
                 if (storeState.selectedNodeData) {
                     result.push({ name: storeState.groupName, data: storeState.selectedNodeData });
                 }
-                return [{ name: vm.$t('MENU.PROJECT.PROJECT'), data: null }, ...result];
+                return [{ name: vm.$t('MENU.PROJECT'), data: null }, ...result];
             }),
             groupMemberCount: undefined as number|undefined,
             groupMemberPageVisible: false,

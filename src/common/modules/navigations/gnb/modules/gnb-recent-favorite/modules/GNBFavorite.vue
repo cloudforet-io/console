@@ -121,14 +121,14 @@ export default {
                 if (state.favoriteProjects.length) {
                     if (results.length !== 0) results.push({ type: 'divider' });
                     results.push({
-                        name: 'title', label: i18n.t('MENU.PROJECT.PROJECT'), type: 'header', itemType: SUGGESTION_TYPE.PROJECT,
+                        name: 'title', label: i18n.t('MENU.PROJECT'), type: 'header', itemType: SUGGESTION_TYPE.PROJECT,
                     });
                     results.push(...state.favoriteProjects.slice(0, FAVORITE_LIMIT));
                 }
                 if (state.favoriteCloudServiceItems.length) {
                     if (results.length !== 0) results.push({ type: 'divider' });
                     results.push({
-                        name: 'title', label: i18n.t('MENU.INVENTORY.CLOUD_SERVICE'), type: 'header', itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
+                        name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_CLOUD_SERVICE'), type: 'header', itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
                     });
                     results.push(...state.favoriteCloudServiceItems.slice(0, FAVORITE_LIMIT));
                 }

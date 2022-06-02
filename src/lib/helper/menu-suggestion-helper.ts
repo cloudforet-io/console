@@ -1,8 +1,10 @@
+import { TranslateResult } from 'vue-i18n';
+
 import { GNBMenu } from '@/store/modules/display/type';
 
 export interface SuggestionMenu {
     id: string;
-    label: string;
+    label: TranslateResult;
     parents?: SuggestionMenu[];
     icon?: string;
 }

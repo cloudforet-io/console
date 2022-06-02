@@ -86,7 +86,7 @@ export default {
             siteMapMenuList: computed<GNBMenu[]>(() => ([
                 {
                     id: DASHBOARD_ROUTE._NAME,
-                    label: vm.$t('MENU.DASHBOARD.DASHBOARD'),
+                    label: vm.$t('MENU.DASHBOARD'),
                     to: { name: DASHBOARD_ROUTE._NAME },
                     subMenuList: [],
                 },

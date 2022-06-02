@@ -38,13 +38,11 @@ import {
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import { find } from 'lodash';
 
-import { i18n } from '@/translations';
-
 import {
     getPagePermissionMap, PAGE_PERMISSION_TYPE, PagePermission,
 } from '@/lib/access-control/page-permission-helper';
 
-import { getPageAccessMenuList } from '@/services/administration/iam/role/lib/page-access-helper';
+import { getPageAccessMenuList } from '@/services/administration/iam/role/lib/page-access-menu-list';
 import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
@@ -86,7 +84,13 @@ export default {
     },
     setup(props, { emit }) {
         const formState = reactive({
-            menuItems: [] as PageAccessMenuItem[],
+            menuItems: getPageAccessMenuList([{
+                id: 'all',
+                translationIds: ['IAM.ROLE.FORM.ALL'],
+                isViewed: false,
+                isManaged: false,
+                hideMenu: false,
+            }]),
         });
         const state = reactive({
             hideAllMenu: computed(() => formState.menuItems.find(d => d.id === 'all')?.hideMenu),
@@ -133,21 +137,6 @@ export default {
                 });
             }
         };
-
-        /* Init */
-        (async () => {
-            const pageAccessMenuList = getPageAccessMenuList();
-            formState.menuItems = [
-                {
-                    id: 'all',
-                    labels: [i18n.t('IAM.ROLE.FORM.ALL')],
-                    isViewed: false,
-                    isManaged: false,
-                    hideMenu: false,
-                },
-                ...pageAccessMenuList,
-            ];
-        })();
 
         /* Watcher */
         watch(() => state.pagePermissions, (after) => {

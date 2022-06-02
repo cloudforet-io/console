@@ -14,8 +14,8 @@ declare module 'vue-router' {
   }
   interface RouteMeta {
     lnbVisible?: boolean;
+    menuId?: string;
     label?: string|RouteLabelFormatter;
-    translationId?: string;
     copiable?: boolean; // for breadcrumbs
     isSignInPage?: boolean;
     accessLevel?: AccessLevel;

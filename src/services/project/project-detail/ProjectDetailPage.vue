@@ -181,7 +181,7 @@ export default {
             projectGroupName: computed(() => state.item?.project_group_info?.name || ''),
             projectGroupNames: [],
             pageNavigation: computed(() => [
-                { name: i18n.t('MENU.PROJECT.PROJECT'), path: '/project' },
+                { name: i18n.t('MENU.PROJECT'), path: '/project' },
                 { name: state.projectGroupName, path: `/project?select_pg=${state.projectGroupId}` },
                 // ...state.projectGroupNames.map(d => ({
                 //     name: d.name,

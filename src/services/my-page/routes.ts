@@ -2,7 +2,6 @@ import { RouteConfig } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { getMenuLabel } from '@/lib/menu/menu-info';
 
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
@@ -18,32 +17,32 @@ const NotificationAddPage = () => import(/* webpackChunkName: "NotificationAddPa
 const myPageRoutes: RouteConfig = {
     path: 'my-page',
     name: MY_PAGE_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.MY_PAGE), accessLevel: ACCESS_LEVEL.AUTHENTICATED },
+    meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.AUTHENTICATED },
     redirect: '/my-page/account',
     component: MyPageContainer,
     children: [
         {
             path: 'account',
             name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
-            meta: { label: getMenuLabel(MENU_ID.MY_PAGE_ACCOUNT) },
+            meta: { menuId: MENU_ID.MY_PAGE_ACCOUNT },
             redirect: '/my-page/account/profile',
             component: { template: '<router-view />' },
             children: [
                 {
                     path: 'profile',
                     name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME,
-                    meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.MY_PAGE_ACCOUNT_PROFILE) },
+                    meta: { lnbVisible: true, menuId: MENU_ID.MY_PAGE_ACCOUNT_PROFILE },
                     component: UserAccountPage,
                 },
                 {
                     path: 'api-key',
                     name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME,
-                    meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.MY_PAGE_API_KEY) },
+                    meta: { lnbVisible: true, menuId: MENU_ID.MY_PAGE_API_KEY },
                     component: UserAPIKeyPage as any,
                 },
                 {
                     path: 'notification',
-                    meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.MY_PAGE_NOTIFICATIONS) },
+                    meta: { lnbVisible: true, menuId: MENU_ID.MY_PAGE_NOTIFICATIONS },
                     component: { template: '<router-view />' },
                     children: [
                         {

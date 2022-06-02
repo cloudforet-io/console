@@ -36,7 +36,6 @@ export interface Menu {
 }
 
 export interface MenuInfo {
-    label: string;
     translationId: string;
     icon?: string;
     isNew?: boolean;

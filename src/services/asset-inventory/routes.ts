@@ -3,7 +3,6 @@ import { RouteConfig } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { getMenuLabel } from '@/lib/menu/menu-info';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
@@ -32,13 +31,13 @@ const CollectJobPage = () => import(/* webpackChunkName: "CollectorHistory" */ '
 const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.ASSET_INVENTORY), accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+    meta: { menuId: MENU_ID.ASSET_INVENTORY, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: '/asset-inventory/cloud-service',
     component: AssetInventoryContainer,
     children: [
         {
             path: 'cloud-service',
-            meta: { label: getMenuLabel(MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE) },
+            meta: { menuId: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -84,12 +83,12 @@ const assetInventoryRoute: RouteConfig = {
         {
             path: 'server',
             name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
-            meta: { lnbVisible: true, label: getMenuLabel(MENU_ID.ASSET_INVENTORY_SERVER) },
+            meta: { lnbVisible: true, menuId: MENU_ID.ASSET_INVENTORY_SERVER },
             component: ServerPage as any,
         },
         {
             path: 'collector',
-            meta: { label: getMenuLabel(MENU_ID.ASSET_INVENTORY_COLLECTOR) },
+            meta: { menuId: MENU_ID.ASSET_INVENTORY_COLLECTOR },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -143,7 +142,7 @@ const assetInventoryRoute: RouteConfig = {
         },
         {
             path: 'service-account',
-            meta: { label: getMenuLabel(MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT) },
+            meta: { menuId: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT },
             component: { template: '<router-view />' },
             children: [
                 {

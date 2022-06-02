@@ -2,7 +2,6 @@ import { RouteConfig } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
-import { getMenuLabel } from '@/lib/menu/menu-info';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
@@ -22,13 +21,13 @@ const BudgetDetailPage = () => import(/* webpackChunkName: "BudgetDetailPage" */
 const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
-    meta: { label: getMenuLabel(MENU_ID.COST_EXPLORER), accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+    meta: { menuId: MENU_ID.COST_EXPLORER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: '/cost-explorer/dashboard',
     component: CostExplorerContainer,
     children: [
         {
             path: 'dashboard',
-            meta: { label: getMenuLabel(MENU_ID.COST_EXPLORER_DASHBOARD) },
+            meta: { menuId: MENU_ID.COST_EXPLORER_DASHBOARD },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -63,7 +62,7 @@ const costExplorerRoutes: RouteConfig = {
         },
         {
             path: 'cost-analysis',
-            meta: { label: getMenuLabel(MENU_ID.COST_EXPLORER_COST_ANALYSIS) },
+            meta: { menuId: MENU_ID.COST_EXPLORER_COST_ANALYSIS },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -79,7 +78,7 @@ const costExplorerRoutes: RouteConfig = {
         },
         {
             path: 'budget',
-            meta: { label: getMenuLabel(MENU_ID.COST_EXPLORER_BUDGET) },
+            meta: { menuId: MENU_ID.COST_EXPLORER_BUDGET },
             component: { template: '<router-view />' },
             children: [
                 {

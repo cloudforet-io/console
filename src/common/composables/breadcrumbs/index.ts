@@ -4,6 +4,8 @@ import { Location, Route } from 'vue-router';
 
 import { i18n } from '@/translations';
 
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+
 import { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 // interface LocationFormatter {
@@ -32,17 +34,21 @@ export const useBreadcrumbs = (route: ComputedRef<Route>, disableRouteNames: str
                 location.path = path;
             }
 
-            const translationId = d.meta.translationId;
-            if (translationId) {
-                const label = i18n.t(translationId);
-                if (label) {
+            const label = d.meta.label;
+            if (label) {
+                if (typeof label === 'function') {
+                    const labelResult = label(route.value);
+                    if (labelResult) results.push({ name: labelResult, to: location, copiable: d.meta.copiable });
+                } else {
                     results.push({ name: label, to: location, copiable: d.meta.copiable });
                 }
             } else {
-                let label = d.meta.label;
-                if (typeof label === 'function') label = label(route.value);
-                if (label) results.push({ name: label, to: location, copiable: d.meta.copiable });
+                const menuInfo = d.meta.menuId ? MENU_INFO_MAP[d.meta.menuId] : undefined;
+                if (menuInfo) {
+                    results.push({ name: i18n.t(menuInfo.translationId), to: location, copiable: d.meta.copiable });
+                }
             }
+
 
             return results;
         }, [] as Breadcrumb[]);

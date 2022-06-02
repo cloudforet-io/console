@@ -9,10 +9,10 @@
                            :disabled="isDisabled"
                            @click="handleToggleMenuVisible"
             />
-            <template v-for="(label, lIdx) in menu.labels">
-                {{ label }}
-                <p-i v-if="lIdx < menu.labels.length - 1"
-                     :key="`label-${menu.labels.join('.')}-${lIdx}`"
+            <template v-for="(translationId, lIdx) in menu.translationIds">
+                {{ $t(translationId) }}
+                <p-i v-if="lIdx < menu.translationIds.length - 1"
+                     :key="`label-${menu.translationIds.join('.')}-${lIdx}`"
                      name="ic_breadcrumb_arrow"
                      width="1rem" height="1rem"
                 />
