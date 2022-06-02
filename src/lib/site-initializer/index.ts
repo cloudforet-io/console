@@ -87,10 +87,12 @@ const initGtag = () => {
 };
 
 const initGtm = () => {
-    if (config.get('GTM_ID')) {
-        Gtm.init();
-        console.log('GTM INITIALIZED', config.get('GTM_ID'));
-    }
+    // if (config.get('GTM_ID')) {
+    //     Gtm.init();
+    //     console.log('GTM INITIALIZED', config.get('GTM_ID'));
+    // }
+    Gtm.init();
+    console.log('GTM INITIALIZED');
 };
 
 
