@@ -53,7 +53,7 @@
 <script lang="ts">
 
 import {
-    defineComponent, onMounted, onUnmounted, PropType, reactive, toRefs, watch,
+    defineComponent, onUnmounted, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -242,12 +242,8 @@ export default defineComponent<MetricChartProps>({
             }
         });
 
-        onMounted(() => {
-            am4core.options.onlyShowOnViewport = false;
-        });
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
-            am4core.options.onlyShowOnViewport = true;
         });
 
         return {
