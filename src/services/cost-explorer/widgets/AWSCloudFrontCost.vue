@@ -350,7 +350,6 @@ export default {
                     end: dayjs.utc(period.end).format('YYYY-MM'),
                     ...queryHelper.apiQuery,
                 });
-                console.log(results);
                 return results;
             } catch (e) {
                 ErrorHandler.handleError(e);
