@@ -19,8 +19,6 @@
 </template>
 
 <script lang="ts">
-import { ComponentRenderProxy, computed, getCurrentInstance } from '@vue/composition-api';
-
 import { store } from '@/store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
@@ -42,8 +40,7 @@ export default {
     },
     setup() {
         registerServiceStore<CostExplorerState>('costExplorer', costExplorerStoreModule, costExplorerStore);
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-        const { breadcrumbs } = useBreadcrumbs(computed(() => vm.$route));
+        const { breadcrumbs } = useBreadcrumbs();
 
         /* Init */
         (async () => {

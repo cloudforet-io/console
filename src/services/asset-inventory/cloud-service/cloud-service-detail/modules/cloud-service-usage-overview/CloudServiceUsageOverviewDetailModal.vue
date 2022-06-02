@@ -35,7 +35,7 @@
             </div>
         </template>
         <template #confirm-button>
-            Close
+            {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.CLOSE') }}
         </template>
     </p-button-modal>
 </template>
@@ -63,6 +63,7 @@ import { isEmpty } from 'lodash';
 
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { Reference } from '@/lib/reference/type';
@@ -139,7 +140,7 @@ export default defineComponent<Props>({
         const queryHelper = new QueryHelper();
         const state = reactive({
             proxyVisible: props.visible,
-            header: computed(() => `Usage Overview of ${props.cloudServiceTypeInfo?.name}`),
+            header: computed(() => i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.USAGE_OVERVIEW_OF_RESOURCE', { resource: props.cloudServiceTypeInfo?.name })),
             widgetSchemaList: [] as DynamicWidgetSchema[],
             summaryWidgetSchemaList: computed<DynamicWidgetSchema[]>(() => props.schemaList.filter(({ type }) => ['summary', 'card'].includes(type))),
             chartWidgetSchemaList: computed<DynamicWidgetSchema[]>(() => props.schemaList.filter(({ type }) => type === 'chart')),

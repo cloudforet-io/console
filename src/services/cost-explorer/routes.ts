@@ -33,13 +33,13 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: 'create',
                     name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME,
-                    meta: { label: 'Create Dashboard' },
+                    meta: { translationId: 'BILLING.COST_MANAGEMENT.DASHBOARD.CREATE_DASHBOARD' },
                     props: true,
                     component: CostDashboardCreatePage as any,
                 },
                 {
                     path: 'customize',
-                    meta: { label: 'Customize' },
+                    meta: { translationId: 'BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE' },
                     component: { template: '<router-view />' },
                     children: [
                         {
@@ -90,19 +90,19 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: 'create',
                     name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
-                    meta: { label: 'Create Budget', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                     component: BudgetCreatePage as any,
                 },
                 {
                     path: 'bulk-create',
                     name: COST_EXPLORER_ROUTE.BUDGET.BULK_CREATE._NAME,
-                    meta: { label: 'Create Bulk Budget', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BULK_BUDGET', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                     component: BudgetBulkCreatePage as any,
                 },
                 {
                     path: 'update/:budgetId',
                     name: COST_EXPLORER_ROUTE.BUDGET.UPDATE._NAME,
-                    meta: { label: 'Update Budget', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.UPDATE_BUDGET', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                     props: true,
                     component: BudgetUpdatePage as any,
                 },

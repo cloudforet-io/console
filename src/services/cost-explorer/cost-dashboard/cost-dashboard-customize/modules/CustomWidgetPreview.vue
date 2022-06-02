@@ -15,11 +15,11 @@
             </div>
             <div>
                 <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_GROUP_BY') }}</p-label>
-                <span :class="{ 'text-gray-500': !groupBy }">{{ getGroupByText(groupBy) }}</span>
+                <span :class="{ 'text-gray-500': !groupBy }">{{ groupByLabel }}</span>
             </div>
             <div>
                 <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_FILTERS') }}</p-label>
-                <span :class="{'text-gray-500': noFilters }">{{ getFiltersText(filters) }}</span>
+                <span :class="{'text-gray-500': noFilters }">{{ filterLabel }}</span>
             </div>
         </template>
         <template #extra>
@@ -50,7 +50,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 
 import CostDashboardCustomizeWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetPreview.vue';
-import { getFiltersText } from '@/services/cost-explorer/cost-dashboard/lib/helper';
+import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -92,14 +92,19 @@ export default {
             }),
             filters: computed(() => props.selectedItem?.options.filters),
             noFilters: computed(() => !state.filters || !Object.keys(state.filters).length),
+            filterLabel: computed(() => {
+                const label = getCostDashboardFilterLabel(state.filters);
+                return label ?? i18n.t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');
+            }),
+            groupByLabel: computed(() => {
+                const groupBy = state.groupBy;
+                if (groupBy) return GROUP_BY_ITEM_MAP[groupBy].label;
+                return i18n.t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');
+            }),
         });
 
         /* Util */
         const getGranularityText = granularity => capitalize(granularity);
-        const getGroupByText = (groupBy) => {
-            if (groupBy) return GROUP_BY_ITEM_MAP[groupBy].label;
-            return 'None';
-        };
         const getViewQueryLink = () => {
             const queryId = props.selectedItem?.cost_query_set_id;
             if (queryId) {
@@ -124,9 +129,7 @@ export default {
             ...toRefs(state),
             LAYOUT,
             COST_EXPLORER_ROUTE,
-            getFiltersText,
             getGranularityText,
-            getGroupByText,
             getViewQueryLink,
         };
     },

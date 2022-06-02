@@ -1,6 +1,7 @@
 import { RouteConfig } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
@@ -24,7 +25,7 @@ const ProjectAlertSettingsPage = () => import(/* webpackChunkName: "ProjectAlert
 
 export default {
     path: 'project',
-    meta: { label: 'Project' },
+    meta: { menuId: MENU_ID.PROJECT },
     component: { template: '<router-view />' },
     children: [
         {

@@ -17,7 +17,7 @@ export default [
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         component: SignOutPage,
         meta: {
-            label: '', isSignInPage: false, accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
+            isSignInPage: false, accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
         },
     },
     {

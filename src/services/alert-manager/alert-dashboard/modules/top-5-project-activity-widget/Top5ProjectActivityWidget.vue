@@ -6,9 +6,9 @@
                     {{ $t('MONITORING.ALERT.DASHBOARD.TOP_5_PROJECT_ACTIVITY') }}
                 </span>
                 <div class="legend-wrapper">
-                    <p-status v-for="(activity, idx) in Object.keys(ACTIVITY)" :key="`status-${idx}`"
+                    <p-status v-for="(activityLabel, activity, idx) in alertActivity" :key="`status-${idx}`"
                               :icon-color="ACTIVITY_COLOR[activity]"
-                              :text="capitalize(activity)"
+                              :text="activityLabel"
                     />
                 </div>
             </div>
@@ -69,11 +69,11 @@ import {
     PAnchor, PSelectStatus, PStatus, PSkeleton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { capitalize, find } from 'lodash';
+import { find } from 'lodash';
 
 
 import { store } from '@/store';
-
+import { i18n } from '@/translations';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -85,11 +85,12 @@ import Top5ProjectActivityTooltip from '@/services/alert-manager/alert-dashboard
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 
-const ACTIVITY = Object.freeze({
+const ACTIVITY = {
     HIGH: 'HIGH',
     LOW: 'LOW',
     // MAINTENANCE: 'MAINTENANCE',
-});
+} as const;
+export type AlertActivity = typeof ACTIVITY[keyof typeof ACTIVITY]
 const ACTIVITY_COLOR = Object.freeze({
     HIGH: red[400],
     LOW: red[200],
@@ -153,6 +154,10 @@ export default {
             ],
             selectedPeriod: PERIOD['14D'],
             showTooltip: false,
+            alertActivity: computed(() => ({
+                HIGH: i18n.t('MONITORING.ALERT.DASHBOARD.HIGH'),
+                LOW: i18n.t('MONITORING.ALERT.DASHBOARD.LOW'),
+            })),
         });
 
         /* util */
@@ -245,7 +250,6 @@ export default {
             ACTIVITY,
             ACTIVITY_COLOR,
             referenceRouter,
-            capitalize,
             projectNameFormatter,
             onMouseOver,
             onMouseLeave,

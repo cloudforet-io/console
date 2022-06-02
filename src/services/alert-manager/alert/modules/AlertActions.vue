@@ -90,6 +90,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertAcknowledgeModal from '@/services/alert-manager/alert/modules/AlertAcknowledgeModal.vue';
 import AlertResolveModal from '@/services/alert-manager/alert/modules/AlertResolveModal.vue';
+import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
+import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-urgency-i18n';
 import {
     ALERT_ACTION, ALERT_URGENCY, ALERT_STATE, AlertAction,
 } from '@/services/alert-manager/lib/config';
@@ -169,16 +171,8 @@ export default {
             visibleAcknowledgeModal: false,
             visibleResolveModal: false,
             deleteLoading: false,
-            alertStateI18n: computed(() => ({
-                TRIGGERED: i18n.t('MONITORING.ALERT.ALERT_LIST.TRIGGERED'),
-                ACKNOWLEDGED: i18n.t('MONITORING.ALERT.ALERT_LIST.ACKNOWLEDGED'),
-                RESOLVED: i18n.t('MONITORING.ALERT.ALERT_LIST.RESOLVED'),
-                ERROR: i18n.t('MONITORING.ALERT.ALERT_LIST.ERROR'),
-            })),
-            urgencyI18n: computed(() => ({
-                HIGH: i18n.t('MONITORING.ALERT.ALERT_LIST.HIGH'),
-                LOW: i18n.t('MONITORING.ALERT.ALERT_LIST.LOW'),
-            })),
+            alertStateI18n: useAlertStateI18n(),
+            urgencyI18n: useAlertUrgencyI18n(),
             webhooks: computed(() => store.state.reference.webhook.items),
         });
 

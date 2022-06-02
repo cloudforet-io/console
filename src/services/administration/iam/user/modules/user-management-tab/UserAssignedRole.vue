@@ -47,6 +47,7 @@ import {
 } from '@spaceone/design-system';
 
 import { Tags } from '@/models';
+import { i18n } from '@/translations';
 
 import { ProjectGroupReferenceItem } from '@/store/modules/reference/project-group/type';
 import { ProjectReferenceItem } from '@/store/modules/reference/project/type';
@@ -85,7 +86,7 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const baseState = reactive({
-            title: 'Assigned Roles',
+            title: computed(() => i18n.t('IDENTITY.USER.MAIN.ASSIGNED_ROLES')),
             loading: true,
             fields: computed(() => [
                 { name: 'role_info.name', label: 'Role Name' },

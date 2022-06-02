@@ -11,7 +11,7 @@
                 </p>
                 <router-link :to="serviceRoute.path">
                     <p-button style-type="primary" class="redirect-button">
-                        Go To {{ serviceRoute.meta.label }} Main
+                        {{ $t('COMMON.ERROR.NO_RESOURCE_GO_MAIN', {service: mainLabel}) }}
                     </p-button>
                 </router-link>
             </div>
@@ -27,34 +27,38 @@ import {
 import {
     PLottie, PButton,
 } from '@spaceone/design-system';
-import { startCase } from 'lodash';
+import { RouteConfig } from 'vue-router';
+
+import { i18n } from '@/translations';
+
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 export default {
-    name: 'NoResource',
+    name: 'NoResourcePage',
     components: {
         PButton,
         PLottie,
     },
-    props: {
-    },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            resourceRoute: computed(() => vm.$route.matched[1]),
-            serviceRoute: computed(() => vm.$route.matched[2]),
-        });
-
-        const routeState = reactive({
-            route: computed(() => ([
-                { name: startCase(state.resourceRoute.path.split('/').pop()), path: state.resourceRoute.path },
-                { name: startCase(state.serviceRoute.path.split('/').pop()), path: state.serviceRoute.path },
-                { name: 'No Resources' },
-            ])),
+            serviceRoute: computed(() => vm.$route.matched[vm.$route.matched.length - 2]),
+            mainLabel: computed(() => {
+                const meta: RouteConfig['meta'] = state.serviceRoute.meta;
+                if (!meta) return '';
+                if (typeof meta.label === 'string') return meta.label;
+                if (typeof meta.label === 'function') return meta.label(vm.$route);
+                if (meta.menuId) {
+                    const menuInfo = MENU_INFO_MAP[meta.menuId];
+                    return menuInfo ? i18n.t(menuInfo.translationId) : '';
+                }
+                if (meta.translationId) return i18n.t(meta.translationId);
+                return '';
+            }),
         });
 
         return {
             ...toRefs(state),
-            ...toRefs(routeState),
         };
     },
 };

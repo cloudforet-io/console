@@ -2,7 +2,7 @@
     <div class="set-filter-part" :class="{responsive: !printMode}">
         <p class="applied-filter">
             <span class="label">{{ $t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER') }}: </span>
-            <span class="text">{{ getFiltersText(proxyFilters) }}</span>
+            <span class="text">{{ filterLabel }}</span>
         </p>
         <p-button v-if="!showSetting && !noFilter && !printMode"
                   style-type="gray-border"
@@ -48,7 +48,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
-import { getFiltersText } from '@/services/cost-explorer/cost-dashboard/lib/helper';
+import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import SetFilterModal from '@/services/cost-explorer/modules/SetFilterModal.vue';
@@ -91,7 +91,11 @@ export default {
     },
     setup(props: Props, { emit, root }) {
         const state = reactive({
-            proxyFilters: useProxyValue('filters', props, emit),
+            proxyFilters: useProxyValue<CostQueryFilters>('filters', props, emit),
+            filterLabel: computed(() => {
+                const label = getCostDashboardFilterLabel(state.proxyFilters);
+                return label ?? i18n.t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');
+            }),
             filterItems: [
                 { name: FILTER.PROJECT_GROUP, title: FILTER_ITEM_MAP[FILTER.PROJECT_GROUP].label },
                 { name: FILTER.PROJECT, title: FILTER_ITEM_MAP[FILTER.PROJECT].label },
@@ -177,7 +181,6 @@ export default {
 
         return {
             ...toRefs(state),
-            getFiltersText,
             handleClickSelectFilter,
             handleClickViewFilter,
             handleConfirmSetFilter,

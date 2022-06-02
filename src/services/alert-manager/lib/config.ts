@@ -9,18 +9,18 @@ export enum ACTION {
     default = 'default',
 }
 
-export const EDIT_MODE = Object.freeze({
+export const EDIT_MODE = {
     DESCRIPTION: 'description',
     PROJECT: 'project',
-} as const);
+} as const;
 export type EditMode = typeof EDIT_MODE[keyof typeof EDIT_MODE];
 
-export const ALERT_ACTION = Object.freeze({
+export const ALERT_ACTION = {
     acknowledge: 'acknowledge',
     resolve: 'resolve',
     merge: 'merge',
     delete: 'delete',
-} as const);
+} as const;
 export type AlertAction = typeof ALERT_ACTION[keyof typeof ALERT_ACTION]
 
 export enum SCOPE {
@@ -33,52 +33,52 @@ export enum FINISH_CONDITION {
     resolved = 'RESOLVED',
 }
 
-export const WEBHOOK_STATE = Object.freeze({
+export const WEBHOOK_STATE = {
     ENABLED: 'ENABLED',
     DISABLED: 'DISABLED',
-} as const);
+} as const;
 export type WebhookState = typeof WEBHOOK_STATE[keyof typeof WEBHOOK_STATE];
 
 
-export const ALERT_STATE = Object.freeze({
+export const ALERT_STATE = {
     TRIGGERED: 'TRIGGERED',
     ACKNOWLEDGED: 'ACKNOWLEDGED',
     RESOLVED: 'RESOLVED',
     ERROR: 'ERROR',
-} as const);
+} as const;
 export type AlertState = typeof ALERT_STATE[keyof typeof ALERT_STATE];
 
-export const ALERT_URGENCY = Object.freeze({
+export const ALERT_URGENCY = {
     ALL: 'ALL',
     HIGH: 'HIGH',
     LOW: 'LOW',
-} as const);
+} as const;
 export type AlertUrgency = typeof ALERT_URGENCY[keyof typeof ALERT_URGENCY];
 
-export const ALERT_SEVERITY = Object.freeze({
+export const ALERT_SEVERITY = {
     CRITICAL: 'Critical',
     ERROR: 'Error',
     WARNING: 'Warning',
     INFO: 'Info',
     NOT_AVAILABLE: 'Not Available',
     NONE: 'None',
-} as const);
+} as const;
 export type AlertSeverity = typeof ALERT_SEVERITY[keyof typeof ALERT_SEVERITY];
 
-export const ALERT_STATE_FILTER = Object.freeze({
+export const ALERT_STATE_FILTER = {
     OPEN: 'OPEN',
     TRIGGERED: 'TRIGGERED',
     ACKNOWLEDGED: 'ACKNOWLEDGED',
     RESOLVED: 'RESOLVED',
     ERROR: 'ERROR',
     ALL: 'ALL',
-} as const);
+} as const;
 export type AlertStateFilter = typeof ALERT_STATE_FILTER[keyof typeof ALERT_STATE_FILTER];
 
-export const ASSIGNED_STATE = Object.freeze({
+export const ASSIGNED_STATE = {
     ALL: 'ALL',
     ASSIGNED_TO_ME: 'ASSIGNED_TO_ME',
-} as const);
+} as const;
 export type AssignedState = typeof ASSIGNED_STATE[keyof typeof ASSIGNED_STATE];
 
 export const ALERT_SEVERITY_COLORS: Record<keyof typeof ALERT_SEVERITY, string> = {

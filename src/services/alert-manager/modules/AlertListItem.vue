@@ -29,7 +29,7 @@
                     {{ projectNameFormatter(item.project_id) }}
                 </p-anchor>
                 <p-badge :style-type="badgeStyleTypeFormatter(item.state)" class="badge">
-                    {{ capitalize(item.state) }}
+                    {{ alertStateI18n[item.state] }}
                 </p-badge>
                 <span class="date">{{ dateFormatter(item.created_at) }}</span>
             </div>
@@ -52,7 +52,6 @@ import {
     PI, PBadge, PAnchor,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { capitalize } from 'lodash';
 
 import { store } from '@/store';
 
@@ -60,17 +59,15 @@ import { ReferenceItem } from '@/store/modules/reference/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+
+import { ALERT_STATE } from '../lib/config';
 
 
 const ALERT_URGENCY = Object.freeze({
     HIGH: 'HIGH',
     LOW: 'LOW',
-});
-const ALERT_STATE = Object.freeze({
-    TRIGGERED: 'TRIGGERED',
-    ACKNOWLEDGED: 'ACKNOWLEDGED',
-    RESOLVED: 'RESOLVED',
 });
 
 export default {
@@ -109,6 +106,7 @@ export default {
     setup(props) {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
+            alertStateI18n: useAlertStateI18n(),
         });
 
         /* util */
@@ -130,7 +128,6 @@ export default {
             ALERT_URGENCY,
             ALERT_MANAGER_ROUTE,
             referenceRouter,
-            capitalize,
             badgeStyleTypeFormatter,
             dateFormatter,
             projectNameFormatter,

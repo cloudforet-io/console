@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, defineComponent, getCurrentInstance,
+    defineComponent,
 } from '@vue/composition-api';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
@@ -42,8 +42,7 @@ export default defineComponent({
     },
     setup() {
         registerServiceStore<AssetInventoryState>('assetInventory', assetInventoryStoreModule, assetInventoryStore);
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-        const { breadcrumbs } = useBreadcrumbs(computed(() => vm.$route));
+        const { breadcrumbs } = useBreadcrumbs();
         return {
             breadcrumbs,
         };

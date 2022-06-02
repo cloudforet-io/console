@@ -7,7 +7,7 @@
         <div class="applied-filter-wrapper">
             <div>
                 <span class="label">{{ $t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER') }}: </span>
-                <span class="text">{{ getFiltersText(filters) }}</span>
+                <span class="text">{{ filterLabel }}</span>
             </div>
             <p-button v-if="!printMode"
                       style-type="gray-border"
@@ -72,6 +72,8 @@ import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 
 
+import { i18n } from '@/translations';
+
 import { CURRENCY } from '@/store/modules/display/config';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -81,7 +83,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import {
     getConvertedFilter, getDataTableCostFields, getInitialDates,
 } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { getFiltersText } from '@/services/cost-explorer/cost-dashboard/lib/helper';
+import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
 import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
@@ -175,6 +177,10 @@ export default {
                 };
             }),
             filters: computed(() => props.options?.filters),
+            filterLabel: computed(() => {
+                const label = getCostDashboardFilterLabel(state.filters);
+                return label ?? i18n.t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');
+            }),
             widgetLink: computed(() => ({
                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                 params: {},
@@ -264,7 +270,6 @@ export default {
             tableState,
             GRANULARITY,
             PAGE_SIZE,
-            getFiltersText,
             handleClickViewFilter,
         };
     },

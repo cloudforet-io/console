@@ -16,6 +16,7 @@ declare module 'vue-router' {
     lnbVisible?: boolean;
     menuId?: string;
     label?: string|RouteLabelFormatter;
+    translationId?: string;
     copiable?: boolean; // for breadcrumbs
     isSignInPage?: boolean;
     accessLevel?: AccessLevel;

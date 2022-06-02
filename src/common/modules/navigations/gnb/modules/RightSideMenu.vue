@@ -89,7 +89,7 @@
                     <div class="sub-menu-list">
                         <div class="sub-menu">
                             <router-link :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}">
-                                Access with API & CLI
+                                {{ $t('MENU.MY_PAGE_API_KEY') }}
                             </router-link>
                         </div>
                     </div>

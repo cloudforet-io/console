@@ -61,7 +61,7 @@ const myPageRoutes: RouteConfig = {
                         {
                             path: ':protocol/:protocolId/:userId',
                             name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
-                            meta: { label: 'Add Notifications Channel' },
+                            meta: { translationId: 'MY_PAGE.NOTIFICATION.ADD_CHANNEL' },
                             props: true,
                             component: NotificationAddPage as any,
                         },

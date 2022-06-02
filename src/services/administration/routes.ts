@@ -50,13 +50,13 @@ const administrationRoutes: RouteConfig = {
                         {
                             path: 'create',
                             name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME,
-                            meta: { label: 'Create Role', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                            meta: { translationId: 'IAM.ROLE.FORM.CREATE_TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                             component: RoleCreatePage,
                         },
                         {
                             path: 'edit/:id',
                             name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME,
-                            meta: { label: 'Edit Role', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                            meta: { translationId: 'IAM.ROLE.FORM.EDIT_TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                             props: true,
                             component: RoleEditPage,
                         },
@@ -77,7 +77,7 @@ const administrationRoutes: RouteConfig = {
                         {
                             path: 'create',
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.CREATE._NAME,
-                            meta: { lnbVisible: false, label: 'Create Policy', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                            meta: { lnbVisible: false, translationId: 'IAM.POLICY.FORM.CREATE_TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                             props: true,
                             component: PolicyCreatePage,
                         },

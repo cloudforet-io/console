@@ -133,15 +133,11 @@ import {
     PAnchor,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { capitalize } from 'lodash';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
-
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -149,6 +145,8 @@ import AlertActions from '@/services/alert-manager/alert/modules/AlertActions.vu
 import AlertFormModal from '@/services/alert-manager/alert/modules/AlertFormModal.vue';
 import AlertTableBottomFilters from '@/services/alert-manager/alert/modules/AlertTableBottomFilters.vue';
 import AlertTriggeredBy from '@/services/alert-manager/alert/modules/AlertTriggeredBy.vue';
+import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
+import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-urgency-i18n';
 import {
     ALERT_STATE, ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE,
 } from '@/services/alert-manager/lib/config';
@@ -307,16 +305,8 @@ export default {
             totalCount: 0,
             tags: tagQueryHelper.setKeyItemSets(querySearchHandlerState.keyItemSets).queryTags,
             visibleAlertFormModal: false,
-            alertStateLabels: computed(() => ({
-                TRIGGERED: i18n.t('MONITORING.ALERT.ALERT_LIST.TRIGGERED'),
-                ACKNOWLEDGED: i18n.t('MONITORING.ALERT.ALERT_LIST.ACKNOWLEDGED'),
-                RESOLVED: i18n.t('MONITORING.ALERT.ALERT_LIST.RESOLVED'),
-                ERROR: i18n.t('MONITORING.ALERT.ALERT_LIST.ERROR'),
-            })),
-            urgencyLabels: computed(() => ({
-                HIGH: i18n.t('MONITORING.ALERT.ALERT_LIST.HIGH'),
-                LOW: i18n.t('MONITORING.ALERT.ALERT_LIST.LOW'),
-            })),
+            alertStateLabels: useAlertStateI18n(),
+            urgencyLabels: useAlertUrgencyI18n(),
         });
 
         /* formatters & autocomplete handlers */
@@ -462,7 +452,6 @@ export default {
             ALERT_MANAGER_ROUTE,
             ASSIGNED_STATE,
             referenceRouter,
-            capitalize,
             alertStateBadgeStyleTypeFormatter,
             getAlerts,
             onChange,

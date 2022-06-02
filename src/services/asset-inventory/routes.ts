@@ -61,7 +61,7 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: 'no-resource',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME,
-                    meta: { lnbVisible: true, label: 'No Resource' },
+                    meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
                     component: NoResourcePage,
                 },
                 {
@@ -100,7 +100,7 @@ const assetInventoryRoute: RouteConfig = {
                 },
                 {
                     path: 'create',
-                    meta: { label: 'Create Collector' },
+                    meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE' },
                     component: { template: '<router-view />' },
                     children: [
                         {
@@ -120,7 +120,7 @@ const assetInventoryRoute: RouteConfig = {
                 },
                 {
                     path: 'history',
-                    meta: { label: 'Collector History' },
+                    meta: { translationId: 'MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE' },
                     component: { template: '<keep-alive><router-view /></keep-alive>' },
                     children: [
                         {
@@ -161,14 +161,14 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: 'add/:provider',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
-                    meta: { label: 'Add Service Account', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { translationId: 'IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                     props: true,
                     component: ServiceAccountAddPage as any,
                 },
                 {
                     path: 'no-resource',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.NO_RESOURCE._NAME,
-                    meta: { lnbVisible: true, label: 'No Resource' },
+                    meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
                     component: NoResourcePage,
                 },
             ],

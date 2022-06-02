@@ -8,7 +8,7 @@
             <template #extra>
                 <router-link :to="{name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }">
                     <p-button style-type="gray-border" outline="true" font-weigth="bold">
-                        Collector History
+                        {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE') }}
                     </p-button>
                 </router-link>
             </template>

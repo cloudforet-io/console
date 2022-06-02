@@ -19,8 +19,6 @@
 </template>
 
 <script lang="ts">
-import { ComponentRenderProxy, computed, getCurrentInstance } from '@vue/composition-api';
-
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -39,8 +37,7 @@ export default {
     },
     setup() {
         registerServiceStore<any>('alertManager', alertManagerStoreModule, alertManagerStore);
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-        const { breadcrumbs } = useBreadcrumbs(computed(() => vm.$route));
+        const { breadcrumbs } = useBreadcrumbs();
         return {
             breadcrumbs,
         };
