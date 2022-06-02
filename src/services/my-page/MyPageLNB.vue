@@ -85,7 +85,7 @@ export default defineComponent({
                     },
                     {
                         type: 'item',
-                        label: MENU_INFO_MAP[MENU_ID.MY_PAGE_NOTIFICATIONS].translationId,
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_NOTIFICATIONS].translationId),
                         id: MENU_ID.MY_PAGE_NOTIFICATIONS,
                         to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME },
                         isBeta: true,
