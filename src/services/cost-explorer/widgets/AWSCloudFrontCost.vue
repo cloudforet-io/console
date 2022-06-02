@@ -292,7 +292,7 @@ export default {
             if (chartData.length) {
                 chart.data = getCurrencyAppliedChartData(chartData, props.currency, props.currencyRates);
             } else {
-                chart.data = [{ category: '' }];
+                chart.data = [{ [CATEGORY_KEY]: '' }];
                 valueAxis.min = 0;
             }
 
@@ -350,6 +350,7 @@ export default {
                     end: dayjs.utc(period.end).format('YYYY-MM'),
                     ...queryHelper.apiQuery,
                 });
+                console.log(results);
                 return results;
             } catch (e) {
                 ErrorHandler.handleError(e);
