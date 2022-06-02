@@ -21,6 +21,5 @@ const customColorTheme = (target) => {
 export const applyAmchartsGlobalSettings = () => {
     am4core.useTheme(customColorTheme);
     am4core.useTheme(am4themesAnimated);
-    am4core.options.onlyShowOnViewport = true;
     am4core.options.autoSetClassName = true;
 };
