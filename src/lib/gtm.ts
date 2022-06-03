@@ -5,7 +5,7 @@ import config from '@/lib/config';
 
 export class Gtm {
     constructor() {
-        const gtmId: string = config.get('GTM_ID') || 'GTM-PKX68HW';
+        const gtmId: string = config.get('GTM_ID') || 'DISABLED';
         Vue.use(VueGtm, {
             id: gtmId,
             defer: false,

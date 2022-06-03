@@ -3,6 +3,7 @@
     "ENDPOINT": "<console-api endpoint>"
   },
   "GTAG_ID": "DISABLED",
+  "GTM_ID": "DISABLED",
   "DOMAIN_NAME": null,
   "DOMAIN_NAME_REF": "hostname",
   "AMCHARTS_LICENSE": {
