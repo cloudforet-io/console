@@ -51,6 +51,7 @@
                     <ul v-for="item in channelList" :key="`${item.name}-${item.created_at}`">
                         <li class="mb-4">
                             <notification-channel-item :channel-data="item" :project-id="projectId"
+                                                       :disabled="disabled"
                                                        @change="onChangeChannelItem"
                                                        @confirm="listChannel"
                             />
