@@ -1,5 +1,5 @@
 <template>
-    <span class="gnb-logo">
+    <span class="gnb-logo" data-gtm="gtm-gnb-logo">
         <component :is="to ? 'router-link' : 'div'"
                    class="inline-block" :to="to"
         >
