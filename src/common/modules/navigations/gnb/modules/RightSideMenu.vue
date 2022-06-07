@@ -12,7 +12,6 @@
         />
         <div v-if="!userState.isDomainOwner" class="menu-wrapper">
             <div class="menu-button notifications" tabindex="0"
-                 :class="{opened: openedMenu === 'notifications'}"
                  @click.stop="toggleMenu('notifications')"
             >
                 <p-i class="menu-icon"
