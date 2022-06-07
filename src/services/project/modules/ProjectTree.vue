@@ -479,6 +479,12 @@ export default {
         &:not(:hover) .group-add-btn {
             display: none;
         }
+        &:hover .data {
+            max-width: 65% !important;
+        }
+        .data {
+            max-width: 80%;
+        }
         .node.no-permission {
             > .data, > .icon {
                 @apply text-gray-400;
