@@ -1,3 +1,10 @@
+# [1.1.0-beta.321](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.320...v1.1.0-beta.321) (2022-06-07)
+
+
+### Bug Fixes
+
+* fix queryTags sync bug ([#978](https://github.com/spaceone-dev/spaceone-design-system/issues/978)) ([116429b](https://github.com/spaceone-dev/spaceone-design-system/commit/116429b791f1e04f9aff3a38bd6b45b4ff932a3a))
+
 # [1.1.0-beta.320](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.319...v1.1.0-beta.320) (2022-05-30)
 
 
