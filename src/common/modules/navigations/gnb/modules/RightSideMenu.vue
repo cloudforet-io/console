@@ -74,7 +74,7 @@
                         <span class="value">{{ userState.timezone }}</span>
                     </div>
                     <div class="info-menu">
-                        <router-link :to="{name: MY_PAGE_ROUTE._NAME }">
+                        <router-link :to="{name: MY_PAGE_ROUTE._NAME }" @click.native="hideMenu">
                             <p-button style-type="primary" :outline="true" size="sm"
                                       class="my-page-button"
                             >
@@ -87,7 +87,7 @@
                     <p-divider class="divider" />
                     <div class="sub-menu-list">
                         <div class="sub-menu">
-                            <router-link :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}">
+                            <router-link :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}" @click.native="hideMenu">
                                 {{ $t('MENU.MY_PAGE_API_KEY') }}
                             </router-link>
                         </div>
@@ -96,7 +96,9 @@
                 <p-divider class="divider" />
                 <div class="sub-menu-list">
                     <div v-for="{ link, label} in supportMenu" :key="label" class="sub-menu">
-                        <a :href="link" target="_blank" class="support-menu">
+                        <a :href="link" target="_blank" class="support-menu"
+                           @click="hideMenu"
+                        >
                             <span>{{ label }}</span>
                             <p-i name="ic_external-link"
                                  height="1em" width="1em"
