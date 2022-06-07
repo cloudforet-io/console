@@ -11,13 +11,13 @@
                          :items="rootData"
                          :loading="loading"
                          :total-count="totalCount"
-                         :sort-by.sync="sortBy"
-                         :sort-desc.sync="sortDesc"
+                         :sort-by="sortBy"
+                         :sort-desc="sortDesc"
                          :select-index="selectIndex"
-                         :page-size.sync="pageSize"
+                         :page-size="pageSize"
                          :key-item-sets="keyItemSets"
                          :value-handler-map="valueHandlerMap"
-                         :query-tags.sync="queryTags"
+                         :query-tags="queryTags"
                          :selectable="selectable"
                          :multi-select="multiSelect"
                          :invalid="invalid"
@@ -153,13 +153,12 @@ export default {
             settingsVisible: computed(() => props.typeOptions?.settingsVisible || false),
 
             /** get data from fetch options */
-            sortBy: props.fetchOptions?.sortBy || '',
-            sortDesc: (props.fetchOptions?.sortDesc !== undefined) ? props.fetchOptions.sortDesc : true,
-            pageSize: props.fetchOptions?.pageLimit || 15,
-            queryTags: props.fetchOptions?.queryTags || [],
+            sortBy: computed(() => props.fetchOptions?.sortBy || ''),
+            sortDesc: computed(() => ((props.fetchOptions?.sortDesc !== undefined) ? props.fetchOptions.sortDesc : true)),
+            pageSize: computed(() => props.fetchOptions?.pageLimit || 15),
+            queryTags: computed(() => props.fetchOptions?.queryTags || []),
 
             /** others */
-            pageStart: 1,
             rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
                     const rootData = getValueByPath(props.data, props.options.root_path) ?? [];

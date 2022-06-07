@@ -11,11 +11,11 @@
                          :items="rootData"
                          :loading="loading"
                          :total-count="totalCount"
-                         :sort-by.sync="sortBy"
-                         :sort-desc.sync="sortDesc"
+                         :sort-by="sortBy"
+                         :sort-desc="sortDesc"
                          :select-index="selectIndex"
-                         :page-size.sync="pageSize"
-                         :search-text.sync="searchText"
+                         :page-size="pageSize"
+                         :search-text="searchText"
                          :selectable="selectable"
                          :multi-select="multiSelect"
                          :invalid="invalid"
@@ -139,10 +139,10 @@ export default {
             settingsVisible: computed(() => props.typeOptions?.settingsVisible || false),
 
             /** get data from fetch options */
-            sortBy: props.fetchOptions?.sortBy || '',
-            sortDesc: props.fetchOptions?.sortDesc || true,
-            pageSize: props.fetchOptions?.pageLimit || 15,
-            searchText: props.fetchOptions?.searchText || '',
+            sortBy: computed(() => props.fetchOptions?.sortBy || ''),
+            sortDesc: computed(() => props.fetchOptions?.sortDesc || true),
+            pageSize: computed(() => props.fetchOptions?.pageLimit || 15),
+            searchText: computed(() => props.fetchOptions?.searchText || ''),
 
             /** others */
             pageStart: 1,

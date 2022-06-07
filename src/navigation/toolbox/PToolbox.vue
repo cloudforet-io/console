@@ -294,17 +294,19 @@ export default defineComponent<ToolboxProps>({
         };
 
         const initQueryTags = () => {
-            const queryTags = props.queryTags ?? [];
-            queryTags.forEach((queryTag: QueryItem) => {
+            const queryTags = props.queryTags ? props.queryTags.map((queryTag: QueryItem) => {
                 const { key, value } = queryTag;
-                if (!key || !value) return;
-                queryTag.value.label = (state.valueSetMap[key.name]) ? state.valueSetMap[key.name][value.name]?.label : value.name;
-            });
+                if (!key || !value) return queryTag;
+                return {
+                    ...queryTag,
+                    value: { ...value, label: (state.valueSetMap[key.name]) ? state.valueSetMap[key.name][value.name]?.label : value.name },
+                };
+            }) : [];
             setQueryTags(queryTags);
         };
 
         watch([() => state.valueSetMap, () => props.queryTags], () => {
-            initQueryTags();
+            if (props.queryTags !== proxyState.queryTags) initQueryTags();
         }, {
             immediate: true,
         });
