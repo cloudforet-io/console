@@ -101,7 +101,7 @@ export default defineComponent<Props>({
         },
         dashboard: {
             type: Object as () => DashboardInfo,
-            default: {},
+            default: () => {},
         },
         manageDisabled: {
             type: Boolean,

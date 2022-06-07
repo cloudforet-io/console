@@ -98,34 +98,6 @@ export default {
             selectedUsers: computed<User[]>(() => administrationStore.state.user.selectedUsers),
         });
 
-        const clickDelete = () => {
-            props.mode = 'delete';
-            props.headerTitle = vm.$t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
-            props.subTitle = vm.$tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', state.selectedIndex.length);
-            props.themeColor = 'alert';
-        };
-        const clickEnable = () => {
-            props.mode = 'enable';
-            props.headerTitle = vm.$t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
-            props.subTitle = vm.$tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', state.selectedIndex.length);
-            props.themeColor = 'safe';
-        };
-        const clickDisable = () => {
-            props.mode = 'disable';
-            props.headerTitle = vm.$t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
-            props.subTitle = vm.$tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', state.selectedIndex.length);
-            props.themeColor = 'alert';
-        };
-
-        const onSelectDropdown = (name) => {
-            switch (name) {
-            case 'enable': clickEnable(); break;
-            case 'disable': clickDisable(); break;
-            case 'delete': clickDelete(); break;
-            default: break;
-            }
-        };
-
         const getUsersParam = items => ({ users: map(items, 'user_id') });
 
         const deleteUser = async (items) => {
@@ -175,7 +147,6 @@ export default {
         return {
             userStateFormatter,
             ...toRefs(state),
-            onSelectDropdown,
             checkModalConfirm,
             handleClose,
         };

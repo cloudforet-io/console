@@ -35,7 +35,6 @@ import {
     ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive,
 } from '@vue/composition-api';
 
-import { PDivider, PI } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
@@ -57,8 +56,6 @@ export default defineComponent({
         VerticalPageLayout,
         HandbookButton,
         UserAPIKeyHandbook,
-        PI,
-        PDivider,
     },
     setup() {
         registerServiceStore('myPage', myPageStore);

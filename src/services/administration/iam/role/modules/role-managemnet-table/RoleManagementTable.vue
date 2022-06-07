@@ -41,7 +41,7 @@
                     {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
                 </p-badge>
             </template>
-            <template #col-tags.description-format="{ value }">
+            <template #[`col-tags.description-format`]="{ value }">
                 <div class="description">
                     {{ value ? value : '--' }}
                 </div>
@@ -81,7 +81,7 @@ import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbo
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PHorizontalLayout, PPageTitle, PToolboxTable, PSelectDropdown,
+    PToolboxTable, PSelectDropdown,
     PBadge, PButton, PI,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -109,8 +109,6 @@ export default defineComponent({
     name: 'RolePage',
     components: {
         RoleDeleteModal,
-        PHorizontalLayout,
-        PPageTitle,
         PToolboxTable,
         PSelectDropdown,
         PBadge,

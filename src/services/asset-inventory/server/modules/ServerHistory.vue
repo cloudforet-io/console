@@ -13,7 +13,7 @@
         >
             <template #col-labels-format="{value}">
                 <p-text-list :items="value" delimiter=" ">
-                    <p-badge v-slot:default="{value: d}">
+                    <p-badge v-slot="{value: d}">
                         {{ d }}
                     </p-badge>
                 </p-text-list>

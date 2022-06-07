@@ -20,7 +20,7 @@
                  @click="onHideAlerts"
             />
         </template>
-        <template #item="{item, index}">
+        <template #item="{ item }">
             <alert-list-item :item="item"
                              :show-project-link="true"
                              :project-reference="$store.state.reference.project.items[item.project_id]"

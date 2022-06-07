@@ -47,7 +47,7 @@
                             {{ $t('PLUGIN.COLLECTOR.MAIN.ACTION') }}
                         </p-select-dropdown>
                     </template>
-                    <template #col-plugin_info.plugin_id-format="{index, field, item}">
+                    <template #col-plugin_info.plugin_id-format="{item}">
                         <p-lazy-img :src="item.plugin_icon"
                                     width="1rem" height="1rem" class="mr-2"
                         />
@@ -56,7 +56,7 @@
                     <template #col-state-format="data">
                         <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
                     </template>
-                    <template #col-collector_history-format="{index, field, item}">
+                    <template #col-collector_history-format="{item}">
                         <router-link :to="item.detailLink">
                             <span class="view-detail">{{ $t('PLUGIN.COLLECTOR.MAIN.VIEW_DETAIL') }}
                                 <p-i name="ic_arrow_right" width="1rem" color="inherit transparent" />
@@ -106,7 +106,7 @@
                               col-copy
                               class="selected-data-tab"
                 >
-                    <template #col-plugin_info.plugin_id-format="{index, field, item}">
+                    <template #col-plugin_info.plugin_id-format="{item}">
                         <p-lazy-img :src="item.plugin_icon"
                                     width="1.5rem" height="1.5rem" class="mr-2"
                         />
@@ -115,7 +115,7 @@
                     <template #col-state-format="data">
                         <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
                     </template>
-                    <template #col-collector_history-format="{index, field, item}">
+                    <template #col-collector_history-format="{item}">
                         <router-link :to="item.detailLink">
                             <span class="view-detail">{{ $t('PLUGIN.COLLECTOR.MAIN.VIEW_DETAIL') }}
                                 <p-i name="ic_arrow_right" width="1rem" color="inherit transparent" />
@@ -153,7 +153,7 @@
                              :items="selectedItems"
                              @confirm="checkModalConfirm"
         >
-            <template #col-plugin_info.plugin_id-format="{index, field, item}">
+            <template #col-plugin_info.plugin_id-format="{item}">
                 <p-lazy-img :src="item.plugin_icon"
                             width="1.5rem" height="1.5rem" class="mr-2"
                 />
@@ -162,7 +162,7 @@
             <template #col-state-format="data">
                 <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
             </template>
-            <template #col-collector_history-format="{index, field, item}">
+            <template #col-collector_history-format="{item}">
                 <router-link :to="item.detailLink">
                     <span class="view-detail">{{ $t('PLUGIN.COLLECTOR.MAIN.VIEW_DETAIL') }}
                         <p-i name="ic_arrow_right" width="1rem" color="inherit transparent" />

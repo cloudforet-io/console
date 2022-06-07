@@ -125,6 +125,7 @@ export default {
                 return monthData.reverse();
             }),
             MonthMenuItems: computed<MenuItem[]>(() => ([
+                // eslint-disable-next-line vue/no-side-effects-in-computed-properties
                 ...state.getMonthMenuItem.reverse(),
                 {
                     type: 'divider',

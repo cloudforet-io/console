@@ -30,7 +30,7 @@
                     {{ $t('IDENTITY.USER.MAIN.ACTION') }}
                 </p-select-dropdown>
             </template>
-            <template #col-resource_id-format="{ value, item }">
+            <template #col-resource_id-format="{ value }">
                 {{ storeState.users[value] ? storeState.users[value].name : value }}
             </template>
             <template #col-assigned-format="{ value }">

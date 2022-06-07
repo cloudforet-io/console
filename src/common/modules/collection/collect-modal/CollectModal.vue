@@ -22,7 +22,7 @@
                                        :mapper="mapper"
                                        :selected-indexes.sync="selectedIndexes"
                     >
-                        <template #extra="{item, index}">
+                        <template #extra="{item}">
                             <span class="count">
                                 {{ collectorResourceMap[item.collector_id].length }}
                             </span>

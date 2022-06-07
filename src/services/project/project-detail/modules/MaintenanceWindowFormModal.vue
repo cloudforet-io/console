@@ -173,6 +173,7 @@ export default {
                 return undefined;
             }),
             isTimePeriodInvalid: computed(() => {
+                // eslint-disable-next-line vue/no-side-effects-in-computed-properties
                 if (props.editMode) state.showValidation = true;
                 const timeDiff = dayjs(state.startTimeInput).diff(state.endTimeInput, 'minute');
                 // eslint-disable-next-line no-restricted-globals

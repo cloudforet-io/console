@@ -21,7 +21,7 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { PDivider, PI } from '@spaceone/design-system';
+import { PI } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -39,7 +39,6 @@ export default defineComponent({
     name: 'MyPageLNB',
     components: {
         PI,
-        PDivider,
         LNB,
     },
     setup() {

@@ -9,7 +9,7 @@
                            @cancel="onClickCancel"
                            @confirm="onClickConfirm"
         >
-            <template #contents-conf="{tab}">
+            <template #contents-conf>
                 <div class="collector-input-wrapper">
                     <p-lazy-img class="flex-shrink-0 mr-8"
                                 :src="imageUrl"

@@ -18,7 +18,7 @@
             :fields="fields"
             :striped="false"
         >
-            <template #col-data-format="{ index, field, item }">
+            <template #col-data-format="{ item }">
                 <div v-if="item.data.length > 1">
                     <p v-for="(value, index) in item.data" :key="`item-${index}`">
                         {{ Object.keys(value)[0] }} : {{ Object.values(value)[0] }}

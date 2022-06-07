@@ -43,7 +43,7 @@
                     {{ $t('PROJECT.DETAIL.WEBHOOK_ACTION') }}
                 </p-select-dropdown>
             </template>
-            <template #col-plugin_info.plugin_id-format="{index, field, item, value}">
+            <template #col-plugin_info.plugin_id-format="{value}">
                 <p-lazy-img :src="plugins[value] ? plugins[value].icon : 'ic_webhook'"
                             error-icon="ic_webhook"
                             width="1.5rem" height="1.5rem" class="mr-2"
@@ -77,7 +77,7 @@
             :items="selectedItem"
             @confirm="checkModalConfirm"
         >
-            <template #col-plugin_info.plugin_id-format="{index, field, item, value}">
+            <template #col-plugin_info.plugin_id-format="{value}">
                 <p-lazy-img :src="plugins[value] ? plugins[value].icon : 'ic_webhook'"
                             error-icon="ic_webhook"
                             width="1.5rem" height="1.5rem" class="mr-2"

@@ -25,7 +25,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PHorizontalLayout, PPageTitle, PToolboxTable, PSelectDropdown,
+    PHorizontalLayout, PPageTitle,
 } from '@spaceone/design-system';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -39,8 +39,6 @@ export default defineComponent({
         RoleManagementTab,
         PHorizontalLayout,
         PPageTitle,
-        PToolboxTable,
-        PSelectDropdown,
         RoleManagementTable,
     },
     setup() {

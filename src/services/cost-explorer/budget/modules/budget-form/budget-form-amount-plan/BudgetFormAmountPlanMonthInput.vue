@@ -83,9 +83,7 @@ export default {
         };
 
         const state = reactive({
-            formattedMonth: computed(() => {
-                i18nDayjs.value.utc(props.month).format('MMMM YYYY');
-            }),
+            formattedMonth: computed(() => i18nDayjs.value.utc(props.month).format('MMMM YYYY')),
             formattedAmount: computed<string>({
                 get: () => commaFormatter(_amount.value),
                 set: (val: string) => { setAmount(getNumberFromString(val)); },

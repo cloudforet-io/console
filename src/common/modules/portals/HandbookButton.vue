@@ -20,7 +20,7 @@
         <portal to="handbook-contents">
             <div class="handbook-contents">
                 <p-tab :tabs="tabs" :active-tab.sync="proxyActiveTab">
-                    <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                    <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
                         <div :key="slot">
                             <slot :name="slot" v-bind="scope" />
                         </div>

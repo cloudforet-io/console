@@ -17,12 +17,6 @@ const ERROR_URL = '/asset-inventory/service-account/no-resource';
 
 export default {
     name: 'ServiceAccountSearchPage',
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-    },
     // TODO: move this code to route file
     beforeRouteEnter(to, from, next) {
         next(async (vm: ComponentRenderProxy) => {
@@ -43,6 +37,12 @@ export default {
                 ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
             }
         });
+    },
+    props: {
+        id: {
+            type: String,
+            default: undefined,
+        },
     },
 };
 </script>

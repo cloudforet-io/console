@@ -44,7 +44,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PDataLoader, PSkeleton, PDataTable, PTextPagination,
+    PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
@@ -81,10 +81,8 @@ export default defineComponent<WidgetProps>({
     components: {
         CostDashboardCardWidgetLayout,
         CostDashboardDataTable,
-        PDataTable,
         PDataLoader,
         PSkeleton,
-        PTextPagination,
     },
     props: {
         name: {

@@ -9,20 +9,6 @@ localVue.use(CompositionApi);
 
 describe('Form Validator Composable', () => {
     const mockComponent = defineComponent({
-        template: `
-            <div>
-                <input id="name-input" :invalid="invalidState.name" :value="name" @input="handleNameInput"/>
-                <span id="name-invalid-text">{{invalidTexts.name}}</span>
-                
-                <input id="address-input" :invalid="invalidState.address" :value="address" @input="handleAddressInput"/>
-                <span id="address-invalid-text">{{invalidTexts.address}}</span>
-                
-                <button v-if="isAllValid" id="confirm-button">Confirm</button>
-                <button id="init-button" @click="handleClickInitiate">Initiate with 
-                    <p ref="initValueRef" id="init-value"></p>
-                </button>
-            </div>
-        `,
         setup() {
             const {
                 forms: { name, address },
@@ -74,6 +60,20 @@ describe('Form Validator Composable', () => {
                 handleClickInitiate,
             };
         },
+        template: `
+            <div>
+                <input id="name-input" :invalid="invalidState.name" :value="name" @input="handleNameInput"/>
+                <span id="name-invalid-text">{{invalidTexts.name}}</span>
+                
+                <input id="address-input" :invalid="invalidState.address" :value="address" @input="handleAddressInput"/>
+                <span id="address-invalid-text">{{invalidTexts.address}}</span>
+                
+                <button v-if="isAllValid" id="confirm-button">Confirm</button>
+                <button id="init-button" @click="handleClickInitiate">Initiate with 
+                    <p ref="initValueRef" id="init-value"></p>
+                </button>
+            </div>
+        `,
 
     });
 

@@ -14,7 +14,7 @@
             <p-collapsible-list :items="escalationRuleItems" theme="card" multi-unfoldable
                                 :unfolded-indices="[alertData.escalation_step - 1]"
             >
-                <template #title="{data, title, index}">
+                <template #title="{data, index}">
                     <p class="responder-info" :class="{'current': data.notification_level === `LV${alertData.escalation_step}` }">
                         <span class="step">[{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.STEP') }} {{ index+1 }}]</span>
                         <span class="level">{{ data.notification_level }}</span>
@@ -23,7 +23,7 @@
                         </p-badge>
                     </p>
                 </template>
-                <template #default="{data, index}">
+                <template #default="{ data }">
                     <p class="data-wrapper">
                         <project-channel-list :project-channels="projectChannels" :notification-level="data.notification_level" />
                     </p>

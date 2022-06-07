@@ -79,7 +79,7 @@
                             />
                         </div>
                     </template>
-                    <template #item="{item, index}">
+                    <template #item="{ item }">
                         <alert-list-item :item="item"
                                          :show-project-link="true"
                                          :project-reference="projects[item.project_id]"

@@ -26,7 +26,7 @@
                             {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
                         </p-badge>
                     </template>
-                    <template #col-tags.description-format="{ value }">
+                    <template #[`col-tags.description-format`]="{ value }">
                         {{ value ? value : '--' }}
                     </template>
                     <template #col-edit_button-format="{ item }">

@@ -17,16 +17,6 @@ const ERROR_URL = '/asset-inventory/cloud-service/no-resource';
 
 export default {
     name: 'CloudServiceSearch',
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-        searchKey: {
-            type: String,
-            default: undefined,
-        },
-    },
     beforeRouteEnter(to, from, next) {
         const queryHelper = new QueryHelper();
         (async () => {
@@ -52,6 +42,16 @@ export default {
                 ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
             }
         })();
+    },
+    props: {
+        id: {
+            type: String,
+            default: undefined,
+        },
+        searchKey: {
+            type: String,
+            default: undefined,
+        },
     },
 };
 </script>

@@ -38,7 +38,7 @@
                           :items="data"
                           :bordered="false"
             >
-                <template #col-provider-format="{ index, field, item }">
+                <template #col-provider-format="{ index, item }">
                     <router-link :to="getLink(item)">
                         <span :style="{color: data[index].color}" class="provider-label">{{ item.providerLabel }}</span>
                     </router-link>

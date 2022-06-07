@@ -161,6 +161,7 @@ export default {
             loading: true,
             project: {},
             cardData: [],
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             orderedCardData: computed(() => state.cardData.sort((a, b) => a.order - b.order)),
             isEditMode: false,
             mode: undefined as undefined | EditMode,

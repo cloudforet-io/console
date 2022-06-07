@@ -8,7 +8,7 @@
             <p-toast-alert group="toastTopCenter" position="top center" />
             <top-notification />
             <template v-if="showGNB">
-                <GNB class="gnb" />
+                <g-n-b class="gnb" />
                 <div class="app-body">
                     <p-sidebar :visible="$store.state.display.visibleSidebar"
                                :style-type="$store.getters['display/sidebarProps'].styleType"
@@ -63,7 +63,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PNoticeAlert, PToastAlert, PIconModal, PSidebar, PLottie,
+    PNoticeAlert, PToastAlert, PIconModal, PSidebar,
 } from '@spaceone/design-system';
 import { Location } from 'vue-router';
 
@@ -95,7 +95,6 @@ export default defineComponent({
         PToastAlert,
         PIconModal: PIconModal as any,
         PSidebar,
-        PLottie,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;

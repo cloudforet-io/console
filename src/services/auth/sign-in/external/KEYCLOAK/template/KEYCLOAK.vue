@@ -20,13 +20,11 @@ import {
 import { PButton } from '@spaceone/design-system';
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
-import KeycloakPage from '@/services/auth/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue';
 
 export default defineComponent({
     name: 'KEYCLOAK',
     components: {
         PButton,
-        KeycloakPage,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;

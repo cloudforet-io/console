@@ -92,7 +92,6 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import deleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
@@ -105,12 +104,6 @@ import { administrationStore } from '@/services/administration/store';
 
 export default defineComponent<PolicyDetailPageProps>({
     name: 'PolicyDetailPage',
-    props: {
-        id: {
-            type: String,
-            default: '',
-        },
-    },
     components: {
         PPageTitle,
         PIconButton,
@@ -122,8 +115,13 @@ export default defineComponent<PolicyDetailPageProps>({
         PTextInput,
         PolicyDeleteModal,
         PolicyNameEditModal,
-        deleteModal,
         PFieldGroup,
+    },
+    props: {
+        id: {
+            type: String,
+            default: '',
+        },
     },
     setup(props) {
         const stringifyPermission = (permissions: Array<string>|undefined) => permissions?.toString().replace(/,/gi, '\n') ?? '';

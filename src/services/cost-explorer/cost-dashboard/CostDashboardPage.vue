@@ -142,12 +142,6 @@ export default {
         PButton,
         PI,
     },
-    props: {
-        dashboardId: {
-            type: String,
-            default: undefined,
-        },
-    },
     beforeRouteEnter(to, from, next) {
         next(async () => {
             if (!await validateDashboardId(to.params.dashboardId)) {
@@ -159,6 +153,12 @@ export default {
             }
             next();
         });
+    },
+    props: {
+        dashboardId: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props) {
         const state = reactive({

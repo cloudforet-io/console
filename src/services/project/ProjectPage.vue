@@ -1,7 +1,7 @@
 <template>
     <fragment>
         <p-vertical-page-layout>
-            <template #sidebar="{width}">
+            <template #sidebar>
                 <div class="sidebar-container">
                     <div class="sidebar-item-wrapper">
                         <sidebar-title :title="$t('PROJECT.LANDING.FAVORITES')">

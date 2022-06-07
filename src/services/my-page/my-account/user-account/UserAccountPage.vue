@@ -33,7 +33,7 @@
                 <template #default="{invalid}">
                     <p-search-dropdown :menu="timezones"
                                        :selected.sync="formState.timezone"
-                                       :invalid="validationState.showValidation && !!validationState.timezoneInvalidText"
+                                       :invalid="invalid"
                                        :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
                     />
                 </template>

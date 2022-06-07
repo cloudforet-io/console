@@ -7,8 +7,6 @@ import {
     ComponentRenderProxy, defineComponent, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 
-import { PButton } from '@spaceone/design-system';
-
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
@@ -19,8 +17,14 @@ import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 export default defineComponent({
     name: 'KeycloakPage',
-    components: {
-        PButton,
+    beforeRouteEnter(to, from, next) {
+        if (from?.meta.isSignInPage) {
+            next((vm) => {
+                vm.$router.replace({
+                    query: { ...to.query, nextPath: from.query.nextPath },
+                }).catch(() => {});
+            });
+        } else next();
     },
     props: {
         visible: {
@@ -31,15 +35,6 @@ export default defineComponent({
             type: String,
             default: undefined,
         },
-    },
-    beforeRouteEnter(to, from, next) {
-        if (from?.meta.isSignInPage) {
-            next((vm) => {
-                vm.$router.replace({
-                    query: { ...to.query, nextPath: from.query.nextPath },
-                }).catch(() => {});
-            });
-        } else next();
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;

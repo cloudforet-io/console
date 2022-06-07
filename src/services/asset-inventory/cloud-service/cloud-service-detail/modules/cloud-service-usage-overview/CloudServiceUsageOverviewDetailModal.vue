@@ -51,7 +51,7 @@ import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { Filter } from '@spaceone/console-core-lib/space-connector/type';
 import {
-    PButtonModal, PDivider, PDynamicWidget, PQuerySearchTags,
+    PButtonModal, PDynamicWidget, PQuerySearchTags,
 } from '@spaceone/design-system';
 import {
     DynamicWidgetFieldHandler,
@@ -99,7 +99,6 @@ export default defineComponent<Props>({
         CloudServicePeriodFilter,
         PButtonModal: PButtonModal as any,
         PDynamicWidget,
-        PDivider,
         PQuerySearchTags,
     },
     model: {

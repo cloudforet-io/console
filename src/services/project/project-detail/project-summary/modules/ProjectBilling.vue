@@ -80,7 +80,7 @@
                     <template #th-service-format>
                         <span />
                     </template>
-                    <template v-for="field in tableState.fields" v-slot:[`col-${field.name}-format`]="{value}">
+                    <template v-for="field in tableState.fields" #[`col-${field.name}-format`]="{value}">
                         <template v-if="field.name !== 'service'">
                             <span v-if="value" :key="field.name" :style="{ 'color': value.color }">{{ value.cost }}</span>
                             <span v-else :key="field.name">-</span>

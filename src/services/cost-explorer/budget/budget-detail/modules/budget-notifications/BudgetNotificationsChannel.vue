@@ -9,7 +9,7 @@
         <template #col-protocol_id-format="{value}">
             {{ protocolFormatter(value) }}
         </template>
-        <template #col-data-format="{ index, field, item }">
+        <template #col-data-format="{ index, item }">
             <p v-if="item.secret_id.length > 0">
                 <!-- masking secret data -->
                 data: *******

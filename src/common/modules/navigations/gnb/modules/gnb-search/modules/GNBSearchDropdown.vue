@@ -60,7 +60,7 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PDataLoader, PDivider } from '@spaceone/design-system';
+import { PDataLoader } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -87,7 +87,6 @@ export default defineComponent<Props>({
     name: 'GNBSearchDropdown',
     components: {
         GNBSuggestionList,
-        PDivider,
         PDataLoader,
     },
     props: {

@@ -16,7 +16,7 @@
                            :invalid="isNameInvalid"
                            required
             >
-                <template #default="{invalid}">
+                <template #default>
                     <p-text-input v-model="alertTitleInput" class="block w-full" :invalid="isNameInvalid"
                                   :placeholder="alertTitle"
                     />

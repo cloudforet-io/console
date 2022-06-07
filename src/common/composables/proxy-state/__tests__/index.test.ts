@@ -9,12 +9,6 @@ localVue.use(CompositionApi);
 
 describe('Proxy State Composable', () => {
     const ChildComponent = defineComponent({
-        template: `
-            <div>
-                <div id="proxy-visible-text">{{ proxyVisible }}</div>
-                <div id="proxy-num-list-text">{{ proxyNumList }}</div>
-            </div>
-        `,
         props: {
             visible: {
                 type: Boolean,
@@ -35,15 +29,15 @@ describe('Proxy State Composable', () => {
                 ...toRefs(state),
             };
         },
+        template: `
+            <div>
+                <div id="proxy-visible-text">{{ proxyVisible }}</div>
+                <div id="proxy-num-list-text">{{ proxyNumList }}</div>
+            </div>
+        `,
 
     });
     const ParentComponent = defineComponent({
-        template: `
-            <div>
-                <child-component :visible.sync="visible" :num-list.sync="numList" />
-                <div id="visible-text">{{ visible }}</div>
-            </div>
-        `,
         components: {
             ChildComponent,
         },
@@ -56,6 +50,12 @@ describe('Proxy State Composable', () => {
                 ...toRefs(state),
             };
         },
+        template: `
+            <div>
+                <child-component :visible.sync="visible" :num-list.sync="numList" />
+                <div id="visible-text">{{ visible }}</div>
+            </div>
+        `,
     });
 
     const initWrappers = () => {

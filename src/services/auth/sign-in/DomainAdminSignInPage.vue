@@ -54,6 +54,15 @@ export default {
         SignInLeftContainer,
         IDPWSignIn,
     },
+    beforeRouteEnter(to, from, next) {
+        if (from.meta.isSignInPage) {
+            next((vm) => {
+                vm.$router.replace({
+                    query: { ...to.query, nextPath: from.query.nextPath },
+                }).catch(() => {});
+            });
+        } else next();
+    },
     props: {
         isDomainOwner: {
             type: Boolean,
@@ -63,15 +72,6 @@ export default {
             type: String,
             default: undefined,
         },
-    },
-    beforeRouteEnter(to, from, next) {
-        if (from.meta.isSignInPage) {
-            next((vm) => {
-                vm.$router.replace({
-                    query: { ...to.query, nextPath: from.query.nextPath },
-                }).catch(() => {});
-            });
-        } else next();
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;

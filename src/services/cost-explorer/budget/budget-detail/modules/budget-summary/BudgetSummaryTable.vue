@@ -14,7 +14,7 @@
                       :disable-hover="true"
                       class="budget-summary-table"
         >
-            <template #col-format="{field, value, index}">
+            <template #col-format="{field, value}">
                 <span v-if="field.name && value.path === 'limit'">
                     {{
                         showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], currency, currencyRates)

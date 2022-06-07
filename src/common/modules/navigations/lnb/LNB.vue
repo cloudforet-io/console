@@ -34,7 +34,7 @@
                              :current-path="currentPath"
                              :depth="Array.isArray(menuData) ? 2 : 1"
             >
-                <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
                     <slot :name="slot" v-bind="scope" />
                 </template>
             </l-n-b-menu-item>

@@ -8,7 +8,7 @@
                       table-style-type="simple"
                       disable-hover
         >
-            <template v-for="field in fields" v-slot:[`th-${field.name}-format`]="{ field }">
+            <template v-for="field in fields" #[`th-${field.name}-format`]>
                 <div :key="field.name" class="tooltip-container">
                     <span>{{ field.label }}</span>
                     <p-i v-if="field.tooltipText" v-tooltip.bottom="field.tooltipText"

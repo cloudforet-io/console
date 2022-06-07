@@ -31,11 +31,11 @@
                              @refresh="handleChange()"
                              @rowLeftClick="onSelect"
             >
-                <template #th-task-format="{  field }">
+                <template #th-task-format="{ field }">
                     <span>{{ field.label }}</span>
                     <span class="th-additional-info-text"> (completed / total)</span>
                 </template>
-                <template #col-collector_info.plugin_info-format="{ value }">
+                <template #[`col-collector_info.plugin_info-format`]="{ value }">
                     <template v-if="value">
                         <p-lazy-img :src="plugins[value.plugin_id] ? plugins[value.plugin_id].icon : ''"
                                     width="1rem" height="1rem" class="mr-2"

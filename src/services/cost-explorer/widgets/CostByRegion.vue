@@ -57,7 +57,7 @@ import { MapChart } from '@amcharts/amcharts4/maps';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import {
     groupBy, sum,
@@ -124,7 +124,6 @@ export default defineComponent<WidgetProps>({
         CostDashboardDataTable,
         CostDashboardCardWidgetLayout,
         PDataLoader,
-        PSkeleton,
     },
     props: {
         name: {
