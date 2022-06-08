@@ -113,6 +113,9 @@ export default defineComponent<Props>({
             const resolved = SpaceRouter.router.resolve(selectedMenuRoute);
             if (!resolved) return false;
 
+            if (currentPath.indexOf('?') > 0) {
+                currentPath = currentPath.slice(0, currentPath.indexOf('?'));
+            }
             let resolvedHref = resolved.href;
             if (!currentPath.endsWith('/')) currentPath += '/';
             if (!resolvedHref.endsWith('/')) resolvedHref += '/';
