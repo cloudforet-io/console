@@ -172,23 +172,20 @@ import {
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 
-import {
-    dynamicFieldsToExcelDataFields,
-    makeQuerySearchPropsWithSearchSchema,
-} from '@/lib/component-util/dynamic-layout';
+import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { Reference } from '@/lib/reference/type';
 import { objectToQueryString, queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string';
 
+import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
@@ -249,7 +246,6 @@ export default {
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
-
         /* Sidebar */
         const sidebarState = reactive({
             selectedItem: computed(() => assetInventoryStore.state.cloudServiceDetail.selectedItem),
@@ -272,8 +268,6 @@ export default {
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [] as number[],
             selectable: true,
-            keyItemSets: [] as KeyItemSet[],
-            valueHandlerMap: {} as ValueHandlerMap,
             colCopy: false,
             settingsVisible: true,
         });
@@ -303,6 +297,17 @@ export default {
             visibleCustomFieldModal: false,
             searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
         });
+        const schemaQueryHelper = new QueryHelper();
+        const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
+            computed(() => tableState.schema?.options?.search ?? []),
+            'inventory.CloudService',
+            schemaQueryHelper.setFilters([
+                { k: 'provider', o: '=', v: props.provider },
+                { k: 'cloud_service_group', o: '=', v: props.group },
+                { k: 'cloud_service_type', o: '=', v: props.name },
+            ]).apiQuery.filter,
+        );
+
 
         const checkTableModalState = reactive({
             visible: false,
@@ -331,7 +336,6 @@ export default {
             typeOptionState.selectIndex = selectIndex;
         };
 
-        const schemaQueryHelper = new QueryHelper();
         const getTableSchema = async (): Promise<null|DynamicLayout> => {
             try {
                 const schema = await SpaceConnector.client.addOns.pageSchema.get({
@@ -343,22 +347,6 @@ export default {
                         cloud_service_type: props.name,
                     },
                 });
-
-                schemaQueryHelper.setFilters([
-                    { k: 'provider', o: '=', v: props.provider },
-                    { k: 'cloud_service_group', o: '=', v: props.group },
-                    { k: 'cloud_service_type', o: '=', v: props.name },
-                ]);
-
-                // declare keyItemSets and valueHandlerMap with search schema
-                if (schema?.options?.search) {
-                    const searchProps = makeQuerySearchPropsWithSearchSchema(schema.options.search, 'inventory.CloudService', schemaQueryHelper.apiQuery.filter);
-                    typeOptionState.keyItemSets = searchProps.keyItemSets;
-                    typeOptionState.valueHandlerMap = searchProps.valueHandlerMap;
-                }
-
-                // initiate queryTags with keyItemSets
-                fetchOptionState.queryTags = queryHelper.setKeyItemSets(typeOptionState.keyItemSets).queryTags;
 
                 // return schema
                 return schema;
@@ -545,6 +533,10 @@ export default {
             tableState.schema = await getTableSchema();
             await fetchTableData();
         }, { immediate: true });
+        watch(() => keyItemSets.value, (after) => {
+            // initiate queryTags with keyItemSets
+            fetchOptionState.queryTags = queryHelper.setKeyItemSets(after).queryTags;
+        });
 
         return {
             /* Sidebar */
@@ -552,7 +544,7 @@ export default {
             /* Main Table */
             tableState,
             fetchOptionState,
-            typeOptionState,
+            typeOptionState: Object.assign(typeOptionState, { keyItemSets, valueHandlerMap }),
             checkTableModalState,
             handleTableHeightChange,
             handleSelect,

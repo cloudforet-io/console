@@ -41,7 +41,6 @@ import {
     DynamicLayoutEventListener, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
@@ -50,13 +49,13 @@ import { store } from '@/store';
 import {
     dynamicFieldsToExcelDataFields,
     getApiActionByLayoutType,
-    makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-util/dynamic-layout';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { Reference } from '@/lib/reference/type';
 
 
+import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
@@ -105,8 +104,6 @@ export default {
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone),
             selectIndex: [] as number[],
-            keyItemSets: [] as KeyItemSet[],
-            valueHandlerMap: {} as ValueHandlerMap,
             language: computed(() => store.state.user.language),
 
             // button tab
@@ -139,17 +136,10 @@ export default {
             }),
             fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
         });
-
-
-        const setSearchOptions = () => {
-            const { keyItemSets, valueHandlerMap } = makeQuerySearchPropsWithSearchSchema(
-                state.currentLayout.options.search,
-                'inventory.CloudService',
-            );
-            state.keyItemSets = keyItemSets;
-            state.valueHandlerMap = valueHandlerMap;
-        };
-
+        const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
+            computed(() => state.currentLayout?.options?.search ?? []),
+            'inventory.CloudService',
+        );
         const getSchema = async () => {
             let layouts = layoutSchemaCacheMap[props.cloudServiceId];
             if (!layouts) {
@@ -171,7 +161,6 @@ export default {
             layoutSchemaCacheMap[props.cloudServiceId] = layouts;
             state.layouts = layouts || [];
             if (!find(state.tabs, { name: state.activeTab })) state.activeTab = state.tabs[0].name;
-            if (state.currentLayout.options?.search) setSearchOptions();
         };
 
         const apiQuery = new ApiQueryHelper();
@@ -264,11 +253,7 @@ export default {
         }, { immediate: false });
 
         (async () => {
-            await Promise.allSettled([
-                loadSchemaAndData(),
-                // LOAD REFERENCE STORE
-                store.dispatch('reference/loadAll'),
-            ]);
+            await loadSchemaAndData();
         })();
 
         return {
@@ -277,6 +262,8 @@ export default {
             dynamicLayoutListeners,
             fetchOptionsMap,
             fieldHandler,
+            keyItemSets,
+            valueHandlerMap,
         };
     },
 };

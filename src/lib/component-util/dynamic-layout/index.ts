@@ -1,14 +1,7 @@
-import {
-    makeDistinctValueHandler,
-    makeEnumValueHandler,
-    makeReferenceValueHandler,
-} from '@spaceone/console-core-lib/component-util/query-search';
-import { Filter } from '@spaceone/console-core-lib/space-connector/type';
 import { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { QuerySearchProps } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { forEach } from 'lodash';
 
-import { ConsoleDynamicField, ConsoleSearchSchema, Reference } from '@/lib/component-util/dynamic-layout/type';
+import { ConsoleDynamicField, Reference } from '@/lib/component-util/dynamic-layout/type';
 
 interface ExcelDataField {
     key: string;
@@ -18,45 +11,6 @@ interface ExcelDataField {
     reference?: Reference;
 }
 
-/**
- * @name makeQuerySearchPropsWithSearchSchema
- * @description A helper function that returns props(keyItemSets, valueHandlerMap) necessary for QuerySearch component using search schema
- * @param schema
- * @param resourceType
- */
-export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema[], resourceType: string, filters?: Filter[]): Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> => {
-    const querySearchProps: Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> = { keyItemSets: [], valueHandlerMap: {} };
-
-    querySearchProps.keyItemSets = schema.map(s => ({
-        title: s.title,
-        items: s.items.map((d) => {
-            let operators;
-            if (d.enums) {
-                querySearchProps.valueHandlerMap[d.key] = makeEnumValueHandler(d.enums);
-                operators = ['=', '!='];
-            } else if (d.reference) {
-                querySearchProps.valueHandlerMap[d.key] = makeReferenceValueHandler(
-                    d.reference,
-                    d.data_type,
-                );
-                operators = ['=', '!='];
-            } else {
-                querySearchProps.valueHandlerMap[d.key] = makeDistinctValueHandler(
-                    resourceType,
-                    d.key,
-                    d.data_type,
-                    filters,
-                );
-            }
-
-            return {
-                label: d.name, name: d.key, dataType: d.data_type, operators, reference: d.reference,
-            };
-        }),
-    }));
-
-    return querySearchProps;
-};
 
 /**
  * @name getApiActionByLayoutType
@@ -100,7 +54,6 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): E
 });
 
 export default {
-    makeQuerySearchPropsWithSearchSchema,
     getApiActionByLayoutType,
     dynamicFieldsToExcelDataFields,
 };

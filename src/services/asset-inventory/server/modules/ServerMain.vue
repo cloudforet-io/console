@@ -133,7 +133,6 @@ import {
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
@@ -141,16 +140,14 @@ import { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 
-import {
-    dynamicFieldsToExcelDataFields,
-    makeQuerySearchPropsWithSearchSchema,
-} from '@/lib/component-util/dynamic-layout';
+import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { Reference } from '@/lib/reference/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
+import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
@@ -229,8 +226,6 @@ export default {
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [] as number[],
             selectable: true,
-            keyItemSets: [] as KeyItemSet[],
-            valueHandlerMap: {} as ValueHandlerMap,
             colCopy: false,
             settingsVisible: true,
         });
@@ -329,6 +324,11 @@ export default {
             }))),
         });
 
+        /* hook */
+        const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
+            computed(() => tableState.schema?.options?.search ?? []),
+            'inventory.Server',
+        );
         /* util */
         const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
             if (field.extraData?.reference) {
@@ -387,12 +387,6 @@ export default {
                     schema: 'table',
                 });
 
-                // declare keyItemSets and valueHandlerMap with search schema
-                if (res?.options?.search) {
-                    const searchProps = makeQuerySearchPropsWithSearchSchema(res.options.search, 'inventory.Server');
-                    typeOptionState.keyItemSets = searchProps.keyItemSets;
-                    typeOptionState.valueHandlerMap = searchProps.valueHandlerMap;
-                }
                 // set api query to get only a few specified data
                 if (res?.options?.fields) {
                     apiQuery.setOnly(...res.options.fields.map(d => d.key).filter(d => !d.startsWith('tags.')),
@@ -494,6 +488,11 @@ export default {
             if (!disabled) init();
         }, { immediate: false });
 
+        watch(() => keyItemSets.value, (after) => {
+            // initiate queryTags with keyItemSets
+            fetchOptionState.queryTags = queryHelper.setKeyItemSets(after).queryTags;
+        });
+
         // LOAD REFERENCE STORE
         (async () => {
             await store.dispatch('reference/loadAll');
@@ -509,7 +508,7 @@ export default {
                 'inventory.CloudServiceType': computed(() => store.state.reference.cloudServiceType.items),
                 'secret.Secret': computed(() => store.state.reference.secret.items),
             });
-            fetchOptionState.queryTags = queryHelper.setKeyItemSets(typeOptionState.keyItemSets).queryTags;
+            fetchOptionState.queryTags = queryHelper.setKeyItemSets(keyItemSets.value).queryTags;
         })();
 
         return {
@@ -517,7 +516,7 @@ export default {
             pageTitle,
             tableState,
             fetchOptionState,
-            typeOptionState,
+            typeOptionState: Object.assign(typeOptionState, { keyItemSets, valueHandlerMap }),
             handleSelect,
             exportServerData,
             handleClickSettings,

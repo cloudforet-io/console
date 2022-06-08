@@ -17,8 +17,8 @@
             <template #container="{ height }">
                 <p-query-search-table :fields="fields"
                                       :items="items"
-                                      :key-item-sets="querySearchHandlers.keyItemSets"
-                                      :value-handler-map="querySearchHandlers.valueHandlerMap"
+                                      :key-item-sets="handlerState.keyItemSets"
+                                      :value-handler-map="handlerState.valueHandlerMap"
                                       :loading="loading"
                                       :total-count="totalCount"
                                       :query-tags="searchTags"
@@ -183,6 +183,8 @@ import {
 
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
+import { makeDistinctValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
+import { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -198,7 +200,6 @@ import { Component } from 'vue/types/umd';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-util/dynamic-layout';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -243,6 +244,38 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
 
+        const storeState = reactive({
+            providers: computed(() => store.state.reference.provider.items),
+        });
+
+        const handlerState = reactive({
+            keyItemSets: computed<KeyItemSet[]>(() => [{
+                title: 'Properties',
+                items: [
+                    { name: 'collector_id', label: 'Collector Id' },
+                    { name: 'name', label: 'Name' },
+                    { name: 'state', label: 'State' },
+                    { name: 'plugin_info.plugin_id', label: 'Plugin' },
+                    { name: 'plugin_info.version', label: 'Version' },
+                    { name: 'provider', label: 'Provider', valueSet: storeState.providers },
+                    { name: 'supported_resource_type', label: 'Resource Type' },
+                    { name: 'created_at', label: 'Created' },
+                    { name: 'last_collected_at', label: 'Last Collected' },
+                ],
+            }]),
+            valueHandlerMap: {
+                collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id'),
+                name: makeDistinctValueHandler('inventory.Collector', 'name'),
+                state: makeDistinctValueHandler('inventory.Collector', 'state'),
+                'plugin_info.plugin_id': makeDistinctValueHandler('inventory.Collector', 'plugin_info.plugin_id'),
+                'plugin_info.version': makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
+                provider: makeDistinctValueHandler('inventory.Collector', 'provider'),
+                supported_resource_type: makeDistinctValueHandler('inventory.Collector', 'supported_resource_type'),
+                created_at: makeDistinctValueHandler('inventory.Collector', 'created_at'),
+                last_collected_at: makeDistinctValueHandler('inventory.Collector', 'last_collected_at'),
+            } as ValueHandlerMap,
+        });
+
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
             timezone: computed(() => store.state.user.timezone),
@@ -274,21 +307,6 @@ export default {
                 return items;
             }),
             selectedDataFields: computed(() => [{ name: 'collector_id', label: 'Collector Id' }, ...state.fields]),
-            // query
-            querySearchHandlers: makeQuerySearchPropsWithSearchSchema([{
-                title: 'Properties',
-                items: [
-                    { key: 'collector_id', name: 'Collector Id' },
-                    { key: 'name', name: 'Name' },
-                    { key: 'state', name: 'State' },
-                    { key: 'plugin_info.plugin_id', name: 'Plugin' },
-                    { key: 'plugin_info.version', name: 'Version' },
-                    { key: 'provider', name: 'Provider' },
-                    { key: 'supported_resource_type', name: 'Resource Type' },
-                    { key: 'created_at', name: 'Created' },
-                    { key: 'last_collected_at', name: 'Last Collected' },
-                ],
-            }], 'inventory.Collector'),
             loading: true,
             searchTags: [],
             pageLimit: 15,
@@ -352,7 +370,7 @@ export default {
         // Url query
         const setSearchTags = async () => {
             queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters)
-                .setKeyItemSets(state.querySearchHandlers.keyItemSets);
+                .setKeyItemSets(handlerState.keyItemSets);
             state.searchTags = queryHelper.queryTags;
         };
 
@@ -494,7 +512,10 @@ export default {
 
         const init = async () => {
             // LOAD REFERENCE STORE
-            await store.dispatch('reference/plugin/load');
+            await Promise.allSettled([
+                store.dispatch('reference/plugin/load'),
+                store.dispatch('reference/provider/load'),
+            ]);
             await Promise.all([setSearchTags(), getCollectors()]);
         };
         init();
@@ -512,6 +533,7 @@ export default {
             multiTabState,
             singleTabState,
             checkModalState,
+            handlerState,
             ASSET_INVENTORY_ROUTE,
             onSelect,
             onChange,
