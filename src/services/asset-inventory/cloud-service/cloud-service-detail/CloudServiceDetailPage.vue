@@ -11,9 +11,12 @@
                      :manage-disabled="!tableState.hasManagePermission"
         >
             <template #period-filter>
-                <cloud-service-period-filter :period="overviewState.period"
-                                             @update:period="handlePeriodUpdate"
-                />
+                <div class="filter-wrapper">
+                    <span class="filter-title">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTER') }}</span>
+                    <cloud-service-period-filter :period="overviewState.period"
+                                                 @update:period="handlePeriodUpdate"
+                    />
+                </div>
             </template>
             <template #usage-overview="{filters}">
                 <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem"
@@ -33,9 +36,12 @@
                           :selected-count="tableState.selectedItems.length"
                           @goBack="$router.go(-1)"
             />
-            <cloud-service-period-filter :period="overviewState.period"
-                                         @update:period="handlePeriodUpdate"
-            />
+            <div class="filter-wrapper">
+                <span class="filter-title">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTER') }}</span>
+                <cloud-service-period-filter :period="overviewState.period"
+                                             @update:period="handlePeriodUpdate"
+                />
+            </div>
             <p-horizontal-layout :min-height="TABLE_MIN_HEIGHT" :height="tableState.tableHeight" @drag-end="handleTableHeightChange">
                 <template #container="{ height }">
                     <template v-if="tableState.schema">
@@ -578,6 +584,18 @@ export default {
 <style lang="postcss" scoped>
 >>> .p-horizontal-layout .horizontal-contents {
     overflow: unset;
+}
+
+.filter-wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.filter-title {
+    @apply text-gray-600;
+    font-size: 0.875rem;
+    margin-right: 0.5rem;
 }
 
 .left-toolbox-item {
