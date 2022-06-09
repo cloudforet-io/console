@@ -24,8 +24,6 @@
 			}
 		},
 		"TOP_NOTI": {
-			"HAS_NO_ROLE": "Every SpaceONE user {needRole}. Please, Contact administrator to get a role.",
-			"NEED_ROLE": "requires Role ",
 			"PERMISSION_DENIED": "Permission denied. Please, Contact administrator to get a role."
 		}
 	},
@@ -1061,7 +1059,6 @@
 		"POLICY": {
 			"FORM": {
 				"CANCEL": "Cancel",
-				"CONTENT": "Content",
 				"CREATE": "Create",
 				"CREATE_TITLE": "Create Custom Policy",
 				"CUSTOM_POLICY": "Custom Policy",
@@ -1375,7 +1372,6 @@
 				"DISABLE_MODAL_DESC": "Are you sure you want to disable selected user? ",
 				"DISABLE_MODAL_TITLE": "Disable User",
 				"DOMAIN_ID": "Domain ID",
-				"DOMAIN_ROLE": "Assign Domain Role",
 				"EMAIL": "E-mail",
 				"ENABLE": "Enable",
 				"ENABLE_MODAL_DESC": "Are you sure you want to enable selected user below?",
@@ -2241,7 +2237,6 @@
 				"MODAL_VALIDATION_REQUIRED": "Required field",
 				"NO_RESULTS_FOUND": "No Results Found",
 				"NO_RESULTS_FOUND_HELP_TEXT": "We can’t find any item matching your search.",
-				"PROJECT_ROLE_LABEL": "Project Role",
 				"ROLE": "Role",
 				"ROLE_HELP_TEXT": "Set a role for selected member",
 				"ROLE_TOOLTIP": "List of Role varies depending on the role type granted to your account.",
@@ -2283,7 +2278,6 @@
 			"MODAL_VALIDATION_DUPLICATED": "Project name is duplicated.",
 			"MODAL_VALIDATION_LENGTH": "Must be longer than 40 characters.",
 			"MODAL_VALIDATION_REQUIRED": "Required field",
-			"MODAL_VALIDATION_SELECT_ROLE": "Select a Role",
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "Loading...",
 			"NOW_HAPPENING_MAINTENANCE": "Maintenance Happening Now.",
 			"PROJECT_ALERT_ACTIVATE": "Activate Alert",
@@ -2291,7 +2285,6 @@
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "Click ‘Activate Alert’ to receive integrated external events or manage of this project.",
 			"PROJECT_ID": "Project ID:",
 			"PROJECT_MEMBER_LABEL": "Labels",
-			"PROJECT_ROLE": "Project Role",
 			"REPORT_CANCEL": "Cancel",
 			"REPORT_DESC": "SpaceONE offers monthly report based on this project. We will update more content soon.",
 			"REPORT_DOWNLOAD_FILE_DESC": "* Only PDF, PPTX formats are avilable.",
@@ -2393,7 +2386,6 @@
 			"CREATE_GROUP": "Create Group",
 			"CREATE_PROJECT": "Create Project",
 			"DATABASE": "Database",
-			"EMPTY_PERMISSION_REQUIRED": "Permission required for using Project groups & Projects.",
 			"EMPTY_PROJECT_GROUP_CREATE_BTN": "Create Project Group",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT": "Manage your resources through projects.",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_1": "Name your project group first.",
@@ -2428,9 +2420,7 @@
 			"SERVICE_ACCOUNTS": "Service Accounts",
 			"SHOW_ALL": "Show all project",
 			"SHOW_ALL_TOOLTIP": "Show all projects of sub project groups",
-			"STORAGE": "Storage",
-			"TOP_NOTI_PERMISSION_REQUIRED_1": "Permission required for using Project groups & Projects. ",
-			"TOP_NOTI_PERMISSION_REQUIRED_2": "Please, Request valid permission to project Admin/Domain Administrator."
+			"STORAGE": "Storage"
 		}
 	},
 	"SPACEONE_USER_DESC": "Forward to the project members' personal notification channel",

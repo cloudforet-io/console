@@ -24,8 +24,6 @@
 			}
 		},
 		"TOP_NOTI": {
-			"HAS_NO_ROLE": "Space  ONEを利用のために{need  Role}が必要です。管理者(Administrator)にお問い合わせください。",
-			"NEED_ROLE": "権限(Role)が必要",
 			"PERMISSION_DENIED": "Permission denied. Please, Contact administrator to get a role."
 		}
 	},
@@ -1061,7 +1059,6 @@
 		"POLICY": {
 			"FORM": {
 				"CANCEL": "取消",
-				"CONTENT": "権限",
 				"CREATE": "作成",
 				"CREATE_TITLE": "カスタムポリシーの作成",
 				"CUSTOM_POLICY": "カスタムポリシー",
@@ -1375,7 +1372,6 @@
 				"DISABLE_MODAL_DESC": "選択したユーザーを無効化にしますか？ |選択したユーザーを全部無効化にしますか？",
 				"DISABLE_MODAL_TITLE": "ユーザ無効化",
 				"DOMAIN_ID": "ドメイン名",
-				"DOMAIN_ROLE": "ドメイン·ロールの割り当てる",
 				"EMAIL": "メールアドレス",
 				"ENABLE": "有効化",
 				"ENABLE_MODAL_DESC": "選択したユーザーを有効にしますか？ |選択したユーザーを全部有効にしますか？",
@@ -2241,7 +2237,6 @@
 				"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
 				"NO_RESULTS_FOUND": "検索結果が見つかりません",
 				"NO_RESULTS_FOUND_HELP_TEXT": "検索キーワードに一致する項目が見つかりません",
-				"PROJECT_ROLE_LABEL": "プロジェクト権限",
 				"ROLE": "ロール",
 				"ROLE_HELP_TEXT": "選択したメンバーにロールを割り当ててください。",
 				"ROLE_TOOLTIP": "アカウントに付与されたロールタイプによって選択可能なリストは異なります。",
@@ -2283,7 +2278,6 @@
 			"MODAL_VALIDATION_DUPLICATED": "名前が重複しています",
 			"MODAL_VALIDATION_LENGTH": "40文字以内で入力してください",
 			"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
-			"MODAL_VALIDATION_SELECT_ROLE": "権限を選択してください。",
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "ロード中...",
 			"NOW_HAPPENING_MAINTENANCE": "現在メンテナンス中です。",
 			"PROJECT_ALERT_ACTIVATE": "通知有効化",
@@ -2291,7 +2285,6 @@
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "統合された外部イベントを受信するかこのプロジェクトを管理のためには「通知有効化」をクリックしてください。",
 			"PROJECT_ID": "プロジェクトID：",
 			"PROJECT_MEMBER_LABEL": "ラベル",
-			"PROJECT_ROLE": "プロジェクト権限",
 			"REPORT_CANCEL": "キャンセル",
 			"REPORT_DESC": "SpaceONEは、プロジェクトベースの月次レポートを提供します。今後提供するコンテンツを追加する予定です",
 			"REPORT_DOWNLOAD_FILE_DESC": "*提供するファイル形式（PDF、PPTX、CSV）",
@@ -2393,7 +2386,6 @@
 			"CREATE_GROUP": "プロジェクトグループ作成",
 			"CREATE_PROJECT": "プロジェクト作成",
 			"DATABASE": "データベース",
-			"EMPTY_PERMISSION_REQUIRED": "プロジェクトグループ/プロジェクトの使用のためには権限が必要です。",
 			"EMPTY_PROJECT_GROUP_CREATE_BTN": "プロジェクトグループ作成",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT": "プロジェクトでリソースを管理してください",
 			"EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_1": "まず、プロジェクトグループを作成してください。",
@@ -2428,9 +2420,7 @@
 			"SERVICE_ACCOUNTS": "サービスアカウント",
 			"SHOW_ALL": "すべてのプロジェクトを見る",
 			"SHOW_ALL_TOOLTIP": "プロジェクトグループのすべてのサブプロジェクトを見る",
-			"STORAGE": "ストレージ",
-			"TOP_NOTI_PERMISSION_REQUIRED_1": "プロジェクトグループとプロジェクトの操作を実行するアクセス許可が必要です",
-			"TOP_NOTI_PERMISSION_REQUIRED_2": "プロジェクト管理者/ドメイン管理者に使用許可を要求してください。"
+			"STORAGE": "ストレージ"
 		}
 	},
 	"SPACEONE_USER_DESC": "プロジェクトメンバーの個人チャンネルに送信します。",
