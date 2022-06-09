@@ -63,7 +63,7 @@
                 </p-field-group>
             </div>
             <div class="policy-detail-contents">
-                <p-label>{{ $t('IAM.POLICY.FORM.CONTENT') }}</p-label>
+                <p-label>{{ $t('IAM.POLICY.FORM.PERMISSION') }}</p-label>
                 <p-text-editor
                     :mode="type === POLICY_TYPES.MANAGED ? 'readOnly' : 'edit'"
                     :code="code"

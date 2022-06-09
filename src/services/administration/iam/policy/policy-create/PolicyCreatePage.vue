@@ -35,7 +35,7 @@
                 </p-field-group>
             </div>
             <div class="policy-create-contents">
-                <p-field-group :label="$t('IAM.POLICY.FORM.CONTENT')" required />
+                <p-field-group :label="$t('IAM.POLICY.FORM.PERMISSION')" required />
                 <p-text-editor :code="code" @update:code="setForm('policyCode', $event)" />
             </div>
         </p-pane-layout>
