@@ -201,8 +201,10 @@ export default defineComponent<ContextMenuProps>({
                 if (state.selectedNameMap[item.name ?? ''] !== undefined) {
                     const indexOfSelected = state.selectedNameMap[item.name ?? ''];
                     state.proxySelected.splice(indexOfSelected, 1);
+                    state.proxySelected = [...state.proxySelected];
                 } else {
                     state.proxySelected.splice(state.proxySelected.length - 1, 0, item);
+                    state.proxySelected = [...state.proxySelected];
                 }
             } else {
                 state.proxySelected = [item];

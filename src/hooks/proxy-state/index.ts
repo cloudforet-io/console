@@ -2,7 +2,10 @@ import {
     computed, Ref, ref, watch,
 } from '@vue/composition-api';
 
-
+/**
+ * @name useProxyValue
+ * @description In case of array or object, set() does not work even if the original value is modified unless reallocated.
+ */
 export function useProxyValue<T = any>(
     name: string,
     props: any,
