@@ -94,6 +94,7 @@
                     </p-page-title>
                     <project-card-list class="card-container"
                                        :parent-groups="storeState.parentGroups"
+                                       :manage-disabled="!hasRootProjectGroupManagePermission"
                                        @create-project-group="openProjectGroupCreateForm"
                     />
 
