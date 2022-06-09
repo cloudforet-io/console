@@ -1,4 +1,13 @@
 {
+	"ALS_S_ADD_MEMBER": "Successfully Added Member ",
+	"ALT_E_ADD_MEMBER": "Failed to Add Member",
+	"ALT_E_DELETE_MEMBER": "Failed to Delete Member",
+	"ALT_E_UPDATE_GROUP_MEMBER": "Failed to Update Project Group Member",
+	"ALT_E_UPDATE_MEMBER": "Failed to Update Member",
+	"ALT_S_ADD_MEMBER": "Successfully Added Member ",
+	"ALT_S_DELETE_MEMBER": "Successfully Deleted Member ",
+	"ALT_S_UPDATE_GROUP_MEMBER": "Successfully Updated Project Group Member ",
+	"ALT_S_UPDATE_MEMBER": "Successfully Updated Member ",
 	"APP": {
 		"MAIN": {
 			"CLOSE": "Close",
@@ -1608,6 +1617,9 @@
 			}
 		}
 	},
+	"MANAGE_PROJECT_GROUP_MEMBER": "Manage Project Group Member",
+	"MEMBER": "Member",
+	"MEMBER_TITLE": "Member",
 	"MENU": {
 		"ADMINISTRATION": "Administration",
 		"ADMINISTRATION_IAM": "IAM",
@@ -1635,6 +1647,9 @@
 		"MY_PAGE_NOTIFICATIONS": "Notifications Channel",
 		"PROJECT": "Project"
 	},
+	"MODAL_DELETE_MEMBER_CONTENT": "Are you sure remove following member from project? ",
+	"MODAL_DELETE_MEMBER_TITLE": "Delete Member",
+	"MODAL_UPDATE_MEMBER_TITLE": "Update Member Information",
 	"MONITORING": {
 		"ALERT": {
 			"ALERT_LIST": {
@@ -1831,7 +1846,6 @@
 					"HIDE": "hide",
 					"LEVEL": "Level",
 					"RESPONDER": "Responder",
-					"SEARCH_PLACEHOLDER": "Search Member",
 					"SHOW_RESPONDERS": "show responders"
 				},
 				"STATUS_UPDATE": {
@@ -2201,18 +2215,15 @@
 			"ALT_S_UPDATE_MEMBER": "Successfully Updated Member ",
 			"ALT_S_UPDATE_PROJECT": "Successfully Updated Project ",
 			"ALT_S_UPDATE_WEBHOOK": "Successfully Updated Webhook ",
-			"CLICK_ADD_MEMBER": "Click to Add Members",
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
 			"MEMBER": {
 				"ADD": "Add",
 				"ADD_FROM": "Add from {user_type}",
-				"ADD_MEMBER": "Add Member",
 				"ALREADY_EXISTING": "Already existing",
 				"ALS_S_ADD_MEMBER": "Successfully Added Member ",
 				"ALT_E_ADD_MEMBER": "Failed to Add Member",
 				"BASE_INFORMATION": "Base Information",
-				"BASE_INFO_HELP_TEXT": "Set selected member’s project role and labels.",
 				"DELETE_ALL": "Delete All",
 				"DUPLICATED_VALUE": "Duplicated Value",
 				"ENTER_KEYWORD_TO_SEARCH": "↑ Enter keywords to search",
@@ -2226,10 +2237,8 @@
 				"LABEL_LABEL": "Label",
 				"LABEL_PLACEHOLDER": "ex. Developer",
 				"MEMBER": "Member",
-				"MEMBER_HELP_TEXT": "Select project members.",
 				"MODAL_INVITE_MEMBER_TITLE": "Invite Member",
 				"MODAL_VALIDATION_REQUIRED": "Required field",
-				"NO_MEMBER": "No Member",
 				"NO_RESULTS_FOUND": "No Results Found",
 				"NO_RESULTS_FOUND_HELP_TEXT": "We can’t find any item matching your search.",
 				"PROJECT_ROLE_LABEL": "Project Role",
@@ -2240,8 +2249,6 @@
 				"USER_ID": "User ID"
 			},
 			"MEMBER_TITLE": "Member",
-			"MODAL_ADDED_MEMBERS": "Added Members",
-			"MODAL_ADD_MEMBER": "Add Member",
 			"MODAL_CREATE_PROJECT_LABEL": "Name",
 			"MODAL_CREATE_PROJECT_PLACEHOLDER": "Project Name",
 			"MODAL_CREATE_PROJECT_TITLE": "Create Project",
@@ -2276,7 +2283,6 @@
 			"MODAL_VALIDATION_DUPLICATED": "Project name is duplicated.",
 			"MODAL_VALIDATION_LENGTH": "Must be longer than 40 characters.",
 			"MODAL_VALIDATION_REQUIRED": "Required field",
-			"MODAL_VALIDATION_SELECT_MEMBER": "Select a member ",
 			"MODAL_VALIDATION_SELECT_ROLE": "Select a Role",
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "Loading...",
 			"NOW_HAPPENING_MAINTENANCE": "Maintenance Happening Now.",
@@ -2426,5 +2432,7 @@
 			"TOP_NOTI_PERMISSION_REQUIRED_1": "Permission required for using Project groups & Projects. ",
 			"TOP_NOTI_PERMISSION_REQUIRED_2": "Please, Request valid permission to project Admin/Domain Administrator."
 		}
-	}
+	},
+	"SPACEONE_USER_DESC": "Forward to the project members' personal notification channel",
+	"TAB_MEMBER": "Member"
 }

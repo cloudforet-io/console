@@ -16,6 +16,195 @@
     <folder_node>
         <name/>
         <children>
+            <concept_node>
+                <name>ALS_S_ADD_MEMBER</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>ALT_E_ADD_MEMBER</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>ALT_E_DELETE_MEMBER</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>ALT_E_UPDATE_GROUP_MEMBER</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>ALT_E_UPDATE_MEMBER</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>ALT_S_ADD_MEMBER</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>ALT_S_DELETE_MEMBER</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>ALT_S_UPDATE_GROUP_MEMBER</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>ALT_S_UPDATE_MEMBER</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
             <folder_node>
                 <name>APP</name>
                 <children>
@@ -29032,6 +29221,69 @@
                     </folder_node>
                 </children>
             </folder_node>
+            <concept_node>
+                <name>MANAGE_PROJECT_GROUP_MEMBER</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>MEMBER</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>MEMBER_TITLE</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
             <folder_node>
                 <name>MENU</name>
                 <children>
@@ -29562,6 +29814,69 @@
                     </concept_node>
                 </children>
             </folder_node>
+            <concept_node>
+                <name>MODAL_DELETE_MEMBER_CONTENT</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>MODAL_DELETE_MEMBER_TITLE</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>MODAL_UPDATE_MEMBER_TITLE</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
             <folder_node>
                 <name>MONITORING</name>
                 <children>
@@ -33106,27 +33421,6 @@
                                             </concept_node>
                                             <concept_node>
                                                 <name>RESPONDER</name>
-                                                <definition_loaded>false</definition_loaded>
-                                                <description/>
-                                                <comment/>
-                                                <default_text/>
-                                                <translations>
-                                                    <translation>
-                                                        <language>en-US</language>
-                                                        <approved>true</approved>
-                                                    </translation>
-                                                    <translation>
-                                                        <language>ja-JP</language>
-                                                        <approved>true</approved>
-                                                    </translation>
-                                                    <translation>
-                                                        <language>ko-KR</language>
-                                                        <approved>true</approved>
-                                                    </translation>
-                                                </translations>
-                                            </concept_node>
-                                            <concept_node>
-                                                <name>SEARCH_PLACEHOLDER</name>
                                                 <definition_loaded>false</definition_loaded>
                                                 <description/>
                                                 <comment/>
@@ -40118,27 +40412,6 @@
                                 </translations>
                             </concept_node>
                             <concept_node>
-                                <name>CLICK_ADD_MEMBER</name>
-                                <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
-                                <translations>
-                                    <translation>
-                                        <language>en-US</language>
-                                        <approved>true</approved>
-                                    </translation>
-                                    <translation>
-                                        <language>ja-JP</language>
-                                        <approved>true</approved>
-                                    </translation>
-                                    <translation>
-                                        <language>ko-KR</language>
-                                        <approved>true</approved>
-                                    </translation>
-                                </translations>
-                            </concept_node>
-                            <concept_node>
                                 <name>DELETE</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description/>
@@ -40226,27 +40499,6 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>ADD_MEMBER</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
                                         <name>ALREADY_EXISTING</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -40311,27 +40563,6 @@
                                     </concept_node>
                                     <concept_node>
                                         <name>BASE_INFORMATION</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
-                                        <name>BASE_INFO_HELP_TEXT</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -40625,27 +40856,6 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>MEMBER_HELP_TEXT</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
                                         <name>MODAL_INVITE_MEMBER_TITLE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -40668,27 +40878,6 @@
                                     </concept_node>
                                     <concept_node>
                                         <name>MODAL_VALIDATION_REQUIRED</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
-                                        <name>NO_MEMBER</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -40880,48 +41069,6 @@
                             </folder_node>
                             <concept_node>
                                 <name>MEMBER_TITLE</name>
-                                <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
-                                <translations>
-                                    <translation>
-                                        <language>en-US</language>
-                                        <approved>true</approved>
-                                    </translation>
-                                    <translation>
-                                        <language>ja-JP</language>
-                                        <approved>true</approved>
-                                    </translation>
-                                    <translation>
-                                        <language>ko-KR</language>
-                                        <approved>true</approved>
-                                    </translation>
-                                </translations>
-                            </concept_node>
-                            <concept_node>
-                                <name>MODAL_ADDED_MEMBERS</name>
-                                <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
-                                <translations>
-                                    <translation>
-                                        <language>en-US</language>
-                                        <approved>true</approved>
-                                    </translation>
-                                    <translation>
-                                        <language>ja-JP</language>
-                                        <approved>true</approved>
-                                    </translation>
-                                    <translation>
-                                        <language>ko-KR</language>
-                                        <approved>true</approved>
-                                    </translation>
-                                </translations>
-                            </concept_node>
-                            <concept_node>
-                                <name>MODAL_ADD_MEMBER</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description/>
                                 <comment/>
@@ -41636,27 +41783,6 @@
                             </concept_node>
                             <concept_node>
                                 <name>MODAL_VALIDATION_REQUIRED</name>
-                                <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
-                                <translations>
-                                    <translation>
-                                        <language>en-US</language>
-                                        <approved>true</approved>
-                                    </translation>
-                                    <translation>
-                                        <language>ja-JP</language>
-                                        <approved>true</approved>
-                                    </translation>
-                                    <translation>
-                                        <language>ko-KR</language>
-                                        <approved>true</approved>
-                                    </translation>
-                                </translations>
-                            </concept_node>
-                            <concept_node>
-                                <name>MODAL_VALIDATION_SELECT_MEMBER</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description/>
                                 <comment/>
@@ -44603,6 +44729,48 @@
                     </folder_node>
                 </children>
             </folder_node>
+            <concept_node>
+                <name>SPACEONE_USER_DESC</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
+            <concept_node>
+                <name>TAB_MEMBER</name>
+                <definition_loaded>false</definition_loaded>
+                <description/>
+                <comment/>
+                <default_text/>
+                <translations>
+                    <translation>
+                        <language>en-US</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ja-JP</language>
+                        <approved>true</approved>
+                    </translation>
+                    <translation>
+                        <language>ko-KR</language>
+                        <approved>true</approved>
+                    </translation>
+                </translations>
+            </concept_node>
         </children>
     </folder_node>
     <isTemplateProject>false</isTemplateProject>
