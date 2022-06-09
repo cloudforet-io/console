@@ -7,7 +7,7 @@
                            use-fixed-menu-style
                            :exact-mode="false"
                            :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
-                           @select-menu="handleSelectMenuItem"
+                           @update:selected="handleUpdateSelected"
                            @search="handleSearch"
         >
             <template v-if="type === CLOUD_SERVICE_FILTER_KEY.REGION" #menu-item--format="{item}">
@@ -143,19 +143,12 @@ export default defineComponent<Props>({
         };
 
         /* event */
-        const handleSelectMenuItem = (selectedItem: SearchDropdownMenuItem) => {
-            const selectedNames = [...props.selected];
-            const selectedName = selectedItem.name as string;
-            if (props.selected?.includes(selectedName)) {
-                const idx = props.selected.indexOf(selectedName);
-                selectedNames.splice(idx, 1);
-            } else {
-                selectedNames.push(selectedItem.name as string);
-            }
-            emit('update:selected', selectedNames);
-        };
         const handleSearch = (val: string) => {
             emit('update:selected', state.selectedItems.map(d => d.name).concat([val]));
+        };
+
+        const handleUpdateSelected = (selected: SearchDropdownMenuItem[]) => {
+            emit('update:selected', selected.map(d => d.name));
         };
 
         // LOAD REFERENCE STORE
@@ -170,8 +163,8 @@ export default defineComponent<Props>({
             ...toRefs(state),
             CLOUD_SERVICE_FILTER_KEY,
             regionMenuHandler,
-            handleSelectMenuItem,
             handleSearch,
+            handleUpdateSelected,
         };
     },
 });

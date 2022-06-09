@@ -19,7 +19,7 @@
             multi-selectable
             use-fixed-menu-style
             :exact-mode="false"
-            @select-menu="handleSelectMenuItem"
+            @update:selected="handleUpdateSelected"
             @search="handleSearch"
         />
         <p-search-dropdown
@@ -30,7 +30,7 @@
             multi-selectable
             use-fixed-menu-style
             :exact-mode="false"
-            @select-menu="handleSelectMenuItem"
+            @update:selected="handleUpdateSelected"
             @search="handleSearch"
         />
     </div>
@@ -156,16 +156,8 @@ export default {
         const handleSelectedProjectIds = (selectedProjectIds) => {
             emit('update:selected', selectedProjectIds);
         };
-        const handleSelectMenuItem = (selectedItem: MenuItem) => {
-            const selectedNames = [...props.selected];
-            const selectedName = selectedItem.name as string;
-            if (props.selected?.includes(selectedName)) {
-                const idx = props.selected.indexOf(selectedName);
-                selectedNames.splice(idx, 1);
-            } else {
-                selectedNames.push(selectedItem.name as string);
-            }
-            emit('update:selected', selectedNames);
+        const handleUpdateSelected = (selectedItem: MenuItem[]) => {
+            emit('update:selected', selectedItem.map(d => d.name));
         };
         const handleSearch = (val: string) => {
             emit('update:selected', state.selectedItems.map(d => d.name).concat([val]));
@@ -185,7 +177,7 @@ export default {
             FILTER,
             menuHandler,
             handleSelectedProjectIds,
-            handleSelectMenuItem,
+            handleUpdateSelected,
             handleSearch,
         };
     },

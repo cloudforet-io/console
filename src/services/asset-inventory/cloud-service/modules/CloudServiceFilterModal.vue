@@ -21,7 +21,8 @@
                         <template #default="{name, isCollapsed}">
                             <cloud-service-filter-search-dropdown v-if="!isCollapsed"
                                                                   :type="name"
-                                                                  :selected.sync="filters[name]"
+                                                                  :selected="filters[name]"
+                                                                  @update:selected="handleFilterUpdate(name, $event)"
                             />
                         </template>
                     </p-collapsible-list>
@@ -177,6 +178,10 @@ export default defineComponent<Props>({
             state.unfoldedIndices = [];
         };
 
+        const handleFilterUpdate = (name: string, selected: string[]) => {
+            state.filters = { ...state.filters, [name]: selected };
+        };
+
         watch(() => state.unfoldedIndices, (after, before) => {
             if (after.length < before.length) {
                 const filters = { ...state.filters };
@@ -212,6 +217,7 @@ export default defineComponent<Props>({
             handleFormConfirm,
             handleClearAll,
             handleDeleteTag,
+            handleFilterUpdate,
         };
     },
 });
