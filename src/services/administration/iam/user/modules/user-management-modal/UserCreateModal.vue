@@ -312,8 +312,21 @@ export default {
             }
         };
 
+        const checkPasswordCheck = async (password) => {
+            const passwordCheckValidation: Validation[] = await Promise.all([
+                checkRequiredField(formState.passwordCheck),
+                checkSamePassword(formState.passwordCheck, password),
+            ]);
+            const passwordCheckInvalidObj = passwordCheckValidation.find(item => item.invalidText.length > 0);
+            if (!passwordCheckInvalidObj) {
+                validationState.isPasswordCheckValid = true;
+                validationState.passwordCheckInvalidText = '';
+            } else {
+                validationState.isPasswordCheckValid = passwordCheckInvalidObj.isValid;
+                validationState.passwordCheckInvalidText = passwordCheckInvalidObj.invalidText;
+            }
+        };
         const checkPassword = async (password) => {
-            // password1
             const passwordValidation: Validation[] = await Promise.all([
                 checkEmptyValue(password),
                 checkMinLength(password, 8),
@@ -329,20 +342,13 @@ export default {
                 validationState.isPasswordValid = passwordInvalidObj.isValid;
                 validationState.passwordInvalidText = passwordInvalidObj.invalidText;
             }
+        };
+        const checkPasswordValidation = async (password) => {
+            // password
+            await checkPassword(password);
 
-            // password2
-            const passwordCheckValidation: Validation[] = await Promise.all([
-                checkRequiredField(formState.passwordCheck),
-                checkSamePassword(formState.passwordCheck, password),
-            ]);
-            const passwordCheckInvalidObj = passwordCheckValidation.find(item => item.invalidText.length > 0);
-            if (!passwordCheckInvalidObj) {
-                validationState.isPasswordCheckValid = true;
-                validationState.passwordCheckInvalidText = '';
-            } else {
-                validationState.isPasswordCheckValid = passwordCheckInvalidObj.isValid;
-                validationState.passwordCheckInvalidText = passwordCheckInvalidObj.invalidText;
-            }
+            // password check
+            await checkPasswordCheck(password);
         };
 
         /* API */
@@ -378,7 +384,7 @@ export default {
             await checkUserID();
             if (!validationState.isUserIdValid || !validationState.isTagsValid) return;
             if (formState.activeTab === 'local') {
-                await checkPassword(formState.password);
+                await checkPasswordValidation(formState.password);
                 if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
             }
             const data = {
@@ -502,6 +508,12 @@ export default {
             } else {
                 listExternalUser();
             }
+        });
+        watch(() => formState.password, (after) => {
+            checkPassword(after);
+        });
+        watch(() => formState.passwordCheck, () => {
+            checkPasswordCheck(formState.password);
         });
 
         return {
