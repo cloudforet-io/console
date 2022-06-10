@@ -1,42 +1,36 @@
 <template>
-    <router-link :key="name"
-                 custom
-                 :class="{ disabled, selected }"
-                 class="p-context-menu-item"
-                 :to="(to && !disabled) ? to : {}"
-                 :href="link ? link : undefined"
-                 :target="link ? '_blank' : undefined"
+    <component :is="isAnchor ? 'router-link' : 'span'"
+               class="p-context-menu-item"
+               :class="{selected, disabled}"
+               v-bind="{...routerLinkProps, ...$attrs}"
+               v-on="$listeners"
     >
-        <template #default>
-            <component :is="isAnchor ? 'a' : 'span'" v-bind="$attrs" v-on="$listeners">
-                <p-i v-if="selectIcon"
-                     class="select-marker"
-                     :name="selectIcon"
-                     width="1em" height="1em"
-                />
-                <span class="label-wrapper" :class="{ellipsis}">
-                    <p-text-highlighting v-if="highlightTerm && !$slots.default"
-                                         :text="label" :term="highlightTerm"
-                                         class="text" :class="{'is-anchor': isAnchor}"
-                                         style-type="secondary"
-                    >
-                        <template #default="textHighlightingSlotProps">
-                            <slot name="text-list" v-bind="{...textHighlightingSlotProps, ...$props}" />
-                        </template>
-                    </p-text-highlighting>
-                    <span v-else class="text" :class="{'is-anchor': isAnchor}">
-                        <slot name="default" v-bind="$props">
-                            {{ label }}
-                        </slot>
-                    </span>
-                    <p-i v-if="link" name="ic_external-link"
-                         class="external-link-icon"
-                         width="0.875rem" height="0.875rem"
-                    />
-                </span>
-            </component>
-        </template>
-    </router-link>
+        <p-i v-if="selectIcon"
+             class="select-marker"
+             :name="selectIcon"
+             width="1em" height="1em"
+        />
+        <span class="label-wrapper" :class="{ellipsis}">
+            <p-text-highlighting v-if="highlightTerm && !$slots.default"
+                                 :text="label" :term="highlightTerm"
+                                 class="text" :class="{'is-anchor': isAnchor}"
+                                 style-type="secondary"
+            >
+                <template #default="textHighlightingSlotProps">
+                    <slot name="text-list" v-bind="{...textHighlightingSlotProps, ...$props}" />
+                </template>
+            </p-text-highlighting>
+            <span v-else class="text" :class="{'is-anchor': isAnchor}">
+                <slot name="default" v-bind="$props">
+                    {{ label }}
+                </slot>
+            </span>
+            <p-i v-if="link" name="ic_external-link"
+                 class="external-link-icon"
+                 width="0.875rem" height="0.875rem"
+            />
+        </span>
+    </component>
 </template>
 
 <script lang="ts">
@@ -129,6 +123,16 @@ export default defineComponent<ContextMenuItemProps>({
                 return undefined;
             }),
             isAnchor: computed(() => !props.disabled && (props.link || props.to)),
+            routerLinkProps: computed(() => {
+                if (state.isAnchor) {
+                    return {
+                        to: props.to && !props.disabled ? props.to : {},
+                        href: props.link,
+                        target: props.link ? '_blank' : undefined,
+                    };
+                }
+                return {};
+            }),
         });
         return {
             ...toRefs(state),
