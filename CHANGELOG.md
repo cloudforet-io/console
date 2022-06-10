@@ -1,3 +1,10 @@
+# [1.1.0-beta.325](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.324...v1.1.0-beta.325) (2022-06-10)
+
+
+### Bug Fixes
+
+* remove underline in ContextMenuItem with link ([#986](https://github.com/spaceone-dev/spaceone-design-system/issues/986)) ([ad4bb86](https://github.com/spaceone-dev/spaceone-design-system/commit/ad4bb863f3cea1f81545ddf6989927eb6cbf31c4))
+
 # [1.1.0-beta.324](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.323...v1.1.0-beta.324) (2022-06-10)
 
 
