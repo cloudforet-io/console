@@ -3,7 +3,8 @@
         class="p-text-input"
         :class="{block, focused: isFocused}"
     >
-        <div ref="targetRef" v-click-outside="handleClickOutside" class="input-container"
+        <div ref="targetRef" v-click-outside="handleClickOutside"
+             class="input-container"
              :class="{invalid: isInvalid || invalid, disabled}"
         >
             <template v-if="proxySelectedValue.length && multiInput">
@@ -20,11 +21,12 @@
             <slot name="default" v-bind="{ value }">
                 <input
                     v-model="proxyValue"
-                    v-focus="isFocused"
                     :disabled="disabled"
                     :type="type"
                     :placeholder="placeholder"
                     size="1"
+                    @focus="handleInputFocus"
+                    @blur="handleInputBlur"
                     v-on="inputListeners"
                 >
             </slot>
@@ -310,6 +312,14 @@ export default {
             state.isFocused = false;
         };
 
+        const handleInputFocus = () => {
+            state.isFocused = true;
+        };
+
+        const handleInputBlur = () => {
+            state.isFocused = false;
+        };
+
         watch(() => props.menu, (menu) => {
             state.filteredMenu = menu;
             filterMenu(state.proxyValue);
@@ -336,6 +346,8 @@ export default {
             handleFocusMenuItem,
             handleSelectMenuItem,
             handleClickOutside,
+            handleInputFocus,
+            handleInputBlur,
         };
     },
 };
