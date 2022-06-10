@@ -1,3 +1,10 @@
+# [1.1.0-beta.324](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.323...v1.1.0-beta.324) (2022-06-10)
+
+
+### Bug Fixes
+
+* text input focus bug ([#984](https://github.com/spaceone-dev/spaceone-design-system/issues/984)) ([e41aea0](https://github.com/spaceone-dev/spaceone-design-system/commit/e41aea0ab929327c96380084e25641b5f55df759))
+
 # [1.1.0-beta.323](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.322...v1.1.0-beta.323) (2022-06-10)
 
 
