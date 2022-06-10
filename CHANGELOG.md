@@ -1,3 +1,10 @@
+# [1.1.0-beta.322](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.321...v1.1.0-beta.322) (2022-06-10)
+
+
+### Bug Fixes
+
+* context menu multiSelect does not working ([#979](https://github.com/spaceone-dev/spaceone-design-system/issues/979)) ([3dd5a54](https://github.com/spaceone-dev/spaceone-design-system/commit/3dd5a54d3e1d3e3b9babe8fb53466180fb372eb9))
+
 # [1.1.0-beta.321](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.320...v1.1.0-beta.321) (2022-06-07)
 
 
