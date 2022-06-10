@@ -55,7 +55,7 @@
                         no-select-indication
                         @select="onSelectMenu"
         >
-            <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
+            <template v-for="(_, slot) of menuSlots" #[slot]="scope">
                 <slot :name="`menu-${slot}`" v-bind="scope" />
             </template>
         </p-context-menu>
@@ -78,7 +78,6 @@ import vClickOutside from 'v-click-outside';
 
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import { MenuItem } from '@/inputs/context-menu/type';
@@ -98,7 +97,6 @@ export default defineComponent<SelectDropdownProps>({
     components: {
         PI,
         PIconButton,
-        PButton,
         PContextMenu,
     },
     model: {

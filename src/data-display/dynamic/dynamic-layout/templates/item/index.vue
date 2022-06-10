@@ -6,7 +6,7 @@
         <p-definition-table :fields="fields" :data="rootData" :loading="loading"
                             v-on="$listeners"
         >
-            <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="slotProps">
+            <template v-for="(item, slotName) of dynamicFieldSlots" #[slotName]>
                 <p-dynamic-field :key="slotName" v-bind="item"
                                  :handler="fieldHandler"
                 />

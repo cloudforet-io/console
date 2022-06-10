@@ -146,6 +146,7 @@ export default defineComponent<DynamicFieldProps>({
                  * For types that recursively use dynamic fields, do not inherit handler.
                  */
                 if (res.type !== props.type) {
+                    // eslint-disable-next-line vue/no-side-effects-in-computed-properties
                     if (RECURSIVE_TYPE.includes(res.type)) state.nextHandler = undefined;
                     loadComponent(res);
                 }

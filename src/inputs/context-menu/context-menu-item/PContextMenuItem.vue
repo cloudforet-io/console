@@ -7,7 +7,7 @@
                  :href="link ? link : undefined"
                  :target="link ? '_blank' : undefined"
     >
-        <template #default="{href, navigate}">
+        <template #default>
             <component :is="isAnchor ? 'a' : 'span'" v-bind="$attrs" v-on="$listeners">
                 <p-i v-if="selectIcon"
                      class="select-marker"

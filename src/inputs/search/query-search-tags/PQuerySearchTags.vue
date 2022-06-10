@@ -48,7 +48,6 @@ import {
 import { VTooltip } from 'v-tooltip';
 
 import PTag from '@/data-display/tags/PTag.vue';
-import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { defaultConverter, defaultValidator } from '@/inputs/search/query-search-tags/helper';
 import {
@@ -65,7 +64,7 @@ export default defineComponent<QuerySearchTagsProps>({
     directives: { tooltip: VTooltip },
     i18n,
     components: {
-        PButton, PI, PTag,
+        PButton, PTag,
     },
     props: {
         tags: {

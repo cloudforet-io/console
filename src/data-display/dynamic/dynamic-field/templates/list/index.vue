@@ -4,7 +4,7 @@
                  :sub-key="options.sub_key"
                  :link="options.link"
     >
-        <template #default="{value, data}">
+        <template #default="{value}">
             <p-dynamic-field :type="options.item ? options.item.type : 'text'"
                              :options="options.item ? options.item.options : undefined"
                              :data="value"

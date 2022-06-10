@@ -43,7 +43,7 @@
                      @click.stop="handleClickDropdownButton"
                 />
             </template>
-            <template v-for="(_, slot) of searchSlots" v-slot:[slot]="scope">
+            <template v-for="(_, slot) of searchSlots" #[slot]="scope">
                 <slot :name="`search-${slot}`" v-bind="{...scope}" />
             </template>
         </p-search>
@@ -72,7 +72,7 @@
                     </span>
                 </span>
             </template>
-            <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
+            <template v-for="(_, slot) of menuSlots" #[slot]="scope">
                 <slot :name="`menu-${slot}`" v-bind="scope" />
             </template>
         </p-context-menu>
@@ -91,8 +91,6 @@ import { reduce } from 'lodash';
 import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
-import PButton from '@/inputs/buttons/button/PButton.vue';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import {
     SEARCH_DROPDOWN_TYPE, SearchDropdownProps, SearchDropdownMenuItem,
@@ -104,12 +102,10 @@ import { makeOptionalProxy } from '@/util/composition-helpers';
 export default defineComponent<SearchDropdownProps>({
     name: 'PSearchDropdown',
     components: {
-        PIconButton,
         PSearch,
         PContextMenu,
         PI,
         PTag,
-        PButton,
     },
     model: {
         prop: 'value',

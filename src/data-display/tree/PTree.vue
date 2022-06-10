@@ -10,7 +10,7 @@
           :unfold-when-dragover="true"
           @drop="handleDrop"
     >
-        <template #default="{node, path, tree, index}">
+        <template #default="{node, path, tree}">
             <div class="node" :class="{
                      'drag-target-parent': dragTargetParentPath ? dragTargetParentPath.toString() === path.toString() : false,
                      ...getClassNames(node)

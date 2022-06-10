@@ -6,7 +6,7 @@
                   :disable-icon="!!selectedKey"
                   :is-focused.sync="isFocused"
         >
-            <template #left="scope">
+            <template #left>
                 <span v-for="(keyItem, idx) in selectedKeys" :key="idx" class="key-tag"
                       :class="{active: isFocused || visibleMenu}"
                 >
@@ -39,7 +39,7 @@
                     </span>
                 </div>
             </template>
-            <template v-for="(_, slot) of searchSlots" v-slot:[slot]="scope">
+            <template v-for="(_, slot) of searchSlots" #[slot]="scope">
                 <slot :name="`search-${slot}`" v-bind="{...scope}" />
             </template>
         </p-search>
@@ -53,7 +53,7 @@
                             @select="onMenuSelect"
                             @blur="focus"
             >
-                <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
+                <template v-for="(_, slot) of menuSlots" #[slot]="scope">
                     <slot :name="`menu-${slot}`" v-bind="{...scope}" />
                 </template>
             </p-context-menu>

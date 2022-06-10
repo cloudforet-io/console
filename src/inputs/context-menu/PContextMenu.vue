@@ -38,7 +38,7 @@
                                      @keydown.up="onKeyUp(index)"
                                      @keydown.down="onKeyDown(index)"
                 >
-                    <template #default="slotProps">
+                    <template #default>
                         <slot name="item--format" v-bind="{...$props, item, index}" />
                     </template>
                     <template #text-list="{text, matched, textList, regex, index: textIndex}">
