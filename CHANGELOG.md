@@ -1,3 +1,10 @@
+# [1.1.0-beta.323](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.322...v1.1.0-beta.323) (2022-06-10)
+
+
+### Bug Fixes
+
+* don't use router-link if link is not given in ContextMenuItem ([9f67971](https://github.com/spaceone-dev/spaceone-design-system/commit/9f67971473513d52801fe496e162828b26756253))
+
 # [1.1.0-beta.322](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.321...v1.1.0-beta.322) (2022-06-10)
 
 
