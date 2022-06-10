@@ -27,7 +27,7 @@
                      @export="emitExport"
                      @rowLeftClick="byPassEvent('rowLeftClick', ...arguments)"
     >
-        <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+        <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
             <slot :name="slot" v-bind="scope" />
         </template>
     </p-toolbox-table>

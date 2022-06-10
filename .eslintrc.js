@@ -17,6 +17,7 @@ module.exports = {
 
     rules: {
         'vue/component-name-in-template-casing': ['error', 'kebab-case'],
+        'vue/valid-v-slot': ['off', { allowModifiers: true }],
         'max-len': ['error', { code: 200 }],
         'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',

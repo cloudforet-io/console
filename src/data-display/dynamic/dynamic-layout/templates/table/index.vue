@@ -32,12 +32,12 @@
                          @export="onExport"
                          @click-settings="$emit('click-settings')"
         >
-            <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" v-slot:[headerSlot]>
+            <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" #[headerSlot]>
                 {{ text }}
                 <span :key="`${headerSlot}-description`" class="field-description">{{ description }}</span>
             </template>
 
-            <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
+            <template v-for="(item, slotName) of dynamicFieldSlots" #[slotName]="data">
                 <slot :name="slotName" v-bind="data">
                     <p-dynamic-field :key="slotName"
                                      v-bind="item"
@@ -47,7 +47,7 @@
                 </slot>
             </template>
 
-            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+            <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
                 <slot v-if="!slot.startsWith('col-')" :name="slot" v-bind="scope" />
             </template>
         </p-toolbox-table>

@@ -34,7 +34,7 @@
                          @export="onExport"
                          @click-settings="$emit('click-settings')"
         >
-            <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="{field, index}">
+            <template v-for="(item, slotName) of dynamicFieldSlots" #[slotName]="{field, index}">
                 <p-dynamic-field v-if="slotName.startsWith('col')" :key="slotName"
                                  v-bind="item"
                                  :data="getValueByPath(rootData[index], field.name)"
@@ -42,12 +42,12 @@
                 />
             </template>
 
-            <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" v-slot:[headerSlot]>
+            <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" #[headerSlot]>
                 {{ text }}
                 <span :key="`${headerSlot}-description`" class="field-description">{{ description }}</span>
             </template>
 
-            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+            <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
                 <slot v-if="!dynamicFieldHeaderSlots[slot] &&
                           !dynamicFieldSlots[slot] &&
                           slot !== 'tag-data-type-datetime'"

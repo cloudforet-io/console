@@ -41,7 +41,7 @@
                     <slot name="toolbox-bottom" />
                 </div>
             </template>
-            <template v-for="name in slotNames" v-slot:[name]="data">
+            <template v-for="name in slotNames" #[name]="data">
                 <slot :name="name" v-bind="data" />
             </template>
         </p-toolbox-grid-layout>

@@ -27,7 +27,7 @@
                                :icon-size="iconSize"
                                @click="onItemClick(item, idx)"
             >
-                <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+                <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
                     <slot :name="slot" v-bind="scope"
                           :items="items" :item="item" :index="idx"
                     />

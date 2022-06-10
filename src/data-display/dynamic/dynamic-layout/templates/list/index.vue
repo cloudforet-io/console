@@ -10,7 +10,7 @@
                           :field-handler="fieldHandler"
                           v-on="getListeners(layout.name, idx)"
         >
-            <template v-for="(slot) of slotNames" v-slot:[slot]="scope">
+            <template v-for="(slot) of slotNames" #[slot]="scope">
                 <slot :name="`${name}-${slot}`" v-bind="scope" />
             </template>
         </p-dynamic-layout>

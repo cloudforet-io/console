@@ -9,7 +9,7 @@
                   :is-focused.sync="proxyIsFocused"
                   v-on="searchListeners"
         >
-            <template v-for="(_, slot) of searchSlots" v-slot:[slot]="scope">
+            <template v-for="(_, slot) of searchSlots" #[slot]="scope">
                 <slot :name="`search-${slot}`" v-bind="{...scope}" />
             </template>
         </p-search>
@@ -24,7 +24,7 @@
                         @keyup:esc="focusSearch"
                         @focus="onFocusMenuItem"
         >
-            <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
+            <template v-for="(_, slot) of menuSlots" #[slot]="scope">
                 <slot :name="`menu-${slot}`" v-bind="scope" />
             </template>
         </p-context-menu>

@@ -58,7 +58,7 @@
                       v-on="$listeners"
                       @changeSort="changeSort"
         >
-            <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+            <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
                 <slot v-if="!slot.startsWith('toolbox')" :name="slot" v-bind="scope" />
             </template>
         </p-data-table>

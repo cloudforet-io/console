@@ -9,12 +9,12 @@
                       :col-copy="colCopy"
                       v-on="$listeners"
         >
-            <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" v-slot:[headerSlot]>
+            <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" #[headerSlot]>
                 {{ text }}
                 <span :key="`${headerSlot}-description`" class="field-description">{{ description }}</span>
             </template>
 
-            <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
+            <template v-for="(item, slotName) of dynamicFieldSlots" #[slotName]="data">
                 <slot :name="slotName" v-bind="data">
                     <p-dynamic-field :key="slotName"
                                      v-bind="item"
