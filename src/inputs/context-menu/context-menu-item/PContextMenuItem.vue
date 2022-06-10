@@ -1,7 +1,7 @@
 <template>
     <component :is="isAnchor ? 'router-link' : 'span'"
                class="p-context-menu-item"
-               :class="{selected, disabled}"
+               :class="{selected, disabled, 'is-anchor': isAnchor}"
                v-bind="{...routerLinkProps, ...$attrs}"
                v-on="$listeners"
     >
@@ -13,14 +13,14 @@
         <span class="label-wrapper" :class="{ellipsis}">
             <p-text-highlighting v-if="highlightTerm && !$slots.default"
                                  :text="label" :term="highlightTerm"
-                                 class="text" :class="{'is-anchor': isAnchor}"
+                                 class="text"
                                  style-type="secondary"
             >
                 <template #default="textHighlightingSlotProps">
                     <slot name="text-list" v-bind="{...textHighlightingSlotProps, ...$props}" />
                 </template>
             </p-text-highlighting>
-            <span v-else class="text" :class="{'is-anchor': isAnchor}">
+            <span v-else class="text">
                 <slot name="default" v-bind="$props">
                     {{ label }}
                 </slot>
@@ -153,6 +153,11 @@ export default defineComponent<ContextMenuItemProps>({
     &:not(.disabled) {
         &:hover, &:focus {
             @apply bg-blue-100;
+            &.is-anchor {
+                > .label-wrapper .text {
+                    text-decoration: underline;
+                }
+            }
         }
     }
     &.disabled {
@@ -175,11 +180,6 @@ export default defineComponent<ContextMenuItemProps>({
         &.ellipsis {
             text-overflow: ellipsis;
             white-space: nowrap;
-        }
-        > .text {
-            &.is-anchor {
-                text-decoration: underline;
-            }
         }
         > .external-link-icon {
             margin-left: 0.25rem;
