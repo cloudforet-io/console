@@ -11,9 +11,12 @@
                     <article class="modal-content" :class="[`modal-${themeColor}`, {'no-footer': hideFooter}]">
                         <h3 class="header">
                             <div v-if="!hideHeader" class="modal-header">
-                                <p-lottie name="lottie_error" auto :size="1.5"
-                                          :class="[`modal-${themeColor}`]" class="header-lottie"
-                                />{{ headerTitle }}
+                                <span class="alert-icon">
+                                    <p-lottie name="lottie_error" auto :size="1.5"
+                                              :class="[`modal-${themeColor}`]" class="header-lottie"
+                                    />
+                                </span>
+                                <span>{{ headerTitle }}</span>
                             </div>
                             <p-icon-button v-if="!hideHeaderCloseButton"
                                            name="ic_delete" color="inherit"
@@ -240,9 +243,14 @@ export default defineComponent<ButtonModalProps>({
             justify-content: space-between;
 
             .modal-header {
+                display: flex;
+                align-items: start;
                 min-height: $header-height;
                 font-size: 1.375rem;
                 line-height: 145%;
+                .alert-icon {
+                    padding-top: 0.25rem;
+                }
             }
 
             .header-lottie {
