@@ -346,7 +346,11 @@ export default {
 
         watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
             if (visible && resourceType) {
-                if (state.allColumns.length === 0) initColumns();
+                if (state.allColumns.length === 0) {
+                    initColumns();
+                } else {
+                    resetSelectedStates();
+                }
                 if (tagState.allTags.length === 0) getTags();
             }
         }, { immediate: true });
