@@ -22,7 +22,7 @@
             <template v-for="(item, index) in menu">
                 <p-context-menu-item v-if="item.type === undefined || item.type === 'item'"
                                      :id="getItemId(index)"
-                                     :key="item.name"
+                                     :key="`item-${item.name}-${index}`"
                                      :name="item.name"
                                      :label="item.label"
                                      :link="item.link"
@@ -45,8 +45,8 @@
                         <slot name="item-text-list" v-bind="{...$props, item, index, text, matched, textList, regex, textIndex}" />
                     </template>
                 </p-context-menu-item>
-                <div v-else-if="item.type==='divider'" :key="index" class="context-divider" />
-                <slot v-else-if="item.type==='header'" :name="`header-${item.name}`" v-bind="{...$props, item, key: index}">
+                <div v-else-if="item.type==='divider'" :key="`divider-${index}`" class="context-divider" />
+                <slot v-else-if="item.type==='header'" :name="`header-${item.name}-${index}`" v-bind="{...$props, item, key: index}">
                     <div :key="index" class="context-header">
                         {{ item.label }}
                     </div>
