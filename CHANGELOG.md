@@ -1,3 +1,10 @@
+# [1.1.0-beta.327](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.326...v1.1.0-beta.327) (2022-06-13)
+
+
+### Bug Fixes
+
+* set alert icon to center in PButtonModal ([#990](https://github.com/spaceone-dev/spaceone-design-system/issues/990)) ([dcea789](https://github.com/spaceone-dev/spaceone-design-system/commit/dcea789a777570b8e498896ea3218680e3a8fe99))
+
 # [1.1.0-beta.326](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.325...v1.1.0-beta.326) (2022-06-13)
 
 
