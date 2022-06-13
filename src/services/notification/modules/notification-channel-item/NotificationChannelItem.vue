@@ -269,6 +269,10 @@ export default {
 .card-header {
     display: flex;
     justify-content: space-between;
+    .left-section {
+        display: flex;
+        align-items: center;
+    }
     .card-title {
         @apply font-bold;
         font-size: 1rem;

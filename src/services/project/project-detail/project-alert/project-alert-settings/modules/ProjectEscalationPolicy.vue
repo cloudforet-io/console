@@ -11,7 +11,7 @@
         </section>
         <section>
             <span class="label">{{ $t('PROJECT.DETAIL.ALERT.FINISH_CONDITION_LABEL') }}</span>
-            <span class="value">{{ finishCondition }}</span>
+            <span>{{ finishCondition }}</span>
         </section>
         <section>
             <span class="label">{{ $t('PROJECT.DETAIL.ALERT.ESCALATION_RULES_LABEL') }}</span>
@@ -184,6 +184,9 @@ export default {
         display: inline-block;
         font-weight: bold;
         padding-right: 0.5rem;
+    }
+    .value {
+        line-height: 1.4;
     }
 
     .escalation-rules-wrapper {
