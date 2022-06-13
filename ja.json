@@ -1065,6 +1065,7 @@
 				"DESCRIPTION": "説明",
 				"ID": "ID",
 				"MANAGED_POLICY": "マネジメントポリシー",
+				"PERMISSION": "権限",
 				"SAVE": "変更事項保存",
 				"TYPE": "タイプ",
 				"VALIDATION_NAME": "2文字以上入力してください。",

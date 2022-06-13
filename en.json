@@ -1065,6 +1065,7 @@
 				"DESCRIPTION": "Description",
 				"ID": "ID",
 				"MANAGED_POLICY": "Managed Policy",
+				"PERMISSION": "Permission",
 				"SAVE": "Save Changes",
 				"TYPE": "Type",
 				"VALIDATION_NAME": "Must be longer than 2 characters",

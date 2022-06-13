@@ -1065,6 +1065,7 @@
 				"DESCRIPTION": "설명",
 				"ID": "아이디",
 				"MANAGED_POLICY": "매니지드 정책(Policy)",
+				"PERMISSION": "권한",
 				"SAVE": "변경사항 저장",
 				"TYPE": "타입",
 				"VALIDATION_NAME": "2글자 이상 입력해주세요.",
