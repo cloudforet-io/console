@@ -46,7 +46,7 @@
             >
                 {{ channelData.notification_level }}
             </p-badge>
-            <button class="edit-btn" :class="{'edit-disable':disableEdit}"
+            <button class="edit-button" :class="{'edit-disable':disableEdit}"
                     @click="startEdit(EDIT_TYPE.LEVEL)"
             >
                 <p-i name="ic_edit" width="1rem" height="1rem"
@@ -142,7 +142,10 @@ export default {
 .level-badge {
     @apply rounded;
 }
-.content-wrapper::v-deep .edit-btn {
+.content-wrapper::v-deep .edit-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     &.edit-disable {
         @apply text-gray-300 cursor-not-allowed;
         &:active {

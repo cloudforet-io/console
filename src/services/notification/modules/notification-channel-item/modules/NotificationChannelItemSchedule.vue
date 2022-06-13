@@ -27,7 +27,7 @@
                 {{ displayStartHour }}:00 ~ {{ displayEndHour }}:00
             </p>
             <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME') }}</span>
-            <button class="edit-btn" :class="{'edit-disable':disableEdit}"
+            <button class="edit-button" :class="{'edit-disable':disableEdit}"
                     @click="startEdit(EDIT_TYPE.SCHEDULE)"
             >
                 <p-i name="ic_edit" width="1rem" height="1rem"
@@ -172,7 +172,10 @@ export default {
 
 <style lang="postcss" scoped>
 @import '../styles/channelItem.pcss';
-.content-wrapper::v-deep .edit-btn {
+.content-wrapper::v-deep .edit-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     &.edit-disable {
         @apply text-gray-300 cursor-not-allowed;
         &:active {

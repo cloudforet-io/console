@@ -8,9 +8,8 @@
                     @update:visible="handleUpdateVisible"
                     @confirm="handleUpdateVisible(false)"
     >
-        <cloud-service-period-filter read-only :period="period" />
         <template #body>
-            <cloud-service-period-filter read-only :period="period" />
+            <cloud-service-period-filter class="period-filter" read-only :period="period" />
             <div class="modal-inner">
                 <p-query-search-tags :tags="queryTags" read-only class="pt-4 border-t border-gray-200" />
                 <cloud-service-usage-overview-summary v-if="summaryDataList.length"
@@ -250,6 +249,9 @@ export default defineComponent<Props>({
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         grid-gap: 0.5rem;
+    }
+    .period-filter {
+        margin-bottom: 0.75rem;
     }
 
     .p-dynamic-chart-column {

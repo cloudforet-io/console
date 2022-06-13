@@ -4,68 +4,68 @@
             {{ $t('PROJECT.DETAIL.ALERT.SETTINGS') }}
         </p>
         <section class="section notification-policy-wrapper">
-            <div class="section-title">
-                {{ $t('PROJECT.DETAIL.ALERT.NOTIFICATION_POLICY') }}
+            <div class="section-wrapper">
+                <span class="text">{{ $t('PROJECT.DETAIL.ALERT.NOTIFICATION_POLICY') }}</span>
+                <p-icon-button name="ic_edit" :disabled="!hasManagePermission"
+                               @click="onClickUpdateNotificationPolicy"
+                />
             </div>
             <div class="content-wrapper">
                 <p-i v-if="notificationUrgency" :name="notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_bell' : 'ic_alert'" />
                 <span class="text">{{ notificationOptionFormatter(notificationUrgency) }}</span>
             </div>
-            <p-icon-button class="edit-button" name="ic_edit" :disabled="!hasManagePermission"
-                           @click="onClickUpdateNotificationPolicy"
-            />
         </section>
         <section class="section auto-recovery-wrapper">
-            <div class="section-title">
-                {{ $t('PROJECT.DETAIL.ALERT.AUTO_RECOVERY') }}
+            <div class="section-wrapper">
+                <span class="text">{{ $t('PROJECT.DETAIL.ALERT.AUTO_RECOVERY') }}</span>
+                <p-icon-button name="ic_edit" :disabled="!hasManagePermission"
+                               @click="onClickUpdateAutoRecovery"
+                />
             </div>
             <div class="content-wrapper">
                 <p-i v-if="recoveryMode === RECOVERY_MODE.AUTO" name="ic_automation" />
                 <span class="text">{{ recoveryMode === RECOVERY_MODE.AUTO ? $t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : $t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
             </div>
-            <p-icon-button class="edit-button" name="ic_edit" :disabled="!hasManagePermission"
-                           @click="onClickUpdateAutoRecovery"
-            />
         </section>
         <section class="section event-rule-wrapper">
-            <div class="section-title">
-                {{ $t('PROJECT.DETAIL.ALERT.EVENT_RULE') }}
+            <div class="section-wrapper">
+                <span class="text">{{ $t('PROJECT.DETAIL.ALERT.EVENT_RULE') }}</span>
+                <p-icon-button name="ic_edit" :disabled="!hasManagePermission"
+                               @click="onClickEditEventRule"
+                />
             </div>
             <div class="content-wrapper">
                 <span class="text"><b>{{ eventRuleTotalCount }}</b> {{ $t('PROJECT.DETAIL.ALERT.RULES_ON_THIS_PROJECT') }}</span>
             </div>
-            <p-icon-button class="edit-button" name="ic_edit" :disabled="!hasManagePermission"
-                           @click="onClickEditEventRule"
-            />
         </section>
         <section class="section escalation-policy-wrapper">
-            <div class="section-title">
-                {{ $t('PROJECT.DETAIL.ALERT.ESCALATION_POLICY') }}
+            <div class="section-wrapper">
+                <span class="text">{{ $t('PROJECT.DETAIL.ALERT.ESCALATION_POLICY') }}</span>
+                <div class="text-button-group">
+                    <p-button class="text-button"
+                              style-type="gray-border"
+                              size="sm"
+                              :outline="true"
+                              :disabled="escalationPolicy.scope === SCOPE.global"
+                              @click="onClickUpdateEscalationPolicy"
+                    >
+                        {{ $t('PROJECT.DETAIL.ALERT.UPDATE') }}
+                    </p-button>
+                    <p-button class="text-button"
+                              style-type="gray-border"
+                              size="sm"
+                              :outline="true"
+                              @click="onClickChangeEscalationPolicy"
+                    >
+                        {{ $t('PROJECT.DETAIL.ALERT.CHANGE') }}
+                    </p-button>
+                </div>
             </div>
             <div class="content-wrapper">
                 <project-escalation-policy
                     :project-id="id"
                     :escalation-policy="escalationPolicy"
                 />
-            </div>
-            <div class="edit-button text-button-group">
-                <p-button class="text-button"
-                          style-type="gray-border"
-                          size="sm"
-                          :outline="true"
-                          :disabled="escalationPolicy.scope === SCOPE.global"
-                          @click="onClickUpdateEscalationPolicy"
-                >
-                    {{ $t('PROJECT.DETAIL.ALERT.UPDATE') }}
-                </p-button>
-                <p-button class="text-button"
-                          style-type="gray-border"
-                          size="sm"
-                          :outline="true"
-                          @click="onClickChangeEscalationPolicy"
-                >
-                    {{ $t('PROJECT.DETAIL.ALERT.CHANGE') }}
-                </p-button>
             </div>
         </section>
         <!--modals-->
@@ -291,18 +291,18 @@ export default {
         line-height: 1.8;
         padding: 1.5rem 1rem;
 
-        .section-title {
+        .section-wrapper {
+            display: flex;
+            align-items: center;
             line-height: 1.5;
             font-size: 1.125rem;
             padding-bottom: 1rem;
+            .text {
+                flex-grow: 1;
+            }
         }
         .content-wrapper {
             font-size: 0.875rem;
-        }
-        .edit-button {
-            position: absolute;
-            top: 1.5rem;
-            right: 1rem;
         }
         .text-button-group {
             display: flex;
@@ -340,7 +340,7 @@ export default {
     }
 
     @screen mobile {
-        .section-title {
+        .section-wrapper {
             padding-right: 8.4375rem;
         }
     }
