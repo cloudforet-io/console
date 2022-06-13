@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
@@ -81,6 +81,10 @@ export default {
             updatePolicyName();
             state.proxyVisible = false;
         };
+
+        watch(() => props.policyName, (policyName) => {
+            state.policyNameInput = policyName;
+        });
 
         return {
             ...toRefs(state),

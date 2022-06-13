@@ -78,7 +78,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, defineComponent,
+    computed, reactive, toRefs, defineComponent, onUnmounted,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -171,6 +171,10 @@ export default defineComponent<PolicyDetailPageProps>({
             state.code = stringifyPermission(administrationStore.state.policy.policyData?.permissions) ?? '';
             state.description = administrationStore.state.policy.policyData?.tags?.description ?? '';
         };
+
+        onUnmounted(() => {
+            administrationStore.commit('policy/setPolicyData', null);
+        });
 
         (async () => {
             const policyType = SpaceRouter.router.currentRoute.query.type;
