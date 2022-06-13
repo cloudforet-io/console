@@ -3,7 +3,6 @@ import faker from 'faker';
 import { MenuItem } from '@/inputs/context-menu/type';
 
 export const menuItems: MenuItem[] = [
-
     { type: 'header', label: 'Actions', name: 'actions' },
     {
         label: 'Add', name: 'add', type: 'button', icon: 'ic_plus_bold',
