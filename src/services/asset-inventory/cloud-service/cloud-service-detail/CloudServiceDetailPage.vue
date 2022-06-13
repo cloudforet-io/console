@@ -444,7 +444,15 @@ export default {
         const exportCloudServiceData = async () => {
             await store.dispatch('file/downloadExcel', {
                 url: '/inventory/cloud-service/list',
-                param: { query: getQuery() },
+                param: {
+                    query: getQuery(),
+                    ...(overviewState.period && {
+                        date_range: {
+                            start: dayjs.utc(overviewState.period.start).format('YYYY-MM-DD'),
+                            end: dayjs.utc(overviewState.period.end).add(1, 'day').format('YYYY-MM-DD'),
+                        },
+                    }),
+                },
                 fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
                 file_name_prefix: FILE_NAME_PREFIX.cloudService,
             });

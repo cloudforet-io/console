@@ -38,7 +38,7 @@
                                 </li>
                             </ul>
                             <p-button icon="ic_setting" style-type="gray900" :outline="true"
-                                      :disabled="manageDisabled"
+                                      :disabled="manageDisabled || !budgetTargetId"
                                       @click="handleSetNotifications"
                             >
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET') }}
@@ -69,7 +69,7 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_DESC') }}
                             </p>
                             <p-button icon="ic_setting" style-type="gray900" :outline="true"
-                                      :disabled="manageDisabled"
+                                      :disabled="manageDisabled || !budgetTargetId"
                                       @click="handleSetNotifications"
                             >
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_SET') }}
@@ -93,13 +93,11 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { commaFormatter } from '@spaceone/console-core-lib';
 import {
-    PCard, PIconButton, PAnchor, PButton, PBadge, PLottie,
+    PAnchor, PBadge, PButton, PCard, PIconButton, PLottie,
 } from '@spaceone/design-system';
 
 import { getUUID } from '@/lib/component-util/getUUID';
@@ -147,7 +145,7 @@ export default {
             }),
             budgetNotificationsModalVisible: false,
             budgetId: computed(() => costExplorerStore.state.budget.budgetData?.budget_id),
-            budgetTargetId: computed(() => costExplorerStore.state.budget.budgetData?.project_id) || undefined,
+            budgetTargetId: computed(() => costExplorerStore.state.budget.budgetData?.project_id || undefined),
             isBudgetLoading: computed(() => costExplorerStore.getters['budget/isBudgetLoading']),
         });
 
