@@ -1244,7 +1244,7 @@
 				"PROVIDERS_TITLE": "서비스 제공자",
 				"TAB_CREDENTIALS": "암호화 키",
 				"TAB_DETAILS": "상세 정보",
-				"TAB_MEMBER": "담당자",
+				"TAB_MEMBER": "연관된 멤버",
 				"TAB_SELECTED_DATA": "선택한 데이터",
 				"TAB_TAG": "태그",
 				"TITLE": "{provider} 계정"
@@ -1473,7 +1473,7 @@
 	"INVENTORY": {
 		"CLOUD_SERVICE": {
 			"ADMIN": {
-				"MEMBER": "담당자"
+				"MEMBER": "연관된 멤버"
 			},
 			"HISTORY": {
 				"HISTORY": "변경 기록"
@@ -1527,7 +1527,7 @@
 				"TAB_DATA": "데이터 ",
 				"TAB_DETAILS": "상세 정보",
 				"TAB_HISTORY": "변경 기록",
-				"TAB_MEMBER": "담당자",
+				"TAB_MEMBER": "연관된 멤버",
 				"TAB_MONITORING": "모니터링",
 				"TAB_SELECTED_DATA": "선택한 데이터 ",
 				"TAB_TAG": "태그"
@@ -1551,7 +1551,7 @@
 				"NO_SELECTED_SERVER": "서버를 선택하면 자세한 정보를 볼 수 있습니다.",
 				"TAB_DETAILS": "상세 정보",
 				"TAB_HISTORY": "변경 기록",
-				"TAB_MEMBER": "담당자",
+				"TAB_MEMBER": "연관된 멤버",
 				"TAB_MONITORING": "모니터링",
 				"TAB_SELECTED_DATA": "선택한 데이터",
 				"TAB_TAG": "태그",

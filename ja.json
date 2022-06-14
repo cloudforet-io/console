@@ -1244,7 +1244,7 @@
 				"PROVIDERS_TITLE": "サービスプロバイダー",
 				"TAB_CREDENTIALS": "暗号化キー",
 				"TAB_DETAILS": "詳細情報",
-				"TAB_MEMBER": "担当者",
+				"TAB_MEMBER": "",
 				"TAB_SELECTED_DATA": "選択したデータ",
 				"TAB_TAG": "タグ",
 				"TITLE": "{provider}アカウント"
@@ -1473,7 +1473,7 @@
 	"INVENTORY": {
 		"CLOUD_SERVICE": {
 			"ADMIN": {
-				"MEMBER": "担当者"
+				"MEMBER": ""
 			},
 			"HISTORY": {
 				"HISTORY": "変更履歴"
@@ -1527,7 +1527,7 @@
 				"TAB_DATA": "データ",
 				"TAB_DETAILS": "詳細情報",
 				"TAB_HISTORY": "変更履歴",
-				"TAB_MEMBER": "担当者",
+				"TAB_MEMBER": "",
 				"TAB_MONITORING": "モニタリング",
 				"TAB_SELECTED_DATA": "選択したデータ",
 				"TAB_TAG": "タグ"
@@ -1551,7 +1551,7 @@
 				"NO_SELECTED_SERVER": "サーバーを選択すると、詳細な情報が表示されます",
 				"TAB_DETAILS": "詳細情報",
 				"TAB_HISTORY": "変更履歴",
-				"TAB_MEMBER": "担当者",
+				"TAB_MEMBER": "",
 				"TAB_MONITORING": "モニタリング",
 				"TAB_SELECTED_DATA": "選択したデータ",
 				"TAB_TAG": "タグ",

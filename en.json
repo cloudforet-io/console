@@ -1244,7 +1244,7 @@
 				"PROVIDERS_TITLE": "Service Providers",
 				"TAB_CREDENTIALS": "Credentials",
 				"TAB_DETAILS": "Details",
-				"TAB_MEMBER": "Member",
+				"TAB_MEMBER": "Related Member",
 				"TAB_SELECTED_DATA": "Selected Data",
 				"TAB_TAG": "Tag",
 				"TITLE": "{provider} Accounts"
@@ -1473,7 +1473,7 @@
 	"INVENTORY": {
 		"CLOUD_SERVICE": {
 			"ADMIN": {
-				"MEMBER": "Member"
+				"MEMBER": "Related Member"
 			},
 			"HISTORY": {
 				"HISTORY": "History"
@@ -1527,7 +1527,7 @@
 				"TAB_DATA": "Data ",
 				"TAB_DETAILS": "Details",
 				"TAB_HISTORY": "History",
-				"TAB_MEMBER": "Member",
+				"TAB_MEMBER": "Related Member",
 				"TAB_MONITORING": "Monitoring",
 				"TAB_SELECTED_DATA": "Selected Data",
 				"TAB_TAG": "Tag"
@@ -1551,7 +1551,7 @@
 				"NO_SELECTED_SERVER": "Select a server for more details.",
 				"TAB_DETAILS": "Details",
 				"TAB_HISTORY": "History",
-				"TAB_MEMBER": "Member",
+				"TAB_MEMBER": "Related Member",
 				"TAB_MONITORING": "Monitoring",
 				"TAB_SELECTED_DATA": "Selected Data",
 				"TAB_TAG": "Tag",
