@@ -195,6 +195,7 @@ export default defineComponent<Props>({
             if (visible) init();
         });
         watch(() => state.provider, (provider) => {
+            if (!props.visible) return;
             if (provider === 'all') return;
             const regionFilters = state.filters[CLOUD_SERVICE_FILTER_KEY.REGION] ?? [];
             assetInventoryStore.dispatch('cloudService/setSelectedRegions', regionFilters.filter((r) => {

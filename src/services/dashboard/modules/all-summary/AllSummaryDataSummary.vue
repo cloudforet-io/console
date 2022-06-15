@@ -54,11 +54,10 @@ import {
 
 import { byteFormatter, commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    PSkeleton,
-} from '@spaceone/design-system';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { range, cloneDeep } from 'lodash';
+import { cloneDeep, range } from 'lodash';
 import { Location } from 'vue-router';
 
 import { store } from '@/store';
@@ -143,31 +142,34 @@ export default {
         };
 
         /* Api */
+        const apiQueryHelper = new ApiQueryHelper();
         const getApiParameter = (type) => {
+            apiQueryHelper.setSort('count', true);
             const defaultParam: any = {
                 ...props.extraParams,
                 labels: [CLOUD_SERVICE_LABEL[type]],
-                query: {
-                    sort: {
-                        key: 'count',
-                        desc: true,
-                    },
-                },
+                query: apiQueryHelper.data,
             };
 
-            if (type !== DATA_TYPE.STORAGE) return defaultParam;
-            const param = {
+            if (type !== DATA_TYPE.STORAGE) {
+                return {
+                    ...defaultParam,
+                    is_primary: true,
+                };
+            }
+
+            // STORAGE
+            apiQueryHelper.setSort('size', true);
+            return {
                 ...defaultParam,
-            };
-            param.query.sort = { key: 'size', desc: true };
-            param.fields = [
-                {
+                is_major: true,
+                query: apiQueryHelper.data,
+                fields: [{
                     name: 'size',
                     operator: 'sum',
                     key: 'data.size',
-                },
-            ];
-            return param;
+                }],
+            };
         };
         const getSummaryInfo = async (type) => {
             try {

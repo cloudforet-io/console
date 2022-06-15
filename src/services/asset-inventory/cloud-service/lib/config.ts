@@ -2,6 +2,7 @@ export const CLOUD_SERVICE_PAGE_URL_QUERY_KEY = ['provider', 'service', 'region'
 
 
 export const CLOUD_SERVICE_CATEGORY = Object.freeze({
+    SERVER: 'Server',
     COMPUTE: 'Compute',
     CONTAINER: 'Container',
     DATABASE: 'Database',

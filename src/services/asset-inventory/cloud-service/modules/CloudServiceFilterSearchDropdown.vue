@@ -59,6 +59,7 @@ import { getRegionFilterMenuItem, RegionMenuItem } from '@/services/asset-invent
 import { assetInventoryStore } from '@/services/asset-inventory/store';
 
 const categoryItems = [
+    { name: CLOUD_SERVICE_CATEGORY.SERVER, label: CLOUD_SERVICE_CATEGORY.SERVER },
     { name: CLOUD_SERVICE_CATEGORY.COMPUTE, label: CLOUD_SERVICE_CATEGORY.COMPUTE },
     { name: CLOUD_SERVICE_CATEGORY.CONTAINER, label: CLOUD_SERVICE_CATEGORY.CONTAINER },
     { name: CLOUD_SERVICE_CATEGORY.DATABASE, label: CLOUD_SERVICE_CATEGORY.DATABASE },
