@@ -95,24 +95,23 @@
 <script lang="ts">
 
 import {
-    reactive, toRefs, watch, computed, onUnmounted,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
+import { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { byteFormatter, commaFormatter } from '@spaceone/console-core-lib';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PDataLoader, PSkeleton, PButton, PBalloonTab,
+    PBalloonTab, PButton, PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 import { Unit } from 'bytes';
 import dayjs from 'dayjs';
-import {
-    forEach, orderBy, range,
-} from 'lodash';
+import { forEach, orderBy, range } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
 import { Location } from 'vue-router';
 
@@ -121,7 +120,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
-import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -193,9 +191,9 @@ export default {
             storageSuffix: 'TB' as Unit,
             storageTrendSuffix: 'TB' as Unit,
             tabs: Object.values(SERVICE_CATEGORY),
-            activeTab: SERVICE_CATEGORY.COMPUTE,
+            activeTab: SERVICE_CATEGORY.SERVER,
             dataMap: computed(() => ({
-                [SERVICE_CATEGORY.COMPUTE]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE') },
+                [SERVICE_CATEGORY.SERVER]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.SERVER') },
                 [SERVICE_CATEGORY.CONTAINER]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.CONTAINER') },
                 [SERVICE_CATEGORY.DATABASE]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE') },
                 [SERVICE_CATEGORY.NETWORKING]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.NETWORKING') },
@@ -287,9 +285,8 @@ export default {
         };
         const getLocation = (type: string) => {
             const query: Location['query'] = {};
-            query.provider = primitiveToQueryString('all');
             if (type !== SERVICE_CATEGORY.ALL) {
-                query.service = arrayToQueryString([CLOUD_SERVICE_LABEL[type]]);
+                query.service = CLOUD_SERVICE_LABEL[type];
             }
 
             // set filters
@@ -386,49 +383,34 @@ export default {
                 chartState.data = [];
             }
         };
+        const apiQueryHelper = new ApiQueryHelper();
         const getApiParameter = (type) => {
-            let param;
+            apiQueryHelper
+                .setSort('count', true)
+                .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
             const defaultParam: any = {
-                query: {
-                    sort: {
-                        key: 'count',
-                        desc: true,
-                    },
-                },
+                query: apiQueryHelper.data,
             };
             if (type !== SERVICE_CATEGORY.ALL) defaultParam.labels = [CLOUD_SERVICE_LABEL[type]];
-            defaultParam.query.filter = {
-                key: 'project_id',
-                operator: 'eq',
-                value: props.projectId,
-            };
-
-            if (type === SERVICE_CATEGORY.COMPUTE) {
-                param = {
-                    ...defaultParam,
-                    resource_type: 'inventory.Server',
-                    is_primary: true,
-                };
-            } else if (type === SERVICE_CATEGORY.STORAGE) {
-                param = {
-                    ...defaultParam,
-                    is_major: true,
-                };
-                param.query.sort = { key: 'size', desc: true };
-                param.fields = [
-                    {
-                        name: 'size',
-                        operator: 'sum',
-                        key: 'data.size',
-                    },
-                ];
-            } else {
-                param = {
+            if (type !== SERVICE_CATEGORY.STORAGE) {
+                return {
                     ...defaultParam,
                     is_primary: true,
                 };
             }
-            return param;
+
+            // STORAGE
+            apiQueryHelper.setSort('size', true);
+            return {
+                ...defaultParam,
+                is_major: true,
+                query: apiQueryHelper.data,
+                fields: [{
+                    name: 'size',
+                    operator: 'sum',
+                    key: 'data.size',
+                }],
+            };
         };
         const getSummaryInfo = async (type) => {
             try {
@@ -443,13 +425,6 @@ export default {
                     filters.push({
                         k: 'project_id', o: '=', v: props.projectId,
                     });
-
-                    if (d.resource_type === 'inventory.Server') {
-                        filters.push(
-                            { k: 'provider', o: '=', v: d.provider },
-                            { k: 'cloud_service_type', o: '=', v: d.cloud_service_type },
-                        );
-                    }
 
                     summaryData.push({
                         provider: d.provider,
@@ -494,7 +469,7 @@ export default {
             await Promise.allSettled(Object.values(SERVICE_CATEGORY).map(d => getCount(d)));
         };
         const chartInit = async () => {
-            await getTrend(SERVICE_CATEGORY.COMPUTE);
+            await getTrend(SERVICE_CATEGORY.SERVER);
             setTimeout(() => {
                 chartState.loading = false;
             }, 300);
@@ -504,7 +479,7 @@ export default {
 
         /* Watcher */
         watch(() => state.providers, (providers) => {
-            if (providers) getSummaryInfo(SERVICE_CATEGORY.COMPUTE);
+            if (providers) getSummaryInfo(SERVICE_CATEGORY.SERVER);
         }, { immediate: true });
         watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
             if (!loading && chartContext) {

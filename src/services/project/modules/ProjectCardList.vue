@@ -158,7 +158,7 @@ import { SUMMARY_TYPE, SummaryType } from '@/services/project/type';
 
 interface CardSummary {
     [projectId: string]: {
-        Compute: number;
+        Server: number;
         Database: number;
         Storage: number;
     };
@@ -209,7 +209,7 @@ export default {
                 set(val) { store.commit('service/project/setProjectFormVisible', val); },
             }),
             projectSummaryList: computed(() => [
-                { title: i18n.t('PROJECT.LANDING.COMPUTE'), summaryType: SUMMARY_TYPE.COMPUTE },
+                { title: i18n.t('PROJECT.LANDING.SERVER'), summaryType: SUMMARY_TYPE.SERVER },
                 { title: i18n.t('PROJECT.LANDING.DATABASE'), summaryType: SUMMARY_TYPE.DATABASE },
                 { title: i18n.t('PROJECT.LANDING.STORAGE'), summaryType: SUMMARY_TYPE.STORAGE },
             ]),
@@ -275,7 +275,7 @@ export default {
                 }, { cancelToken: getCardToken.token });
                 res.results.forEach((d) => {
                     cardSummary[d.project_id] = {
-                        Compute: d.compute_count || 0,
+                        Server: d.server_count || 0,
                         Database: d.database_count || 0,
                         Storage: d.storage_size || 0,
                     };

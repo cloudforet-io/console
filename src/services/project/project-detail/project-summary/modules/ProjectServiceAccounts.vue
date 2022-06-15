@@ -5,7 +5,7 @@
                       :selectable="false"
                       :bordered="false"
                       :loading="loading"
-                      :items="data"
+                      :items="items"
         >
             <template #col-provider-format="{ value }">
                 <router-link :to="value.to" class="link-text" :style="{color: value.color}">
@@ -17,7 +17,7 @@
                     {{ value.label }}
                 </router-link>
             </template>
-            <template #col-compute-format="{ value }">
+            <template #col-server-format="{ value }">
                 <router-link :to="value.to" class="link-text">
                     {{ value.count }}
                 </router-link>
@@ -37,21 +37,17 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 
+import { byteFormatter } from '@spaceone/console-core-lib';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    PDataTable,
-} from '@spaceone/design-system';
-import bytes from 'bytes';
+import { PDataTable } from '@spaceone/design-system';
 import { Location } from 'vue-router';
 
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { primitiveToQueryString } from '@/lib/router-query-string';
@@ -62,19 +58,29 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
-enum DATA_TYPE {
-    compute = 'compute',
-    database = 'database',
-    storage = 'storage',
-}
+export const DATA_TYPE = {
+    SERVER: 'SERVER',
+    DATABASE: 'DATABASE',
+    STORAGE: 'STORAGE',
+} as const;
 enum CLOUD_SERVICE_LABEL {
-    compute = 'Compute',
-    database = 'Database',
-    storage = 'Storage',
+    SERVER = 'Server',
+    DATABASE = 'Database',
+    STORAGE = 'Storage',
+}
+
+interface TableColumnData {
+    label?: string;
+    count?: number;
+    color?: string;
+    to: Location;
+}
+interface Item {
+    [key: string]: TableColumnData;
 }
 
 export default {
-    name: 'ServiceAccountsTable',
+    name: 'ProjectServiceAccounts',
     components: {
         WidgetLayout,
         PDataTable,
@@ -86,31 +92,23 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
 
         const state = reactive({
-            data: [],
             loading: true,
-            fields: computed(() => [
-                { name: 'provider', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.PROVIDER') },
-                { name: 'service_account', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.ACCOUNT_NAME') },
-                { name: 'compute', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.COMPUTE') },
-                { name: 'database', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.DATABASE') },
-                { name: 'storage', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.STORAGE') },
-            ]),
             providers: computed(() => store.state.reference.provider.items),
+            items: [] as Item[],
+            fields: computed(() => [
+                { name: 'provider', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.PROVIDER') },
+                { name: 'service_account', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.ACCOUNT_NAME') },
+                { name: 'server', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.SERVER') },
+                { name: 'database', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.DATABASE') },
+                { name: 'storage', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.STORAGE') },
+            ]),
         });
 
-        /* util */
-        const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
+        /* Util */
         const getLocation = (type, provider, serviceAccountId) => {
-            const query: Location['query'] = {
-                provider: primitiveToQueryString(provider),
-                service: primitiveToQueryString(CLOUD_SERVICE_LABEL[type]),
-            };
-
-            // set filters
             queryHelper.setFilters([
                 { k: 'collection_info.service_accounts', v: serviceAccountId, o: '=' },
                 { k: 'project_id', o: '=', v: props.projectId },
@@ -119,49 +117,51 @@ export default {
             const location: Location = {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 query: {
+                    provider: primitiveToQueryString(provider),
+                    service: CLOUD_SERVICE_LABEL[type],
                     filters: queryHelper.rawQueryStrings,
-                    ...query,
                 },
             };
             return location;
         };
+        const getConvertedData = (rawData): Item[] => rawData.map(item => ({
+            provider: {
+                label: state.providers[item.provider]?.label,
+                color: state.providers[item.provider]?.color,
+                to: {
+                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+                    query: { provider: item.provider },
+                },
+            },
+            service_account: {
+                label: item.service_account_name,
+                to: referenceRouter(item.service_account_id, { resource_type: 'identity.ServiceAccount' }),
+            },
+            server: {
+                count: item.server_count || 0,
+                to: getLocation(DATA_TYPE.SERVER, item.provider, item.service_account_id),
+            },
+            database: {
+                count: item.database_count || 0,
+                to: getLocation(DATA_TYPE.DATABASE, item.provider, item.service_account_id),
+            },
+            storage: {
+                count: byteFormatter(item.storage_size) || 0,
+                to: getLocation(DATA_TYPE.STORAGE, item.provider, item.service_account_id),
+            },
+        }));
 
         /* api */
         const getData = async () => {
             state.loading = true;
-            state.data = [];
-            await store.dispatch('reference/provider/load');
             try {
-                const res = await SpaceConnector.client.statistics.topic.serviceAccountSummary({
+                const { results } = await SpaceConnector.client.statistics.topic.serviceAccountSummary({
                     project_id: props.projectId,
                 });
-                state.data = res.results.map(item => ({
-                    provider: {
-                        label: state.providers[item.provider]?.label,
-                        color: state.providers[item.provider]?.color,
-                        to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: item.provider } },
-                    },
-                    service_account: {
-                        label: item.service_account_name,
-                        id: item.service_account_id,
-                        to: referenceRouter(item.service_account_id, { resource_type: 'identity.ServiceAccount' }),
-                    },
-                    compute: {
-                        count: item.server_count || 0,
-                        to: getLocation(DATA_TYPE.compute, item.provider, item.service_account_id),
-                    },
-                    database: {
-                        count: item.database_count || 0,
-                        to: getLocation(DATA_TYPE.database, item.provider, item.service_account_id),
-                    },
-                    storage: {
-                        count: byteFormatter(item.storage_size) || 0,
-                        to: getLocation(DATA_TYPE.storage, item.provider, item.service_account_id),
-                    },
-                }));
+                state.items = getConvertedData(results);
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.data = [];
+                state.items = [];
             } finally {
                 state.loading = false;
             }
