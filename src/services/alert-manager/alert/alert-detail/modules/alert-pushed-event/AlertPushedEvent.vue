@@ -19,10 +19,13 @@
                 >
                     <template #timeline-detail>
                         <div class="list-item" @click="onOpenModal(item)">
-                            <span class="severity">[{{ item.severity }}]</span> {{ item.title }}
-                            <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                                 color="inherit"
-                            />
+                            <div class="list-item-title">
+                                <span class="severity">[{{ item.severity }}]</span>
+                                <span>{{ item.title }}</span>
+                                <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                                     color="inherit"
+                                />
+                            </div>
                             <p class="desc">
                                 {{ item.description }}
                             </p>
@@ -206,6 +209,10 @@ export default {
         .desc {
             @apply text-blue-600;
         }
+    }
+    .list-item-title {
+        @apply flex items-center;
+        height: 1.315rem;
     }
     .desc {
         @apply text-gray-500;
