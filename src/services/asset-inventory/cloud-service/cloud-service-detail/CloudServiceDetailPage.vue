@@ -36,7 +36,7 @@
                           :selected-count="tableState.selectedItems.length"
                           @goBack="$router.go(-1)"
             />
-            <div class="filter-wrapper">
+            <div v-if="!checkIsEmpty(overviewState.period)" class="filter-wrapper">
                 <span class="filter-title">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTER') }}</span>
                 <cloud-service-period-filter :period="overviewState.period"
                                              @update:period="handlePeriodUpdate"
@@ -179,7 +179,7 @@ import {
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import dayjs from 'dayjs';
-import { get } from 'lodash';
+import { isEmpty, get } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
@@ -541,6 +541,8 @@ export default {
             replaceUrlQuery('period', objectToQueryString(period));
         };
 
+        const checkIsEmpty = data => isEmpty(data);
+
         /* Watchers */
         watch([() => props.group, () => props.name], async () => {
             if (!props.name) return;
@@ -583,6 +585,7 @@ export default {
             /* Usage Overview */
             overviewState,
             handlePeriodUpdate,
+            checkIsEmpty,
         };
     },
 };
