@@ -1,3 +1,10 @@
+# [1.1.0-beta.329](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.328...v1.1.0-beta.329) (2022-06-15)
+
+
+### Features
+
+* add autoKeyWidth to Definition component ([#992](https://github.com/spaceone-dev/spaceone-design-system/issues/992)) ([cb64470](https://github.com/spaceone-dev/spaceone-design-system/commit/cb64470cdf5fa90858b8e1d74f603595cad82700))
+
 # [1.1.0-beta.328](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.327...v1.1.0-beta.328) (2022-06-15)
 
 
