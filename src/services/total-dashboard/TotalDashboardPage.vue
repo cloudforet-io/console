@@ -77,7 +77,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
 import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
-import AllSummary from '@/services/dashboard/modules/AllSummary.vue';
+import AllSummary from '@/services/dashboard/modules/all-summary/AllSummary.vue';
 import CollectorProgress from '@/services/dashboard/modules/CollectingProgress.vue';
 import FavoritesWidget from '@/services/dashboard/modules/FavoritesWidget.vue';
 import PersonalHealthDashboard from '@/services/dashboard/modules/PersonalHealthDashboard.vue';
