@@ -3,7 +3,7 @@
         class="p-text-input"
         :class="{block, focused: isFocused}"
     >
-        <div ref="targetRef" v-click-outside="handleClickOutside"
+        <div ref="targetRef"
              class="input-container"
              :class="{invalid: isInvalid || invalid, disabled}"
         >
@@ -25,8 +25,6 @@
                     :type="type"
                     :placeholder="placeholder"
                     size="1"
-                    @focus="handleInputFocus"
-                    @blur="handleInputBlur"
                     v-on="inputListeners"
                 >
             </slot>
@@ -36,9 +34,11 @@
                 </slot>
             </span>
             <p-i
-                v-if="(isFocused || isInvalid)"
-                class="delete-all-icon" name="ic_delete" height="1rem"
-                width="1rem" color="inherit transparent"
+                v-show="(isFocused || isInvalid)"
+                class="delete-all-icon"
+                name="ic_delete" height="1rem" width="1rem"
+                color="inherit transparent"
+                @mousedown.native.prevent
                 @click="handleDeleteAllTags"
             />
         </div>
@@ -288,6 +288,9 @@ export default {
             focus() {
                 state.isFocused = true;
             },
+            blur() {
+                state.isFocused = false;
+            },
             keyup(event) {
                 if ((event.key === 'ArrowDown' || event.key === 'Down') && props.useAutoComplete) {
                     if (state.bindingMenu.length === 0) return;
@@ -306,18 +309,6 @@ export default {
                     if (props.multiInput) deleteSelectedTags();
                 }
             },
-        };
-
-        const handleClickOutside = () => {
-            state.isFocused = false;
-        };
-
-        const handleInputFocus = () => {
-            state.isFocused = true;
-        };
-
-        const handleInputBlur = () => {
-            state.isFocused = false;
         };
 
         watch(() => props.menu, (menu) => {
@@ -345,9 +336,6 @@ export default {
             handleDeleteAllTags,
             handleFocusMenuItem,
             handleSelectMenuItem,
-            handleClickOutside,
-            handleInputFocus,
-            handleInputBlur,
         };
     },
 };
