@@ -521,6 +521,10 @@ export default {
             await listServiceAccountData();
         };
 
+        watch(() => tableState.selectedItems, () => {
+            getConsoleLink();
+        });
+
         const init = async () => {
             await Promise.allSettled([
                 store.dispatch('reference/project/load'),
