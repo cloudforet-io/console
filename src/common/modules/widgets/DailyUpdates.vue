@@ -162,20 +162,8 @@ export default {
         });
 
         /* API */
-        const listServerData = async (): Promise<void> => {
-            try {
-                const params: any = {
-                    timezone: store.state.user.timezone,
-                };
-                if (props.projectId) params.project_id = props.projectId;
-                const { results } = await SpaceConnector.client.statistics.topic.dailyUpdateServer(params);
-                state.serverData = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.serverData = [];
-            }
-        };
         const listCloudServiceData = async (): Promise<void> => {
+            state.loading = true;
             try {
                 const params: any = {
                     timezone: store.state.user.timezone,
@@ -186,6 +174,8 @@ export default {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.cloudServiceData = [];
+            } finally {
+                state.loading = false;
             }
         };
 
@@ -228,37 +218,27 @@ export default {
             });
             return results;
         };
-        const getWarningData = (data: Item[]) => {
+        const getWarningData = (data: Item[]): Item[] => {
             const warningData: Item[] = [];
             find(data, (d) => {
                 if (d.isCreateWarning || d.isDeleteWarning) {
                     warningData.push(d);
                 }
             });
-            state.warningData = warningData;
-            state.data = state.data.filter(x => !state.warningData.includes(x));
+            return warningData;
         };
 
         /* Init */
         const init = async (): Promise<void> => {
-            state.loading = true;
-            await Promise.all([listServerData(), listCloudServiceData()]);
-            const data = [
-                ...getConvertedCloudServiceData(state.serverData),
-                ...getConvertedCloudServiceData(state.cloudServiceData),
-            ];
-            state.data = data;
-            getWarningData(data);
-            state.loading = false;
-        };
-        init();
-
-        (async () => {
             await Promise.allSettled([
-                // LOAD REFERENCE STORE
+                listCloudServiceData(),
                 store.dispatch('reference/provider/load'),
             ]);
-        })();
+            const data = getConvertedCloudServiceData(state.cloudServiceData);
+            state.warningData = getWarningData(data);
+            state.data = data.filter(x => !state.warningData.includes(x));
+        };
+        init();
 
         return {
             ...toRefs(state),

@@ -20,7 +20,7 @@
                 </template>
                 <div ref="chartRef" class="chart" />
             </p-data-loader>
-            <div v-if="!loading && data.length === 0"
+            <div v-if="!loading && items.length === 0"
                  class="no-data-wrapper"
             >
                 <p class="title">
@@ -39,7 +39,7 @@
                 <p-data-table
                     :loading="loading"
                     :fields="fields"
-                    :items="data"
+                    :items="items"
                     :bordered="false"
                 >
                     <template #col-rank-format="{ index }">
@@ -57,12 +57,12 @@
                     </template>
                     <template #col-server-format="{ value }">
                         <router-link class="link-text" :to="value.to">
-                            <span>{{ value.label }}</span>
+                            <span>{{ value.count }}</span>
                         </router-link>
                     </template>
                     <template #col-database-format="{ value }">
                         <router-link class="link-text" :to="value.to">
-                            <span>{{ value.label }}</span>
+                            <span>{{ value.count }}</span>
                         </router-link>
                     </template>
                     <template #col-storage-format="{ value }">
@@ -78,7 +78,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -86,12 +86,14 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PDataLoader, PDataTable, PButton, PSkeleton, PI,
+    PButton, PDataLoader, PDataTable, PI, PSkeleton,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
-import { orderBy, range } from 'lodash';
+import { range } from 'lodash';
 import { Location } from 'vue-router';
 
+
+import { i18n } from '@/translations';
 
 import config from '@/lib/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -100,36 +102,35 @@ import { arrayToQueryString } from '@/lib/router-query-string';
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import {
-    gray, peacock, secondary,
-} from '@/styles/colors';
+import { gray, peacock, secondary } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { CLOUD_SERVICE_LABEL } from '@/services/dashboard/modules/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 
-enum CLOUD_SERVICE_LABEL {
-    compute = 'Compute',
-    database = 'Database',
-    storage = 'Storage',
-}
+const DATA_TYPE = Object.freeze({
+    SERVER: 'SERVER',
+    DATABASE: 'DATABASE',
+    STORAGE: 'STORAGE',
+} as const);
 
 interface ChartData {
     rank: string;
     server: number;
     database: number;
 }
-interface ProjectData {
-    project_id: string;
-    project: string;
-    project_group: string;
-    project_group_id: string;
-    servers?: number;
-    total?: number;
+interface TableColumnData {
+    label?: string;
+    count?: number;
+    to: Location;
+}
+interface TableItem {
+    [key: string]: TableColumnData;
 }
 
 const DATA_COUNT = 5;
-const COMPUTE_COLOR = secondary;
+const SERVER_COLOR = secondary;
 const DATABASE_COLOR = peacock[200];
 
 
@@ -150,29 +151,27 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
             loading: true,
-            data: [] as ProjectData[],
+            items: [] as TableItem[],
             chartData: [] as ChartData[],
             chartRef: null as HTMLElement | null,
             chart: null as null | any,
             colors: {
-                server: COMPUTE_COLOR,
+                server: SERVER_COLOR,
                 database: DATABASE_COLOR,
             },
             fields: computed(() => [
-                { name: 'rank', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_RANK'), width: 3 },
-                { name: 'project_group', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT_GROUP') },
-                { name: 'project', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_PROJECT') },
-                { name: 'server', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_COMPUTE') },
-                { name: 'database', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_DATABASE') },
-                { name: 'storage', label: vm.$t('COMMON.WIDGETS.TOP_PROJECT_STORAGE') },
+                { name: 'rank', label: i18n.t('COMMON.WIDGETS.TOP_PROJECT_RANK'), width: 3 },
+                { name: 'project_group', label: i18n.t('COMMON.WIDGETS.TOP_PROJECT_PROJECT_GROUP') },
+                { name: 'project', label: i18n.t('COMMON.WIDGETS.TOP_PROJECT_PROJECT') },
+                { name: 'server', label: i18n.t('COMMON.WIDGETS.TOP_PROJECT_SERVER') },
+                { name: 'database', label: i18n.t('COMMON.WIDGETS.TOP_PROJECT_DATABASE') },
+                { name: 'storage', label: i18n.t('COMMON.WIDGETS.TOP_PROJECT_STORAGE') },
             ]),
         });
 
-        /* util */
+        /* Util */
         const drawChart = (chartContext) => {
             const chart = am4core.create(chartContext, am4charts.XYChart);
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
@@ -235,8 +234,8 @@ export default {
             } else {
                 chart.data = state.chartData;
             }
-            createSeries('server', 'Server');
-            createSeries('database', 'Database');
+            createSeries('server', i18n.t('COMMON.WIDGETS.TOP_PROJECT_SERVER'));
+            createSeries('database', i18n.t('COMMON.WIDGETS.TOP_PROJECT_DATABASE'));
 
             chart.legend = new am4charts.Legend();
             chart.legend.position = 'bottom';
@@ -250,7 +249,7 @@ export default {
 
             state.chart = chart;
         };
-
+        //
         const queryHelper = new QueryHelper();
         const getLocation = (type: string, projectId: string) => {
             const query: Location['query'] = {};
@@ -267,56 +266,59 @@ export default {
             };
             return location;
         };
+        //
+        const getConvertedData = (rawData): TableItem[] => rawData.map(d => ({
+            project_group: {
+                label: d.project_group,
+                to: referenceRouter(d.project_group_id, { resource_type: 'identity.ProjectGroup' }),
+            },
+            project: {
+                label: d.project,
+                to: referenceRouter(d.project_id, { resource_type: 'identity.Project' }),
+            },
+            server: {
+                count: d.server_count,
+                to: getLocation(DATA_TYPE.SERVER, d.project_id),
+            },
+            database: {
+                count: d.database_count,
+                to: getLocation(DATA_TYPE.DATABASE, d.project_id),
+            },
+            storage: {
+                label: bytes(d.storage_size, { unitSeparator: ' ' }),
+                to: getLocation(DATA_TYPE.STORAGE, d.project_id),
+            },
+        }));
+        const getConvertedChartData = (orderedData: TableItem[]): ChartData[] => {
+            const chartData = [] as ChartData[];
+            range(0, DATA_COUNT).forEach((idx) => {
+                chartData.push({
+                    rank: `#${idx + 1}`,
+                    server: 0,
+                    database: 0,
+                });
+            });
+            orderedData.forEach((d, idx) => {
+                chartData.splice(idx, 1, {
+                    rank: `#${idx + 1}`,
+                    server: d.server.count as number,
+                    database: d.database.count as number,
+                });
+            });
+            return chartData.reverse();
+        };
 
-        /* api */
+        /* Api */
         const getData = async () => {
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.statistics.topic.topProject(props.extraParams);
-                const data = res.results.map(d => ({
-                    rank: d.rank,
-                    project_group: {
-                        label: d.project_group,
-                        to: referenceRouter(d.project_group_id, { resource_type: 'identity.ProjectGroup' }),
-                    },
-                    project: {
-                        label: d.project,
-                        to: referenceRouter(d.project_id, { resource_type: 'identity.Project' }),
-                    },
-                    server: {
-                        label: d.server_count,
-                        to: getLocation('compute', d.project_id),
-                    },
-                    database: {
-                        label: d.database_count,
-                        to: getLocation('database', d.project_id),
-                    },
-                    storage: {
-                        label: bytes(d.storage_size, { unitSeparator: ' ' }),
-                        to: getLocation('storage', d.project_id),
-                    },
-                }));
-                const orderedData = orderBy(data, ['total'], ['desc']);
-                state.data = orderedData;
-
-                const chartData = [] as ChartData[];
-                range(0, DATA_COUNT).forEach((idx) => {
-                    chartData.push({
-                        rank: `#${idx + 1}`,
-                        server: 0,
-                        database: 0,
-                    });
-                });
-                orderedData.forEach((d, idx) => {
-                    chartData.splice(idx, 1, {
-                        rank: `#${idx + 1}`,
-                        server: d.server.label,
-                        database: d.database.label,
-                    });
-                });
-                state.chartData = chartData.reverse();
+                const { results } = await SpaceConnector.client.statistics.topic.topProject(props.extraParams);
+                const orderedData = getConvertedData(results);
+                state.items = orderedData;
+                state.chartData = getConvertedChartData(orderedData);
             } catch (e) {
                 ErrorHandler.handleError(e);
+                state.items = [];
                 state.chartData = [];
             } finally {
                 state.loading = false;

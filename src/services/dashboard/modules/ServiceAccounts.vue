@@ -174,7 +174,7 @@ export default {
 
         const getLink = (data): Location => ({
             name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-            params: {
+            query: {
                 provider: data.provider,
             },
         });
