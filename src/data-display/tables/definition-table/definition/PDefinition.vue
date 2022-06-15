@@ -1,11 +1,11 @@
 <template>
     <tr class="p-definition" :class="{block}">
-        <td class="key">
+        <td class="key" :class="{'auto-width': autoKeyWidth}">
             <slot name="key" v-bind="{name, label, data, value: displayData}">
                 {{ label || name }}
             </slot>
         </td>
-        <td class="value-wrapper">
+        <td class="value-wrapper" :class="{'auto-width': autoKeyWidth}">
             <span class="value">
                 <slot v-if="disableCopy" name="default" v-bind="{name, label, data, value: displayData}">
                     {{ displayData }}
@@ -71,6 +71,10 @@ export default defineComponent<DefinitionProps>({
             type: Function,
             default: undefined,
         },
+        autoKeyWidth: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: DefinitionProps) {
         const state = reactive({
@@ -88,48 +92,60 @@ export default defineComponent<DefinitionProps>({
 <style lang="postcss">
 .p-definition {
     display: flex;
-    .key {
+    > .key {
         @apply font-bold;
         width: 18rem;
+        padding: 0.65rem 1rem 0.35rem 1rem;
+        font-size: 0.875rem;
+        line-height: 1.25;
+
+        &.auto-width {
+            width: auto;
+        }
     }
-    .value-wrapper {
+    > .value-wrapper {
+        max-width: calc(100% - 18rem);
         display: inline-flex;
         align-items: center;
         flex-grow: 1;
         flex-wrap: wrap;
-        max-width: calc(100% - 18rem);
-        cursor: text;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
 
-        .p-copy-button {
-            flex-shrink: 0;
+        &.auto-width {
+            max-width: none;
         }
-        .extra {
+
+        > .value {
+            line-height: 1.25;
+            > .p-copy-button {
+                flex-shrink: 0;
+            }
+        }
+
+        > .extra {
             flex-grow: 1;
             flex-shrink: 0;
             margin-left: 0.5rem;
         }
     }
 
-    .key, .value-wrapper {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        line-height: 1.45;
-        cursor: unset;
-    }
     &.block {
         display: flex;
-        .value {
-            flex-grow: 1;
-        }
-        .extra {
-            flex-grow: unset;
+        > .value-wrapper {
+            > .value {
+                flex-grow: 1;
+            }
+            > .extra {
+                flex-grow: unset;
+            }
         }
     }
 
     @screen mobile {
         flex-wrap: no-wrap;
         flex-direction: column;
-        .key, .value-wrapper {
+        > .key, > .value-wrapper {
             width: 100%;
             max-width: 100%;
         }

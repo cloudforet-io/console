@@ -136,6 +136,24 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
             },
         },
     },
+    autoKeyWidth: {
+        name: 'autoKeyWidth',
+        type: { name: 'string' },
+        description: 'Make key width auto',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     /* slots */
     defaultSlot: {
         name: 'default',

@@ -29,6 +29,7 @@ export const Template = (args, { argTypes }) => ({
     :formatter="formatter"
     :block="block"
     :copy-value="copyValue"
+    :auto-key-width="autoKeyWidth"
 >
 </p-definition>`,
     setup(props) {
@@ -251,6 +252,61 @@ export const Template = (args, { argTypes }) => ({
 
 <br/>
 <br/>
+
+## Auto Key Width
+
+<Canvas>
+    <Story name="Auto Key Width">
+        {{
+            components:{ PDefinition },
+            template: `
+<table>
+    <tbody>
+        <p-definition
+            name="string data"
+            :data="data.stringData"
+            auto-key-width
+        />
+        <p-definition
+            name="object data"
+            :data="data.objectData"
+            auto-key-width
+        />
+        <p-definition
+            name="array data"
+            :data="data.arrayData"
+            auto-key-width
+        />
+        <p-definition
+            name="boolean data"
+            :data="data.booleanData"
+            auto-key-width
+        />
+        <p-definition
+            name="number data"
+            :data="data.numberData"
+            auto-key-width
+        />
+    </tbody>
+</table>
+`,
+            setup() {
+                const state = reactive({
+                    data: {
+                        stringData: 'string data',
+                        objectData: {name: 'object data'},
+                        arrayData: ['array', 'data'],
+                        booleanData: true,
+                        numberData: 13,
+                    }
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
 
 ## Slots
 | Slot name | Description |
