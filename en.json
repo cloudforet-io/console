@@ -901,7 +901,6 @@
 				"ALL": "All",
 				"ANALYTICS": "Analytics",
 				"CLOUD_SERVICE": "Cloud Service",
-				"COMPUTE": "Compute",
 				"CONTAINER": "Container",
 				"DATABASE": "Database",
 				"DAY": "Day",
@@ -913,6 +912,7 @@
 				"REGION_SERVICE_TITLE": "Region",
 				"RESOURCE": "Resource",
 				"SECURITY": "Security",
+				"SERVER": "Server",
 				"STORAGE": "Storage",
 				"TITLE": "General",
 				"TREND_TITLE": "Trend",
@@ -1013,7 +1013,6 @@
 			"SERVICE_ACCOUNT_TABLE": {
 				"ACCOUNT_NAME": "Account Name",
 				"CLOUD_SERVICE": "Cloud Service",
-				"COMPUTE": "Compute",
 				"CREDENTIALS": "Credentials",
 				"DATABASE": "Database",
 				"PROVIDER": "Provider",
@@ -1030,13 +1029,13 @@
 				"NO_PROJECT_HELP_TEXT": "Getting started with grouping your scattered resource and accounts with your own project."
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "Cloud Service",
-			"TOP_PROJECT_COMPUTE": "Compute",
 			"TOP_PROJECT_CREATE_PROJECT": "Create Project",
 			"TOP_PROJECT_DATABASE": "Database",
 			"TOP_PROJECT_HELP": "Check project ranking with most resources and services.",
 			"TOP_PROJECT_PROJECT": "Project",
 			"TOP_PROJECT_PROJECT_GROUP": "Project Group",
 			"TOP_PROJECT_RANK": "Rank",
+			"TOP_PROJECT_SERVER": "Server",
 			"TOP_PROJECT_STORAGE": "Storage",
 			"TOP_PROJECT_TITLE": "Top Resource Managing Projects",
 			"TRUSTED_ADVISOR": {

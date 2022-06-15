@@ -901,7 +901,6 @@
 				"ALL": "合計",
 				"ANALYTICS": "分析",
 				"CLOUD_SERVICE": "クラウドサービス",
-				"COMPUTE": "コンピューティング",
 				"CONTAINER": "コンテナ",
 				"DATABASE": "データベース",
 				"DAY": "日",
@@ -913,6 +912,7 @@
 				"REGION_SERVICE_TITLE": "リージョン",
 				"RESOURCE": "リソース",
 				"SECURITY": "セキュリティ",
+				"SERVER": "サーバ",
 				"STORAGE": "ストレージ",
 				"TITLE": "一般",
 				"TREND_TITLE": "トレンド",
@@ -1013,7 +1013,6 @@
 			"SERVICE_ACCOUNT_TABLE": {
 				"ACCOUNT_NAME": "アカウント名",
 				"CLOUD_SERVICE": "クラウドサービス",
-				"COMPUTE": "コンピューティング",
 				"CREDENTIALS": "暗号化キー",
 				"DATABASE": "データベース",
 				"PROVIDER": "プロバイダー",
@@ -1030,13 +1029,13 @@
 				"NO_PROJECT_HELP_TEXT": "分散されているリソースやアカウントを独自のプロジェクトでグループ化をしてみましょう"
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "クラウドサービス",
-			"TOP_PROJECT_COMPUTE": "コンピューティング",
 			"TOP_PROJECT_CREATE_PROJECT": "プロジェクト作成",
 			"TOP_PROJECT_DATABASE": "データベース",
 			"TOP_PROJECT_HELP": "プロジェクト単位でクラウドサービス及びサーバのランクを表示します",
 			"TOP_PROJECT_PROJECT": "プロジェクト",
 			"TOP_PROJECT_PROJECT_GROUP": "プロジェクトグループ",
 			"TOP_PROJECT_RANK": "ランキング",
+			"TOP_PROJECT_SERVER": "サーバ",
 			"TOP_PROJECT_STORAGE": "ストレージ",
 			"TOP_PROJECT_TITLE": "最もリソースを使用しているプロジェクト",
 			"TRUSTED_ADVISOR": {
