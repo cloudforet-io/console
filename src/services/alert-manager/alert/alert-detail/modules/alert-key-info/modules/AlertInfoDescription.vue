@@ -1,7 +1,7 @@
 <template>
     <p v-if="!isEditMode" class="content-wrapper">
         <span class="description">{{ alertData.description }}&zwnj;</span>
-        <button class="edit-btn" :class="{'disabled':!hasManagePermission}" @click="startEdit(alertData.description)">
+        <button class="edit-btn" :class="{'disabled': manageDisabled}" @click="startEdit(alertData.description)">
             {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
         </button>
     </p>
@@ -26,12 +26,9 @@
 </template>
 
 <script lang="ts">
-import { toRefs, ref, computed } from '@vue/composition-api';
+import { toRefs } from '@vue/composition-api';
 
 import { PTextarea, PButton } from '@spaceone/design-system';
-
-
-import { store } from '@/store';
 
 import { useAlertInfoItem } from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/composables';
 import { EDIT_MODE } from '@/services/alert-manager/lib/config';
@@ -51,6 +48,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        manageDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props) {
         const {
@@ -64,9 +65,6 @@ export default {
             isEditMode: false,
             dataForUpdate: props.alertData?.description,
         });
-
-        const hasManagePermission = ref(computed<boolean>(() => store.getters['user/hasManagePermission']));
-
         return {
             EDIT_MODE,
             ...toRefs(alertDetailItemState),
@@ -74,7 +72,6 @@ export default {
             startEdit,
             updateAlert,
             onClickSave,
-            hasManagePermission,
         };
     },
 };

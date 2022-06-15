@@ -6,7 +6,12 @@
                             block
         >
             <template #data-description>
-                <alert-info-description :id="id" :alert-data="data" @update="$emit('update')" />
+                <alert-info-description
+                    :id="id"
+                    :alert-data="data"
+                    :manage-disabled="manageDisabled"
+                    @update="$emit('update')"
+                />
             </template>
             <template #data-rule="{value}">
                 <span v-if="Object.keys(value).length === 0">
