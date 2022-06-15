@@ -2229,7 +2229,7 @@
 				"INVALID": "無効",
 				"INVITE": "招待",
 				"KEYCLOAK": "キークローク",
-				"LABEL_HELP_TEXT": "最大5つのラベルまで追加可能",
+				"LABEL_HELP_TEXT": "各ラベルはエンターキーで区切れます。（最大5つまで）",
 				"LABEL_LABEL": "ラベル",
 				"LABEL_PLACEHOLDER": "ex. 開発者",
 				"MEMBER": "構成員",

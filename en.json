@@ -2229,7 +2229,7 @@
 				"INVALID": "Invalid",
 				"INVITE": "Invite",
 				"KEYCLOAK": "Keycloak",
-				"LABEL_HELP_TEXT": "Up to 5 labels",
+				"LABEL_HELP_TEXT": "Seperate labels(Up to 5) with Enter key",
 				"LABEL_LABEL": "Label",
 				"LABEL_PLACEHOLDER": "ex. Developer",
 				"MEMBER": "Member",

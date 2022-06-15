@@ -2229,7 +2229,7 @@
 				"INVALID": "잘못된값",
 				"INVITE": "초대",
 				"KEYCLOAK": "Keycloak",
-				"LABEL_HELP_TEXT": "최대 5개 추가 가능",
+				"LABEL_HELP_TEXT": "각 라벨은 엔터 키로 구분되며, 최대 5개 추가 가능",
 				"LABEL_LABEL": "라벨",
 				"LABEL_PLACEHOLDER": "ex. 개발자",
 				"MEMBER": "멤버",
