@@ -469,7 +469,7 @@ export default {
 .alert-data-table {
     @apply col-span-12;
     .p-toolbox-table::v-deep {
-        @apply overflow-hidden rounded-l;
+        @apply rounded-l;
         .top-wrapper {
             @apply bg-white;
         }
