@@ -18,6 +18,19 @@
                     </p-badge>
                 </p-text-list>
             </template>
+            <template #col-job_id-format="{value}">
+                <p-anchor v-if="value" :to="getJobLink(value)">
+                    {{ value }}
+                </p-anchor>
+            </template>
+            <template #col-updated_by-format="{value}">
+                <p-anchor v-if="collectors[value]" :to="getCollectorLink(value)">
+                    {{ collectors[value].label }}
+                </p-anchor>
+                <template v-else>
+                    {{ value }}
+                </template>
+            </template>
             <template #col-updated_at-format="{value}">
                 {{ iso8601Formatter(value, timezone) }}
             </template>
@@ -31,12 +44,13 @@ import {
 } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PTextList, PBadge, PPanelTop, PSearchTable,
+    PTextList, PBadge, PPanelTop, PSearchTable, PAnchor,
 } from '@spaceone/design-system';
-
+import { Location } from 'vue-router';
 
 import { store } from '@/store';
 
@@ -44,10 +58,12 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
 export default {
     name: 'ServerHistory',
     components: {
-        PPanelTop, PBadge, PTextList, PSearchTable,
+        PPanelTop, PBadge, PTextList, PSearchTable, PAnchor,
     },
     props: {
         serverId: {
@@ -106,6 +122,22 @@ export default {
             }
         };
 
+        const collectorLinkQueryHelper = new QueryHelper();
+        const getCollectorLink = (collectorId: string): Location => {
+            collectorLinkQueryHelper.setFilters([{ k: 'collector_id', v: collectorId, o: '=' }]);
+            return {
+                name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
+                query: {
+                    filters: collectorLinkQueryHelper.rawQueryStrings,
+                },
+            };
+        };
+
+        const getJobLink = (jobId: string): Location => ({
+            name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
+            params: { jobId },
+        });
+
         const onChange = async (options) => {
             state.options = { ...state.options, ...options };
             await listHistory();
@@ -131,6 +163,8 @@ export default {
 
         return {
             ...toRefs(state),
+            getCollectorLink,
+            getJobLink,
             onChange,
             onExport,
             iso8601Formatter,

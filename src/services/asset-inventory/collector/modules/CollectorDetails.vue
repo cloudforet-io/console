@@ -21,10 +21,6 @@
                 {{ data ? iso8601Formatter(data, baseState.timezone) : '' }}
             </template>
         </p-definition-table>
-        <p-panel-top :use-total-count="true" :total-count="filterState.items? filterState.items.length:0">
-            {{ filterState.name }}
-        </p-panel-top>
-        <p-data-table :items="filterState.items" :fields="filterState.fields" v-on="$listeners" />
     </div>
 </template>
 
@@ -38,9 +34,8 @@ import {
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PPanelTop, PDefinitionTable, PLazyImg, PDataTable, PStatus, PTextList,
+    PPanelTop, PDefinitionTable, PLazyImg, PStatus, PTextList,
 } from '@spaceone/design-system';
-import { get } from 'lodash';
 
 import { store } from '@/store';
 
@@ -51,7 +46,6 @@ export default {
         PTextList,
         PPanelTop,
         PDefinitionTable,
-        PDataTable,
         PLazyImg,
     },
     props: {
@@ -69,7 +63,6 @@ export default {
             fields: computed(() => [
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_NAME'), name: 'name' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_STATE'), name: 'state' },
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PRIORITY'), name: 'priority' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PLUGIN'), name: 'plugin_name' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_VERSION'), name: 'plugin_info.version' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PROVIDER'), name: 'provider' },
@@ -79,24 +72,13 @@ export default {
             data: {},
         });
 
-        const filterState = reactive({
-            name: computed(() => vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_FILTER_TITLE')),
-            fields: [
-                { label: 'Name', name: 'name' },
-                { label: 'Key', name: 'key' },
-                { label: 'Type', name: 'type' },
-                { label: 'Resource Type', name: 'resource_type' },
-            ],
-            rootPath: 'plugin_info.metadata.filter_format',
-            items: computed(() => get(baseState.data, filterState.rootPath, [])),
-        });
 
         /* api */
         const getCollectorDetailData = async () => {
             const res = await SpaceConnector.client.inventory.collector.get({
                 collector_id: props.collectorId,
-                only: ['name', 'priority', 'provider', 'state', 'plugin_info.version', 'plugin_info.metadata.metadata.supported_resource_type',
-                    'last_collected_at', 'created_at', 'plugin_info.metadata.filter_format', 'tags', 'plugin_info.plugin_id'],
+                only: ['name', 'provider', 'state', 'plugin_info.version',
+                    'last_collected_at', 'created_at', 'tags', 'plugin_info.plugin_id'],
 
                 // ...baseState.fields.map(d => d.name)
             });
@@ -122,7 +104,6 @@ export default {
 
         return {
             baseState,
-            filterState,
             iso8601Formatter,
         };
     },

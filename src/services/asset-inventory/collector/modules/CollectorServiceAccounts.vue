@@ -1,7 +1,7 @@
 <template>
     <div class="collector-credentials">
         <p-panel-top use-total-count :total-count="totalCount">
-            {{ $t('PLUGIN.COLLECTOR.MAIN.CREDENTIALS_TITLE') }}
+            {{ $t('PLUGIN.COLLECTOR.MAIN.SERVICE_ACCOUNT') }}
         </p-panel-top>
         <p-query-search-table :items="items"
                               :fields="fields"
@@ -18,20 +18,20 @@
                               use-cursor-loading
                               @change="onChange"
         >
-            <template #col-service_account-format="{ item }">
+            <template #col-service_account_id-format="{ value }">
                 <p-anchor :to="referenceRouter(
-                    item.service_account_id,
+                    value,
                     { resource_type: 'identity.ServiceAccount' })"
                 >
-                    <span class="text">{{ item.name }}</span>
+                    {{ serviceAccounts[value] ? serviceAccounts[value].label : value }}
                 </p-anchor>
             </template>
-            <template #col-project_id-format="{ item }">
+            <template #col-project_id-format="{ value }">
                 <p-anchor :to="referenceRouter(
-                    item.project_id,
+                    value,
                     { resource_type: 'identity.Project' })"
                 >
-                    <span class="text">{{ item.project_name }}</span>
+                    {{ projects[value] ? projects[value].label : value }}
                 </p-anchor>
             </template>
             <template #col-created_at-format="{value}">
@@ -96,7 +96,7 @@ interface SecretModel {
 }
 
 export default {
-    name: 'CollectorCredentials',
+    name: 'CollectorServiceAccounts',
     components: {
         PQuerySearchTable,
         PPanelTop,
@@ -141,8 +141,7 @@ export default {
             totalCount: 0,
             loading: true,
             fields: [
-                { name: 'name', label: 'Name' },
-                { name: 'service_account', label: 'Service Account' },
+                { name: 'service_account_id', label: 'Service Account' },
                 { name: 'project_id', label: 'Project' },
                 { name: 'created_at', label: 'Created' },
                 {
@@ -156,6 +155,8 @@ export default {
             collectDataVisible: false,
             targetCredentialId: null as string | null,
             queryTags: [],
+            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+            projects: computed(() => store.state.reference.project.items),
         });
 
         const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
@@ -174,11 +175,7 @@ export default {
                 const res = await SpaceConnector.client.secret.secret.list({
                     query: getQuery(),
                 });
-                state.items = res.results.map(d => ({
-                    service_account_name: computed(() => store.state.reference.serviceAccount.items[d.service_account_id]?.label || d.service_account_id).value,
-                    project_name: computed(() => store.state.reference.project.items[d.project_id]?.label || d.project_id).value,
-                    ...d,
-                }));
+                state.items = res.results;
                 state.totalCount = res.total_count;
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -206,8 +203,8 @@ export default {
                 // LOAD REFERENCE STORE
                 store.dispatch('reference/serviceAccount/load'),
                 store.dispatch('reference/project/load'),
+                listCredentials(),
             ]);
-            await listCredentials();
         })();
 
         watch(() => props.collectorId, () => {

@@ -38,12 +38,13 @@
                 <p class="sub-header">
                     {{ $t('PLUGIN.COLLECTOR.MAIN.COLLECT_MODAL_LABEL_OPTION') }}
                 </p>
-                <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.COLLECT_MODAL_CREDENTIALS_LABEL')">
-                    <p-text-input :value="credential ? credential.name : $t('PLUGIN.COLLECTOR.MAIN.COLLECT_MODAL_CREDENTIALS_ALL')"
-                                  disabled
-                                  class="w-full"
+                <table class="w-full">
+                    <p-definition
+                        :label="$t('PLUGIN.COLLECTOR.MAIN.COLLECT_MODAL_SERVICE_ACCOUNT_LABEL')"
+                        :data="credential ? credential.name : $t('PLUGIN.COLLECTOR.MAIN.COLLECT_MODAL_CREDENTIALS_ALL')"
+                        auto-key-width
                     />
-                </p-field-group>
+                </table>
             </div>
         </template>
     </p-button-modal>
@@ -58,7 +59,7 @@ import {
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PTextInput, PLazyImg,
+    PButtonModal, PLazyImg, PDefinition,
 } from '@spaceone/design-system';
 import { get } from 'lodash';
 
@@ -143,8 +144,7 @@ export default {
     name: 'CollectDataModal',
     components: {
         PButtonModal,
-        PFieldGroup,
-        PTextInput,
+        PDefinition,
         PLazyImg,
     },
     props: {

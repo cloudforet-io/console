@@ -84,8 +84,8 @@
                             :disabled="!hasManagePermission"
                 />
             </template>
-            <template #credentials>
-                <collector-credentials :collector-id="selectedItems[0].collector_id" :provider="selectedItems[0].plugin_info.provider" />
+            <template #serviceAccounts>
+                <collector-service-accounts :collector-id="selectedItems[0].collector_id" :provider="selectedItems[0].plugin_info.provider" />
             </template>
             <template #schedules>
                 <collector-schedules :collector="selectedItems[0]" :manage-disabled="!hasManagePermission" />
@@ -214,7 +214,7 @@ const TagsPanel = (): Component => import('@/common/modules/tags/tags-panel/Tags
 const CollectorUpdateModal = (): Component => import('@/services/asset-inventory/collector/modules/CollectorUpdateModal.vue') as Component;
 const CollectDataModal = (): Component => import('@/services/asset-inventory/collector/modules/CollectDataModal.vue') as Component;
 const CollectorDetails = (): Component => import('@/services/asset-inventory/collector/modules/CollectorDetails.vue') as Component;
-const CollectorCredentials = (): Component => import('@/services/asset-inventory/collector/modules/CollectorCredentials.vue') as Component;
+const CollectorServiceAccounts = (): Component => import('@/services/asset-inventory/collector/modules/CollectorServiceAccounts.vue') as Component;
 const CollectorSchedules = (): Component => import('@/services/asset-inventory/collector/modules/CollectorSchedules.vue') as Component;
 
 export default {
@@ -235,7 +235,7 @@ export default {
         CollectorUpdateModal,
         CollectDataModal,
         CollectorDetails,
-        CollectorCredentials,
+        CollectorServiceAccounts,
         CollectorSchedules,
         // CollectionRule,
         TagsPanel,
@@ -283,7 +283,6 @@ export default {
             fields: computed(() => [
                 { name: 'name', label: 'Name' },
                 { name: 'state', label: 'State' },
-                { name: 'priority', label: 'Priority' },
                 { name: 'plugin_info.plugin_id', label: 'Plugin' },
                 { name: 'plugin_info.version', label: 'Version' },
                 { name: 'collector_history', label: 'Collector History', sortable: false },
@@ -292,7 +291,6 @@ export default {
             excelFields: [
                 { key: 'name', name: 'Name' },
                 { key: 'state', name: 'State' },
-                { key: 'priority', name: 'Priority' },
                 { key: 'plugin_info.plugin_id', name: 'Plugin' },
                 { key: 'plugin_info.version', name: 'Version' },
                 { key: 'last_collected_at', name: 'Last Collected', type: 'datetime' },
@@ -343,7 +341,6 @@ export default {
             tableCheckFields: [
                 { name: 'name', label: 'Name' },
                 { name: 'state', label: 'State' },
-                { name: 'priority', label: 'Priority' },
             ],
         });
 
@@ -352,7 +349,7 @@ export default {
             tabs: computed<TabItem[]>(() => [
                 { label: i18n.t('PLUGIN.COLLECTOR.MAIN.TAB_DETAILS'), name: 'details', keepAlive: true },
                 { label: i18n.t('PLUGIN.COLLECTOR.MAIN.TAB_TAG'), name: 'tag', keepAlive: true },
-                { label: i18n.t('PLUGIN.COLLECTOR.MAIN.TAB_CREDENTIALS'), name: 'credentials', keepAlive: true },
+                { label: i18n.t('PLUGIN.COLLECTOR.MAIN.TAB_SERVICE_ACCOUNT'), name: 'serviceAccounts', keepAlive: true },
                 { label: i18n.t('PLUGIN.COLLECTOR.MAIN.TAB_SCHEDULE'), name: 'schedules', keepAlive: true },
                 // { label: i18n.t('PLUGIN.COLLECTOR.MAIN.TAB_COLLECTION_RULE'), name: 'collectionRule', keepAlive: true },
             ]),
@@ -376,7 +373,7 @@ export default {
 
         // Table
         const apiQuery = new ApiQueryHelper().setOnly(
-            'collector_id', 'name', 'priority', 'last_collected_at',
+            'collector_id', 'name', 'last_collected_at',
             'provider', 'tags', 'plugin_info', 'state',
         );
         const getQuery = () => {

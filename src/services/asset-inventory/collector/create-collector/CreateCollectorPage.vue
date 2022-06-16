@@ -26,17 +26,6 @@
                                 <p-text-input v-model="inputModel.name" class="block" :invalid="invalid" />
                             </template>
                         </p-field-group>
-                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.PRIORITY_LABEL')"
-                                       :invalid-text="priorityInvalidText"
-                                       :invalid="!isPriorityValid"
-                                       :required="true"
-                        >
-                            <template #default="{invalid}">
-                                <p-text-input v-model="inputModel.priority" type="number" class="block"
-                                              :invalid="invalid"
-                                />
-                            </template>
-                        </p-field-group>
                         <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.VERSION_LABEL')"
                                        :invalid="!isVersionValid"
                                        :required="true"
@@ -48,9 +37,6 @@
                         </p-field-group>
                     </div>
                 </div>
-            </template>
-            <template #contents-credentials>
-                <confirm-credentials :provider="provider" :supported-schema="supportedSchema" class="mt-8" />
             </template>
             <template #contents-tags>
                 <tags-input-group :tags="tags"
@@ -81,7 +67,6 @@ import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInput
 import { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import ConfirmCredentials from '@/services/asset-inventory/collector/create-collector/modules/ConfirmCredentials.vue';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
@@ -92,7 +77,6 @@ export default {
         PSelectDropdown,
         PTextInput,
         PFieldGroup,
-        ConfirmCredentials,
         PProgressWizard,
         TagsInputGroup,
         PPageTitle,
@@ -116,7 +100,6 @@ export default {
         const formState = reactive({
             inputModel: {
                 name: '',
-                priority: 10,
                 version: '',
             },
             nameInvalidText: computed(() => {
@@ -128,15 +111,6 @@ export default {
                 return '';
             }),
             isNameValid: computed(() => !(formState.inputModel.name.length < 2 || state.collectorNames.includes(formState.inputModel.name))),
-            priorityInvalidText: computed(() => {
-                if (formState.inputModel.priority < 1) {
-                    return vm.$t('PLUGIN.COLLECTOR.CREATE.PRIORITY_INVALID_MIN');
-                } if (formState.inputModel.priority > 10) {
-                    return vm.$t('PLUGIN.COLLECTOR.CREATE.PRIORITY_INVALID_MAX');
-                }
-                return '';
-            }),
-            isPriorityValid: computed(() => !(formState.inputModel.priority < 1 || formState.inputModel.priority > 10)),
             versionInvalidText: computed(() => {
                 if (formState.inputModel.version.length === 0) {
                     return vm.$t('PLUGIN.COLLECTOR.CREATE.VERSION_INVALID_REQUIRED');
@@ -144,7 +118,7 @@ export default {
                 return '';
             }),
             isVersionValid: computed(() => !(formState.inputModel.version.length === 0)),
-            isConfValid: computed(() => formState.isNameValid && formState.isPriorityValid && formState.isVersionValid),
+            isConfValid: computed(() => formState.isNameValid && formState.isVersionValid),
             isTagsValid: true,
             isAutoUpgrade: true,
         });
@@ -153,10 +127,6 @@ export default {
                 {
                     name: 'conf',
                     label: vm.$t('PLUGIN.COLLECTOR.CREATE.TAB_SET_COLLECTOR'),
-                },
-                {
-                    name: 'credentials',
-                    label: vm.$t('PLUGIN.COLLECTOR.CREATE.TAB_CONFIRM_CREDENTIALS'),
                 },
                 {
                     name: 'tags',
@@ -168,7 +138,6 @@ export default {
             loading: false,
             invalidState: computed(() => ({
                 conf: !formState.isConfValid,
-                credentials: false,
                 tags: !formState.isTagsValid,
             })),
             disabled: computed(() => some(tabState.invalidState, v => v === true)),
@@ -232,7 +201,7 @@ export default {
             tabState.loading = true;
             const params = {
                 name: formState.inputModel.name,
-                priority: formState.inputModel.priority,
+                priority: 10,
                 tags: state.tags,
                 plugin_info: {
                     plugin_id: state.pluginId,
