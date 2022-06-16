@@ -1,7 +1,7 @@
 <template>
     <p-button-modal
-        class="alert-reassign-modal"
-        header-title="Reassign to other member"
+        class="alert-assign-modal"
+        :header-title="$t('MONITORING.ALERT.DETAIL.ASSIGN_MODAL_TITLE')"
         size="md"
         :disabled="!selectedUserID"
         :visible.sync="proxyVisible"
@@ -55,7 +55,7 @@ import { ProjectMember } from '@/services/alert-manager/type';
 
 
 export default {
-    name: 'AlertReassignModal',
+    name: 'AlertAssignModal',
     components: {
         PButtonModal,
         PToolboxTable,

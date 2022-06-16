@@ -55,7 +55,7 @@
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.DURATION') }}</span>
             <span class="time">{{ duration }}</span>
         </p>
-        <alert-reassign-modal
+        <alert-assign-modal
             :visible.sync="reassignModalVisible" :project-id="alertData.project_id"
             :alert-id="id"
         />
@@ -79,7 +79,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import AlertReassignModal from '@/services/alert-manager/alert/alert-detail/modules/alert-summary/modules/AlertReassignModal.vue';
+import AlertAssignModal from '@/services/alert-manager/alert/alert-detail/modules/alert-summary/modules/AlertAssignModal.vue';
 import {
     ALERT_STATE, ALERT_URGENCY, AlertState, AlertUrgency,
 } from '@/services/alert-manager/lib/config';
@@ -116,7 +116,7 @@ const calculateTime = (time) => {
 export default {
     name: 'AlertSummary',
     components: {
-        AlertReassignModal,
+        AlertAssignModal,
         PPaneLayout,
         PSelectDropdown,
         PButton,
