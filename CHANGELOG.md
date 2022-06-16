@@ -1,3 +1,10 @@
+# [1.1.0-beta.330](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.329...v1.1.0-beta.330) (2022-06-16)
+
+
+### Bug Fixes
+
+* make style different when copy button exist or not in Definition ([#993](https://github.com/spaceone-dev/spaceone-design-system/issues/993)) ([ccfe303](https://github.com/spaceone-dev/spaceone-design-system/commit/ccfe30353b30d6fc2c0546ce991c2d672261567b))
+
 # [1.1.0-beta.329](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.328...v1.1.0-beta.329) (2022-06-15)
 
 
