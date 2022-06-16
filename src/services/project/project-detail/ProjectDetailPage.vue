@@ -45,7 +45,7 @@
                 </p-page-title>
             </div>
 
-            <maintenance-happening-list ref="maintenanceHappeningListRef" class="maintenance-happening-list" />
+            <maintenance-happening-list ref="maintenanceHappeningListRef" class="maintenance-happening-list" :project-id="projectId" />
 
             <p-tab v-if="item"
                    :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"

@@ -45,7 +45,13 @@ export default {
         PListCard,
         PI,
     },
-    setup() {
+    props: {
+        projectId: {
+            type: String,
+            default: '',
+        },
+    },
+    setup(props) {
         const state = reactive({
             loading: false,
             items: [],
@@ -64,6 +70,7 @@ export default {
             state.loading = true;
             try {
                 const { results } = await SpaceConnector.client.monitoring.maintenanceWindow.list({
+                    project_id: props.projectId,
                     query,
                 });
 
