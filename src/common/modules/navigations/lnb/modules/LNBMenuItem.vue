@@ -81,6 +81,7 @@ export default defineComponent<Props>({
     props: {
         menuData: {
             type: [Object, Array] as PropType<LNBMenu>,
+            default: () => ({}),
         },
         currentPath: {
             type: String,

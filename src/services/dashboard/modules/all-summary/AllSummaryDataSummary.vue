@@ -5,7 +5,7 @@
         </div>
         <template v-if="!loading && !!summaryData.length">
             <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
-                <router-link :to="activeTab !== 'billing' ? allLink : ''"
+                <router-link :to="getAllServiceLocation()"
                              class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
                              :class="{'link-text': activeTab !== 'billing'}"
                 >
@@ -57,17 +57,20 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { cloneDeep, range } from 'lodash';
+import { range } from 'lodash';
 import { Location } from 'vue-router';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { objectToQueryString } from '@/lib/router-query-string';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { DAY_COUNT, MONTH_COUNT } from '@/services/dashboard/modules/all-summary/AllSummary.vue';
 import { CLOUD_SERVICE_LABEL, DATA_TYPE } from '@/services/dashboard/modules/type';
 
 
@@ -100,9 +103,9 @@ export default {
             type: [String, Number],
             default: '-',
         },
-        allLink: {
-            type: Object,
-            default: () => ({}),
+        selectedDateType: {
+            type: String,
+            default: 'DAILY',
         },
         storageSuffix: {
             type: String,
@@ -125,11 +128,42 @@ export default {
         });
 
         /* Util */
-        const getLocation = (data): Location => {
+        const getBillingServiceLocation = (serviceCode?: string, disableFilter = false) => {
+            const period = {
+                start: dayjs.utc().subtract(DAY_COUNT, 'day').format('YYYY-MM-DD'),
+                end: dayjs.utc().subtract(1, 'day').format('YYYY-MM-DD'),
+            };
+            if (props.selectedDateType === 'MONTHLY') {
+                period.start = dayjs.utc().subtract(MONTH_COUNT - 1, 'month').format('YYYY-MM');
+                period.end = dayjs.utc().format('YYYY-MM');
+            }
+            const location: any = {
+                name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                query: {
+                    granularity: primitiveToQueryString(props.selectedDateType),
+                    groupBy: arrayToQueryString([GROUP_BY.PRODUCT]),
+                    period: objectToQueryString(period),
+                },
+            };
+            if (!disableFilter) {
+                location.query.filters = objectToQueryString({ product: [serviceCode] });
+            }
+            return location;
+        };
+        const getAllServiceLocation = (): Location => {
             if (props.activeTab === DATA_TYPE.BILLING) {
-                const allLink = cloneDeep(props.allLink);
-                allLink.query.filters = objectToQueryString({ product: [data.service_code] });
-                return allLink;
+                return getBillingServiceLocation(undefined, true);
+            }
+            return {
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+                query: {
+                    service: CLOUD_SERVICE_LABEL[props.activeTab],
+                },
+            };
+        };
+        const getServiceLocation = (data): Location => {
+            if (props.activeTab === DATA_TYPE.BILLING) {
+                return getBillingServiceLocation(data.service_code, false);
             }
             return {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
@@ -218,7 +252,7 @@ export default {
                             provider: d.provider,
                             type: d.cloud_service_group || d.service_code,
                             count: numberFormatter(d.billing_data[0].cost),
-                            to: getLocation(d),
+                            to: getServiceLocation(d),
                         });
                     }
                 });
@@ -249,6 +283,7 @@ export default {
 
         return {
             ...toRefs(state),
+            getAllServiceLocation,
         };
     },
 };

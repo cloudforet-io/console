@@ -6,7 +6,7 @@
             <template #tab="{name, label}">
                 <div class="tab-box-wrapper" :class="{selected: name === activeTab}">
                     <div class="count">
-                        <router-link :to="name !== 'billing' ? getLocation(name) : ''" class="anchor">
+                        <router-link :to="getAllSummaryTabLocation(name)" class="anchor">
                             <span class="number">
                                 <span v-if="name === 'billing'" class="dollar-sign">$</span>
                                 <span>{{ count[name] }}</span>
@@ -46,7 +46,7 @@
                                           :active-tab="activeTab"
                                           :label="tabs.find(d => d.name === activeTab).label"
                                           :count="count[activeTab]"
-                                          :all-link="getLocation(activeTab)"
+                                          :selected-date-type="selectedDateType"
                                           :storage-suffix="storageBoxSuffix"
                 />
             </div>
@@ -83,13 +83,15 @@ import { gray, primary, primary1 } from '@/styles/colors';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { Granularity, Period } from '@/services/cost-explorer/type';
+import { Period } from '@/services/cost-explorer/type';
 import AllSummaryDataSummary from '@/services/dashboard/modules/all-summary/AllSummaryDataSummary.vue';
 import {
     DATA_TYPE, DateItem, DateType, DataType, CLOUD_SERVICE_LABEL,
 } from '@/services/dashboard/modules/type';
-import { DATE_TYPE } from '@/services/project/project-detail/project-summary/modules/config';
 
+
+export const DAY_COUNT = 14;
+export const MONTH_COUNT = 12;
 
 /* type */
 type Unit = 'b' | 'gb' | 'kb' | 'mb' | 'pb' | 'tb' | 'B' | 'GB' | 'KB' | 'MB' | 'PB' | 'TB';
@@ -102,8 +104,6 @@ interface ChartData {
     tooltipText?: string | number;
 }
 
-const DAY_COUNT = 14;
-const MONTH_COUNT = 12;
 const BOX_SWITCH_INTERVAL = 10000;
 
 export default {
@@ -274,27 +274,6 @@ export default {
                 state.activeTab = state.tabs[activeTabIndex].name as DataType;
             }, BOX_SWITCH_INTERVAL);
         };
-        const getLocation = (type: DataType): Location => {
-            if (type === DATA_TYPE.BILLING) {
-                let granularity: Granularity = GRANULARITY.DAILY;
-                if (state.selectedDateType === DATE_TYPE.MONTHLY) {
-                    granularity = GRANULARITY.MONTHLY;
-                }
-                return {
-                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-                    query: {
-                        granularity: primitiveToQueryString(granularity),
-                        period: objectToQueryString(state.period),
-                    },
-                };
-            }
-            return {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-                query: {
-                    service: CLOUD_SERVICE_LABEL[type],
-                },
-            };
-        };
         const setChartData = (data) => {
             const chartData: ChartData[] = [];
             const dateType = state.selectedDateType;
@@ -365,6 +344,27 @@ export default {
                     tooltipText,
                 };
             });
+        };
+        const getAllSummaryTabLocation = (type: DataType): Location => {
+            if (type === DATA_TYPE.BILLING) {
+                const _period = {
+                    start: dayjs.utc().startOf('month').format('YYYY-MM-DD'),
+                    end: dayjs.utc().endOf('month').format('YYYY-MM-DD'),
+                };
+                return {
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                    query: {
+                        granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                        period: objectToQueryString(_period),
+                    },
+                };
+            }
+            return {
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+                query: {
+                    service: CLOUD_SERVICE_LABEL[type],
+                },
+            };
         };
 
         /* Api */
@@ -488,7 +488,7 @@ export default {
             chartState,
             handleChangeTab,
             handleChangeDateType,
-            getLocation,
+            getAllSummaryTabLocation,
         };
     },
 };
