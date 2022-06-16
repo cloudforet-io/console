@@ -1756,6 +1756,7 @@
 			"DETAIL": {
 				"ALT_E_DELETE_ALERT": "Failed to Delete Alert",
 				"ALT_S_DELETE_ALERT": "Successfully Deleted Alert",
+				"ASSIGN_MODAL_TITLE": "Assign to other member",
 				"DELETE_MODAL_DESC": "Are you sure you want to delete alert?",
 				"DELETE_MODAL_TITLE": "Delete Alert",
 				"DETAILS": {

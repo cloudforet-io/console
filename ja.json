@@ -1756,6 +1756,7 @@
 			"DETAIL": {
 				"ALT_E_DELETE_ALERT": "アラート削除に失敗",
 				"ALT_S_DELETE_ALERT": "アラート削除に成功",
+				"ASSIGN_MODAL_TITLE": "担当者アサイン",
 				"DELETE_MODAL_DESC": "アラートを削除しますか？",
 				"DELETE_MODAL_TITLE": "アラート削除",
 				"DETAILS": {

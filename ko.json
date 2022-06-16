@@ -1756,6 +1756,7 @@
 			"DETAIL": {
 				"ALT_E_DELETE_ALERT": "알람 삭제 실패",
 				"ALT_S_DELETE_ALERT": "알람 삭제 성공",
+				"ASSIGN_MODAL_TITLE": "담당자 할당",
 				"DELETE_MODAL_DESC": "알람을 삭제하시겠습니까?",
 				"DELETE_MODAL_TITLE": "알람 삭제",
 				"DETAILS": {
