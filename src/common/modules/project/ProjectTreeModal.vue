@@ -25,21 +25,19 @@
                         @change-select="onChangeSelect"
                 >
                     <template #data="{node}">
-                        <span :class="{
-                            'ml-2': node.data.item_type === 'PROJECT'
-                        }"
-                        >{{ node.data.name }}</span>
+                        <span class="ml-1">{{ node.data.name }}</span>
                     </template>
-                    <template #toggle="{node, path, selected}">
-                        <p-radio v-if="node.data.item_type === 'PROJECT'"
-                                 :selected="selected" :value="true"
-                                 @click.stop="changeSelectState(node, path)"
-                        />
-                    </template>
-                    <template #toggle-right="{node}">
-                        <p-i v-if="node.data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="mx-1"
-                             width="1rem" height="1rem" color="inherit transparent"
-                        />
+                    <template #toggle-right="{node, path, selected}">
+                        <span>
+                            <p-radio v-if="node.data.item_type === 'PROJECT'"
+                                     :selected="selected" :value="true"
+                                     class="mr-1"
+                                     @click.stop="changeSelectState(node, path)"
+                            />
+                            <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_tree_project-group' : 'ic_tree_project'"
+                                 width="1rem" height="1rem"
+                            />
+                        </span>
                     </template>
                 </p-tree>
                 <div class="no-select">
