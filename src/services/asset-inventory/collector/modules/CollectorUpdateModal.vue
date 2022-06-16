@@ -302,7 +302,7 @@ export default {
 .collector-update-modal {
     .collector-input-wrapper {
         @apply flex;
-        padding: 0 2rem 3rem 2rem;
+        margin-bottom: 1.5rem;
         .p-text-input {
             @apply text-gray-900 rounded-xs;
             width: 100%;
@@ -314,6 +314,7 @@ export default {
             padding-right: 0.5rem;
         }
         .p-select-dropdown {
+            @apply w-full;
             padding-left: 0.5rem;
             padding-right: 0.5rem;
             .p-context-menu {
