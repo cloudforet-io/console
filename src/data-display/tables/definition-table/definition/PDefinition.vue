@@ -1,6 +1,6 @@
 <template>
     <tr class="p-definition" :class="{block}">
-        <td class="key" :class="{'auto-width': autoKeyWidth}">
+        <td class="key" :class="{'auto-width': autoKeyWidth, 'no-copy-button': disableCopy}">
             <slot name="key" v-bind="{name, label, data, value: displayData}">
                 {{ label || name }}
             </slot>
@@ -102,6 +102,9 @@ export default defineComponent<DefinitionProps>({
         &.auto-width {
             width: auto;
         }
+        &.no-copy-button {
+            padding: 0.5rem 1rem;
+        }
     }
     > .value-wrapper {
         max-width: calc(100% - 18rem);
@@ -143,7 +146,7 @@ export default defineComponent<DefinitionProps>({
     }
 
     @screen mobile {
-        flex-wrap: no-wrap;
+        flex-wrap: nowrap;
         flex-direction: column;
         > .key, > .value-wrapper {
             width: 100%;

@@ -103,16 +103,32 @@ export const Template = (args, { argTypes }) => ({
 {{
     components:{ PDefinition },
     template: `
-        <p-definition
-            :label="label"
-            :data="data"
-            disable-copy
-        />
+        <div>
+            <p-definition
+                :label="label"
+                :data="data"
+                disable-copy
+            />
+            <p-definition
+                :label="label2"
+                :data="data2"
+                disable-copy
+            />
+            <p-definition
+                :label="label3"
+                :data="data3"
+                disable-copy
+            />
+        </div>
 `,
     setup() {
         return {
             label: faker.lorem.sentence(5),
-            data: faker.lorem.sentence(20)
+            data: faker.lorem.sentence(20),
+            label2: faker.lorem.sentence(15),
+            data2: faker.lorem.sentence(5),
+            label3: faker.lorem.sentence(5),
+            data3: faker.lorem.sentence(5),
         }
     }
 }}
@@ -287,6 +303,33 @@ export const Template = (args, { argTypes }) => ({
             :data="data.numberData"
             auto-key-width
         />
+        <p-definition
+            name="long string data"
+            :data="data.longStringData"
+            auto-key-width
+        />
+        <p-definition
+            name="long string data with long, long, long, long, long, long key"
+            :data="data.longStringData"
+            auto-key-width
+        />
+        <p-definition
+            name="long string data with long, long, long, long, long, long key & disable copy"
+            :data="data.longStringData"
+            auto-key-width
+            disable-copy
+        />
+        <p-definition
+            name="short string data with long, long, long, long, long, long key"
+            :data="data.stringData"
+            auto-key-width
+        />
+        <p-definition
+            name="short string data with long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long, long key & disable copy"
+            :data="data.stringData"
+            auto-key-width
+            disable-copy
+        />
     </tbody>
 </table>
 `,
@@ -298,6 +341,7 @@ export const Template = (args, { argTypes }) => ({
                         arrayData: ['array', 'data'],
                         booleanData: true,
                         numberData: 13,
+                        longStringData: faker.lorem.sentence(30),
                     }
                 });
                 return {
