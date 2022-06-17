@@ -10,16 +10,11 @@ export interface DateItem {
     name: DateType;
     label: TranslateResult;
 }
+
 export const DATA_TYPE = {
-    SERVER: 'SERVER',
-    DATABASE: 'DATABASE',
-    STORAGE: 'STORAGE',
-    BILLING: 'BILLING',
+    SERVER: 'Server',
+    DATABASE: 'Database',
+    STORAGE: 'Storage',
+    BILLING: 'Billing',
 } as const;
 export type DataType = typeof DATA_TYPE[keyof typeof DATA_TYPE]
-export enum CLOUD_SERVICE_LABEL {
-    SERVER = 'Server',
-    DATABASE = 'Database',
-    STORAGE = 'Storage',
-    BILLING = 'Billing'
-}

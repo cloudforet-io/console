@@ -11,8 +11,8 @@
             <template #tab="{name}">
                 <div class="box" :class="{selected: name === activeTab}">
                     <span>{{ dataMap[name].label }}</span>
-                    <span v-if="name === 'storage'" class="suffix">({{ storageSuffix }})</span>
-                    <span class="count"> {{ name === 'storage' ? byteFormatter(count[name]).split(' ')[0] : commaFormatter(count[name]) }}</span>
+                    <span v-if="name === SERVICE_CATEGORY.STORAGE" class="suffix">({{ storageSuffix }})</span>
+                    <span class="count"> {{ name === SERVICE_CATEGORY.STORAGE ? byteFormatter(count[name]).split(' ')[0] : commaFormatter(count[name]) }}</span>
                 </div>
             </template>
         </p-balloon-tab>
@@ -21,7 +21,7 @@
                 <div class="chart-wrapper">
                     <div class="sub-title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
-                        <span v-if="activeTab === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
+                        <span v-if="activeTab === SERVICE_CATEGORY.STORAGE" class="suffix">({{ storageTrendSuffix }})</span>
                     </div>
                     <div class="toggle-button-group">
                         <p-button v-for="(d, idx) in dateTypes"
@@ -51,7 +51,7 @@
                                 <div class="text-group">
                                     <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
                                 </div>
-                                <span class="count">{{ activeTab === 'storage' ? byteFormatter(count[activeTab]) : commaFormatter(count[activeTab]) }}</span>
+                                <span class="count">{{ activeTab === SERVICE_CATEGORY.STORAGE ? byteFormatter(count[activeTab]) : commaFormatter(count[activeTab]) }}</span>
                             </router-link>
                             <router-link v-for="(data, idx) of summaryData" :key="idx"
                                          :to="data.to"
@@ -85,7 +85,7 @@
                     <div class="sub-title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE_TITLE') }}</span>
                     </div>
-                    <project-region-service :project-id="projectId" :label="selectedLabel" :count="count[activeTab]" />
+                    <project-region-service :project-id="projectId" :label="activeTab" :count="count[activeTab]" />
                 </div>
             </div>
         </div>
@@ -127,7 +127,7 @@ import { gray, primary1, primary2 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import {
-    CLOUD_SERVICE_LABEL, DATE_TYPE, SERVICE_CATEGORY,
+    DATE_TYPE, DateType, SERVICE_CATEGORY, ServiceCategory,
 } from '@/services/project/project-detail/project-summary/modules/config';
 import ProjectRegionService from '@/services/project/project-detail/project-summary/modules/ProjectRegionService.vue';
 
@@ -171,27 +171,27 @@ export default {
             skeletons: range(4),
             providers: computed(() => store.state.reference.provider.items),
             //
-            selectedLabel: computed(() => CLOUD_SERVICE_LABEL[state.activeTab]),
-            selectedDateType: DATE_TYPE.DAILY,
+            // selectedLabel: computed(() => state.activeTab),
+            selectedDateType: DATE_TYPE.DAILY as DateType,
             dateTypes: computed(() => ([
                 { name: DATE_TYPE.DAILY, label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.DAY') },
                 { name: DATE_TYPE.MONTHLY, label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.MONTH') },
             ])),
             //
             count: {
-                compute: 0,
-                container: 0,
-                database: 0,
-                networking: 0,
-                storage: 0,
-                security: 0,
-                analytics: 0,
-                all: 0,
+                [SERVICE_CATEGORY.SERVER]: 0,
+                [SERVICE_CATEGORY.CONTAINER]: 0,
+                [SERVICE_CATEGORY.DATABASE]: 0,
+                [SERVICE_CATEGORY.NETWORKING]: 0,
+                [SERVICE_CATEGORY.STORAGE]: 0,
+                [SERVICE_CATEGORY.SECURITY]: 0,
+                [SERVICE_CATEGORY.ANALYTICS]: 0,
+                [SERVICE_CATEGORY.ALL]: 0,
             },
             storageSuffix: 'TB' as Unit,
             storageTrendSuffix: 'TB' as Unit,
             tabs: Object.values(SERVICE_CATEGORY),
-            activeTab: SERVICE_CATEGORY.SERVER,
+            activeTab: SERVICE_CATEGORY.SERVER as ServiceCategory,
             dataMap: computed(() => ({
                 [SERVICE_CATEGORY.SERVER]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.SERVER') },
                 [SERVICE_CATEGORY.CONTAINER]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.CONTAINER') },
@@ -216,17 +216,17 @@ export default {
         });
 
         /* Util */
-        const disposeChart = () => {
-            if (chartState.registry[state.chartRef]) {
-                chartState.registry[state.chartRef].dispose();
-                delete chartState.registry[state.chartRef];
+        const disposeChart = (chartContext) => {
+            if (chartState.registry[chartContext]) {
+                chartState.registry[chartContext].dispose();
+                delete chartState.registry[chartContext];
             }
         };
-        const drawChart = () => {
+        const drawChart = (chartContext) => {
             const createChart = () => {
-                disposeChart();
-                chartState.registry[state.chartRef] = am4core.create(state.chartRef, am4charts.XYChart);
-                return chartState.registry[state.chartRef];
+                disposeChart(chartContext);
+                chartState.registry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
+                return chartState.registry[chartContext];
             };
             const chart = createChart();
             state.chart = chart;
@@ -283,10 +283,10 @@ export default {
             chart.cursor.lineY.strokeOpacity = 0;
             chart.cursor.behavior = 'none';
         };
-        const getLocation = (type: string) => {
+        const getLocation = (type: ServiceCategory) => {
             const query: Location['query'] = {};
             if (type !== SERVICE_CATEGORY.ALL) {
-                query.service = CLOUD_SERVICE_LABEL[type];
+                query.service = type;
             }
 
             // set filters
@@ -308,17 +308,21 @@ export default {
         };
 
         /* Api */
-        const getCount = async (type) => {
+        const getCount = async () => {
             try {
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
+                const { results } = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
                     project_id: props.projectId,
-                    labels: [CLOUD_SERVICE_LABEL[type]],
+                    labels: Object.values(SERVICE_CATEGORY),
                 });
-                const count = res.results[0]?.total || 0;
-                if (type === SERVICE_CATEGORY.STORAGE) {
-                    state.storageSuffix = byteFormatter(count).split(' ')[1];
-                }
-                state.count[type] = count;
+
+                results.forEach((result) => {
+                    const count = result.total || 0;
+                    const label: ServiceCategory = result.label;
+                    if (label === SERVICE_CATEGORY.STORAGE) {
+                        state.storageSuffix = byteFormatter(count).split(' ')[1] as Unit;
+                    }
+                    state.count[label] = count;
+                });
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
@@ -334,7 +338,7 @@ export default {
                     granularity: state.selectedDateType,
                     project_id: props.projectId,
                 };
-                if (type !== SERVICE_CATEGORY.ALL) param.label = CLOUD_SERVICE_LABEL[type];
+                if (type !== SERVICE_CATEGORY.ALL) param.label = type;
                 const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary(param);
                 const data = res.results;
 
@@ -391,7 +395,7 @@ export default {
             const defaultParam: any = {
                 query: apiQueryHelper.data,
             };
-            if (type !== SERVICE_CATEGORY.ALL) defaultParam.labels = [CLOUD_SERVICE_LABEL[type]];
+            if (type !== SERVICE_CATEGORY.ALL) defaultParam.labels = [type];
             if (type !== SERVICE_CATEGORY.STORAGE) {
                 return {
                     ...defaultParam,
@@ -456,17 +460,18 @@ export default {
         /* Event */
         const handleChangeTab = async (type) => {
             await Promise.all([getSummaryInfo(type), getTrend(type)]);
-            drawChart();
+            drawChart(state.chartRef);
         };
         const handleChangeDateType = async (dateType) => {
             state.selectedDateType = dateType;
             await getTrend(state.activeTab);
-            drawChart();
+            drawChart(state.chartRef);
         };
 
         /* Init */
         const init = async () => {
-            await Promise.allSettled(Object.values(SERVICE_CATEGORY).map(d => getCount(d)));
+            await getCount();
+            // await Promise.allSettled(Object.values(SERVICE_CATEGORY).map(d => getCount(d)));
         };
         const chartInit = async () => {
             await getTrend(SERVICE_CATEGORY.SERVER);
@@ -483,7 +488,7 @@ export default {
         }, { immediate: true });
         watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
             if (!loading && chartContext) {
-                drawChart();
+                drawChart(chartContext);
             }
         }, { immediate: true });
 
@@ -499,6 +504,7 @@ export default {
         return {
             ...toRefs(state),
             chartState,
+            SERVICE_CATEGORY,
             handleChangeTab,
             handleChangeDateType,
             byteFormatter,

@@ -86,7 +86,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { Period } from '@/services/cost-explorer/type';
 import AllSummaryDataSummary from '@/services/dashboard/modules/all-summary/AllSummaryDataSummary.vue';
 import {
-    DATA_TYPE, DateItem, DateType, DataType, CLOUD_SERVICE_LABEL,
+    DATA_TYPE, DateItem, DateType, DataType,
 } from '@/services/dashboard/modules/type';
 
 
@@ -102,6 +102,9 @@ interface ChartData {
     bulletColor?: string;
     bulletText?: string | number;
     tooltipText?: string | number;
+}
+interface CountMap {
+    [key: string]: number | string;
 }
 
 const BOX_SWITCH_INTERVAL = 10000;
@@ -149,7 +152,7 @@ export default {
                 [DATA_TYPE.DATABASE]: 0,
                 [DATA_TYPE.STORAGE]: 0,
                 [DATA_TYPE.BILLING]: 0,
-            },
+            } as CountMap,
             storageBoxSuffix: 'TB' as Unit,
             storageTrendSuffix: 'TB' as Unit,
             activeTab: DATA_TYPE.SERVER as DataType,
@@ -362,7 +365,7 @@ export default {
             return {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 query: {
-                    service: CLOUD_SERVICE_LABEL[type],
+                    service: type,
                 },
             };
         };
@@ -384,22 +387,24 @@ export default {
                 ErrorHandler.handleError(e);
             }
         };
-        const getCount = async (type) => {
+        const getCount = async () => {
             try {
                 const { results } = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
                     ...props.extraParams,
-                    labels: [CLOUD_SERVICE_LABEL[type]],
+                    labels: Object.values(DATA_TYPE),
                 });
-                let count = 0 as number | string;
-                results.forEach((d) => {
-                    if (type === DATA_TYPE.STORAGE) {
-                        state.storageBoxSuffix = byteFormatter(d.total).split(' ')[1] as Unit;
-                        count = parseFloat(byteFormatter(d.total).split(' ')[0]);
+
+                results.forEach((result) => {
+                    let count;
+                    const label: DataType = result.label;
+                    if (label === DATA_TYPE.STORAGE) {
+                        state.storageBoxSuffix = byteFormatter(result.total).split(' ')[1] as Unit;
+                        count = parseFloat(byteFormatter(result.total).split(' ')[0]);
                         count = commaFormatter(count);
                     } else {
-                        count = numberFormatter(d.total);
+                        count = numberFormatter(result.total);
                     }
-                    state.count[type] = count;
+                    state.count[label] = count;
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -426,7 +431,7 @@ export default {
                 } else {
                     const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
                         ...props.extraParams,
-                        label: CLOUD_SERVICE_LABEL[type],
+                        label: type,
                         granularity: state.selectedDateType,
                     });
                     data = res.results;
@@ -450,7 +455,7 @@ export default {
 
         const init = async () => {
             await Promise.all([
-                Object.keys(DATA_TYPE).map(d => getCount(d)),
+                getCount(),
                 getBillingCount(),
             ]);
             setTabInterval();

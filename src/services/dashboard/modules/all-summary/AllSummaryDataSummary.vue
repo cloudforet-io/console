@@ -71,7 +71,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { DAY_COUNT, MONTH_COUNT } from '@/services/dashboard/modules/all-summary/AllSummary.vue';
-import { CLOUD_SERVICE_LABEL, DATA_TYPE } from '@/services/dashboard/modules/type';
+import { DATA_TYPE } from '@/services/dashboard/modules/type';
 
 
 interface SummaryData {
@@ -157,7 +157,7 @@ export default {
             return {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 query: {
-                    service: CLOUD_SERVICE_LABEL[props.activeTab],
+                    service: props.activeTab,
                 },
             };
         };
@@ -181,7 +181,7 @@ export default {
             apiQueryHelper.setSort('count', true);
             const defaultParam: any = {
                 ...props.extraParams,
-                labels: [CLOUD_SERVICE_LABEL[type]],
+                labels: [type],
                 query: apiQueryHelper.data,
             };
 

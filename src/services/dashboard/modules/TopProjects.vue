@@ -105,15 +105,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray, peacock, secondary } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { CLOUD_SERVICE_LABEL } from '@/services/dashboard/modules/type';
+import { DATA_TYPE } from '@/services/dashboard/modules/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-
-const DATA_TYPE = Object.freeze({
-    SERVER: 'SERVER',
-    DATABASE: 'DATABASE',
-    STORAGE: 'STORAGE',
-} as const);
 
 interface ChartData {
     rank: string;
@@ -253,7 +247,7 @@ export default {
         const queryHelper = new QueryHelper();
         const getLocation = (type: string, projectId: string) => {
             const query: Location['query'] = {};
-            query.service = arrayToQueryString([CLOUD_SERVICE_LABEL[type]]);
+            query.service = arrayToQueryString([type]);
 
             const location: Location = {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
