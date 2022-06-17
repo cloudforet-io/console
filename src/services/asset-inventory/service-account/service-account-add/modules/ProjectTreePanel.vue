@@ -12,7 +12,7 @@
             </div>
             <div class="body-container">
                 <div class="radio-row">
-                    <p-radio v-model="selectedToggle"
+                    <p-radio v-model="isToggleSelected"
                              class="mr-2"
                              :value="true"
                              @click="handleToggle"
@@ -21,7 +21,7 @@
                     </p-radio>
                 </div>
                 <div class="radio-row">
-                    <p-radio v-model="selectedToggle"
+                    <p-radio v-model="isToggleSelected"
                              class="mr-2"
                              :value="false"
                              @click="handleToggle"
@@ -31,7 +31,7 @@
                     <div class="search-radio">
                         <project-select-dropdown class="project-search-dropdown"
                                                  project-selectable
-                                                 :disabled="selectedToggle"
+                                                 :disabled="isToggleSelected"
                                                  :selected-project-ids="selectedProject"
                                                  :use-fixed-menu-style="false"
                                                  @select="handleSelectedProjectIds"
@@ -79,7 +79,7 @@ export default {
 
         const state = reactive({
             selectedProject: [] as ProjectGroupTreeItem[],
-            selectedToggle: true,
+            isToggleSelected: true,
         });
 
         const projectPath = vm?.$router.resolve({ name: PROJECT_ROUTE._NAME }).href;
@@ -93,7 +93,7 @@ export default {
         };
 
         const handleToggle = () => {
-            if (state.selectedToggle) emit('select', null);
+            if (state.isToggleSelected) emit('select', null);
             else if (state.selectedProject.length) emit('select', state.selectedProject[0] as ProjectGroup);
         };
         return {

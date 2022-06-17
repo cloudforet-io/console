@@ -94,10 +94,10 @@
                               size="sm"
                               @confirm="deleteServiceAccount"
         />
-        <project-tree-modal :visible.sync="changeProjectState.visible"
-                            :project-id="changeProjectState.projectId"
-                            :loading="changeProjectState.loading"
-                            @confirm="changeProject"
+        <project-change-modal :visible.sync="changeProjectState.visible"
+                              :project-id="changeProjectState.projectId"
+                              :loading="changeProjectState.loading"
+                              @confirm="changeProject"
         />
         <custom-field-modal v-model="tableState.visibleCustomFieldModal"
                             resource-type="identity.ServiceAccount"
@@ -149,7 +149,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
-import ProjectTreeModal from '@/common/modules/project/ProjectTreeModal.vue';
+import ProjectChangeModal from '@/common/modules/project/ProjectChangeModal.vue';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
 /* page modules */
@@ -177,7 +177,7 @@ export default {
     name: 'ServiceAccountPage',
     components: {
         CustomFieldModal,
-        ProjectTreeModal,
+        ProjectChangeModal,
         PDoubleCheckModal,
         PSelectDropdown,
         PButton,

@@ -146,7 +146,8 @@ export default {
             }),
         });
 
-        const getSearchPath = async (id: string, type: string): Promise<string[]> => {
+        const getSearchPath = async (id: string|undefined, type: string|undefined): Promise<string[]> => {
+            if (!id) return [];
             try {
                 const res = await SpaceConnector.client.identity.project.tree.search({
                     item_id: id,
