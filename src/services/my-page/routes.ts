@@ -17,7 +17,7 @@ const NotificationAddPage = () => import(/* webpackChunkName: "NotificationAddPa
 const myPageRoutes: RouteConfig = {
     path: 'my-page',
     name: MY_PAGE_ROUTE._NAME,
-    meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.AUTHENTICATED },
+    meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: '/my-page/account',
     component: MyPageContainer,
     children: [

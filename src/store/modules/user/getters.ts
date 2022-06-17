@@ -48,14 +48,22 @@ export const hasDomainRole = (state: UserState): boolean => {
 
 export const hasPermission = (state: UserState): boolean => !!state.roles?.length;
 
+const defaultPagePermission: PagePermissionTuple[] = [
+    [MENU_ID.MY_PAGE_ACCOUNT_PROFILE, 'MANAGE'],
+    [MENU_ID.MY_PAGE_NOTIFICATIONS, 'MANAGE'],
+    [MENU_ID.MY_PAGE_API_KEY, 'MANAGE'],
+];
+
 export const pagePermissionList: Getter<UserState, any> = (state, getters): PagePermissionTuple[] => {
     if (getters.isDomainOwner) {
         return [
             [MENU_ID.ADMINISTRATION_ROLE, 'MANAGE'],
             [MENU_ID.ADMINISTRATION_POLICY, 'MANAGE'],
             [MENU_ID.ADMINISTRATION_USER, 'MANAGE'],
+            [MENU_ID.MY_PAGE_ACCOUNT_PROFILE, 'MANAGE'],
         ];
     }
     const permissions = state.roles?.flatMap(role => role.pagePermissions) ?? [];
-    return Object.entries(getPagePermissionMap(permissions));
+    const roleBasePagePermissions = Object.entries(getPagePermissionMap(permissions));
+    return roleBasePagePermissions.concat(defaultPagePermission);
 };
