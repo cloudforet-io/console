@@ -286,19 +286,23 @@ export default {
 .policy-list-data-table {
     @apply mx-0;
     max-width: 100%;
-}
-
-.filter {
-    @apply flex items-center;
-    margin: 1.625rem 1rem -0.375rem;
-    .filter-label {
-        @apply text-gray-400;
-        margin-right: 1rem;
-        font-size: 0.875rem;
-        line-height: 1.15;
+    .filter {
+        @apply flex items-center;
+        margin: 1.625rem 1rem 1.125rem;
+        .filter-label {
+            @apply text-gray-400;
+            margin-right: 1rem;
+            font-size: 0.875rem;
+            line-height: 1.15;
+        }
+        .p-status {
+            margin-right: 1rem;
+        }
     }
-    .p-status {
-        margin-right: 1rem;
+}
+.p-toolbox-table::v-deep {
+    .p-toolbox {
+        padding-top: 0;
     }
 }
 </style>

@@ -23,10 +23,8 @@ export const policyTypeURIFormatter = (policyType: PolicyTypes) => {
     }
 };
 
-export const policyCreatedAtFormatter = (createdAt: TimeStamp, selectedPolicyType: PolicyTypes, timezone: string): string => {
-    if (selectedPolicyType === POLICY_TYPES.MANAGED) return '--';
-    return iso8601Formatter(createdAt.toString(), timezone, 'YYYY-MM-DD hh:mm:ss');
-};
+// eslint-disable-next-line max-len
+export const policyCreatedAtFormatter = (createdAt: TimeStamp, selectedPolicyType: PolicyTypes, timezone: string): string => iso8601Formatter(createdAt?.toString(), timezone, 'YYYY-MM-DD hh:mm:ss') || '--';
 
 export const makeCustomValueHandler = (policyList: PolicyDataModel[], distinct: string, dataType?: KeyDataType): ValueHandler|undefined => {
     if (['datetime', 'boolean'].includes(dataType || '')) return undefined;
