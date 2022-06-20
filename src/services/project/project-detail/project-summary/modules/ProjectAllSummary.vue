@@ -12,7 +12,7 @@
                 <div class="box" :class="{selected: name === activeTab}">
                     <span>{{ dataMap[name].label }}</span>
                     <span v-if="name === SERVICE_CATEGORY.STORAGE" class="suffix">({{ storageSuffix }})</span>
-                    <span class="count"> {{ name === SERVICE_CATEGORY.STORAGE ? byteFormatter(count[name]).split(' ')[0] : commaFormatter(count[name]) }}</span>
+                    <span class="count"> {{ name === SERVICE_CATEGORY.STORAGE ? byteFormatter(dataMap[name].count).split(' ')[0] : commaFormatter(dataMap[name].count) }}</span>
                 </div>
             </template>
         </p-balloon-tab>
@@ -51,7 +51,7 @@
                                 <div class="text-group">
                                     <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
                                 </div>
-                                <span class="count">{{ activeTab === SERVICE_CATEGORY.STORAGE ? byteFormatter(count[activeTab]) : commaFormatter(count[activeTab]) }}</span>
+                                <span class="count">{{ activeTab === SERVICE_CATEGORY.STORAGE ? byteFormatter(dataMap[activeTab].count) : commaFormatter(dataMap[activeTab].count) }}</span>
                             </router-link>
                             <router-link v-for="(data, idx) of summaryData" :key="idx"
                                          :to="data.to"
@@ -85,7 +85,7 @@
                     <div class="sub-title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE_TITLE') }}</span>
                     </div>
-                    <project-region-service :project-id="projectId" :label="activeTab" :count="count[activeTab]" />
+                    <project-region-service :project-id="projectId" :label="activeTab" :count="dataMap[activeTab].count" />
                 </div>
             </div>
         </div>
@@ -171,36 +171,49 @@ export default {
             skeletons: range(4),
             providers: computed(() => store.state.reference.provider.items),
             //
-            // selectedLabel: computed(() => state.activeTab),
             selectedDateType: DATE_TYPE.DAILY as DateType,
             dateTypes: computed(() => ([
                 { name: DATE_TYPE.DAILY, label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.DAY') },
                 { name: DATE_TYPE.MONTHLY, label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.MONTH') },
             ])),
             //
-            count: {
-                [SERVICE_CATEGORY.SERVER]: 0,
-                [SERVICE_CATEGORY.CONTAINER]: 0,
-                [SERVICE_CATEGORY.DATABASE]: 0,
-                [SERVICE_CATEGORY.NETWORKING]: 0,
-                [SERVICE_CATEGORY.STORAGE]: 0,
-                [SERVICE_CATEGORY.SECURITY]: 0,
-                [SERVICE_CATEGORY.ANALYTICS]: 0,
-                [SERVICE_CATEGORY.ALL]: 0,
-            },
             storageSuffix: 'TB' as Unit,
             storageTrendSuffix: 'TB' as Unit,
             tabs: Object.values(SERVICE_CATEGORY),
             activeTab: SERVICE_CATEGORY.SERVER as ServiceCategory,
             dataMap: computed(() => ({
-                [SERVICE_CATEGORY.SERVER]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.SERVER') },
-                [SERVICE_CATEGORY.CONTAINER]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.CONTAINER') },
-                [SERVICE_CATEGORY.DATABASE]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE') },
-                [SERVICE_CATEGORY.NETWORKING]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.NETWORKING') },
-                [SERVICE_CATEGORY.STORAGE]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE') },
-                [SERVICE_CATEGORY.SECURITY]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.SECURITY') },
-                [SERVICE_CATEGORY.ANALYTICS]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.ANALYTICS') },
-                [SERVICE_CATEGORY.ALL]: { label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.ALL') },
+                [SERVICE_CATEGORY.SERVER]: {
+                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.SERVER'),
+                    count: 0,
+                },
+                [SERVICE_CATEGORY.CONTAINER]: {
+                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.CONTAINER'),
+                    count: 0,
+                },
+                [SERVICE_CATEGORY.DATABASE]: {
+                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE'),
+                    count: 0,
+                },
+                [SERVICE_CATEGORY.NETWORKING]: {
+                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.NETWORKING'),
+                    count: 0,
+                },
+                [SERVICE_CATEGORY.STORAGE]: {
+                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE'),
+                    count: 0,
+                },
+                [SERVICE_CATEGORY.SECURITY]: {
+                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.SECURITY'),
+                    count: 0,
+                },
+                [SERVICE_CATEGORY.ANALYTICS]: {
+                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.ANALYTICS'),
+                    count: 0,
+                },
+                [SERVICE_CATEGORY.ALL]: {
+                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.ALL'),
+                    count: 0,
+                },
             })),
             summaryData: [] as SummaryData[],
         });
@@ -321,7 +334,7 @@ export default {
                     if (label === SERVICE_CATEGORY.STORAGE) {
                         state.storageSuffix = byteFormatter(count).split(' ')[1] as Unit;
                     }
-                    state.count[label] = count;
+                    state.dataMap[label].count = count;
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
