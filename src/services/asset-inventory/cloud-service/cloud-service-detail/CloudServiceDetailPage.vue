@@ -416,6 +416,7 @@ export default {
             const { items, totalCount } = await getCloudServiceTableData();
             tableState.items = items;
             typeOptionState.totalCount = totalCount;
+            typeOptionState.selectIndex = [];
         };
 
 
