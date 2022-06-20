@@ -103,6 +103,7 @@ export default defineComponent<Props>({
 <style lang="postcss">
 .p-radio {
     vertical-align: middle;
+    line-height: 1.07rem;
     &:hover {
         .text {
             @apply text-blue-600;
