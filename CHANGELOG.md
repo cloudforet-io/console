@@ -1,3 +1,10 @@
+# [1.1.0-beta.331](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.330...v1.1.0-beta.331) (2022-06-20)
+
+
+### Bug Fixes
+
+* add line height at PRadio ([#994](https://github.com/spaceone-dev/spaceone-design-system/issues/994)) ([3831db7](https://github.com/spaceone-dev/spaceone-design-system/commit/3831db71f88145476bdc3b30470877a1039dd82e))
+
 # [1.1.0-beta.330](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.329...v1.1.0-beta.330) (2022-06-16)
 
 
