@@ -24,7 +24,6 @@
                                                    :cloud-service-type-info="cloudServiceTypeInfo"
                                                    :filters="filters"
                                                    :period="period"
-                                                   :is-server="isServer"
         />
     </fragment>
 </template>
@@ -65,10 +64,8 @@ import { Period } from '@/services/cost-explorer/type';
 
 interface Props {
     cloudServiceTypeInfo: CloudServiceTypeInfo;
-    isServer?: boolean;
     filters?: QueryStoreFilter[];
     period?: Period;
-    disabled?: boolean;
 }
 
 interface Data {
@@ -88,10 +85,6 @@ export default defineComponent<Props>({
             type: Object as () => CloudServiceTypeInfo,
             default: () => ({}),
         },
-        isServer: {
-            type: Boolean,
-            default: false,
-        },
         filters: {
             type: Array as () => QueryStoreFilter[]|undefined,
             default: undefined,
@@ -99,10 +92,6 @@ export default defineComponent<Props>({
         period: {
             type: Object as () => Period|undefined,
             default: undefined,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props) {
@@ -137,16 +126,16 @@ export default defineComponent<Props>({
         const fetchSchemaList = async (): Promise<DynamicWidgetSchema[]> => {
             try {
                 const { provider, group, name } = props.cloudServiceTypeInfo as CloudServiceTypeInfo;
-                const options: any = {
-                    provider,
-                    cloud_service_group: group,
-                    cloud_service_type: name,
-                };
-
                 const { widget } = await SpaceConnector.client.addOns.pageSchema.get({
-                    resource_type: props.isServer ? 'inventory.Server' : 'inventory.CloudService',
+                    resource_type: 'inventory.CloudService',
                     schema: 'widget',
-                    options,
+                    options: {
+                        provider,
+                        cloud_service_group: group,
+                        cloud_service_type: name,
+                        // widget_type: 'chart',
+                        // limit: 15,
+                    },
                 });
                 return widget ?? [];
             } catch (e) {
@@ -161,7 +150,7 @@ export default defineComponent<Props>({
             fetchDataTokenList[idx] = axios.CancelToken.source();
 
             try {
-                const { results } = await SpaceConnector.client.inventory[props.isServer ? 'server' : 'cloudService'].analyze({
+                const { results } = await SpaceConnector.client.inventory.cloudService.analyze({
                     ...state.apiQuery,
                     default_query: schema.query,
                     date_range: state.dateRange,
@@ -211,13 +200,13 @@ export default defineComponent<Props>({
 
         /* Watchers */
         watch([() => props.filters, () => state.dateRange], () => {
-            if (!props.disabled && state.cloudServiceTypeId) {
+            if (state.cloudServiceTypeId) {
                 getDataListWithSchema();
             }
         });
 
         watch(() => state.cloudServiceTypeId, async (cloudServiceTypeId) => {
-            if (!props.disabled && cloudServiceTypeId) {
+            if (cloudServiceTypeId) {
                 state.schemaLoading = true;
                 state.dataLoading = true;
                 await getWidgetSchemaList();

@@ -106,6 +106,7 @@ interface Props {
     visible: boolean;
     resourceType: string;
     options: any;
+    isServerPage: boolean;
 }
 
 type SelectedColumnMap = Record<string, DynamicField>
@@ -139,6 +140,10 @@ export default {
         options: {
             type: Object,
             default: () => ({}),
+        },
+        isServerPage: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: Props, { emit, root }) {
@@ -229,7 +234,7 @@ export default {
                 if (cloudServiceType) options.cloud_service_type = cloudServiceType;
 
                 const res = await SpaceConnector.client.addOns.pageSchema.get({
-                    resource_type: props.resourceType,
+                    resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
                     schema: 'table',
                     options,
                 });
@@ -277,7 +282,7 @@ export default {
 
             try {
                 await SpaceConnector.client.addOns.pageSchema.update({
-                    resource_type: props.resourceType,
+                    resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
                     schema: 'table',
                     data,
                     options,

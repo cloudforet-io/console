@@ -86,7 +86,6 @@ interface Props {
     schemaList: DynamicWidgetSchema[];
     summaryDataList: Data[][];
     cloudServiceTypeInfo: CloudServiceTypeInfo;
-    isServer: boolean;
     filters: QueryStoreFilter[];
     period?: Period;
 }
@@ -120,10 +119,6 @@ export default defineComponent<Props>({
         cloudServiceTypeInfo: {
             type: Object as () => CloudServiceTypeInfo,
             default: () => ({}),
-        },
-        isServer: {
-            type: Boolean,
-            default: false,
         },
         filters: {
             type: Array as () => QueryStoreFilter[],
@@ -160,7 +155,7 @@ export default defineComponent<Props>({
 
         const fetchDataWithSchema = async (schema: DynamicWidgetSchema): Promise<Data[]> => {
             try {
-                const { results } = await SpaceConnector.client.inventory[props.isServer ? 'server' : 'cloudService'].analyze({
+                const { results } = await SpaceConnector.client.inventory.cloudService.analyze({
                     ...state.apiQuery,
                     default_query: schema.query,
                     date_range: state.dateRange,
