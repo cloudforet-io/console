@@ -57,10 +57,10 @@
             </template>
             <template #col-tags-format="{value}">
                 <template v-if="!!Object.keys(value).length">
-                    <p-badge v-for="([key, value], idx) in Object.entries(value)" :key="`${key}-${value}-${idx}`"
+                    <p-badge v-for="([key, val], idx) in Object.entries(value)" :key="`${key}-${val}-${idx}`"
                              style-type="gray200" class="mr-2"
                     >
-                        {{ key }}: {{ value }}
+                        {{ key }}: {{ val }}
                     </p-badge>
                 </template>
                 <template v-else>

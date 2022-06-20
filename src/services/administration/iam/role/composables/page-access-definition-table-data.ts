@@ -36,19 +36,17 @@ const flattenPageAccessDefinitionData = (pagePermissionMap: PagePermissionMap, s
     });
     return result;
 };
-export const usePageAccessDefinitionTableData = (pagePermissionData: PagePermission[] = []): ComputedRef<PageAccessDefinitionTableData[]> => {
-    const pagePermissionMap = getPagePermissionMap(pagePermissionData);
-    return computed<PageAccessDefinitionTableData[]>(() => {
-        const results: PageAccessDefinitionTableData[] = [];
-        MENU_LIST.forEach((menu) => {
-            const permissionRequiredMenuIdList = getPermissionRequiredMenuIds();
-            if (!permissionRequiredMenuIdList.includes(menu.id)) return;
-            const menuInfo = MENU_INFO_MAP[menu.id];
-            results.push({
-                label: i18n.t(menuInfo.translationId),
-                ...flattenPageAccessDefinitionData(pagePermissionMap, [menu]),
-            });
+export const usePageAccessDefinitionTableData = (pagePermissionData: ComputedRef<PagePermission[]>): ComputedRef<PageAccessDefinitionTableData[]> => computed<PageAccessDefinitionTableData[]>(() => {
+    const pagePermissionMap = getPagePermissionMap(pagePermissionData.value);
+    const results: PageAccessDefinitionTableData[] = [];
+    MENU_LIST.forEach((menu) => {
+        const permissionRequiredMenuIdList = getPermissionRequiredMenuIds();
+        if (!permissionRequiredMenuIdList.includes(menu.id)) return;
+        const menuInfo = MENU_INFO_MAP[menu.id];
+        results.push({
+            label: i18n.t(menuInfo.translationId),
+            ...flattenPageAccessDefinitionData(pagePermissionMap, [menu]),
         });
-        return results;
     });
-};
+    return results;
+});
