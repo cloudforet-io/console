@@ -95,7 +95,7 @@ type DataTableTranslationField = DataTableField | {
 
 
 export default {
-    name: 'UserDetail',
+    name: 'RoleDetail',
     components: {
         PDefinitionTable,
         PPanelTop,
@@ -122,11 +122,12 @@ export default {
                 { name: 'created_at', label: i18n.t('IAM.ROLE.DETAIL.CREATED_AT') },
             ]),
             data: {} as Partial<RoleData>,
+            pagePermissions: computed(() => baseInfoState.data?.page_permissions),
         });
         const pageAccessState = reactive({
             title: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS'),
             loading: false,
-            pageAccessDataList: usePageAccessDefinitionTableData(baseInfoState.data?.page_permissions),
+            pageAccessDataList: usePageAccessDefinitionTableData(computed(() => baseInfoState.pagePermissions ?? [])),
         });
         const policyState = reactive({
             fields: [
