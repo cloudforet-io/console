@@ -177,7 +177,7 @@ export default {
         });
         const checkDeleteState = reactive({
             visible: false,
-            headerTitle: i18n.t('PROJECT.EVENT_RULE.DELETE_MODAL_TITLE'),
+            headerTitle: computed(() => i18n.t('PROJECT.EVENT_RULE.DELETE_MODAL_TITLE')),
         });
 
         const changeOrder = (targetData, clickedData, tempOrder) => {
