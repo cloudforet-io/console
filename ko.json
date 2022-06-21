@@ -531,6 +531,7 @@
 				"BUDGET_STATUS": "예산 사용 상태",
 				"BUDGET_USAGE": "예산 사용량",
 				"BUDGET_USAGE_SUMMARY": "예산 사용 현황 요약",
+				"CHECK_DELETE_MODAL_TITLE": "대시보드를 삭제하시겠습니까?",
 				"COST_BY_PROJECT": "프로젝트별 발생 비용",
 				"COST_BY_PROVIDER": "서비스 제공자별 발생 비용",
 				"COST_BY_REGION": "리전별 발생 비용",
@@ -608,7 +609,7 @@
 						"VIEW_QUERY": "쿼리 확인"
 					},
 					"CANCEL": "취소",
-					"CURRENT_WIDGETS": "위젯 리스트",
+					"CURRENT_WIDGETS": "위젯 목록",
 					"CUSTOMIZE": "편집",
 					"CUSTOMIZE_TITLE": "대시보드 편집",
 					"FORM": {

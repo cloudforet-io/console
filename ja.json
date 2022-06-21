@@ -531,6 +531,7 @@
 				"BUDGET_STATUS": "予算使用の状況",
 				"BUDGET_USAGE": "予算使用量",
 				"BUDGET_USAGE_SUMMARY": "予算使用状況の概要",
+				"CHECK_DELETE_MODAL_TITLE": "ダッシュボードを削除しますか？",
 				"COST_BY_PROJECT": "プロジェクト別コスト",
 				"COST_BY_PROVIDER": "プロバイダー別コスト",
 				"COST_BY_REGION": "リージョン別コスト",

@@ -531,6 +531,7 @@
 				"BUDGET_STATUS": "Budget Status",
 				"BUDGET_USAGE": "Budget Usage",
 				"BUDGET_USAGE_SUMMARY": "Budget Usage Summary",
+				"CHECK_DELETE_MODAL_TITLE": "Are you sure you want to delete dashboard?",
 				"COST_BY_PROJECT": "Cost By Project",
 				"COST_BY_PROVIDER": "Cost By Provider",
 				"COST_BY_REGION": "Cost By Region",
