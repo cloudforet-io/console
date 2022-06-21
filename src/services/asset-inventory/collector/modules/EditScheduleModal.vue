@@ -69,9 +69,7 @@
                         <div v-else class="interval-wrapper">
                             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_EVERY_LABEL')" required class="w-full flex">
                                 <div class="ml-4 flex-grow inline-flex">
-                                    <p-text-input v-model="formState.intervalTime" class="w-1/2" type="number"
-                                                  :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_PLACEHOLDER')"
-                                    />
+                                    <p-text-input v-model="formState.intervalTime" class="w-1/2" type="number" />
                                     <p-select-dropdown v-model="formState.intervalTimeType" class="w-1/2" :items="intervalTimeTypes"
                                                        use-fixed-menu-style
                                     />
@@ -94,7 +92,7 @@ import {
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PButtonModal, PSearchDropdown, PFieldGroup, PRadio, PButton, PTextInput, PI,
+    PButtonModal, PSearchDropdown, PFieldGroup, PRadio, PButton, PTextInput, PI, PSelectDropdown,
 } from '@spaceone/design-system';
 import { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 import dayjs, { Dayjs } from 'dayjs';
@@ -138,6 +136,7 @@ export default {
         PSearchDropdown,
         PFieldGroup,
         PButtonModal,
+        PSelectDropdown,
     },
     props: {
         /* sync */
