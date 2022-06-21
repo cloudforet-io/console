@@ -45,7 +45,7 @@ export default {
     setup(props) {
         const state = reactive({
             selectedPrivacy: DASHBOARD_PRIVACY_TYPE.USER as DashboardPrivacyType,
-            filteredPrivacyList: computed(() => (!props.manageDisabled ? privacyList.filter(item => item.name !== DASHBOARD_PRIVACY_TYPE.PUBLIC) : privacyList)),
+            filteredPrivacyList: computed(() => (props.manageDisabled ? privacyList.filter(item => item.name !== DASHBOARD_PRIVACY_TYPE.PUBLIC) : privacyList)),
         });
 
         const handleRadio = (value: DashboardPrivacyType) => {
