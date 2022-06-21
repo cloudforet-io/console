@@ -46,7 +46,7 @@
                     </template>
                 </p-context-menu-item>
                 <div v-else-if="item.type==='divider'" :key="`divider-${index}`" class="context-divider" />
-                <slot v-else-if="item.type==='header'" :name="`header-${item.name}-${index}`" v-bind="{...$props, item, key: index}">
+                <slot v-else-if="item.type==='header'" :name="`header-${item.name}`" v-bind="{...$props, item, key: index}">
                     <div :key="index" class="context-header">
                         {{ item.label }}
                     </div>
