@@ -1,3 +1,10 @@
+# [1.1.0-beta.332](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.331...v1.1.0-beta.332) (2022-06-21)
+
+
+### Bug Fixes
+
+* remove index on slot name in PContextMenu ([#995](https://github.com/spaceone-dev/spaceone-design-system/issues/995)) ([b62ccd7](https://github.com/spaceone-dev/spaceone-design-system/commit/b62ccd7c3ae12ffc6acbb8f21f0f41306242e7f2))
+
 # [1.1.0-beta.331](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.330...v1.1.0-beta.331) (2022-06-20)
 
 
