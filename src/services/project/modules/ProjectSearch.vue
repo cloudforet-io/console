@@ -98,6 +98,7 @@ const makeMenuItems = (...args: MenuOption[]): MenuItem[] => {
                 name: d.type === 'PROJECT' ? item.project_id : item.project_group_id,
                 icon: d.icon,
                 link: d.type === 'PROJECT' ? `/project/${item.project_id}` : undefined,
+                target: d.type === 'PROJECT' ? '_blank' : undefined,
                 dataType: d.type,
             });
         });
