@@ -45,7 +45,7 @@
 
                         <div class="column-items-wrapper">
                             <draggable v-model="allColumns" draggable=".draggable-item" ghost-class="ghost">
-                                <column-item v-for="column in allColumns" :key="column.key"
+                                <column-item v-for="(column, idx) in allColumns" :key="`${column.key}-${idx}`"
                                              v-model="selectedAllColumnKeys"
                                              :item="column"
                                              :search-text="search"
@@ -66,7 +66,7 @@
                         <keep-alive>
                             <select-tag-columns :all-tags="tagState.allTags"
                                                 :loading="tagState.loading"
-                                                :selected-keys.sync="selectedAllColumnKeys"
+                                                :proxy-selected-keys.sync="selectedAllColumnKeys"
                             />
                         </keep-alive>
                     </section>
@@ -89,7 +89,7 @@ import {
     PButton, PButtonModal, PCheckBox, PDataLoader, PSearch,
 } from '@spaceone/design-system';
 import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import { camelCase, unionBy, uniq } from 'lodash';
+import { camelCase, uniq } from 'lodash';
 import draggable from 'vuedraggable';
 
 import { i18n } from '@/translations';
@@ -110,6 +110,20 @@ interface Props {
 }
 
 type SelectedColumnMap = Record<string, DynamicField>
+
+/**
+ * @description Merge two field lists. Duplicate check is performed based on key, and the field list given as the first parameter takes precedence.
+ * @param fieldsA
+ * @param fieldsB
+ */
+const mergeFields = (fieldsA: DynamicField[], fieldsB: DynamicField[]): DynamicField[] => {
+    const allColumns: any[] = [...fieldsA];
+    fieldsB.forEach((d) => {
+        const isExist = fieldsA.some(c => c.key === d.key);
+        if (!isExist) allColumns.push(d);
+    });
+    return allColumns;
+};
 
 export default {
     name: 'CustomFieldModal',
@@ -154,10 +168,9 @@ export default {
             search: '',
             isAllSelected: computed(() => state.selectedColumns.length === state.allColumns.length),
             loading: true,
-            availableColumns: [] as DynamicField[],
-            currentColumns: [] as DynamicField[],
-            allColumns: [] as DynamicField[],
-            defaultColumns: computed<DynamicField[]>(() => state.availableColumns.filter(d => !d.options?.is_optional)),
+            availableColumns: [] as DynamicField[], // all default fields including optional fields.
+            currentColumns: [] as DynamicField[], // if custom fields exist, it will be custom fields. if custom fields don't exist, it will be default fields excluding optional fields.
+            allColumns: [] as DynamicField[], // fields merged with availableColumns and currentColumns
             selectedColumnMap: {} as SelectedColumnMap,
             selectedColumns: computed<DynamicField[]>({
                 get: () => state.allColumns.filter(d => !!state.selectedColumnMap[d.key]),
@@ -169,7 +182,7 @@ export default {
                         if (d.key.startsWith(TAGS_PREFIX)) tagColumns.push(d);
                     });
 
-                    state.allColumns = unionBy(state.allColumns, tagColumns, d => d.key)
+                    state.allColumns = mergeFields(state.allColumns, tagColumns)
                         .filter(d => (d.key.startsWith(TAGS_PREFIX) ? !!selectedMap[d.key] : true));
                     state.selectedColumnMap = selectedMap;
                 },
@@ -223,7 +236,7 @@ export default {
             }
         };
 
-        const getColumns = async (includeOptionalFields = false) => {
+        const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]> => {
             try {
                 const options: any = {
                     include_optional_fields: includeOptionalFields,
@@ -241,30 +254,18 @@ export default {
 
                 schema = res;
                 delete schema.options?.search;
-
-                if (includeOptionalFields) {
-                    state.availableColumns = res.options?.fields || [];
-                } else {
-                    state.currentColumns = res.options?.fields || [];
-                }
+                return res.options?.fields || [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 schema = {};
-                if (includeOptionalFields) {
-                    state.availableColumns = [];
-                } else {
-                    state.currentColumns = [];
-                }
+                return [];
             }
         };
 
         const setColumnsDefault = async () => {
-            state.selectedColumns = [...state.defaultColumns];
+            state.allColumns = state.availableColumns;
+            state.selectedColumns = state.availableColumns.filter(d => !d.options?.is_optional);
             sortByRecommendation();
-        };
-
-        const resetSelectedStates = () => {
-            state.selectedColumns = [...state.currentColumns];
         };
 
         const updatePageSchema = async () => {
@@ -300,14 +301,17 @@ export default {
 
         const initColumns = async () => {
             state.loading = true;
-            await Promise.all([getColumns(true), getColumns(false)]);
-            resetSelectedStates();
+            const [availableColumnRes, currentColumnRes] = await Promise.allSettled([getColumns(true), getColumns(false)]);
+            state.availableColumns = availableColumnRes.status === 'fulfilled' ? availableColumnRes.value : [];
+            state.currentColumns = currentColumnRes.status === 'fulfilled' ? currentColumnRes.value : [];
+            state.allColumns = mergeFields(state.currentColumns, state.availableColumns);
+            state.selectedColumns = [...state.currentColumns];
             state.loading = false;
         };
 
         /* Tags */
         const clearSelectedTags = () => {
-            state.selectedAllColumnKeys.filter(d => !d.startsWith(TAGS_PREFIX));
+            state.selectedAllColumnKeys = state.selectedAllColumnKeys.filter(d => !d.startsWith(TAGS_PREFIX));
         };
 
         const tagState = reactive({
@@ -343,12 +347,6 @@ export default {
             }
         };
 
-        watch([() => state.availableColumns, () => state.currentColumns], ([availableColumns, currentColumns]) => {
-            if (Array.isArray(availableColumns) && Array.isArray(currentColumns)) {
-                state.allColumns = unionBy<DynamicField>(currentColumns, availableColumns, d => d.key);
-            }
-        });
-
         watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
             if (visible && resourceType) {
                 initColumns();
@@ -374,6 +372,7 @@ export default {
 <style lang="postcss" scoped>
 .p-button-modal::v-deep {
     .modal-content {
+        height: 100vh;
         .modal-body {
             @apply flex;
             .p-data-loader {

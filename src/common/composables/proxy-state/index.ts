@@ -1,17 +1,32 @@
 import {
-    computed, Ref, ref, watch,
+    computed, Ref, ref, SetupContext, watch,
 } from '@vue/composition-api';
 
-
-export function useProxyValue<T = any>(
+/**
+ * @description It detects changes in prop and creates a state that is automatically reflected.
+ *              'update:{prop name}' event occurs when there is a change in state, so sync binding can be used.
+ * @param name
+ * @param props
+ * @param emit
+ * @param additionalEvents Additional event name or list of event names to be triggered when state is changed
+ */
+export function useProxyValue<T = any, Prop = any>(
     name: string,
-    props: any,
-    emit: any,
+    props: Prop,
+    emit: SetupContext['emit'],
+    additionalEvents?: string|string[],
 ): Ref<T> {
+    const emitEvents = (value: T) => {
+        emit(`update:${name}`, value);
+        if (!additionalEvents) return;
+        if (typeof additionalEvents === 'string') emit(additionalEvents, value);
+        else if (Array.isArray(additionalEvents)) additionalEvents.forEach(eventName => emit(eventName, value));
+    };
+
     const proxyValue = ref<T>(props[name]);
     const setProxyValue = (value: T) => {
         (proxyValue.value as T) = value;
-        emit(`update:${name}`, value);
+        emitEvents(value);
     };
 
     watch(() => props[name], (value) => {
