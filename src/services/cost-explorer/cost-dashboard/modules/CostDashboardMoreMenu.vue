@@ -4,7 +4,7 @@
                            :items="moreMenuItems"
                            style-type="icon-button"
                            button-icon="ic_more"
-                           :menu-position="'left'"
+                           menu-position="left"
                            @select="handleSelectMoreMenu"
         />
         <cost-dashboard-duplicate-modal
@@ -99,7 +99,7 @@ export default {
 
         const checkDeleteState = reactive({
             visible: false,
-            headerTitle: 'Are you sure you want to delete dashboard?',
+            headerTitle: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CHECK_DELETE_MODAL_TITLE'),
             loading: false,
         });
 
