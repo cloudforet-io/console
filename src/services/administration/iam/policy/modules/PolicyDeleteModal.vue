@@ -124,7 +124,11 @@ export default {
 <style lang="postcss" scoped>
 .policy-delete-modal {
     .modal-delete-disabled-title {
-        @apply inline-block;
+        @apply inline-flex;
+        vertical-align: middle;
+        & > span {
+            margin-right: 0.25rem;
+        }
     }
     .p-data-table {
         margin-top: 1rem;
