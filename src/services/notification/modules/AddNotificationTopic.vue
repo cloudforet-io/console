@@ -22,7 +22,7 @@
             </div>
         </article>
         <p v-if="!isTopicValid" class="invalid-text">
-            Required
+            {{ $t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC_REQUIRED') }}
         </p>
     </div>
 </template>
