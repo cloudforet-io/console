@@ -1080,7 +1080,7 @@
 				"ALT_S_DELETE_POLICY": "정책(Policy) 삭제 완료",
 				"ALT_S_UPDATE_POLICY": "정책(Policy) 이름 변경 완료",
 				"DELETE_CANNOT_POLICY": "본 정책(Policy)은 삭제가 불가합니다",
-				"DELETE_FOLLOW_ROLES": "다음의 역할(Role)들에 연결되어있습니다.",
+				"DELETE_FOLLOW_ROLES": "다음의 역할(Role)들에 연결되어 있습니다.",
 				"DELETE_HELP_TEXT": "해당 정책(Policy)은 현재",
 				"DELETE_POLICY": "본 정책을 삭제하시겠습니까?",
 				"EDIT_TITLE": "정책(Policy) 이름 수정",
