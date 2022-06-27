@@ -1448,7 +1448,8 @@
 					"SETTING_MODE": "Setting Mode",
 					"SLACK_TOKEN": "Slack Token",
 					"TO": "to",
-					"TOPIC": "Topic"
+					"TOPIC": "Topic",
+					"TOPIC_REQUIRED": "Required field"
 				},
 				"MANAGE": "Manage",
 				"MANAGE_CHANNEL": "Manage Notifications Channel",

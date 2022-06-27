@@ -1448,7 +1448,8 @@
 					"SETTING_MODE": "설정 방식",
 					"SLACK_TOKEN": "슬랙 토큰",
 					"TO": "부터",
-					"TOPIC": "토픽"
+					"TOPIC": "토픽",
+					"TOPIC_REQUIRED": "필수 입력 항목입니다."
 				},
 				"MANAGE": "관리",
 				"MANAGE_CHANNEL": "알림 채널 관리",

@@ -1448,7 +1448,8 @@
 					"SETTING_MODE": "設定方法",
 					"SLACK_TOKEN": "スラックトークン",
 					"TO": "から",
-					"TOPIC": "トピックス"
+					"TOPIC": "トピックス",
+					"TOPIC_REQUIRED": "必須項目です"
 				},
 				"MANAGE": "管理",
 				"MANAGE_CHANNEL": "通知チャネル管理",
