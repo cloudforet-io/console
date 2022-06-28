@@ -67,6 +67,7 @@
                     :provider="provider"
                     :cloud-service-group="group"
                     :cloud-service-type="name"
+                    :is-server-page="isServerPage"
                 />
             </template>
 
@@ -358,6 +359,9 @@ export default {
                     { k: 'cloud_service_type', o: '=', v: props.name },
                 );
 
+            if (props.isServerPage) {
+                apiQuery.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' });
+            }
             const fields = schema?.options?.fields || tableState.schema?.options?.fields;
             if (fields) {
                 apiQuery.setOnly(...fields.map(d => d.key).filter(d => !d.startsWith('tags.')), 'reference.external_link', 'cloud_service_id', 'tags', 'provider');
@@ -369,10 +373,8 @@ export default {
         const getCloudServiceTableData = async (schema?): Promise<{items: any[]; totalCount: number}> => {
             typeOptionState.loading = true;
             try {
-                const query = getQuery(schema);
-                if (props.isServerPage) query.filter = [{ k: 'ref_cloud_service_type.labels', v: 'Server', o: 'eq' }];
                 const res = await SpaceConnector.client.inventory.cloudService.list({
-                    query,
+                    query: getQuery(schema),
                     ...(overviewState.period && {
                         date_range: {
                             start: dayjs.utc(overviewState.period.start).format('YYYY-MM-DD'),

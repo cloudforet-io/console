@@ -90,6 +90,10 @@ export default {
             type: String,
             required: true,
         },
+        isServerPage: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -144,13 +148,18 @@ export default {
             let layouts = layoutSchemaCacheMap[props.cloudServiceId];
             if (!layouts) {
                 try {
-                    const res = await SpaceConnector.client.addOns.pageSchema.get({
-                        resource_type: 'inventory.CloudService',
+                    const params: Record<string, any> = {
                         schema: 'details',
                         options: {
                             cloud_service_id: props.cloudServiceId,
                         },
-                    });
+                    };
+                    if (props.isServerPage) {
+                        params.resource_type = 'inventory.Server';
+                    } else {
+                        params.resource_type = 'inventory.CloudService';
+                    }
+                    const res = await SpaceConnector.client.addOns.pageSchema.get(params);
 
                     layouts = res.details;
                 } catch (e) {
