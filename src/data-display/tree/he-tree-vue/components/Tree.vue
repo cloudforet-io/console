@@ -1,83 +1,60 @@
-<script lang="jsx">
+<template>
+    <div class="he-tree" :class="{'he-tree--rtl': rtl}" :data-tree-id="treeId">
+        <children-list :nodes="rootNode.children"
+                       :indent="indent"
+                       :parent="rootNode"
+                       :parent-path="[]"
+                       :root-node="rootNode"
+                       :rtl="rtl"
+        >
+            <template #default="scope">
+              <slot v-bind="scope" />
+            </template>
+        </children-list>
+    </div>
+</template>
+
+<script lang="ts">
 import * as hp from 'helper-js';
 import * as vf from 'vue-functions';
 
 import * as ut from '../utils';
+import { defineComponent } from '@vue/composition-api';
 
 const trees = {};
+const ChildrenList = () => ({
+  component: import('./ChildrenList.vue') as any,
+})
 
-const Tree = {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    render(h) {
-        // convert undefined to empty str
-        const noUndefined = str => (str || '');
-        // tree tpl, to render recursively
-        const childrenListTpl = (nodes, parent, parentPath) => {
-            const indentStyle = { [!this.rtl ? 'paddingLeft' : 'paddingRight']: `${parentPath.length * this.indent}px` };
-            const branchTpl = (node, index) => {
-                const path = [...parentPath, index];
-                const transitionComponent = this.foldingTransition || 'transition';
-                const slotDefault = () => {
-                    const original = () => {
-                        if (this.$scopedSlots.default) {
-                            return this.$scopedSlots.default({
-                                node, index, path, tree: this,
-                            });
-                        } if (this.$slots.default) {
-                            return this.$slots.default;
-                        }
-                        return node.text;
-                    };
-                    if (this.overrideSlotDefault) {
-                        return this.overrideSlotDefault({
-                            node, index, path, tree: this,
-                        }, original);
-                    }
-                    return original();
-                };
-                let nodebackStyle = indentStyle;
-                if (node.$nodeBackStyle) {
-                    nodebackStyle = { ...nodebackStyle, ...node.$nodeBackStyle };
-                }
-                return <div class={`tree-branch ${noUndefined(node.$branchClass)} ${noUndefined(node.$hidden && 'he-tree--hidden')}`}
-                    style={node.$branchStyle || {}}
-                    data-tree-node-path={path.join(',')}
-                >
-                    <div class={`tree-node-back ${noUndefined(node.$nodeBackClass)}`} style={nodebackStyle || {}}>
-                        <div class={`tree-node ${noUndefined(node.$nodeClass)}`} style={node.$nodeStyle || {}}>
-                            {slotDefault()}
-                        </div>
-                    </div>
-                    {(node.children && node.children.length) > 0 && <transitionComponent name={this.$props.foldingTransitionName}>
-                        {!node.$folded && childrenListTpl(node.children, node, path)}
-                    </transitionComponent>}
-                </div>;
-            };
-            return <div class={`tree-children ${noUndefined(parent === this.rootNode && 'tree-root')} ${noUndefined(parent.$childrenClass)}`}
-                style={parent.$childrenStyle || {}}
-            >
-                {nodes.map(branchTpl)}
-            </div>;
-        };
-        return <div class={`he-tree ${this.treeClass} ${noUndefined(this.rtl && 'he-tree--rtl')}`} data-tree-id={this.treeId}>
-            {this.blockHeader && this.blockHeader()}
-            {childrenListTpl(this.rootNode.children, this.rootNode, [])}
-            {this.blockFooter && this.blockFooter()}
-        </div>;
+export default defineComponent({
+    name: 'Tree',
+    components: {
+        ChildrenList
+    },
+    props: {
+        value: {
+          type: Array,
+          default: () => []
+        },
+        indent: {
+          type: Number,
+          default: 20
+        },
+        rtl: {
+          type: Boolean,
+          default: false
+        },
+        rootNode: {
+          type: Object,
+          default: () => ({})
+        },
     },
     mixins: [
-        vf.updatablePropsEvenUnbound({
-            value: { $localName: 'treeData', required: true },
-        }),
-        vf.hookHelper,
+      vf.updatablePropsEvenUnbound({
+        value: { $localName: 'treeData', required: true },
+      }),
+      vf.hookHelper,
     ],
-    props: {
-        indent: { type: Number, default: 20 },
-        rtl: { type: Boolean },
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        rootNode: { default: is => ({}) },
-    },
-    // components: {},
     data() {
         return {
             trees,
@@ -97,15 +74,18 @@ const Tree = {
     },
     methods: {
         iteratePath(path, opt) {
+            // @ts-ignore
             return this._TreeDataHelper.iteratePath(path, opt);
         },
         getTreeVmByTreeEl(treeEl) {
             return this.trees[treeEl.getAttribute('data-tree-id')];
         },
         getAllNodesByPath(path) {
+            // @ts-ignore
             return this._TreeDataHelper.getAllNodes(path);
         },
         getNodeByPath(path) {
+            // @ts-ignore
             return this._TreeDataHelper.getNode(path);
         },
         getPathByBranchEl(branchEl) {
@@ -118,9 +98,11 @@ const Tree = {
             return this.getNodeByPath(this.getPathByBranchEl(branchEl));
         },
         getNodeParentByPath(path) {
+            // @ts-ignore
             return this._TreeDataHelper.getNodeParent(path);
         },
         removeNodeByPath(path) {
+            // @ts-ignore
             return this._TreeDataHelper.removeNode(path);
         },
         walkTreeData(handler, opt) {
@@ -148,19 +130,6 @@ const Tree = {
             this.$delete(this.trees, this.treeId);
         });
     },
-    // beforeDestroy() {},
-
-    //
-    mixPlugins(plugins) {
-        const MixedTree = {
-            name: 'Tree',
-            extends: Tree,
-            mixins: plugins,
-            mixPlugins: this.mixPlugins,
-        };
-        return MixedTree;
-    },
-};
-export default Tree;
+});
 
 </script>

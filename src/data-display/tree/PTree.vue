@@ -10,7 +10,7 @@
           :unfold-when-dragover="true"
           @drop="handleDrop"
     >
-        <template #default="{node, path, tree}">
+        <template #default="{node, path}">
             <div class="node" :class="{
                      'drag-target-parent': dragTargetParentPath ? dragTargetParentPath.toString() === path.toString() : false,
                      ...getClassNames(node)
@@ -23,7 +23,7 @@
                         <slot name="left-extra" v-bind="{node, path, selected: getSelectState(path)}" />
                     </span>
                     <span v-if="!toggleOptions.disabled || $scopedSlots[`toggle`]" class="toggle"
-                          @click.stop="onToggle(node, path, tree)"
+                          @click.stop="onToggle(node, path)"
                     >
                         <slot name="toggle" v-bind="{node, path, selected: getSelectState(path)}">
                             <p-i v-if="node.loading" name="ic_loading"
@@ -51,7 +51,7 @@
                             <slot name="icon" v-bind="{node, path, selected: getSelectState(path)}" />
                         </span>
                         <span class="data">
-                            <slot name="data" v-bind="{node, path, tree, selected: getSelectState(path)}">
+                            <slot name="data" v-bind="{node, path, selected: getSelectState(path)}">
                                 {{ dataGetter(node) }}
                             </slot>
                         </span>
@@ -68,14 +68,14 @@
 <script lang="ts">
 /* eslint-disable no-await-in-loop */
 import {
-    computed, defineComponent, onMounted, reactive, toRefs, watch,
+    defineComponent, computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { unionBy } from 'lodash';
 import { focus } from 'vue-focus';
 
 import {
-    CloneTreeDataOptions, HeTree, Store, WalkTreeDataCallback,
+    CloneTreeDataOptions, Store, WalkTreeDataCallback,
 } from '@/data-display/tree/he-tree-vue/types';
 import { getDefaultNode } from '@/data-display/tree/helper';
 import {
@@ -100,6 +100,7 @@ import FoldPlugin from './he-tree-vue/plugins/fold';
 import { walkTreeData, cloneTreeData } from './he-tree-vue/utils';
 
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface Props {
     toggleOptions: ToggleOptions;
     selectOptions: SelectOptions;
@@ -112,14 +113,16 @@ interface Props {
     getClassNames: GetClassNames;
 }
 
-const MixedTree = (OriginTree as any).mixPlugins([FoldPlugin, DraggablePlugin]);
-
 export default defineComponent<Props>({
     name: 'PTree',
     components: {
         PTextInput,
         PI,
-        Tree: (MixedTree as any),
+        Tree: {
+            name: 'Tree',
+            extends: OriginTree,
+            mixins: [FoldPlugin, DraggablePlugin],
+        },
     },
     directives: { focus },
     props: {
@@ -162,7 +165,7 @@ export default defineComponent<Props>({
     },
     setup(props: Props, { emit }) {
         const state = reactive({
-            treeRef: null as null|HeTree,
+            treeRef: null as null|any,
             treeData: [] as TreeNode[],
             editText: '',
             isEditing: false,
@@ -175,7 +178,7 @@ export default defineComponent<Props>({
             isFetchAndFinding: false,
             dragTargetParentPath: null as null|number[],
         });
-
+        //
         const getSelectState = (path: number[]) => !!state.selectedPaths.find(d => d.toString() === path.toString());
 
         const resetSelect = () => {
@@ -272,7 +275,7 @@ export default defineComponent<Props>({
             setSelectItem(node, path, value);
         };
 
-        const onDragStart = (tree: HeTree, e: Store) => {
+        const onDragStart = (tree: any, e: Store) => {
             const validator = props.dragOptions.startValidator;
             const parent = e.startPath ? tree.getNodeParentByPath(e.startPath) as TreeNode : null;
 
@@ -282,7 +285,7 @@ export default defineComponent<Props>({
             return true;
         };
 
-        const onDragEnd = (tree: HeTree, e: Store) => {
+        const onDragEnd = (tree: any, e: Store) => {
             state.dragTargetParentPath = null;
             const parent = e.targetPath ? tree.getNodeParentByPath(e.targetPath) as TreeNode : null;
             const oldParent = e.startPath ? tree.getNodeParentByPath(e.startPath) as TreeNode : null;
@@ -323,7 +326,7 @@ export default defineComponent<Props>({
             emit('drop', e.dragNode, oldParent, parent, rollback);
         };
 
-        const eachDraggable = (path: number[], tree: HeTree, e: Store) => {
+        const eachDraggable = (path: number[], tree: any, e: Store) => {
             const dragValidator = props.dragOptions.dragValidator;
             if (dragValidator
                 && !dragValidator(e.dragNode as TreeNode, path ? tree.getNodeParentByPath(path) as TreeNode : undefined)) {
@@ -331,7 +334,7 @@ export default defineComponent<Props>({
             }
             return true;
         };
-        const eachDroppable = (parentPath: number[], tree: HeTree, e: Store) => {
+        const eachDroppable = (parentPath: number[], tree: any, e: Store) => {
             const dropValidator = props.dragOptions.dropValidator;
 
             let parent: null|TreeNode = null;
@@ -393,15 +396,13 @@ export default defineComponent<Props>({
             }
         };
 
-        const onToggle = async (node: TreeNode, path: number[], tree: HeTree) => {
+        const onToggle = async (node: TreeNode, path: number[]) => {
             if (props.toggleOptions.disabled) return;
             if (props.toggleOptions.validator && !props.toggleOptions.validator(node)) return;
 
             if (node.$folded) {
-                tree.unfold(node, path);
-            } else {
-                tree.fold(node, path);
-            }
+                if (state.treeRef) state.treeRef.unfold(node, path);
+            } else if (state.treeRef) state.treeRef.fold(node, path);
             await onNodeFoldedChange(node, path, node.$folded);
         };
 
@@ -411,7 +412,7 @@ export default defineComponent<Props>({
             if (getSelectState(path)) startEdit(node);
             else changeSelectState(node, path);
 
-            if (props.toggleOptions.toggleOnNodeClick) onToggle(node, path, state.treeRef);
+            if (props.toggleOptions.toggleOnNodeClick) onToggle(node, path);
         };
 
         const addNode = (data: any[]|any): void => {
@@ -593,7 +594,7 @@ export default defineComponent<Props>({
             updateNode,
             toggleNode: (node: TreeNode, path: number[]) => {
                 (async () => {
-                    await onToggle(node, path, state.treeRef);
+                    await onToggle(node, path);
                 })();
             },
             getNodeParentByPath(path: number[]) {
@@ -651,6 +652,12 @@ export default defineComponent<Props>({
                 @apply border border-secondary;
             }
         }
+    }
+    .he-tree--hidden {
+        display: none;
+    }
+    .he-tree--rtl {
+        direction: rtl;
     }
     .tree-node-back {
         @apply rounded;

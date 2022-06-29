@@ -1,7 +1,9 @@
+import { defineComponent } from '@vue/composition-api';
 import Vue from 'vue';
 
+// eslint-disable-next-line import/no-cycle
 import {
-    Fold, Node, Path, UnfoldOptions,
+    Node, Path, UnfoldOptions,
 } from '@/data-display/tree/he-tree-vue/types';
 
 import { walkTreeData } from '../utils';
@@ -17,18 +19,22 @@ export function unfoldAll(treeData) {
     });
 }
 
-export default {
+export default defineComponent({
     props: {
         foldingTransitionName: { type: String },
         foldingTransition: {},
         foldAllAfterMounted: { type: Boolean },
     },
+    mounted() {
+        if (this.foldAllAfterMounted) {
+            // @ts-ignore
+            this.foldAll();
+        }
+    },
     methods: {
         fold(node) {
             if (!node.$folded) {
-                // @ts-ignore
                 this.$set(node, '$folded', true);
-                // @ts-ignore
                 this.$emit('nodeFoldedChanged', node);
             }
         },
@@ -42,11 +48,8 @@ export default {
                 this.foldAll();
             }
             if (node.$folded) {
-                // @ts-ignore
                 this.$set(node, '$folded', false);
-                // @ts-ignore
                 this.$emit('nodeFoldedChanged', node);
-                // @ts-ignore
                 this.$emit('node-folded-changed', node);
             }
         },
@@ -71,11 +74,4 @@ export default {
             });
         },
     },
-    mounted() {
-        // @ts-ignore
-        if (this.foldAllAfterMounted) {
-            // @ts-ignore
-            this.foldAll();
-        }
-    },
-} as unknown as Fold;
+});
