@@ -78,7 +78,7 @@ export const Template = (args, { argTypes }) => ({
     </div>
     `,
     setup(props) {
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance()?.proxy
         const state = reactive({
             proxySortBy: makeOptionalProxy('sortBy', vm, props.sortBy),
             proxySortDesc: makeOptionalProxy('sortDesc', vm, props.sortDesc),

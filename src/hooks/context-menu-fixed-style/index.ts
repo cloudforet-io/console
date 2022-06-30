@@ -34,7 +34,7 @@ const getScrollableParent = (ele?: Element|null): Element => {
 };
 
 export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu }: StateArgs) => {
-    const vm = getCurrentInstance() as ComponentRenderProxy;
+    const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
     const state = reactive({
         useFixedMenuStyle,
         visibleMenu,

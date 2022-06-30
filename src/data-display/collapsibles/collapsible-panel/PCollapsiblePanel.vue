@@ -45,7 +45,7 @@ export default defineComponent({
         },
     },
     setup(props: CollapsiblePanelProps) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             proxyIsCollapsed: makeOptionalProxy('isCollapsed', vm, props.isCollapsed),
             fakeTextRef: null as null|HTMLElement,

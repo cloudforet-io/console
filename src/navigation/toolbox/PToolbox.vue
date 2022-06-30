@@ -192,7 +192,7 @@ export default defineComponent<ToolboxProps>({
         },
     },
     setup(props: ToolboxProps, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const initPageSize = props.pageSizeOptions ? props.pageSizeOptions[0] || 24 : 24;
 
         const proxyState = reactive({

@@ -47,7 +47,7 @@ export const Template = (args, { argTypes }) => ({
         </p-autocomplete-search>
     `,
     setup(props) {
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance()?.proxy
         const state = reactive({
             proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, props.visibleMenu)
         })

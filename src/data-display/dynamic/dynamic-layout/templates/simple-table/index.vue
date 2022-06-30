@@ -79,7 +79,7 @@ export default {
         },
     },
     setup(props: SimpleTableDynamicLayoutProps) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const state = reactive({
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),

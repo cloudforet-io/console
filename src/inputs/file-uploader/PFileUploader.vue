@@ -55,7 +55,7 @@ export default defineComponent<FileUploaderProps>({
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             proxyUploadedFiles: makeOptionalProxy<File[]>('uploadedFiles', vm, props.uploadedFiles),
             fileRef: null as Element|null,

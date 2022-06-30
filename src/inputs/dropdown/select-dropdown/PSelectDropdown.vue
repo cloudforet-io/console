@@ -163,7 +163,7 @@ export default defineComponent<SelectDropdownProps>({
         },
     },
     setup(props: SelectDropdownProps, { emit, slots }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const {
             proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,

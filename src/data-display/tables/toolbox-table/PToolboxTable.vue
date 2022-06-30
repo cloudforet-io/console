@@ -246,7 +246,7 @@ export default defineComponent<ToolboxTableProps>({
         },
     },
     setup(props: ToolboxTableProps, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const proxyState = reactive({
             selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, [], ['select']),

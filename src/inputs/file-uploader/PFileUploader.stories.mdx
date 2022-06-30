@@ -24,7 +24,7 @@ export const Template = (args, { argTypes }) => ({
             </div>
     `,
     setup(props) {
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance()?.proxy
         const state = reactive({
             proxyUploadedFiles: makeOptionalProxy('uploadedFiles', vm, props.uploadedFiles),
         });

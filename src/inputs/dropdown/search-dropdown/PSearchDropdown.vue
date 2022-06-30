@@ -190,7 +190,7 @@ export default defineComponent<SearchDropdownProps>({
         },
     },
     setup(props: SearchDropdownProps, { emit, slots, listeners }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const {
             proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,

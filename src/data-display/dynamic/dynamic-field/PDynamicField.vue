@@ -31,7 +31,7 @@ import {
     computed, defineComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
 import { AsyncComponent } from 'vue';
-import { AsyncComponentPromise } from 'vue/types/options';
+import { ImportedComponent } from 'vue/types/options';
 
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import { DynamicFieldType, dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
@@ -42,28 +42,28 @@ const RECURSIVE_TYPE = ['list', 'enum'];
 
 const componentMap: Record<DynamicFieldType, AsyncComponent> = {
     text: () => ({
-        component: import('./templates/text/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/text/index.vue') as Promise<ImportedComponent>,
     }),
     badge: () => ({
-        component: import('./templates/badge/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/badge/index.vue') as Promise<ImportedComponent>,
     }),
     datetime: () => ({
-        component: import('./templates/datetime/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/datetime/index.vue') as Promise<ImportedComponent>,
     }),
     state: () => ({
-        component: import('./templates/state/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/state/index.vue') as Promise<ImportedComponent>,
     }),
     enum: () => ({
-        component: import('./templates/enum/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/enum/index.vue') as Promise<ImportedComponent>,
     }),
     size: () => ({
-        component: import('./templates/size/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/size/index.vue') as Promise<ImportedComponent>,
     }),
     dict: () => ({
-        component: import('./templates/dict/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/dict/index.vue') as Promise<ImportedComponent>,
     }),
     list: () => ({
-        component: import('./templates/list/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/list/index.vue') as Promise<ImportedComponent>,
     }),
 };
 

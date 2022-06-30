@@ -33,7 +33,7 @@ export const Template = (args, { argTypes }) => ({
     </div>
     `,
     setup(props) {
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance()?.proxy
         const state= reactive({
             proxyIsCollapsed: makeOptionalProxy('isCollapsed', vm, props.isCollapsed)
         })

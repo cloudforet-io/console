@@ -184,7 +184,7 @@ export default {
         },
     },
     setup(props: ToolboxGridLayoutProps, context) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const proxyState = reactive({
             thisPage: makeOptionalProxy<number>('thisPage', vm, 1),

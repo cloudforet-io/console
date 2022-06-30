@@ -1,4 +1,5 @@
 import {
+    ComponentRenderProxy,
     computed, ref, Ref,
 } from '@vue/composition-api';
 
@@ -48,7 +49,7 @@ export const makeProxy = <T>(name: string, props: any, emit: any): Ref<T> => com
  * * @param events?
  * @return {Ref<*>|*}
  */
-export function makeOptionalProxy <T=any>(name: string, vm, initData: any, events?: string[]) {
+export function makeOptionalProxy <T=any>(name: string, vm: ComponentRenderProxy, initData: any, events?: string[]) {
     let propsVal = vm.$props[name];
     const currentVal = ref(propsVal === undefined ? initData : propsVal);
     let prevVal = currentVal.value;

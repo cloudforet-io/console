@@ -55,7 +55,7 @@ export default defineComponent<CollapsibleToggleProps>({
         },
     },
     setup(props: CollapsibleToggleProps) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             proxyIsCollapsed: makeOptionalProxy('isCollapsed', vm, props.isCollapsed),
         });

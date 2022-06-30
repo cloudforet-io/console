@@ -23,7 +23,7 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { AsyncComponent } from 'vue';
-import { AsyncComponentPromise } from 'vue/types/options';
+import { ImportedComponent } from 'vue/types/options';
 
 import {
     DEFAULT_NAME_OPTIONS,
@@ -39,13 +39,13 @@ import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
 const componentMap: Record<DynamicChartType, AsyncComponent> = {
     COLUMN: () => ({
-        component: import('./templates/column/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/column/index.vue') as Promise<ImportedComponent>,
     }),
     DONUT: () => ({
-        component: import('./templates/donut/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/donut/index.vue') as Promise<ImportedComponent>,
     }),
     TREEMAP: () => ({
-        component: import('./templates/treemap/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/treemap/index.vue') as Promise<ImportedComponent>,
     }),
 };
 

@@ -17,7 +17,7 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { AsyncComponent } from 'vue';
-import { AsyncComponentPromise } from 'vue/types/options';
+import { ImportedComponent } from 'vue/types/options';
 
 import {
     DYNAMIC_WIDGET_TYPE,
@@ -29,10 +29,10 @@ import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 
 const componentMap: Record<DynamicWidgetType, AsyncComponent> = {
     summary: () => ({
-        component: import('./templates/summary/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/summary/index.vue') as Promise<ImportedComponent>,
     }),
     chart: () => ({
-        component: import('./templates/chart/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/chart/index.vue') as Promise<ImportedComponent>,
     }),
 };
 

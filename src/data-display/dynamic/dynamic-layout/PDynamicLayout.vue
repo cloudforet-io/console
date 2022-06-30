@@ -19,7 +19,7 @@ import {
     onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { AsyncComponent } from 'vue';
-import { AsyncComponentPromise } from 'vue/types/options';
+import { ImportedComponent } from 'vue/types/options';
 
 import { isEqual } from 'lodash';
 
@@ -29,31 +29,31 @@ import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 
 const componentMap: Record<DynamicLayoutType, AsyncComponent> = {
     item: () => ({
-        component: import('./templates/item/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/item/index.vue') as Promise<ImportedComponent>,
     }),
     'simple-table': () => ({
-        component: import('./templates/simple-table/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/simple-table/index.vue') as Promise<ImportedComponent>,
     }),
     table: () => ({
-        component: import('./templates/table/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/table/index.vue') as Promise<ImportedComponent>,
     }),
     'query-search-table': () => ({
-        component: import('./templates/query-search-table/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/query-search-table/index.vue') as Promise<ImportedComponent>,
     }),
     raw: () => ({
-        component: import('./templates/raw/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/raw/index.vue') as Promise<ImportedComponent>,
     }),
     markdown: () => ({
-        component: import('./templates/markdown/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/markdown/index.vue') as Promise<ImportedComponent>,
     }),
     list: () => ({
-        component: import('./templates/list/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/list/index.vue') as Promise<ImportedComponent>,
     }),
     'raw-table': () => ({
-        component: import('./templates/raw-table/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/raw-table/index.vue') as Promise<ImportedComponent>,
     }),
     html: () => ({
-        component: import('./templates/html/index.vue') as unknown as AsyncComponentPromise,
+        component: import('./templates/html/index.vue') as Promise<ImportedComponent>,
     }),
 };
 export default {

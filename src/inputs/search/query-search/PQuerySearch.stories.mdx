@@ -27,7 +27,7 @@ export const Template = (args, { argTypes }) => ({
     </div>
     `,
     setup() {
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance()?.proxy
         const state = reactive({
             proxyValue: makeOptionalProxy('value', vm, '')
         })
@@ -99,6 +99,7 @@ For ```key:value``` searches, ```keyItemSets``` must be given as props. <br/>
 If you input a value that is not in key items and press enter, it is regarded as a general keyword search.<br/>
 
 ```typescript
+import {KeyDataType,OperatorType} from "./type";
 interface KeyItem {
     label: string;
     name: any;
@@ -189,6 +190,9 @@ And ```operators``` are list of available operators in the next search.<br/>
 
 
 ```typescript
+import {ContextMenuType,KeyDataType,KeyItem,OperatorType} from "./type";
+interface T{
+}
 interface ValueMenuItem {
     label: string;
     name: any;
@@ -394,10 +398,10 @@ It's NOT used for validation. It's only for input form determination. <br/>
 - object
 
 ### How data types without value items suggestions work
-| Selected Key's Data Type | How It Works |
- | --------- | --------------- |
-| boolean | TRUE/FALSE ```text``` suggestion. |
-| datetime | Operator suggestion will be given. There will be value validation. |
+| Selected Key's Data Type | How It Works                                                       |
+|--------------------------|--------------------------------------------------------------------|
+| boolean                  | TRUE/FALSE ```text``` suggestion.                                  |
+| datetime                 | Operator suggestion will be given. There will be value validation. |
 
 <Canvas>
     <Story name="Data Types" height="300px">

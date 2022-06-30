@@ -42,7 +42,7 @@ export const Template = (args, { argTypes }) => ({
     </div>
     `,
     setup(props) {
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance()?.proxy
         const state= reactive({
             proxyUnfoldedIndices: makeOptionalProxy('unfoldedIndices', vm, props.unfoldedIndices)
         })

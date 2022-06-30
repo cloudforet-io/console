@@ -84,7 +84,7 @@ export default defineComponent<SearchProps>({
         },
     },
     setup(props: SearchProps, { emit, listeners }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
             placeholderText: computed<TranslateResult>(() => {

@@ -105,7 +105,7 @@ export default defineComponent<CollapsibleListProps>({
         },
     },
     setup(props: CollapsibleListProps) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             proxyUnfoldedIndices: makeOptionalProxy<number[]>('unfoldedIndices', vm, props.unfoldedIndices || []),
             collapsibleItems: computed<CollapsibleItem[]>(() => props.items.map((d) => {

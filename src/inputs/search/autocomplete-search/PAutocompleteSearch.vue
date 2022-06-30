@@ -141,7 +141,7 @@ export default defineComponent<AutocompleteSearchProps>({
 
     },
     setup(props: AutocompleteSearchProps, { emit, slots, listeners }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const {
             proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,

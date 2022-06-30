@@ -57,7 +57,7 @@ export const Template = (args, { argTypes }) => ({
     </p-toolbox>
     `,
     setup(props) {
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance()?.proxy
         const state = reactive({
             proxyThisPage: makeOptionalProxy('thisPage', vm, props.thisPage),
             proxyPageSize: makeOptionalProxy('pageSize', vm, props.pageSize),

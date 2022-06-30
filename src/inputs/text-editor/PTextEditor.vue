@@ -102,7 +102,7 @@ export default defineComponent({
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             content: '',
             cminstance: null as any,

@@ -51,7 +51,7 @@ export const Template = (args, { argTypes }) => ({
         </p-search-dropdown>
     `,
     setup(props) {
-        const vm = getCurrentInstance();
+        const vm = getCurrentInstance()?.proxy
         const state = reactive({
             proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, props.visibleMenu),
             proxySelected: makeOptionalProxy('selected', vm, props.selected),

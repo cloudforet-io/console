@@ -268,7 +268,7 @@ export default defineComponent<DataTableProps>({
         },
     },
     setup(props: DataTableProps, context) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const getChildFields = (field: DataTableFieldType): DataTableFieldType[]|undefined => field.children?.map(child => ({ sortable: true, ...child }));
 
