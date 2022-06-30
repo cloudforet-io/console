@@ -1,4 +1,4 @@
-import { TreeData } from 'helper-js';
+import { TreeData } from './helpers';
 
 export function cloneTreeData(treeData, opt?) {
     return (new TreeData(treeData)).clone(opt);

@@ -1,12 +1,20 @@
-/* eslint-disable  */
-// @ts-nocheck
-import * as hp from 'helper-js';
-import draggableHelper from 'draggable-helper';
+import {
+    addClass,
+    appendTo,
+    attachCache, binarySearch, createElementFromHTML,
+    elementsFromPoint, findNodeList,
+    findParent,
+    getOffset, getViewportPosition,
+    hasClass, insertAfter, insertBefore,
+    isDescendantOf, prependTo, removeEl,
+} from '../../helpers';
 import doDraggableDecision from './draggable-decision-part';
+import draggableHelper from './draggable-helper';
+
 
 // in follow code, options belongs to makeTreeDraggable, opt belongs to draggableHelper
-export default function makeTreeDraggable(treeEl, options = {}) {
-    options = {
+export default function makeTreeDraggable(treeEl, _options: any = {}) {
+    const options = {
         // indent: 20,
         // triggerClass: 'tree-node',
         // triggerBySelf: false,
@@ -35,7 +43,7 @@ export default function makeTreeDraggable(treeEl, options = {}) {
         // edgeScrollSpecifiedContainerY?: HTMLElement,
         // rtl: false
         // preventTextSelection: boolean
-        ...options,
+        ..._options,
         treeEl,
     };
     const { destroy, options: draggableHelperOptions } = draggableHelper(treeEl, {
@@ -54,8 +62,9 @@ export default function makeTreeDraggable(treeEl, options = {}) {
         updateMovedElementStyleManually: true,
         getMovedOrClonedElement: (directTriggerElement, store) => {
             // find closest branch from parents
-            const el = hp.findParent(store.triggerElement, el => hp.hasClass(el, options.branchClass), { withSelf: true });
-            return el;
+            const el = findParent(store.triggerElement,
+                _el => hasClass(_el, options.branchClass), { withSelf: true });
+            return el as HTMLElement;
         },
         beforeFirstMove(store, dhOptions) {
             store.startTreeEl = treeEl;
@@ -64,96 +73,101 @@ export default function makeTreeDraggable(treeEl, options = {}) {
             if (options.beforeFirstMove && options.beforeFirstMove(store, dhOptions) === false) {
                 return false;
             }
+            return undefined;
         },
         beforeMove: (store, dhOptions) => {
             const updatePlaceholderIndent = () => {
                 // set indent of placeholder
                 const placeholderPath = options.getPathByBranchEl(store.placeholder);
-                const placeholderNodeBack = store.placeholder.querySelector(`.${options.nodeBackClass}`);
-                placeholderNodeBack.style[!options.rtl ? 'paddingLeft' : 'paddingRight'] = `${(placeholderPath.length - 1) * options.indent}px`;
+                if (store.placeholder) {
+                    const placeholderNodeBack = store.placeholder.querySelector(`.${options.nodeBackClass}`) as HTMLElement;
+                    placeholderNodeBack.style[!options.rtl ? 'paddingLeft' : 'paddingRight'] = `${(placeholderPath.length - 1) * options.indent}px`;
+                }
                 // remove tempChildren if empty
-                if (store.tempChildren.children.length === 0) {
-                    hp.removeEl(store.tempChildren);
+                if (store.tempChildren?.children.length === 0) {
+                    removeEl(store.tempChildren);
                 }
             };
             // first move
             if (store.movedCount === 0) {
                 // create placeholder
-                const placeholder = hp.createElementFromHTML(`
-          <div id="${options.placeholderId}" class="${options.branchClass} ${options.placeholderClass}">
-            <div class="${options.nodeBackClass} ${options.placeholderNodeBackClass}">
-              <div class="${options.nodeClass} ${options.placeholderNodeClass}">
-              </div>
-            </div>
-          </div>
-        `);
-                hp.insertAfter(placeholder, store.movedOrClonedElement);
-                store.placeholder = placeholder;
+                const placeholder = createElementFromHTML(`
+                  <div id="${options.placeholderId}" class="${options.branchClass} ${options.placeholderClass}">
+                    <div class="${options.nodeBackClass} ${options.placeholderNodeBackClass}">
+                      <div class="${options.nodeClass} ${options.placeholderNodeClass}">
+                      </div>
+                    </div>
+                  </div>
+                `) as Node;
+                insertAfter(placeholder, store.movedOrClonedElement);
+                store.placeholder = placeholder as HTMLElement;
                 options.afterPlaceholderCreated(store);
                 // create a tree children el to use when can't get childrenEl
                 const tempChildren = document.createElement('DIV');
-                hp.addClass(tempChildren, options.childrenClass);
+                addClass(tempChildren, options.childrenClass);
                 store.tempChildren = tempChildren;
                 // update placeholder indent. update moved element style
                 updatePlaceholderIndent();
                 store.updateMovedElementStyle();
                 // skip first move
-                return;
+                return undefined;
             }
             //
             store.updateMovedElementStyle();
             //
             store.oneMoveStore = {}; // life cycle: one move
             const movingEl = store.movedElement; // branch
+
             // find closest branch and hovering tree
-            let tree;
-            const movingNode = movingEl.querySelector(`.${options.nodeClass}`);
-            // movingNodeOf and movingNodeRect are not always real. when RTL, there 'x' is top right. when draggingNodePositionMode is mouse, there x and y are mouse position. So don't calc them with their width or height.
-            // movingNodeOf 和 movingNodeRect并非一直如字面意义是movingNode真实坐标. RTL时, x坐标是右上角. draggingNodePositionMode是mouse时, x和y是鼠标坐标.
-            let movingNodeOf = hp.getOffset(movingNode);
-            let movingNodeRect = hp.getBoundingClientRect(movingNode);
+            const movingNode = movingEl.querySelector(`.${options.nodeClass}`) as HTMLElement;
+            if (!movingNode) return undefined;
+
+            // movingNodeOf and movingNodeRect are not always real.
+            // when RTL, there 'x' is top right. when draggingNodePositionMode is mouse, there x and y are mouse position. So don't calc them with their width or height.
+            let movingNodeOf = getOffset(movingNode);
+            let movingNodeRect: { x: number; y: number } = getViewportPosition(movingNode);
             if (options.draggingNodePositionMode === 'mouse') {
                 // use mouse position as dragging node position
-                const { moveEvent } = store;
+                const moveEvent = store.moveEvent as MouseEvent;
                 movingNodeOf = { x: moveEvent.pageX, y: moveEvent.pageY };
                 movingNodeRect = { x: moveEvent.clientX, y: moveEvent.clientY };
             } else if (options.rtl) {
                 movingNodeOf.x += movingNode.offsetWidth;
                 movingNodeRect.x += movingNode.offsetWidth;
             }
+
             // find tree with elementsFromPoint
-            let found;
+            let found: HTMLElement|null = null;
             let firstElement;
-            for (const itemEl of hp.elementsFromPoint(movingNodeRect.x, movingNodeRect.y)) {
+            // eslint-disable-next-line no-restricted-syntax
+            for (const itemEl of elementsFromPoint(movingNodeRect.x, movingNodeRect.y)) {
                 if (!firstElement) {
                     firstElement = itemEl;
                 }
-                if (hp.hasClass(itemEl, options.treeClass)) {
-                    found = itemEl;
+                if (hasClass(itemEl, options.treeClass)) {
+                    found = itemEl as HTMLElement;
                     break;
                 }
             }
             // check if the found element is covered by other elements
-            if (firstElement !== found && !hp.isDescendantOf(firstElement, found)) {
+            if (found && firstElement !== found && !isDescendantOf(firstElement, found)) {
                 found = null;
             }
-            tree = found;
-            if (!tree) {
-                // out of tree or tree is covered by other elements
-                return;
-            }
+
+            const tree = found;
+            // out of tree or tree is covered by other elements
+            if (!tree) return undefined;
             // check if target tree right
-            if (options.filterTargetTree(tree, store, dhOptions) === false) {
-                return;
-            }
-            store.targetTreeEl = tree;
+            if (options.filterTargetTree(tree, store, dhOptions) === false) return undefined;
+
+            store.targetTreeEl = tree as HTMLElement;
             // info ========================================
             // life cycle: one move
-            const info = {
+            const info: any = {
                 tree: () => tree,
                 root: () => info.tree.querySelector(`.${options.childrenClass}`),
-                closestNode: () => {
-                    const nodes = []; // all visible nodes sort by y
+                closestNode: (): HTMLElement|undefined => {
+                    const nodes: HTMLElement[] = []; // all visible nodes sort by y
                     const walkToGetNodes = (branch) => {
                         //
                         if (branch !== info.tree) {
@@ -167,7 +181,7 @@ export default function makeTreeDraggable(treeEl, options = {}) {
                         if (childrenEl) {
                             for (let i = 0; i < childrenEl.children.length; i++) {
                                 const child = childrenEl.children[i];
-                                if (child !== movingEl && hp.hasClass(child, options.branchClass)) {
+                                if (child !== movingEl && hasClass(child, options.branchClass)) {
                                     walkToGetNodes(child);
                                 }
                             }
@@ -175,79 +189,79 @@ export default function makeTreeDraggable(treeEl, options = {}) {
                     };
                     walkToGetNodes(info.tree);
                     //
-                    if (nodes.length === 0) {
-                        return;
-                    }
+                    if (nodes.length === 0) return undefined;
                     //
-                    let found;
-                    const t = hp.binarySearch(nodes, node => hp.getOffset(node).y - movingNodeOf.y, { returnNearestIfNoHit: true });
-                    if (t.hit) {
-                        found = t.value;
-                    } else if (t.greater) {
-                        found = nodes[t.index - 1] || t.value;
+                    let _found: HTMLElement|undefined;
+                    const t = binarySearch(nodes, node => getOffset(node).y - movingNodeOf.y, { returnNearestIfNoHit: true });
+                    if (t?.hit) {
+                        _found = t.value;
+                    } else if (t?.greater) {
+                        _found = nodes[t.index - 1] || t.value;
                     } else {
-                        found = t.value;
+                        _found = t?.value;
                     }
-                    return found;
+                    return _found;
                 },
-                closestNodeOffset: () => hp.getOffset(info.closestNode),
-                closestBranch: () => hp.findParent(info.closestNode, el => hp.hasClass(el, options.branchClass)),
+                closestNodeOffset: () => getOffset(info.closestNode),
+                closestBranch: () => findParent(info.closestNode, el => hasClass(el, options.branchClass)),
                 closestNext: () => {
                     let next = info.closestBranch.nextSibling;
                     while (next) {
-                        if (next !== movingEl && hp.hasClass(next, options.branchClass) && !isElementHidden(next)) {
+                        if (next !== movingEl && hasClass(next, options.branchClass) && !isElementHidden(next)) {
                             return next;
                         }
                         next = next.nextSibling;
                     }
+                    return undefined;
                 },
                 closestPrev: () => {
                     let prev = info.closestBranch.previousSibling;
                     while (prev) {
-                        if (prev !== movingEl && hp.hasClass(prev, options.branchClass) && !isElementHidden(prev)) {
+                        if (prev !== movingEl && hasClass(prev, options.branchClass) && !isElementHidden(prev)) {
                             return prev;
                         }
                         prev = prev.previousSibling;
                     }
+                    return undefined;
                 },
                 aboveBranch: () => {
                     // find above from branch to root
                     // closestBranch must be placeholder
                     if (info.closestBranch !== store.placeholder) {
-                        return;
+                        return undefined;
                     }
                     if (conditions['closest has next']) {
-                        return;
+                        return undefined;
                     }
                     // find placeholder prev or parent
                     let cur = info.closestBranch;
                     let prev = cur.previousSibling;
-                    let found;
+                    let _found;
                     while (prev) {
-                        if (prev !== movingEl && hp.hasClass(prev, options.branchClass) && !isElementHidden(prev)) {
+                        if (prev !== movingEl && hasClass(prev, options.branchClass) && !isElementHidden(prev)) {
                             cur = prev;
-                            found = true;
+                            _found = true;
                             break;
                         }
                         prev = prev.previousSibling;
                     }
-                    if (!found) {
-                        cur = hp.findParent(cur, el => hp.hasClass(el, options.branchClass));
+                    if (!_found) {
+                        cur = findParent(cur, el => hasClass(el, options.branchClass));
                     }
                     //
                     while (cur) {
                         const curNode = cur.querySelector(`.${options.nodeClass}`);
                         if (!options.rtl) {
-                            if (hp.getOffset(curNode).x <= movingNodeOf.x) {
+                            if (getOffset(curNode).x <= movingNodeOf.x) {
                                 break;
                             }
-                        } else if (hp.getOffset(curNode).x + curNode.offsetWidth >= movingNodeOf.x) {
+                        } else if (getOffset(curNode).x + curNode.offsetWidth >= movingNodeOf.x) {
                             break;
                         }
                         let hasNextBranch;
                         let t = cur.nextSibling;
                         while (t) {
-                            if (t !== movingEl && t !== store.placeholder && hp.hasClass(t, options.branchClass) && !isElementHidden(t)) {
+                            if (t !== movingEl && t !== store.placeholder && hasClass(t, options.branchClass) && !isElementHidden(t)) {
                                 hasNextBranch = true;
                                 break;
                             }
@@ -256,7 +270,7 @@ export default function makeTreeDraggable(treeEl, options = {}) {
                         if (hasNextBranch) {
                             break;
                         }
-                        const parent = hp.findParent(cur, el => hp.hasClass(el, options.branchClass));
+                        const parent = findParent(cur, el => hasClass(el, options.branchClass));
                         if (!parent) {
                             break;
                         }
@@ -269,8 +283,8 @@ export default function makeTreeDraggable(treeEl, options = {}) {
             // life cycle: one move
             const conditions = {
                 'no closest': () => !info.closestNode,
-                'closest is top': () => info.closestBranch === hp.findNodeList(info.root.children, el => el !== movingEl && !isElementHidden(el)),
-                'closest is top excluding placeholder': () => info.closestBranch === hp.findNodeList(info.root.children, el => el !== movingEl && el !== store.placeholder && !isElementHidden(el)),
+                'closest is top': () => info.closestBranch === findNodeList(info.root.children, el => el !== movingEl && !isElementHidden(el)),
+                'closest is top excluding placeholder': () => info.closestBranch === findNodeList(info.root.children, el => el !== movingEl && el !== store.placeholder && !isElementHidden(el)),
                 'on closest middle': () => movingNodeOf.y < info.closestNodeOffset.y + info.closestNode.offsetHeight / 2,
                 'at closest indent right': () => movingNodeOf.x > info.closestNodeOffset.x + options.indent,
                 'at closest left': () => movingNodeOf.x < info.closestNodeOffset.x,
@@ -281,8 +295,9 @@ export default function makeTreeDraggable(treeEl, options = {}) {
                 'closest has children excluding placeholder movingEl': () => {
                     const childrenEl = info.closestBranch.querySelector(`.${options.childrenClass}`);
                     if (childrenEl) {
-                        return hp.findNodeList(childrenEl.children, el => el !== movingEl && el !== store.placeholder && !isElementHidden(el));
+                        return findNodeList(childrenEl.children, el => el !== movingEl && el !== store.placeholder && !isElementHidden(el));
                     }
+                    return undefined;
                 },
             };
             // fix for rtl
@@ -300,8 +315,8 @@ export default function makeTreeDraggable(treeEl, options = {}) {
                 };
             });
             //
-            hp.attachCache(info, info);
-            hp.attachCache(conditions, conditions);
+            attachCache(info, info);
+            attachCache(conditions, conditions);
             store.oneMoveStore.info = info;
             store.oneMoveStore.conditions = conditions;
             // actions start ========================================
@@ -325,23 +340,25 @@ export default function makeTreeDraggable(treeEl, options = {}) {
                 });
             };
             const actions = {
+                // eslint-disable-next-line no-empty-function
                 async nothing() {}, // do nothing
                 'append to root': async function () {
                     // no closest branch, just append to root
                     if (options.isTargetTreeRootDroppable(store)) {
-                        hp.appendTo(store.placeholder, info.root);
+                        if (store.placeholder) appendTo(store.placeholder, info.root);
                     }
                 },
                 'insert before': async function () {
                     if (options.isNodeParentDroppable(info.closestBranch, store.targetTreeEl)) {
-                        hp.insertBefore(store.placeholder, info.closestBranch);
+                        if (store.placeholder) insertBefore(store.placeholder, info.closestBranch);
                     } else {
                         return secondCase(getParentBranchByEl(info.closestBranch));
                     }
+                    return undefined;
                 },
                 'insert after': async function (branch = info.closestBranch) {
                     if (options.isNodeParentDroppable(branch, store.targetTreeEl)) {
-                        hp.insertAfter(store.placeholder, branch);
+                        if (store.placeholder) insertAfter(store.placeholder, branch);
                     } else {
                         const moved = await secondCase(getParentBranchByEl(branch));
                         const isFirstTriedAction = !store.oneMoveStore.actionRecords || store.oneMoveStore.actionRecords.length === 1;
@@ -349,10 +366,11 @@ export default function makeTreeDraggable(treeEl, options = {}) {
                             return thirdCase(branch);
                         }
                     }
+                    return undefined;
                 },
                 async prepend() {
                     if (info.closestBranch === store.placeholder) {
-                        return;
+                        return undefined;
                     }
                     if (options.ifNodeFolded(info.closestBranch, store) && !options.unfoldWhenDragover) {
                         return doAction('insert after', info.closestBranch);
@@ -362,38 +380,42 @@ export default function makeTreeDraggable(treeEl, options = {}) {
                     } else {
                         return secondCase(info.closestBranch);
                     }
+                    return undefined;
                 },
                 'after above': async function () {
                     if (options.isNodeParentDroppable(info.aboveBranch, store.targetTreeEl)) {
-                        hp.insertAfter(store.placeholder, info.aboveBranch);
+                        if (store.placeholder) insertAfter(store.placeholder, info.aboveBranch);
                     } else {
                         return secondCase(getParentBranchByEl(info.aboveBranch));
                     }
+                    return undefined;
                 },
                 'append to prev': async function () {
                     if (info.closestPrev === store.placeholder) {
-                        return;
+                        return undefined;
                     }
                     if (options.ifNodeFolded(info.closestPrev, store)) {
                         return doAction('insert after', info.closestPrev);
                     } if (options.isNodeDroppable(info.closestPrev, store.targetTreeEl)) {
                         const childrenEl = await unfoldAndGetChildrenEl(info.closestPrev);
-                        hp.appendTo(store.placeholder, childrenEl);
+                        if (store.placeholder) appendTo(store.placeholder, childrenEl);
                     } else {
                         return secondCase(info.closestPrev);
                     }
+                    return undefined;
                 },
             };
             // second case for actions, when target position not droppable
             // return true if moved
-            const secondCase = async (branchEl) => {
+            const secondCase = async (branchEl): Promise<boolean|undefined> => {
                 if (branchEl) {
                     const targetEl = options._findClosestDroppablePosition(branchEl, store.targetTreeEl);
                     if (targetEl) {
-                        hp.insertAfter(store.placeholder, targetEl);
+                        if (store.placeholder) insertAfter(store.placeholder, targetEl);
                         return true;
                     }
                 }
+                return undefined;
             };
             // when action is after, first case and second case invalid, try prepend
             const thirdCase = async (branchEl) => {
@@ -407,14 +429,14 @@ export default function makeTreeDraggable(treeEl, options = {}) {
                 let childrenEl = branch.querySelector(`.${options.childrenClass}`);
                 if (!childrenEl) {
                     childrenEl = store.tempChildren;
-                    hp.appendTo(childrenEl, branch);
+                    appendTo(childrenEl, branch);
                 }
                 return childrenEl;
             };
             const tryUnfoldAndPrepend = async (branchEl) => {
                 const func = async () => {
                     const childrenEl = await unfoldAndGetChildrenEl(branchEl);
-                    hp.prependTo(store.placeholder, childrenEl);
+                    if (store.placeholder) prependTo(store.placeholder, childrenEl);
                 };
                 if (options.ifNodeFolded(branchEl, store)) {
                     // delay if node folded
@@ -431,32 +453,32 @@ export default function makeTreeDraggable(treeEl, options = {}) {
             };
             // actions end ========================================
             doDraggableDecision({
-                options, event: store.moveEvent, store, opt: dhOptions, info, conditions, actions, doAction,
+                conditions, doAction,
             });
+
+            return undefined;
         },
         afterMove: (store, dhOptions) => {
-            options.afterMove && options.afterMove(store, dhOptions);
+            if (options.afterMove) options.afterMove(store, dhOptions);
         },
         beforeDrop: async (store, dhOptions) => {
-            const { endEvent } = store;
-            const movingEl = store.movedElement; // branch
             const {
-                placeholder, tempChildren, movedCount, targetTreeEl, startTreeEl,
+                placeholder, tempChildren, targetTreeEl, startTreeEl,
             } = store;
             // use mask tree to avoid flick caused by DOM update in short time
-            let maskTree; let
-                maskTree2;
+            let maskTree;
+            let maskTree2;
             if (targetTreeEl) {
                 // No targetTreeEl mean no valid move.
 
                 // create mask tree
                 maskTree = targetTreeEl.cloneNode(true);
                 targetTreeEl.style.display = 'none';
-                hp.insertAfter(maskTree, targetTreeEl);
-                if (startTreeEl !== targetTreeEl) {
+                insertAfter(maskTree, targetTreeEl);
+                if (startTreeEl && startTreeEl !== targetTreeEl) {
                     maskTree2 = startTreeEl.cloneNode(true);
                     startTreeEl.style.display = 'none';
-                    hp.insertAfter(maskTree2, startTreeEl);
+                    insertAfter(maskTree2, startTreeEl);
                 }
                 //
                 store.targetPath = options.getPathByBranchEl(placeholder);
@@ -470,21 +492,19 @@ export default function makeTreeDraggable(treeEl, options = {}) {
                 store.pathChanged = pathChanged;
             }
             // destroy placeholder and tempChildren
-            hp.removeEl(placeholder);
-            if (tempChildren) {
-                hp.removeEl(tempChildren);
-            }
+            if (placeholder) removeEl(placeholder);
+            if (tempChildren) removeEl(tempChildren);
+
             store.updateMovedElementStyle();
             //
             await options.afterDrop(store, dhOptions);
             // remove mask tree
             if (maskTree) {
-                await hp.waitTime(0);
-                hp.removeEl(maskTree);
-                targetTreeEl.style.display = 'block';
+                removeEl(maskTree);
+                if (targetTreeEl) targetTreeEl.style.display = 'block';
                 if (maskTree2) {
-                    hp.removeEl(maskTree2);
-                    startTreeEl.style.display = 'block';
+                    removeEl(maskTree2);
+                    if (startTreeEl) startTreeEl.style.display = 'block';
                 }
             }
             //
@@ -492,7 +512,7 @@ export default function makeTreeDraggable(treeEl, options = {}) {
                 const {
                     startTree, targetTree, startPath, targetPath,
                 } = store;
-                if (startTree === targetTree && startPath.length === targetPath.length) {
+                if (startPath && targetPath && startTree === targetTree && startPath.length === targetPath.length) {
                     if (startPath.toString() === targetPath.toString()) {
                         return false;
                     }
@@ -509,13 +529,14 @@ export default function makeTreeDraggable(treeEl, options = {}) {
     });
     return { destroy, options, optionsUpdated };
     function getParentBranchByEl(el) {
-        return hp.findParent(el, (el) => {
-            if (hp.hasClass(el, options.branchClass)) {
+        return findParent(el, (_el) => {
+            if (hasClass(_el, options.branchClass)) {
                 return true;
             }
-            if (hp.hasClass(el, options.rootClass)) {
+            if (hasClass(_el, options.rootClass)) {
                 return 'break';
             }
+            return undefined;
         });
     }
     function optionsUpdated() {

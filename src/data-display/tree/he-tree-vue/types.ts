@@ -1,20 +1,7 @@
-import * as dh from 'draggable-helper';
+// eslint-disable-next-line import/no-cycle
+import { Store } from './plugins/draggable/draggable-types';
 
 export type Path = number[]
-export interface Store extends dh.Store {
-    startTreeEl?: HTMLElement;
-    startTree?: any;
-    startPath?: Path;
-    dragBranchEl?: HTMLElement;
-    dragNode?: Node;
-    targetTreeEl?: HTMLElement;
-    targetTree?: any;
-    targetPath?: Path;
-    targetPathNotEqualToStartPath?: boolean;
-    placeholder?: HTMLElement;
-    pathChangePrevented?: boolean;
-    pathChanged?: boolean;
-}
 
 type IsDraggableOrIsDroppable = boolean | undefined
 export interface Node {
@@ -35,15 +22,27 @@ export interface Node {
     $droppable?(currentPath: Path, tree: any, store: Store): IsDraggableOrIsDroppable;
 }
 
-
 /* Utils */
 export interface CloneTreeDataOptions {
     afterNodeCreated(newNode: object, info: {oldNode: object; index: number; parent: object; path: Path}): void;
 }
 type WalkTreeDataCallbackReturn = void|false|'skip children'|'skip siblings'
-export interface WalkTreeDataCallback {
-    (node: Node, index: number, parent: object|null, path: number[]): WalkTreeDataCallbackReturn;
-}
+export type WalkTreeDataHandler<T> = (
+    node: T,
+    index: number,
+    parent: T | null,
+    path: TreeDataPath
+) => WalkTreeDataCallbackReturn;
+export type WalkTreeDataCallback = WalkTreeDataHandler<Node>
+
+export type TreeDataPath = number[];
+
+export type WalkTreeDataOptions = {
+    childrenKey?: string;
+    reverse?: boolean;
+    childFirst?: boolean;
+};
+
 
 /* Component Type */
 export interface UnfoldOptions {

@@ -15,16 +15,20 @@
 </template>
 
 <script lang="ts">
-import * as hp from 'helper-js';
-import * as vf from 'vue-functions';
-
 import * as ut from '../utils';
 import { defineComponent } from '@vue/composition-api';
+import {
+  arrayRemove,
+  joinFunctionsByNext,
+  randString,
+  TreeData, updatablePropsEvenUnbound
+} from "../helpers";
 
 const trees = {};
 const ChildrenList = () => ({
   component: import('./ChildrenList.vue') as any,
 })
+
 
 export default defineComponent({
     name: 'Tree',
@@ -50,16 +54,16 @@ export default defineComponent({
         },
     },
     mixins: [
-      vf.updatablePropsEvenUnbound({
+      updatablePropsEvenUnbound({
         value: { $localName: 'treeData', required: true },
       }),
-      vf.hookHelper,
     ],
     data() {
         return {
             trees,
             treeClass: '',
-            treeId: hp.randString(),
+            treeId: randString(),
+            _hooks: {} as Record<string, {(...args: any[]): any}[]>
         };
     },
     // computed: {},
@@ -68,11 +72,51 @@ export default defineComponent({
             immediate: true,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             handler(treeData) {
-                this._TreeDataHelper = new hp.TreeData(this.treeData);
+                this._TreeDataHelper = new TreeData(this.treeData);
             },
         },
     },
     methods: {
+      //
+      // get hooks in this._hooks, without which in props
+      _getNonPropHooksByName(name) {
+        if (this._hooks) {
+          return this._hooks[name]
+        }
+      },
+      addHook(name, func) {
+        if (!this._getNonPropHooksByName(name)) {
+          if (!this._hooks) {
+            this._hooks = {}
+          }
+          if (!this._hooks[name]) {
+            this._hooks[name] = []
+          }
+        }
+        this._hooks[name].push(func)
+      },
+      removeHook(name, func) {
+        const hooks = this._getNonPropHooksByName(name)
+        if (hooks) {
+          arrayRemove(hooks, func)
+        }
+      },
+      hasHook(name) {
+        return this._getNonPropHooksByName(name) || this[name]
+      },
+      executeHook(name, hookArgs: any[]) {
+        let hooks = this._getNonPropHooksByName(name)
+        hooks = hooks ? hooks.slice() : []
+        const func = this[name]
+        if (func && typeof func === 'function') {
+          hooks.push((next, ...args) => {
+            return func(...args)
+          })
+        }
+        return joinFunctionsByNext(hooks)(...hookArgs)
+      },
+
+      //
         iteratePath(path, opt) {
             // @ts-ignore
             return this._TreeDataHelper.iteratePath(path, opt);
@@ -124,7 +168,7 @@ export default defineComponent({
     },
     mounted() {
         //
-        this.treeId = hp.randString();
+        this.treeId = randString();
         this.$set(this.trees, this.treeId, this);
         this.$once('hook:beforeDestroy', () => {
             this.$delete(this.trees, this.treeId);

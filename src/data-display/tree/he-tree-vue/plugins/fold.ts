@@ -1,7 +1,6 @@
 import { defineComponent } from '@vue/composition-api';
 import Vue from 'vue';
 
-// eslint-disable-next-line import/no-cycle
 import {
     Node, Path, UnfoldOptions,
 } from '@/data-display/tree/he-tree-vue/types';
