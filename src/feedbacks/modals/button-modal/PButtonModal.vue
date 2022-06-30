@@ -244,7 +244,7 @@ export default defineComponent<ButtonModalProps>({
 
             .modal-header {
                 display: flex;
-                align-items: start;
+                align-items: flex-start;
                 min-height: $header-height;
                 font-size: 1.375rem;
                 line-height: 145%;

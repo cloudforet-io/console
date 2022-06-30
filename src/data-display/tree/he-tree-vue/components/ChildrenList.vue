@@ -5,7 +5,7 @@
              :class="{'he-tree--hidden': node.$hidden}"
              :data-tree-node-path="getTreeNodePath(index).join(',')"
         >
-            <div class="tree-node-back" :style="node.$nodeBackStyle ? getNodeBackStyle(node) : indentStyle">
+            <div class="tree-node-back" :class="node.$nodeBackClass" :style="indentStyle">
                 <div class="tree-node">
                     <slot v-bind="{node, index, path: getTreeNodePath(index)}">
                         {{ node.text ? node.text : node.data }}
@@ -79,11 +79,9 @@ export default defineComponent<ChildrenListProps>({
             })),
         });
         const getTreeNodePath = (index: number) => [...props.parentPath, index];
-        const getNodeBackStyle = node => ({ ...state.indentStyle, ...node.$nodeBackStyle });
         return {
             ...toRefs(state),
             getTreeNodePath,
-            getNodeBackStyle,
         };
     },
 });
