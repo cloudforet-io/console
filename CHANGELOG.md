@@ -1,3 +1,10 @@
+# [1.1.0-beta.334](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.333...v1.1.0-beta.334) (2022-06-30)
+
+
+### Bug Fixes
+
+* apply tree selected style ([#1000](https://github.com/spaceone-dev/spaceone-design-system/issues/1000)) ([427ecb4](https://github.com/spaceone-dev/spaceone-design-system/commit/427ecb4df1911cf6c2920ce23bdf2e18db4c613a))
+
 # [1.1.0-beta.333](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.332...v1.1.0-beta.333) (2022-06-30)
 
 
