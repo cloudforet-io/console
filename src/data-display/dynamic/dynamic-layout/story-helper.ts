@@ -246,23 +246,6 @@ export const getDynamicLayoutArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    searchable: {
-        name: 'searchable',
-        type: { name: 'boolean' },
-        defaultValue: true,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'typeOptions',
-            defaultValue: {
-                summary: true,
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
     selectable: {
         name: 'selectable',
         type: { name: 'boolean' },

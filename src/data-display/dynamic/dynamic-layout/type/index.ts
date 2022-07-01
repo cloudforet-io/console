@@ -24,7 +24,6 @@ export interface DynamicLayoutTypeOptions {
     selectIndex?: number[];
     selectable?: boolean;
     colCopy?: boolean;
-    searchable?: boolean;
     multiSelect?: boolean;
     invalid?: boolean;
     excelVisible?: boolean;

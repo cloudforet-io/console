@@ -20,7 +20,6 @@ export const getDynamicLayoutRawTableArgTypes = (): ArgTypes => {
         multiSelect: argTypes.multiSelect,
         invalid: argTypes.invalid,
         colCopy: argTypes.colCopy,
-        searchable: argTypes.searchable,
         excelVisible: argTypes.excelVisible,
         settingsVisible: argTypes.settingsVisible,
         sortBy: argTypes.sortBy,

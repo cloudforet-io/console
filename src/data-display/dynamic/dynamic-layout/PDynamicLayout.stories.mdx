@@ -24,7 +24,6 @@ export const Template = (args, { argTypes }) => ({
                                   multiSelect,
                                   invalid,
                                   colCopy,
-                                  searchable,
                                   excelVisible,
                                   settingsVisible,
                                   keyItemSets,
@@ -121,9 +120,9 @@ Each type of dynamic layout corresponds to each component as the table below.<br
 | ---- | ----------- |
 | item | DefinitionTable |
 | simple-table | DataTable |
-| table | DataTable |
-| raw-table | DataTable |
-| query-search-table | QuerySearchTable |
+| table | ToolboxTable |
+| raw-table | ToolboxTable |
+| query-search-table | ToolboxTable |
 | raw | Raw |
 | markdown | Markdown |
 | html | - |
@@ -137,9 +136,9 @@ Each type of dynamic layout corresponds to each component as the table below.<br
 | ---- | ----------- |
 | item | ```loading```, ```timezone``` |
 | simple-table | ```loading```, ```timezone```, ```colCopy``` |
-| table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```searchable```, ```excelVisible```, ```settingsVisible``` |
-| raw-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```searchable```, ```excelVisible```, ```settingsVisible```  |
-| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```searchable```, ```excelVisible```, ```settingsVisible``` , ```keyItemSets```, ```valueHandlerMap``` |
+| table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```,  ```excelVisible```, ```settingsVisible``` |
+| raw-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```excelVisible```, ```settingsVisible```  |
+| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```excelVisible```, ```settingsVisible``` , ```keyItemSets```, ```valueHandlerMap``` |
 | raw | ```loading``` |
 | markdown | ```language``` |
 | html | - |
@@ -161,7 +160,6 @@ Each type of dynamic layout corresponds to each component as the table below.<br
 | colCopy | boolean | ```false``` | Used to on/off each column copy. |
 | excelVisible | boolean | ```false``` | Used to on/off export button. |
 | settingsVisible | boolean | ```false``` | Used to on/off settings button. |
-| searchable | boolean | ```true``` | Used to on/off search. |
 | keyItemSets | KeyItemSet[] |```options.fields``` or ```[]``` | Only for query-search-table's key items. |
 | valueHandlerMap | ValueHandlerMap |```{}``` | Only for query-search-table's value handler map. |
 | language | string | ```'en'``` | NOT supported yet except markdown type. |
@@ -174,7 +172,6 @@ interface DynamicLayoutTypeOptions {
     selectIndex?: number[];
     selectable?: boolean;
     colCopy?: boolean;
-    searchable?: boolean;
     multiSelect?: boolean;
     invalid?: boolean;
     excelVisible?: boolean;
@@ -197,11 +194,10 @@ interface DynamicLayoutTypeOptions {
 <br/>
 <br/>
 
-## Event Handlers and Parameters
+## Event Handlers and Event Parameters
 
 ```typescript
 interface DynamicLayoutEventListeners {
-    init: () => void|Promise<void>;
     fetch: (options: DynamicLayoutFetchOptions, layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     select: (selectIndex: number[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     export: (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
@@ -209,7 +205,7 @@ interface DynamicLayoutEventListeners {
 }
 ```
 
-| Parameter Name | Description |
+| Event Parameter Name | Description |
 | ---------- | ----------- |
 | options | All layout fetch options. Different by layout types. |
 | selectIndex | Selected row(item) indexes. |
@@ -222,15 +218,15 @@ interface DynamicLayoutEventListeners {
 ## Supported Events by Types
 | Type | Type Options Properties |
 | ---- | ----------- |
-| item | init |
-| simple-table | init |
-| table | init, fetch, select, export |
-| raw-table | init, fetch, select, export |
-| query-search-table | init, fetch, select, export |
-| raw | init |
-| markdown | init |
-| html | init |
-| list | init, fetch, select, export |
+| item | - |
+| simple-table | - |
+| table | fetch, select, export |
+| raw-table | fetch, select, export |
+| query-search-table | fetch, select, export |
+| raw | - |
+| markdown | - |
+| html | - |
+| list | fetch, select, export |
 
 <br/>
 <br/>
