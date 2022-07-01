@@ -30,20 +30,6 @@
                             />
                         </template>
                     </p-field-group>
-
-                    <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_PRIORITY_LABEL')"
-                                   :invalid-text="priorityInvalidText"
-                                   :invalid="showValidation && !isPriorityValid"
-                                   :required="true"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input v-model.number="inputModel.priority" block
-                                          type="number"
-                                          class="block"
-                                          :invalid="invalid"
-                            />
-                        </template>
-                    </p-field-group>
                     <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_VERSION_LABEL')"
                                    :required="true"
                     >
@@ -145,7 +131,6 @@ export default {
         const formState = reactive({
             inputModel: {
                 name: '',
-                priority: 10,
                 version: '',
                 isAutoUpgrade: true,
             },
@@ -158,16 +143,7 @@ export default {
                 return '';
             }),
             isNameValid: computed(() => !(formState.inputModel.name.length < 2 || state.collectorNames.includes(formState.inputModel.name))),
-            priorityInvalidText: computed(() => {
-                if (formState.inputModel.priority < 1) {
-                    return i18n.t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_PRIORITY_MIN');
-                } if (formState.inputModel.priority > 10) {
-                    return i18n.t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_PRIORITY_MAX');
-                }
-                return '';
-            }),
-            isPriorityValid: computed(() => !(formState.inputModel.priority < 1 || formState.inputModel.priority > 10)),
-            isValid: computed(() => formState.isNameValid && formState.isPriorityValid),
+            isValid: computed(() => formState.isNameValid),
             showValidation: false,
         });
 
@@ -179,7 +155,6 @@ export default {
                 });
                 state.collector = res;
                 formState.inputModel.name = res.name;
-                formState.inputModel.priority = Number(res.priority);
                 formState.inputModel.version = res.plugin_info.version;
                 formState.inputModel.isAutoUpgrade = res.plugin_info.upgrade_mode === UPGRADE_MODE.AUTO;
             } catch (e) {
@@ -219,7 +194,6 @@ export default {
             if (state.loading) return;
             formState.showValidation = false;
             formState.inputModel.name = get(state.collector, 'name', '');
-            formState.inputModel.priority = get(state.collector, 'priority', null);
             formState.inputModel.version = get(state.collector, 'plugin_info.version', state.versions[0]);
         };
         const onClickConfirm = async (): Promise<void> => {
@@ -230,7 +204,6 @@ export default {
                 state.collectorUpdateParam = {
                     collector_id: props.collectorId,
                     name: formState.inputModel.name,
-                    priority: formState.inputModel.priority,
                     plugin_info: {
                         plugin_id: state.pluginInfo.plugin_id,
                         provider: state.pluginInfo.provider,
@@ -261,7 +234,6 @@ export default {
         const clearForm = () => {
             formState.showValidation = false;
             formState.inputModel.name = '';
-            formState.inputModel.priority = 10;
             formState.inputModel.version = '';
         };
 
