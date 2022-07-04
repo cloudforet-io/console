@@ -1,3 +1,10 @@
+# [1.1.0-beta.335](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.334...v1.1.0-beta.335) (2022-07-04)
+
+
+### Bug Fixes
+
+* fix bug in PTextEditor ([#1001](https://github.com/spaceone-dev/spaceone-design-system/issues/1001)) ([5e3fddf](https://github.com/spaceone-dev/spaceone-design-system/commit/5e3fddf576f770070490657d3cb4e921f256b0df))
+
 # [1.1.0-beta.334](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.333...v1.1.0-beta.334) (2022-06-30)
 
 
