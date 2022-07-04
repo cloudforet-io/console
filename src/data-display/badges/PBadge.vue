@@ -124,7 +124,7 @@ export default {
     @mixin badge-without-outline primary3, theme('colors.primary3'), theme('colors.violet.600');
     @mixin badge-without-outline blue200, theme('colors.blue.200'), theme('colors.blue.600');
     @mixin badge-without-outline blue300, theme('colors.blue.300'), theme('colors.blue.600');
-    @mixin badge-without-outline green200, theme('colors.green.200'), theme('colors.green.600');
+    @mixin badge-without-outline green200, theme('colors.green.200'), theme('colors.green.700');
     @mixin badge-without-outline gray200, theme('colors.gray.200'), theme('colors.gray.900');
     @mixin badge-without-outline coral100, theme('colors.coral.100'), theme('colors.coral.600');
     @mixin badge-without-outline peacock200, theme('colors.peacock.200'), theme('colors.peacock.800');
