@@ -38,7 +38,7 @@
     "core-js": "^3.6.5",
     "currency.js": "^2.0.4",
     "dayjs": "^1.10.7",
-    "ejs": "^3.1.5",
+    "ejs": "^3.1.7",
     "gapi-script": "^1.1.0",
     "hashids": "^2.2.1",
     "html-to-image": "^1.9.0",
