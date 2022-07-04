@@ -31,7 +31,7 @@ export type SearchSchema = SearchKeyGroup;
 /** Metadata schema types for Dynamic layout */
 export const dynamicLayoutTypes = [
     'item', 'simple-table', 'table', 'query-search-table',
-    'raw', 'markdown', 'list', 'raw-table', 'html',
+    'raw', 'markdown', 'list', 'raw-table', 'html', 'popup',
 ];
 export type DynamicLayoutType = typeof dynamicLayoutTypes[number];
 
@@ -75,14 +75,19 @@ export interface MarkdownOptions extends CommonOptions {
     };
 }
 
+export interface PopupOptions extends CommonOptions {
+    layout: DynamicLayout
+}
+
 export interface ListOptions extends CommonOptions {
     layouts: DynamicLayout[];
 }
 
+
 export interface DynamicLayoutOptions extends
     ItemOptions, SimpleTableOptions, TableOptions,
     QuerySearchTableOptions, RawOptions, MarkdownOptions,
-    RawTableOptions, HtmlOptions, ListOptions {}
+    RawTableOptions, HtmlOptions, PopupOptions, ListOptions {}
 
 
 export interface DynamicLayout {

@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import {
+    defineComponent,
     onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { AsyncComponent } from 'vue';
@@ -55,8 +56,11 @@ const componentMap: Record<DynamicLayoutType, AsyncComponent> = {
     html: () => ({
         component: import('./templates/html/index.vue') as Promise<ImportedComponent>,
     }),
+    popup: () => ({
+        component: import('./templates/popup/index.vue') as Promise<ImportedComponent>,
+    }),
 };
-export default {
+export default defineComponent({
     name: 'PDynamicLayout',
     components: { PSkeleton },
     props: {
@@ -119,5 +123,5 @@ export default {
             ...toRefs(state),
         };
     },
-};
+});
 </script>
