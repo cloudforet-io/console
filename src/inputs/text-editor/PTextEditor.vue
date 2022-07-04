@@ -11,8 +11,7 @@
                 </slot>
             </div>
         </transition>
-        <textarea v-if="!loading"
-                  ref="textareaRef"
+        <textarea ref="textareaRef"
                   name="codemirror"
                   placeholder=""
         />
@@ -105,87 +104,69 @@ export default defineComponent({
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             content: '',
-            cminstance: null as any,
+            cmInstance: null as any,
             textareaRef: null as HTMLTextAreaElement|null,
             mergedOptions: computed(() => ({ ...props.options, readOnly: props.mode === 'readOnly' })),
         });
 
-        const forceFold = () => {
-            if (props.folded && state.cminstance && props.code) {
-                state.cminstance.operation(() => {
-                    for (let l = state.cminstance.firstLine() + 1;
-                        l <= state.cminstance.lastLine(); ++l) {
-                        state.cminstance.foldCode({ line: l, ch: 0 }, null, 'fold');
+        const forceFold = (cmInstance) => {
+            if (props.folded && cmInstance && props.code) {
+                cmInstance.operation(() => {
+                    for (let l = cmInstance.firstLine() + 1;
+                        l <= cmInstance.lastLine(); ++l) {
+                        cmInstance.foldCode({ line: l, ch: 0 }, null, 'fold');
                     }
                 });
             }
         };
 
-        const onCmCodeChange = (newCode) => {
-            emit('update:code', newCode);
-        };
-
-        const handleCodeChange = (newVal) => {
-            const cmValue = state.cminstance.getValue();
-            if (newVal !== cmValue) {
-                const scrollInfo = state.cminstance.getScrollInfo();
-                state.cminstance.setValue(newVal);
-                state.content = newVal;
-                state.cminstance.scrollTo(scrollInfo.left, scrollInfo.top);
+        const setCode = (cmInstance, code) => {
+            if (code !== cmInstance.getValue()) {
+                const scrollInfo = cmInstance.getScrollInfo();
+                cmInstance.setValue(code);
+                cmInstance.scrollTo(scrollInfo.left, scrollInfo.top);
             }
         };
 
-        const refresh = () => {
+        const refresh = (cmInstance) => {
             vm.$nextTick(() => {
-                state.cminstance.refresh();
+                cmInstance.refresh();
             });
         };
 
-        const destroy = (cminstance) => {
+        const destroy = (cmInstance) => {
             // garbage cleanup
-            const element = cminstance?.doc?.cm?.getWrapperElement();
+            const element = cmInstance?.doc?.cm?.getWrapperElement();
             if (element?.remove) element.remove();
+            state.cmInstance = null;
         };
 
-        const init = async () => {
-            if (!state.textareaRef) return;
-            state.cminstance = CodeMirror.fromTextArea(state.textareaRef, state.mergedOptions);
+        const init = (textareaRef: HTMLTextAreaElement) => {
+            state.cmInstance = CodeMirror.fromTextArea(textareaRef, state.mergedOptions);
 
             watch(() => state.mergedOptions, (options) => {
-                if (options && state.cminstance) {
+                if (options && state.cmInstance) {
                     forEach(options, (d, k) => {
-                        state.cminstance.setOption(k, d);
+                        state.cmInstance.setOption(k, d);
                     });
                 }
             }, { deep: true });
 
-            state.cminstance.on('change', (cm) => {
-                state.content = cm.getValue();
-                onCmCodeChange(state.content);
+            state.cmInstance.on('change', (cm) => {
+                emit('update:code', cm.getValue());
             });
-
-            watch(() => props.code, (newVal) => {
-                handleCodeChange(newVal);
-            }, { immediate: true });
-
-            forceFold();
-
-            // prevents funky dynamic rendering
-            refresh();
         };
 
-
-        watch(() => state.textareaRef, async (after, before) => {
-            if (after) {
-                await init();
-            } else {
-                destroy(before);
-            }
-        });
-
+        watch([() => state.textareaRef, () => props.code], async ([textareaRef, code]) => {
+            if (!textareaRef) return;
+            if (!state.cmInstance) init(textareaRef);
+            setCode(state.cmInstance, code);
+            forceFold(state.cmInstance);
+            refresh(state.cmInstance);
+        }, { immediate: true });
 
         onBeforeUnmount(() => {
-            destroy(state.cminstance);
+            destroy(state.cmInstance);
         });
 
 
@@ -205,6 +186,9 @@ export default defineComponent({
     position: relative;
     height: 100%;
     min-height: 5rem;
+    > textarea {
+        display: none;
+    }
     > .CodeMirror {
         font-family: Inconsolata, monospace;
         line-height: 1.5;

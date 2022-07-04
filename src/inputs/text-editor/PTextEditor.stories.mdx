@@ -1,0 +1,108 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+
+import PTextEditor from './PTextEditor.vue';
+
+import { getTextEditorArgTypes, sampleCode } from '@/inputs/text-editor/story-helper'; import {
+    reactive, toRefs
+} from '@vue/composition-api';
+
+
+<Meta title='Inputs/Text Editor' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A182308'
+    }
+}} component={PTextEditor} argTypes={getTextEditorArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PTextEditor },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-text-editor :code="sampleCode" />
+    </div>
+    `,
+    setup() {
+        const state = reactive({
+            sampleCode: sampleCode,
+        });
+        return {
+            ...toRefs(state),
+        }
+    }
+});
+
+
+# Text Editor
+<br/>
+<br/>
+
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PTextEditor },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-text-editor :code="sampleCode" folded />
+    </div>
+    `,
+        setup() {
+            const state = reactive({
+                sampleCode: sampleCode,
+            });
+            return {
+                ...toRefs(state),
+            }
+        }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+# Change Code
+<br/>
+<br/>
+
+
+<Canvas>
+    <Story name="Change Code">
+        {{
+            components: { PTextEditor },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-text-editor :code="sampleCode" folded />
+        <button @click="handleChangeCode">Change Code!</button>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    sampleCode: sampleCode,
+                });
+                const handleChangeCode = () => {
+                    state.sampleCode = JSON.stringify({a: 3}, null, '');
+                };
+                return {
+                    ...toRefs(state),
+                    handleChangeCode,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
