@@ -139,7 +139,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             widgetCount: computed<number>(() => props.layout.flat().length),
             renderedCount: 0,

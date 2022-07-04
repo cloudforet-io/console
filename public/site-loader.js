@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 lottie.loadAnimation({
     container: document.getElementById('site-loader'), // the dom element that will contain the animation
     renderer: 'svg',

@@ -97,7 +97,7 @@ export default defineComponent({
         PSidebar,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const state = reactive({
             showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),

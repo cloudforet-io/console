@@ -170,7 +170,7 @@ export default {
         },
     },
     setup(props, { root, emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             showLanguageMenu: false,
             supportMenu: computed(() => {

@@ -9,7 +9,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 export const useBreadcrumbs = () => {
-    const vm = getCurrentInstance() as ComponentRenderProxy;
+    const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
     return {
         breadcrumbs: computed(() => {
             const matched = vm.$route.matched;

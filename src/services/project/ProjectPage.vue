@@ -179,7 +179,7 @@ export default {
         ProjectGroupFormModal,
     },
     setup() {
-        const vm: ComponentRenderProxy = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         registerServiceStore<ProjectPageState>('project', ProjectPageStoreModule);
 

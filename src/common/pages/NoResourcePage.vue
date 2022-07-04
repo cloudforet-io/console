@@ -40,7 +40,7 @@ export default {
         PLottie,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             serviceRoute: computed(() => vm.$route.matched[vm.$route.matched.length - 2]),
             mainLabel: computed(() => {

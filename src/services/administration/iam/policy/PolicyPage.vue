@@ -21,7 +21,9 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs,
+} from '@vue/composition-api';
 
 import { PPageTitle, PButton } from '@spaceone/design-system';
 

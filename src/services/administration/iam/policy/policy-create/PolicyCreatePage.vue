@@ -61,7 +61,9 @@
 
 <script lang="ts">
 
-import { reactive, toRefs } from '@vue/composition-api';
+import {
+    reactive, toRefs,
+} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {

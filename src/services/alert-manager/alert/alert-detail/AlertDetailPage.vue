@@ -121,7 +121,7 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const state = reactive({
             hasManagePermission: useManagePermissionState(),

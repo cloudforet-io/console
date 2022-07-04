@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import { mount, createLocalVue } from '@vue/test-utils';
 
 import CompositionApi, { defineComponent, reactive, toRefs } from '@vue/composition-api';

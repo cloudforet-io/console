@@ -98,7 +98,7 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const { i18nDayjs } = useI18nDayjs();
         const budgetUsageApiQueryHelper = new ApiQueryHelper();
         const state = reactive({

@@ -74,7 +74,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const state = reactive({
             userType: computed(() => (props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER')),

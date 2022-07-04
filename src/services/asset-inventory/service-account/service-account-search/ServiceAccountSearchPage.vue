@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
+    ComponentInstance,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -19,7 +19,7 @@ export default {
     name: 'ServiceAccountSearchPage',
     // TODO: move this code to route file
     beforeRouteEnter(to, from, next) {
-        next(async (vm: ComponentRenderProxy) => {
+        next(async (vm: ComponentInstance) => {
             let link = DEFAULT_URL;
             try {
                 const result = await SpaceConnector.client.addOns.pageDiscovery.get({

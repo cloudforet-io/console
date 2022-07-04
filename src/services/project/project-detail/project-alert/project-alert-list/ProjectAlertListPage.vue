@@ -43,7 +43,7 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
             alertState: vm.$route.query.state ?? ALERT_STATE_FILTER.OPEN,

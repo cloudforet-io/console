@@ -84,7 +84,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const baseState = reactive({
             title: computed(() => i18n.t('IDENTITY.USER.MAIN.ASSIGNED_ROLES')),
             loading: true,

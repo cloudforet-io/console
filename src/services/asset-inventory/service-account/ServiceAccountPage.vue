@@ -193,7 +193,7 @@ export default {
         PTab,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         /** Provider(located at sidebar) & Page Title * */

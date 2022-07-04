@@ -112,7 +112,7 @@ export default defineComponent<WidgetProps>({
         },
     },
     setup(props: WidgetProps, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const checkThisMonth = () => dayjs.utc(props.period?.end).format('MM') === thisMonth;
         const thisMonthFormatter = (targetDate: Dayjs) => {
             if (checkThisMonth()) {

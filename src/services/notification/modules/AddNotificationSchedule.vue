@@ -84,7 +84,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const timezoneForFormatter = computed(() => store.state.user.timezone).value;
 
         const checkInvalidByHour = (startHour: number, endHour: number) => {

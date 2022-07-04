@@ -215,7 +215,7 @@ export default {
         },
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
         const apiQuery = new ApiQueryHelper();
         const pageTitle = computed(() => (props.isCloudService ? props.cloudServiceType : vm.$t('INVENTORY.SERVER.MAIN.TITLE')));

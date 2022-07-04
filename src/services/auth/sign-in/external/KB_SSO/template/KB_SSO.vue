@@ -31,7 +31,7 @@ export default defineComponent({
         PButton,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             authOptions: computed(() => vm.$store.state.domain.authOptions),
         });

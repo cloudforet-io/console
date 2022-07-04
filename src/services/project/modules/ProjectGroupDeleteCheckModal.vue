@@ -32,7 +32,7 @@ export default {
         DeleteModal,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             proxyVisible: computed({
                 get() { return store.state.service.project.projectGroupDeleteCheckModalVisible; },

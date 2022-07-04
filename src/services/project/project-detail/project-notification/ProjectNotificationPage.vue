@@ -26,7 +26,7 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             projectId: vm.$route.params.id,
             hasManagePermission: useManagePermissionState(),

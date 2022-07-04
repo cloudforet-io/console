@@ -42,7 +42,7 @@ export default defineComponent({
     name: 'AssetInventoryLNB',
     components: { LNB },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             isCloudServiceDetailPage: computed(() => vm.$route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME),
             detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {

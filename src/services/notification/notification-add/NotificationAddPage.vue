@@ -86,7 +86,7 @@ export default {
     },
 
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             type: '',
             pageTitle: '' as TranslateResult,

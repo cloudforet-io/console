@@ -86,7 +86,7 @@
 <script lang="ts">
 
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance,
+    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 
@@ -132,7 +132,7 @@ export default {
         },
     },
     setup(props) {
-        const vm: any = getCurrentInstance();
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             totalCount: 0,

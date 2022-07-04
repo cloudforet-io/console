@@ -75,7 +75,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const state = reactive({
             selectedProject: [] as ProjectGroupTreeItem[],

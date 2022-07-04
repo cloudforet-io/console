@@ -55,7 +55,7 @@ export default defineComponent({
     },
     setup() {
         registerServiceStore<any>('administration', administrationStoreModule, administrationStore);
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const { breadcrumbs } = useBreadcrumbs();
         const handbookState = reactive({
             isVisible: computed((): boolean => (vm?.$route.name === ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME || vm?.$route.name === ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME)),

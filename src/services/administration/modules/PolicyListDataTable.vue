@@ -103,7 +103,7 @@ const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], 
 
     // 2. filter by query tags
     let results = [..._typeFilteredItems];
-    queryTags.forEach((queryTag) => {
+    queryTags.forEach((queryTag: any) => {
         const regex = RegExp(queryTag.value.name, 'i');
         results = filter(results, item => regex.test(item[queryTag.key?.name]));
     });

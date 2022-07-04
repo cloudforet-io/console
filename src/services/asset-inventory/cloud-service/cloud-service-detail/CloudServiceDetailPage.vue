@@ -234,7 +234,7 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
         /* Sidebar */
         const sidebarState = reactive({

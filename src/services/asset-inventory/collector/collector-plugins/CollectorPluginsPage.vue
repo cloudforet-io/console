@@ -149,7 +149,7 @@ export default {
         CollectorPluginsToolbox,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             loading: false,
             totalCount: 0,

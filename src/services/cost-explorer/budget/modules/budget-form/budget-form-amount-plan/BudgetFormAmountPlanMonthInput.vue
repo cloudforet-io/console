@@ -100,7 +100,7 @@ export default {
             if (props.amount !== amount) {
                 emit('update', {
                     amount: _amount.value,
-                    isValid: !invalidState._amount.value,
+                    isValid: !invalidState._amount,
                 });
             }
         });

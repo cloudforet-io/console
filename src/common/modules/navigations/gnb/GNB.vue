@@ -64,7 +64,7 @@ export default {
         clickOutside: vClickOutside.directive,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const state = reactive({
             openedMenu: '',

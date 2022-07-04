@@ -109,7 +109,7 @@ export default defineComponent<WidgetProps>({
         },
     },
     setup(props: WidgetProps, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const budgetQueryHelper = new QueryHelper();
         const state = reactive({
             loading: false,

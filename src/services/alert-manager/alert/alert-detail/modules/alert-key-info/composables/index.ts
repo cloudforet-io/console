@@ -29,7 +29,7 @@ interface ParamType {
 }
 
 export const useAlertInfoItem = (obj: AlertDetailItemState) => {
-    const vm = getCurrentInstance() as ComponentRenderProxy;
+    const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
     const state = reactive<AlertDetailItemState>(obj);
     const cancelEdit = (initialData) => {
         state.isEditMode = false;

@@ -150,7 +150,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const userListApiQueryHelper = new ApiQueryHelper()
             .setPageStart(1).setPageLimit(15)
             .setSort('name', true)

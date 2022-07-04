@@ -22,7 +22,7 @@ interface NotificationItemState {
 	projectChannelId?: string;
 }
 export const useNotificationItem = (obj: NotificationItemState) => {
-    const vm = getCurrentInstance() as ComponentRenderProxy;
+    const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
     const state = reactive<NotificationItemState>(obj);
     const cancelEdit = (initialData) => {
         state.isEditMode = false;

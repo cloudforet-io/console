@@ -107,7 +107,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
 
         const state = reactive({

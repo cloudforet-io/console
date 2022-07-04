@@ -164,7 +164,7 @@ export default {
         },
     },
     setup(props: MonitoringProps) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             showLoader: computed(() => props.loading || state.metricsLoading),
             timezone: computed(() => store.state.user.timezone),

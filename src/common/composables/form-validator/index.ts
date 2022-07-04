@@ -1,5 +1,5 @@
 import {
-    computed, ComputedRef, ref, UnwrapRef,
+    computed, ComputedRef, reactive, ref, UnwrapRef,
 } from '@vue/composition-api';
 
 import { clone } from 'lodash';
@@ -148,14 +148,14 @@ type ImmediateMap<T> = {
  * @example
  *
  <template>
-    <p-field-group :invalid="invalidState.name" :invalid-text="invalidTexts.name">
-        <p-text-input :value="name" @input="handleNameInput" />
-    </p-field-group>
-    <p-field-group :invalid="invalidState.address" :invalid-text="invalidTexts.address">
-        <p-text-input :value="address" @input="handleAddressInput" />
-    </p-field-group>
-    <p-button :disabled="isAllValid">confirm</p-button>
-    <p-button @click="handleReset">reset</p-button>
+ <p-field-group :invalid="invalidState.name" :invalid-text="invalidTexts.name">
+ <p-text-input :value="name" @input="handleNameInput" />
+ </p-field-group>
+ <p-field-group :invalid="invalidState.address" :invalid-text="invalidTexts.address">
+ <p-text-input :value="address" @input="handleAddressInput" />
+ </p-field-group>
+ <p-button :disabled="isAllValid">confirm</p-button>
+ <p-button @click="handleReset">reset</p-button>
  </template>
 
  setup() {
@@ -298,8 +298,8 @@ export function useFormValidator<T extends Record<string, any> = any>(
 
     return {
         forms,
-        invalidState,
-        invalidTexts,
+        invalidState: reactive(invalidState),
+        invalidTexts: reactive(invalidTexts),
         isAllValid,
         initForm,
         setForm,

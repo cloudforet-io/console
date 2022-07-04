@@ -140,7 +140,7 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const tagQueryHandler = new QueryHelper()
             .setKeyItemSets(keyItemSets)

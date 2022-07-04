@@ -241,7 +241,7 @@ export default {
         TagsPanel,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
 
         const storeState = reactive({

@@ -39,7 +39,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const onSignIn = async () => {
             if (!props.nextPath) {

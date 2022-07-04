@@ -91,7 +91,7 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const tableState = reactive({
             loading: true,
             items: [] as any,

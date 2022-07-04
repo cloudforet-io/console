@@ -27,7 +27,7 @@ export default {
         NotificationChannelList, PBreadcrumbs, PPageTitle,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             isManageable: computed(() => store.getters['user/isDomainOwner'] || store.getters['user/hasDomainRole']),
         });

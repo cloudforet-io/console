@@ -92,7 +92,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const baseState = reactive({
             title: computed(() => vm.$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')),
             loading: true,

@@ -76,7 +76,7 @@ export default {
         },
     },
     setup(props: FavoriteListProps) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             displayItems: computed<FavoriteItem[]>(() => {
                 if (state.isExpanded) return props.items;

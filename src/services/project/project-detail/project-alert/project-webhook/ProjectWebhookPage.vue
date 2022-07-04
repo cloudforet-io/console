@@ -190,7 +190,7 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const handlers = {
             keyItemSets: [{
                 title: 'Properties',

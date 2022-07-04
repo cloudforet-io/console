@@ -86,7 +86,8 @@ module.exports = {
         ],
         '@typescript-eslint/camelcase': ['off'],
         '@typescript-eslint/naming-convention': [
-            'error',
+            // FIXME:: turn on naming-convention
+            'off',
             {
                 selector: 'variable',
                 format: ['camelCase', 'UPPER_CASE', 'PascalCase'],

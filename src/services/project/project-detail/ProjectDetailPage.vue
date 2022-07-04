@@ -166,7 +166,7 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         registerServiceStore<ProjectDetailState>('projectDetail', ProjectDetailStoreModule);
 

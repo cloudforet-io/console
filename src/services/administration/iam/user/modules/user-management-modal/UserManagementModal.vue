@@ -77,7 +77,7 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             fields: computed(() => ([
                 { name: 'user_id', label: 'User ID' },

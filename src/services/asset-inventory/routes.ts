@@ -62,7 +62,7 @@ const assetInventoryRoute: RouteConfig = {
                     path: 'no-resource',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME,
                     meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
-                    component: NoResourcePage,
+                    component: NoResourcePage as any,
                 },
                 {
                     path: ':provider/:group',
@@ -169,7 +169,7 @@ const assetInventoryRoute: RouteConfig = {
                     path: 'no-resource',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.NO_RESOURCE._NAME,
                     meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
-                    component: NoResourcePage,
+                    component: NoResourcePage as any,
                 },
             ],
         },

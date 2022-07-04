@@ -70,7 +70,7 @@ export default defineComponent({
         },
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             userId: '' as string | undefined,
             password: '',

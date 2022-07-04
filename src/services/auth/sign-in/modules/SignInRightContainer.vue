@@ -80,7 +80,7 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
         });

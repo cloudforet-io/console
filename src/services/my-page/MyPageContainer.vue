@@ -59,7 +59,7 @@ export default defineComponent({
     },
     setup() {
         registerServiceStore('myPage', myPageStore);
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const { breadcrumbs } = useBreadcrumbs();
         const handbookState = reactive({
             tabs: [{ name: 'spacectl', label: 'Spacectl', keepAlive: true }] as TabItem[],

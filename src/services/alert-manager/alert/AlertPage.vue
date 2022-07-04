@@ -47,7 +47,7 @@ export default {
         PPageTitle,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
             pageTitle: computed(() => i18n.t('MONITORING.ALERT.ALERT_LIST.ALERT')),
