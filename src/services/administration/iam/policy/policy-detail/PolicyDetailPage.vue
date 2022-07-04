@@ -2,7 +2,7 @@
     <section>
         <p-page-title
             child
-            :title="policyInfo.name"
+            :title="policyName"
             @goBack="$router.go(-1)"
         >
             <template #title-right-extra>
@@ -42,7 +42,7 @@
             </div>
             <div class="policy-detail-contents">
                 <p-label>{{ $t('IAM.POLICY.FORM.ID') }}</p-label>
-                <p>{{ policyInfo.policy_id }}</p>
+                <p>{{ policyInfo ? policyInfo.policy_id : '' }}</p>
             </div>
             <div class="policy-detail-contents">
                 <div v-if="type === POLICY_TYPES.MANAGED">
@@ -50,7 +50,7 @@
                         {{ $t('IAM.POLICY.FORM.DESCRIPTION') }}
                     </p-label>
                     <br>
-                    <p>{{ policyInfo.tags.description }}</p>
+                    <p>{{ policyInfo ? policyInfo.tags.description : '' }}</p>
                 </div>
                 <p-field-group
                     v-else
@@ -72,7 +72,7 @@
             </div>
         </p-pane-layout>
         <policy-delete-modal :visible.sync="visibleDeleteModal" :policy-id="id" />
-        <policy-name-edit-modal :visible.sync="visibleTitleEditModal" :policy-id="id" :policy-name="policyInfo.name" />
+        <policy-name-edit-modal :visible.sync="visibleTitleEditModal" :policy-id="id" :policy-name="policyName" />
     </section>
 </template>
 
@@ -130,6 +130,7 @@ export default defineComponent<PolicyDetailPageProps>({
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
             policyInfo: computed(() => administrationStore.state.policy.policyData),
+            policyName: computed(() => state.policyInfo?.name || ''),
             type: SpaceRouter.router.currentRoute.query.type,
             code: '',
             isCodeModified: false,

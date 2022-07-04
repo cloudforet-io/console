@@ -36,7 +36,7 @@
             </div>
             <div class="policy-create-contents">
                 <p-field-group :label="$t('IAM.POLICY.FORM.PERMISSION')" required />
-                <p-text-editor :code="code" @update:code="setForm('policyCode', $event)" />
+                <p-text-editor :code="policyCode" @update:code="setForm('policyCode', $event)" />
             </div>
         </p-pane-layout>
         <div class="policy-modify-buttons">
@@ -136,6 +136,7 @@ export default {
             ...toRefs(state),
             handleCreatePolicy,
             policyName,
+            policyCode,
             setForm,
             invalidState,
             invalidTexts,
