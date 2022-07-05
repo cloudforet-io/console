@@ -16,23 +16,31 @@
                 />
             </template>
         </p-toolbox>
-        <vertical-timeline v-for="(item, idx) in items"
-                           :key="`timeline-${item.date}-${idx}`"
-                           :item="item"
-                           :timezone="timezone"
-                           :is-last-item="idx===items.length-1"
-        >
-            <template v-if="item.data && item.data.length" #timeline-detail>
-                <div class="timeline-content-wrapper">
-                    <key-value-item v-for="(keyValueItem, kIdx) in item.data.slice(0, TIMELINE_CONTENT_LIMIT)"
-                                    :key="`key-value-item-${keyValueItem.key}-${kIdx}`"
-                                    :item="keyValueItem"
-                    />
-                    <!--                    song-lang-->
-                    <span v-if="item.data.length >TIMELINE_CONTENT_LIMIT" class="text-gray-500">and more...</span>
-                </div>
-            </template>
-        </vertical-timeline>
+        <div class="timeline-wrapper">
+            <vertical-timeline v-for="(item, idx) in items"
+                               :key="`timeline-${item.date}-${idx}`"
+                               :item="item"
+                               :timezone="timezone"
+                               :is-last-item="idx === items.length-1"
+                               @click-timeline="handleClickTimeline"
+            >
+                <template v-if="item.data && item.data.length" #timeline-detail>
+                    <div class="timeline-content-wrapper">
+                        <key-value-item v-for="(keyValueItem, kIdx) in item.data.slice(0, TIMELINE_CONTENT_LIMIT)"
+                                        :key="`key-value-item-${keyValueItem.key}-${kIdx}`"
+                                        :item="keyValueItem"
+                        />
+                        <!--                    song-lang-->
+                        <span v-if="item.data.length > TIMELINE_CONTENT_LIMIT" class="text-gray-500">and more...</span>
+                    </div>
+                </template>
+            </vertical-timeline>
+        </div>
+        <transition name="slide-up">
+            <cloud-service-history-detail v-if="showDetailOverlay"
+                                          @close="handleCloseOverlay"
+            />
+        </transition>
     </div>
 </template>
 
@@ -52,6 +60,9 @@ import { store } from '@/store';
 import KeyValueItem from '@/common/components/key-value-item/KeyValueItem.vue';
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 
+import CloudServiceHistoryDetail
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistoryDetail.vue';
+
 
 interface TimelineItem {
     date: string;
@@ -66,6 +77,7 @@ const TIMELINE_CONTENT_LIMIT = 10;
 export default {
     name: 'CloudServiceHistory',
     components: {
+        CloudServiceHistoryDetail,
         KeyValueItem,
         VerticalTimeline,
         PPanelTop,
@@ -121,6 +133,7 @@ export default {
                     ],
                 },
             ])),
+            showDetailOverlay: false,
             loading: true,
             totalCount: 0,
             options: {
@@ -132,57 +145,14 @@ export default {
             },
             collectors: computed(() => store.state.reference.collector.items),
         });
-        console.log(dayjs.utc().tz(state.timezone));
-
-        /* Api */
-        // const apiQuery = new ApiQueryHelper();
-        // const getParams = () => ({
-        //     cloud_service_id: props.cloudServiceId,
-        //     key_path: 'collection_info.change_history',
-        //     query: apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
-        //         .setPage(
-        //             state.options.pageStart,
-        //             state.options.pageLimit,
-        //         )
-        //         .setFilters([{ v: state.options.searchText }])
-        //         .data,
-        // });
-        // const listHistory = async () => {
-        //     state.loading = true;
-        //     try {
-        //         const res = await SpaceConnector.client.inventory.cloudService.getData(getParams());
-        //
-        //         state.items = res.results;
-        //         state.totalCount = res.total_count;
-        //     } catch (e) {
-        //         ErrorHandler.handleError(e);
-        //     } finally {
-        //         state.loading = false;
-        //     }
-        // };
-
-        /* Util */
-        // const collectorLinkQueryHelper = new QueryHelper();
-        // const getCollectorLink = (collectorId: string): Location => {
-        //     collectorLinkQueryHelper.setFilters([{ k: 'collector_id', v: collectorId, o: '=' }]);
-        //     return {
-        //         name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
-        //         query: {
-        //             filters: collectorLinkQueryHelper.rawQueryStrings,
-        //         },
-        //     };
-        // };
-        //
-        // const getJobLink = (jobId: string): Location => ({
-        //     name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
-        //     params: { jobId },
-        // });
 
         /* Event */
-        // const onChange = async (options = {}) => {
-        //     state.options = { ...state.options, ...options };
-        //     await listHistory();
-        // };
+        const handleClickTimeline = () => {
+            state.showDetailOverlay = true;
+        };
+        const handleCloseOverlay = () => {
+            state.showDetailOverlay = false;
+        };
 
         /* Watcher */
         // watch(() => props.cloudServiceId, (after, before) => {
@@ -199,14 +169,15 @@ export default {
             await Promise.allSettled([
                 store.dispatch('reference/collector/load'),
                 // listHistory(),
-                // onChange(),
             ]);
         })();
 
         return {
             ...toRefs(state),
-            TIMELINE_CONTENT_LIMIT,
             iso8601Formatter,
+            TIMELINE_CONTENT_LIMIT,
+            handleClickTimeline,
+            handleCloseOverlay,
         };
     },
 };
@@ -220,10 +191,25 @@ export default {
             width: 120px;
         }
     }
+    .timeline-wrapper {
+        padding: 0 1.125rem;
+    }
     .vertical-timeline {
         .timeline-content-wrapper {
             padding-top: 0.25rem;
         }
     }
+}
+
+/* transition */
+.slide-up-enter-active {
+    transition: all 0.3s ease;
+}
+.slide-up-leave-active {
+    transition: all 0.3s ease-out;
+}
+.slide-up-enter, .slide-up-leave-to {
+    transform: translateY(100px);
+    opacity: 0;
 }
 </style>

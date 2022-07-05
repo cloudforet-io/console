@@ -39,6 +39,7 @@ export default defineComponent<Props>({
 .key-value-item {
     display: inline-flex;
     align-items: center;
+    max-width: 50%;
     margin-right: 0.625rem;
     margin-bottom: 0.625rem;
     .key-wrapper {
@@ -47,7 +48,6 @@ export default defineComponent<Props>({
     }
     .value-wrapper {
         @apply bg-white border border-l-0 border-primary-3 truncate;
-        max-width: 24rem;
         padding: 0.5rem 0.75rem;
     }
 }

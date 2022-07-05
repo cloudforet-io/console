@@ -1,8 +1,12 @@
 <template>
-    <div class="vertical-timeline">
-        <div class="timeline-item" :class="[item.color, {'no-border': isLastItem}]">
+    <div class="vertical-timeline" @click="handleClickTimeline">
+        <div class="timeline-item" :class="[{'last-item': isLastItem}]">
             <div class="timestamp">
                 {{ item.date }}
+            </div>
+            <div class="vertical-line">
+                <div class="line" />
+                <div class="circle" :class="item.color" />
             </div>
             <div class="item-detail">
                 <div class="title-wrapper">
@@ -58,7 +62,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup() {
+    setup(props, { emit }) {
         /* Util */
         const getBadgeStyleType = (itemColor: string): string => {
             if (itemColor === 'GREEN') return 'green200';
@@ -66,9 +70,14 @@ export default defineComponent<Props>({
             return 'gray200';
         };
 
+        const handleClickTimeline = () => {
+            emit('click-timeline', props.item);
+        };
+
         return {
             iso8601Formatter,
             getBadgeStyleType,
+            handleClickTimeline,
         };
     },
 });
@@ -78,6 +87,7 @@ export default defineComponent<Props>({
 <style lang="postcss" scoped>
 @define-mixin circle-style {
     position: absolute;
+    top: 0.5rem;
     left: -0.4375rem;
     content: " ";
     border-radius: theme('borderRadius.full');
@@ -85,58 +95,71 @@ export default defineComponent<Props>({
     width: 0.875rem;
 }
 .vertical-timeline {
+    @apply rounded-md;
+    cursor: pointer;
+
+    &:hover {
+        @apply bg-blue-100;
+    }
+
     .timeline-list {
         padding: 0;
         display: inline-block;
     }
     .timeline-item {
-        @apply border-l border-gray-200;
+        display: inline-flex;
         min-height: 3.25rem;
         position: relative;
-        padding-left: 1rem;
-        padding-bottom: 1.5rem;
-        margin-left: 7.5rem;
-        &::before {
-            @mixin circle-style;
 
+        &::before {
             @apply border-4 border-primary3 bg-primary;
         }
-        &.RED {
-            &::before {
-                @mixin circle-style;
 
-                @apply border-4 border-red-200 bg-red-400;
+        .vertical-line {
+            position: relative;
+            margin-left: 1rem;
+            margin-right: 0.75rem;
+            .line {
+                @apply border-l border-gray-200;
+                position: absolute;
+                height: 100%;
+                top: 1rem;
+            }
+            .circle {
+                position: absolute;
+                width: 1rem;
+                height: 1rem;
+                border-radius: theme('borderRadius.full');
+                left: -0.5rem;
+                top: 1rem;
+                &.RED {
+                    @apply border-4 border-red-200 bg-red-400;
+                }
+                &.GREEN {
+                    @apply border-4 border-green-300 bg-green-600;
+                }
+                &.BLUE {
+                    @apply border-4 border-blue-300 bg-blue-600;
+                }
             }
         }
-        &.GREEN {
-            &::before {
-                @mixin circle-style;
-
-                @apply border-4 border-green-300 bg-green-600;
+        &.last-item {
+            .line {
+                height: 1rem;
             }
         }
-        &.BLUE {
-            &::before {
-                @mixin circle-style;
-
-                @apply border-4 border-blue-300 bg-blue-600;
-            }
-        }
-        &.no-border {
-            @apply border-white;
-        }
-
         .timestamp {
-            position: absolute;
+            flex-shrink: 0;
             width: 6.25rem;
-            left: -7.5rem;
             text-align: right;
             font-size: 0.875rem;
             line-height: 1.25;
+            padding: 1rem 0;
         }
         .item-detail {
             font-size: 0.875rem;
             line-height: 150%;
+            padding: 1rem 0;
             .title-wrapper {
                 display: flex;
                 align-items: center;
