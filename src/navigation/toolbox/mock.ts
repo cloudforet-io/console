@@ -1,4 +1,4 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 import { range } from 'lodash';
 
 import { getQuerySearchTags } from '@/inputs/search/query-search-tags/mock';
@@ -21,7 +21,7 @@ export const getHandler = items => async (inputText) => {
 };
 
 export const getValueHandlerMap = () => ({
-    id: getHandler(range(10).map(() => faker.random.uuid())),
+    id: getHandler(range(10).map(() => faker.datatype.uuid())),
     name: getHandler(range(10).map(() => faker.name.findName())),
     group: getHandler(range(10).map(() => faker.name.jobArea())),
 });

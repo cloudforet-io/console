@@ -1,6 +1,6 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import { reactive, toRefs } from '@vue/composition-api';
-import faker from 'faker'
+import { faker }  from '@faker-js/faker'
 import {range} from 'lodash'
 import dayjs from 'dayjs';
 
@@ -172,10 +172,10 @@ If you give ```false``` to ```header``` props and don't give ```header``` slot, 
                 return {
                     items: range(10).map(() => ({
                         value: faker.lorem.sentence(6),
-                        icon: faker.random.arrayElement(['ic_alert', 'ic_list_duplication']),
-                        badge: faker.random.arrayElement(['Acknowledged', 'Triggered']),
+                        icon: faker.helpers.arrayElement(['ic_alert', 'ic_list_duplication']),
+                        badge: faker.helpers.arrayElement(['Acknowledged', 'Triggered']),
                         date: dayjs(faker.date.past('2021')).format('MM/DD hh:mm'),
-                        description: faker.random.arrayElement([{
+                        description: faker.helpers.arrayElement([{
                             message: faker.lorem.sentence(6),
                             date: dayjs(faker.date.past('2021')).format('MM/DD hh:mm')
                         }, undefined]),
@@ -219,7 +219,7 @@ If you give ```false``` to ```header``` props and don't give ```header``` slot, 
                 const updateItems = () => {
                     state.loading = true;
                     setTimeout(() => {
-                        state.items =range(faker.random.number({ min: 0, max: 3 }))
+                        state.items =range(faker.datatype.number({ min: 0, max: 3 }))
                             .map(() => faker.lorem.sentence(8))
                         state.loading = false
                     }, 300)

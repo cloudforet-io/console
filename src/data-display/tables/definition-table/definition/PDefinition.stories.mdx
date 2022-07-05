@@ -2,7 +2,7 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import {
     toRefs, reactive,
 } from '@vue/composition-api';
-import faker from 'faker'
+import { faker }  from '@faker-js/faker'
 
 import PButton from '@/inputs/buttons/button/PButton';
 import PDefinition from '@/data-display/tables/definition-table/definition/PDefinition.vue';
@@ -166,7 +166,7 @@ export const Template = (args, { argTypes }) => ({
         </div>
 `,
             setup() {
-                const copyValue = faker.random.uuid()
+                const copyValue = faker.datatype.uuid()
                 return {
                     label: faker.lorem.sentence(5),
                     data: faker.lorem.sentence(20),

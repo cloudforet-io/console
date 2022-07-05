@@ -1,4 +1,4 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 import { range } from 'lodash';
 
 import {
@@ -8,18 +8,18 @@ import {
 
 const getKeyItem = () => ({
     label: faker.random.word(),
-    name: faker.random.uuid(),
+    name: faker.datatype.uuid(),
 });
 export const getKeyItems = (length = 10) => range(length).map(() => getKeyItem());
 
 export const getKeyItemSet = (length = 10) => ({
-    title: faker.name.title(),
+    title: faker.name.jobTitle(),
     items: getKeyItems(length),
 });
 
 export const getKeyItemSets = (itemLength = 10, setLength = 3) => range(setLength).map(() => getKeyItemSet(itemLength));
 
-export const getValueItems = (length = 20) => range(length).map(() => ({ label: faker.random.word(), name: faker.random.uuid() }));
+export const getValueItems = (length = 20) => range(length).map(() => ({ label: faker.random.word(), name: faker.datatype.uuid() }));
 
 export const getValueHandler = (items = getValueItems()): ValueHandler => (inputText: string) => {
     let results = items;

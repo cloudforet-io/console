@@ -1,4 +1,4 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { DYNAMIC_CHART_THEMES, DYNAMIC_CHART_TYPE } from '@/data-display/dynamic/dynamic-chart/config';
 import { getDynamicChartMockData } from '@/data-display/dynamic/dynamic-chart/mock';
@@ -14,7 +14,7 @@ interface DynamicWidgetMockData {
 }
 
 export const getDynamicWidgetChartTypeMockData = (_chartType?: DynamicChartType): DynamicWidgetMockData => {
-    const chartType = _chartType ?? faker.random.arrayElement(DYNAMIC_CHART_TYPE);
+    const chartType = _chartType ?? faker.helpers.arrayElement(DYNAMIC_CHART_TYPE);
 
     return {
         schemaOptions: {
@@ -31,15 +31,15 @@ export const getDynamicWidgetSummaryTypeMockData = (): DynamicWidgetMockData => 
         value_options: DEFAULT_VALUE_OPTIONS,
     },
     data: {
-        value: faker.random.number(10000000),
+        value: faker.datatype.number(10000000),
     },
 });
 
 export const getDynamicWidgetMockData = (_type?: DynamicWidgetType): DynamicWidgetProps => {
-    const type = _type ?? faker.random.arrayElement(DYNAMIC_WIDGET_TYPE);
+    const type = _type ?? faker.helpers.arrayElement(DYNAMIC_WIDGET_TYPE);
 
     let props: DynamicWidgetProps = {
-        index: faker.random.number({ min: 0, max: DYNAMIC_CHART_THEMES.length - 1 }),
+        index: faker.datatype.number({ min: 0, max: DYNAMIC_CHART_THEMES.length - 1 }),
         type,
         name: faker.lorem.sentence(3),
         schemaOptions: {},

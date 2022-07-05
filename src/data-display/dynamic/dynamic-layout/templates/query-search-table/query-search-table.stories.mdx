@@ -2,7 +2,7 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
 import {i18n} from '@/translations'
 import { reactive, toRefs } from '@vue/composition-api';
-import faker from 'faker'
+import { faker }  from '@faker-js/faker'
 import {range} from 'lodash'
 import { getDynamicLayoutQuerySearchTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/query-search-table/story-helper';
 
@@ -178,19 +178,19 @@ export const Template = (args, { argTypes }) => ({
             state.typeOptions.loading = true;
             state.data = await new Promise((resolve) => {
                 setTimeout(() => {
-                    state.typeOptions.totalCount = faker.random.number({ min: 0 });
+                    state.typeOptions.totalCount = faker.datatype.number({ min: 0 });
                     resolve(range(options.pageLimit || 15)
                         .map(d => ({
                             // eslint-disable-next-line camelcase
-                            server_id: faker.random.uuid(),
+                            server_id: faker.datatype.uuid(),
                             data: {
                                 compute: {
                                     region: faker.random.word(),
                                     // eslint-disable-next-line camelcase
-                                    instance_state: faker.random.arrayElements(['ACTIVE', 'DISCONNECTED']),
+                                    instance_state: faker.helpers.arrayElements(['ACTIVE', 'DISCONNECTED']),
                                 },
                                 collection_info: {
-                                    change_history: range(faker.random.number({ min: 0, max: 10 })).map(d => ({job_id: faker.random.uuid()}))
+                                    change_history: range(faker.datatype.number({ min: 0, max: 10 })).map(d => ({job_id: faker.datatype.uuid()}))
                                 }
                             },
                         })))

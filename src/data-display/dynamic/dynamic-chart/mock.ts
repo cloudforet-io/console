@@ -1,4 +1,4 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { DEFAULT_NAME_OPTIONS, DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_TYPE } from '@/data-display/dynamic/dynamic-chart/config';
 import { DynamicChartType } from '@/data-display/dynamic/dynamic-chart/type';
@@ -16,10 +16,10 @@ const getChartData = (
 ): any[] => {
     const nameKey = nameOptions.key;
     const valueKey = valueOptions.key;
-    faker.random.arrayElements(Array.from(Array(23).keys()));
+    faker.helpers.arrayElements(Array.from(Array(23).keys()));
     return Array.from(Array(length).keys()).map(() => ({
         [nameKey]: faker.random.word(),
-        [valueKey]: faker.random.number(19000000000),
+        [valueKey]: faker.datatype.number(19000000000),
     }));
 };
 
@@ -29,7 +29,7 @@ export const getDynamicChartMockData = (
     valueOptions: DynamicField = DEFAULT_VALUE_OPTIONS,
     nameOptions: DynamicField = DEFAULT_NAME_OPTIONS,
 ): DynamicChartMockData => {
-    const chartType = type ?? faker.random.arrayElement(DYNAMIC_CHART_TYPE);
+    const chartType = type ?? faker.helpers.arrayElement(DYNAMIC_CHART_TYPE);
 
 
     return {

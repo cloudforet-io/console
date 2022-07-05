@@ -1,4 +1,4 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 import { range } from 'lodash';
 
 const getUser = () => ({
@@ -9,7 +9,7 @@ const getUser = () => ({
     homepage: faker.internet.url(),
 });
 
-export const getUsers = (min = 7, max = 15) => range(faker.random.number({ min, max })).map(() => getUser());
+export const getUsers = (min = 7, max = 15) => range(faker.datatype.number({ min, max })).map(() => getUser());
 
 export const getUserFields = () => [
     { name: 'name', label: 'Name' },
@@ -19,7 +19,7 @@ export const getUserFields = () => [
     { name: 'homepage', label: 'Home Page' },
 ];
 
-export const getLongUsers = (min = 7, max = 15) => range(faker.random.number({ min, max })).map(() => ({
+export const getLongUsers = (min = 7, max = 15) => range(faker.datatype.number({ min, max })).map(() => ({
     name: faker.lorem.sentence(15),
     phone: faker.lorem.sentence(15),
     email: faker.internet.email(),

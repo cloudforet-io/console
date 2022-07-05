@@ -2,7 +2,7 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
 import {i18n} from '@/translations'
 import { getDynamicLayoutSimpleTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/simple-table/story-helper';
-import faker from 'faker'
+import { faker }  from '@faker-js/faker'
 
 <Meta title='Data Display/Dynamic/Dynamic Layout/- [Table] Simple Table'
       argTypes={getDynamicLayoutSimpleTableArgTypes()}/>
@@ -200,7 +200,7 @@ export const Template = (args, { argTypes }) => ({
         },
         data: {
             data: {
-                id: faker.random.uuid(),
+                id: faker.datatype.uuid(),
                 name: faker.lorem.sentence(2),
                 security_groups: [
                     {
@@ -208,9 +208,9 @@ export const Template = (args, { argTypes }) => ({
                             direction: 'ingress',
                             port_range_min: 1,
                             created_at: '2021-06-30T04:33:40.000000+0000',
-                            security_group_id: faker.random.uuid(),
+                            security_group_id: faker.datatype.uuid(),
                             protocol: 'tcp',
-                            id: faker.random.uuid(),
+                            id: faker.datatype.uuid(),
                             ethertype: 'IPv4',
                             remote_ip_prefix: '0.0.0.0/0',
                             security_group_name: 'default',
@@ -223,10 +223,10 @@ export const Template = (args, { argTypes }) => ({
                         created_at: '2021-06-28T06:33:28.000000+0000',
                         external_link: null,
                         updated_at: '2021-06-30T06:07:53.000000+0000',
-                        id: faker.random.uuid(),
-                        tenant_id: faker.random.uuid(),
+                        id: faker.datatype.uuid(),
+                        tenant_id: faker.datatype.uuid(),
                         region_name: 'RegionOne',
-                        project_id: faker.random.uuid(),
+                        project_id: faker.datatype.uuid(),
                     },
                 ],
             },

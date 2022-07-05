@@ -1,5 +1,5 @@
+import { faker } from '@faker-js/faker';
 import { ArgTypes } from '@storybook/addons';
-import faker from 'faker';
 
 export const getTextBeautifierArgTypes = (): ArgTypes => ({
     value: {

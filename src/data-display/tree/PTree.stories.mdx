@@ -7,7 +7,7 @@ import PTextInput from '@/inputs/input/PTextInput.vue';
 import PRadio from '@/inputs/radio/PRadio.vue'
 import { reactive, toRefs, computed } from '@vue/composition-api';
 import {getTreeList, getTreeData, getTreeNode, getRecursiveInfo, getPermissionInfo} from './mock';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 import './PTree.stories.pcss'
 import { getTreeArgTypes } from '@/data-display/tree/story-helper';
 
@@ -154,7 +154,7 @@ export const ExpertTemplate = (args, { argTypes }) => ({
                         res = getTreeList()
                     }
                     if (state.editMode) {
-                        res.forEach(d => {state.permissionInfo[d.id] = faker.random.boolean();})
+                        res.forEach(d => {state.permissionInfo[d.id] = faker.datatype.boolean();})
                     }
                     resolve(res)
                 }, 1000)
@@ -169,7 +169,7 @@ export const ExpertTemplate = (args, { argTypes }) => ({
         const onClickEdit = () => {
             const all = state.root.getAllNodes()
             state.permissionInfo = {}
-            all.forEach((d) => {state.permissionInfo[d.data.id] = faker.random.boolean();})
+            all.forEach((d) => {state.permissionInfo[d.data.id] = faker.datatype.boolean();})
             state.editMode = !state.editMode;
         }
         const onInit = async (root) => {

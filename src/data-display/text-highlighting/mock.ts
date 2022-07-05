@@ -1,4 +1,4 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { TEXT_HIGHLIGHTING_STYLE_TYPE, TextHighlightingProps } from '@/data-display/text-highlighting/type';
 

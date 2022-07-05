@@ -1,5 +1,5 @@
+import { faker } from '@faker-js/faker';
 import { ArgTypes } from '@storybook/addons';
-import faker from 'faker';
 import { range } from 'lodash';
 
 import {
