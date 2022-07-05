@@ -34,10 +34,10 @@
                          @export="onExport"
                          @click-settings="$emit('click-settings')"
         >
-            <template v-for="(item, slotName) of dynamicFieldSlots" #[slotName]="{field, index}">
+            <template v-for="(dynamicField, slotName) of dynamicFieldSlots" #[slotName]="{item, field}">
                 <p-dynamic-field v-if="slotName.startsWith('col')" :key="slotName"
-                                 v-bind="item"
-                                 :data="getValueByPath(rootData[index], field.name)"
+                                 v-bind="dynamicField"
+                                 :data="getFieldData(item, field.name, dynamicField)"
                                  :handler="fieldHandler"
                 />
             </template>
@@ -198,6 +198,8 @@ export default defineComponent<QuerySearchTableDynamicLayoutProps>({
 
                     if (field.type === 'datetime') {
                         item.typeOptions = { timezone: state.timezone };
+                    } else if (field.type === 'more') {
+                        item.typeOptions = { displayKey: field.key };
                     }
 
                     res[`col-${i}-format`] = item;
@@ -207,6 +209,12 @@ export default defineComponent<QuerySearchTableDynamicLayoutProps>({
             }),
         });
 
+        const getFieldData = (rowData, dataPath: string, { type }: DynamicFieldProps): any => {
+            if (type === 'more') {
+                return rowData;
+            }
+            return getValueByPath(rowData, dataPath);
+        };
 
         const onSelect = (selectIndex: number[]) => {
             if (!props.typeOptions?.selectIndex) state.selectIndex = selectIndex;
@@ -226,7 +234,7 @@ export default defineComponent<QuerySearchTableDynamicLayoutProps>({
             onChange,
             onSelect,
             onExport,
-            getValueByPath,
+            getFieldData,
         };
     },
 });

@@ -37,11 +37,11 @@
                 <span :key="`${headerSlot}-description`" class="field-description">{{ description }}</span>
             </template>
 
-            <template v-for="(item, slotName) of dynamicFieldSlots" #[slotName]="data">
-                <slot :name="slotName" v-bind="data">
+            <template v-for="(dynamicField, slotName) of dynamicFieldSlots" #[slotName]="slotProps">
+                <slot :name="slotName" v-bind="slotProps">
                     <p-dynamic-field :key="slotName"
-                                     v-bind="item"
-                                     :data="getValueByPath(rootData[data.index], data.field.name)"
+                                     v-bind="dynamicField"
+                                     :data="getFieldData(slotProps.item, slotProps.field.name, dynamicField)"
                                      :handler="fieldHandler"
                     />
                 </slot>
@@ -185,6 +185,8 @@ export default defineComponent<TableDynamicLayoutProps>({
 
                     if (field.type === 'datetime') {
                         item.typeOptions = { timezone: state.timezone };
+                    } else if (field.type === 'more') {
+                        item.typeOptions = { displayKey: field.key };
                     }
 
                     res[`col-${i}-format`] = item;
@@ -193,6 +195,13 @@ export default defineComponent<TableDynamicLayoutProps>({
                 return res;
             }),
         });
+
+        const getFieldData = (rowData, dataPath: string, { type }: DynamicFieldProps): any => {
+            if (type === 'more') {
+                return rowData;
+            }
+            return getValueByPath(rowData, dataPath);
+        };
 
         const onSelect = (selectIndex: number[]) => {
             if (!props.typeOptions?.selectIndex) state.selectIndex = selectIndex;
@@ -212,7 +221,7 @@ export default defineComponent<TableDynamicLayoutProps>({
             onChange,
             onSelect,
             onExport,
-            getValueByPath,
+            getFieldData,
         };
     },
 });

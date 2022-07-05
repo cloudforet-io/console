@@ -14,11 +14,11 @@
                 <span :key="`${headerSlot}-description`" class="field-description">{{ description }}</span>
             </template>
 
-            <template v-for="(item, slotName) of dynamicFieldSlots" #[slotName]="data">
-                <slot :name="slotName" v-bind="data">
+            <template v-for="(dynamicField, slotName) of dynamicFieldSlots" #[slotName]="slotProps">
+                <slot :name="slotName" v-bind="slotProps">
                     <p-dynamic-field :key="slotName"
-                                     v-bind="item"
-                                     :data="getValueByPath(rootData[data.index], data.field.name)"
+                                     v-bind="dynamicField"
+                                     :data="getFieldData(slotProps.item, slotProps.field.name, dynamicField)"
                                      :handler="fieldHandler"
                     />
                 </slot>
@@ -104,6 +104,8 @@ export default {
                 if (Array.isArray(props.data)) return props.data;
                 return [];
             }),
+            /** get data from typeOptions prop */
+            timezone: computed(() => props.typeOptions?.timezone || 'UTC'),
             loading: computed(() => (props.typeOptions?.loading || false)),
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
             /** others */
@@ -125,20 +127,19 @@ export default {
                 const res = {};
                 if (!props.options.fields) return res;
 
-                // Do NOT move this code to inside the forEach callback. This code let 'computed' track 'props.typeOptions'.
-                const timezone = props.typeOptions?.timezone || 'UTC';
-
-                props.options.fields.forEach((ds: DynamicField, i) => {
+                props.options.fields.forEach((field: DynamicField, i) => {
                     const item: Omit<DynamicFieldProps, 'data'> = {
-                        type: ds.type || 'text',
-                        options: { ...ds.options },
-                        extraData: { ...ds, index: i },
+                        type: field.type || 'text',
+                        options: { ...field.options },
+                        extraData: { ...field, index: i },
                     };
 
                     if (item.options.translation_id) delete item.options.translation_id;
 
-                    if (ds.type === 'datetime') {
-                        item.typeOptions = { timezone };
+                    if (field.type === 'datetime') {
+                        item.typeOptions = { timezone: state.timezone };
+                    } else if (field.type === 'more') {
+                        item.typeOptions = { displayKey: field.key };
                     }
 
                     res[`col-${i}-format`] = item;
@@ -148,9 +149,17 @@ export default {
             }),
         });
 
+        const getFieldData = (rowData, dataPath: string, { type }: DynamicFieldProps): any => {
+            if (type === 'more') {
+                return rowData;
+            }
+            return getValueByPath(rowData, dataPath);
+        };
+
+
         return {
             ...toRefs(state),
-            getValueByPath,
+            getFieldData,
         };
     },
 };
