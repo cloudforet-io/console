@@ -1,3 +1,18 @@
+# [1.1.0-beta.340](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.339...v1.1.0-beta.340) (2022-07-05)
+
+
+### Bug Fixes
+
+* make ButtonModal root element be inline ([314c463](https://github.com/spaceone-dev/spaceone-design-system/commit/314c4633888bc9d875f9335ecd9cae78903ae5ae))
+* make CopyButton check only if textRef has text value ([e7a7476](https://github.com/spaceone-dev/spaceone-design-system/commit/e7a7476e46af8830f442beadc72c32d3f495b02c))
+* make more type field works in dynamic layout table types ([f9af926](https://github.com/spaceone-dev/spaceone-design-system/commit/f9af9262876ffa19d1566352252592894f139c09))
+* make root element of popup type of DynamicLayout be inline ([a7c9ec6](https://github.com/spaceone-dev/spaceone-design-system/commit/a7c9ec6a4f8161bd240dd922fd74dbf2f55278a3))
+
+
+### Features
+
+* make more type filed work in item type DynamicLayout ([2d093d8](https://github.com/spaceone-dev/spaceone-design-system/commit/2d093d844fd5f7e01afe565a94637d867c6da899))
+
 # [1.1.0-beta.339](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.338...v1.1.0-beta.339) (2022-07-05)
 
 
