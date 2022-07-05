@@ -48,18 +48,23 @@ export interface SimpleTableOptions extends CommonOptions {
     fields: DynamicField[];
 }
 
+export interface RawTableOptions extends CommonOptions {
+    disable_search?: boolean;
+}
+
 export interface TableOptions extends CommonOptions {
     fields: DynamicField[];
+    disable_search?: boolean;
 }
 
 export interface QuerySearchTableOptions extends CommonOptions {
     fields: DynamicField[];
     search: SearchSchema;
+    disable_search?: boolean;
 }
 
 export type RawOptions = CommonOptions
 
-export type RawTableOptions = CommonOptions
 
 export type HtmlOptions = CommonOptions
 

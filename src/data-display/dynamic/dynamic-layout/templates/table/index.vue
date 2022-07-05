@@ -58,21 +58,23 @@
 /* eslint-disable camelcase */
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, defineComponent, getCurrentInstance, PropType, reactive, toRefs,
 } from '@vue/composition-api';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
+import { DynamicFieldHandler, DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import {
     TableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/table/type';
+import { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
+import { TableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import { Options } from '@/data-display/tables/query-search-table/type';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 
-export default {
+export default defineComponent<TableDynamicLayoutProps>({
     name: 'PDynamicLayoutTable',
     components: {
         PDynamicField,
@@ -85,7 +87,7 @@ export default {
             required: true,
         },
         options: {
-            type: Object,
+            type: Object as PropType<TableOptions>,
             default: () => ({}),
         },
         data: {
@@ -93,19 +95,19 @@ export default {
             default: undefined,
         },
         fetchOptions: {
-            type: Object,
+            type: Object as PropType<DynamicLayoutFetchOptions|undefined>,
             default: undefined,
         },
         typeOptions: {
-            type: Object,
+            type: Object as PropType<DynamicLayoutTypeOptions|undefined>,
             default: undefined,
         },
         fieldHandler: {
-            type: Function,
+            type: Function as PropType<DynamicFieldHandler|undefined>,
             default: undefined,
         },
     },
-    setup(props: TableDynamicLayoutProps, { emit }) {
+    setup(props, { emit }) {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const state = reactive({
@@ -123,6 +125,7 @@ export default {
                     width: ds.options?.width,
                 }));
             }),
+            searchable: computed(() => !props.options.disable_search),
 
             /** get data from typeOptions prop */
             timezone: computed(() => props.typeOptions?.timezone || 'UTC'),
@@ -134,7 +137,6 @@ export default {
             multiSelect: computed(() => (props.typeOptions?.multiSelect === undefined ? true : props.typeOptions.multiSelect)),
             invalid: computed(() => (props.typeOptions?.invalid || false)),
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
-            searchable: computed(() => (props.typeOptions?.searchable === undefined ? true : props.typeOptions.searchable)),
             excelVisible: computed(() => (props.typeOptions?.excelVisible === undefined ? true : props.typeOptions.excelVisible)),
             settingsVisible: computed(() => props.typeOptions?.settingsVisible || false),
 
@@ -213,7 +215,7 @@ export default {
             getValueByPath,
         };
     },
-};
+});
 </script>
 <style lang="postcss">
 .p-dynamic-layout-table {

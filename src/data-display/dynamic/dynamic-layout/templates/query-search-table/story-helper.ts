@@ -21,7 +21,6 @@ export const getDynamicLayoutQuerySearchTableArgTypes = (): ArgTypes => {
         multiSelect: argTypes.multiSelect,
         invalid: argTypes.invalid,
         colCopy: argTypes.colCopy,
-        searchable: argTypes.searchable,
         excelVisible: argTypes.excelVisible,
         settingsVisible: argTypes.settingsVisible,
         keyItemSets: argTypes.keyItemSets,

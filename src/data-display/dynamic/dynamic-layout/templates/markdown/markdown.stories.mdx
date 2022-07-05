@@ -4,7 +4,7 @@ import {i18n} from '@/translations'
 import mock from '@/data-display/dynamic/dynamic-layout/mock.ts'
 import { getDynamicLayoutMarkdownArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/markdown/story-helper';
 
-<Meta title='Data Display/Dynamic/Dynamic Layout/Markdown'
+<Meta title='Data Display/Dynamic/Dynamic Layout/- Markdown'
       argTypes={getDynamicLayoutMarkdownArgTypes()}/>
 
 
@@ -44,6 +44,7 @@ export const Template = (args, { argTypes }) => ({
 | markdown | O |
 | layouts | X |
 | search | X |
+| disable_search | X |
 
 
 ## Supported Fetch Options
@@ -71,7 +72,6 @@ export const Template = (args, { argTypes }) => ({
 | colCopy | X |
 | excelVisible | X |
 | settingsVisible | X |
-| searchable | X |
 | keyItemSets | X |
 | valueHandlerMap | X |
 | language | O |

@@ -4,7 +4,7 @@ import {i18n} from '@/translations'
 import { getDynamicLayoutSimpleTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/simple-table/story-helper';
 import faker from 'faker'
 
-<Meta title='Data Display/Dynamic/Dynamic Layout/Simple Table'
+<Meta title='Data Display/Dynamic/Dynamic Layout/- [Table] Simple Table'
       argTypes={getDynamicLayoutSimpleTableArgTypes()}/>
 
 
@@ -47,6 +47,7 @@ export const Template = (args, { argTypes }) => ({
 | markdown | X |
 | layouts | X |
 | search | X |
+| disable_search | X |
 
 
 ## Supported Fetch Options
@@ -82,7 +83,6 @@ export const Template = (args, { argTypes }) => ({
 | colCopy | O |
 | excelVisible | X |
 | settingsVisible | X |
-| searchable | X |
 | keyItemSets | X |
 | valueHandlerMap | X |
 | language | X |
