@@ -1,3 +1,10 @@
+# [1.1.0-beta.337](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.336...v1.1.0-beta.337) (2022-07-05)
+
+
+### Features
+
+* remove searchable from typeOptions & add disable_search to schema options in DynamicLayout ([e93fb2c](https://github.com/spaceone-dev/spaceone-design-system/commit/e93fb2cce418b1222c62e7a2c3ad86ebdf8f65ef))
+
 # [1.1.0-beta.336](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.335...v1.1.0-beta.336) (2022-07-05)
 
 
