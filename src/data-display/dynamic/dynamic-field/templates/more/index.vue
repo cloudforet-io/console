@@ -1,7 +1,9 @@
 <template>
     <span class="p-dynamic-field-more">
         <span @click="handleClick">{{ displayData }}</span>
-        <p-dynamic-layout :type="SUPPORTED_TYPES.includes(layoutSchema.type) ? layoutSchema.type : SUPPORTED_TYPES[0]"
+        <p-dynamic-layout v-if="isInitiated"
+                          :type="SUPPORTED_TYPES.includes(layoutSchema.type) ? layoutSchema.type : SUPPORTED_TYPES[0]"
+                          :name="layoutSchema.name"
                           :options="layoutSchema.options"
                           :data="subData"
                           :type-options="{
@@ -20,8 +22,9 @@ import {
 
 import { MoreDynamicFieldProps, MoreTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/more/type';
 import { MoreOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
 import { getValueByPath } from '@/data-display/dynamic/helper';
+
+const PDynamicLayout = () => import('@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue');
 
 const SUPPORTED_TYPES = ['popup'];
 export default defineComponent<MoreDynamicFieldProps>({
@@ -52,12 +55,14 @@ export default defineComponent<MoreDynamicFieldProps>({
     setup(props) {
         const state = reactive({
             layoutSchema: computed(() => props.options.layout ?? {}),
-            popupVisible: false,
             displayData: computed(() => (props.typeOptions?.displayKey ? getValueByPath(props.data, props.typeOptions.displayKey) : props.data)),
             subData: computed(() => (props.options?.sub_key ? getValueByPath(props.data, props.options.sub_key) : props.data)),
+            isInitiated: false,
+            popupVisible: false,
         });
 
         const handleClick = () => {
+            if (!state.isInitiated) state.isInitiated = true;
             state.popupVisible = true;
         };
 

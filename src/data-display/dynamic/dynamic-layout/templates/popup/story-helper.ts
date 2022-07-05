@@ -13,5 +13,6 @@ export const getDynamicLayoutPopupArgTypes = (): ArgTypes => {
         name: argTypes.name,
         options: argTypes.options,
         data: argTypes.data,
+        popupVisible: argTypes.popupVisible,
     };
 };

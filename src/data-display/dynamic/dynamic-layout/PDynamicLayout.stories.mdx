@@ -85,7 +85,7 @@ export const Template = (args, { argTypes }) => ({
 | raw | ```root_path?: string translation_id?: string``` |
 | markdown | ```translation_id?: string, markdown: string``` or <br/> ```markdown: { en: string, ko: string }``` |
 | html | ```root_path?: string, translation_id?: string``` |
-| popup | ```translation_id?: string, layout?: DynamicLayout``` |
+| popup | ```sub_key?: string, layout?: DynamicLayout``` |
 | list | ```root_path?: string, layouts: DynamicLayout[]``` |
 
 
@@ -101,6 +101,7 @@ export const Template = (args, { argTypes }) => ({
 | raw | - |
 | markdown | - |
 | html | - |
+| popup | - |
 | list | The fetch options required for all layouts in the list are applied collectively. |
 
 <br/>

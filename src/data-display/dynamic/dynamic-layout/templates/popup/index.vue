@@ -1,6 +1,10 @@
 <template>
     <div class="p-dynamic-layout-popup">
-        <p-button-modal :title="name" :visible="popupVisible" @update:visible="handleUpdateVisible">
+        <p-button-modal v-if="isInitiated"
+                        :header-title="name"
+                        :visible="popupVisible"
+                        @update:visible="handleUpdateVisible"
+        >
             <template #body>
                 <p-dynamic-layout :type="layoutSchema.type"
                                   :options="layoutSchema.options"
@@ -22,7 +26,8 @@ import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout
 import { PopupDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/popup/type';
 import { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
 import { PopupOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
-import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
+
+const PButtonModal = () => import('@/feedbacks/modals/button-modal/PButtonModal.vue');
 
 export default defineComponent<PopupDynamicLayoutProps>({
     name: 'PDynamicLayoutPopup',
@@ -60,16 +65,18 @@ export default defineComponent<PopupDynamicLayoutProps>({
         const state = reactive({
             layoutSchema: computed(() => props.options.layout ?? {}),
             popupVisible: props.typeOptions?.popupVisible,
+            isInitiated: props.typeOptions?.popupVisible,
         });
 
         const handleUpdateVisible = (popupVisible) => {
+            if (!state.isInitiated) state.isInitiated = true;
             state.popupVisible = popupVisible;
             emit('update-popup-visible', popupVisible);
         };
         watch(() => props.typeOptions, (typeOptions) => {
             if (typeOptions?.popupVisible !== state.popupVisible) {
+                if (!state.isInitiated) state.isInitiated = true;
                 state.popupVisible = typeOptions?.popupVisible;
-                // emit('update-popup-visible', state.popupVisible);
             }
         });
 
