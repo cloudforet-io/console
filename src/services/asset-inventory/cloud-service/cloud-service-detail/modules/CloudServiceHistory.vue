@@ -37,8 +37,9 @@
             </vertical-timeline>
         </div>
         <transition name="slide-up">
-            <cloud-service-history-detail v-if="showDetailOverlay"
-                                          @close="handleCloseOverlay"
+            <cloud-service-history-detail-overlay v-if="showDetailOverlay"
+                                                  :timeline-items="items"
+                                                  @close="handleCloseOverlay"
             />
         </transition>
     </div>
@@ -60,8 +61,8 @@ import { store } from '@/store';
 import KeyValueItem from '@/common/components/key-value-item/KeyValueItem.vue';
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 
-import CloudServiceHistoryDetail
-    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistoryDetail.vue';
+import CloudServiceHistoryDetailOverlay
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistoryDetailOverlay.vue';
 
 
 interface TimelineItem {
@@ -77,7 +78,7 @@ const TIMELINE_CONTENT_LIMIT = 10;
 export default {
     name: 'CloudServiceHistory',
     components: {
-        CloudServiceHistoryDetail,
+        CloudServiceHistoryDetailOverlay,
         KeyValueItem,
         VerticalTimeline,
         PPanelTop,
