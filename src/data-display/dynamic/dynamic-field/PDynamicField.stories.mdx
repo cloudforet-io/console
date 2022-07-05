@@ -41,6 +41,7 @@ The types that can be displayed as dynamic fields are as follows.
 - state
 - enum
 - size
+- more
 - list (deprecated)
 
 <br/>
@@ -100,7 +101,8 @@ For example, ```timezone``` is not the property of the ```options``` props but o
 
 ```typescript
 interface DynamicFieldTypeOptions {
-    timezone: string;
+    timezone?: string;
+    displayKey?: string;
 }
 ```
 
@@ -481,6 +483,45 @@ interface SizeOptions extends CommonOptions {
                 <p class="font-bold text-lg">from kb to gb</p><br/>
                 <p-dynamic-field type="size" :options="{source_unit: 'KB', display_unit: 'GB'}" :data="123456789"></p-dynamic-field><br/>
                 <br/>
+            </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## More Type
+It's options are:
+
+```typescript
+interface MoreOptions extends CommonOptions {
+    sub_key?: string;
+    layout: DynamicLayout;
+}
+```
+
+<Canvas>
+    <Story name="More Type">
+        {{
+            components: { PDynamicField },
+            template: `
+            <div>
+                <p-dynamic-field type="more" :options="{
+                        sub_key: 'info',
+                        layout: {
+                            type: 'popup',
+                            options: {
+                                layout: {
+                                    type: 'raw',
+                                    options: {}
+                                }
+                            }
+                        },
+                     }" :data="{ id: 'j', name: 'sulmo', info: { weight: '83.5 kg', height: '179.3cm' } }"
+                    :type-options="{ displayKey: 'name' }"
+                ></p-dynamic-field>
+                <br><br>
             </div>
     `,
         }}

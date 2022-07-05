@@ -665,6 +665,22 @@ export default {
                     name: 'Hello',
                     type: 'badge',
                 },
+                {
+                    key: 'value',
+                    name: 'More',
+                    type: 'more',
+                    options: {
+                        sub_key: 'data',
+                        layout: {
+                            type: 'popup',
+                            options: {
+                                layout: {
+                                    type: 'raw',
+                                },
+                            },
+                        },
+                    },
+                },
             ],
         },
         data: [
@@ -849,6 +865,22 @@ Right aligned columns
 `,
         },
         data: {},
+    },
+    popup: {
+        options: {
+            layout: {
+                name: 'Pop Up',
+                type: 'raw',
+                options: {},
+            },
+        },
+        data: [
+            { key: 'replica_set', value: '2', data: { array: [{ id: 'a' }] } },
+            { key: 'Name', value: 'mongodb-s2d3-dev', data: { array: [{ id: 'b' }] } },
+            { key: 'rs_type', value: 'arbiter', data: { array: [{ id: 'c' }, { id: 'cccccc' }] } },
+            { key: 'rs_primary', value: 'false', data: { array: [{ id: 'd' }, { id: 'ddd' }] } },
+            { key: 'server_type', value: 'mongodb', data: { array: [] } },
+        ],
     },
 };
 

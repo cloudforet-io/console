@@ -7,6 +7,7 @@
             <template #default="{value}">
                 <p-dynamic-field :options="options"
                                  :data="value"
+                                 :type="type"
                                  :type-options="typeOptions"
                                  :extra-data="extraData"
                                  :handler="handler"
@@ -37,6 +38,10 @@ import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import { DynamicFieldType, dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PTextList from '@/others/console/text-list/PTextList.vue';
 
+const PDynamicField = () => ({
+    // eslint-disable-next-line import/no-self-import
+    component: import('./PDynamicField.vue'),
+});
 
 const RECURSIVE_TYPE = ['list', 'enum'];
 
@@ -65,12 +70,14 @@ const componentMap: Record<DynamicFieldType, AsyncComponent> = {
     list: () => ({
         component: import('./templates/list/index.vue') as Promise<ImportedComponent>,
     }),
+    more: () => ({
+        component: import('./templates/more/index.vue') as Promise<ImportedComponent>,
+    }),
 };
 
 export default defineComponent<DynamicFieldProps>({
     name: 'PDynamicField',
-    // eslint-disable-next-line import/no-self-import
-    components: { PTextList, PDynamicField: () => import('@/data-display/dynamic/dynamic-field/PDynamicField.vue') },
+    components: { PTextList, PDynamicField },
     props: {
         type: {
             type: String,

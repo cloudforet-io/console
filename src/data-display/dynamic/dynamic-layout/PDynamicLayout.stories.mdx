@@ -29,6 +29,7 @@ export const Template = (args, { argTypes }) => ({
                                   keyItemSets,
                                   valueHandlerMap,
                                   language,
+                                  popupVisible,
                               }"
                               :fetch-options="{
                                   sortBy,
@@ -38,11 +39,12 @@ export const Template = (args, { argTypes }) => ({
                                   queryTags,
                                   searchText
                               }"
-                               class="w-full"
-                               @fetch="onFetch"
-                                @select="onSelect"
-                                @export="onExport"
-                                @click-settings="onClickSettings"
+                              class="w-full"
+                              @fetch="onFetch"
+                              @select="onSelect"
+                              @export="onExport"
+                              @click-settings="onClickSettings"
+                              @update-popup-visible="onUpdatePopupVisible"
             >
             </p-dynamic-layout>
     `,
@@ -65,6 +67,7 @@ export const Template = (args, { argTypes }) => ({
 | raw | - |
 | markdown | - |
 | html | - |
+| popup | modal view |
 | list | list(<dynamic_layout>) |
 
 <br/>
@@ -82,6 +85,7 @@ export const Template = (args, { argTypes }) => ({
 | raw | ```root_path?: string translation_id?: string``` |
 | markdown | ```translation_id?: string, markdown: string``` or <br/> ```markdown: { en: string, ko: string }``` |
 | html | ```root_path?: string, translation_id?: string``` |
+| popup | ```sub_key?: string, layout?: DynamicLayout``` |
 | list | ```root_path?: string, layouts: DynamicLayout[]``` |
 
 
@@ -97,6 +101,7 @@ export const Template = (args, { argTypes }) => ({
 | raw | - |
 | markdown | - |
 | html | - |
+| popup | - |
 | list | The fetch options required for all layouts in the list are applied collectively. |
 
 <br/>
@@ -126,6 +131,7 @@ Each type of dynamic layout corresponds to each component as the table below.<br
 | raw | Raw |
 | markdown | Markdown |
 | html | - |
+| popup | ButtonModal |
 | list | - |
 
 <br/>
@@ -142,6 +148,7 @@ Each type of dynamic layout corresponds to each component as the table below.<br
 | raw | ```loading``` |
 | markdown | ```language``` |
 | html | - |
+| popup | ```popupVisible``` |
 | list | all |
 
 <br/>
@@ -150,19 +157,20 @@ Each type of dynamic layout corresponds to each component as the table below.<br
 ## Type Options Description
 | Name | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
-| loading | boolean | ```false``` | Used to display loading spinner. |
-| totalCount | number | ```0``` | Used to calculate pagination, displaying count next to the title. |
-| timezone | string |```'UTC'``` | Used to display datetime. |
-| selectIndex | number[] |```[]``` | Used to initiate selectIndex of tables. Works only when 'selectable' is ```true```. |
-| selectable | boolean | ```false``` | Used to make tables selectable. |
-| multiSelect | boolean | ```true``` | Used to make tables multi-selectable. Works only when 'selectable' is ```true```. |
-| invalid | boolean | ```false``` | Used to display invalid style. |
-| colCopy | boolean | ```false``` | Used to on/off each column copy. |
-| excelVisible | boolean | ```false``` | Used to on/off export button. |
-| settingsVisible | boolean | ```false``` | Used to on/off settings button. |
+| loading | boolean | ```false``` | Displays loading spinner. |
+| totalCount | number | ```0``` | Calculate pagination, displaying count next to the title. |
+| timezone | string |```'UTC'``` | Display datetime. |
+| selectIndex | number[] |```[]``` | Initiate selectIndex of tables. Works only when 'selectable' is ```true```. |
+| selectable | boolean | ```false``` | Make tables selectable. |
+| multiSelect | boolean | ```true``` | Make tables multi-selectable. Works only when 'selectable' is ```true```. |
+| invalid | boolean | ```false``` | Display invalid style. |
+| colCopy | boolean | ```false``` | Determine whether to each column copiable or not. |
+| excelVisible | boolean | ```false``` | Determine whether to show export button or not. |
+| settingsVisible | boolean | ```false``` | Determine whether to show settings button or not. |
 | keyItemSets | KeyItemSet[] |```options.fields``` or ```[]``` | Only for query-search-table's key items. |
 | valueHandlerMap | ValueHandlerMap |```{}``` | Only for query-search-table's value handler map. |
 | language | string | ```'en'``` | NOT supported yet except markdown type. |
+| popupVisible | boolean | ```false``` | Determine whether to show popup modal or not. Supported only for `popup` type. |
 
 ```typescript
 interface DynamicLayoutTypeOptions {
@@ -179,6 +187,7 @@ interface DynamicLayoutTypeOptions {
     keyItemSets?: KeyItemSet[];
     valueHandlerMap?: ValueHandlerMap;
     language?: string;
+    popupVisible?: boolean;
 }
 ```
 
@@ -190,6 +199,7 @@ interface DynamicLayoutTypeOptions {
 | select | Emitted when row(item) has been selected. |
 | export | Emitted when clicked export button. |
 | click-settings | Emitted when clicked settings button. |
+| update-popup-visible | Emitted when popupVisible typeOptions is updated. |
 
 <br/>
 <br/>
@@ -202,6 +212,7 @@ interface DynamicLayoutEventListeners {
     select: (selectIndex: number[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     export: (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     'click-settings': (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    'update-popup-visible': (popupVisible?: boolean) => void|Promise<void>;
 }
 ```
 
@@ -211,6 +222,7 @@ interface DynamicLayoutEventListeners {
 | selectIndex | Selected row(item) indexes. |
 | layoutName | Name props. Only provided when layout type is 'list'. |
 | layoutIndex | Layout index. Only provided when layout type is 'list'. |
+| popupVisible | Is popup visible or not. |
 
 <br/>
 <br/>
@@ -226,6 +238,7 @@ interface DynamicLayoutEventListeners {
 | raw | - |
 | markdown | - |
 | html | - |
+| popup | update-popup-visible |
 | list | fetch, select, export |
 
 <br/>

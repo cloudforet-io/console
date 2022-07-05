@@ -2,10 +2,10 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
 import {i18n} from '@/translations'
 import mock from '@/data-display/dynamic/dynamic-layout/mock.ts'
-import { getDynamicLayoutHtmlArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/html/story-helper';
+import { getDynamicLayoutPopupArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/popup/story-helper';
 
-<Meta title='Data Display/Dynamic/Dynamic Layout/- Html'
-      argTypes={getDynamicLayoutHtmlArgTypes()}/>
+<Meta title='Data Display/Dynamic/Dynamic Layout/- Popup'
+      argTypes={getDynamicLayoutPopupArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
@@ -13,16 +13,16 @@ export const Template = (args, { argTypes }) => ({
     components: { PDynamicLayout },
     i18n,
     template: `
-      <p-dynamic-layout :name="name" type="html"
+      <p-dynamic-layout :name="name" type="popup"
                           :options="options"
                           :data="data"
                           :type-options="{
+                              popupVisible
                           }"
                           :fetch-options="{
                           }"
                            class="w-full"
-            >
-        </p-dynamic-layout>
+      />
     `,
     setup() {
         return {}
@@ -30,7 +30,7 @@ export const Template = (args, { argTypes }) => ({
 });
 
 
-# Html Type
+# Markdown Type
 <br/>
 <br/>
 
@@ -41,11 +41,12 @@ export const Template = (args, { argTypes }) => ({
 | root_path | O |
 | translation_id | O |
 | fields | X |
-| markdown | X |
+| markdown | O |
 | layouts | X |
 | search | X |
 | disable_search | X |
-| layout | X |
+| layout | O |
+
 
 ## Supported Fetch Options
 
@@ -57,7 +58,6 @@ export const Template = (args, { argTypes }) => ({
 | pageLimit | X |
 | searchText | X |
 | queryTags | X |
-
 
 ## Supported Type Options
 
@@ -76,40 +76,27 @@ export const Template = (args, { argTypes }) => ({
 | keyItemSets | X |
 | valueHandlerMap | X |
 | language | X |
-| popupVisible | X |
+| popupVisible | O |
 
 
 ## Supported Events
-
 | Event Name | Supported |
 | ---------- | ----------- |
 | fetch | X |
 | select | X |
 | export | X |
 | click-settings | X |
-| update-popup-visible | X |
-
+| update-popup-visible | O |
 
 <br/>
 <br/>
+
+
 
 ## Playground
 
 <Canvas>
-    <Story name="Playground" argTypes={{
-        data: {
-            name: 'data',
-            type: {name: 'string'},
-            defaultValue: '',
-            control: {
-                type: 'text'
-            }
-        }
-    }} args={{
-        type: 'html',
-        data: mock.html.data,
-        options: mock.html.options,
-    }}>
+    <Story name="Playground" >
         {Template.bind({})}
     </Story>
 </Canvas>
@@ -118,3 +105,4 @@ export const Template = (args, { argTypes }) => ({
 
 <br/>
 <br/>
+
