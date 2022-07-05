@@ -376,6 +376,24 @@ export const getDataTableArgsType = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
+        control: {
+            type: 'text',
+        },
+    },
+    beautifyText: {
+        name: 'beautifyText',
+        type: { name: 'string' },
+        description: 'Whether to beautify text or not. See the `TextBeautifier` component.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'function',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
     },
     /* slots */
     headSlot: {

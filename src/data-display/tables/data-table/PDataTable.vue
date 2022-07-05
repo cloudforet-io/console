@@ -77,7 +77,7 @@
                     <slot v-if="showNoData" name="no-data" v-bind="getDefaultSlotProps()">
                         <div class="no-data">
                             <slot name="no-data-format" v-bind="getDefaultSlotProps()">
-                                No Items
+                                {{ $t('COMPONENT.DATA_TABLE.NO_DATA') }}
                             </slot>
                         </div>
                         <tr :colspan="selectable ? leafFields.length +1 : leafFields.length" class="fake-row" />
@@ -121,7 +121,10 @@
                                 <slot name="col-format" v-bind="getColSlotProps(item, field, colIndex, rowIndex)">
                                     <slot :name="`col-${field.name}-format`" v-bind="getColSlotProps(item, field, colIndex, rowIndex)">
                                         <slot :name="`col-${colIndex}-format`" v-bind="getColSlotProps(item, field, colIndex, rowIndex)">
-                                            {{ getValue(item, field) }}
+                                            <p-text-beautifier v-if="beautifyText" :value="getValue(item, field)" />
+                                            <template v-else>
+                                                {{ getValue(item, field) }}
+                                            </template>
                                         </slot>
                                     </slot>
                                 </slot>
@@ -156,13 +159,15 @@ import { get, range } from 'lodash';
 
 import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
 import { DataTableField, DataTableFieldType, DataTableProps } from '@/data-display/tables/data-table/type';
-import PI from '@/foundation/icons/PI.vue';
-import PLottie from '@/foundation/lottie/PLottie.vue';
-import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
-import PCheckBox from '@/inputs/checkbox/PCheckBox.vue';
-import PRadio from '@/inputs/radio/PRadio.vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import { copyAnyData } from '@/util/helpers';
+
+const PCheckBox = () => import('@/inputs/checkbox/PCheckBox.vue');
+const PTextBeautifier = () => import('@/data-display/text-beautifier/PTextBeautifier.vue');
+const PRadio = () => import('@/inputs/radio/PRadio.vue');
+const PI = () => import('@/foundation/icons/PI.vue');
+const PLottie = () => import('@/foundation/lottie/PLottie.vue');
+const PCopyButton = () => import('@/inputs/buttons/copy-button/PCopyButton.vue');
 
 interface TableField extends DataTableFieldType {
     depth?: number;
@@ -171,6 +176,7 @@ interface TableField extends DataTableFieldType {
 export default defineComponent<DataTableProps>({
     name: 'PDataTable',
     components: {
+        PTextBeautifier,
         PI,
         PCheckBox,
         PCopyButton,
@@ -266,8 +272,12 @@ export default defineComponent<DataTableProps>({
             type: Function,
             default: undefined,
         },
+        beautifyText: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: DataTableProps, context) {
+    setup(props, context) {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const getChildFields = (field: DataTableFieldType): DataTableFieldType[]|undefined => field.children?.map(child => ({ sortable: true, ...child }));
@@ -630,6 +640,9 @@ export default defineComponent<DataTableProps>({
         }
         &.center {
             @apply text-center;
+        }
+        i, span, div, input, textarea, article, main, ul, li {
+            vertical-align: baseline;
         }
     }
     tr {

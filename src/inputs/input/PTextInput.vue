@@ -19,13 +19,12 @@
                 </p-tag>
             </template>
             <slot name="default" v-bind="{ value }">
-                <input
-                    v-model="proxyValue"
-                    :disabled="disabled"
-                    :type="type"
-                    :placeholder="placeholder"
-                    size="1"
-                    v-on="inputListeners"
+                <input v-model="proxyValue"
+                       :disabled="disabled"
+                       :type="type"
+                       :placeholder="placeholder"
+                       size="1"
+                       v-on="inputListeners"
                 >
             </slot>
             <span v-if="$slots['right-extra']" class="right-extra">
@@ -284,12 +283,15 @@ export default {
                     showMenu();
                     filterMenu(state.proxyValue);
                 }
+                emit('input', event.target.value);
             },
             focus() {
                 state.isFocused = true;
+                emit('focus');
             },
             blur() {
                 state.isFocused = false;
+                emit('blur');
             },
             keyup(event) {
                 if ((event.key === 'ArrowDown' || event.key === 'Down') && props.useAutoComplete) {
@@ -301,6 +303,7 @@ export default {
                         handleSelectMenuItem({ label: event.target.value, name: event.target.value });
                     }
                 }
+                emit('keyup', event);
             },
             keydown(event) {
                 if (event.code === 'Backspace') {
@@ -308,6 +311,7 @@ export default {
                     if (isInputEmpty && props.useAutoComplete) hideMenu();
                     if (props.multiInput) deleteSelectedTags();
                 }
+                emit('keydown', event);
             },
         };
 

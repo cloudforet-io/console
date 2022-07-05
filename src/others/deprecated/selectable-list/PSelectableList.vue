@@ -11,7 +11,7 @@
         <slot v-else-if="items.length === 0" name="no-data">
             <p-empty>
                 <slot name="no-data-format">
-                    No Items
+                    {{ $t('COMPONENT.EMPTY.NO_DATA') }}
                 </slot>
             </p-empty>
         </slot>

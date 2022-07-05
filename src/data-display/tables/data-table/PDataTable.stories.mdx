@@ -47,6 +47,7 @@ export const Template = (args, { argTypes }) => ({
             :invalid="invalid"
             :getRowClassNames="getRowClassNames"
             :getRowSelectable="getRowSelectable"
+            :beautify-text="beautifyText"
             @select="onSelect"
             @rowLeftClick="onRowLeftClick"
             @changeSort="onChangeSort"
@@ -524,6 +525,28 @@ To enable multi selection on row click, give `true` to `rowClickMultiSelectionMo
             components: { PDataTable },
             template: `
 <p-data-table :fields="fields" :items="items" invalid />
+`,
+            setup() {
+                return {
+                    fields: getUserFields(),
+                    items: getUsers(5, 5)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Beautify Text
+
+<Canvas>
+    <Story name="Beautify Text">
+        {{
+            components: { PDataTable },
+            template: `
+<p-data-table :fields="fields" :items="items" beautify-text />
 `,
             setup() {
                 return {

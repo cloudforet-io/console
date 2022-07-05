@@ -47,4 +47,5 @@ export interface DataTableProps {
     invalid?: boolean;
     getRowClassNames?: (item: any, i: number) => Record<string, boolean>;
     getRowSelectable?: (item: any, i: number) => boolean;
+    beautifyText?: boolean;
 }

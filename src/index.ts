@@ -114,3 +114,4 @@ export { default as PDynamicChart } from './data-display/dynamic/dynamic-chart/P
 export { default as PDynamicWidget } from './data-display/dynamic/dynamic-widget/PDynamicWidget.vue';
 export { default as PPopover } from './data-display/popover/PPopover.vue';
 export { default as PTextHighlighting } from './data-display/text-highlighting/PTextHighlighting.vue';
+export { default as PTextBeautifier } from './data-display/text-beautifier/PTextBeautifier.vue';
