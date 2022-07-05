@@ -1,41 +1,38 @@
 <template>
-    <div>
-        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.HISTORY')" :total-count="totalCount" />
-        <p-search-table :fields="fields"
-                        :items="items"
-                        :loading="loading"
-                        :total-count="totalCount"
-                        :sort-by.sync="options.sortBy"
-                        :sort-desc.sync="options.sortDesc"
-                        :page-size.sync="options.pageLimit"
-                        :selectable="false"
-                        @change="onChange"
-                        @export="onExport"
+    <div class="cloud-service-history">
+        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.HISTORY')"
+                     :total-count="7"
+                     use-total-count
+        />
+        <p-toolbox search-type="plain"
+                   searchable
+                   :pagination-visible="false"
+                   :page-size-changeable="false"
         >
-            <template #col-labels-format="{value}">
-                <p-text-list :items="value" delimiter=" ">
-                    <p-badge v-slot="{value: d}">
-                        {{ d }}
-                    </p-badge>
-                </p-text-list>
+            <template #left-area>
+                <p-datetime-picker data-type="yearToMonth"
+                                   :selected-dates.sync="selectedDates"
+                                   :timezone="timezone"
+                />
             </template>
-            <template #col-job_id-format="{value}">
-                <p-anchor v-if="value" :to="getJobLink(value)">
-                    {{ value }}
-                </p-anchor>
+        </p-toolbox>
+        <vertical-timeline v-for="(item, idx) in items"
+                           :key="`timeline-${item.date}-${idx}`"
+                           :item="item"
+                           :timezone="timezone"
+                           :is-last-item="idx===items.length-1"
+        >
+            <template v-if="item.data && item.data.length" #timeline-detail>
+                <div class="timeline-content-wrapper">
+                    <key-value-item v-for="(keyValueItem, kIdx) in item.data.slice(0, TIMELINE_CONTENT_LIMIT)"
+                                    :key="`key-value-item-${keyValueItem.key}-${kIdx}`"
+                                    :item="keyValueItem"
+                    />
+                    <!--                    song-lang-->
+                    <span v-if="item.data.length >TIMELINE_CONTENT_LIMIT" class="text-gray-500">and more...</span>
+                </div>
             </template>
-            <template #col-updated_by-format="{value}">
-                <p-anchor v-if="collectors[value]" :to="getCollectorLink(value)">
-                    {{ collectors[value].label }}
-                </p-anchor>
-                <template v-else>
-                    {{ value }}
-                </template>
-            </template>
-            <template #col-updated_at-format="{value}">
-                {{ iso8601Formatter(value, timezone) }}
-            </template>
-        </p-search-table>
+        </vertical-timeline>
     </div>
 </template>
 
@@ -45,44 +42,85 @@ import {
 } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PSearchTable, PTextList, PPanelTop, PBadge, PAnchor,
+    PPanelTop, PToolbox, PDatetimePicker,
 } from '@spaceone/design-system';
-import { Location } from 'vue-router';
+import dayjs from 'dayjs';
 
 import { store } from '@/store';
 
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import KeyValueItem from '@/common/components/key-value-item/KeyValueItem.vue';
+import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+interface TimelineItem {
+    date: string;
+    color: string;
+    title: string;
+    count?: number;
+    data?: { key: string, value?: any }[];
+}
+
+const TIMELINE_CONTENT_LIMIT = 10;
 
 export default {
     name: 'CloudServiceHistory',
     components: {
-        PPanelTop, PBadge, PTextList, PSearchTable, PAnchor,
+        KeyValueItem,
+        VerticalTimeline,
+        PPanelTop,
+        PToolbox,
+        PDatetimePicker,
     },
     props: {
         cloudServiceId: {
             type: String,
             default: '',
-            required: true,
         },
     },
-    setup(props) {
+    setup() {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            fields: [
-                { label: 'Key', name: 'key' },
-                { label: 'Job ID', name: 'job_id' },
-                { label: 'Updated By', name: 'updated_by' },
-                { label: 'Updated', name: 'updated_at' },
-            ],
-            items: [],
+            selectedDates: [] as string[],
+            items: computed<TimelineItem[]>(() => ([
+                {
+                    date: '2022/07/05 15:00:00', // dayjs.utc().tz(state.timezone).format('YYYY/MM/DD HH:mm:ss'),
+                    color: 'RED',
+                    title: 'Deleted',
+                },
+                {
+                    date: '2022/07/05 13:01:35', // dayjs.utc().tz(state.timezone).format('YYYY/MM/DD HH:mm:ss'),
+                    color: 'GREEN',
+                    title: 'Updated',
+                    count: 11,
+                    data: [
+                        { key: 'tags', value: { os: 'Amazon Linux 2', dept: 'cloudone', type: 'spaceone' } },
+                        { key: 'type', value: 't3a.large' },
+                        { key: 'os_type' },
+                        { key: 'key', value: 'value' },
+                        { key: 'cloud_service_type' },
+                        { key: 'ip_address', value: ['13.233.222.111', '192.168.1.10', '322.222.222.222'] },
+                        { key: 'project_id' },
+                        { key: 'key', value: 'value' },
+                        { key: 'key', value: 'value' },
+                        { key: 'key', value: 'value' },
+                        { key: '11th', value: 'value' },
+                    ],
+                },
+                {
+                    date: '2022/07/05 11:00:21', // dayjs.utc().tz(state.timezone).format('YYYY/MM/DD HH:mm:ss'),
+                    color: 'BLUE',
+                    title: 'Created',
+                    count: 5,
+                    data: [
+                        { key: 'tags' },
+                        { key: 'os_type' },
+                        { key: 'cloud_service_type' },
+                        { key: 'ip_address' },
+                        { key: 'project_id' },
+                    ],
+                },
+            ])),
             loading: true,
             totalCount: 0,
             options: {
@@ -94,90 +132,80 @@ export default {
             },
             collectors: computed(() => store.state.reference.collector.items),
         });
+        console.log(dayjs.utc().tz(state.timezone));
 
-        const apiQuery = new ApiQueryHelper();
-        const getParams = () => ({
-            cloud_service_id: props.cloudServiceId,
-            key_path: 'collection_info.change_history',
-            query: apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
-                .setPage(
-                    state.options.pageStart,
-                    state.options.pageLimit,
-                )
-                .setFilters([{ v: state.options.searchText }])
-                .data,
-        });
+        /* Api */
+        // const apiQuery = new ApiQueryHelper();
+        // const getParams = () => ({
+        //     cloud_service_id: props.cloudServiceId,
+        //     key_path: 'collection_info.change_history',
+        //     query: apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
+        //         .setPage(
+        //             state.options.pageStart,
+        //             state.options.pageLimit,
+        //         )
+        //         .setFilters([{ v: state.options.searchText }])
+        //         .data,
+        // });
+        // const listHistory = async () => {
+        //     state.loading = true;
+        //     try {
+        //         const res = await SpaceConnector.client.inventory.cloudService.getData(getParams());
+        //
+        //         state.items = res.results;
+        //         state.totalCount = res.total_count;
+        //     } catch (e) {
+        //         ErrorHandler.handleError(e);
+        //     } finally {
+        //         state.loading = false;
+        //     }
+        // };
 
+        /* Util */
+        // const collectorLinkQueryHelper = new QueryHelper();
+        // const getCollectorLink = (collectorId: string): Location => {
+        //     collectorLinkQueryHelper.setFilters([{ k: 'collector_id', v: collectorId, o: '=' }]);
+        //     return {
+        //         name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
+        //         query: {
+        //             filters: collectorLinkQueryHelper.rawQueryStrings,
+        //         },
+        //     };
+        // };
+        //
+        // const getJobLink = (jobId: string): Location => ({
+        //     name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
+        //     params: { jobId },
+        // });
 
-        const api = SpaceConnector.client.inventory.cloudService.getData;
-        const listHistory = async () => {
-            state.loading = true;
+        /* Event */
+        // const onChange = async (options = {}) => {
+        //     state.options = { ...state.options, ...options };
+        //     await listHistory();
+        // };
 
-            try {
-                const res = await api(getParams());
-
-                state.items = res.results;
-                state.totalCount = res.total_count;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
+        /* Watcher */
+        // watch(() => props.cloudServiceId, (after, before) => {
+        //     if (after !== before) listHistory();
+        // }, { immediate: false });
+        watch(() => state.timezone, (timezone) => {
+            if (timezone) {
+                state.selectedDates = [dayjs.utc().tz(timezone).format()];
             }
-        };
-
-        const collectorLinkQueryHelper = new QueryHelper();
-        const getCollectorLink = (collectorId: string): Location => {
-            collectorLinkQueryHelper.setFilters([{ k: 'collector_id', v: collectorId, o: '=' }]);
-            return {
-                name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
-                query: {
-                    filters: collectorLinkQueryHelper.rawQueryStrings,
-                },
-            };
-        };
-
-        const getJobLink = (jobId: string): Location => ({
-            name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
-            params: { jobId },
-        });
-
-        const onChange = async (options = {}) => {
-            state.options = { ...state.options, ...options };
-            await listHistory();
-        };
-
-        const onExport = async () => {
-            await store.dispatch('file/downloadExcel', {
-                url: '/inventory/cloud-service/get-data',
-                param: getParams(),
-                fields: [
-                    { name: 'Key', key: 'key' },
-                    { name: 'Job ID', key: 'job_id' },
-                    { name: 'Updated By', key: 'updated_by' },
-                    { name: 'Updated', key: 'updated_at', type: 'datetime' },
-                ],
-                file_name_prefix: FILE_NAME_PREFIX.cloudService,
-            });
-        };
-
-        watch(() => props.cloudServiceId, (after, before) => {
-            if (after !== before) listHistory();
-        }, { immediate: false });
+        }, { immediate: true });
 
         /* Init */
         (async () => {
             await Promise.allSettled([
                 store.dispatch('reference/collector/load'),
-                onChange(),
+                // listHistory(),
+                // onChange(),
             ]);
         })();
 
         return {
             ...toRefs(state),
-            getCollectorLink,
-            getJobLink,
-            onChange,
-            onExport,
+            TIMELINE_CONTENT_LIMIT,
             iso8601Formatter,
         };
     },
@@ -185,7 +213,17 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
->>> .p-search-table {
-    border-width: 0;
+.cloud-service-history {
+    .p-toolbox::v-deep {
+        padding: 1.5rem 1rem 0.5rem;
+        .p-datetime-picker {
+            width: 120px;
+        }
+    }
+    .vertical-timeline {
+        .timeline-content-wrapper {
+            padding-top: 0.25rem;
+        }
+    }
 }
 </style>
