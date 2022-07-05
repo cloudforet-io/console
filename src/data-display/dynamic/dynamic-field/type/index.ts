@@ -6,6 +6,7 @@ import {
 
 export interface DynamicFieldTypeOptions {
     timezone?: string;
+    displayKey?: string;
 }
 
 export interface DynamicFieldProps<Options = DynamicFieldOptions, TypeOptions = DynamicFieldTypeOptions, ExtraData = any> {

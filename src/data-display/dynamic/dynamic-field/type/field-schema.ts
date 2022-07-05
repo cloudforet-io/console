@@ -1,6 +1,8 @@
 /** Metadata schema types for Dynamic field */
+// eslint-disable-next-line import/no-cycle
+import { DynamicLayout } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 
-export const dynamicFieldTypes = ['text', 'badge', 'datetime', 'state', 'enum', 'size', 'dict', 'list'];
+export const dynamicFieldTypes = ['text', 'badge', 'datetime', 'state', 'enum', 'size', 'dict', 'list', 'more'];
 
 export type DynamicFieldType = typeof dynamicFieldTypes[number];
 
@@ -50,6 +52,11 @@ export interface StateOptions extends CommonOptions {
     text_color?: string;
 }
 
+export interface MoreOptions extends CommonOptions {
+    sub_key?: string;
+    layout: DynamicLayout;
+}
+
 export interface EnumItem {
     name?: string;
     type: DynamicFieldType;
@@ -85,6 +92,7 @@ export type DynamicFieldOptions =
     | StateOptions
     | TextOptions
     | SizeOptions
+    | MoreOptions
 
 
 export interface DynamicField {
