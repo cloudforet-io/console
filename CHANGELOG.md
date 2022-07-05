@@ -1,3 +1,10 @@
+# [1.1.0-beta.338](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.337...v1.1.0-beta.338) (2022-07-05)
+
+
+### Bug Fixes
+
+* change green200 badge's text color ([ae2e2f4](https://github.com/spaceone-dev/spaceone-design-system/commit/ae2e2f46f2b42d68d608cd01d043346936bcdebd))
+
 # [1.1.0-beta.337](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.336...v1.1.0-beta.337) (2022-07-05)
 
 
