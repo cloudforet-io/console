@@ -1,3 +1,10 @@
+# [1.1.0-beta.336](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.335...v1.1.0-beta.336) (2022-07-05)
+
+
+### Features
+
+* add TextBeautifier component and add beautifyText prop to DataTable ([#1002](https://github.com/spaceone-dev/spaceone-design-system/issues/1002)) ([7b2a4c4](https://github.com/spaceone-dev/spaceone-design-system/commit/7b2a4c4d3f16fff009d17a387940bfa6c5049b01))
+
 # [1.1.0-beta.335](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.334...v1.1.0-beta.335) (2022-07-04)
 
 
