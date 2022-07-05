@@ -29,6 +29,7 @@ export const Template = (args, { argTypes }) => ({
                                   keyItemSets,
                                   valueHandlerMap,
                                   language,
+                                  popupVisible
                               }"
                               :fetch-options="{
                                   sortBy,
@@ -43,6 +44,7 @@ export const Template = (args, { argTypes }) => ({
                                 @select="onSelect"
                                 @export="onExport"
                                 @click-settings="onClickSettings"
+                                @update-popup-visible="onUpdatePopupVisible"
             >
             </p-dynamic-layout>
     `,

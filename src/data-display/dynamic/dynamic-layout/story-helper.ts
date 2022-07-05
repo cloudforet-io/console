@@ -1,6 +1,7 @@
 import { ArgTypes } from '@storybook/addons';
 
 import mock, { getQueryTags } from '@/data-display/dynamic/dynamic-layout/mock';
+import { dynamicLayoutTypes } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 export const getDynamicLayoutArgTypes = (): ArgTypes => ({
     name: {
@@ -25,19 +26,19 @@ export const getDynamicLayoutArgTypes = (): ArgTypes => ({
         name: 'type',
         type: { name: 'string' },
         description: 'Type of dynamic layout',
-        defaultValue: 'item',
+        defaultValue: dynamicLayoutTypes[0],
         table: {
             type: {
                 summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: 'item',
+                summary: dynamicLayoutTypes[0],
             },
         },
         control: {
             type: 'select',
-            options: ['item', 'html', 'markdown', 'query-search-table', 'raw-table', 'table', 'simple-table', 'raw'],
+            options: dynamicLayoutTypes,
         },
     },
     options: {
@@ -348,6 +349,23 @@ export const getDynamicLayoutArgTypes = (): ArgTypes => ({
             type: 'object',
         },
     },
+    popupVisible: {
+        name: 'popupVisible',
+        type: { name: 'boolean' },
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'typeOptions',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     // fetch options
     sortBy: {
         name: 'sortBy',
@@ -495,6 +513,19 @@ export const getDynamicLayoutArgTypes = (): ArgTypes => ({
     onClickSettings: {
         name: 'click-settings',
         description: 'An event emitted by an settings button click action.',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+            defaultValue: {
+                summary: null,
+            },
+        },
+    },
+    onUpdatePopupVisible: {
+        name: 'update-popup-visible',
+        description: 'An event emitted when popupVisible typeOptions is updated.',
         table: {
             type: {
                 summary: null,

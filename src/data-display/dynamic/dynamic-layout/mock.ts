@@ -665,6 +665,22 @@ export default {
                     name: 'Hello',
                     type: 'badge',
                 },
+                {
+                    key: 'value',
+                    name: 'More',
+                    type: 'more',
+                    options: {
+                        sub_key: 'data',
+                        layout: {
+                            type: 'popup',
+                            options: {
+                                layout: {
+                                    type: 'raw',
+                                },
+                            },
+                        },
+                    },
+                },
             ],
         },
         data: [

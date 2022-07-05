@@ -31,6 +31,7 @@ export interface DynamicLayoutTypeOptions {
     keyItemSets?: KeyItemSet[];
     valueHandlerMap?: ValueHandlerMap;
     language?: string;
+    popupVisible?: boolean;
 }
 
 export interface DynamicLayoutProps<

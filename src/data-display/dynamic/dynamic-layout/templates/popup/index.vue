@@ -1,6 +1,6 @@
 <template>
     <div class="p-dynamic-layout-popup">
-        <p-button-modal v-model="modalVisible">
+        <p-button-modal :title="name" :visible="popupVisible" @update:visible="handleUpdateVisible">
             <template #body>
                 <p-dynamic-layout :type="layoutSchema.type"
                                   :options="layoutSchema.options"
@@ -14,7 +14,7 @@
 <script lang="ts">
 import {
     computed, defineComponent, PropType,
-    reactive, toRefs,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
@@ -56,14 +56,26 @@ export default defineComponent<PopupDynamicLayoutProps>({
             default: undefined,
         },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const state = reactive({
             layoutSchema: computed(() => props.options.layout ?? {}),
-            modalVisible: true,
+            popupVisible: props.typeOptions?.popupVisible,
+        });
+
+        const handleUpdateVisible = (popupVisible) => {
+            state.popupVisible = popupVisible;
+            emit('update-popup-visible', popupVisible);
+        };
+        watch(() => props.typeOptions, (typeOptions) => {
+            if (typeOptions?.popupVisible !== state.popupVisible) {
+                state.popupVisible = typeOptions?.popupVisible;
+                // emit('update-popup-visible', state.popupVisible);
+            }
         });
 
         return {
             ...toRefs(state),
+            handleUpdateVisible,
         };
     },
 });
