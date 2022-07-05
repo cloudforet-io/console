@@ -453,6 +453,23 @@ export default {
                     delimiter: '  ',
                     link: 'https://www.google.com',
                 },
+            }, {
+                name: 'Collection Information',
+                key: 'collection_info.state',
+                type: 'more',
+                options: {
+                    sub_key: 'collection_info.change_history',
+                    layout: {
+                        name: 'Change History Details',
+                        type: 'popup',
+                        options: {
+                            layout: {
+                                type: 'raw',
+                                options: {},
+                            },
+                        },
+                    },
+                },
             }],
         },
         data: {

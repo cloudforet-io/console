@@ -92,6 +92,13 @@ export default {
             timezone: computed<string>(() => props.typeOptions?.timezone || 'UTC'),
         });
 
+        const getFieldData = (rootData, dataPath: string, type?: string): any => {
+            if (type === 'more') {
+                return rootData;
+            }
+            return getValueByPath(rootData, dataPath);
+        };
+
         const dynamicFieldSlots = computed(() => {
             const res = {};
             if (!props.options.fields) return res;
@@ -101,13 +108,15 @@ export default {
                     type: ds.type || 'text',
                     options: { ...ds.options },
                     extraData: { ...ds, index: i },
-                    data: getValueByPath(state.rootData, ds.key),
+                    data: getFieldData(state.rootData, ds.key, ds.type),
                 };
 
                 if (item.options.translation_id) delete item.options.translation_id;
 
                 if (ds.type === 'datetime') {
                     item.typeOptions = { timezone: state.timezone };
+                } else if (ds.type === 'more') {
+                    item.typeOptions = { displayKey: ds.key };
                 }
 
                 res[`data-${i}`] = item;
