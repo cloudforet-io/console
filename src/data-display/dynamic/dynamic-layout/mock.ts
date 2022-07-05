@@ -1,5 +1,52 @@
 /* eslint-disable camelcase */
+import { faker } from '@faker-js/faker';
+
 import { getQueryTags as getToolboxQueryTags } from '@/navigation/toolbox/mock';
+
+const getCareerInfo = () => ({ company: faker.company.companyName(), from: faker.datatype.datetime() });
+const getTableRow = () => ({
+    name: faker.name.firstName(),
+    age: faker.datatype.number({ min: 10, max: 90 }),
+    job: faker.name.jobTitle(),
+    information: { career: faker.datatype.array(5).map(() => getCareerInfo()) },
+});
+const makeTableData = () => faker.datatype.array(5).map(() => getTableRow());
+
+const makeTableFields = () => ([
+    {
+        key: 'name',
+        name: 'Key (text)',
+        type: 'text',
+    },
+    {
+        key: 'age',
+        name: 'Age (text)',
+        type: 'text',
+    },
+    {
+        key: 'job',
+        name: 'Job (badge)',
+        type: 'badge',
+    },
+    {
+        key: 'information.career.company',
+        name: 'Career (more, array)',
+        type: 'more',
+        options: {
+            sub_key: 'information.career',
+            layout: {
+                name: 'Career Details',
+                type: 'popup',
+                options: {
+                    layout: {
+                        type: 'raw',
+                    },
+                },
+            },
+        },
+    },
+]);
+
 
 export default {
     list: {
@@ -406,6 +453,23 @@ export default {
                     delimiter: '  ',
                     link: 'https://www.google.com',
                 },
+            }, {
+                name: 'Collection Information',
+                key: 'collection_info.state',
+                type: 'more',
+                options: {
+                    sub_key: 'collection_info.change_history',
+                    layout: {
+                        name: 'Change History Details',
+                        type: 'popup',
+                        options: {
+                            layout: {
+                                type: 'raw',
+                                options: {},
+                            },
+                        },
+                    },
+                },
             }],
         },
         data: {
@@ -649,84 +713,18 @@ export default {
     },
     table: {
         options: {
-            fields: [
-                {
-                    key: 'key',
-                    type: 'text',
-                    name: 'Key',
-                },
-                {
-                    key: 'value',
-                    name: 'Value',
-                    type: 'text',
-                },
-                {
-                    key: 'data.array.id',
-                    name: 'Hello',
-                    type: 'badge',
-                },
-                {
-                    key: 'value',
-                    name: 'More',
-                    type: 'more',
-                    options: {
-                        sub_key: 'data',
-                        layout: {
-                            type: 'popup',
-                            options: {
-                                layout: {
-                                    type: 'raw',
-                                },
-                            },
-                        },
-                    },
-                },
-            ],
+            fields: makeTableFields(),
         },
-        data: [
-            { key: 'replica_set', value: '2', data: { array: [{ id: 'a' }] } },
-            { key: 'Name', value: 'mongodb-s2d3-dev', data: { array: [{ id: 'b' }] } },
-            { key: 'rs_type', value: 'arbiter', data: { array: [{ id: 'c' }, { id: 'cccccc' }] } },
-            { key: 'rs_primary', value: 'false', data: { array: [{ id: 'd' }, { id: 'ddd' }] } },
-            { key: 'server_type', value: 'mongodb', data: { array: [] } },
-        ],
+        data: makeTableData(),
     },
     rawTable: {
-        data: [
-            { key: 'replica_set', value: '2', data: { array: [{ id: 'a' }] } },
-            { key: 'Name', value: 'mongodb-s2d3-dev', data: { array: [{ id: 'b' }] } },
-            { key: 'rs_type', value: 'arbiter', data: { array: [{ id: 'c' }, { id: 'cccccc' }] } },
-            { key: 'rs_primary', value: 'false', data: { array: [{ id: 'd' }, { id: 'ddd' }] } },
-            { key: 'server_type', value: 'mongodb', data: { array: [] } },
-        ],
+        data: makeTableData(),
     },
     querySearchTable: {
         options: {
-            fields: [
-                {
-                    key: 'key',
-                    type: 'text',
-                    name: 'Key',
-                },
-                {
-                    key: 'value',
-                    name: 'Value',
-                    type: 'text',
-                },
-                {
-                    key: 'data.array.id',
-                    name: 'Hello',
-                    type: 'badge',
-                },
-            ],
+            fields: makeTableFields(),
         },
-        data: [
-            { key: 'replica_set', value: '2', data: { array: [{ id: 'a' }] } },
-            { key: 'Name', value: 'mongodb-s2d3-dev', data: { array: [{ id: 'b' }] } },
-            { key: 'rs_type', value: 'arbiter', data: { array: [{ id: 'c' }, { id: 'cccccc' }] } },
-            { key: 'rs_primary', value: 'false', data: { array: [{ id: 'd' }, { id: 'ddd' }] } },
-            { key: 'server_type', value: 'mongodb', data: { array: [] } },
-        ],
+        data: makeTableData(),
     },
     markdown: {
         options: {

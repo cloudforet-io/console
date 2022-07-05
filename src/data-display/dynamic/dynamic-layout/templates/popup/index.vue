@@ -1,5 +1,5 @@
 <template>
-    <div class="p-dynamic-layout-popup">
+    <span class="p-dynamic-layout-popup">
         <p-button-modal v-if="isInitiated"
                         :header-title="name"
                         :visible="popupVisible"
@@ -12,7 +12,7 @@
                 />
             </template>
         </p-button-modal>
-    </div>
+    </span>
 </template>
 
 <script lang="ts">

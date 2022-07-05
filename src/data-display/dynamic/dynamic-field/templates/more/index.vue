@@ -1,6 +1,6 @@
 <template>
     <span class="p-dynamic-field-more">
-        <span @click="handleClick">{{ displayData }}</span>
+        <p-dynamic-field type="text" :data="displayData" @click="handleClick" />
         <p-dynamic-layout v-if="isInitiated"
                           :type="SUPPORTED_TYPES.includes(layoutSchema.type) ? layoutSchema.type : SUPPORTED_TYPES[0]"
                           :name="layoutSchema.name"
@@ -25,11 +25,12 @@ import { MoreOptions } from '@/data-display/dynamic/dynamic-field/type/field-sch
 import { getValueByPath } from '@/data-display/dynamic/helper';
 
 const PDynamicLayout = () => import('@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue');
+const PDynamicField = () => import('@/data-display/dynamic/dynamic-field/PDynamicField.vue');
 
 const SUPPORTED_TYPES = ['popup'];
 export default defineComponent<MoreDynamicFieldProps>({
     name: 'PDynamicFieldMore',
-    components: { PDynamicLayout },
+    components: { PDynamicLayout, PDynamicField },
     props: {
         options: {
             type: Object as PropType<MoreOptions>,
