@@ -1,3 +1,17 @@
+# [1.1.0-beta.339](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.338...v1.1.0-beta.339) (2022-07-05)
+
+
+### Bug Fixes
+
+* apply title to popup type layout and make load on first click in more type field ([72ab02a](https://github.com/spaceone-dev/spaceone-design-system/commit/72ab02a5c8e6eace25a7d59ae493b9a1856b93e6))
+
+
+### Features
+
+* add more type & displayKey typeOptions to Dynamic Field ([1f6d537](https://github.com/spaceone-dev/spaceone-design-system/commit/1f6d53789fad3920df259549f7a3190ebce36747))
+* add popup type in Dynamic Layout ([5500fba](https://github.com/spaceone-dev/spaceone-design-system/commit/5500fba036a2fccaf4d3b551aca29caacf4d69af))
+* add popupVisible typeOptions & update-popup-visible event to Dynamic Layout ([a88cdde](https://github.com/spaceone-dev/spaceone-design-system/commit/a88cdde2d9624d9426060cab0d7d9f4d947c5ad9))
+
 # [1.1.0-beta.338](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.337...v1.1.0-beta.338) (2022-07-05)
 
 
