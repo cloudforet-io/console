@@ -20,3 +20,13 @@ export interface CloudServiceDetailPageParams {
     group: string;
     name?: string;
 }
+
+/* History Tab */
+export interface CloudServiceTimelineItem {
+    id: string;
+    date: string;
+    color: string;
+    title: string;
+    count?: number;
+    data?: { key: string, value?: any }[];
+}

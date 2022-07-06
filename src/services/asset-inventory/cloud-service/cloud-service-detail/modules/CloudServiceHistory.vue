@@ -39,6 +39,7 @@
         <transition name="slide-up">
             <cloud-service-history-detail-overlay v-if="showDetailOverlay"
                                                   :timeline-items="items"
+                                                  :selected-timeline-item="selectedTimelineItem"
                                                   @close="handleCloseOverlay"
             />
         </transition>
@@ -63,15 +64,8 @@ import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTime
 
 import CloudServiceHistoryDetailOverlay
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistoryDetailOverlay.vue';
+import { CloudServiceTimelineItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
-
-interface TimelineItem {
-    date: string;
-    color: string;
-    title: string;
-    count?: number;
-    data?: { key: string, value?: any }[];
-}
 
 const TIMELINE_CONTENT_LIMIT = 10;
 
@@ -95,13 +89,15 @@ export default {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             selectedDates: [] as string[],
-            items: computed<TimelineItem[]>(() => ([
+            items: computed<CloudServiceTimelineItem[]>(() => ([
                 {
+                    id: 'sample1',
                     date: '2022/07/05 15:00:00', // dayjs.utc().tz(state.timezone).format('YYYY/MM/DD HH:mm:ss'),
                     color: 'RED',
                     title: 'Deleted',
                 },
                 {
+                    id: 'sample2',
                     date: '2022/07/05 13:01:35', // dayjs.utc().tz(state.timezone).format('YYYY/MM/DD HH:mm:ss'),
                     color: 'GREEN',
                     title: 'Updated',
@@ -121,6 +117,7 @@ export default {
                     ],
                 },
                 {
+                    id: 'sample3',
                     date: '2022/07/05 11:00:21', // dayjs.utc().tz(state.timezone).format('YYYY/MM/DD HH:mm:ss'),
                     color: 'BLUE',
                     title: 'Created',
@@ -134,6 +131,7 @@ export default {
                     ],
                 },
             ])),
+            selectedTimelineItem: undefined as undefined | CloudServiceTimelineItem,
             showDetailOverlay: false,
             loading: true,
             totalCount: 0,
@@ -148,7 +146,8 @@ export default {
         });
 
         /* Event */
-        const handleClickTimeline = () => {
+        const handleClickTimeline = (item: CloudServiceTimelineItem) => {
+            state.selectedTimelineItem = item;
             state.showDetailOverlay = true;
         };
         const handleCloseOverlay = () => {

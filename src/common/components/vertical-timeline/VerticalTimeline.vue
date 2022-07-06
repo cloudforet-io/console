@@ -1,8 +1,8 @@
 <template>
-    <div class="vertical-timeline" @click="handleClickTimeline">
+    <div class="vertical-timeline" :class="{selected: selected}" @click="handleClickTimeline">
         <div class="timeline-item" :class="[{'last-item': isLastItem}]">
             <div class="timestamp">
-                {{ item.date }}
+                {{ getTimezoneDate(item.date) }}
             </div>
             <div class="vertical-line">
                 <div class="line" />
@@ -29,17 +29,15 @@ import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     PBadge,
 } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+import { CloudServiceTimelineItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
 
-interface TimelineItem {
-    date: string;
-    color: string;
-    title: string;
-    count?: number;
-}
 interface Props {
-    item: TimelineItem;
+    item: CloudServiceTimelineItem;
     timezone: string;
+    selected: boolean;
     isLastItem: boolean;
 }
 
@@ -51,11 +49,15 @@ export default defineComponent<Props>({
     props: {
         item: {
             type: Object,
-            default: () => ({}) as PropType<TimelineItem>,
+            default: () => ({}) as PropType<CloudServiceTimelineItem>,
         },
         timezone: {
             type: String,
             default: 'UTC',
+        },
+        selected: {
+            type: Boolean,
+            default: false,
         },
         isLastItem: {
             type: Boolean,
@@ -69,7 +71,9 @@ export default defineComponent<Props>({
             if (itemColor === 'BLUE') return 'blue200';
             return 'gray200';
         };
+        const getTimezoneDate = (date: string): string => dayjs.utc(date).tz(props.timezone).format('YYYY/MM/DD HH:mm:ss');
 
+        /* Event */
         const handleClickTimeline = () => {
             emit('click-timeline', props.item);
         };
@@ -77,6 +81,7 @@ export default defineComponent<Props>({
         return {
             iso8601Formatter,
             getBadgeStyleType,
+            getTimezoneDate,
             handleClickTimeline,
         };
     },
@@ -85,21 +90,15 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss" scoped>
-@define-mixin circle-style {
-    position: absolute;
-    top: 0.5rem;
-    left: -0.4375rem;
-    content: " ";
-    border-radius: theme('borderRadius.full');
-    height: 0.875rem;
-    width: 0.875rem;
-}
 .vertical-timeline {
     @apply rounded-md;
     cursor: pointer;
 
     &:hover {
         @apply bg-blue-100;
+    }
+    &.selected {
+        @apply bg-blue-200;
     }
 
     .timeline-list {

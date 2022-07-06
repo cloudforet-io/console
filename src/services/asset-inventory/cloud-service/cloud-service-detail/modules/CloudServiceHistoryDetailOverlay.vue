@@ -5,6 +5,7 @@
             <div class="content-wrapper">
                 <div class="left-part">
                     <div class="title-wrapper">
+                        <!--                        song-lang-->
                         <span class="title">History</span>
                         <span class="total-count">({{ timelineItems.length }})</span>
                     </div>
@@ -12,6 +13,7 @@
                                        :key="`timeline-${item.date}-${idx}`"
                                        :item="item"
                                        :timezone="timezone"
+                                       :selected="item.id === selectedTimelineId"
                                        :is-last-item="idx === timelineItems.length-1"
                                        @click-timeline="handleClickTimeline"
                     />
@@ -26,7 +28,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, defineComponent, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -37,8 +39,14 @@ import { store } from '@/store';
 
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 
+import { CloudServiceTimelineItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
-export default defineComponent({
+interface Props {
+    timelineItems: CloudServiceTimelineItem[];
+    selectedTimelineItem: CloudServiceTimelineItem;
+}
+
+export default defineComponent<Props>({
     name: 'CloudServiceHistoryDetailOverlay',
     components: {
         VerticalTimeline,
@@ -50,19 +58,31 @@ export default defineComponent({
             type: Array,
             default: () => [],
         },
+        selectedTimelineItem: {
+            type: Object,
+            default: () => ({}) as PropType<CloudServiceTimelineItem>,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
+            selectedTimelineId: '',
         });
 
         /* Event */
         const handleGoBack = () => {
             emit('close');
         };
-        const handleClickTimeline = () => {
-            // console.log('click timeline!');
+        const handleClickTimeline = (selectedItem: CloudServiceTimelineItem) => {
+            state.selectedTimelineId = selectedItem.id;
         };
+
+        /* Watcher */
+        watch(() => props.selectedTimelineItem, (selectedTimelineItem) => {
+            if (selectedTimelineItem?.id) {
+                state.selectedTimelineId = selectedTimelineItem.id;
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
