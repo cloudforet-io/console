@@ -63,6 +63,33 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+# Highlight Lines
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Highlight Lines">
+        {{
+            components: { PTextEditor },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-text-editor :code="sampleCode" folded :highlight-lines="[2,3,4]" />
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    sampleCode: sampleCode,
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 # Change Code
 <br/>

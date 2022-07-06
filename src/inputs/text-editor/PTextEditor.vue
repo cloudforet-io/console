@@ -22,7 +22,7 @@
 <script lang="ts">
 /**
   * Used library: codemirror
-  * https://github.com/surmon-china/vue-codemirror#readme
+  * https://github.com/codemirror/codemirror5
 * */
 import {
     ComponentRenderProxy, computed, defineComponent,
@@ -50,15 +50,16 @@ require('codemirror/addon/lint/json-lint');
 require('codemirror/addon/edit/closebrackets');
 require('codemirror/addon/edit/closetag');
 
-// interface Props {
-//     code: string;
-//     options: EditorConfiguration;
-//     mode: TextEditorMode;
-//     loading: boolean;
-//     folded: boolean;
-// }
+interface Props {
+    code: string;
+    options: EditorConfiguration;
+    mode: TextEditorMode;
+    loading: boolean;
+    folded: boolean;
+    highlightLines?: Array<number>;
+}
 
-export default defineComponent({
+export default defineComponent<Props>({
     name: 'PTextEditor',
     components: { PLottie },
     props: {
@@ -76,12 +77,12 @@ export default defineComponent({
                 line: true,
                 mode: 'application/json',
                 lineWrapping: true,
-                theme: 'ayu-mirage',
+                theme: 'dracula',
                 matchBrackets: true,
                 autoCloseBrackets: true,
                 autoCloseTags: true,
                 foldGutter: true,
-                gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+                gutters: ['CodeMirror-linenumbers', 'CodeMirror-addedline', 'CodeMirror-foldgutter'],
             }),
         },
         mode: {
@@ -98,6 +99,10 @@ export default defineComponent({
         folded: {
             type: Boolean,
             default: false,
+        },
+        highlightLines: {
+            type: Array as PropType<Array<number>>,
+            default: () => [],
         },
     },
     setup(props, { emit }) {
@@ -126,6 +131,19 @@ export default defineComponent({
                 cmInstance.setValue(code);
                 cmInstance.scrollTo(scrollInfo.left, scrollInfo.top);
             }
+        };
+
+        const setHighlightLines = (cmInstance, lines: Array<number>|undefined) => {
+            forEach(lines, (line) => {
+                cmInstance.setGutterMarker(line, 'CodeMirror-addedline', (() => {
+                    const marker = document.createElement('span');
+                    marker.innerHTML = '+';
+                    return marker;
+                })());
+                cmInstance.addLineClass(line, 'wrap', 'CodeMirror-activeline');
+                cmInstance.addLineClass(line, 'background', 'CodeMirror-activeline-background');
+                cmInstance.addLineClass(line, 'gutter', 'CodeMirror-activeline-gutter');
+            });
         };
 
         const refresh = (cmInstance) => {
@@ -161,6 +179,7 @@ export default defineComponent({
             if (!textareaRef) return;
             if (!state.cmInstance) init(textareaRef);
             setCode(state.cmInstance, code);
+            if (props.highlightLines) setHighlightLines(state.cmInstance, props.highlightLines);
             forceFold(state.cmInstance);
             refresh(state.cmInstance);
         }, { immediate: true });
@@ -179,7 +198,7 @@ export default defineComponent({
 
 <style lang="postcss">
 @import 'codemirror/lib/codemirror.css';
-@import 'codemirror/theme/ayu-mirage.css';
+@import 'codemirror/theme/dracula.css';
 @import 'codemirror/addon/lint/lint.css';
 @import 'codemirror/addon/fold/foldgutter.css';
 .p-text-editor {
@@ -190,6 +209,15 @@ export default defineComponent({
         display: none;
     }
     > .CodeMirror {
+        .CodeMirror-addedline {
+            width: 1rem;
+        }
+        .CodeMirror-gutters {
+            border-right: 0.03rem solid rgba(109, 138, 136, 0.5);
+        }
+        .CodeMirror-activeline-gutter, .CodeMirror-activeline-background {
+            background-color: rgba(172, 229, 100, 0.24);
+        }
         font-family: Inconsolata, monospace;
         line-height: 1.5;
         height: fit-content;
