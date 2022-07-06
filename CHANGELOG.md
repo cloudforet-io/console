@@ -1,3 +1,10 @@
+# [1.1.0-beta.341](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.340...v1.1.0-beta.341) (2022-07-06)
+
+
+### Features
+
+* texteditor highlight ([#1008](https://github.com/spaceone-dev/spaceone-design-system/issues/1008)) ([c4eb589](https://github.com/spaceone-dev/spaceone-design-system/commit/c4eb5899e403657c77fb198a8c93ab7f6fbeed89))
+
 # [1.1.0-beta.340](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.339...v1.1.0-beta.340) (2022-07-05)
 
 
