@@ -19,7 +19,19 @@
                     />
                 </div>
                 <div class="right-part">
-                    right part!
+                    <p-tab :tabs="tabs"
+                           :active-tab.sync="activeTab"
+                    >
+                        <template #changed>
+                            changed-tab-component
+                        </template>
+                        <template #log>
+                            log-tab-component
+                        </template>
+                        <template #note>
+                            note-tab-component
+                        </template>
+                    </p-tab>
                 </div>
             </div>
         </p-pane-layout>
@@ -32,10 +44,12 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPaneLayout, PPageTitle,
+    PPaneLayout, PPageTitle, PTab,
 } from '@spaceone/design-system';
+import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 
@@ -52,6 +66,7 @@ export default defineComponent<Props>({
         VerticalTimeline,
         PPaneLayout,
         PPageTitle,
+        PTab,
     },
     props: {
         timelineItems: {
@@ -67,6 +82,13 @@ export default defineComponent<Props>({
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             selectedTimelineId: '',
+            tabs: computed(() => ([
+                // song-lang
+                { name: 'changed', label: i18n.t('Changed') },
+                { name: 'log', label: i18n.t('Log') },
+                { name: 'note', label: i18n.t('Note') },
+            ] as TabItem[])),
+            activeTab: 'changed',
         });
 
         /* Event */
