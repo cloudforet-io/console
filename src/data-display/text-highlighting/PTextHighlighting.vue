@@ -1,10 +1,10 @@
 <template>
     <span class="p-text-highlighting" :class="styleType" v-on="$listeners">
-        <span v-for="({text, matched}, i) in textList"
-              :key="`label-${text}-${i}`"
-              :class="{'matched-character': matched}"
+        <span v-for="(x, i) in textList"
+              :key="`label-${(x.text)}-${i}`"
+              :class="{'matched-character': x.matched}"
         >
-            <slot v-bind="{ textList, text, matched, index: i, regex }">{{ text }}</slot>
+            <slot v-bind="{ textList, text:x.text, matched:x.matched, index: i, regex }">{{ x.text }}</slot>
         </span>
     </span>
 </template>
