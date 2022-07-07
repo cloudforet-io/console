@@ -4,8 +4,8 @@ import { reactive, toRefs, watch } from '@vue/composition-api';
 import PContextMenu from './PContextMenu.vue';
 import PEmpty from '@/data-display/empty/PEmpty';
 import PI from '@/foundation/icons/PI.vue';
+import PRawData from '@/data-display/raw-data/PRawData';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
-import PTextEditor from "@/inputs/text-editor/PTextEditor";
 
 import {getContextMenuArgTypes} from '@/inputs/context-menu/story-helper';
 import {menuItems, longMenuItems} from '@/inputs/context-menu/mock';
@@ -189,7 +189,7 @@ Context Menu have 3 types fot slots:
     <Story name="No Data Slots" args={{menu: menuItems}}>
         {{
             props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu, PEmpty, PTextEditor },
+            components: { PContextMenu, PEmpty, PRawData },
             template: `
         <div class="flex h-full flex-col">
             <div class="mt-4">
@@ -214,7 +214,7 @@ Context Menu have 3 types fot slots:
     <Story name="Menu Slot" args={{menu: menuItems}}>
         {{
             props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu, PTextEditor },
+            components: { PContextMenu, PRawData },
             template: `
         <div class="flex h-full flex-col">
             <div class="mt-4">
@@ -238,7 +238,7 @@ Context Menu have 3 types fot slots:
                         <pre ref="slotPropsRef">{{slotProps}}</pre>
                     </template>
                 </p-context-menu>
-                <p-text-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
+                <p-raw-data v-if="slotPropsText" :raw="slotPropsText" folded style="font-size: 12px;" />
             </div>
         </div>
 <!--<div>-->
@@ -266,7 +266,7 @@ Context Menu have 3 types fot slots:
     <Story name="Item Slots" args={{menu: menuItems}}>
         {{
             props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu, PI, PTextEditor },
+            components: { PContextMenu, PI, PRawData },
             template: `
         <div class="flex h-full flex-col">
             <div class="mt-4">
@@ -287,7 +287,7 @@ Context Menu have 3 types fot slots:
                         <pre ref="slotPropsRef">{{slotProps}}</pre>
                     </template>
                 </p-context-menu>
-                <p-text-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
+                <p-raw-data v-if="slotPropsText" :raw="slotPropsText" folded style="font-size: 12px;" />
             </div>
         </div>
 <!--<div>-->
@@ -316,7 +316,7 @@ Context Menu have 3 types fot slots:
     <Story name="Header Slots" args={{menu: menuItems}}>
         {{
             props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu, PI, PTextEditor },
+            components: { PContextMenu, PI, PRawData },
             template: `
         <div class="flex h-full flex-col">
             <div class="mt-4">
@@ -337,7 +337,7 @@ Context Menu have 3 types fot slots:
                         <pre ref="slotPropsRef">{{slotProps}}</pre>
                     </template>
                 </p-context-menu>
-                <p-text-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
+                <p-raw-data v-if="slotPropsText" :raw="slotPropsText" folded style="font-size: 12px;" />
             </div>
         </div>
 <!--<div>-->
@@ -474,7 +474,7 @@ Context Menu have 3 types fot slots:
     <Story name="Highlight Term & Item Text List Slot" args={{menu: menuItems}} height={'18rem'}>
         {{
             props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu, PTextEditor },
+            components: { PContextMenu, PRawData },
             template: `
         <div>
             <p class="text-lg my-4">highlight term: 'o'</p>
@@ -486,7 +486,7 @@ Context Menu have 3 types fot slots:
                 </template>
             </p-context-menu>
             <p class="text-lg my-4">The last item's <strong>Slot Props</strong> for <strong>item-text-list</strong> slot with highlight term: 'o'</p>
-            <p-text-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
+            <p-raw-data v-if="slotPropsText" :raw="slotPropsText" folded style="font-size: 12px;" />
             <p-context-menu v-show="false" :menu="menu" highlight-term="o">
                 <template #item-text-list="slotProps">
                     <pre ref="slotPropsRef">{{slotProps}}</pre>

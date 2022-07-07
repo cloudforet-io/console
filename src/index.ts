@@ -79,6 +79,7 @@ export { default as PIconModal } from './feedbacks/modals/icon-modal/PIconModal.
 export { default as PTableCheckModal } from './others/console/modals/table-modal/PTableCheckModal.vue';
 export { default as PPagination } from './navigation/pagination/pagination/PPagination.vue';
 export { default as PTextPagination } from './navigation/pagination/text-pagination/PTextPagination.vue';
+export { default as PRawData } from './data-display/raw-data/PRawData.vue';
 export { default as PAutocompleteSearch } from './inputs/search/autocomplete-search/PAutocompleteSearch.vue';
 export { default as PSearchDropdown } from './inputs/dropdown/search-dropdown/PSearchDropdown.vue';
 export { default as PQuerySearch } from './inputs/search/query-search/PQuerySearch.vue';

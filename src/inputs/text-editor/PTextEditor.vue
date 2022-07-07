@@ -35,6 +35,8 @@ import { forEach } from 'lodash';
 
 import PLottie from '@/foundation/lottie/PLottie.vue';
 
+import { textEditorModes, TextEditorMode } from './config';
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('codemirror/mode/javascript/javascript');
 require('codemirror/addon/fold/brace-fold');
@@ -49,13 +51,12 @@ require('codemirror/addon/edit/closebrackets');
 require('codemirror/addon/edit/closetag');
 
 interface Props {
-    code: string|Record<string, any>|Array<any>;
+    code: string;
     options: EditorConfiguration;
-    readOnly: boolean;
+    mode: TextEditorMode;
     loading: boolean;
     folded: boolean;
     highlightLines?: Array<number>;
-    needRefine?: boolean;
 }
 
 export default defineComponent<Props>({
@@ -63,8 +64,8 @@ export default defineComponent<Props>({
     components: { PLottie },
     props: {
         code: {
-            type: [String, Object, Array],
-            default: null,
+            type: String,
+            default: '',
             required: true,
         },
         options: {
@@ -84,9 +85,12 @@ export default defineComponent<Props>({
                 gutters: ['CodeMirror-linenumbers', 'CodeMirror-addedline', 'CodeMirror-foldgutter'],
             }),
         },
-        readOnly: {
-            type: Boolean,
-            default: false,
+        mode: {
+            type: String as PropType<TextEditorMode>,
+            default: 'edit',
+            validator(mode: TextEditorMode) {
+                return textEditorModes.includes(mode);
+            },
         },
         loading: {
             type: Boolean,
@@ -100,10 +104,6 @@ export default defineComponent<Props>({
             type: Array as PropType<Array<number>>,
             default: () => [],
         },
-        needRefine: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
@@ -111,10 +111,8 @@ export default defineComponent<Props>({
             content: '',
             cmInstance: null as any,
             textareaRef: null as HTMLTextAreaElement|null,
-            mergedOptions: computed(() => ({ ...props.options, readOnly: props.readOnly })),
+            mergedOptions: computed(() => ({ ...props.options, readOnly: props.mode === 'readOnly' })),
         });
-
-        const stringifyCode = code => JSON.stringify(code, undefined, 4);
 
         const forceFold = (cmInstance) => {
             if (props.folded && cmInstance && props.code) {
@@ -180,7 +178,7 @@ export default defineComponent<Props>({
         watch([() => state.textareaRef, () => props.code], async ([textareaRef, code]) => {
             if (!textareaRef) return;
             if (!state.cmInstance) init(textareaRef);
-            setCode(state.cmInstance, props.needRefine ? stringifyCode(code) : code);
+            setCode(state.cmInstance, code);
             if (props.highlightLines) setHighlightLines(state.cmInstance, props.highlightLines);
             forceFold(state.cmInstance);
             refresh(state.cmInstance);
