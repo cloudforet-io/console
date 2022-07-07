@@ -1,6 +1,7 @@
 <template>
     <div class="cloud-service-history-detail">
         <p-pane-layout class="page-wrapper">
+            <!--            song-lang-->
             <p-page-title title="History Details" child @goBack="handleGoBack" />
             <div class="content-wrapper">
                 <div class="left-part">
@@ -13,7 +14,7 @@
                                        :key="`timeline-${item.date}-${idx}`"
                                        :item="item"
                                        :timezone="timezone"
-                                       :selected="item.id === selectedTimelineId"
+                                       :selected="item.id === selectedTimelineRecordId"
                                        :is-last-item="idx === timelineItems.length-1"
                                        @click-timeline="handleClickTimeline"
                     />
@@ -29,7 +30,7 @@
                             log-tab-component
                         </template>
                         <template #note>
-                            note-tab-component
+                            <cloud-service-history-detail-note :record-id="selectedTimelineRecordId" />
                         </template>
                     </p-tab>
                 </div>
@@ -53,6 +54,8 @@ import { i18n } from '@/translations';
 
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 
+import CloudServiceHistoryDetailNote
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailNote.vue';
 import { CloudServiceTimelineItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
 interface Props {
@@ -67,6 +70,7 @@ export default defineComponent<Props>({
         PPaneLayout,
         PPageTitle,
         PTab,
+        CloudServiceHistoryDetailNote,
     },
     props: {
         timelineItems: {
@@ -81,7 +85,7 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            selectedTimelineId: '',
+            selectedTimelineRecordId: '',
             tabs: computed(() => ([
                 // song-lang
                 { name: 'changed', label: i18n.t('Changed') },
@@ -96,13 +100,13 @@ export default defineComponent<Props>({
             emit('close');
         };
         const handleClickTimeline = (selectedItem: CloudServiceTimelineItem) => {
-            state.selectedTimelineId = selectedItem.id;
+            state.selectedTimelineRecordId = selectedItem.record_id;
         };
 
         /* Watcher */
         watch(() => props.selectedTimelineItem, (selectedTimelineItem) => {
-            if (selectedTimelineItem?.id) {
-                state.selectedTimelineId = selectedTimelineItem.id;
+            if (selectedTimelineItem?.record_id) {
+                state.selectedTimelineRecordId = selectedTimelineItem.record_id;
             }
         }, { immediate: true });
 

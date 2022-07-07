@@ -1,7 +1,8 @@
 <template>
-    <p-pane-layout class="alert-detail-note">
+    <p-pane-layout class="cloud-service-history-detail-note">
         <p-panel-top>
-            {{ $t('MONITORING.ALERT.DETAIL.NOTE.NOTE') }}
+            <!--            song-lang-->
+            Note
         </p-panel-top>
         <article class="note-wrapper">
             <p-collapsible-list :items="noteList" toggle-position="contents" :line-clamp="2">
@@ -29,7 +30,8 @@
                       :disabled="(noteInput.trim()).length === 0 || manageDisabled"
                       @click="handleCreateNote"
             >
-                {{ $t('MONITORING.ALERT.DETAIL.NOTE.ADD_NOTE') }}
+                <!--                song-lang -->
+                Add Note
             </p-button>
         </article>
         <delete-modal :header-title="checkDeleteState.headerTitle"
@@ -41,7 +43,9 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -52,14 +56,13 @@ import {
 
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface NoteModel {
     note_id: string;
-    alert_id: string;
+    cloud_service_id: string;
     note: string;
     user_id: string;
     project_id: string;
@@ -67,7 +70,7 @@ interface NoteModel {
 }
 
 export default {
-    name: 'AlertNote',
+    name: 'CloudServiceHistoryDetailNote',
     components: {
         PPaneLayout,
         PPanelTop,
@@ -78,7 +81,7 @@ export default {
         DeleteModal,
     },
     props: {
-        id: {
+        recordId: {
             type: String,
             default: undefined,
         },
@@ -89,6 +92,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
+            id: '',
             noteInput: '',
             noteList: [] as NoteModel[],
             loading: true,
@@ -110,8 +114,8 @@ export default {
         const listNote = async () => {
             try {
                 state.loading = true;
-                apiQuery.setFilters([{ k: 'alert_id', v: props.id, o: '=' }]).setSort('created_at');
-                const res = await SpaceConnector.client.monitoring.note.list({
+                apiQuery.setFilters([{ k: 'record_id', v: props.recordId, o: '=' }]).setSort('created_at');
+                const res = await SpaceConnector.client.inventory.note.list({
                     query: apiQuery.data,
                 });
                 state.noteList = res.results.map(d => ({
@@ -132,8 +136,8 @@ export default {
 
         const handleCreateNote = async () => {
             try {
-                await SpaceConnector.client.monitoring.note.create({
-                    alert_id: props.id,
+                await SpaceConnector.client.inventory.note.create({
+                    record_id: props.recordId,
                     user_id: state.userId,
                     note: state.noteInput,
                 });
@@ -146,7 +150,8 @@ export default {
         };
 
         const checkDeleteState = reactive({
-            headerTitle: i18n.t('MONITORING.ALERT.DETAIL.NOTE.DELETE_MODAL_TITLE'),
+            // song-lang
+            headerTitle: 'Delete this Note?',
             visible: false,
             loading: false,
         });
@@ -163,7 +168,7 @@ export default {
         const handleDeleteNote = async () => {
             checkDeleteState.loading = true;
             try {
-                await SpaceConnector.client.monitoring.note.delete({
+                await SpaceConnector.client.inventory.note.delete({
                     note_id: state.selectedNoteIdForDelete,
                 });
             } catch (e) {
@@ -174,6 +179,14 @@ export default {
                 await listNote();
             }
         };
+
+        watch(() => props.recordId, (recordId) => {
+            state.id = recordId;
+        });
+
+        watch(() => state.id, () => {
+            listNote();
+        });
 
         (async () => {
             await listNote();
@@ -197,7 +210,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.alert-detail-note {
+.cloud-service-history-detail-note {
     padding-bottom: 2.5rem;
 }
 .note-wrapper {

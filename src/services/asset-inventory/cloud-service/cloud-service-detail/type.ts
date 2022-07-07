@@ -24,6 +24,7 @@ export interface CloudServiceDetailPageParams {
 /* History Tab */
 export interface CloudServiceTimelineItem {
     id: string;
+    record_id: string;
     date: string;
     color: string;
     title: string;

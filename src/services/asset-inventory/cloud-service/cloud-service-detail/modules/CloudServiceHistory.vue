@@ -92,12 +92,14 @@ export default {
             items: computed<CloudServiceTimelineItem[]>(() => ([
                 {
                     id: 'sample1',
+                    record_id: 'record-835c86043ee8',
                     date: '2022/07/05 15:00:00', // dayjs.utc().tz(state.timezone).format('YYYY/MM/DD HH:mm:ss'),
                     color: 'RED',
                     title: 'Deleted',
                 },
                 {
                     id: 'sample2',
+                    record_id: 'record-17af21745fb0',
                     date: '2022/07/05 13:01:35', // dayjs.utc().tz(state.timezone).format('YYYY/MM/DD HH:mm:ss'),
                     color: 'GREEN',
                     title: 'Updated',
@@ -118,6 +120,7 @@ export default {
                 },
                 {
                     id: 'sample3',
+                    record_id: 'record-aaaaa',
                     date: '2022/07/05 11:00:21', // dayjs.utc().tz(state.timezone).format('YYYY/MM/DD HH:mm:ss'),
                     color: 'BLUE',
                     title: 'Created',
