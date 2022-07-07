@@ -173,7 +173,7 @@ export default {
             searchTags: [],
             // references
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
         });
 
         const querySearchHandlers = reactive({

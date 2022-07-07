@@ -120,7 +120,7 @@ export default {
     },
     setup() {
         const storeState = reactive({
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             projectGroups: computed(() => store.state.reference.projectGroup.items),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
         });

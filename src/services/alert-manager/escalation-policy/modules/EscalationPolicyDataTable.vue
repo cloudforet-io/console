@@ -83,7 +83,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             finishConditions: computed(() => ({
                 ACKNOWLEDGED: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.ACKNOWLEDGED'),
                 RESOLVED: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.RESOLVED'),

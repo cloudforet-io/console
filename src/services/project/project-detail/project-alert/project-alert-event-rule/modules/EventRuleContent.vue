@@ -111,7 +111,7 @@ export default {
                 { name: 'stop_processing', label: i18n.t('PROJECT.EVENT_RULE.THEN_STOP_PROCESSING') },
             ])),
             items: [] as any,
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             conditions: computed(() => ({
                 ANY: i18n.t('PROJECT.EVENT_RULE.ANY'),
                 ALL: i18n.t('PROJECT.EVENT_RULE.ALL'),

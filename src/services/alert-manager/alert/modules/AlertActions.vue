@@ -138,7 +138,7 @@ export default {
     setup(props, { emit, root }) {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             selectedItemsState: computed(() => {
                 const selectedItemsState = props.selectedItems.map(selectedItem => selectedItem.state);
                 return selectedItemsState;

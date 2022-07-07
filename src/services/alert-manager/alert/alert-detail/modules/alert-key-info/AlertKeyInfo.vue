@@ -95,11 +95,6 @@ import { alertManagerStore } from '@/services/alert-manager/store';
 import { AlertDataModel } from '@/services/alert-manager/type';
 
 
-// const EDIT_MODE = {
-//     DESCRIPTION: 'description',
-// } as const;
-// type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];
-
 export default {
     name: 'AlertKeyInfo',
     components: {
@@ -148,7 +143,6 @@ export default {
             escalationPolicyName: '',
             loading: true,
             timezone: computed(() => store.state.user.timezone),
-            projects: computed(() => store.state.reference.project.items),
         });
 
         const getEscalationPolicy = async () => {
@@ -170,7 +164,6 @@ export default {
                 getEscalationPolicy(),
                 store.dispatch('reference/webhook/load'),
                 store.dispatch('reference/user/load'),
-                store.dispatch('reference/project/load'),
             ]);
         })();
 

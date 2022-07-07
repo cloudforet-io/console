@@ -204,7 +204,7 @@ export default {
             parentGroups: computed(() => store.getters['service/project/parentGroups']),
             hasProjectGroup: computed(() => store.state.service.project.hasProjectGroup),
             projectCount: computed(() => store.state.service.project.projectCount),
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             favoriteProjects: computed(() => store.state.favorite.projectItems),
             projectGroups: computed(() => store.state.reference.projectGroup.items),
             projectGroupFormVisible: computed(() => store.state.service.project.projectGroupFormVisible),

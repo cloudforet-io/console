@@ -43,7 +43,7 @@
             </template>
             <template #col-project-format="{ value }">
                 <p-anchor v-if="value" :highlight="true" :href="getProjectLink(value)">
-                    {{ projectFieldHandler(value) }}
+                    {{ projectFieldHandler(value, projects) }}
                 </p-anchor>
             </template>
         </p-data-table>
@@ -108,7 +108,7 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             users: computed(() => store.state.reference.user.items),
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             projectGroups: computed(() => store.state.reference.projectGroup.items),
             loading: true,
             proxyVisible: useProxyValue('visible', props, emit),
@@ -149,11 +149,11 @@ export default {
             }
         };
 
-        const projectFieldHandler = (value) => {
+        const projectFieldHandler = (value, projects) => {
             if (value) {
                 const projectId = value.project_info?.project_id;
                 if (projectId) {
-                    return state.projects[projectId] ? state.projects[projectId].label : projectId;
+                    return projects[projectId] ? projects[projectId].label : projectId;
                 }
                 const projectGroupId = value.project_group_info?.project_group_id;
                 return state.projectGroups[projectGroupId] ? state.projectGroups[projectGroupId].label : projectGroupId;
@@ -202,6 +202,16 @@ export default {
                 state.unDeletableRoles = [];
             }
         }));
+
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/user/load'),
+            ]);
+        })();
+
+        /* Watcher */
         watch(() => state.proxyVisible, async (after) => {
             state.loading = true;
             if (after) {
@@ -211,13 +221,6 @@ export default {
             }
         }, { immediate: true });
 
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
-                store.dispatch('reference/user/load'),
-            ]);
-        })();
         return {
             ...toRefs(state),
             handleDelete,

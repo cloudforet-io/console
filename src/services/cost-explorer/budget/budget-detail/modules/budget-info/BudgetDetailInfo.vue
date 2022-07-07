@@ -24,7 +24,7 @@
                               (budgetData.project_id || budgetData.project_group_id),
                               { resource_type: budgetData.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
                 >
-                    {{ getTargetLabel() }}
+                    {{ getTargetLabel(projects) }}
                 </p-anchor>
             </p>
         </p-pane-layout>
@@ -53,6 +53,7 @@ import { PPaneLayout, PAnchor } from '@spaceone/design-system';
 import { store } from '@/store';
 
 import { CURRENCY } from '@/store/modules/display/config';
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -96,7 +97,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed(() => store.state.reference.projectGroup.items),
             budgetData: computed<Partial<BudgetData>|null>(() => costExplorerStore.state.budget.budgetData),
             costTypeKey: computed(() => (state.budgetData ? getKeyOfCostType(state.budgetData.cost_types ?? {}) : '')),
@@ -111,8 +112,8 @@ export default {
             state.balloonVisible = true;
         };
 
-        const getTargetLabel = () => {
-            if (state.budgetData?.project_id) return state.projects[state.budgetData.project_id]?.label ?? '';
+        const getTargetLabel = (projects: ProjectReferenceMap) => {
+            if (state.budgetData?.project_id) return projects[state.budgetData.project_id]?.label ?? '';
             if (state.budgetData?.project_group_id) return state.projectGroups[state.budgetData.project_group_id]?.label ?? '';
             return 'No Item';
         };

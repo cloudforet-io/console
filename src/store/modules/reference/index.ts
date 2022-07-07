@@ -1,6 +1,7 @@
 import * as actions from './actions';
 import cloudServiceType from './cloud-service-type';
 import collector from './collector';
+import * as getters from './getters';
 import plugin from './plugin';
 import project from './project';
 import projectGroup from './project-group';
@@ -29,4 +30,5 @@ export default {
         webhook,
     },
     actions,
+    getters,
 };

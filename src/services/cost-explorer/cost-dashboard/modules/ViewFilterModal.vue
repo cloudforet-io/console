@@ -85,7 +85,7 @@ export default {
             items: computed(() => {
                 const resourceItemsMap = {
                     [FILTER.PROJECT_GROUP]: store.state.reference.projectGroup.items,
-                    [FILTER.PROJECT]: store.state.reference.project.items,
+                    [FILTER.PROJECT]: store.getters['reference/projectItems'],
                     [FILTER.PROVIDER]: store.state.reference.provider.items,
                     [FILTER.SERVICE_ACCOUNT]: store.state.reference.serviceAccount.items,
                     [FILTER.REGION]: store.state.reference.region.items,

@@ -67,6 +67,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 
 import { store } from '@/store';
 
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { ReferenceMap } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -121,6 +122,7 @@ export default {
             visibleMenu: false,
             isFocused: false,
             root: null as ProjectTreeRoot|null,
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             // selected states
             selectedProjectItems: [] as ProjectTreeItem[],
             selectedProjects: computed<ProjectItemResp[]>(() => state.selectedProjectItems.map(d => d.node.data)),
@@ -128,7 +130,7 @@ export default {
             selectedItems: computed<MenuItem[]>({
                 get() {
                     const items: ReferenceMap = {
-                        ...store.state.reference.project.items,
+                        ...state.projects,
                         ...store.state.reference.projectGroup.items,
                     };
                     return state._selectedProjectIds.map(id => ({

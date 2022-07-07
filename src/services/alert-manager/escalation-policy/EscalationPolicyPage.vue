@@ -110,7 +110,7 @@ export default {
             .setPage(1, 15)
             .setFiltersAsRawQueryString(currentQuery.filters);
         const storeState = reactive({
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
         });
         const handlerState = reactive({
             keyItemSets: computed<KeyItemSet[]>(() => [{

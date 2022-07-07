@@ -59,7 +59,7 @@ export default {
     setup(props) {
         const state = reactive({
             projectList: props.alertData?.project_dependencies,
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
         });
 
         // LOAD REFERENCE STORE

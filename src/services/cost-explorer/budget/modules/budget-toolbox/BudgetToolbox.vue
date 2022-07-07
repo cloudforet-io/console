@@ -54,8 +54,7 @@
 
 <script lang="ts">
 import {
-    computed,
-    reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 
@@ -76,6 +75,8 @@ import { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import BudgetToolboxUsageRange
     from '@/services/cost-explorer/budget/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
@@ -115,7 +116,7 @@ export default {
         const pageSizeOptions = [12, 24, 36];
 
         const storeState = reactive({
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed(() => store.state.reference.projectGroup.items),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
         });

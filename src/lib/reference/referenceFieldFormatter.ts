@@ -24,7 +24,7 @@ const formatterMap: FormatterMap = {
         link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
     }),
     'identity.Project': (data, reference) => ({
-        data: store.state.reference.project.items[data]?.label || data,
+        data: store.getters['reference/projectItems'][data]?.label || data,
         options: {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },

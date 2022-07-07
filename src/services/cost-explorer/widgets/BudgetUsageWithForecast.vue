@@ -17,7 +17,7 @@
                     <p-i :name="value.projectId ? 'ic_project' : 'ic_tree_project-group'" width="1rem" height="1rem"
                          class="project-icon"
                     />
-                    {{ value.projectId ? projectNameFormatter(value.projectId) : projectGroupNameFormatter(value.projectGroupId) }}
+                    {{ value.projectId ? projectNameFormatter(value.projectId, projects) : projectGroupNameFormatter(value.projectGroupId) }}
                 </div>
             </template>
             <template #col-amountSpent-format="{ value }">
@@ -56,6 +56,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { CURRENCY } from '@/store/modules/display/config';
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -138,7 +139,7 @@ export default {
             ])),
             items: [] as BudgetItem[],
             projectGroups: computed(() => store.state.reference.projectGroup.items),
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
                 return {
@@ -173,7 +174,7 @@ export default {
             if (value > 90) return yellow[500];
             return gray[400];
         };
-        const projectNameFormatter = projectId => state.projects[projectId]?.label || projectId;
+        const projectNameFormatter = (projectId: string, projects: ProjectReferenceMap) => projects[projectId]?.label || projectId;
         const projectGroupNameFormatter = projectGroupId => state.projectGroups[projectGroupId]?.label || projectGroupId;
 
         /* api */

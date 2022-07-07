@@ -55,7 +55,6 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PSkeleton, PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { CURRENCY } from '@/store/modules/display/config';
@@ -134,7 +133,6 @@ export default defineComponent<WidgetProps>({
             loading: true,
             chartData: [] as PieChartData[],
             legends: [] as Legend[],
-            projects: computed(() => store.state.reference.project.items),
             groupBy: computed(() => props.options?.group_by),
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
@@ -274,11 +272,6 @@ export default defineComponent<WidgetProps>({
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
         });
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/project/load');
-        })();
 
         return {
             ...toRefs(state),

@@ -114,7 +114,7 @@ export default {
         });
 
         const state = reactive({
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             isModalLoading: true,
             modalVisible: false,
         });

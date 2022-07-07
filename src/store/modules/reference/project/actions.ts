@@ -13,7 +13,7 @@ export const load: Action<ProjectReferenceState, any> = async ({ state, commit }
 
     if (
         (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
-        || (lazyLoad && Object.keys(state.items).length > 0)
+        || (lazyLoad && state.items)
     ) return;
     lastLoadedTime = currentTime;
 

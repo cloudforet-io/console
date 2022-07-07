@@ -20,10 +20,10 @@
                      @click="onClickProjectBox(item)"
                 >
                     <p class="sub-title">
-                        {{ projectGroupNameFormatter(item.project_id) }}
+                        {{ projectGroupNameFormatter(item.project_id, projects) }}
                     </p>
                     <p class="title">
-                        {{ projectNameFormatter(item.project_id) }}
+                        {{ projectNameFormatter(item.project_id, projects) }}
                     </p>
                     <div class="content-wrapper" :class="{'multiple-items': item.alert_count > 0 && item.maintenance_window_count > 0}">
                         <project-maintenance-window-list-item v-if="item.maintenance_window_count > 0" :project-id="item.project_id" />
@@ -60,6 +60,8 @@ import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query
 
 import { store } from '@/store';
 
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
@@ -88,7 +90,7 @@ export default {
     setup(props) {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             totalCount: 0,
             pageLimit: 12,
             items: [],
@@ -112,13 +114,14 @@ export default {
         };
 
         /* util */
-        const projectGroupNameFormatter = (projectId) => {
-            const projectLabel = state.projects[projectId]?.label;
-            const projectName = state.projects[projectId]?.name;
+        const projectGroupNameFormatter = (projectId: string, projects?: ProjectReferenceMap) => {
+            if (!projects) return undefined;
+            const projectLabel = projects[projectId]?.label;
+            const projectName = projects[projectId]?.name;
             if (!projectLabel || projectLabel === projectName) return undefined;
             return projectLabel.replace(` > ${projectName}`, '');
         };
-        const projectNameFormatter = projectId => state.projects[projectId]?.name || projectId;
+        const projectNameFormatter = (projectId: string, projects: ProjectReferenceMap) => projects[projectId]?.name || projectId;
         const countFormatter = (count) => {
             if (count > 15) return '15+';
             return count;

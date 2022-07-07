@@ -213,7 +213,7 @@ export default {
 
         const storeState = reactive({
             timezone: computed(() => store.state.user.timezone),
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             webhooks: computed(() => store.state.reference.webhook.items),
         });
 
@@ -437,7 +437,7 @@ export default {
                 store.dispatch('reference/project/load'),
             ]);
             state.tags = tagQueryHelper.setReference({
-                'identity.Project': computed(() => store.state.reference.project.items),
+                'identity.Project': computed(() => store.getters['reference/projectItems']),
                 'monitoring.Webhook': computed(() => store.state.reference.webhook.items),
             }).setKeyItemSets(querySearchHandlerState.keyItemSets).queryTags;
         })();

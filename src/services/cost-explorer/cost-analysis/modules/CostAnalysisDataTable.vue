@@ -77,6 +77,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ExcelDataField } from '@/store/modules/file/type';
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { ReferenceMap } from '@/store/modules/reference/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
@@ -126,7 +127,7 @@ export default {
             }),
             //
             projectGroups: computed(() => store.state.reference.projectGroup.items),
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             providers: computed(() => store.state.reference.provider.items),
             regions: computed(() => store.state.reference.region.items),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),

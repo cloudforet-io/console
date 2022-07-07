@@ -70,7 +70,7 @@ export default {
     components: { PI },
     setup() {
         const state = reactive({
-            projects: computed<ProjectReferenceMap>(() => store.state.reference.project.items),
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.state.reference.projectGroup.items),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.state.reference.cloudServiceType.items),
             favoriteProjects: computed<FavoriteItem[]>(() => {

@@ -156,7 +156,7 @@ export default {
             targetCredentialId: null as string | null,
             queryTags: [],
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
         });
 
         const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);

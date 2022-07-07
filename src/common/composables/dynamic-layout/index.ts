@@ -74,7 +74,7 @@ export function useQuerySearchPropsWithSearchSchema(
         await store.dispatch('reference/loadAll');
     })();
     const storeState = reactive({
-        Project: computed(() => store.state.reference.project.items),
+        Project: computed(() => store.getters['reference/projectItems']),
         ProjectGroup: computed(() => store.state.reference.projectGroup.items),
         ServiceAccount: computed(() => store.state.reference.serviceAccount.items),
         CloudServiceType: computed(() => store.state.reference.cloudServiceType.items),

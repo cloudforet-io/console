@@ -78,10 +78,7 @@ import {
 } from '@spaceone/design-system';
 import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
-import { store } from '@/store';
-
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
-
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -159,8 +156,6 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            providers: computed(() => store.state.reference.provider.items),
-            projects: computed(() => store.state.reference.project.items),
             slicedItems: computed(() => {
                 if (props.printMode) return props.items;
                 const startIndex = state.proxyThisPage * props.pageSize - props.pageSize;
@@ -231,14 +226,6 @@ export default {
         //         state.convertedItems = getConvertedItems(items);
         //     }
         // }, { immediate: true });
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
-                store.dispatch('reference/project/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

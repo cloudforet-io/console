@@ -69,7 +69,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -85,6 +85,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -136,7 +137,6 @@ export default {
         const state = reactive({
             loading: true,
             providers: computed(() => store.state.reference.provider.items),
-            projects: computed(() => store.state.reference.project.items),
             favoriteProjects: computed<FavoriteItem[]>(() => store.state.favorite.projectItems),
             thisPage: 1,
             allPage: 1,
@@ -204,7 +204,7 @@ export default {
         };
 
         /* api */
-        const getProjectSummary = async () => {
+        const getProjectSummary = async (projects: ProjectReferenceMap) => {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.statistics.topic.trustedAdvisorByProject(props.extraParams);
@@ -229,8 +229,8 @@ export default {
                     });
                     projectSummaryData.push({
                         projectId,
-                        projectName: state.projects[projectId]?.name,
-                        tooltipText: state.projects[projectId]?.label,
+                        projectName: projects[projectId]?.name,
+                        tooltipText: projects[projectId]?.label,
                         counts,
                         isFavorite: !!find(state.favoriteProjects, { itemId: projectId }),
                     });
@@ -251,9 +251,12 @@ export default {
                 store.dispatch('reference/project/load'),
                 store.dispatch('reference/provider/load'),
             ]);
-            await getProjectSummary();
         };
         asyncInit();
+
+        watch(() => store.state.reference.project.items, (projects) => {
+            if (projects) getProjectSummary(projects);
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

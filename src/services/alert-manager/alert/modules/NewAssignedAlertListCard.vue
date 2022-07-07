@@ -23,14 +23,13 @@
         <template #item="{ item }">
             <alert-list-item :item="item"
                              :show-project-link="true"
-                             :project-reference="$store.state.reference.project.items[item.project_id]"
-                             :user-reference="$store.state.reference.user.items[item.assignee]"
+                             :project-reference="storeState.projects[item.project_id]"
+                             :user-reference="storeState.users[item.assignee]"
             />
         </template>
     </p-list-card>
 </template>
 <script lang="ts">
-
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
@@ -45,6 +44,8 @@ import dayjs from 'dayjs';
 import { get } from 'lodash';
 
 import { store } from '@/store';
+
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -61,6 +62,10 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const storeState = reactive({
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+            users: computed(() => store.state.reference.user.items),
+        });
         const state = reactive({
             loading: false,
             items: [],
@@ -127,6 +132,7 @@ export default {
 
         return {
             ...toRefs(state),
+            storeState,
             getAssignedAlerts,
             onHideAlerts,
             onClickListItem,

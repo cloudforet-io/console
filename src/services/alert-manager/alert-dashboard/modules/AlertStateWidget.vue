@@ -198,7 +198,7 @@ export default {
         const state = reactive({
             loading: true,
             users: computed(() => store.state.reference.user.items),
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             urgencyList: computed(() => ([
                 {
                     name: ALERT_URGENCY.ALL,

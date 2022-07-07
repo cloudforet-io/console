@@ -74,7 +74,7 @@ export default {
     setup(props, { emit }) {
         const storeState = reactive({
             menuItems: computed<GNBMenu[]>(() => store.getters['display/allGnbMenuList']),
-            projects: computed<ProjectReferenceMap>(() => store.state.reference.project.items),
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.state.reference.projectGroup.items),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.state.reference.cloudServiceType.items),
             recents: computed<RecentConfig[]>(() => store.state.recent.allItems),

@@ -150,7 +150,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             proxyIsAllValid: useProxyValue('isAllValid', props, emit),
             //
             inputModel: {

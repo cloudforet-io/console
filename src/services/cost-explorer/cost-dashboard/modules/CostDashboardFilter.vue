@@ -28,19 +28,14 @@
 </template>
 
 <script lang="ts">
-
 import { computed, reactive, toRefs } from '@vue/composition-api';
-
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButton, PIconButton } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { ReferenceItem } from '@/store/modules/reference/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -52,7 +47,7 @@ import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashb
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import SetFilterModal from '@/services/cost-explorer/modules/SetFilterModal.vue';
-import { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
+import { CostQueryFilters } from '@/services/cost-explorer/type';
 
 
 interface Props {
@@ -102,26 +97,7 @@ export default {
                 { name: FILTER.SERVICE_ACCOUNT, title: FILTER_ITEM_MAP[FILTER.SERVICE_ACCOUNT].label },
                 { name: FILTER.PROVIDER, title: FILTER_ITEM_MAP[FILTER.PROVIDER].label },
             ],
-            filterItemsMap: computed<CostQueryFilterItemsMap>(() => {
-                const itemsMap: CostQueryFilterItemsMap = {};
-                const resourceItemsMap = {
-                    project_id: store.state.reference.project.items,
-                    service_account_id: store.state.reference.serviceAccount.items,
-                    provider: store.state.reference.provider.items,
-                };
-
-                Object.entries(state.proxyFilters as CostQueryFilters).forEach(([key, data]) => {
-                    const resourceItems = resourceItemsMap[key];
-                    if (resourceItems) {
-                        itemsMap[key] = data?.map((d) => {
-                            const resourceItem: ReferenceItem = resourceItems[d];
-                            return { name: d, label: resourceItem?.label ?? d };
-                        });
-                    } else itemsMap[key] = data?.map(d => ({ name: d, label: d }));
-                });
-                return itemsMap;
-            }),
-            noFilter: computed(() => isEmpty(state.filterItemsMap) || Object.values(state.proxyFilters).every(d => !d)),
+            noFilter: computed(() => isEmpty(state.proxyFilters) || Object.values(state.proxyFilters).every(d => !d)),
             viewFilterModalVisible: false,
             selectFilterModalVisible: false,
             isUserDashboard: computed(() => (props.dashboardId?.startsWith(DASHBOARD_TYPE.USER))),

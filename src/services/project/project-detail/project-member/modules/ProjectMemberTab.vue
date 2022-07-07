@@ -72,7 +72,9 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
@@ -92,6 +94,8 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -148,7 +152,7 @@ export default {
         const apiQueryHelper = new ApiQueryHelper().setPageLimit(15).setFilters(props.filters);
         const storeState = reactive({
             users: computed(() => store.state.reference.user.items),
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             projectGroups: computed(() => store.state.reference.projectGroup.items),
         });
         const state = reactive({
@@ -208,7 +212,7 @@ export default {
         };
 
         /* Api */
-        const listMembers = async () => {
+        const listMembers = async (projects: ProjectReferenceMap) => {
             state.loading = true;
             state.selectIndex = [];
             try {
@@ -227,7 +231,7 @@ export default {
                 }
                 state.items = res.results.map((d) => {
                     let assigned;
-                    if (d.project_info) assigned = storeState.projects[d.project_info?.project_id]?.label;
+                    if (d.project_info) assigned = projects[d.project_info?.project_id]?.label;
                     else if (d.project_group_info) assigned = storeState.projectGroups[d.project_group_info.project_group_id]?.label;
                     return {
                         ...d,
@@ -274,7 +278,7 @@ export default {
                 const filters = [{ v: options.searchText }];
                 emit('update-filters', filters);
             }
-            await listMembers();
+            await listMembers(storeState.projects);
         };
         const handleClickInviteMember = () => {
             state.memberAddFormVisible = true;
@@ -298,7 +302,7 @@ export default {
             else await deleteProjectMember(items);
 
             checkMemberDeleteState.visible = false;
-            await listMembers();
+            await listMembers(storeState.projects);
         };
 
         /* Init */
@@ -309,9 +313,12 @@ export default {
                 store.dispatch('reference/project/load'),
                 store.dispatch('reference/projectGroup/load'),
             ]);
-            await listMembers();
         })();
 
+        /* Watcher */
+        watch(() => store.state.reference.project.items, (projects) => {
+            if (projects) listMembers(projects);
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

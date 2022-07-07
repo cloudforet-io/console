@@ -40,7 +40,7 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
                             </p>
                             <div class="amount-used-wrapper" :class="progressStatus">
-                                <span class="cost">{{ currencyMoneyFormatter(cost, currency, currencyRates) }}</span>
+                                <span class="cost">{{ currencyMoneyFormatter(cost, storeState.currency, storeState.currencyRates) }}</span>
                                 <span class="percent">(<template v-if="percentage < 0">0.00</template>
                                     <template v-else>{{ percentage.toFixed(2) }}</template>%)</span>
                             </div>
@@ -50,7 +50,7 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
                             </p>
                             <div class="cost">
-                                {{ currencyMoneyFormatter(limit, currency, currencyRates) }}
+                                {{ currencyMoneyFormatter(limit, storeState.currency, storeState.currencyRates) }}
                             </div>
                         </div>
                     </div>
@@ -135,6 +135,15 @@ export default {
         },
     },
     setup(props: Props) {
+        const storeState = reactive({
+            projects: computed(() => store.getters['reference/projectItems']),
+            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            providers: computed(() => store.state.reference.provider.items),
+            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+            regions: computed(() => store.state.reference.region.items),
+            currency: computed(() => store.state.display.currency),
+            currencyRates: computed(() => store.state.display.currencyRates),
+        });
         const state = reactive({
             linkLocation: computed<Location>(() => ({
                 name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
@@ -147,12 +156,12 @@ export default {
                 const projects: string[] = [];
                 if (state.isProject) {
                     const projectId = props.budgetUsage.project_id as string;
-                    const project: ProjectReferenceItem|undefined = store.state.reference.project.items[projectId];
+                    const project: ProjectReferenceItem|undefined = storeState.projects[projectId];
                     if (project?.data?.groupInfo.name) projects.push(project.data.groupInfo.name);
                     projects.push(project?.name ?? projectId);
                 } else {
                     const projectGroupId = props.budgetUsage.project_group_id as string;
-                    const projectGroup: ProjectGroupReferenceItem|undefined = store.state.reference.projectGroup.items[projectGroupId];
+                    const projectGroup: ProjectGroupReferenceItem|undefined = storeState.projectGroups[projectGroupId];
                     if (projectGroup?.data?.parentGroupInfo?.name) projects.push(projectGroup.data.parentGroupInfo.name);
                     projects.push(projectGroup?.name ?? projectGroupId);
                 }
@@ -161,15 +170,15 @@ export default {
             resourceItemMap: computed<CostTypeResourceItemMap>(() => ({
                 provider: {
                     label: 'Provider',
-                    items: store.state.reference.provider.items,
+                    items: storeState.providers,
                 },
                 region_code: {
                     label: 'Region',
-                    items: store.state.reference.region.items,
+                    items: storeState.regions,
                 },
                 service_account_id: {
                     label: 'Service Account',
-                    items: store.state.reference.serviceAccount.items,
+                    items: storeState.serviceAccounts,
                 },
             })),
             costTypeResourceListMap: computed<CostTypeResourceListMap>(() => {
@@ -200,13 +209,6 @@ export default {
                 if (state.percentage === 0) return 'unused';
                 return 'common';
             }),
-
-            // reference store items
-            providers: computed(() => store.state.reference.provider.items),
-            regions: computed(() => store.state.reference.region.items),
-            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
-            currency: computed(() => store.state.display.currency),
-            currencyRates: computed(() => store.state.display.currencyRates),
         });
 
         // LOAD REFERENCE STORE
@@ -222,6 +224,7 @@ export default {
 
         return {
             ...toRefs(state),
+            storeState,
             currencyMoneyFormatter,
         };
     },

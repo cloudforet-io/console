@@ -33,8 +33,8 @@
                               size="sm"
                               class="col-name"
                     >
-                        <span v-tooltip.bottom="projectNameFormatter(projectId)" class="tablet:hidden">{{ projectNameFormatter(projectId) }}</span>
-                        <span class="tablet-text">{{ projectNameFormatter(projectId) }}</span>
+                        <span v-tooltip.bottom="projectNameFormatter(projectId, projects)" class="tablet:hidden">{{ projectNameFormatter(projectId, projects) }}</span>
+                        <span class="tablet-text">{{ projectNameFormatter(projectId, projects) }}</span>
                     </p-anchor>
                     <div class="col-activity">
                         <div v-for="(activity, aIdx) in activity[projectId]" :key="`activity-${aIdx}`"
@@ -74,6 +74,8 @@ import { find } from 'lodash';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -131,7 +133,7 @@ export default {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             loading: true,
-            projects: computed(() => store.state.reference.project.items),
+            projects: computed(() => store.getters['reference/projectItems']),
             top5Projects: [] as string[],
             activity: {},
             periods: [
@@ -181,7 +183,7 @@ export default {
             return activities;
         };
         const periodNumberFormatter = period => parseInt(period.match(/\d+/)[0]);
-        const projectNameFormatter = projectId => (state.projects[projectId] ? state.projects[projectId].label : projectId);
+        const projectNameFormatter = (projectId: string, projects: ProjectReferenceMap) => projects[projectId]?.label || projectId;
 
         /* api */
         const getTop5ProjectList = async () => {

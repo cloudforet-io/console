@@ -47,6 +47,7 @@ import {
 } from '@spaceone/design-system';
 
 import { Tags } from '@/models';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ProjectGroupReferenceItem } from '@/store/modules/reference/project-group/type';
@@ -96,8 +97,8 @@ export default {
                 { name: 'labels', label: 'Labels' },
             ]),
             items: [] as UserRoleItem[],
-            projectGroups: computed(() => vm.$store.state.reference.projectGroup.items),
-            projects: computed(() => vm.$store.state.reference.project.items),
+            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projects: computed(() => store.getters['reference/projectItems']),
         });
 
         const getProjectLink = (value, isProject: true) => {
@@ -144,8 +145,8 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                vm.$store.dispatch('reference/project/load'),
-                vm.$store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
             ]);
         })();
 

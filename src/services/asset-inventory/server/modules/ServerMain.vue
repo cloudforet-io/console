@@ -499,7 +499,7 @@ export default {
             await init();
             // initiate queryTags with keyItemSets & QueryHelper
             queryHelper.setReference({
-                'identity.Project': computed(() => store.state.reference.project.items),
+                'identity.Project': computed(() => store.getters['reference/projectItems']),
                 'identity.ProjectGroup': computed(() => store.state.reference.projectGroup.items),
                 'inventory.Collector': computed(() => store.state.reference.collector.items),
                 'identity.ServiceAccount': computed(() => store.state.reference.serviceAccount.items),

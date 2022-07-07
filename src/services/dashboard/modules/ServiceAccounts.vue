@@ -1,5 +1,5 @@
 <template>
-    <widget-layout>
+    <widget-layout class="service-accounts">
         <template #title>
             <div class="top">
                 <p class="title">
@@ -38,9 +38,9 @@
                           :items="data"
                           :bordered="false"
             >
-                <template #col-provider-format="{ index, item }">
+                <template #col-provider-format="{ item }">
                     <router-link :to="getLink(item)">
-                        <span :style="{color: data[index].color}" class="provider-label">{{ item.providerLabel }}</span>
+                        <span :style="{color: item.color}" class="provider-label">{{ providers[item.provider].label }}</span>
                     </router-link>
                 </template>
             </p-data-table>
@@ -59,8 +59,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDataLoader, PDataTable, PI, PSkeleton,
 } from '@spaceone/design-system';
-import Color from 'color';
-import { forEach, range } from 'lodash';
+import { forEach, range, isEmpty } from 'lodash';
 import { Location } from 'vue-router';
 
 
@@ -80,15 +79,17 @@ import {
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 
-const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
+const DEFAULT_COLOR = violet[200];
 
 interface Data {
-    providerLabel?: string;
     provider?: string;
     color: string;
     service_account_count: number;
     href: string;
 }
+
+const CATEGORY_KEY = 'name';
+const VALUE_KEY = 'service_account_count';
 
 export default {
     name: 'ServiceAccounts',
@@ -114,23 +115,37 @@ export default {
             chartRef: null as HTMLElement | null,
             data: [] as Data[],
             chart: null as null | any,
+            chartRegistry: {},
             fields: computed(() => [
                 { name: 'provider', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
                 { name: 'service_account_count', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
             ]),
         });
 
+        /* Util */
+        const disposeChart = (ctx) => {
+            if (state.chartRegistry[ctx]) {
+                state.chartRegistry[ctx].dispose();
+                delete state.chartRegistry[ctx];
+            }
+        };
         const drawChart = (ctx, isLoading = false) => {
-            const chart = am4core.create(ctx, am4charts.PieChart);
-            chart.responsive.enabled = true;
+            const createChart = () => {
+                disposeChart(ctx);
+                state.chartRegistry[ctx] = am4core.create(ctx, am4charts.PieChart);
+                return state.chartRegistry[ctx];
+            };
+            const chart = createChart();
+            state.chart = chart;
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+            chart.responsive.enabled = true;
             chart.innerRadius = am4core.percent(63);
 
             if (isLoading) {
                 chart.data = [{
                     provider: 'Dummy',
                     service_account_count: 1000,
-                    color: DEFAULT_COLORS[0],
+                    color: DEFAULT_COLOR,
                 }];
             } else {
                 chart.data = state.data;
@@ -139,22 +154,16 @@ export default {
             const series = chart.series.create();
             series.slices.template.togglable = false;
             series.slices.template.clickable = false;
-            series.dataFields.value = 'service_account_count';
-            series.dataFields.category = 'name';
+            series.dataFields.value = VALUE_KEY;
+            series.dataFields.category = CATEGORY_KEY;
             series.slices.template.propertyFields.fill = 'color';
             series.slices.template.stroke = am4core.color(white);
             series.slices.template.strokeWidth = 2;
             series.slices.template.strokeOpacity = 1;
-
-            if (isLoading) {
-                series.slices.template.tooltipText = '';
-            } else {
-                series.slices.template.tooltipText = '{value}';
-                if (series.tooltip) {
-                    series.tooltip.fontSize = 12;
-                    series.tooltip.fontFamily = 'Noto Sans';
-                }
-            }
+            series.slices.template.states.getKey('hover').properties.scale = 1;
+            series.tooltip.disabled = true;
+            series.ticks.template.disabled = true;
+            series.labels.template.text = '';
 
             const label = new am4core.Label();
             label.parent = series;
@@ -168,8 +177,6 @@ export default {
             } else {
                 label.text = '{values.value.sum}';
             }
-
-            state.chart = chart;
         };
 
         const getLink = (data): Location => ({
@@ -187,16 +194,13 @@ export default {
             try {
                 const { results } = await SpaceConnector.client.statistics.topic.serviceAccountByProvider(props.extraParams);
                 forEach(results, (d) => {
-                    if (state.providers[d.provider]) {
-                        data.push({
-                            providerLabel: state.providers[d.provider].label || d.provider,
-                            provider: d.provider,
-                            color: state.providers[d.provider].color || '',
-                            href: getLink(d),
-                            service_account_count: d.service_account_count,
-                            ...d,
-                        });
-                    }
+                    data.push({
+                        ...d,
+                        provider: d.provider,
+                        color: state.providers[d.provider].color || '',
+                        href: getLink(d),
+                        service_account_count: d.service_account_count,
+                    });
                 });
                 state.data = data;
             } catch (e) {
@@ -210,19 +214,19 @@ export default {
 
         /* Init */
         (async () => {
-            await Promise.allSettled([
-                // LOAD REFERENCE STORE
-                store.dispatch('reference/provider/load'),
-            ]);
-            await getData();
+            await store.dispatch('reference/provider/load', true);
         })();
 
 
         /* Watcher */
+        watch(() => state.providers, (providers) => {
+            if (!isEmpty(providers)) getData();
+        }, { immediate: true });
         watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
             if (loading && loaderCtx) {
                 drawChart(loaderCtx, true);
-            } else if (!loading && chartCtx) {
+            }
+            if (!loading && chartCtx) {
                 drawChart(chartCtx, false);
             }
         }, { immediate: true });
