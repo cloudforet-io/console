@@ -3,8 +3,9 @@
         <p-panel-top v-if="layoutName">
             {{ layoutName }}
         </p-panel-top>
-        <p-raw-data class="m-4" :item="rootData" :loading="loading"
-                    folded
+        <p-text-editor class="m-4" :code="rootData" :loading="loading"
+                       need-refine
+                       folded
         />
     </div>
 </template>
@@ -17,12 +18,12 @@ import {
 
 import { RawDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
-import PRawData from '@/data-display/raw-data/PRawData.vue';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
+import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 
 export default {
     name: 'PDynamicLayoutRaw',
-    components: { PRawData, PPanelTop },
+    components: { PTextEditor, PPanelTop },
     props: {
         name: {
             type: String,
