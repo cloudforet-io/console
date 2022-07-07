@@ -1,3 +1,10 @@
+# [1.1.0-beta.342](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.341...v1.1.0-beta.342) (2022-07-07)
+
+
+### Reverts
+
+* Revert "refactor: merge PRawEditor into PTextEditor (#1009)" (#1010) ([eebe6b5](https://github.com/spaceone-dev/spaceone-design-system/commit/eebe6b5c5f5c37750f5511dc230760209c6a88ca)), closes [#1009](https://github.com/spaceone-dev/spaceone-design-system/issues/1009) [#1010](https://github.com/spaceone-dev/spaceone-design-system/issues/1010)
+
 # [1.1.0-beta.341](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.340...v1.1.0-beta.341) (2022-07-06)
 
 
