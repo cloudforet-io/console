@@ -17,10 +17,7 @@
                         <div class="card-top-wrapper">
                             <div class="group-name-wrapper">
                                 <div class="group-name">
-                                    <template v-if="parentGroups.length > 0">
-                                        {{ parentGroups[parentGroups.length - 1].name }} >
-                                    </template>
-                                    {{ item.project_group_info.name }}
+                                    {{ getProjectGroupName(parentGroups, item) }}
                                 </div>
                                 <div class="favorite-wrapper">
                                     <favorite-button :item-id="item.project_id"
@@ -233,6 +230,14 @@ export default {
             });
         };
         const getDistinctProviders = (items: string[]) => uniq(items);
+        const getProjectGroupName = (parentGroups, projectItem) => {
+            let result = '';
+            if (parentGroups.length > 0) {
+                result = `${parentGroups[parentGroups.length - 1].name} > `;
+            }
+            result += projectItem.project_group_info.name;
+            return result;
+        };
 
         const listProjectApi = SpaceConnector.client.identity.projectGroup.listProjects;
         const listAllProjectApi = SpaceConnector.client.identity.project.list;
@@ -391,6 +396,7 @@ export default {
             getLocation,
             byteFormatter,
             getItemSummaryCount,
+            getProjectGroupName,
             SUMMARY_TYPE,
             FAVORITE_TYPE,
             BACKGROUND_COLOR,
@@ -477,6 +483,7 @@ export default {
         .group-name {
             @apply flex-shrink-0 text-gray-500 text-xs truncate;
             line-height: 1.5;
+            width: calc(100% - 1rem);
         }
     }
     .accounts {
