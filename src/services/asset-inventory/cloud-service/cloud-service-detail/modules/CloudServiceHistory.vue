@@ -8,6 +8,8 @@
                    searchable
                    :pagination-visible="false"
                    :page-size-changeable="false"
+                   :search-text.sync="searchText"
+                   @change="handleChange"
                    @refresh="handleRefresh"
         >
             <template #left-area>
@@ -37,7 +39,7 @@
                             <div class="key-wrapper">
                                 {{ diffItem.key }}
                             </div>
-                            <div v-if="diffItem.changedValue" class="value-wrapper">
+                            <div v-if="item.action === 'UPDATE'" class="value-wrapper">
                                 {{ diffItem.changedValue }}
                             </div>
                         </div>
@@ -64,6 +66,8 @@ import {
 } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
+import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
+import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
@@ -111,6 +115,7 @@ export default {
             totalCount: 0,
             pageStart: 1,
             pageLimit: 10,
+            searchText: '',
         });
 
         /* Util */
@@ -130,13 +135,13 @@ export default {
         const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
 
         /* Api */
-        const apiHelper = new ApiQueryHelper().setPage(state.pageStart, state.pageLimit);
+        const apiQueryHelper = new ApiQueryHelper().setPage(state.pageStart, state.pageLimit);
         const listHistory = async () => {
             try {
                 state.loading = true;
                 const { results, total_count } = await SpaceConnector.client.inventory.changeHistory.list({
                     cloud_service_id: props.cloudServiceId,
-                    query: apiHelper.data,
+                    query: apiQueryHelper.data,
                 });
                 state.items = getConvertedHistoryData(results);
                 state.totalCount = total_count;
@@ -156,6 +161,13 @@ export default {
         };
         const handleCloseOverlay = () => {
             state.showDetailOverlay = false;
+        };
+        const handleChange = async (options: ToolboxOptions = {}) => {
+            setApiQueryWithToolboxOptions(apiQueryHelper, options);
+            if (options.searchText !== undefined) {
+                apiQueryHelper.setFilters([{ v: options.searchText }]);
+            }
+            await listHistory();
         };
         const handleRefresh = () => {
             listHistory();
@@ -183,6 +195,7 @@ export default {
             getTimelineColor,
             handleClickTimeline,
             handleCloseOverlay,
+            handleChange,
             handleRefresh,
         };
     },
