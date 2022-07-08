@@ -53,7 +53,10 @@
         >
             <template #body>
                 <div class="content-wrapper">
-                    <p-raw-data :item="selectedItem" class="code-block" folded />
+                    <p-text-editor :code="selectedItem" class="code-block" need-refine
+                                   read-only
+                                   folded
+                    />
                 </div>
             </template>
             <template #footer-extra>
@@ -90,7 +93,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PButton, PButtonModal, PI, PRawData, PToolbox, PEmpty,
+    PButton, PButtonModal, PI, PTextEditor, PToolbox, PEmpty,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -112,7 +115,7 @@ export default {
         PToolbox,
         PButton,
         PButtonModal,
-        PRawData,
+        PTextEditor,
         PI,
         PEmpty,
     },

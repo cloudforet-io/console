@@ -65,7 +65,7 @@
             <div class="policy-detail-contents">
                 <p-label>{{ $t('IAM.POLICY.FORM.PERMISSION') }}</p-label>
                 <p-text-editor
-                    :mode="type === POLICY_TYPES.MANAGED ? 'readOnly' : 'edit'"
+                    :read-only="type === POLICY_TYPES.MANAGED"
                     :code="code"
                     @update:code="handleCodeUpdate"
                 />

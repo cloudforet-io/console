@@ -24,8 +24,8 @@
                     <p-collapsible-toggle :is-collapsed.sync="isAPICollapsed" class="collapsible-toggle">
                         {{ isAPICollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
                     </p-collapsible-toggle>
-                    <p-raw-data v-if="!isAPICollapsed" class="m-4" :item="apiItem"
-                                folded
+                    <p-text-editor v-if="!isAPICollapsed" class="m-4" :code="apiItem"
+                                   need-refine folded read-only
                     />
                 </p>
                 <p-divider class="divider" />
@@ -59,8 +59,8 @@
                     <p-collapsible-toggle :is-collapsed.sync="isSpacectlCollapsed" class="collapsible-toggle">
                         {{ isSpacectlCollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
                     </p-collapsible-toggle>
-                    <p-raw-data v-if="!isSpacectlCollapsed" class="m-4" :raw="yamlItem"
-                                folded
+                    <p-text-editor v-if="!isSpacectlCollapsed" class="m-4" :code="yamlItem"
+                                   folded read-only
                     />
                 </p>
                 <p-divider class="divider" />
@@ -79,7 +79,7 @@
 import { reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PRawData, PButton, PAnchor,
+    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PAnchor, PTextEditor,
 } from '@spaceone/design-system';
 import yaml from 'js-yaml';
 
@@ -103,7 +103,7 @@ export default {
         PPaneLayout,
         PDivider,
         PCollapsibleToggle,
-        PRawData,
+        PTextEditor,
         PButton,
         PAnchor,
     },
