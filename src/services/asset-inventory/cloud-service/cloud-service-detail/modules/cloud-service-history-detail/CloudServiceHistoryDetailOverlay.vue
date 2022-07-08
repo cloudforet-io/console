@@ -31,7 +31,7 @@
                             changed-tab-component
                         </template>
                         <template #log>
-                            log-tab-component
+                            <cloud-service-history-log-tab />
                         </template>
                         <template #note>
                             <cloud-service-history-detail-note :record-id="selectedHistoryRecordId" />
@@ -60,6 +60,8 @@ import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTime
 
 import CloudServiceHistoryDetailNote
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailNote.vue';
+import CloudServiceHistoryLogTab
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryLogTab.vue';
 import {
     CloudServiceHistoryItem, HISTORY_ACTION_MAP,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
@@ -73,6 +75,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'CloudServiceHistoryDetailOverlay',
     components: {
+        CloudServiceHistoryLogTab,
         VerticalTimeline,
         PPaneLayout,
         PPageTitle,

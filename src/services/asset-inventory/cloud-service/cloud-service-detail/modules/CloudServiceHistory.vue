@@ -77,7 +77,7 @@ import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTime
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CloudServiceHistoryDetailOverlay
-    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistoryDetailOverlay.vue';
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailOverlay.vue';
 import {
     CloudServiceHistoryItem, HISTORY_ACTION_MAP,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
