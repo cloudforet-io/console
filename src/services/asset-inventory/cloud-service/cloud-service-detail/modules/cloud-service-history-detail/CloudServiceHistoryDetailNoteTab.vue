@@ -100,6 +100,7 @@ export default {
             userId: computed(() => store.state.user.userId),
             menuItems: [
                 {
+                    // song-lang
                     label: 'Delete', name: 'delete',
                 },
             ],
@@ -172,6 +173,7 @@ export default {
                     note_id: state.selectedNoteIdForDelete,
                 });
             } catch (e) {
+                // song-lang
                 ErrorHandler.handleRequestError(e, 'Failed to Delete Note');
             } finally {
                 checkDeleteState.loading = false;

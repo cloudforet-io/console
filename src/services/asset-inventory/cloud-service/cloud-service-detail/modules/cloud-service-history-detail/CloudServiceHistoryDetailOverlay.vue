@@ -59,7 +59,7 @@ import { i18n } from '@/translations';
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 
 import CloudServiceHistoryDetailNote
-    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailNote.vue';
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailNoteTab.vue';
 import CloudServiceHistoryLogTab
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryLogTab.vue';
 import {
