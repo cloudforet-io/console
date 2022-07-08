@@ -11,4 +11,9 @@ const PLUGINS = [
     ...displayPlugins,
 ];
 
-export default DEBUG ? [createLogger(), ...PLUGINS] : PLUGINS;
+const logger = createLogger({
+    logMutations: true,
+    logActions: false,
+});
+
+export default DEBUG ? [logger, ...PLUGINS] : PLUGINS;
