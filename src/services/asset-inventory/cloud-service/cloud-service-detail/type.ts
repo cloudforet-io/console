@@ -22,12 +22,22 @@ export interface CloudServiceDetailPageParams {
 }
 
 /* History Tab */
-export interface CloudServiceTimelineItem {
-    id: string;
-    record_id: string;
+export const HISTORY_ACTION_MAP = {
+    UPDATE: { label: 'Update', color: 'GREEN' },
+    CREATE: { label: 'Created', color: 'BLUE' },
+    DELETE: { label: 'Deleted', color: 'RED' },
+} as const;
+export interface DiffItem {
+    key: string;
+    previousValue?: any;
+    changedValue: any;
+    type: string;
+}
+export interface CloudServiceHistoryItem {
+    recordId: string;
     date: string;
-    color: string;
     title: string;
-    count?: number;
-    data?: { key: string, value?: any }[];
+    action: string;
+    diffItems?: DiffItem[];
+    diffCount?: number;
 }

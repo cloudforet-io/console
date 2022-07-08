@@ -8,15 +8,18 @@
                     <div class="title-wrapper">
                         <!--                        song-lang-->
                         <span class="title">History</span>
-                        <span class="total-count">({{ timelineItems.length }})</span>
+                        <span class="total-count">({{ totalCount }})</span>
                     </div>
-                    <vertical-timeline v-for="(item, idx) in timelineItems"
-                                       :key="`timeline-${item.date}-${idx}`"
-                                       :item="item"
+                    <vertical-timeline v-for="(item, idx) in historyItems"
+                                       :key="`timeline-${item.recordId}-${idx}`"
+                                       :date="item.date"
+                                       :title="item.title"
+                                       :count="item.diffCount"
+                                       :color="getTimelineColor(item.action)"
                                        :timezone="timezone"
-                                       :selected="item.id === selectedTimelineRecordId"
-                                       :is-last-item="idx === timelineItems.length-1"
-                                       @click-timeline="handleClickTimeline"
+                                       :selected="item.recordId === selectedHistoryRecordId"
+                                       :is-last-item="idx === historyItems.length-1"
+                                       @click-timeline="handleClickTimeline(item)"
                     />
                 </div>
                 <div class="right-part">
@@ -24,13 +27,14 @@
                            :active-tab.sync="activeTab"
                     >
                         <template #changed>
+                            {{ selectedHistoryRecordId }}
                             changed-tab-component
                         </template>
                         <template #log>
                             log-tab-component
                         </template>
                         <template #note>
-                            <cloud-service-history-detail-note :record-id="selectedTimelineRecordId" />
+                            <cloud-service-history-detail-note :record-id="selectedHistoryRecordId" />
                         </template>
                     </p-tab>
                 </div>
@@ -56,11 +60,14 @@ import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTime
 
 import CloudServiceHistoryDetailNote
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailNote.vue';
-import { CloudServiceTimelineItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
+import {
+    CloudServiceHistoryItem, HISTORY_ACTION_MAP,
+} from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
 interface Props {
-    timelineItems: CloudServiceTimelineItem[];
-    selectedTimelineItem: CloudServiceTimelineItem;
+    historyItems: CloudServiceHistoryItem[];
+    selectedHistoryItem: CloudServiceHistoryItem;
+    totalCount: number;
 }
 
 export default defineComponent<Props>({
@@ -73,19 +80,23 @@ export default defineComponent<Props>({
         CloudServiceHistoryDetailNote,
     },
     props: {
-        timelineItems: {
+        historyItems: {
             type: Array,
-            default: () => [],
+            default: () => [] as PropType<CloudServiceHistoryItem[]>,
         },
-        selectedTimelineItem: {
+        selectedHistoryItem: {
             type: Object,
-            default: () => ({}) as PropType<CloudServiceTimelineItem>,
+            default: () => ({}) as PropType<CloudServiceHistoryItem>,
+        },
+        totalCount: {
+            type: Number,
+            default: 0,
         },
     },
     setup(props, { emit }) {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            selectedTimelineRecordId: '',
+            selectedHistoryRecordId: '',
             tabs: computed(() => ([
                 // song-lang
                 { name: 'changed', label: i18n.t('Changed') },
@@ -95,23 +106,25 @@ export default defineComponent<Props>({
             activeTab: 'changed',
         });
 
+        /* Util */
+        const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
+
         /* Event */
         const handleGoBack = () => {
             emit('close');
         };
-        const handleClickTimeline = (selectedItem: CloudServiceTimelineItem) => {
-            state.selectedTimelineRecordId = selectedItem.record_id;
+        const handleClickTimeline = (selectedItem: CloudServiceHistoryItem) => {
+            state.selectedHistoryRecordId = selectedItem.recordId;
         };
 
         /* Watcher */
-        watch(() => props.selectedTimelineItem, (selectedTimelineItem) => {
-            if (selectedTimelineItem?.record_id) {
-                state.selectedTimelineRecordId = selectedTimelineItem.record_id;
-            }
+        watch(() => props.selectedHistoryItem, (selectedTimelineItem) => {
+            state.selectedHistoryRecordId = selectedTimelineItem?.recordId;
         }, { immediate: true });
 
         return {
             ...toRefs(state),
+            getTimelineColor,
             handleGoBack,
             handleClickTimeline,
         };

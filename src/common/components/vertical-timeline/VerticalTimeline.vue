@@ -1,18 +1,18 @@
 <template>
     <div class="vertical-timeline" :class="{selected: selected}" @click="handleClickTimeline">
         <div class="timeline-item" :class="[{'last-item': isLastItem}]">
-            <div class="timestamp">
-                {{ getTimezoneDate(item.date) }}
+            <div class="date">
+                {{ getTimezoneDate(date, timezone) }}
             </div>
             <div class="vertical-line">
                 <div class="line" />
-                <div class="circle" :class="item.color" />
+                <div class="circle" :class="color" />
             </div>
             <div class="item-detail">
                 <div class="title-wrapper">
-                    <span class="title">{{ item.title }}</span>
-                    <p-badge v-if="item.count" :style-type="getBadgeStyleType(item.color)">
-                        {{ item.count }}
+                    <span class="title">{{ title }}</span>
+                    <p-badge v-if="count" :style-type="getBadgeStyleType(color)">
+                        {{ count }}
                     </p-badge>
                     <slot name="title-right" />
                 </div>
@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
@@ -31,11 +31,12 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { CloudServiceTimelineItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
-
 
 interface Props {
-    item: CloudServiceTimelineItem;
+    date: string;
+    title: string;
+    count?: number;
+    color: string;
     timezone: string;
     selected: boolean;
     isLastItem: boolean;
@@ -47,9 +48,21 @@ export default defineComponent<Props>({
         PBadge,
     },
     props: {
-        item: {
-            type: Object,
-            default: () => ({}) as PropType<CloudServiceTimelineItem>,
+        date: {
+            type: String,
+            default: '',
+        },
+        title: {
+            type: String,
+            default: '',
+        },
+        count: {
+            type: Number,
+            default: 0,
+        },
+        color: {
+            type: String,
+            default: 'GREEN',
         },
         timezone: {
             type: String,
@@ -71,11 +84,11 @@ export default defineComponent<Props>({
             if (itemColor === 'BLUE') return 'blue200';
             return 'gray200';
         };
-        const getTimezoneDate = (date: string): string => dayjs.utc(date).tz(props.timezone).format('YYYY/MM/DD HH:mm:ss');
+        const getTimezoneDate = (date: string, timezone: string): string => dayjs.utc(date).tz(timezone).format('YYYY/MM/DD HH:mm:ss');
 
         /* Event */
         const handleClickTimeline = () => {
-            emit('click-timeline', props.item);
+            emit('click-timeline');
         };
 
         return {
@@ -107,6 +120,7 @@ export default defineComponent<Props>({
     }
     .timeline-item {
         display: inline-flex;
+        width: 100%;
         min-height: 3.25rem;
         position: relative;
 
@@ -147,7 +161,7 @@ export default defineComponent<Props>({
                 height: 1rem;
             }
         }
-        .timestamp {
+        .date {
             flex-shrink: 0;
             width: 6.25rem;
             text-align: right;
@@ -156,6 +170,8 @@ export default defineComponent<Props>({
             padding: 1rem 0;
         }
         .item-detail {
+            width: 100%;
+            overflow: hidden;
             font-size: 0.875rem;
             line-height: 150%;
             padding: 1rem 0;
