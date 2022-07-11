@@ -28,7 +28,7 @@
                     >
                         <template #changed>
                             {{ selectedHistoryRecordId }}
-                            changed-tab-component
+                            <cloud-service-history-changes-tab />
                         </template>
                         <template #log>
                             <cloud-service-history-log-tab />
@@ -58,6 +58,8 @@ import { i18n } from '@/translations';
 
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 
+import CloudServiceHistoryChangesTab
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryChangesTab.vue';
 import CloudServiceHistoryDetailNote
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailNoteTab.vue';
 import CloudServiceHistoryLogTab
@@ -75,6 +77,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'CloudServiceHistoryDetailOverlay',
     components: {
+        CloudServiceHistoryChangesTab,
         CloudServiceHistoryLogTab,
         VerticalTimeline,
         PPaneLayout,

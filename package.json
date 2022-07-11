@@ -63,7 +63,10 @@
     "vue-selecto": "^1.6.4",
     "vuedraggable": "^2.24.1",
     "vuex": "^3.6.2",
-    "webfontloader": "^1.6.28"
+    "webfontloader": "^1.6.28",
+    "@vueuse/core": "^8.3.1",
+    "diff-match-patch": "^1.0.5",
+    "highlight.js": "^11.5.1"
   },
   "devDependencies": {
     "@babel/compat-data": "^7.18.6",
