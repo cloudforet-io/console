@@ -32,7 +32,7 @@
                            :active-tab.sync="activeTab"
                     >
                         <template #changed>
-                            <cloud-service-history-changes-tab />
+                            <cloud-service-history-changes-tab :selected-history-item="proxySelectedHistoryItem" />
                         </template>
                         <template #log>
                             <cloud-service-history-log-tab :provider="provider"

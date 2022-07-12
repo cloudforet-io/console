@@ -114,12 +114,14 @@ export default defineComponent({
 .vue-diff-wrapper {
     overflow: hidden;
     width: 100%;
+    height: 100%;
     border-radius: 0.3em;
 }
 
 .vue-diff-viewer {
     overflow-y: auto;
     width: 100%;
+    height: 100%;
     padding: 1em 0;
     line-height: 1.5;
     font-size: 16px;
