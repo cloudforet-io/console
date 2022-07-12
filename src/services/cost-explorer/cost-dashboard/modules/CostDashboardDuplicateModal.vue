@@ -25,7 +25,7 @@
                            required
                            class="mt-6"
             >
-                <p-radio v-for="{ name, label } in filteredVisibilityList" :key="name" :value="name"
+                <p-radio v-for="{ name: visibilityName, label } in filteredVisibilityList" :key="visibilityName" :value="visibilityName"
                          :selected="visibility"
                          class="radio-group"
                          @change="setForm('visibility', $event)"

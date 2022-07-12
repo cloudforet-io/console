@@ -1,9 +1,9 @@
 <template>
     <span class="text-highlighting" :class="styleType">
-        <span v-for="({text, matched}, i) in getTextList(text)"
-              :key="`label-${text}-${i}`"
+        <span v-for="({text: eachText, matched}, i) in getTextList(text)"
+              :key="`label-${eachText}-${i}`"
         >
-            <span :class="{'matched-character': matched}">{{ text }}</span>
+            <span :class="{'matched-character': matched}">{{ eachText }}</span>
         </span>
     </span>
 </template>

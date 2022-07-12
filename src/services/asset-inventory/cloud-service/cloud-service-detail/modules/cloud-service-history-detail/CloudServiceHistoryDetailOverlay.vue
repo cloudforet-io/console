@@ -10,24 +10,26 @@
                         <span class="title">History</span>
                         <span class="total-count">({{ totalCount }})</span>
                     </div>
-                    <vertical-timeline v-for="(item, idx) in historyItems"
-                                       :key="`timeline-${item.recordId}-${idx}`"
-                                       :date="item.date"
-                                       :title="item.title"
-                                       :count="item.diffCount"
-                                       :color="getTimelineColor(item.action)"
-                                       :timezone="timezone"
-                                       :selected="item.recordId === selectedHistoryRecordId"
-                                       :is-last-item="idx === historyItems.length-1"
-                                       @click-timeline="handleClickTimeline(item)"
-                    />
+                    <div class="timeline-wrapper">
+                        <vertical-timeline v-for="(item, idx) in historyItems"
+                                           :ref="`timelineRef_${item.recordId}`"
+                                           :key="`timeline-${item.recordId}-${idx}`"
+                                           :date="item.date"
+                                           :title="item.title"
+                                           :count="item.diffCount"
+                                           :color="getTimelineColor(item.action)"
+                                           :selected="item.recordId === selectedHistoryRecordId"
+                                           :is-last-item="idx === historyItems.length-1"
+                                           @click-timeline="handleClickTimeline(item)"
+                        />
+                        <scroll-observer :loading="loading" @trigger-observer="handleScrollTrigger" />
+                    </div>
                 </div>
                 <div class="right-part">
                     <p-tab :tabs="tabs"
                            :active-tab.sync="activeTab"
                     >
                         <template #changed>
-                            {{ selectedHistoryRecordId }}
                             <cloud-service-history-changes-tab />
                         </template>
                         <template #log>
@@ -48,7 +50,8 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, PropType, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, defineComponent, getCurrentInstance, onMounted, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -56,10 +59,11 @@ import {
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import ScrollObserver from '@/common/components/observer/ScrollObserver.vue';
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import CloudServiceHistoryChangesTab
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryChangesTab.vue';
@@ -71,7 +75,9 @@ import {
     CloudServiceHistoryItem, HISTORY_ACTION_MAP,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
+
 interface Props {
+    loading: boolean;
     historyItems: CloudServiceHistoryItem[];
     selectedHistoryItem: CloudServiceHistoryItem;
     totalCount: number;
@@ -83,12 +89,17 @@ export default defineComponent<Props>({
         CloudServiceHistoryChangesTab,
         CloudServiceHistoryLogTab,
         VerticalTimeline,
+        ScrollObserver,
         PPaneLayout,
         PPageTitle,
         PTab,
         CloudServiceHistoryDetailNote,
     },
     props: {
+        loading: {
+            type: Boolean,
+            default: false,
+        },
         historyItems: {
             type: Array,
             default: () => [] as PropType<CloudServiceHistoryItem[]>,
@@ -111,10 +122,11 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
-            timezone: computed(() => store.state.user.timezone),
             selectedHistoryRecordId: '',
             selectedHistoryRecordDate: '',
+            proxySelectedHistoryItem: useProxyValue('selectedHistoryItem', props, emit),
             tabs: computed(() => ([
                 // song-lang
                 { name: 'changed', label: i18n.t('Changed') },
@@ -126,27 +138,38 @@ export default defineComponent<Props>({
 
         /* Util */
         const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
+        const handleScrollTrigger = async () => {
+            emit('trigger-observer');
+        };
 
         /* Event */
         const handleGoBack = () => {
             emit('close');
         };
         const handleClickTimeline = (selectedItem: CloudServiceHistoryItem) => {
-            state.selectedHistoryRecordId = selectedItem.recordId;
-            state.selectedHistoryRecordDate = selectedItem.date;
+            state.proxySelectedHistoryItem = selectedItem;
         };
 
         /* Watcher */
-        watch(() => props.selectedHistoryItem, (selectedTimelineItem) => {
+        watch(() => props.selectedHistoryItem, (selectedTimelineItem: CloudServiceHistoryItem) => {
             state.selectedHistoryRecordId = selectedTimelineItem?.recordId;
             state.selectedHistoryRecordDate = selectedTimelineItem?.date;
         }, { immediate: true });
+
+        onMounted(() => {
+            const selectedRef = vm.$refs[`timelineRef_${props.selectedHistoryItem.recordId}`] as any;
+            if (selectedRef) {
+                const selectedEl: HTMLElement = selectedRef[0].$el;
+                selectedEl.scrollIntoView();
+            }
+        });
 
         return {
             ...toRefs(state),
             getTimelineColor,
             handleGoBack,
             handleClickTimeline,
+            handleScrollTrigger,
         };
     },
 });
@@ -186,7 +209,7 @@ export default defineComponent<Props>({
 
             .left-part {
                 @apply col-span-3 bg-white border border-gray-200 rounded-md;
-                padding: 1.5rem 1rem;
+                padding: 1.5rem 1rem 0 1rem;
                 .title-wrapper {
                     font-size: 1rem;
                     padding-bottom: 0.75rem;
@@ -197,6 +220,11 @@ export default defineComponent<Props>({
                     .total-count {
                         @apply text-gray-500;
                     }
+                }
+                .timeline-wrapper {
+                    height: 72vh;
+                    overflow-y: auto;
+                    padding-bottom: 1.5rem;
                 }
             }
             .right-part {

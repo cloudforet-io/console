@@ -20,7 +20,7 @@
                 </span>
             </p>
             <div v-else-if="item.data">
-                <p v-for="(value, index) in item.data" :key="`item-${index}`">
+                <p v-for="(value, dIdx) in item.data" :key="`item-${dIdx}`">
                     {{ value }}
                 </p>
             </div>
