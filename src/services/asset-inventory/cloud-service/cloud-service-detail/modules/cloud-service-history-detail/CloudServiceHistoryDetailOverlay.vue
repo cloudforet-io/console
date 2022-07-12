@@ -31,7 +31,10 @@
                             <cloud-service-history-changes-tab />
                         </template>
                         <template #log>
-                            <cloud-service-history-log-tab />
+                            <cloud-service-history-log-tab :provider="provider"
+                                                           :cloud-service-id="cloudServiceId"
+                                                           :date="selectedHistoryRecordDate"
+                            />
                         </template>
                         <template #note>
                             <cloud-service-history-detail-note :record-id="selectedHistoryRecordId" />
@@ -98,11 +101,20 @@ export default defineComponent<Props>({
             type: Number,
             default: 0,
         },
+        provider: {
+            type: String,
+            default: '',
+        },
+        cloudServiceId: {
+            type: String,
+            default: '',
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             selectedHistoryRecordId: '',
+            selectedHistoryRecordDate: '',
             tabs: computed(() => ([
                 // song-lang
                 { name: 'changed', label: i18n.t('Changed') },
@@ -121,11 +133,13 @@ export default defineComponent<Props>({
         };
         const handleClickTimeline = (selectedItem: CloudServiceHistoryItem) => {
             state.selectedHistoryRecordId = selectedItem.recordId;
+            state.selectedHistoryRecordDate = selectedItem.date;
         };
 
         /* Watcher */
         watch(() => props.selectedHistoryItem, (selectedTimelineItem) => {
             state.selectedHistoryRecordId = selectedTimelineItem?.recordId;
+            state.selectedHistoryRecordDate = selectedTimelineItem?.date;
         }, { immediate: true });
 
         return {

@@ -54,6 +54,8 @@
                                                   :history-items="items"
                                                   :selected-history-item="selectedHistoryItem"
                                                   :total-count="totalCount"
+                                                  :provider="provider"
+                                                  :cloud-service-id="cloudServiceId"
                                                   @close="handleCloseOverlay"
             />
         </transition>
@@ -100,6 +102,10 @@ export default {
     },
     props: {
         cloudServiceId: {
+            type: String,
+            default: '',
+        },
+        provider: {
             type: String,
             default: '',
         },
