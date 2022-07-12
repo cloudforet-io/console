@@ -10,7 +10,7 @@
                         <span class="title">History</span>
                         <span class="total-count">({{ totalCount }})</span>
                     </div>
-                    <div class="timeline-wrapper">
+                    <div ref="timelineWrapperRef" class="timeline-wrapper">
                         <vertical-timeline v-for="(item, idx) in historyItems"
                                            :ref="`timelineRef_${item.recordId}`"
                                            :key="`timeline-${item.recordId}-${idx}`"
@@ -22,7 +22,9 @@
                                            :is-last-item="idx === historyItems.length-1"
                                            @click-timeline="handleClickTimeline(item)"
                         />
-                        <scroll-observer :loading="loading" @trigger-observer="handleScrollTrigger" />
+                        <p-lottie v-if="loading" name="thin-spinner" auto
+                                  :size="2"
+                        />
                     </div>
                 </div>
                 <div class="right-part">
@@ -55,13 +57,13 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPaneLayout, PPageTitle, PTab,
+    PPaneLayout, PPageTitle, PTab, PLottie,
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { useInfiniteScroll } from '@vueuse/core';
 
 import { i18n } from '@/translations';
 
-import ScrollObserver from '@/common/components/observer/ScrollObserver.vue';
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -89,11 +91,11 @@ export default defineComponent<Props>({
         CloudServiceHistoryChangesTab,
         CloudServiceHistoryLogTab,
         VerticalTimeline,
-        ScrollObserver,
         PPaneLayout,
         PPageTitle,
         PTab,
         CloudServiceHistoryDetailNote,
+        PLottie,
     },
     props: {
         loading: {
@@ -124,6 +126,7 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
+            timelineWrapperRef: null as null | HTMLElement,
             selectedHistoryRecordId: '',
             selectedHistoryRecordDate: '',
             proxySelectedHistoryItem: useProxyValue('selectedHistoryItem', props, emit),
@@ -138,9 +141,6 @@ export default defineComponent<Props>({
 
         /* Util */
         const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
-        const handleScrollTrigger = async () => {
-            emit('trigger-observer');
-        };
 
         /* Event */
         const handleGoBack = () => {
@@ -162,6 +162,9 @@ export default defineComponent<Props>({
                 const selectedEl: HTMLElement = selectedRef[0].$el;
                 selectedEl.scrollIntoView();
             }
+            useInfiniteScroll(state.timelineWrapperRef, () => {
+                emit('load-more');
+            });
         });
 
         return {
@@ -169,7 +172,6 @@ export default defineComponent<Props>({
             getTimelineColor,
             handleGoBack,
             handleClickTimeline,
-            handleScrollTrigger,
         };
     },
 });
@@ -225,6 +227,12 @@ export default defineComponent<Props>({
                     height: 72vh;
                     overflow-y: auto;
                     padding-bottom: 1.5rem;
+                    .p-lottie {
+                        display: flex;
+                        height: 5rem;
+                        justify-content: center;
+                        align-items: center;
+                    }
                 }
             }
             .right-part {

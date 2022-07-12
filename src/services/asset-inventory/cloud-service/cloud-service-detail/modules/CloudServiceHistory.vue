@@ -26,7 +26,7 @@
             </template>
         </p-toolbox>
         <p-data-loader :data="items" :loading="!items.length && loading">
-            <div class="timeline-wrapper">
+            <div ref="timelineWrapperRef" class="timeline-wrapper">
                 <vertical-timeline v-for="(item, idx) in items"
                                    :key="`timeline-${item.date}-${idx}`"
                                    :date="item.date"
@@ -54,7 +54,9 @@
                         </div>
                     </template>
                 </vertical-timeline>
-                <scroll-observer :loading="!!items.length && loading" @trigger-observer="handleScrollTrigger" />
+                <p-lottie v-if="loading && !!items.length" name="thin-spinner" auto
+                          :size="2"
+                />
             </div>
         </p-data-loader>
         <transition name="slide-up">
@@ -66,7 +68,7 @@
                                                   :provider="provider"
                                                   :cloud-service-id="cloudServiceId"
                                                   @close="handleCloseOverlay"
-                                                  @trigger-observer="handleScrollTrigger"
+                                                  @load-more="handleLoadMore"
             />
         </transition>
     </div>
@@ -74,7 +76,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
@@ -83,16 +85,16 @@ import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbo
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PPanelTop, PToolbox, PSelectDropdown, PDataLoader,
+    PPanelTop, PToolbox, PSelectDropdown, PDataLoader, PLottie,
 } from '@spaceone/design-system';
 import { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
+import { useInfiniteScroll } from '@vueuse/core';
 import dayjs from 'dayjs';
 import localeData from 'dayjs/plugin/localeData';
 import { range } from 'lodash';
 
 import { store } from '@/store';
 
-import ScrollObserver from '@/common/components/observer/ScrollObserver.vue';
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
@@ -112,13 +114,13 @@ const { i18nDayjs } = useI18nDayjs();
 export default {
     name: 'CloudServiceHistory',
     components: {
-        ScrollObserver,
         CloudServiceHistoryDetailOverlay,
         VerticalTimeline,
         PPanelTop,
         PToolbox,
         PSelectDropdown,
         PDataLoader,
+        PLottie,
     },
     props: {
         cloudServiceId: {
@@ -133,6 +135,7 @@ export default {
     setup(props) {
         const state = reactive({
             loading: true,
+            timelineWrapperRef: null as null | HTMLElement,
             timezone: computed(() => store.state.user.timezone),
             selectedYear: dayjs.utc().format('YYYY'),
             selectedMonth: 'all',
@@ -184,6 +187,15 @@ export default {
         }));
         const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
         const delay = time => new Promise(resolve => setTimeout(resolve, time));
+        const loadMoreHistoryData = async () => {
+            const newPageStart = state.pageStart + DIFF_ITEM_LIMIT;
+            if (state.totalCount < newPageStart) return;
+
+            state.pageStart = newPageStart;
+            state.loading = true;
+            await delay(1000);
+            await listHistory();
+        };
 
         /* Api */
         const apiQueryHelper = new ApiQueryHelper();
@@ -243,14 +255,8 @@ export default {
         const handleRefresh = async () => {
             await listHistory(true);
         };
-        const handleScrollTrigger = async () => {
-            const newPageStart = state.pageStart + DIFF_ITEM_LIMIT;
-            if (state.totalCount < newPageStart) return;
-
-            state.pageStart = newPageStart;
-            state.loading = true;
-            await delay(1000);
-            await listHistory();
+        const handleLoadMore = () => {
+            loadMoreHistoryData();
         };
         const handleSelectMonth = (selectedMonth) => {
             state.selectedMonth = selectedMonth;
@@ -275,6 +281,12 @@ export default {
             listHistory(true);
         }, { immediate: false });
 
+        onMounted(() => {
+            useInfiniteScroll(state.timelineWrapperRef, () => {
+                loadMoreHistoryData();
+            });
+        });
+
         return {
             ...toRefs(state),
             iso8601Formatter,
@@ -284,9 +296,9 @@ export default {
             handleCloseOverlay,
             handleChange,
             handleRefresh,
-            handleScrollTrigger,
             handleSelectMonth,
             handleSelectYear,
+            handleLoadMore,
         };
     },
 };
@@ -314,6 +326,12 @@ export default {
         height: 30rem;
         overflow: auto;
         padding: 0 1.125rem;
+        .p-lottie {
+            display: flex;
+            height: 5rem;
+            justify-content: center;
+            align-items: center;
+        }
     }
     .vertical-timeline {
         .timeline-content-wrapper {
