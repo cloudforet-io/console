@@ -64,6 +64,7 @@ module.exports = {
             symlinks: false,
             alias: {
                 '@vue/composition-api': path.resolve(__dirname, './node_modules/@vue/composition-api/'),
+                '@spaceone/console-core-lib': path.resolve(__dirname, './packages/@spaceone/console-core-lib/dist/'),
             },
         },
         plugins: [
@@ -74,6 +75,9 @@ module.exports = {
         externals(context, request, callback) {
             if (/xlsx|canvg/.test(request)) {
                 return callback(null, `commonjs ${request}`);
+            }
+            if (/@spaceone\/console-core-lib/.test(request)) {
+                console.log('console core lib!!!', request);
             }
             callback();
         },

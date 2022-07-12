@@ -1,28 +1,30 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "target": "es6",
-    "module": "esnext",
+    "target": "ES6",
+    "module": "ESNext",
     "strict": true,
-    "jsx": "preserve",
     "importHelpers": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "allowJs": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "jsx": "preserve",
     "sourceMap": true,
     "baseUrl": ".",
     "declaration": true,
     "outDir": "dist",
     "types": ["webpack-env"],
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@spaceone/console-core-lib": ["packages/@spaceone/console-core-lib/dist/index.d.ts"],
+      "@spaceone/console-core-lib/*": ["packages/@spaceone/console-core-lib/dist/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
-  "exclude": ["node_modules", "src/**/*.stories.ts", "__tests__"]
+  "exclude": ["packages", "node_modules", "src/**/*.stories.ts", "__tests__"]
 }
