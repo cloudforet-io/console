@@ -4,7 +4,7 @@
   "description": "SpaceONE Console Core Library",
   "scripts": {
     "build": "npm run babel && npm run tsc",
-    "build:watch": "babel src --watch --out-dir dist --extensions \".ts\" --source-maps inline --copy-files & tsc -w",
+    "build:watch": "babel src --watch --out-dir dist --extensions \".ts\" --source-maps inline --copy-files & tsc -w & tsc-alias -w",
     "tsc-alias:watch": "tsc-alias -w",
     "babel": "babel src --out-dir dist --extensions \".ts\" --source-maps inline --copy-files",
     "tsc": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
@@ -81,5 +81,10 @@
       "@semantic-release/git",
       "@semantic-release/changelog"
     ]
+  },
+  "main": "./dist/index.js",
+  "type": "module",
+  "typesVersions": {
+    ">=3.1": { "*": ["./dist/*"] }
   }
 }
