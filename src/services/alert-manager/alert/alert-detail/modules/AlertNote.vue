@@ -4,6 +4,15 @@
             {{ $t('MONITORING.ALERT.DETAIL.NOTE.NOTE') }}
         </p-panel-top>
         <article class="note-wrapper">
+            <article class="add-note-wrapper">
+                <p-textarea :value="noteInput" @input="handleChangeNoteInput" />
+                <p-button style-type="gray-border" size="md" class="add-btn"
+                          :disabled="(noteInput.trim()).length === 0 || manageDisabled"
+                          @click="handleCreateNote"
+                >
+                    {{ $t('MONITORING.ALERT.DETAIL.NOTE.ADD_NOTE') }}
+                </p-button>
+            </article>
             <p-collapsible-list :items="noteList" toggle-position="contents" :line-clamp="2">
                 <template #title="{data, title, index}">
                     <div class="title-wrapper">
@@ -22,15 +31,6 @@
                     <span class="note-content">{{ data.note }}</span>
                 </template>
             </p-collapsible-list>
-        </article>
-        <article class="add-note-wrapper">
-            <p-textarea :value="noteInput" @input="handleChangeNoteInput" />
-            <p-button style-type="gray-border" size="md" class="add-btn"
-                      :disabled="(noteInput.trim()).length === 0 || manageDisabled"
-                      @click="handleCreateNote"
-            >
-                {{ $t('MONITORING.ALERT.DETAIL.NOTE.ADD_NOTE') }}
-            </p-button>
         </article>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
@@ -121,7 +121,7 @@ export default {
                         note_id: d.note_id,
                     },
                     ...d,
-                }));
+                })).reverse();
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.noteList = [];
@@ -203,6 +203,15 @@ export default {
 .note-wrapper {
     @apply flex flex-col;
     margin-top: 0.5rem;
+    .p-collapsible-list {
+        max-height: 27.5rem;
+        overflow-y: scroll;
+    }
+    .p-select-dropdown::v-deep {
+        .p-context-menu {
+            right: 0;
+        }
+    }
     .title-wrapper {
         display: flex;
         align-items: center;
@@ -224,7 +233,7 @@ export default {
     }
 }
 .add-note-wrapper {
-    @apply px-4 pt-2;
+    @apply px-4 pt-2 pb-4;
 }
 .add-btn {
     width: 6.125rem;
