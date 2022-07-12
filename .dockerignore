@@ -3,7 +3,6 @@
 .git
 .gitignore
 .dockerignore
-.eslintrc.cjs
 .eslintrc.js
 node_modules
 test
