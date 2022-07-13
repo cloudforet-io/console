@@ -25,6 +25,7 @@
     "@spaceone/console-core-lib": "^1.16.0",
     "@spaceone/design-system": "^1.1.0-beta.343",
     "@vue/composition-api": "^1.6.2",
+    "@vueuse/core": "^8.3.1",
     "@vvo/tzdb": "^6.4.1",
     "animated-number-vue": "^1.0.0",
     "axios": "^0.25.0",
@@ -38,9 +39,11 @@
     "core-js": "^3.6.5",
     "currency.js": "^2.0.4",
     "dayjs": "^1.10.7",
+    "diff-match-patch": "^1.0.5",
     "ejs": "^3.1.7",
     "gapi-script": "^1.1.0",
     "hashids": "^2.2.1",
+    "highlight.js": "^11.5.1",
     "html-to-image": "^1.9.0",
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^8.5.1",
@@ -63,10 +66,7 @@
     "vue-selecto": "^1.6.4",
     "vuedraggable": "^2.24.1",
     "vuex": "^3.6.2",
-    "webfontloader": "^1.6.28",
-    "@vueuse/core": "^8.3.1",
-    "diff-match-patch": "^1.0.5",
-    "highlight.js": "^11.5.1"
+    "webfontloader": "^1.6.28"
   },
   "devDependencies": {
     "@babel/compat-data": "^7.18.6",
@@ -148,5 +148,8 @@
     "npm": ">= 8.1.0"
   },
   "license": "Apache-2.0",
-  "types": "dist/src/index.d.ts"
+  "types": "dist/src/index.d.ts",
+  "workspaces": [
+    "packages/@spaceone/console-core-lib"
+  ]
 }
