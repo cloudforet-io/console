@@ -21,18 +21,29 @@
             <nav class="cloud-service-history-changes-code-nav">
                 <p-card>
                     <template #header>
-                        <span>data</span>
-                        <p-i v-if="selectedKeyMenu" name="ic_arrow_right" color="#898995"
-                             scale="0.8"
-                        />
-                        <span>{{ selectedKeyMenu }}</span>
+                        <div class="flex justify-between w-full align-middle">
+                            <div>
+                                <span>data</span>
+                                <p-i v-if="selectedKeyMenu" name="ic_arrow_right" color="#898995"
+                                     scale="0.8"
+                                />
+                                <span>{{ selectedKeyMenu }}</span>
+                            </div>
+                            <div>
+                                <!--                                song-lang-->
+                                <span>Fold no changes </span>
+                                <p-check-box v-model="folding" />
+                            </div>
+                        </div>
                     </template>
                     <div class="secondary-header">
+                        <!--                        song-lang-->
                         <div>Previous</div>
+                        <!--                        song-lang-->
                         <div>Changed</div>
                     </div>
                     <div class="cloud-service-history-changes-code-area">
-                        <vueDiff :prev="previousValue" :current="changedValue" />
+                        <vue-diff :prev="previousValue" :current="changedValue" :folding="folding" />
                     </div>
                 </p-card>
             </nav>
@@ -46,7 +57,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPanelTop, PCard, PContextMenu, PI,
+    PPanelTop, PCard, PContextMenu, PI, PCheckBox,
 } from '@spaceone/design-system';
 
 import vueDiff from '@/common/components/forms/vue-diff/Diff.vue';
@@ -61,6 +72,7 @@ export default defineComponent({
         PCard,
         PContextMenu,
         PI,
+        PCheckBox,
     },
     props: {
         selectedHistoryItem: {
@@ -76,6 +88,7 @@ export default defineComponent({
             filteredDiffItem: computed(() => props.selectedHistoryItem?.diffItems?.filter(d => d.key === state.selectedKeyMenu) ?? []),
             previousValue: computed(() => JSON.stringify(state.filteredDiffItem[0]?.previousValue ?? '', undefined, 2)),
             changedValue: computed(() => JSON.stringify(state.filteredDiffItem[0]?.changedValue ?? '', undefined, 2)),
+            folding: true,
         });
 
         const handleSelect = (menu) => { state.selectedKeyMenu = menu.label; };
@@ -97,6 +110,7 @@ export default defineComponent({
             width: 20%;
             .p-card::v-deep {
                 header {
+                    @apply border-gray-200 border-solid border border-b h-8;
                     border-top-right-radius: 0;
                 }
                 .body {
@@ -108,7 +122,7 @@ export default defineComponent({
                 }
             }
             .p-i-ic_plus {
-                border: 0.1rem solid #60b731;
+                @apply border-green-600 border border-solid;
                 border-radius: 4px;
             }
         }
@@ -116,14 +130,17 @@ export default defineComponent({
             width: 80%;
             .p-card::v-deep {
                 header {
-                    @apply flex items-center;
+                    @apply flex items-center h-8 border border-b border-solid;
                     border-top-left-radius: 0;
                     border-left: 0;
                 }
                 .secondary-header {
                     @apply flex;
+                    & > :last-child {
+                        @apply border-solid border-l;
+                    }
                     div {
-                        @apply bg-gray-700 text-gray-200 text-sm w-1/2;
+                        @apply bg-gray-100 text-sm text-gray-500 w-1/2 border-gray-200 border-b border-solid;
                         padding: 4px 12px;
                     }
                 }
