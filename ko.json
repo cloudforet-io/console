@@ -1476,6 +1476,29 @@
 				"MEMBER": "연관된 멤버"
 			},
 			"HISTORY": {
+				"ALL_MONTH": "",
+				"AND_MORE": "",
+				"DETAIL": {
+					"CHANGED_KEYS": "",
+					"CHANGES": "",
+					"HISTORY": "",
+					"HISTORY_DETAIL": "",
+					"LOG": "로그",
+					"LOG_TAB": {
+						"LAST_12_HRS": "",
+						"LAST_1_DAY": "",
+						"LAST_2_DAYS": "",
+						"LAST_6_HRS": "",
+						"TIME_WITHIN": ""
+					},
+					"NOTE": "노트",
+					"NOTE_TAB": {
+						"ADD_NOTE": "",
+						"ALT_E_DELETE_NOTE": "",
+						"DELETE": "",
+						"DELETE_HELP_TEXT": ""
+					}
+				},
 				"HISTORY": "변경 기록"
 			},
 			"MAIN": {

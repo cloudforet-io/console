@@ -1476,6 +1476,29 @@
 				"MEMBER": "Related Member"
 			},
 			"HISTORY": {
+				"ALL_MONTH": "All Month",
+				"AND_MORE": "and more...",
+				"DETAIL": {
+					"CHANGED_KEYS": "Changed Keys",
+					"CHANGES": "Changes",
+					"HISTORY": "History",
+					"HISTORY_DETAIL": "History Detail",
+					"LOG": "Log",
+					"LOG_TAB": {
+						"LAST_12_HRS": "Last 12 hrs",
+						"LAST_1_DAY": "Last 1 day",
+						"LAST_2_DAYS": "Last 2 days",
+						"LAST_6_HRS": "Last 6 hrs",
+						"TIME_WITHIN": "Time Within"
+					},
+					"NOTE": "Note",
+					"NOTE_TAB": {
+						"ADD_NOTE": "Add Note",
+						"ALT_E_DELETE_NOTE": "Failed to Delete Note",
+						"DELETE": "Delete",
+						"DELETE_HELP_TEXT": "Delete this Note?"
+					}
+				},
 				"HISTORY": "History"
 			},
 			"MAIN": {
