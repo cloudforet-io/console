@@ -1,3 +1,10 @@
+# [1.1.0-beta.344](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.343...v1.1.0-beta.344) (2022-07-13)
+
+
+### Bug Fixes
+
+* add read-only at dynamic-layout raw ([#1014](https://github.com/spaceone-dev/spaceone-design-system/issues/1014)) ([6ce5d13](https://github.com/spaceone-dev/spaceone-design-system/commit/6ce5d137a94747d271741136c6695adae7ee598e))
+
 # [1.1.0-beta.343](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.342...v1.1.0-beta.343) (2022-07-07)
 
 
