@@ -6,11 +6,19 @@
             <nav class="cloud-service-history-changes-key-nav">
                 <!--            song-lang-->
                 <p-card header="Changed Keys">
-                    <p-context-menu :menu="keyMenus" @select="handleSelect" />
+                    <p-context-menu :menu="keyMenus" @select="handleSelect">
+                        <template #item--format="{ item }">
+                            <div class="flex justify-between items-center">
+                                <span>{{ item.label }}</span>
+                                <p-i v-if="item.updateType === 'ADDED'" name="ic_plus" color="#60B731"
+                                     width="1rem" height="1rem" class="p-i-ic_plus"
+                                />
+                            </div>
+                        </template>
+                    </p-context-menu>
                 </p-card>
             </nav>
             <nav class="cloud-service-history-changes-code-nav">
-                <!--                <p-card :header="`data > ${selectedKeyMenu}`">-->
                 <p-card>
                     <template #header>
                         <span>data</span>
@@ -63,11 +71,11 @@ export default defineComponent({
     setup(props) {
         const state = reactive({
             selectedKeyMenu: '',
-            keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map(d => ({ label: d.key, name: d.key })) ?? []),
+            keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map(d => ({ label: d.key, name: d.key, updateType: d.type })) ?? []),
             changesCount: computed(() => props.selectedHistoryItem?.diffCount ?? 0),
             filteredDiffItem: computed(() => props.selectedHistoryItem?.diffItems?.filter(d => d.key === state.selectedKeyMenu) ?? []),
-            previousValue: computed(() => JSON.stringify(state.filteredDiffItem[0]?.previousValue ?? '', undefined, 4)),
-            changedValue: computed(() => JSON.stringify(state.filteredDiffItem[0]?.changedValue ?? '', undefined, 4)),
+            previousValue: computed(() => JSON.stringify(state.filteredDiffItem[0]?.previousValue ?? '', undefined, 2)),
+            changedValue: computed(() => JSON.stringify(state.filteredDiffItem[0]?.changedValue ?? '', undefined, 2)),
         });
 
         const handleSelect = (menu) => { state.selectedKeyMenu = menu.label; };
@@ -98,6 +106,10 @@ export default defineComponent({
                 .p-context-menu {
                     border: none;
                 }
+            }
+            .p-i-ic_plus {
+                border: 0.1rem solid #60b731;
+                border-radius: 4px;
             }
         }
         .cloud-service-history-changes-code-nav {
