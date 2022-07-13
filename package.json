@@ -4,10 +4,11 @@
   "description": "SpaceONE Console Core Library",
   "scripts": {
     "build": "npm run babel && npm run tsc",
-    "build:watch": "babel src --watch --out-dir dist --extensions \".ts\" --source-maps inline --copy-files & tsc -w & tsc-alias -w",
-    "tsc-alias:watch": "tsc-alias -w",
+    "build:watch": "concurrently \"npm run babel:watch\"  \"npm run tsc:watch\"",
     "babel": "babel src --out-dir dist --extensions \".ts\" --source-maps inline --copy-files",
+    "babel:watch": "babel src --watch --out-dir dist --extensions \".ts\" --source-maps inline --copy-files",
     "tsc": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "tsc:watch": "tsc-watch --project . --outDir ./dist --onSuccess \"tsc-alias -w\"",
     "prepare": "node -e \"if(require('fs').existsSync('.git')){process.exit(1)}\" || is-ci || husky install",
     "lint": "eslint --ext .js,.ts src",
     "lint:fix": "eslint --fix --ext .js,.ts src",
@@ -53,19 +54,23 @@
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
     "babel-plugin-module-resolver": "^4.1.0",
+    "concurrently": "^7.2.2",
     "cross-env": "^7.0.3",
     "eslint": "^7.30.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-import-resolver-typescript": "^2.4.0",
     "eslint-plugin-import": "^2.26.0",
     "husky": "^7.0.4",
+    "install": "^0.13.0",
     "lint-staged": "^11.2.6",
     "mocha": "^9.1.3",
     "nodemon": "^2.0.9",
+    "npm": "^8.13.2",
     "rimraf": "^3.0.2",
     "semantic-release": "^17.4.4",
     "ts-node": "^10.7.0",
     "tsc-alias": "^1.3.7",
+    "tsc-watch": "^5.0.3",
     "tsconfig-paths": "^3.11.0",
     "typescript": "^4.6.2"
   },
@@ -85,6 +90,10 @@
   "main": "./dist/index.js",
   "type": "module",
   "typesVersions": {
-    ">=3.1": { "*": ["./dist/*"] }
+    ">=3.1": {
+      "*": [
+        "./dist/*"
+      ]
+    }
   }
 }
