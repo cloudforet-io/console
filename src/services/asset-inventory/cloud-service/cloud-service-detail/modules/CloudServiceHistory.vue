@@ -82,7 +82,6 @@ import {
     computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { makeDistinctValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
@@ -104,6 +103,7 @@ import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTime
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
+import { makeCustomValueHandler } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/helper';
 import CloudServiceHistoryDetailOverlay
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailOverlay.vue';
 import {
@@ -183,12 +183,7 @@ export default {
                 ] as KeyItem[],
             }],
             valueHandlerMap: {
-                'diff.key': makeDistinctValueHandler(
-                    'inventory.ChangeHistory',
-                    'diff.key',
-                    'string',
-                    [{ k: 'cloud_service_id', v: props.cloudServiceId, o: 'eq' }],
-                ),
+                'diff.key': makeCustomValueHandler('diff.key', props.cloudServiceId),
             },
         });
 
