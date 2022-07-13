@@ -69,6 +69,7 @@ interface Props {
     provider: string;
     cloudServiceId: string;
     date: string;
+    prevDate: string | undefined;
 }
 interface PeriodItem {
     name: string;
@@ -98,6 +99,10 @@ export default defineComponent<Props>({
             type: String,
             default: '',
         },
+        prevDate: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props) {
         const state = reactive({
@@ -109,6 +114,12 @@ export default defineComponent<Props>({
             tabs: [] as TabItem[],
             activeTab: '',
             timeWithinList: computed<PeriodItem[]>(() => ([
+                {
+                    name: 'auto',
+                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.AUTO'),
+                    start: props.prevDate ? dayjs.utc(props.prevDate) : dayjs.utc(props.date).subtract(1, 'day'),
+                    end: dayjs.utc(props.date),
+                },
                 {
                     name: 'last6hrs',
                     label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_6_HRS'),
@@ -134,7 +145,7 @@ export default defineComponent<Props>({
                     end: dayjs.utc(props.date),
                 },
             ])),
-            selectedTimeWithin: 'last6hrs',
+            selectedTimeWithin: 'auto',
             layouts: [] as DynamicLayout[],
             currentLayout: computed(() => state.layouts.find(layout => layout.name === state.activeTab)),
             dataSourceIds: {} as { [key: string]: string },
@@ -147,15 +158,15 @@ export default defineComponent<Props>({
             try {
                 state.loading = true;
                 const selectedTimeWithin = state.timeWithinList.find(timeWith => timeWith.name === state.selectedTimeWithin);
-                const { logs } = await SpaceConnector.client.monitoring.log.list({
+                const { results } = await SpaceConnector.client.monitoring.log.list({
                     data_source_id: state.dataSourceIds[state.activeTab],
                     resource_id: props.cloudServiceId,
                     keyword: state.searchText,
                     start: selectedTimeWithin?.start.toISOString(),
                     end: selectedTimeWithin?.end.toISOString(),
                 });
-                state.totalCount = logs.length;
-                state.data = logs.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1);
+                state.totalCount = results.length;
+                state.data = results.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.data = [];
