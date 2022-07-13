@@ -49,8 +49,7 @@
                                     {{ diffItem.changedValue }}
                                 </div>
                             </div>
-                            <!--                    song-lang-->
-                            <span v-if="item.diffCount > DIFF_ITEM_LIMIT" class="text-gray-500">and more...</span>
+                            <span v-if="item.diffCount > DIFF_ITEM_LIMIT" class="text-gray-500">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.AND_MORE') }}</span>
                         </div>
                     </template>
                 </vertical-timeline>
@@ -94,6 +93,7 @@ import localeData from 'dayjs/plugin/localeData';
 import { range } from 'lodash';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -153,8 +153,7 @@ export default {
             monthMenuItems: computed<SelectDropdownMenu[]>(() => {
                 const months = i18nDayjs.value.months();
                 const menuItems = [
-                    // song-lang
-                    { name: 'all', label: 'All Month' },
+                    { name: 'all', label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.ALL_MONTH') },
                 ];
                 months.forEach((month, idx) => {
                     menuItems.push({

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top :title="title" use-total-count :total-count="totalCount" />
+        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG')" use-total-count :total-count="totalCount" />
         <p-button-tab v-if="tabs.length > 0"
                       :tabs="tabs"
                       :active-tab="activeTab"
@@ -24,8 +24,7 @@
                     >
                         <template #toolbox-top>
                             <div class="filter">
-                                <!--song-lang-->
-                                <span class="filter-label">{{ $t('Time Within') }}</span>
+                                <span class="filter-label">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.TIME_WITHIN') }}</span>
                                 <p-select-status
                                     v-for="(item, index) in timeWithinList"
                                     :key="`${item.name}-${index}`"
@@ -104,35 +103,33 @@ export default defineComponent<Props>({
         const state = reactive({
             loading: true,
             searchText: '',
-            title: computed(() => i18n.t('Log')),
             totalCount: 0,
             pageStart: 1,
             pageLimit: 15,
             tabs: [] as TabItem[],
             activeTab: '',
             timeWithinList: computed<PeriodItem[]>(() => ([
-                // song-lang
                 {
                     name: 'last6hrs',
-                    label: i18n.t('LAST_6_HRS'),
+                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_6_HRS'),
                     start: dayjs.utc(props.date).subtract(6, 'hour'),
                     end: dayjs.utc(props.date),
                 },
                 {
                     name: 'last12hrs',
-                    label: i18n.t('LAST_12_HRS'),
+                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_12_HRS'),
                     start: dayjs.utc(props.date).subtract(12, 'hour'),
                     end: dayjs.utc(props.date),
                 },
                 {
                     name: 'last1day',
-                    label: i18n.t('LAST_1_DAY'),
+                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_1_DAY'),
                     start: dayjs.utc(props.date).subtract(1, 'day'),
                     end: dayjs.utc(props.date),
                 },
                 {
                     name: 'last2day',
-                    label: i18n.t('LAST_2_DAYS'),
+                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_2_DAYS'),
                     start: dayjs.utc(props.date).subtract(2, 'day'),
                     end: dayjs.utc(props.date),
                 },

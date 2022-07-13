@@ -1,11 +1,9 @@
 <template>
     <div class="cloud-service-history-changes-tab">
-        <!--        song-lang-->
-        <p-panel-top title="Changes" use-total-count :total-count="changesCount" />
+        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES')" use-total-count :total-count="changesCount" />
         <div class="cloud-service-history-changes-wrapper">
             <nav class="cloud-service-history-changes-key-nav">
-                <!--            song-lang-->
-                <p-card header="Changed Keys">
+                <p-card :header="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGED_KEYS')">
                     <p-context-menu :menu="keyMenus" @select="handleSelect">
                         <template #item--format="{ item }">
                             <div class="flex justify-between items-center">

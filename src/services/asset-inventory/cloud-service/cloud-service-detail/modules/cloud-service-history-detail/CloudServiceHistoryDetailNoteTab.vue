@@ -1,8 +1,7 @@
 <template>
     <p-pane-layout class="cloud-service-history-detail-note">
         <p-panel-top>
-            <!--            song-lang-->
-            Note
+            {{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}
         </p-panel-top>
         <article class="note-wrapper">
             <p-collapsible-list :items="noteList" toggle-position="contents" :line-clamp="2">
@@ -30,8 +29,7 @@
                       :disabled="(noteInput.trim()).length === 0 || manageDisabled"
                       @click="handleCreateNote"
             >
-                <!--                song-lang -->
-                Add Note
+                {{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.ADD_NOTE') }}
             </p-button>
         </article>
         <delete-modal :header-title="checkDeleteState.headerTitle"
@@ -56,6 +54,7 @@ import {
 
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -98,12 +97,11 @@ export default {
             loading: true,
             timezone: computed(() => store.state.user.timezone),
             userId: computed(() => store.state.user.userId),
-            menuItems: [
+            menuItems: computed(() => [
                 {
-                    // song-lang
-                    label: 'Delete', name: 'delete',
+                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE'), name: 'delete',
                 },
-            ],
+            ]),
             selectedNoteIdForDelete: '',
         });
 
@@ -151,8 +149,7 @@ export default {
         };
 
         const checkDeleteState = reactive({
-            // song-lang
-            headerTitle: 'Delete this Note?',
+            headerTitle: computed(() => i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE_HELP_TEXT')),
             visible: false,
             loading: false,
         });
@@ -173,8 +170,7 @@ export default {
                     note_id: state.selectedNoteIdForDelete,
                 });
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, 'Failed to Delete Note');
+                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.ALT_E_DELETE_NOTE'));
             } finally {
                 checkDeleteState.loading = false;
                 checkDeleteState.visible = false;

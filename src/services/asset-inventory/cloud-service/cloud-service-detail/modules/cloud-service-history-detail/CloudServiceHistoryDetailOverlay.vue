@@ -1,13 +1,11 @@
 <template>
     <div class="cloud-service-history-detail">
         <p-pane-layout class="page-wrapper">
-            <!--            song-lang-->
-            <p-page-title title="History Details" child @goBack="handleGoBack" />
+            <p-page-title :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')" child @goBack="handleGoBack" />
             <div class="content-wrapper">
                 <div class="left-part">
                     <div class="title-wrapper">
-                        <!--                        song-lang-->
-                        <span class="title">History</span>
+                        <span class="title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY') }}</span>
                         <span class="total-count">({{ totalCount }})</span>
                     </div>
                     <div ref="timelineWrapperRef" class="timeline-wrapper">
@@ -131,10 +129,9 @@ export default defineComponent<Props>({
             selectedHistoryRecordDate: '',
             proxySelectedHistoryItem: useProxyValue('selectedHistoryItem', props, emit),
             tabs: computed(() => ([
-                // song-lang
-                { name: 'changed', label: i18n.t('Changed') },
-                { name: 'log', label: i18n.t('Log') },
-                { name: 'note', label: i18n.t('Note') },
+                { name: 'changed', label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES') },
+                { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG') },
+                { name: 'note', label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') },
             ] as TabItem[])),
             activeTab: 'changed',
         });
