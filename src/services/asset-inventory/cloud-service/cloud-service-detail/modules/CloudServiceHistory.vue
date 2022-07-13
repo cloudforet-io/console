@@ -12,7 +12,7 @@
                    :key-item-sets="handlerState.keyItemSets"
                    :value-handler-map="handlerState.valueHandlerMap"
                    @change="handleChange"
-                   @refresh="handleRefresh"
+                   @refresh="handleChange()"
         >
             <template #left-area>
                 <p-select-dropdown class="month-select-dropdown"
@@ -85,6 +85,7 @@ import {
 import { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
@@ -186,6 +187,7 @@ export default {
                 'diff.key': makeCustomValueHandler('diff.key', props.cloudServiceId),
             },
         });
+        const searchQueryHelper = new QueryHelper().setKeyItemSets(handlerState.keyItemSets);
 
         /* Util */
         const getConvertedHistoryData = (rawData: any[]): CloudServiceHistoryItem[] => rawData.map(data => ({
@@ -230,24 +232,26 @@ export default {
             }
             try {
                 state.loading = true;
-                // todo: date filter
-                // let startDate;
-                // let endDate;
-                // if (state.selectedMonth !== 'all') {
-                //     startDate = dayjs.utc(`${state.selectedYear}-${state.selectedMonth}`).startOf('month');
-                //     endDate = startDate.add(1, 'month');
-                // } else {
-                //     startDate = dayjs.utc(state.selectedYear).startOf('year');
-                //     endDate = startDate.add(1, 'year');
-                // }
-                // apiQueryHelper.setFilters([
-                //     { k: 'created_at', v: startDate.format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
-                //     { k: 'created_at', v: endDate.format('YYYY-MM-DD HH:mm:ss'), o: '<t' },
-                // ]);
                 apiQueryHelper.setPage(state.pageStart, DIFF_ITEM_LIMIT);
+                let startDate;
+                let endDate;
+                if (state.selectedMonth !== 'all') {
+                    startDate = dayjs.utc(`${state.selectedYear}-${state.selectedMonth}`).startOf('month');
+                    endDate = startDate.add(1, 'month');
+                } else {
+                    startDate = dayjs.utc(state.selectedYear).startOf('year');
+                    endDate = startDate.add(1, 'year');
+                }
+                apiQueryHelper.setFilters([
+                    { k: 'created_at', v: startDate.format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
+                    { k: 'created_at', v: endDate.format('YYYY-MM-DD HH:mm:ss'), o: '<t' },
+                    ...searchQueryHelper.filters,
+                ]);
                 const { results, total_count } = await SpaceConnector.client.inventory.changeHistory.list({
                     cloud_service_id: props.cloudServiceId,
-                    query: apiQueryHelper.data,
+                    query: {
+                        ...apiQueryHelper.data,
+                    },
                 });
                 const convertedData = getConvertedHistoryData(results);
                 state.items = state.items.concat(convertedData);
@@ -274,12 +278,9 @@ export default {
         };
         const handleChange = async (options: ToolboxOptions = {}) => {
             setApiQueryWithToolboxOptions(apiQueryHelper, options);
-            if (options.searchText !== undefined) {
-                apiQueryHelper.setFilters([{ v: options.searchText }]);
+            if (options.queryTags) {
+                searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
             }
-            await listHistory(true);
-        };
-        const handleRefresh = async () => {
             await listHistory(true);
         };
         const handleLoadMore = () => {
@@ -323,7 +324,6 @@ export default {
             handleClickTimeline,
             handleCloseOverlay,
             handleChange,
-            handleRefresh,
             handleSelectMonth,
             handleSelectYear,
             handleLoadMore,
