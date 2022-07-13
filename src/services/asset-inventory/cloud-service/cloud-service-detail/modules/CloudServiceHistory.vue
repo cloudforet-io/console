@@ -205,11 +205,8 @@ export default {
         }));
         const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
         const getConvertedChangedValue = (value) => {
-            // todo: 종민님이 value 모두 string 으로 바꿔주시면 수정해야 함
-            if (typeof value === 'object') {
-                if (Array.isArray(value)) return '[ ... ]';
-                return '{ ... }';
-            }
+            if (value.startsWith('[')) return '[ ... ]';
+            if (value.startsWith('{')) return '{ ... }';
             return value;
         };
         const delay = time => new Promise(resolve => setTimeout(resolve, time));
