@@ -1485,6 +1485,7 @@
 					"HISTORY_DETAIL": "",
 					"LOG": "로그",
 					"LOG_TAB": {
+						"AUTO": "",
 						"LAST_12_HRS": "",
 						"LAST_1_DAY": "",
 						"LAST_2_DAYS": "",
