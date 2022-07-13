@@ -83,7 +83,10 @@ interface Props {
     loading: boolean;
     historyItems: CloudServiceHistoryItem[];
     selectedHistoryItem: CloudServiceHistoryItem;
+    selectedKeyName?: string;
     totalCount: number;
+    provider: string;
+    cloudServiceId: string;
 }
 
 interface SelectedCloudServiceHistoryItem {
@@ -115,6 +118,10 @@ export default defineComponent<Props>({
         selectedHistoryItem: {
             type: Object,
             default: () => ({}) as PropType<CloudServiceHistoryItem>,
+        },
+        selectedKeyName: {
+            type: String,
+            default: undefined,
         },
         totalCount: {
             type: Number,
@@ -150,6 +157,7 @@ export default defineComponent<Props>({
 
         /* Event */
         const handleGoBack = () => {
+            // todo: hash 값으로 이동하도록 수정
             emit('close');
         };
         const handleClickTimeline = (selectedItem: SelectedCloudServiceHistoryItem) => {

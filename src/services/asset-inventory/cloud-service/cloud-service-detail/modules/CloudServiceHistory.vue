@@ -4,11 +4,13 @@
                      :total-count="totalCount"
                      use-total-count
         />
-        <p-toolbox search-type="plain"
+        <p-toolbox search-type="query"
                    searchable
                    :pagination-visible="false"
                    :page-size-changeable="false"
                    :search-text.sync="searchText"
+                   :key-item-sets="handlerState.keyItemSets"
+                   :value-handler-map="handlerState.valueHandlerMap"
                    @change="handleChange"
                    @refresh="handleRefresh"
         >
@@ -41,12 +43,13 @@
                             <div v-for="(diffItem, kIdx) in item.diffItems"
                                  :key="`key-value-item-${diffItem.key}-${kIdx}`"
                                  class="key-value-item"
+                                 @click="handleClickKey(diffItem.key)"
                             >
                                 <div class="key-wrapper">
                                     {{ diffItem.key }}
                                 </div>
                                 <div v-if="item.action === 'UPDATE'" class="value-wrapper">
-                                    {{ diffItem.changedValue }}
+                                    {{ getConvertedChangedValue(diffItem.changedValue) }}
                                 </div>
                             </div>
                             <span v-if="item.diffCount > DIFF_ITEM_LIMIT" class="text-gray-500">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.AND_MORE') }}</span>
@@ -63,6 +66,7 @@
                                                   :loading="loading"
                                                   :history-items="items"
                                                   :selected-history-item.sync="selectedHistoryItem"
+                                                  :selected-key-name="selectedKeyName"
                                                   :total-count="totalCount"
                                                   :provider="provider"
                                                   :cloud-service-id="cloudServiceId"
@@ -78,7 +82,8 @@ import {
     computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
+import { makeDistinctValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
+import { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -164,10 +169,27 @@ export default {
             }),
             items: [] as CloudServiceHistoryItem[],
             selectedHistoryItem: undefined as undefined | CloudServiceHistoryItem,
+            selectedKeyName: undefined as undefined | string,
             showDetailOverlay: false,
             totalCount: 0,
             pageStart: 1,
             searchText: '',
+        });
+        const handlerState = reactive({
+            keyItemSets: [{
+                title: 'Properties',
+                items: [
+                    { name: 'diff.key', label: 'Key' },
+                ] as KeyItem[],
+            }],
+            valueHandlerMap: {
+                'diff.key': makeDistinctValueHandler(
+                    'inventory.ChangeHistory',
+                    'diff.key',
+                    'string',
+                    [{ k: 'cloud_service_id', v: props.cloudServiceId, o: 'eq' }],
+                ),
+            },
         });
 
         /* Util */
@@ -185,6 +207,14 @@ export default {
             diffCount: data.diff_count,
         }));
         const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
+        const getConvertedChangedValue = (value) => {
+            // todo: 종민님이 value 모두 string 으로 바꿔주시면 수정해야 함
+            if (typeof value === 'object') {
+                if (Array.isArray(value)) return '[ ... ]';
+                return '{ ... }';
+            }
+            return value;
+        };
         const delay = time => new Promise(resolve => setTimeout(resolve, time));
         const loadMoreHistoryData = async () => {
             const newPageStart = state.pageStart + DIFF_ITEM_LIMIT;
@@ -241,6 +271,9 @@ export default {
             state.selectedHistoryItem = item;
             state.showDetailOverlay = true;
         };
+        const handleClickKey = (keyName: string) => {
+            state.selectedKeyName = keyName;
+        };
         const handleCloseOverlay = () => {
             state.showDetailOverlay = false;
         };
@@ -288,9 +321,10 @@ export default {
 
         return {
             ...toRefs(state),
-            iso8601Formatter,
+            handlerState,
             DIFF_ITEM_LIMIT,
             getTimelineColor,
+            getConvertedChangedValue,
             handleClickTimeline,
             handleCloseOverlay,
             handleChange,
@@ -298,6 +332,7 @@ export default {
             handleSelectMonth,
             handleSelectYear,
             handleLoadMore,
+            handleClickKey,
         };
     },
 };
@@ -341,6 +376,15 @@ export default {
                 max-width: 50%;
                 margin-right: 0.625rem;
                 margin-bottom: 0.625rem;
+                &:hover {
+                    .key-wrapper {
+                        @apply bg-blue-200 text-blue-700;
+                        text-decoration: underline;
+                    }
+                    .value-wrapper {
+                        @apply bg-blue-200 text-blue-700;
+                    }
+                }
                 .key-wrapper {
                     @apply bg-primary-4 border border-primary-3;
                     padding: 0.5rem 0.75rem;
