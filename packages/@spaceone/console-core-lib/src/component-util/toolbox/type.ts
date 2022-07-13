@@ -1,4 +1,4 @@
-import { QueryTag } from '@src/component-util/query-search/type';
+import { QueryTag } from '@/component-util/query-search/type';
 
 export interface ToolboxOptions {
     pageStart?: number;

@@ -7,11 +7,11 @@ import {
     APIError, AuthenticationError,
     AuthorizationError, BadRequestError,
     NotFoundError
-} from '@src/space-connector/error';
+} from '@/space-connector/error';
 import {
     AxiosPostResponse,
     SessionTimeoutCallback
-} from '@src/space-connector/type';
+} from '@/space-connector/type';
 
 const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';

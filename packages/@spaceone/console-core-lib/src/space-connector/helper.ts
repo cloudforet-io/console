@@ -1,5 +1,5 @@
-import { QueryHelper } from '@src/query';
-import { Query, Sort } from '@src/space-connector/type';
+import { QueryHelper } from '@/query';
+import { Query, Sort } from '@/space-connector/type';
 
 class ApiQueryHelper extends QueryHelper {
     private _data: Query = {};

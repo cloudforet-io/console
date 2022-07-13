@@ -11,16 +11,16 @@ import {
     KeyItemSet,
     OperatorType,
     QueryItem
-} from '@src/component-util/query-search/type';
+} from '@/component-util/query-search/type';
 import {
     datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,
     rawQueryOperatorToPluralApiQueryOperatorMap
-} from '@src/query/config';
-import { convertDatetimeQueryStoreFilterToFilters } from '@src/query/helper';
+} from '@/query/config';
+import { convertDatetimeQueryStoreFilterToFilters } from '@/query/helper';
 import {
     QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator
-} from '@src/query/type';
-import { Filter, FilterOperator } from '@src/space-connector/type';
+} from '@/query/type';
+import { Filter, FilterOperator } from '@/space-connector/type';
 
 dayjs.extend(utc);
 dayjs.extend(tz);

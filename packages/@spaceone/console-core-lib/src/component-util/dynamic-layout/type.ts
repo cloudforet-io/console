@@ -1,5 +1,5 @@
-import { DynamicField } from '@src/component-util/dynamic-layout/field-schema';
-import { SearchDataType, SearchKeyOptions, SearchSchema } from '@src/component-util/dynamic-layout/layout-schema';
+import { DynamicField } from '@/component-util/dynamic-layout/field-schema';
+import { SearchDataType, SearchKeyOptions, SearchSchema } from '@/component-util/dynamic-layout/layout-schema';
 
 export interface Reference {
     resource_type: string;

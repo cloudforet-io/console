@@ -1,10 +1,10 @@
 import { AxiosRequestConfig } from 'axios';
 import { camelCase } from 'lodash';
 
-import API from '@src/space-connector/api';
+import API from '@/space-connector/api';
 import {
     SessionTimeoutCallback, APIInfo, MockInfo, AxiosPostResponse
-} from '@src/space-connector/type';
+} from '@/space-connector/type';
 
 const API_REFLECTION_URL = '/api/reflection';
 

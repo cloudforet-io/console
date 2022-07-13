@@ -2,7 +2,7 @@
 /* eslint-disable no-tabs */
 import { AxiosError } from 'axios';
 
-import { RESPONSE } from '@src/space-connector/type';
+import { RESPONSE } from '@/space-connector/type';
 
 export class APIError extends Error {
 	status?: number;
