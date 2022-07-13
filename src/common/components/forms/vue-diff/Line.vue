@@ -1,6 +1,6 @@
 <template>
     <div
-        ref="line"
+        ref="lineRef"
         class="vue-diff-row"
         :class="`vue-diff-row-${mode}`"
         :style="rowStyle"
@@ -100,7 +100,7 @@ export default defineComponent({
         },
     },
     setup(props, { emit }) {
-        const line = ref<null | HTMLElement>(null);
+        const lineRef = ref<null | HTMLElement>(null);
         const rowStyle = computed(() => {
             if (!props.scrollOptions) return undefined;
             return {
@@ -135,22 +135,22 @@ export default defineComponent({
         };
 
         const rendered = () => {
-            if (!line.value || props.meta.height === line.value.offsetHeight) return;
-            emit('setLineHeight', props.meta.index, line.value.offsetHeight);
+            if (!lineRef.value || props.meta.height === lineRef.value.offsetHeight) return;
+            emit('setLineHeight', props.meta.index, lineRef.value.offsetHeight);
         };
 
         if (props.scrollOptions) {
             useResizeObserver(
-                line,
+                lineRef,
                 useThrottleFn(() => {
-                    if (!line.value || props.meta.height === line.value.offsetHeight) return;
-                    emit('setLineHeight', props.meta.index, line.value.offsetHeight);
+                    if (!lineRef.value || props.meta.height === lineRef.value.offsetHeight) return;
+                    emit('setLineHeight', props.meta.index, lineRef.value.offsetHeight);
                 }, props.scrollOptions.delay),
             );
         }
 
         return {
-            line, isFoldLine, rendered, rowStyle, setCode,
+            lineRef, isFoldLine, rendered, rowStyle, setCode,
         };
     },
 });

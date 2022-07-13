@@ -10,5 +10,6 @@ export const FILE_NAME_PREFIX = Object.freeze({
     costAnalysis: 'costAnalysis',
     budget: 'budget',
     policy: 'policy',
+    cloudServiceHistoryLog: 'cloud_service_history_log',
 });
 // export type FILE_NAME_PREFIX = typeof FILE_NAME_PREFIX[keyof typeof FILE_NAME_PREFIX]

@@ -23,9 +23,9 @@
                           table-style-type="simple"
                           disable-hover
             >
-                <template #col-format="{field: { name }, item, index}">
+                <template #col-format="{field, item, index}">
                     <div class="right">
-                        <template v-if="name === groupBy">
+                        <template v-if="field.name === groupBy">
                             <p-status class="group-by-index"
                                       :text="getConvertedIndex(index, itemSetIdx).toString()"
                                       :icon-color="item.backgroundColor"
