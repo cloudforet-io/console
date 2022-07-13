@@ -4,8 +4,7 @@
             {{ layoutName }}
         </p-panel-top>
         <p-text-editor class="m-4" :code="rootData" :loading="loading"
-                       need-refine
-                       folded
+                       need-refine folded read-only
         />
     </div>
 </template>
