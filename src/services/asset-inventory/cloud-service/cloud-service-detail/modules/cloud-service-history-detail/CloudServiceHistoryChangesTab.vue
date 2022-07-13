@@ -59,6 +59,7 @@ import {
 import {
     PPanelTop, PCard, PContextMenu, PI, PCheckBox,
 } from '@spaceone/design-system';
+import { isObject } from 'lodash';
 
 import vueDiff from '@/common/components/forms/vue-diff/Diff.vue';
 
@@ -86,10 +87,17 @@ export default defineComponent({
             keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map(d => ({ label: d.key, name: d.key, updateType: d.type })) ?? []),
             changesCount: computed(() => props.selectedHistoryItem?.diffCount ?? 0),
             filteredDiffItem: computed(() => props.selectedHistoryItem?.diffItems?.filter(d => d.key === state.selectedKeyMenu) ?? []),
-            previousValue: computed(() => JSON.stringify(state.filteredDiffItem[0]?.previousValue ?? '', undefined, 2)),
-            changedValue: computed(() => JSON.stringify(state.filteredDiffItem[0]?.changedValue ?? '', undefined, 2)),
+            previousValue: computed(() => valueConverter(state.filteredDiffItem[0]?.previousValue)),
+            changedValue: computed(() => valueConverter(state.filteredDiffItem[0]?.changedValue)),
             folding: true,
         });
+
+        const valueConverter = (value) => {
+            if (value === null) return undefined;
+            if (typeof value === 'string') return value;
+            if (isObject(value)) return JSON.stringify(value, undefined, 2);
+            return undefined;
+        };
 
         const handleSelect = (menu) => { state.selectedKeyMenu = menu.label; };
 
