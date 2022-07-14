@@ -24,6 +24,12 @@
   * Used library: codemirror
   * https://github.com/codemirror/codemirror5
 * */
+
+/**
+ * PTextEditor can get any types,
+ * CodeMirror can get String ONLY
+ */
+
 import {
     ComponentRenderProxy, computed, defineComponent,
     getCurrentInstance, onBeforeUnmount, PropType,
@@ -55,7 +61,6 @@ interface Props {
     loading: boolean;
     folded: boolean;
     highlightLines?: Array<number>;
-    needRefine?: boolean;
 }
 
 export default defineComponent<Props>({
@@ -63,7 +68,7 @@ export default defineComponent<Props>({
     components: { PLottie },
     props: {
         code: {
-            type: [String, Object, Array],
+            type: [Array, Object, String, Number, undefined, null] as PropType<any>,
             default: null,
             required: true,
         },
@@ -100,10 +105,6 @@ export default defineComponent<Props>({
             type: Array as PropType<Array<number>>,
             default: () => [],
         },
-        needRefine: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
@@ -114,7 +115,26 @@ export default defineComponent<Props>({
             mergedOptions: computed(() => ({ ...props.options, readOnly: props.readOnly })),
         });
 
-        const stringifyCode = code => JSON.stringify(code, undefined, 4);
+        const refineCode = (code: any): string => {
+            if (typeof code === 'string') {
+                if (code.startsWith('{') || code.startsWith('[')) {
+                    try {
+                        // Object encased in String
+                        // "{height: 182}"
+                        return JSON.stringify(JSON.parse(code), undefined, 4);
+                    } catch {
+                        // Looks like Object encased in String, BUT Pure String
+                        // "{haha}"
+                        return code;
+                    }
+                }
+                // Pure String
+                // "haha"
+                return code;
+            }
+            // Object, null, undefined, Number
+            return JSON.stringify(code, undefined, 4);
+        };
 
         const forceFold = (cmInstance) => {
             if (props.folded && cmInstance && props.code) {
@@ -180,7 +200,7 @@ export default defineComponent<Props>({
         watch([() => state.textareaRef, () => props.code], async ([textareaRef, code]) => {
             if (!textareaRef) return;
             if (!state.cmInstance) init(textareaRef);
-            setCode(state.cmInstance, props.needRefine ? stringifyCode(code) : code);
+            setCode(state.cmInstance, refineCode(code));
             if (props.highlightLines) setHighlightLines(state.cmInstance, props.highlightLines);
             forceFold(state.cmInstance);
             refresh(state.cmInstance);

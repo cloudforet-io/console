@@ -1,8 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
 
-import { textEditorModes } from '@/inputs/text-editor/config';
-
-
 const sampleCodeObj = {
     server_id: 'server-283cd170d17d',
     name: 'spaceone-dev-eks-cluster_kubectl',
@@ -76,14 +73,14 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
             type: 'object',
         },
     },
-    mode: {
-        name: 'mode',
-        type: { name: 'string' },
-        description: 'Mode of text editor.',
-        defaultValue: 'edit',
+    readOnly: {
+        name: 'readOnly',
+        type: { name: 'boolean' },
+        description: 'Whether Mode of text editor is ReadOnly',
+        defaultValue: false,
         table: {
             type: {
-                summary: 'string',
+                summary: 'boolean',
             },
             category: 'props',
             defaultValue: {
@@ -91,8 +88,7 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
             },
         },
         control: {
-            type: 'select',
-            options: textEditorModes,
+            type: 'boolean',
         },
     },
     loading: {
