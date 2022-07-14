@@ -1,6 +1,6 @@
 <template>
     <p-pane-layout class="cloud-service-history-detail-note">
-        <p-panel-top>
+        <p-panel-top use-total-count :total-count="totalCount">
             {{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}
         </p-panel-top>
         <article class="note-wrapper">
@@ -103,6 +103,7 @@ export default {
                 },
             ]),
             selectedNoteIdForDelete: '',
+            totalCount: 0,
         });
 
 
@@ -125,6 +126,7 @@ export default {
                     },
                     ...d,
                 }));
+                state.totalCount = res.total_count;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.noteList = [];

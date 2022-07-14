@@ -1,44 +1,54 @@
 <template>
     <div>
-        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG')" use-total-count :total-count="totalCount" />
-        <p-button-tab v-if="tabs.length > 0"
-                      :tabs="tabs"
-                      :active-tab="activeTab"
-                      keep-alive-all
-                      @change="handleChangeTab"
-        >
-            <template v-for="(layout, i) in layouts" #[layout.name]>
-                <div :key="`${layout.name}-${i}`" class="log-dynamic-layout">
-                    <p-dynamic-layout :type="layout.type"
-                                      :options="layout.options"
-                                      :data="data"
-                                      :type-options="{
-                                          loading,
-                                          searchText,
-                                          totalCount,
-                                      }"
-                                      :fetch-options="{
-                                          pageLimit,
-                                      }"
-                                      v-on="dynamicLayoutListeners"
-                    >
-                        <template #toolbox-top>
-                            <div class="filter">
-                                <span class="filter-label">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.TIME_WITHIN') }}</span>
-                                <p-select-status
-                                    v-for="(item, index) in timeWithinList"
-                                    :key="`${item.name}-${index}`"
-                                    v-model="selectedTimeWithin"
-                                    :value="item.name"
-                                >
-                                    {{ item.label }}
-                                </p-select-status>
-                            </div>
-                        </template>
-                    </p-dynamic-layout>
-                </div>
-            </template>
-        </p-button-tab>
+        <div v-if="tabs.length">
+            <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG')" use-total-count :total-count="totalCount" />
+            <p-button-tab v-if="tabs.length > 0"
+                          :tabs="tabs"
+                          :active-tab="activeTab"
+                          keep-alive-all
+                          @change="handleChangeTab"
+            >
+                <template v-for="(layout, i) in layouts" #[layout.name]>
+                    <div :key="`${layout.name}-${i}`" class="log-dynamic-layout">
+                        <p-dynamic-layout :type="layout.type"
+                                          :options="layout.options"
+                                          :data="data"
+                                          :type-options="{
+                                              loading,
+                                              searchText,
+                                              totalCount,
+                                          }"
+                                          :fetch-options="{
+                                              pageLimit,
+                                          }"
+                                          v-on="dynamicLayoutListeners"
+                        >
+                            <template #toolbox-top>
+                                <div class="filter">
+                                    <span class="filter-label">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.TIME_WITHIN') }}</span>
+                                    <p-select-status
+                                        v-for="(item, index) in timeWithinList"
+                                        :key="`${item.name}-${index}`"
+                                        v-model="selectedTimeWithin"
+                                        :value="item.name"
+                                    >
+                                        {{ item.label }}
+                                    </p-select-status>
+                                </div>
+                            </template>
+                        </p-dynamic-layout>
+                    </div>
+                </template>
+            </p-button-tab>
+        </div>
+        <div v-else class="empty-tab">
+            <div class="container">
+                <img src="@/assets/images/illust_microscope.svg">
+                <p class="desc">
+                    {{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.NO_LOG_HELP_TEXT') }}
+                </p>
+            </div>
+        </div>
     </div>
 </template>
 <script lang="ts">
@@ -69,6 +79,7 @@ interface Props {
     provider: string;
     cloudServiceId: string;
     date: string;
+    prevDate: string | undefined;
 }
 interface PeriodItem {
     name: string;
@@ -98,6 +109,10 @@ export default defineComponent<Props>({
             type: String,
             default: '',
         },
+        prevDate: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props) {
         const state = reactive({
@@ -108,33 +123,42 @@ export default defineComponent<Props>({
             pageLimit: 15,
             tabs: [] as TabItem[],
             activeTab: '',
-            timeWithinList: computed<PeriodItem[]>(() => ([
-                {
-                    name: 'last6hrs',
-                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_6_HRS'),
-                    start: dayjs.utc(props.date).subtract(6, 'hour'),
-                    end: dayjs.utc(props.date),
-                },
-                {
-                    name: 'last12hrs',
-                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_12_HRS'),
-                    start: dayjs.utc(props.date).subtract(12, 'hour'),
-                    end: dayjs.utc(props.date),
-                },
-                {
-                    name: 'last1day',
-                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_1_DAY'),
-                    start: dayjs.utc(props.date).subtract(1, 'day'),
-                    end: dayjs.utc(props.date),
-                },
-                {
-                    name: 'last2day',
-                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_2_DAYS'),
-                    start: dayjs.utc(props.date).subtract(2, 'day'),
-                    end: dayjs.utc(props.date),
-                },
-            ])),
-            selectedTimeWithin: 'last6hrs',
+            timeWithinList: computed<PeriodItem[]>(() => {
+                const checkDate = props.prevDate ? dayjs.utc(props.date).diff(props.prevDate, 'day') < 2 : false;
+                return ([
+                    {
+                        name: 'auto',
+                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.AUTO'),
+                        start: checkDate ? dayjs.utc(props.prevDate) : dayjs.utc(props.date).subtract(2, 'day'),
+                        end: dayjs.utc(props.date),
+                    },
+                    {
+                        name: 'last6hrs',
+                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_6_HRS'),
+                        start: dayjs.utc(props.date).subtract(6, 'hour'),
+                        end: dayjs.utc(props.date),
+                    },
+                    {
+                        name: 'last12hrs',
+                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_12_HRS'),
+                        start: dayjs.utc(props.date).subtract(12, 'hour'),
+                        end: dayjs.utc(props.date),
+                    },
+                    {
+                        name: 'last1day',
+                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_1_DAY'),
+                        start: dayjs.utc(props.date).subtract(1, 'day'),
+                        end: dayjs.utc(props.date),
+                    },
+                    {
+                        name: 'last2day',
+                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_2_DAYS'),
+                        start: dayjs.utc(props.date).subtract(2, 'day'),
+                        end: dayjs.utc(props.date),
+                    },
+                ]);
+            }),
+            selectedTimeWithin: 'auto',
             layouts: [] as DynamicLayout[],
             currentLayout: computed(() => state.layouts.find(layout => layout.name === state.activeTab)),
             dataSourceIds: {} as { [key: string]: string },
@@ -147,15 +171,15 @@ export default defineComponent<Props>({
             try {
                 state.loading = true;
                 const selectedTimeWithin = state.timeWithinList.find(timeWith => timeWith.name === state.selectedTimeWithin);
-                const { logs } = await SpaceConnector.client.monitoring.log.list({
+                const { results } = await SpaceConnector.client.monitoring.log.list({
                     data_source_id: state.dataSourceIds[state.activeTab],
                     resource_id: props.cloudServiceId,
                     keyword: state.searchText,
                     start: selectedTimeWithin?.start.toISOString(),
                     end: selectedTimeWithin?.end.toISOString(),
                 });
-                state.totalCount = logs.length;
-                state.data = logs.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1);
+                state.totalCount = results.length;
+                state.data = results.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.data = [];
@@ -253,6 +277,19 @@ export default defineComponent<Props>({
         @apply text-gray-400;
         font-size: 0.875rem;
         line-height: 1.15;
+    }
+}
+.empty-tab {
+    @apply flex justify-center items-center;
+    height: 26.125rem;
+
+    .container {
+        @apply flex flex-col items-center justify-center flex-wrap gap-8;
+        .desc {
+            @apply text-gray-400;
+            line-height: 1.25rem;
+            font-size: 1rem;
+        }
     }
 }
 </style>

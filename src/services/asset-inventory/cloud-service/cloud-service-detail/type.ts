@@ -23,7 +23,7 @@ export interface CloudServiceDetailPageParams {
 
 /* History Tab */
 export const HISTORY_ACTION_MAP = {
-    UPDATE: { label: 'Update', color: 'GREEN' },
+    UPDATE: { label: 'Updated', color: 'GREEN' },
     CREATE: { label: 'Created', color: 'BLUE' },
     DELETE: { label: 'Deleted', color: 'RED' },
 } as const;

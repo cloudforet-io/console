@@ -18,11 +18,13 @@
                                            :color="getTimelineColor(item.action)"
                                            :selected="item.recordId === selectedHistoryRecordId"
                                            :is-last-item="idx === historyItems.length-1"
-                                           @click-timeline="handleClickTimeline(item)"
-                        />
-                        <p-lottie v-if="loading" name="thin-spinner" auto
-                                  :size="2"
-                        />
+                                           @click-timeline="handleClickTimeline({cur: item, prev: historyItems[idx+1]})"
+                        >
+                            />
+                            <p-lottie v-if="loading" name="thin-spinner" auto
+                                      :size="2"
+                            />
+                        </vertical-timeline>
                     </div>
                 </div>
                 <div class="right-part">
@@ -36,6 +38,7 @@
                             <cloud-service-history-log-tab :provider="provider"
                                                            :cloud-service-id="cloudServiceId"
                                                            :date="selectedHistoryRecordDate"
+                                                           :prev-date="selectedPrevHistoryRecordDate"
                             />
                         </template>
                         <template #note>
@@ -80,7 +83,15 @@ interface Props {
     loading: boolean;
     historyItems: CloudServiceHistoryItem[];
     selectedHistoryItem: CloudServiceHistoryItem;
+    selectedKeyName?: string;
     totalCount: number;
+    provider: string;
+    cloudServiceId: string;
+}
+
+interface SelectedCloudServiceHistoryItem {
+    cur: CloudServiceHistoryItem;
+    prev: CloudServiceHistoryItem | undefined;
 }
 
 export default defineComponent<Props>({
@@ -108,6 +119,10 @@ export default defineComponent<Props>({
             type: Object,
             default: () => ({}) as PropType<CloudServiceHistoryItem>,
         },
+        selectedKeyName: {
+            type: String,
+            default: undefined,
+        },
         totalCount: {
             type: Number,
             default: 0,
@@ -127,6 +142,7 @@ export default defineComponent<Props>({
             timelineWrapperRef: null as null | HTMLElement,
             selectedHistoryRecordId: '',
             selectedHistoryRecordDate: '',
+            selectedPrevHistoryRecordDate: '' as CloudServiceHistoryItem['date']|undefined,
             proxySelectedHistoryItem: useProxyValue('selectedHistoryItem', props, emit),
             tabs: computed(() => ([
                 { name: 'changed', label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES') },
@@ -141,10 +157,12 @@ export default defineComponent<Props>({
 
         /* Event */
         const handleGoBack = () => {
+            // todo: hash 값으로 이동하도록 수정
             emit('close');
         };
-        const handleClickTimeline = (selectedItem: CloudServiceHistoryItem) => {
-            state.proxySelectedHistoryItem = selectedItem;
+        const handleClickTimeline = (selectedItem: SelectedCloudServiceHistoryItem) => {
+            state.proxySelectedHistoryItem = selectedItem.cur;
+            state.selectedPrevHistoryRecordDate = selectedItem.prev?.date;
         };
 
         /* Watcher */
@@ -232,8 +250,11 @@ export default defineComponent<Props>({
                     }
                 }
             }
-            .right-part {
+            .right-part::v-deep {
                 @apply col-span-9;
+                .p-data-table {
+                    max-height: 45vh;
+                }
             }
         }
     }

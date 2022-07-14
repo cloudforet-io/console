@@ -4,13 +4,15 @@
                      :total-count="totalCount"
                      use-total-count
         />
-        <p-toolbox search-type="plain"
+        <p-toolbox search-type="query"
                    searchable
                    :pagination-visible="false"
                    :page-size-changeable="false"
                    :search-text.sync="searchText"
+                   :key-item-sets="handlerState.keyItemSets"
+                   :value-handler-map="handlerState.valueHandlerMap"
                    @change="handleChange"
-                   @refresh="handleRefresh"
+                   @refresh="handleChange()"
         >
             <template #left-area>
                 <p-select-dropdown class="month-select-dropdown"
@@ -41,12 +43,13 @@
                             <div v-for="(diffItem, kIdx) in item.diffItems"
                                  :key="`key-value-item-${diffItem.key}-${kIdx}`"
                                  class="key-value-item"
+                                 @click="handleClickKey(diffItem.key)"
                             >
                                 <div class="key-wrapper">
                                     {{ diffItem.key }}
                                 </div>
                                 <div v-if="item.action === 'UPDATE'" class="value-wrapper">
-                                    {{ diffItem.changedValue }}
+                                    {{ getConvertedChangedValue(diffItem.changedValue) }}
                                 </div>
                             </div>
                             <span v-if="item.diffCount > DIFF_ITEM_LIMIT" class="text-gray-500">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.AND_MORE') }}</span>
@@ -63,6 +66,7 @@
                                                   :loading="loading"
                                                   :history-items="items"
                                                   :selected-history-item.sync="selectedHistoryItem"
+                                                  :selected-key-name="selectedKeyName"
                                                   :total-count="totalCount"
                                                   :provider="provider"
                                                   :cloud-service-id="cloudServiceId"
@@ -78,9 +82,10 @@ import {
     computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
+import { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
@@ -99,6 +104,7 @@ import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTime
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
+import { makeCustomValueHandler } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/helper';
 import CloudServiceHistoryDetailOverlay
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailOverlay.vue';
 import {
@@ -164,11 +170,24 @@ export default {
             }),
             items: [] as CloudServiceHistoryItem[],
             selectedHistoryItem: undefined as undefined | CloudServiceHistoryItem,
+            selectedKeyName: undefined as undefined | string,
             showDetailOverlay: false,
             totalCount: 0,
             pageStart: 1,
             searchText: '',
         });
+        const handlerState = reactive({
+            keyItemSets: [{
+                title: 'Properties',
+                items: [
+                    { name: 'diff.key', label: 'Key' },
+                ] as KeyItem[],
+            }],
+            valueHandlerMap: {
+                'diff.key': makeCustomValueHandler('diff.key', props.cloudServiceId),
+            },
+        });
+        const searchQueryHelper = new QueryHelper().setKeyItemSets(handlerState.keyItemSets);
 
         /* Util */
         const getConvertedHistoryData = (rawData: any[]): CloudServiceHistoryItem[] => rawData.map(data => ({
@@ -185,6 +204,11 @@ export default {
             diffCount: data.diff_count,
         }));
         const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
+        const getConvertedChangedValue = (value) => {
+            if (value?.startsWith('[')) return '[ ... ]';
+            if (value?.startsWith('{')) return '{ ... }';
+            return value;
+        };
         const delay = time => new Promise(resolve => setTimeout(resolve, time));
         const loadMoreHistoryData = async () => {
             const newPageStart = state.pageStart + DIFF_ITEM_LIMIT;
@@ -205,24 +229,26 @@ export default {
             }
             try {
                 state.loading = true;
-                // todo: date filter
-                // let startDate;
-                // let endDate;
-                // if (state.selectedMonth !== 'all') {
-                //     startDate = dayjs.utc(`${state.selectedYear}-${state.selectedMonth}`).startOf('month');
-                //     endDate = startDate.add(1, 'month');
-                // } else {
-                //     startDate = dayjs.utc(state.selectedYear).startOf('year');
-                //     endDate = startDate.add(1, 'year');
-                // }
-                // apiQueryHelper.setFilters([
-                //     { k: 'created_at', v: startDate.format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
-                //     { k: 'created_at', v: endDate.format('YYYY-MM-DD HH:mm:ss'), o: '<t' },
-                // ]);
                 apiQueryHelper.setPage(state.pageStart, DIFF_ITEM_LIMIT);
+                let startDate;
+                let endDate;
+                if (state.selectedMonth !== 'all') {
+                    startDate = dayjs.utc(`${state.selectedYear}-${state.selectedMonth}`).startOf('month');
+                    endDate = startDate.add(1, 'month');
+                } else {
+                    startDate = dayjs.utc(state.selectedYear).startOf('year');
+                    endDate = startDate.add(1, 'year');
+                }
+                apiQueryHelper.setFilters([
+                    { k: 'created_at', v: startDate.format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
+                    { k: 'created_at', v: endDate.format('YYYY-MM-DD HH:mm:ss'), o: '<t' },
+                    ...searchQueryHelper.filters,
+                ]);
                 const { results, total_count } = await SpaceConnector.client.inventory.changeHistory.list({
                     cloud_service_id: props.cloudServiceId,
-                    query: apiQueryHelper.data,
+                    query: {
+                        ...apiQueryHelper.data,
+                    },
                 });
                 const convertedData = getConvertedHistoryData(results);
                 state.items = state.items.concat(convertedData);
@@ -241,17 +267,17 @@ export default {
             state.selectedHistoryItem = item;
             state.showDetailOverlay = true;
         };
+        const handleClickKey = (keyName: string) => {
+            state.selectedKeyName = keyName;
+        };
         const handleCloseOverlay = () => {
             state.showDetailOverlay = false;
         };
         const handleChange = async (options: ToolboxOptions = {}) => {
             setApiQueryWithToolboxOptions(apiQueryHelper, options);
-            if (options.searchText !== undefined) {
-                apiQueryHelper.setFilters([{ v: options.searchText }]);
+            if (options.queryTags) {
+                searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
             }
-            await listHistory(true);
-        };
-        const handleRefresh = async () => {
             await listHistory(true);
         };
         const handleLoadMore = () => {
@@ -288,16 +314,17 @@ export default {
 
         return {
             ...toRefs(state),
-            iso8601Formatter,
+            handlerState,
             DIFF_ITEM_LIMIT,
             getTimelineColor,
+            getConvertedChangedValue,
             handleClickTimeline,
             handleCloseOverlay,
             handleChange,
-            handleRefresh,
             handleSelectMonth,
             handleSelectYear,
             handleLoadMore,
+            handleClickKey,
         };
     },
 };
@@ -341,6 +368,15 @@ export default {
                 max-width: 50%;
                 margin-right: 0.625rem;
                 margin-bottom: 0.625rem;
+                &:hover {
+                    .key-wrapper {
+                        @apply bg-blue-200 text-blue-700;
+                        text-decoration: underline;
+                    }
+                    .value-wrapper {
+                        @apply bg-blue-200 text-blue-700;
+                    }
+                }
                 .key-wrapper {
                     @apply bg-primary-4 border border-primary-3;
                     padding: 0.5rem 0.75rem;

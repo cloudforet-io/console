@@ -57,7 +57,6 @@ import {
 import {
     PPanelTop, PCard, PContextMenu, PI, PCheckBox,
 } from '@spaceone/design-system';
-import { isObject } from 'lodash';
 
 import vueDiff from '@/common/components/forms/vue-diff/Diff.vue';
 
@@ -82,7 +81,7 @@ export default defineComponent({
     setup(props) {
         const state = reactive({
             selectedKeyMenu: '',
-            keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map(d => ({ label: d.key, name: d.key, updateType: d.type })) ?? []),
+            keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map((d, index) => ({ label: d.key, name: `${d.key}-${index}`, updateType: d.type })) ?? []),
             changesCount: computed(() => props.selectedHistoryItem?.diffCount ?? 0),
             filteredDiffItem: computed(() => props.selectedHistoryItem?.diffItems?.filter(d => d.key === state.selectedKeyMenu) ?? []),
             previousValue: computed(() => valueConverter(state.filteredDiffItem[0]?.previousValue)),
@@ -91,9 +90,12 @@ export default defineComponent({
         });
 
         const valueConverter = (value) => {
-            if (value === null) return undefined;
-            if (typeof value === 'string') return value;
-            if (isObject(value)) return JSON.stringify(value, undefined, 2);
+            if (typeof value === 'string' && value.length) {
+                if (value.startsWith('{') || value.startsWith('[')) {
+                    return JSON.stringify(JSON.parse(value), undefined, 2);
+                }
+                return value;
+            }
             return undefined;
         };
 

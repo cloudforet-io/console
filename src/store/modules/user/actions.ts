@@ -29,6 +29,7 @@ const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
         email: response.email,
         language: response.language,
         timezone: response.timezone,
+        requiredActions: response.required_actions,
     };
 };
 

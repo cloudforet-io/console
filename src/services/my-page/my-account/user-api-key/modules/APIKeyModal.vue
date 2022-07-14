@@ -25,7 +25,7 @@
                         {{ isAPICollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
                     </p-collapsible-toggle>
                     <p-text-editor v-if="!isAPICollapsed" class="m-4" :code="apiItem"
-                                   need-refine folded read-only
+                                   folded read-only
                     />
                 </p>
                 <p-divider class="divider" />
