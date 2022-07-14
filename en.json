@@ -27,6 +27,15 @@
 			"PERMISSION_DENIED": "Permission denied. Please, Contact administrator to get a role."
 		}
 	},
+	"AUTH": {
+		"RESET_PASSWORD_PAGE": {
+			"GO_TO_LOGIN_PAGE": "Go to Login Page",
+			"HELP_TEXT": "Enter a new password for account: ",
+			"HELP_TEXT_2": "To reset your password, go to login page and select “Forgot Password?” to send a new email.",
+			"INVALID_LINK": "Invalid Link",
+			"RESET_PASSWORD": "Reset Password"
+		}
+	},
 	"AUTOMATION": {
 		"POWER_SCHEDULER": {
 			"DETAILS": {
@@ -1479,8 +1488,13 @@
 				"ALL_MONTH": "All Month",
 				"AND_MORE": "and more...",
 				"DETAIL": {
-					"CHANGED_KEYS": "Changed Keys",
 					"CHANGES": "Changes",
+					"CHANGES_TAB": {
+						"CHANGED": "Changed",
+						"CHANGED_KEYS": "Changed Keys",
+						"FOLD_NO_CHANGES": "Fold no changes",
+						"PREVIOUS": "Previous"
+					},
 					"HISTORY": "History",
 					"HISTORY_DETAIL": "History Detail",
 					"LOG": "Log",

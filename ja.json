@@ -27,6 +27,15 @@
 			"PERMISSION_DENIED": "Permission denied. Please, Contact administrator to get a role."
 		}
 	},
+	"AUTH": {
+		"RESET_PASSWORD_PAGE": {
+			"GO_TO_LOGIN_PAGE": "",
+			"HELP_TEXT": "",
+			"HELP_TEXT_2": "",
+			"INVALID_LINK": "",
+			"RESET_PASSWORD": ""
+		}
+	},
 	"AUTOMATION": {
 		"POWER_SCHEDULER": {
 			"DETAILS": {
@@ -1479,8 +1488,13 @@
 				"ALL_MONTH": "",
 				"AND_MORE": "",
 				"DETAIL": {
-					"CHANGED_KEYS": "",
 					"CHANGES": "",
+					"CHANGES_TAB": {
+						"CHANGED": "",
+						"CHANGED_KEYS": "",
+						"FOLD_NO_CHANGES": "",
+						"PREVIOUS": ""
+					},
 					"HISTORY": "",
 					"HISTORY_DETAIL": "",
 					"LOG": "",
