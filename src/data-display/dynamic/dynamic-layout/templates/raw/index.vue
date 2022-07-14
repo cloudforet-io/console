@@ -55,7 +55,7 @@ export default {
                     const rootData = getValueByPath(props.data, props.options.root_path) ?? [];
                     return Array.isArray(rootData) ? rootData : [rootData];
                 }
-                if (typeof props.data !== 'object') return {};
+                if (props.data === null || props.data === undefined) return {};
                 return props.data;
             }),
             loading: computed(() => (props.typeOptions?.loading || false)),
