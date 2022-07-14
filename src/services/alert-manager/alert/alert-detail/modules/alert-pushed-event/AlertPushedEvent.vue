@@ -53,7 +53,7 @@
         >
             <template #body>
                 <div class="content-wrapper">
-                    <p-text-editor :code="selectedItem" class="code-block" need-refine
+                    <p-text-editor :code="selectedItem" class="code-block"
                                    read-only
                                    folded
                     />
