@@ -28,7 +28,7 @@ ENV NODE_ENV production
 
 COPY src ${BUILD_PATH}/src
 
-RUN npm run build:workspaces && npm run build \
+RUN npm run build --workspaces \
     && cp -ar ${BUILD_PATH}/dist/* ${ROOT_PATH}/ \
     && rm -rf ${BUILD_PATH}
 
