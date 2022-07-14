@@ -18,6 +18,7 @@ RUN mkdir -p ${BUILD_PATH} \
 COPY pkg/nginx.conf ${NGINX_CONF_PATH}/spaceone_console.conf
 COPY public ${BUILD_PATH}/public
 COPY package.json package-lock.json *.js ${BUILD_PATH}/
+COPY packages ${BUILD_PATH}/packages
 
 RUN npm install
 
@@ -27,7 +28,7 @@ ENV NODE_ENV production
 
 COPY src ${BUILD_PATH}/src
 
-RUN npm run build \
+RUN npm run build --workspaces \
     && cp -ar ${BUILD_PATH}/dist/* ${ROOT_PATH}/ \
     && rm -rf ${BUILD_PATH}
 

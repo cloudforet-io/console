@@ -41,15 +41,15 @@ jobs:
 
       - name: StyleLint
         run: |
-          npm run stylelint
+          npm run stylelint --workspaces --if-present
 
 
       - name: Unit Test
         run: |
-          npm run test:unit
+          npm run test:unit --workspaces
 
 
       - name: Build
         run: |
-          npm run build
+          npm run build --workspaces
 

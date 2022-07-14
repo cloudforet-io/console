@@ -1,0 +1,96 @@
+{
+  "name": "@spaceone/console-core-lib",
+  "version": "1.16.0",
+  "description": "SpaceONE Console Core Library",
+  "scripts": {
+    "build": "npm run babel && npm run tsc",
+    "build:watch": "concurrently \"npm run babel:watch\"  \"npm run tsc:watch\"",
+    "babel": "babel src --out-dir dist --extensions \".ts\" --source-maps inline --copy-files",
+    "babel:watch": "babel src --watch --out-dir dist --extensions \".ts\" --source-maps inline --copy-files",
+    "tsc": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "tsc:watch": "tsc-watch --project . --outDir ./dist --onSuccess \"tsc-alias -w\"",
+    "eslint": "eslint --ext .js,.ts src",
+    "eslint:fix": "eslint --fix --ext .js,.ts src",
+    "test:unit": "jest",
+    "semantic-release": "cp -r dist/. . && rimraf src && SKIP_PRE_COMMIT=1 SKIP_COMMIT_MSG=1 semantic-release"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spaceone-dev/console-core-lib.git"
+  },
+  "author": "SpaceONE",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/spaceone-dev/console-core-lib#readme",
+  "dependencies": {
+    "@vue/composition-api": ">= 0.6.7",
+    "axios": "^0.25.0",
+    "axios-auth-refresh": "^3.1.0",
+    "bytes": "^3.1.1",
+    "dayjs": "^1.10.7",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "luxon": "^1.27.0"
+  },
+  "peerDependencies": {
+    "@vue/composition-api": ">= 0.6.7"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.14.5",
+    "@babel/core": "^7.14.6",
+    "@babel/plugin-proposal-class-properties": "^7.14.5",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.14.5",
+    "@babel/preset-env": "^7.14.7",
+    "@babel/preset-typescript": "^7.14.5",
+    "@commitlint/cli": "^14.1.0",
+    "@commitlint/config-conventional": "^14.1.0",
+    "@semantic-release/changelog": "^5.0.1",
+    "@semantic-release/exec": "^5.0.0",
+    "@semantic-release/git": "^9.0.0",
+    "@types/bytes": "^3.1.1",
+    "@types/luxon": "^1.27.0",
+    "@types/node": "^16.11.6",
+    "@typescript-eslint/eslint-plugin": "^5.14.0",
+    "@typescript-eslint/parser": "^5.14.0",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "concurrently": "^7.2.2",
+    "cross-env": "^7.0.3",
+    "eslint": "^7.30.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-import-resolver-typescript": "^2.4.0",
+    "eslint-plugin-import": "^2.26.0",
+    "nodemon": "^2.0.9",
+    "rimraf": "^3.0.2",
+    "semantic-release": "^17.4.4",
+    "ts-node": "^10.7.0",
+    "tsc-alias": "^1.3.7",
+    "tsc-watch": "^5.0.3",
+    "tsconfig-paths": "^3.11.0",
+    "typescript": "^4.6.2"
+  },
+  "release": {
+    "branches": [
+      "master"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/npm",
+      "@semantic-release/github",
+      "@semantic-release/git",
+      "@semantic-release/changelog"
+    ]
+  },
+  "main": "./dist/index.js",
+  "type": "module",
+  "typesVersions": {
+    ">=3.1": {
+      "*": [
+        "./dist/*"
+      ]
+    }
+  },
+  "jest": {
+    "testPathIgnorePatterns": ["dist"]
+  }
+}
