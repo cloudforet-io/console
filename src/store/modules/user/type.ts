@@ -23,6 +23,7 @@ export interface UserState {
     language?: string;
     timezone?: string;
     roles?: Array<UserRole>;
+    requiredActions?: string[];
 }
 
 export interface SignInRequest {

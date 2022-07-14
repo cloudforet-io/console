@@ -23,6 +23,7 @@ const state: UserState = {
     language: storedUserState.language || 'en',
     timezone: storedUserState.timezone,
     roles: storedUserState.roles,
+    requiredActions: storedUserState.requiredActions,
 };
 
 export default {

@@ -7,7 +7,7 @@
             </p>
             <p class="help-text">
                 <!--                song-lang-->
-                Enter a new password for account: <span class="text-gray-900">{{ userInfo.userId }}</span>
+                Enter a new password for account: <span class="text-gray-900">{{ userId }}</span>
             </p>
             <div class="form-wrapper">
                 <p-field-group :label="$t('COMMON.PROFILE.PASSWORD')"
@@ -44,7 +44,7 @@
             </p-button>
         </div>
         <div v-else class="invalid-link-wrapper">
-            <!--            <img class="logo-character" src="@/assets/images/brand-asset_no-file_opacity50.svg">-->
+            <img class="logo-character" src="@/assets/images/brand-asset_no-file_opacity50.svg">
             <p class="title">
                 <!--                song-lang-->
                 Invalid Link
@@ -65,7 +65,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -84,12 +84,6 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 
-interface UserInfo {
-    userId: string;
-    userType: string;
-    requiredActions: string[];
-}
-
 const UPDATE_PASSWORD_ACTION = 'UPDATE_PASSWORD';
 
 export default {
@@ -102,8 +96,10 @@ export default {
     setup() {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
-            userInfo: {} as UserInfo,
+            userId: '',
+            userType: '',
             showResetPassword: false,
+            isLoginUser: computed(() => !!store.state.user.userId),
         });
 
         const {
@@ -139,39 +135,36 @@ export default {
         };
 
         /* Api */
-        const getUserInfo = async (userId) => {
+        const getUserInfo = async () => {
             try {
                 const result = await SpaceConnector.client.identity.user.get({
-                    user_id: userId,
+                    user_id: state.userId,
                 });
-                state.userInfo = {
-                    userId: result.user_id,
-                    userType: result.user_type || 'USER',
-                    requiredActions: result.required_actions,
-                };
-                state.showResetPassword = state.userInfo.requiredActions.includes(UPDATE_PASSWORD_ACTION);
+                state.userType = result.user_type || 'USER';
+                const requiredActions = result.required_actions;
+                state.showResetPassword = requiredActions.includes(UPDATE_PASSWORD_ACTION);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.showResetPassword = false;
             }
         };
-        const updateUser = async (userId) => {
+        const updateUser = async () => {
             try {
                 await SpaceConnector.client.identity.user.update({
-                    user_id: userId,
+                    user_id: state.userId,
                     password: password.value,
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         };
-        const signIn = async (userId, userType) => {
+        const signIn = async () => {
             try {
                 await store.dispatch('user/signIn', {
                     domainId: store.state.domain.domainId,
                     credentials: { password: password.value },
-                    userType: userType || 'USER',
-                    userId,
+                    userType: state.userType || 'USER',
+                    userId: state.userId,
                 });
             } catch (e: any) {
                 throw new Error(e);
@@ -182,20 +175,32 @@ export default {
         const handleResetPassword = async () => {
             if (!isAllValid.value) return;
 
-            await updateUser(state.userInfo.userId);
-            await signIn(state.userInfo.userId, state.userInfo.userType);
+            await updateUser();
+            await signIn();
             await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
         };
         const handleGoToLoginPage = () => {
             SpaceRouter.router.push({ name: AUTH_ROUTE.SIGN_IN._NAME });
         };
 
+        /* Init */
         (async () => {
-            const userId = getUserIdFromToken();
-            if (userId) {
-                await getUserInfo(userId);
+            if (state.isLoginUser) {
+                if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
+                    state.userId = store.state.user.userId;
+                    state.userType = store.state.user.userType;
+                    state.showResetPassword = true;
+                } else {
+                    await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                }
             } else {
-                state.showResetPassword = false;
+                const userId = getUserIdFromToken();
+                if (userId) {
+                    state.userId = userId;
+                    await getUserInfo();
+                } else {
+                    state.showResetPassword = false;
+                }
             }
         })();
 
@@ -263,6 +268,10 @@ export default {
         text-align: center;
         margin: auto;
         padding: 0;
+        .logo-character {
+            height: 6rem;
+            margin: 1rem auto;
+        }
         .title {
             @apply text-primary-1;
             font-size: 2rem;
