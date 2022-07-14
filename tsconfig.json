@@ -1,44 +1,13 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "target": "es6",
-    "module": "esnext",
-    "strict": true,
-    "jsx": "preserve",
-    "importHelpers": true,
-    "moduleResolution": "node",
-    "allowJs": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "noImplicitAny": false,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "sourceMap": true,
-    "baseUrl": ".",
-    "types": [
-      "webpack-env",
-      "jest"
-    ],
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
-    ]
+      "@/*": ["src/*", "packages/@spaceone/console-core-lib/src/*"],
+      "@spaceone/console-core-lib": ["packages/@spaceone/console-core-lib/src/"],
+      "@spaceone/console-core-lib/*": ["packages/@spaceone/console-core-lib/src/*"]
+    }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.vue"
-  ],
-  "exclude": [
-    "node_modules",
-    "src/assets",
-    "**/*.stories.ts"
-  ]
+  "include": [ "**/*.ts", "**/*.tsx", "**/*.vue" ],
+  "exclude": [ "node_modules", "src/assets", "**/*.stories.ts", "dist" ],
+  "references": [{"path": "packages/@spaceone/console-core-lib/tsconfig.ref.json"}]
 }
