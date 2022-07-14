@@ -1490,6 +1490,7 @@
 						"LAST_1_DAY": "",
 						"LAST_2_DAYS": "",
 						"LAST_6_HRS": "",
+						"NO_LOG_HELP_TEXT": "",
 						"TIME_WITHIN": ""
 					},
 					"NOTE": "노트",

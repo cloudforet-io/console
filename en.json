@@ -1490,6 +1490,7 @@
 						"LAST_1_DAY": "Last 1 day",
 						"LAST_2_DAYS": "Last 2 days",
 						"LAST_6_HRS": "Last 6 hrs",
+						"NO_LOG_HELP_TEXT": "No log available for this provider",
 						"TIME_WITHIN": "Time Within"
 					},
 					"NOTE": "Note",
