@@ -130,6 +130,14 @@ const initErrorHandler = () => {
     });
 };
 
+const checkSsoAccessToken = () => {
+    if (window.location.pathname === '/reset-password') return;
+    const queryString = window.location.search;
+    const params = new URLSearchParams(queryString);
+    const ssoAccessToken = params.get('sso_access_token');
+    if (ssoAccessToken) window.location.pathname = 'reset-password';
+};
+
 const removeInitializer = () => {
     const el = document.getElementById('site-loader-wrapper');
     if (el?.parentElement) el.parentElement.removeChild(el);
@@ -150,6 +158,7 @@ const init = async () => {
         initGtm();
         initAmcharts();
         initErrorHandler();
+        checkSsoAccessToken();
     } else {
         initRouter();
         throw new Error('Site initialization failed: No matched domain');

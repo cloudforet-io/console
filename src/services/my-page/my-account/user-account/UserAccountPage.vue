@@ -108,6 +108,7 @@ import { map } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { languages, timezoneList } from '@/store/modules/user/config';
 import { LanguageCode, UpdateUserRequest } from '@/store/modules/user/type';
@@ -115,6 +116,8 @@ import { LanguageCode, UpdateUserRequest } from '@/store/modules/user/type';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { getPasswordValidationInfo } from '@/services/auth/lib/helper';
 
 
 export default {
@@ -170,7 +173,7 @@ export default {
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
             timezoneInvalidText: computed(() => {
-                if (!formState.timezone.length) return vm.$t('IDENTITY.USER.FORM.TIMEZONE_INVALID');
+                if (!formState.timezone.length) return i18n.t('IDENTITY.USER.FORM.TIMEZONE_INVALID');
                 return '';
             }),
             showValidation: false,
@@ -181,7 +184,7 @@ export default {
             if (formState.email) {
                 if (!regex.test(formState.email)) {
                     validationState.isEmailValid = false;
-                    validationState.emailInvalidText = vm.$t('IDENTITY.USER.FORM.EMAIL_INVALID');
+                    validationState.emailInvalidText = i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID');
                 } else {
                     validationState.isEmailValid = true;
                     validationState.emailInvalidText = '';
@@ -191,30 +194,14 @@ export default {
 
         const checkPassword = async (password) => {
             // password1
-            if (password.replace(/ /g, '').length !== password.length) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
-            } else if (password.length < 8) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 });
-            } else if (!password.match(/[a-z]/)) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
-            } else if (!password.match(/[A-Z]/)) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
-            } else if (!password.match(/[0-9]/)) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
-            } else {
-                validationState.isPasswordValid = true;
-                validationState.passwordInvalidText = '';
-            }
+            const { isValid, invalidText } = getPasswordValidationInfo(password);
+            validationState.isPasswordValid = isValid;
+            validationState.passwordInvalidText = invalidText;
 
             // password2
             if (password !== formState.passwordCheck) {
                 validationState.isPasswordCheckValid = false;
-                validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
+                validationState.passwordCheckInvalidText = i18n.t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
             } else {
                 validationState.isPasswordCheckValid = true;
                 validationState.passwordCheckInvalidText = '';
@@ -229,9 +216,9 @@ export default {
                 if (userParam.language) {
                     vm.$i18n.locale = userParam.language as string;
                 }
-                showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
             }
         };
 

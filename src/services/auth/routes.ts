@@ -5,6 +5,7 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 const SignOutPage = () => import(/* webpackChunkName: "SignOutPage" */ '@/services/auth/sign-out/SignOutPage.vue');
+const ResetPasswordPage = () => import(/* webpackChunkName: "ResetPasswordPage" */ '@/services/auth/reset-password/ResetPasswordPage.vue');
 
 const SignInPage = () => import(/* webpackChunkName: "SignInPage" */ '@/services/auth/sign-in/SignInPage.vue');
 const DomainAdminSignInPage = () => import(/* webpackChunkName: "DomainAdminSignInPage" */ '@/services/auth/sign-in/DomainAdminSignInPage.vue');
@@ -79,5 +80,14 @@ export default [
             nextPath: query.nextPath,
         }),
         component: KB_SSO,
+    },
+    {
+        path: '/reset-password',
+        name: AUTH_ROUTE.RESET_PASSWORD._NAME,
+        component: ResetPasswordPage,
+        meta: {
+            isSignInPage: false,
+            accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
+        },
     },
 ] as RouteConfig[];
