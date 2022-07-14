@@ -36,7 +36,7 @@ export const convertDatetimeQueryStoreFilterToFilters = (filter: QueryStoreFilte
         }
         return [
             { k: f.k, v: time.toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['>=t'] },
-            { k: f.k, v: time.add(1, 'day').toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['<t'] }
+            { k: f.k, v: time.add(1, 'day').toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['<t'] },
         ];
     }
 

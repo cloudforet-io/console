@@ -3,7 +3,7 @@ import { camelCase } from 'lodash';
 
 import API from '@/space-connector/api';
 import {
-    SessionTimeoutCallback, APIInfo, MockInfo, AxiosPostResponse
+    SessionTimeoutCallback, APIInfo, MockInfo, AxiosPostResponse,
 } from '@/space-connector/type';
 
 const API_REFLECTION_URL = '/api/reflection';
@@ -81,8 +81,7 @@ export class SpaceConnector {
             response.data.apis.forEach((apiInfo: APIInfo) => {
                 this.bindAPIHandler(apiInfo);
             });
-        } catch (e) {
-            // @ts-ignore
+        } catch (e: any) {
             throw new Error(`SpaceONE Client LoadAPI Error: ${e.message}`);
         }
     }

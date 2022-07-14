@@ -1,7 +1,7 @@
 const CONTEXT_MENU_TYPE = {
     divider: 'divider',
     header: 'header',
-    item: 'item'
+    item: 'item',
 } as const;
 type CONTEXT_MENU_TYPE = typeof CONTEXT_MENU_TYPE[keyof typeof CONTEXT_MENU_TYPE];
 
@@ -17,7 +17,7 @@ export const OPERATOR = Object.freeze({
     lessEqual: '<=',
     equal: '=',
     notEqual: '!=',
-    regex: '~'
+    regex: '~',
 } as const);
 
 export const operators = Object.values(OPERATOR);

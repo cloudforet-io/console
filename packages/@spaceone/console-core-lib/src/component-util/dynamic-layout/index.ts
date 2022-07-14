@@ -6,7 +6,7 @@ import { ConsoleDynamicField, ConsoleSearchSchema, Reference } from '@/component
 import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
-    makeReferenceValueHandler
+    makeReferenceValueHandler,
 } from '@/component-util/query-search';
 import { KeyItemSet, ValueHandlerMap } from '@/component-util/query-search/type';
 import { Filter } from '@/space-connector/type';
@@ -36,7 +36,7 @@ interface QuerySearchProps {
 export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema[], resourceType: string, filters?: Filter[]): Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> => {
     const querySearchProps: Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> = { keyItemSets: [], valueHandlerMap: {} };
 
-    querySearchProps.keyItemSets = schema.map((s) => ({
+    querySearchProps.keyItemSets = schema.map(s => ({
         title: s.title,
         items: s.items.map((d) => {
             let operators;
@@ -46,7 +46,7 @@ export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema
             } else if (d.reference) {
                 querySearchProps.valueHandlerMap[d.key] = makeReferenceValueHandler(
                     d.reference,
-                    d.data_type
+                    d.data_type,
                 );
                 operators = ['=', '!='];
             } else {
@@ -54,14 +54,14 @@ export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema
                     resourceType,
                     d.key,
                     d.data_type,
-                    filters
+                    filters,
                 );
             }
 
             return {
-                label: d.name, name: d.key, dataType: d.data_type, operators
+                label: d.name, name: d.key, dataType: d.data_type, operators,
             };
-        })
+        }),
     }));
 
     return querySearchProps;
@@ -90,10 +90,9 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): E
     } else if (d.type === 'enum') {
         res.type = d.type;
 
-        const options = (d.options as EnumOptions)?.items || d.options;
-        if (options) {
+        const options = (d.options as EnumOptions)?.items ?? d.options;
+        if (options && typeof options !== 'string') {
             const items = {};
-            // @ts-ignore
             forEach(options, (item, k) => {
                 if (typeof item === 'string') items[k] = item;
                 else items[k] = item.name || k;
@@ -113,5 +112,5 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): E
 export default {
     makeQuerySearchPropsWithSearchSchema,
     getApiActionByLayoutType,
-    dynamicFieldsToExcelDataFields
+    dynamicFieldsToExcelDataFields,
 };

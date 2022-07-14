@@ -1,5 +1,5 @@
 import {
-    map, size, flatMap, flatten, uniq, cloneDeep
+    map, size, flatMap, flatten, uniq, cloneDeep,
 } from 'lodash';
 
 import { SearchEnumItem, SearchEnums } from '@/component-util/dynamic-layout/layout-schema';
@@ -8,7 +8,7 @@ import {
     KeyItem, KeyItemSet,
     ValueHandler,
     ValueHandlerMap,
-    ValueItem
+    ValueItem,
 } from '@/component-util/query-search/type';
 import { SpaceConnector } from '@/space-connector';
 import { Filter } from '@/space-connector/type';
@@ -21,14 +21,14 @@ const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number, 
         return {
             results: [],
             totalCount: undefined,
-            dataType: dataType || undefined
+            dataType: dataType || undefined,
         };
     }
     if (typeof d === 'string' || typeof d === 'boolean') {
         return {
             results,
             totalCount,
-            dataType: dataType || typeof d
+            dataType: dataType || typeof d,
         };
     }
     if (typeof d === 'number') {
@@ -39,7 +39,7 @@ const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number, 
         return {
             results,
             totalCount,
-            dataType: dataType || type
+            dataType: dataType || type,
         };
     }
 
@@ -49,23 +49,23 @@ const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number, 
             /* when first item is array */
             if (Array.isArray(d[0])) {
                 const next = uniq(flatten(d));
-                return getHandlerResp(next, next.map((t) => ({ label: t, name: t })), d.length, 'object');
+                return getHandlerResp(next, next.map(t => ({ label: t, name: t })), d.length, 'object');
             }
             /* when first item is object */
-            const next = uniq(flatMap(d, ((t) => Object.keys(t))));
-            return getHandlerResp(next, next.map((t) => ({ label: t, name: t })), d.length, 'object');
+            const next = uniq(flatMap(d, (t => Object.keys(t))));
+            return getHandlerResp(next, next.map(t => ({ label: t, name: t })), d.length, 'object');
         }
 
         /* when first item is primitive type */
-        return getHandlerResp(d, d.map((t) => ({ label: t, name: t })), d.length, 'object');
+        return getHandlerResp(d, d.map(t => ({ label: t, name: t })), d.length, 'object');
     }
 
     /* object case */
     const keys = Object.keys(d);
     return {
-        results: keys.map((k) => ({ label: k, name: k })),
+        results: keys.map(k => ({ label: k, name: k })),
         totalCount: keys.length,
-        dataType: dataType || 'object'
+        dataType: dataType || 'object',
     };
 };
 
@@ -83,7 +83,7 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
     const staticParam: any = {
         resource_type: resourceType,
         options: { limit: limit || 10 },
-        distinct_key: distinct
+        distinct_key: distinct,
     };
 
     return async (inputText: string, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
@@ -102,19 +102,19 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
         try {
             const res = await SpaceConnector.client.addOns.autocomplete.distinct(param);
 
-            if (keyItem.dataType === 'object') return getHandlerResp(res.results[0]?.key, res.results.map((d) => ({ label: d.name, name: d.key })), res.total_count);
+            if (keyItem.dataType === 'object') return getHandlerResp(res.results[0]?.key, res.results.map(d => ({ label: d.name, name: d.key })), res.total_count);
 
             return {
                 results: res.results.reduce((results, d) => {
                     if (d.name !== '' && d.name !== undefined && d.name !== null) results.push({ label: d.name, name: d.key });
                     return results;
                 }, []),
-                totalCount: res.total_count
+                totalCount: res.total_count,
             };
         } catch (e) {
             return {
                 results: [],
-                totalCount: 0
+                totalCount: 0,
             };
         }
     };
@@ -136,7 +136,7 @@ export function makeReferenceValueHandler(resourceType: string, dataType?: KeyDa
     return async (inputText: string) => {
         try {
             const res = await SpaceConnector.client.addOns.autocomplete.resource({
-                ...param, search: inputText
+                ...param, search: inputText,
             });
             return {
                 results: res.results.reduce((results, d) => {
@@ -144,13 +144,13 @@ export function makeReferenceValueHandler(resourceType: string, dataType?: KeyDa
                     return results;
                 }, []),
                 totalCount: res.total_count,
-                dataType
+                dataType,
             };
         } catch (e) {
             return {
                 results: [],
                 totalCount: 0,
-                dataType
+                dataType,
             };
         }
     };
@@ -162,16 +162,15 @@ export function makeReferenceValueHandler(resourceType: string, dataType?: KeyDa
  * @param enums
  */
 export function makeEnumValueHandler(
-    enums: SearchEnums
+    enums: SearchEnums,
 ): ValueHandler {
     const totalCount = size(enums);
-    // @ts-ignore
-    const allItems: ValueItem[] = map(enums, (d: SearchEnumItem|string, k: number|string) => {
+    const allItems: ValueItem[] = map<SearchEnumItem|string>(enums, (d: SearchEnumItem|string, k) => {
         if (typeof d === 'string') {
             return { label: d, name: d };
         }
         return { label: d.label, name: k, icon: d.icon };
-    });
+    }) as unknown as ValueItem[];
 
     return async (inputText: string) => {
         let res: ValueItem[] = [...allItems];
@@ -185,7 +184,7 @@ export function makeEnumValueHandler(
 
         return {
             results: res,
-            totalCount
+            totalCount,
         };
     };
 }

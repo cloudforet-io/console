@@ -1,16 +1,16 @@
 import axios, {
-    AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse
+    AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse,
 } from 'axios';
 import jwt from 'jsonwebtoken';
 
 import {
     APIError, AuthenticationError,
     AuthorizationError, BadRequestError,
-    NotFoundError
+    NotFoundError,
 } from '@/space-connector/error';
 import {
     AxiosPostResponse,
-    SessionTimeoutCallback
+    SessionTimeoutCallback,
 } from '@/space-connector/type';
 
 const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
@@ -31,8 +31,8 @@ class API {
 
     private defaultAxiosConfig: AxiosRequestConfig = {
         headers: {
-            'Content-Type': 'application/json'
-        }
+            'Content-Type': 'application/json',
+        },
     };
 
     constructor(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback) {
@@ -192,7 +192,7 @@ class API {
         // Axios response interceptor with error handling
         this.instance.interceptors.response.use(
             (response: AxiosResponse) => response,
-            (error) => Promise.reject(this.handleRequestError(error))
+            error => Promise.reject(this.handleRequestError(error)),
         );
     }
 }

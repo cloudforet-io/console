@@ -31,7 +31,7 @@ export type SearchSchema = SearchKeyGroup;
 /** Metadata schema types for Dynamic layout */
 export const dynamicLayoutTypes = [
     'item', 'simple-table', 'table', 'query-search-table',
-    'raw', 'markdown', 'list', 'raw-table', 'html'
+    'raw', 'markdown', 'list', 'raw-table', 'html',
 ];
 export type DynamicLayoutType = typeof dynamicLayoutTypes[number];
 

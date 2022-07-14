@@ -9,7 +9,7 @@ export const RESPONSE = {
     BAD_REQUEST_ERROR: 'BadRequestError',
     NOT_FOUND_ERROR: 'NotFoundError',
     AUTHENTICATION_ERROR: 'AuthenticationError',
-    AUTHORIZATION_ERROR: 'AuthorizationError'
+    AUTHORIZATION_ERROR: 'AuthorizationError',
 } as const;
 
 export type RESPONSE = typeof RESPONSE[keyof typeof RESPONSE];

@@ -10,15 +10,15 @@ import {
     KeyItem,
     KeyItemSet,
     OperatorType,
-    QueryItem
+    QueryItem,
 } from '@/component-util/query-search/type';
 import {
     datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,
-    rawQueryOperatorToPluralApiQueryOperatorMap
+    rawQueryOperatorToPluralApiQueryOperatorMap,
 } from '@/query/config';
 import { convertDatetimeQueryStoreFilterToFilters } from '@/query/helper';
 import {
-    QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator
+    QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
 } from '@/query/type';
 import { Filter, FilterOperator } from '@/space-connector/type';
 
@@ -32,7 +32,7 @@ type ReferenceStore = Record<string, ComputedRef<ReferenceMap>>;
 const filterToQueryTag = (
     filter: { k?: string; v: QueryStoreFilterValue; o?: RawQueryOperator },
     keyMap: Record<string, KeyItem>,
-    referenceStore: ReferenceStore | undefined
+    referenceStore: ReferenceStore | undefined,
 ): QueryTag | null => {
     if (filter.k === undefined || filter.k === null) {
         /* no key case */
@@ -44,7 +44,7 @@ const filterToQueryTag = (
         return {
             key: keyMap[filter.k] || { label: filter.k, name: filter.k },
             value: { label: 'Null', name: null },
-            operator: filter.o && filter.o.startsWith('!') ? '!' : '='
+            operator: filter.o && filter.o.startsWith('!') ? '!' : '=',
         };
     }
     if (datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string]) {
@@ -54,7 +54,7 @@ const filterToQueryTag = (
         return {
             key,
             value: { label: filter.v.toString(), name: filter.v },
-            operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string]
+            operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string],
         };
     }
     /* general case */
@@ -64,7 +64,7 @@ const filterToQueryTag = (
     return {
         key: keyMap[filter.k] || { label: filter.k, name: filter.k },
         value: { label, name: filter.v },
-        operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string] || filter.o || '' as OperatorType
+        operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string] || filter.o || '' as OperatorType,
     };
 };
 const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') => {
@@ -96,13 +96,13 @@ const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') 
             }
         } else if (f.v !== null && f.v !== undefined) {
             /* keyword case */
-            if (Array.isArray(f.v)) keyword.push(...f.v.map((v) => (v !== null ? v.toString().trim() : '')));
+            if (Array.isArray(f.v)) keyword.push(...f.v.map(v => (v !== null ? v.toString().trim() : '')));
             else keyword.push(f.v.toString().trim());
         }
     });
     return {
         filter,
-        keyword
+        keyword,
     };
 };
 
@@ -128,7 +128,7 @@ export class QueryHelper {
 
     setKeyItemSets(keyItemSets: KeyItemSet[]): this {
         this._keyMap = {};
-        flatten(keyItemSets.map((d) => d.items)).forEach((d) => {
+        flatten(keyItemSets.map(d => d.items)).forEach((d) => {
             this._keyMap[d.name] = d;
         });
         return this;
@@ -258,7 +258,7 @@ export class QueryHelper {
     }
 
     get rawQueryStrings(): string[] {
-        return this.rawQueries.map((q) => JSON.stringify(q));
+        return this.rawQueries.map(q => JSON.stringify(q));
     }
 
     get rawQueryString(): string {
@@ -272,7 +272,7 @@ export class QueryHelper {
         return {
             filter,
             filterOr,
-            keyword: keyword.join(' ') || ''
+            keyword: keyword.join(' ') || '',
         };
     }
 }

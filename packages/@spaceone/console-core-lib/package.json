@@ -10,7 +10,7 @@
     "tsc": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "tsc:watch": "tsc-watch --project . --outDir ./dist --onSuccess \"tsc-alias -w\"",
     "eslint": "eslint --ext .js,.ts src",
-    "lint:fix": "eslint --fix --ext .js,.ts src",
+    "eslint:fix": "eslint --fix --ext .js,.ts src",
     "test:unit": "cross-env mocha --require ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
     "semantic-release": "cp -r dist/. . && rimraf src && SKIP_PRE_COMMIT=1 SKIP_COMMIT_MSG=1 semantic-release"
   },
