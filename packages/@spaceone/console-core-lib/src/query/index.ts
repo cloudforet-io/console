@@ -1,5 +1,3 @@
-import { ComputedRef } from '@vue/composition-api';
-
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
@@ -26,8 +24,7 @@ dayjs.extend(utc);
 dayjs.extend(tz);
 
 interface QueryTag extends Tag, QueryItem {}
-type ReferenceMap = Record<string, { label: string; name: string }>;
-type ReferenceStore = Record<string, ComputedRef<ReferenceMap>>;
+type ReferenceStore = Record<string, any>;
 
 const filterToQueryTag = (
     filter: { k?: string; v: QueryStoreFilterValue; o?: RawQueryOperator },
@@ -107,7 +104,7 @@ const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') 
 };
 
 export class QueryHelper {
-    private static timezone: ComputedRef<string> | undefined;
+    private static timezone: any | undefined;
 
     private _referenceStore: ReferenceStore | undefined;
 
@@ -117,7 +114,7 @@ export class QueryHelper {
 
     private _orFilters: QueryStoreFilter[] = [];
 
-    static init(timezone: ComputedRef<string>) {
+    static init(timezone: any) {
         QueryHelper.timezone = timezone;
     }
 
