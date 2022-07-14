@@ -12,6 +12,7 @@
     "src"
   ],
   "exclude": [
-    "dist"
+    "dist",
+    "__tests__"
   ]
 }
