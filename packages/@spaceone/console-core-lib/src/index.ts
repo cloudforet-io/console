@@ -1,10 +1,12 @@
 import bytes from 'bytes';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 
 dayjs.extend(tz);
+dayjs.extend(utc);
 
 // formatter
 export const timestampFormatter = (value, timezone) => {
