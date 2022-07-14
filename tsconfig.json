@@ -3,8 +3,8 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["src/*", "packages/@spaceone/console-core-lib/src/*"],
-      "@spaceone/console-core-lib": ["packages/@spaceone/console-core-lib/src/"],
-      "@spaceone/console-core-lib/*": ["packages/@spaceone/console-core-lib/src/*"]
+      "@spaceone/console-core-lib": ["packages/@spaceone/console-core-lib/dist/index.d.ts", "packages/@spaceone/console-core-lib/src/index.ts"],
+      "@spaceone/console-core-lib/*": ["packages/@spaceone/console-core-lib/dist/*", "packages/@spaceone/console-core-lib/src/*"]
     }
   },
   "include": [ "**/*.ts", "**/*.tsx", "**/*.vue" ],
