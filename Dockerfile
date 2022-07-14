@@ -22,7 +22,7 @@ COPY packages ${BUILD_PATH}/packages
 
 RUN npm install
 
-COPY tsconfig.json ${BUILD_PATH}/
+COPY tsconfig.base.json tsconfig.json ${BUILD_PATH}/
 COPY vue.config.js ${BUILD_PATH}/
 ENV NODE_ENV production
 
