@@ -31,7 +31,7 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
         name: 'code',
         type: { name: 'string' },
         description: 'Code',
-        defaultValue: '',
+        defaultValue: sampleCode,
         table: {
             type: {
                 summary: 'string',

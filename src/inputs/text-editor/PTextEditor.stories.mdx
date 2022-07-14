@@ -12,7 +12,7 @@ import { getTextEditorArgTypes, sampleCode } from '@/inputs/text-editor/story-he
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A182308'
     }
-}} component={PTextEditor} argTypes={getTextEditorArgTypes()}
+}} argTypes={getTextEditorArgTypes()}
 />
 
 export const Template = (args, { argTypes }) => ({
@@ -20,17 +20,9 @@ export const Template = (args, { argTypes }) => ({
     components: { PTextEditor },
     template: `
     <div class="h-full w-full overflow p-8">
-        <p-text-editor :code="sampleCode" />
+        <p-text-editor :code="code" :folded="folded" />
     </div>
     `,
-    setup() {
-        const state = reactive({
-            sampleCode: sampleCode,
-        });
-        return {
-            ...toRefs(state),
-        }
-    }
 });
 
 
@@ -63,7 +55,7 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-# Highlight Lines
+## Highlight Lines
 <br/>
 <br/>
 
@@ -91,7 +83,7 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-# Change Code
+## Change Code
 <br/>
 <br/>
 
@@ -125,6 +117,7 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## Playground
 
 <Canvas>
     <Story name="Playground">
