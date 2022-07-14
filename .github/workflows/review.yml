@@ -54,6 +54,6 @@ jobs:
 
       - name: Build
         run: |
-          npm run build --workspaces
+          npm run build:workspaces
           npm run build
 
