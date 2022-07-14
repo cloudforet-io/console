@@ -36,20 +36,24 @@ jobs:
 
       - name: ESLint
         run: |
+          npm run eslint --workspaces
           npm run eslint
 
 
       - name: StyleLint
         run: |
+          npm run stylelint --workspaces --if-present
           npm run stylelint
 
 
       - name: Unit Test
         run: |
+          npm run test:unit --workspaces
           npm run test:unit
 
 
       - name: Build
         run: |
+          npm run build --workspaces
           npm run build
 
