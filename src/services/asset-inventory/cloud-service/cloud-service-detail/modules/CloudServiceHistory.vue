@@ -205,8 +205,8 @@ export default {
         }));
         const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
         const getConvertedChangedValue = (value) => {
-            if (value.startsWith('[')) return '[ ... ]';
-            if (value.startsWith('{')) return '{ ... }';
+            if (value?.startsWith('[')) return '[ ... ]';
+            if (value?.startsWith('{')) return '{ ... }';
             return value;
         };
         const delay = time => new Promise(resolve => setTimeout(resolve, time));

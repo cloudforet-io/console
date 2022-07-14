@@ -250,8 +250,11 @@ export default defineComponent<Props>({
                     }
                 }
             }
-            .right-part {
+            .right-part::v-deep {
                 @apply col-span-9;
+                .p-data-table {
+                    max-height: 45vh;
+                }
             }
         }
     }
