@@ -16,6 +16,7 @@
                                           :type-options="{
                                               searchText,
                                               totalCount,
+                                              sortable: false,
                                           }"
                                           :fetch-options="{
                                               pageLimit,
