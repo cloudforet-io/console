@@ -28,7 +28,7 @@
                                 <span>{{ selectedKeyMenu }}</span>
                             </div>
                             <div>
-                                <span>{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.FOLD_NO_CHANGES') }}</span>
+                                <span>{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.HIDE_UNCHANGED') }}</span>
                                 <p-check-box v-model="folding" />
                             </div>
                         </div>
