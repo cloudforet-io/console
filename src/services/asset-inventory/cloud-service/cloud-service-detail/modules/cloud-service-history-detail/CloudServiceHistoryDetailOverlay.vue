@@ -28,6 +28,11 @@
                     </div>
                 </div>
                 <div class="right-part">
+                    <div class="info-wrapper">
+                        <div class="circle" :class="getTimelineColor(proxySelectedHistoryItem.action)" />
+                        <span class="action-text">{{ HISTORY_ACTION_MAP[proxySelectedHistoryItem.action].label }}</span>
+                        <span class="date-text">({{ iso8601Formatter(selectedHistoryRecordDate) }})</span>
+                    </div>
                     <p-tab :tabs="tabs"
                            :active-tab.sync="activeTab"
                     >
@@ -57,6 +62,7 @@ import {
     computed, defineComponent, getCurrentInstance, onMounted, PropType, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     PPaneLayout, PPageTitle, PTab, PLottie,
 } from '@spaceone/design-system';
@@ -184,9 +190,11 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
+            HISTORY_ACTION_MAP,
             getTimelineColor,
             handleGoBack,
             handleClickTimeline,
+            iso8601Formatter,
         };
     },
 });
@@ -252,6 +260,42 @@ export default defineComponent<Props>({
             }
             .right-part::v-deep {
                 @apply col-span-9;
+                display: grid;
+                gap: 0.5rem;
+                .info-wrapper {
+                    @apply border border-gray-200 rounded-md bg-white;
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    height: 4.125rem;
+                    padding: 1.5rem 1rem;
+                    .circle {
+                        width: 1rem;
+                        height: 1rem;
+                        border-radius: theme('borderRadius.full');
+                        left: -0.5rem;
+                        top: 1rem;
+                        margin-right: 0.5rem;
+                        &.RED {
+                            @apply border-4 border-red-200 bg-red-400;
+                        }
+                        &.GREEN {
+                            @apply border-4 border-green-300 bg-green-600;
+                        }
+                        &.BLUE {
+                            @apply border-4 border-blue-300 bg-blue-600;
+                        }
+                    }
+                    .action-text {
+                        font-size: 0.875rem;
+                        font-weight: 700;
+                        padding-right: 0.25rem;
+                    }
+                    .date-text {
+                        @apply text-gray-500;
+                        font-size: 0.875rem;
+                    }
+                }
                 .p-data-table {
                     max-height: 45vh;
                 }
