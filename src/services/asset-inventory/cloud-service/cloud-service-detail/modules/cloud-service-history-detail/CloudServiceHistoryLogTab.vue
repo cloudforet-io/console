@@ -14,7 +14,6 @@
                                           :options="layout.options"
                                           :data="data"
                                           :type-options="{
-                                              loading,
                                               searchText,
                                               totalCount,
                                           }"
