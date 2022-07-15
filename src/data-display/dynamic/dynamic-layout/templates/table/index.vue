@@ -24,7 +24,7 @@
                          :exportable="excelVisible"
                          :settings-visible="settingsVisible"
                          :timezone="timezone"
-                         sortable
+                         :sortable="sortable"
                          use-cursor-loading
                          @change="onChange"
                          @refresh="onChange()"
@@ -139,6 +139,7 @@ export default defineComponent<TableDynamicLayoutProps>({
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
             excelVisible: computed(() => (props.typeOptions?.excelVisible === undefined ? true : props.typeOptions.excelVisible)),
             settingsVisible: computed(() => props.typeOptions?.settingsVisible || false),
+            sortable: computed(() => (props.typeOptions?.sortable ?? true)),
 
             /** get data from fetch options */
             sortBy: computed(() => props.fetchOptions?.sortBy || ''),

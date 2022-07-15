@@ -32,6 +32,7 @@ export interface DynamicLayoutTypeOptions {
     valueHandlerMap?: ValueHandlerMap;
     language?: string;
     popupVisible?: boolean;
+    sortable?: boolean;
 }
 
 export interface DynamicLayoutProps<
