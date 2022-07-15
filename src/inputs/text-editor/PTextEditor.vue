@@ -159,7 +159,7 @@ export default defineComponent<Props>({
             forEach(lines, (line) => {
                 cmInstance.setGutterMarker(line, 'CodeMirror-addedline', (() => {
                     const marker = document.createElement('span');
-                    marker.innerHTML = '+';
+                    marker.innerHTML = '৹';
                     return marker;
                 })());
                 cmInstance.addLineClass(line, 'wrap', 'CodeMirror-activeline');
@@ -238,7 +238,7 @@ export default defineComponent<Props>({
             border-right: 0.03rem solid rgba(109, 138, 136, 0.5);
         }
         .CodeMirror-activeline-gutter, .CodeMirror-activeline-background {
-            background-color: rgba(172, 229, 100, 0.24);
+            background-color: rgba(255, 255, 222, 0.3);
         }
         font-family: Inconsolata, monospace;
         line-height: 1.5;

@@ -26,12 +26,12 @@ export const sampleCode = JSON.stringify(sampleCodeObj, null, ' ');
 export const getTextEditorArgTypes = (): ArgTypes => ({
     code: {
         name: 'code',
-        type: { name: 'string' },
+        type: { name: 'any' },
         description: 'Code',
         defaultValue: sampleCode,
         table: {
             type: {
-                summary: 'string',
+                summary: 'any',
             },
             category: 'props',
             defaultValue: {
@@ -125,6 +125,24 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'boolean',
+        },
+    },
+    highlightLines: {
+        name: 'highlightLines',
+        type: { name: 'Array<number>' },
+        description: 'highlight inputted lines',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'Array<number>',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'object',
         },
     },
     /* slots */
