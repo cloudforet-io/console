@@ -2,12 +2,10 @@
     <div class="reset-password-page">
         <div v-if="showResetPassword" class="reset-password-wrapper">
             <p class="title">
-                <!--                song-lang-->
-                Reset Password
+                {{ $t('AUTH.RESET_PASSWORD_PAGE.RESET_PASSWORD') }}
             </p>
             <p class="help-text">
-                <!--                song-lang-->
-                Enter a new password for account: <span class="text-gray-900">{{ userId }}</span>
+                {{ $t('AUTH.RESET_PASSWORD_PAGE.HELP_TEXT') }}<span class="text-gray-900">{{ userInfo.userId }}</span>
             </p>
             <div class="form-wrapper">
                 <p-field-group :label="$t('COMMON.PROFILE.PASSWORD')"
@@ -39,25 +37,21 @@
                       class="reset-button"
                       @click="handleResetPassword"
             >
-                <!--                song-lang-->
-                Reset Password
+                {{ $t('AUTH.RESET_PASSWORD_PAGE.RESET_PASSWORD') }}
             </p-button>
         </div>
         <div v-else class="invalid-link-wrapper">
             <img class="logo-character" src="@/assets/images/brand-asset_no-file_opacity50.svg">
             <p class="title">
-                <!--                song-lang-->
-                Invalid Link
+                {{ $t('AUTH.RESET_PASSWORD_PAGE.INVALID_LINK') }}
             </p>
             <p class="help-text">
-                <!--                song-lang-->
-                To reset your password, go to login page and select “Forgot Password?” to send a new email.
+                {{ $t('AUTH.RESET_PASSWORD_PAGE.HELP_TEXT_2') }}
             </p>
             <p-button style-type="primary" size="md" class="reset-button"
                       @click="handleGoToLoginPage"
             >
-                <!--                song-lang-->
-                Go to Login Page
+                {{ $t('AUTH.RESET_PASSWORD_PAGE.GO_TO_LOGIN_PAGE') }}
             </p-button>
         </div>
     </div>

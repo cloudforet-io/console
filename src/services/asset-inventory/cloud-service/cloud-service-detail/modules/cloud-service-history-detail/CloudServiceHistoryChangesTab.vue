@@ -3,7 +3,7 @@
         <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES')" use-total-count :total-count="changesCount" />
         <div class="cloud-service-history-changes-wrapper">
             <nav class="cloud-service-history-changes-key-nav">
-                <p-card :header="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGED_KEYS')">
+                <p-card :header="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.CHANGED_KEYS')">
                     <p-context-menu :menu="keyMenus" @select="handleSelect">
                         <template #item--format="{ item }">
                             <div class="flex justify-between items-center">
@@ -28,17 +28,14 @@
                                 <span>{{ selectedKeyMenu }}</span>
                             </div>
                             <div>
-                                <!--                                song-lang-->
-                                <span>Fold no changes </span>
+                                <span>{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.FOLD_NO_CHANGES') }}</span>
                                 <p-check-box v-model="folding" />
                             </div>
                         </div>
                     </template>
                     <div class="secondary-header">
-                        <!--                        song-lang-->
-                        <div>Previous</div>
-                        <!--                        song-lang-->
-                        <div>Changed</div>
+                        <div>{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.PREVIOUS') }}</div>
+                        <div>{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.CHANGED') }}</div>
                     </div>
                     <div class="cloud-service-history-changes-code-area">
                         <vue-diff :prev="previousValue" :current="changedValue" :folding="folding" />

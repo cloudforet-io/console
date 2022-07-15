@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <p-data-loader :loading="loading" :class="{ 'data-loader': loading }">
         <div v-if="tabs.length">
             <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG')" use-total-count :total-count="totalCount" />
             <p-button-tab v-if="tabs.length > 0"
@@ -43,13 +43,13 @@
         </div>
         <div v-else class="empty-tab">
             <div class="container">
-                <img src="@/assets/images/illust_microscope.svg">
+                <img class="image" src="@/assets/images/illust_microscope.svg">
                 <p class="desc">
                     {{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.NO_LOG_HELP_TEXT') }}
                 </p>
             </div>
         </div>
-    </div>
+    </p-data-loader>
 </template>
 <script lang="ts">
 import {
@@ -58,7 +58,7 @@ import {
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PButtonTab, PDynamicLayout, PPanelTop, PSelectStatus,
+    PButtonTab, PDynamicLayout, PPanelTop, PSelectStatus, PDataLoader,
 } from '@spaceone/design-system';
 import { DynamicLayoutEventListener } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
@@ -95,6 +95,7 @@ export default defineComponent<Props>({
         PButtonTab,
         PPanelTop,
         PSelectStatus,
+        PDataLoader,
     },
     props: {
         provider: {
@@ -249,6 +250,7 @@ export default defineComponent<Props>({
         (async () => {
             const totalLayoutCount = await getSchema();
             if (totalLayoutCount) await getLogData();
+            state.loading = false;
         })();
 
         // watcher
@@ -265,6 +267,9 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss" scoped>
+.data-loader {
+    height: 26.125rem;
+}
 .log-dynamic-layout::v-deep {
     .p-toolbox {
         padding-top: 0;
