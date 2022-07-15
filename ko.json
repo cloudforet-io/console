@@ -29,11 +29,11 @@
 	},
 	"AUTH": {
 		"RESET_PASSWORD_PAGE": {
-			"GO_TO_LOGIN_PAGE": "",
-			"HELP_TEXT": "",
+			"GO_TO_LOGIN_PAGE": "로그인 페이지로 이동",
+			"HELP_TEXT": "다음 계정의 새로운 비밀번호 입력 필요: ",
 			"HELP_TEXT_2": "",
 			"INVALID_LINK": "",
-			"RESET_PASSWORD": ""
+			"RESET_PASSWORD": "비밀번호 재설정"
 		}
 	},
 	"AUTOMATION": {
@@ -434,14 +434,14 @@
 					"COST_TYPE": "비용 발생 기준",
 					"CREATE": "예산 생성",
 					"CREATE_BUDGET": "예산 생성",
-					"CREATE_BULK_BUDGET": "",
+					"CREATE_BULK_BUDGET": "예산 일괄 추가",
 					"DESC": "내림차순",
 					"OVERSPENT": "예산초과",
 					"PERIOD": "기준 기간",
 					"SINGLE_BUDGET": "단일 예산",
 					"THIS_MONTH": "이번 달",
 					"TOTAL": "전체",
-					"UPDATE_BUDGET": "",
+					"UPDATE_BUDGET": "예산 수정",
 					"USAGE": "사용량({symbol})"
 				},
 				"STAT": {
@@ -1485,34 +1485,34 @@
 				"MEMBER": "연관된 멤버"
 			},
 			"HISTORY": {
-				"ALL_MONTH": "",
-				"AND_MORE": "",
+				"ALL_MONTH": "전체 월",
+				"AND_MORE": "and more...",
 				"DETAIL": {
-					"CHANGES": "",
+					"CHANGES": "변경 내역",
 					"CHANGES_TAB": {
-						"CHANGED": "",
-						"CHANGED_KEYS": "",
-						"FOLD_NO_CHANGES": "",
-						"PREVIOUS": ""
+						"CHANGED": "변경 후",
+						"CHANGED_KEYS": "변경된 키 목록",
+						"FOLD_NO_CHANGES": "이것은 무엇인가요??",
+						"PREVIOUS": "변경 전"
 					},
-					"HISTORY": "",
-					"HISTORY_DETAIL": "",
+					"HISTORY": "변경 이력 관리",
+					"HISTORY_DETAIL": "변경 이력 상세",
 					"LOG": "로그",
 					"LOG_TAB": {
-						"AUTO": "",
-						"LAST_12_HRS": "",
-						"LAST_1_DAY": "",
-						"LAST_2_DAYS": "",
-						"LAST_6_HRS": "",
-						"NO_LOG_HELP_TEXT": "",
-						"TIME_WITHIN": ""
+						"AUTO": "자동",
+						"LAST_12_HRS": "12시간 전",
+						"LAST_1_DAY": "1일 전",
+						"LAST_2_DAYS": "2일 전",
+						"LAST_6_HRS": "6시간 전",
+						"NO_LOG_HELP_TEXT": "해당 클라우드 프로바이더는 현재 별도의 로그를 제공하고 있지 않습니다.",
+						"TIME_WITHIN": "시간 포함 기준"
 					},
 					"NOTE": "노트",
 					"NOTE_TAB": {
-						"ADD_NOTE": "",
-						"ALT_E_DELETE_NOTE": "",
-						"DELETE": "",
-						"DELETE_HELP_TEXT": ""
+						"ADD_NOTE": "노트 추가",
+						"ALT_E_DELETE_NOTE": "삭제 실패",
+						"DELETE": "삭제",
+						"DELETE_HELP_TEXT": "선택한 노트를 삭제하시겠습니까?"
 					}
 				},
 				"HISTORY": "변경 기록"
