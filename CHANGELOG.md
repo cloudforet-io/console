@@ -1,3 +1,10 @@
+# [1.1.0-beta.348](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.347...v1.1.0-beta.348) (2022-07-15)
+
+
+### Features
+
+* add sortable type to type-options ([#1020](https://github.com/spaceone-dev/spaceone-design-system/issues/1020)) ([e15973a](https://github.com/spaceone-dev/spaceone-design-system/commit/e15973aacb857b0f136a20e0e058ffdbc1e2ea94))
+
 # [1.1.0-beta.347](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.346...v1.1.0-beta.347) (2022-07-14)
 
 
