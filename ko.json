@@ -1492,7 +1492,7 @@
 					"CHANGES_TAB": {
 						"CHANGED": "변경 후",
 						"CHANGED_KEYS": "변경된 키 목록",
-						"FOLD_NO_CHANGES": "",
+						"HIDE_UNCHANGED": "변경없는 항목 숨기기",
 						"PREVIOUS": "변경 전"
 					},
 					"HISTORY": "변경 이력 관리",

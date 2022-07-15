@@ -1492,7 +1492,7 @@
 					"CHANGES_TAB": {
 						"CHANGED": "Changed",
 						"CHANGED_KEYS": "Changed Keys",
-						"FOLD_NO_CHANGES": "Fold no changes",
+						"HIDE_UNCHANGED": "Hide Unchanged List",
 						"PREVIOUS": "Previous"
 					},
 					"HISTORY": "History",
