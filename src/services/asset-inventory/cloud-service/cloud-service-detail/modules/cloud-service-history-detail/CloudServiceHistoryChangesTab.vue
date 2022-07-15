@@ -4,7 +4,7 @@
         <div class="cloud-service-history-changes-wrapper">
             <nav class="cloud-service-history-changes-key-nav">
                 <p-card :header="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.CHANGED_KEYS')">
-                    <p-context-menu :menu="keyMenus" @select="handleSelect">
+                    <p-context-menu :menu="keyMenus" :selected="[{name: selectedKeyMenu}]" @select="handleSelect">
                         <template #item--format="{ item }">
                             <div class="flex justify-between items-center">
                                 <span>{{ item.label }}</span>
@@ -57,7 +57,9 @@ import {
 
 import vueDiff from '@/common/components/forms/vue-diff/Diff.vue';
 
-import type { CloudServiceHistoryItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
+import type {
+    CloudServiceHistoryItem,
+} from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
 export default defineComponent({
     name: 'CloudServiceHistoryChangesTab',
@@ -74,11 +76,16 @@ export default defineComponent({
             type: Object as PropType<CloudServiceHistoryItem>,
             default: () => ({}),
         },
+        selectedKeyName: {
+            type: String,
+            default: '',
+        },
     },
     setup(props) {
         const state = reactive({
-            selectedKeyMenu: '',
-            keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map((d, index) => ({ label: d.key, name: `${d.key}-${index}`, updateType: d.type })) ?? []),
+            keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map(d => ({ label: d.key, name: d.key, updateType: d.type })) ?? []),
+            // TODO:: set selectedKeyMenu as computed
+            selectedKeyMenu: props.selectedKeyName || props.selectedHistoryItem?.diffItems?.at(0)?.key || '',
             changesCount: computed(() => props.selectedHistoryItem?.diffCount ?? 0),
             filteredDiffItem: computed(() => props.selectedHistoryItem?.diffItems?.filter(d => d.key === state.selectedKeyMenu) ?? []),
             previousValue: computed(() => valueConverter(state.filteredDiffItem[0]?.previousValue)),
