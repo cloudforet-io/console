@@ -1,5 +1,5 @@
 <template>
-    <div class="cloud-service-history-detail">
+    <div class="cloud-service-history-detail-overlay">
         <p-pane-layout class="page-wrapper">
             <p-page-title :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')" child @goBack="handleGoBack" />
             <div class="content-wrapper">
@@ -19,12 +19,10 @@
                                            :selected="item.recordId === selectedHistoryRecordId"
                                            :is-last-item="idx === historyItems.length-1"
                                            @click-timeline="handleClickTimeline({cur: item, prev: historyItems[idx+1]})"
-                        >
-                            />
-                            <p-lottie v-if="loading" name="thin-spinner" auto
-                                      :size="2"
-                            />
-                        </vertical-timeline>
+                        />
+                        <p-lottie v-if="loading" name="thin-spinner" auto
+                                  :size="2"
+                        />
                     </div>
                 </div>
                 <div class="right-part">
@@ -204,7 +202,7 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss" scoped>
-.cloud-service-history-detail {
+.cloud-service-history-detail-overlay {
     position: absolute;
     display: flex;
     width: 100%;
@@ -301,6 +299,24 @@ export default defineComponent<Props>({
                 }
                 .p-data-table {
                     max-height: 45vh;
+                }
+            }
+        }
+    }
+}
+
+@screen tablet {
+    .cloud-service-history-detail-overlay {
+        display: block;
+        overflow-y: auto;
+        .page-wrapper {
+            .content-wrapper {
+                .left-part, .right-part {
+                    @apply col-span-12;
+                    gap: 1rem;
+                    .timeline-wrapper {
+                        max-height: 12rem;
+                    }
                 }
             }
         }

@@ -147,9 +147,7 @@ export default {
             selectedMonth: 'all',
             yearMenuItems: computed<SelectDropdownMenu[]>(() => {
                 const currYear = dayjs.utc();
-                const menuItems = [
-                    { name: currYear.format('YYYY'), label: currYear.format('YYYY') },
-                ];
+                const menuItems: SelectDropdownMenu[] = [];
                 range(4).forEach((i) => {
                     const date = currYear.subtract(i, 'year').format('YYYY');
                     menuItems.push({ name: date, label: date });

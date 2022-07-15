@@ -211,6 +211,7 @@ export default {
 
 <style lang="postcss" scoped>
 .cloud-service-history-detail-note {
+    border: none;
     padding-bottom: 2.5rem;
 }
 .note-wrapper {
