@@ -211,8 +211,9 @@ export default {
 
 <style lang="postcss" scoped>
 .cloud-service-history-detail-note {
+    height: 100%;
     border: none;
-    padding-bottom: 2.5rem;
+    overflow: auto;
 }
 .note-wrapper {
     @apply flex flex-col;
@@ -243,5 +244,11 @@ export default {
 .add-btn {
     width: 6.125rem;
     margin-top: 0.5rem;
+}
+
+@screen tablet {
+    .cloud-service-history-detail-note {
+        height: 30rem;
+    }
 }
 </style>

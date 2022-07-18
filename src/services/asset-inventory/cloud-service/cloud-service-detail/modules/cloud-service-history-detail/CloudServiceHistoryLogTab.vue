@@ -1,5 +1,5 @@
 <template>
-    <p-data-loader :loading="loading" :class="{ 'data-loader': loading }">
+    <p-data-loader :loading="loading" :class="{ 'data-loader': loading }" class="cloud-service-history-log-tab">
         <div v-if="tabs.length">
             <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG')" use-total-count :total-count="totalCount" />
             <p-button-tab v-if="tabs.length > 0"
@@ -66,7 +66,6 @@ import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/t
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import type { TranslateResult } from 'vue-i18n';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -268,6 +267,11 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss" scoped>
+.cloud-service-history-log-tab {
+    height: 100%;
+    padding-bottom: 0.5rem;
+    max-width: calc(100vw - 3rem);
+}
 .data-loader {
     height: 26.125rem;
 }
@@ -296,6 +300,12 @@ export default defineComponent<Props>({
             line-height: 1.25rem;
             font-size: 1rem;
         }
+    }
+}
+
+@screen tablet {
+    .cloud-service-history-log-tab {
+        height: 30rem;
     }
 }
 </style>

@@ -202,6 +202,7 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .cloud-service-history-detail-overlay {
+    @apply bg-gray-100;
     position: absolute;
     display: flex;
     width: 100%;
@@ -223,17 +224,23 @@ export default defineComponent<Props>({
         flex-grow: 1;
 
         .p-page-title {
-            @apply bg-white;
-            padding: 1.5rem;
+            height: 4rem;
+            padding-top: 1.5rem;
+            padding-left: 1.5rem;
             margin: 0;
         }
         .content-wrapper {
-            @apply grid grid-cols-12;
+            @apply flex;
+            position: relative;
+            height: calc(100vh - $(gnb-height) - 4rem);
             gap: 1rem;
-            padding: 1.5rem;
+            padding: 1rem 1.5rem;
 
             .left-part {
-                @apply col-span-3 bg-white border border-gray-200 rounded-md;
+                @apply bg-white border border-gray-200 rounded-md;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
                 padding: 1.5rem 1rem 0 1rem;
                 .title-wrapper {
                     font-size: 1rem;
@@ -247,9 +254,11 @@ export default defineComponent<Props>({
                     }
                 }
                 .timeline-wrapper {
-                    height: 72vh;
+                    height: 76vh;
                     overflow-y: auto;
-                    padding-bottom: 1.5rem;
+                    .vertical-timeline {
+                        padding-right: 1rem;
+                    }
                     .p-lottie {
                         display: flex;
                         height: 5rem;
@@ -259,9 +268,21 @@ export default defineComponent<Props>({
                 }
             }
             .right-part::v-deep {
-                @apply col-span-9;
-                display: grid;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
                 gap: 0.5rem;
+                .p-tab {
+                    flex-grow: 1;
+                    .tab-item-wrapper {
+                        height: 2.75rem;
+                    }
+                    .tab-pane {
+                        height: calc(100% - 2.75rem);
+                        padding: 0;
+                    }
+                }
                 .info-wrapper {
                     @apply border border-gray-200 rounded-md bg-white;
                     position: relative;
@@ -296,9 +317,6 @@ export default defineComponent<Props>({
                         font-size: 0.875rem;
                     }
                 }
-                .p-data-table {
-                    max-height: 45vh;
-                }
             }
         }
     }
@@ -310,8 +328,11 @@ export default defineComponent<Props>({
         overflow-y: auto;
         .page-wrapper {
             .content-wrapper {
-                .left-part, .right-part {
-                    @apply col-span-12;
+                display: grid;
+                height: auto;
+                gap: 1rem;
+                .left-part, .right-part::v-deep {
+                    display: grid;
                     gap: 1rem;
                     .timeline-wrapper {
                         max-height: 12rem;
