@@ -19,7 +19,7 @@
             <nav class="cloud-service-history-changes-code-nav">
                 <p-card>
                     <template #header>
-                        <div class="flex justify-between w-full align-middle">
+                        <div class="cloud-service-history-changes-code-header-wrapper">
                             <div>
                                 <span>data</span>
                                 <p-i v-if="selectedKeyMenu" name="ic_arrow_right" color="#898995"
@@ -84,7 +84,6 @@ export default defineComponent({
     setup(props) {
         const state = reactive({
             keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map(d => ({ label: d.key, name: d.key, updateType: d.type })) ?? []),
-            // TODO:: set selectedKeyMenu as computed
             selectedKeyMenu: props.selectedKeyName || props.selectedHistoryItem?.diffItems?.at(0)?.key || '',
             changesCount: computed(() => props.selectedHistoryItem?.diffCount ?? 0),
             filteredDiffItem: computed(() => props.selectedHistoryItem?.diffItems?.filter(d => d.key === state.selectedKeyMenu) ?? []),
@@ -117,7 +116,7 @@ export default defineComponent({
 .cloud-service-history-changes-tab {
     .cloud-service-history-changes-wrapper {
         @apply flex;
-        padding: 0 17px;
+        padding: 0 1rem;
         .cloud-service-history-changes-key-nav {
             width: 20%;
             .p-card::v-deep {
@@ -135,7 +134,7 @@ export default defineComponent({
             }
             .p-i-ic_plus {
                 @apply border-green-600 border border-solid;
-                border-radius: 4px;
+                border-radius: 0.25rem;
             }
         }
         .cloud-service-history-changes-code-nav {
@@ -153,7 +152,7 @@ export default defineComponent({
                     }
                     div {
                         @apply bg-gray-100 text-sm text-gray-500 w-1/2 border-gray-200 border-b border-solid;
-                        padding: 4px 12px;
+                        padding: 0.25rem 0.75rem;
                     }
                 }
                 .body {
@@ -163,7 +162,43 @@ export default defineComponent({
                     padding: 0;
                 }
                 .cloud-service-history-changes-code-area {
-                    height: calc(100% - 25px);
+                    height: calc(100% - 1.5rem);
+                }
+                .cloud-service-history-changes-code-header-wrapper {
+                    @apply flex justify-between w-full align-middle;
+                }
+            }
+        }
+    }
+}
+
+@screen mobile {
+    .cloud-service-history-changes-wrapper {
+        flex-flow: column;
+        & nav {
+            width: 100% !important;
+        }
+        .cloud-service-history-changes-key-nav {
+            .p-card::v-deep {
+                & .body {
+                    max-height: 11.25rem;
+                    overflow-y: scroll;
+                }
+            }
+        }
+        .cloud-service-history-changes-code-nav {
+            .p-card::v-deep {
+                & header {
+                    height: 100% !important;
+                }
+                .cloud-service-history-changes-code-header-wrapper {
+                    @apply w-full align-middle flex-col gap-1;
+                    & div {
+                        display: inline-flex !important;
+                        &:last-child {
+                            @apply justify-end;
+                        }
+                    }
                 }
             }
         }
