@@ -25,9 +25,10 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed,
-    defineComponent, onMounted, onUnmounted, PropType,
+    defineComponent, onMounted, onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -40,7 +41,7 @@ import {
     DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
 import { drawPieChart } from '@/data-display/dynamic/dynamic-chart/templates/donut/helper';
-import {
+import type {
     DynamicChartFieldHandler,
     DynamicChartTemplateProps,
     DynamicChartTheme,

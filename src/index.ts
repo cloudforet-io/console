@@ -1,6 +1,7 @@
-import { PluginObject } from 'vue';
+import type { PluginObject } from 'vue';
 
-import { SpaceDSInstaller, SpaceoneDSOptions } from './install';
+import type { SpaceoneDSOptions } from './install';
+import { SpaceDSInstaller } from './install';
 
 const SpaceoneDS: PluginObject<SpaceoneDSOptions> = {
     install: SpaceDSInstaller.install,

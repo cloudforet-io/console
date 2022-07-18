@@ -151,14 +151,15 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    toRefs, computed, reactive, watch, getCurrentInstance, ComponentRenderProxy, defineComponent,
+    toRefs, computed, reactive, watch, getCurrentInstance, defineComponent,
 } from '@vue/composition-api';
 
 import { get, range } from 'lodash';
 
 import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
-import { DataTableField, DataTableFieldType, DataTableProps } from '@/data-display/tables/data-table/type';
+import type { DataTableField, DataTableFieldType, DataTableProps } from '@/data-display/tables/data-table/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import { copyAnyData } from '@/util/helpers';
 

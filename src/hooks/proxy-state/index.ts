@@ -1,5 +1,6 @@
+import type { Ref } from '@vue/composition-api';
 import {
-    computed, Ref, ref, watch,
+    computed, ref, watch,
 } from '@vue/composition-api';
 
 /**

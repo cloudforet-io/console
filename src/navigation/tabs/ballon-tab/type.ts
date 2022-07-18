@@ -1,4 +1,4 @@
-import { TabItem } from '@/navigation/tabs/tab/type';
+import type { TabItem } from '@/navigation/tabs/tab/type';
 
 export interface BalloonTabProps {
     tabs: Array<string|TabItem>;

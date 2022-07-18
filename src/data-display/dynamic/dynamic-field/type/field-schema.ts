@@ -1,6 +1,6 @@
 /** Metadata schema types for Dynamic field */
 // eslint-disable-next-line import/no-cycle
-import { DynamicLayout } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayout } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 export const dynamicFieldTypes = ['text', 'badge', 'datetime', 'state', 'enum', 'size', 'dict', 'list', 'more'];
 

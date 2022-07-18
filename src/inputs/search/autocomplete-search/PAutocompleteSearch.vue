@@ -32,8 +32,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -42,8 +42,8 @@ import { reduce } from 'lodash';
 
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import { MenuItem } from '@/inputs/context-menu/type';
-import {
+import type { MenuItem } from '@/inputs/context-menu/type';
+import type {
     AutocompleteHandler,
 } from '@/inputs/search/autocomplete-search/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';

@@ -1,8 +1,8 @@
-import {
+import type {
     DynamicFieldProps,
     DynamicFieldTypeOptions,
 } from '@/data-display/dynamic/dynamic-field/type';
-import { MoreOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { MoreOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 
 export type MoreTypeOptions = Pick<DynamicFieldTypeOptions, 'displayKey'>;

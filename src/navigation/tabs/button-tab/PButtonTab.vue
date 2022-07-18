@@ -30,8 +30,8 @@ import {
 } from '@vue/composition-api';
 
 import { useTab } from '@/hooks/tab';
-import { ButtonTabProps } from '@/navigation/tabs/button-tab/type';
-import { TabItem } from '@/navigation/tabs/tab/type';
+import type { ButtonTabProps } from '@/navigation/tabs/button-tab/type';
+import type { TabItem } from '@/navigation/tabs/tab/type';
 
 
 export default defineComponent({

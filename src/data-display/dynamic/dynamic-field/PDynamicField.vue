@@ -31,11 +31,12 @@
 import {
     computed, defineComponent, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
-import { AsyncComponent } from 'vue';
-import { ImportedComponent } from 'vue/types/options';
+import type { AsyncComponent } from 'vue';
+import type { ImportedComponent } from 'vue/types/options';
 
-import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
-import { DynamicFieldType, dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
+import type { DynamicFieldType } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import { dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PTextList from '@/others/console/text-list/PTextList.vue';
 
 const PDynamicField = () => ({

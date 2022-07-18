@@ -20,7 +20,7 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import { ListDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/list/type';
+import type { ListDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/list/type';
 import PTextList from '@/others/console/text-list/PTextList.vue';
 import { isNotEmpty } from '@/util/helpers';
 

@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import mock, { getQueryTags } from '@/data-display/dynamic/dynamic-layout/mock';
 import { dynamicLayoutTypes } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';

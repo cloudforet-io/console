@@ -1,4 +1,4 @@
-import {
+import type {
     OperatorType, ValueItem, ValueHandler, QueryItem, KeyDataType,
 } from '@/inputs/search/query-search/type';
 

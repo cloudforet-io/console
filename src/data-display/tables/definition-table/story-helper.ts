@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
 

@@ -1,11 +1,12 @@
 import VueCompositionApi from '@vue/composition-api';
-import { PluginFunction, VueConstructor } from 'vue';
+import type { PluginFunction, VueConstructor } from 'vue';
 
 import VTooltip from 'v-tooltip';
 import velocity from 'velocity-animate';
 import Fragment from 'vue-fragment';
 import VueI18n from 'vue-i18n';
-import Notifications, { NotificationOptions } from 'vue-notification';
+import type { NotificationOptions } from 'vue-notification';
+import Notifications from 'vue-notification';
 import VueRouter from 'vue-router';
 import SvgIcon from 'vue-svgicon';
 
@@ -24,6 +25,7 @@ declare module 'vue/types/vue' {
     interface Vue {
         $notify: (options: NotificationOptions | string) => void;
     }
+	// eslint-disable-next-line @typescript-eslint/no-shadow
     interface VueConstructor {
         notify: (options: NotificationOptions | string) => void;
     }

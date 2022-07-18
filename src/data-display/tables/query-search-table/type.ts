@@ -1,6 +1,6 @@
-import { DataTableFieldType } from '@/data-display/tables/data-table/type';
-import { QueryTag } from '@/inputs/search/query-search-tags/type';
-import { KeyItemSet, QueryItem, ValueHandlerMap } from '@/inputs/search/query-search/type';
+import type { DataTableFieldType } from '@/data-display/tables/data-table/type';
+import type { QueryTag } from '@/inputs/search/query-search-tags/type';
+import type { KeyItemSet, QueryItem, ValueHandlerMap } from '@/inputs/search/query-search/type';
 
 export interface QuerySearchTableProps {
     fields: DataTableFieldType[];

@@ -14,14 +14,14 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import DOMPurify from 'dompurify';
 
-import { HtmlDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/html/type';
+import type { HtmlDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/html/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 

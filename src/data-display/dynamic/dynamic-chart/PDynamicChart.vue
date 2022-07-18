@@ -18,19 +18,20 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    defineComponent, PropType,
+    defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { AsyncComponent } from 'vue';
-import { ImportedComponent } from 'vue/types/options';
+import type { AsyncComponent } from 'vue';
+import type { ImportedComponent } from 'vue/types/options';
 
 import {
     DEFAULT_NAME_OPTIONS,
     DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_TYPE,
     DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
-import {
+import type {
     DynamicChartFieldHandler,
     DynamicChartProps, DynamicChartTheme, DynamicChartType,
 } from '@/data-display/dynamic/dynamic-chart/type';

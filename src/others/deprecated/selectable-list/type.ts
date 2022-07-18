@@ -1,4 +1,4 @@
-import { ThemeType } from '@/others/deprecated/selectable-item/type';
+import type { ThemeType } from '@/others/deprecated/selectable-item/type';
 
 export type MapperKeyType = string | ((item: any) => string);
 interface MapperType {

@@ -30,13 +30,15 @@
  * CodeMirror can get String ONLY
  */
 
+import type { ComponentRenderProxy, PropType } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, defineComponent,
-    getCurrentInstance, onBeforeUnmount, PropType,
+    computed, defineComponent,
+    getCurrentInstance, onBeforeUnmount,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import CodeMirror, { EditorConfiguration } from 'codemirror';
+import type { EditorConfiguration } from 'codemirror';
+import CodeMirror from 'codemirror';
 import { forEach } from 'lodash';
 
 import PLottie from '@/foundation/lottie/PLottie.vue';

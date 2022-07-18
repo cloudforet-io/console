@@ -59,24 +59,24 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy, PropType } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
-    computed, defineComponent, getCurrentInstance, PropType, reactive, toRefs,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import { DynamicFieldHandler, DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
-import {
+import type { DynamicFieldHandler, DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
+import type {
     QuerySearchTableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
-import { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
-import { QuerySearchTableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
+import type { QuerySearchTableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
-import { DataTableFieldType } from '@/data-display/tables/data-table/type';
-import { Options } from '@/data-display/tables/query-search-table/type';
+import type { DataTableFieldType } from '@/data-display/tables/data-table/type';
+import type { Options } from '@/data-display/tables/query-search-table/type';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
-import { KeyItemSet } from '@/inputs/search/query-search/type';
+import type { KeyItemSet } from '@/inputs/search/query-search/type';
 
 
 export default defineComponent<QuerySearchTableDynamicLayoutProps>({

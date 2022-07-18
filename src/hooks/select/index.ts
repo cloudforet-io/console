@@ -1,5 +1,6 @@
+import type { ComputedRef, UnwrapRef } from '@vue/composition-api';
 import {
-    computed, ComputedRef, reactive, toRefs, UnwrapRef,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { pull, remove } from 'lodash';

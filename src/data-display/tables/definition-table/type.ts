@@ -1,5 +1,5 @@
-import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
-import { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
+import type { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
+import type { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
 
 export interface DefinitionData {
     [key: string]: any;

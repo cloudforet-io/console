@@ -74,8 +74,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
@@ -86,7 +86,7 @@ import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 import PGridLayout from '@/others/deprecated/grid-layout/PGridLayout.vue';
-import { ToolboxGridLayoutProps } from '@/others/deprecated/toolbox-grid-layout/type';
+import type { ToolboxGridLayoutProps } from '@/others/deprecated/toolbox-grid-layout/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
 export default {

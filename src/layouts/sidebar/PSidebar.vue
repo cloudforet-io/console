@@ -37,10 +37,10 @@ import {
 } from '@vue/composition-api';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import type { SidebarProps } from '@/layouts/sidebar/type';
 import {
     STYLE_TYPE as SIDEBAR_STYLE_TYPE,
     SIZE as SIDEBAR_SIZE,
-    SidebarProps,
 } from '@/layouts/sidebar/type';
 
 export default defineComponent({

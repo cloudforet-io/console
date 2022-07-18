@@ -1,10 +1,11 @@
+import type { ComponentRenderProxy, ComputedRef } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
-    computed, ComputedRef, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
+    computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { Vue } from 'vue/types/vue';
+import type { Vue } from 'vue/types/vue';
 
-import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
+import type { ResizeObserverEntry } from '@juggle/resize-observer';
+import { ResizeObserver } from '@juggle/resize-observer';
 import { throttle } from 'lodash';
 
 import { makeOptionalProxy } from '@/util/composition-helpers';

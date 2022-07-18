@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { getTextHighlightingProps } from '@/data-display/text-highlighting/mock';
 import { TEXT_HIGHLIGHTING_STYLE_TYPE } from '@/data-display/text-highlighting/type';

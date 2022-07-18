@@ -1,9 +1,10 @@
+import type { PieSeriesDataItem, TreeMapSeriesDataItem } from '@amcharts/amcharts4/charts';
 import {
-    PieSeries, PieSeriesDataItem,
-    TreeMapSeries, TreeMapSeriesDataItem,
+    PieSeries,
+    TreeMapSeries,
 } from '@amcharts/amcharts4/charts';
 
-import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 export const drawSeriesTooltip = (series: TreeMapSeries|PieSeries, nameOptions: DynamicField): TreeMapSeries|PieSeries => {
     series.calculatePercent = true;

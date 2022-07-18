@@ -1,4 +1,5 @@
-import { computed, ComputedRef, reactive } from '@vue/composition-api';
+import type { ComputedRef } from '@vue/composition-api';
+import { computed, reactive } from '@vue/composition-api';
 
 interface Predicate<T> {
     (item: T): boolean;

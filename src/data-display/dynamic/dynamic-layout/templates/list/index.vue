@@ -25,10 +25,10 @@ import {
 import { map, replace } from 'lodash';
 
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
-import {
+import type {
     ListDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/list/type';
-import { DynamicLayout } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayout } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import { makeByPassListeners } from '@/util/composition-helpers';
 

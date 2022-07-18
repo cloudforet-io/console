@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { TOGGLE_BUTTON_THEME } from '@/inputs/buttons/toggle-button/config';
 

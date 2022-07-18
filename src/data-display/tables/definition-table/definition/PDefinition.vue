@@ -32,7 +32,7 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
+import type { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 
 export default defineComponent<DefinitionProps>({

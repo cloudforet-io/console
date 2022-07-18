@@ -1,4 +1,4 @@
-import { ModalThemeColor } from '@/feedbacks/modals/button-modal/type';
+import type { ModalThemeColor } from '@/feedbacks/modals/button-modal/type';
 
 export interface PDoubleCheckModalProps {
     verificationText: string;

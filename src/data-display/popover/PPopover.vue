@@ -25,9 +25,10 @@
 import {
     onMounted, onUnmounted, reactive, toRefs,
 } from '@vue/composition-api';
-import { PropType } from 'vue';
+import type { PropType } from 'vue';
 
-import { createPopper, Instance } from '@popperjs/core';
+import type { Instance } from '@popperjs/core';
+import { createPopper } from '@popperjs/core';
 import vClickOutside from 'v-click-outside';
 
 import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type';

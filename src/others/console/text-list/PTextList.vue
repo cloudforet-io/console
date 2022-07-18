@@ -24,7 +24,7 @@ import {
 import { get } from 'lodash';
 
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
-import { TextListItem, TextListProps } from '@/others/console/text-list/type';
+import type { TextListItem, TextListProps } from '@/others/console/text-list/type';
 import { isNotEmpty } from '@/util/helpers';
 
 export default defineComponent({

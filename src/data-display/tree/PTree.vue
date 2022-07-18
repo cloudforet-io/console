@@ -74,12 +74,12 @@ import {
 import { unionBy } from 'lodash';
 import { focus } from 'vue-focus';
 
-import { Store } from '@/data-display/tree/he-tree-vue/plugins/draggable/draggable-types';
-import {
+import type { Store } from '@/data-display/tree/he-tree-vue/plugins/draggable/draggable-types';
+import type {
     CloneTreeDataOptions, WalkTreeDataCallback,
 } from '@/data-display/tree/he-tree-vue/types';
 import { getDefaultNode } from '@/data-display/tree/helper';
-import {
+import type {
     TreeNode,
     Tree,
     Predicate,

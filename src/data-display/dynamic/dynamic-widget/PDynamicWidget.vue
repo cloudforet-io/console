@@ -12,17 +12,20 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    defineComponent, PropType,
+    defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { AsyncComponent } from 'vue';
-import { ImportedComponent } from 'vue/types/options';
+import type { AsyncComponent } from 'vue';
+import type { ImportedComponent } from 'vue/types/options';
 
-import {
-    DYNAMIC_WIDGET_TYPE,
+import type {
     DynamicWidgetFieldHandler,
     DynamicWidgetProps, DynamicWidgetType,
+} from '@/data-display/dynamic/dynamic-widget/type';
+import {
+    DYNAMIC_WIDGET_TYPE,
 } from '@/data-display/dynamic/dynamic-widget/type';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';

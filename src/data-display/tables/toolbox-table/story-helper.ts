@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { getDataTableArgsType } from '@/data-display/tables/data-table/story-helper';
 import { getToolboxArgTypes } from '@/navigation/toolbox/story-helper';

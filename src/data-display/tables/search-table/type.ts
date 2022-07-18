@@ -1,4 +1,4 @@
-import { DataTableFieldType } from '@/data-display/tables/data-table/type';
+import type { DataTableFieldType } from '@/data-display/tables/data-table/type';
 
 export interface SearchTableProps {
     fields: DataTableFieldType[];

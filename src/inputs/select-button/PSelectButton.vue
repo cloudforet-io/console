@@ -10,7 +10,8 @@
 <script lang="ts">
 import { computed, defineComponent } from '@vue/composition-api';
 
-import { SelectProps, useSelect } from '@/hooks/select';
+import type { SelectProps } from '@/hooks/select';
+import { useSelect } from '@/hooks/select';
 import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 
 interface Props extends SelectProps {

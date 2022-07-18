@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
 

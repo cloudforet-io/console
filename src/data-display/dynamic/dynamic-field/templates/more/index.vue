@@ -15,13 +15,14 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed,
-    defineComponent, PropType, reactive, toRefs,
+    defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { MoreDynamicFieldProps, MoreTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/more/type';
-import { MoreOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { MoreDynamicFieldProps, MoreTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/more/type';
+import type { MoreOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 
 const PDynamicLayout = () => import('@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue');

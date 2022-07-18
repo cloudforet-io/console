@@ -1,6 +1,6 @@
-import {
+import type {
     DynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/type';
-import { ListOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { ListOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 export type ListDynamicLayoutProps = DynamicLayoutProps<ListOptions>

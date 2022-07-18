@@ -32,7 +32,8 @@ import {
 } from '@vue/composition-api';
 
 import PI from '@/foundation/icons/PI.vue';
-import { SelectProps, useSingleSelect } from '@/hooks/select';
+import type { SelectProps } from '@/hooks/select';
+import { useSingleSelect } from '@/hooks/select';
 
 interface Props extends SelectProps {
     invalid?: boolean;

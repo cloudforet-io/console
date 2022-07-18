@@ -72,24 +72,25 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { groupBy } from 'lodash';
 
 import { useProxyValue } from '@/hooks/proxy-state';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import { MenuItem } from '@/inputs/context-menu/type';
+import type { MenuItem } from '@/inputs/context-menu/type';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
-import { QueryTag } from '@/inputs/search/query-search-tags/type';
+import type { QueryTag } from '@/inputs/search/query-search-tags/type';
 import PQuerySearch from '@/inputs/search/query-search/PQuerySearch.vue';
-import { QueryItem } from '@/inputs/search/query-search/type';
+import type { QueryItem } from '@/inputs/search/query-search/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
 import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
-import { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/type';
+import type { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
 

@@ -11,13 +11,13 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance,
     reactive, toRefs,
 } from '@vue/composition-api';
 
-import {
+import type {
     MarkdownDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/markdown/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';

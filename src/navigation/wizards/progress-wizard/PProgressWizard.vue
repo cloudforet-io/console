@@ -124,7 +124,7 @@ import { size } from 'lodash';
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
-import {
+import type {
     ProgressWizardProps,
 } from '@/navigation/wizards/progress-wizard/type';
 import PTooltipButton from '@/others/deprecated/tooltip-button/PTooltipButton.vue';

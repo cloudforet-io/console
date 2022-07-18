@@ -22,7 +22,7 @@ import VueFormJsonSchema from 'vue-form-json-schema/dist/vue-form-json-schema.es
 
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import { getFormUiSchema, getDefaultInputValue } from '@/inputs/forms/json-schema-form/helper';
-import {
+import type {
     JsonSchema, JsonSchemaFormProps, UiSchema,
 } from '@/inputs/forms/json-schema-form/type';
 import PTextInput from '@/inputs/input/PTextInput.vue';

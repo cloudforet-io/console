@@ -1,4 +1,4 @@
-import { CloneTreeDataOptions, WalkTreeDataCallback, Node } from '@/data-display/tree/he-tree-vue/types';
+import type { CloneTreeDataOptions, WalkTreeDataCallback, Node } from '@/data-display/tree/he-tree-vue/types';
 
 export interface TreeNode<T=any> extends Node {
     data: T;

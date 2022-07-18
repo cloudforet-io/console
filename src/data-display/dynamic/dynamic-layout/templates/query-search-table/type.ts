@@ -1,6 +1,6 @@
-import {
+import type {
     DynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/type';
-import { QuerySearchTableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { QuerySearchTableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 export type QuerySearchTableDynamicLayoutProps = DynamicLayoutProps<QuerySearchTableOptions>

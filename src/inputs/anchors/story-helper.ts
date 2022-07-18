@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 import VueRouter from 'vue-router';
 
 import { AnchorSize, IconPosition } from '@/inputs/anchors/type';

@@ -34,13 +34,14 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed,
-    defineComponent, PropType, reactive, toRefs,
+    defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { TranslateResult } from 'vue-i18n';
-import { Location } from 'vue-router';
+import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router';
 
 import PTextHighlighting from '@/data-display/text-highlighting/PTextHighlighting.vue';
 import PI from '@/foundation/icons/PI.vue';

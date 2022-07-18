@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import { getKeyItemSets, getQueryTags, getValueHandlerMap } from '@/navigation/toolbox/mock';

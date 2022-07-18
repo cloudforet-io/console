@@ -42,8 +42,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed,
+    computed,
     defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -51,7 +52,7 @@ import {
     COLLAPSIBLE_LIST_THEME,
     COLLAPSIBLE_LIST_TOGGLE_POSITION,
 } from '@/data-display/collapsibles/collapsible-list/config';
-import { CollapsibleItem, CollapsibleListProps } from '@/data-display/collapsibles/collapsible-list/type';
+import type { CollapsibleItem, CollapsibleListProps } from '@/data-display/collapsibles/collapsible-list/type';
 import PCollapsiblePanel from '@/data-display/collapsibles/collapsible-panel/PCollapsiblePanel.vue';
 import PCollapsibleToggle from '@/data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';

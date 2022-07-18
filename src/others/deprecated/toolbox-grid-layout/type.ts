@@ -1,4 +1,4 @@
-import { GridLayoutProps } from '@/others/deprecated/grid-layout/type';
+import type { GridLayoutProps } from '@/others/deprecated/grid-layout/type';
 
 
 export interface ToolboxGridLayoutProps extends GridLayoutProps {

@@ -56,21 +56,21 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import type { ComponentRenderProxy, PropType } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
-    computed, defineComponent, getCurrentInstance, PropType, reactive, toRefs,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import { DynamicFieldHandler, DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
-import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import {
+import type { DynamicFieldHandler, DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
+import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type {
     TableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/table/type';
-import { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
-import { TableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
+import type { TableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
-import { Options } from '@/data-display/tables/query-search-table/type';
+import type { Options } from '@/data-display/tables/query-search-table/type';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 

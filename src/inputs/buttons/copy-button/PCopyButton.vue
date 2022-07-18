@@ -34,7 +34,7 @@
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import Vue from 'vue';
+import type Vue from 'vue';
 
 
 import PI from '@/foundation/icons/PI.vue';

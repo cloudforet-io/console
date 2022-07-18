@@ -10,12 +10,12 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { RawDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw/type';
+import type { RawDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';

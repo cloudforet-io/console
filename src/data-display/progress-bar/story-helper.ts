@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
 

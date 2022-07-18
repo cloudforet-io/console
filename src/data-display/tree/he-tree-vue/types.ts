@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-cycle
-import { Store } from './plugins/draggable/draggable-types';
+import type { Store } from './plugins/draggable/draggable-types';
 
 export type Path = number[]
 

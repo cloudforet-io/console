@@ -15,14 +15,15 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, defineComponent, getCurrentInstance, reactive, toRefs,
+    defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import vueFilePond from 'vue-filepond';
 
-import { FileUploaderProps } from '@/inputs/file-uploader/type';
+import type { FileUploaderProps } from '@/inputs/file-uploader/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
 

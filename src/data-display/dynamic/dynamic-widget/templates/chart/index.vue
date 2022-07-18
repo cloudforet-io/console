@@ -20,16 +20,17 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed,
-    defineComponent, PropType,
+    defineComponent,
     reactive, toRefs,
 } from '@vue/composition-api';
 
 import { DYNAMIC_CHART_LIMIT_MAP, DYNAMIC_CHART_THEMES } from '@/data-display/dynamic/dynamic-chart/config';
 import PDynamicChart from '@/data-display/dynamic/dynamic-chart/PDynamicChart.vue';
-import { DynamicChartTheme, DynamicChartType } from '@/data-display/dynamic/dynamic-chart/type';
-import {
+import type { DynamicChartTheme, DynamicChartType } from '@/data-display/dynamic/dynamic-chart/type';
+import type {
     DynamicWidgetFieldHandler,
     DynamicWidgetProps,
     DynamicWidgetSchemaOptions,

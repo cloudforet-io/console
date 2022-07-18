@@ -80,8 +80,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -92,8 +92,9 @@ import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import type { SearchDropdownProps, SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
 import {
-    SEARCH_DROPDOWN_TYPE, SearchDropdownProps, SearchDropdownMenuItem,
+    SEARCH_DROPDOWN_TYPE,
 } from '@/inputs/dropdown/search-dropdown/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';

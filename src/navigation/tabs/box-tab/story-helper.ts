@@ -1,6 +1,6 @@
 import { reactive, toRefs } from '@vue/composition-api';
 
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';

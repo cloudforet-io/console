@@ -31,8 +31,9 @@ import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import PI from '@/foundation/icons/PI.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
+import type { IconButtonProps } from '@/inputs/buttons/icon-button/type';
 import {
-    ICON_BUTTON_SIZE, ICON_BUTTON_STYLE_TYPE, IconButtonProps,
+    ICON_BUTTON_SIZE, ICON_BUTTON_STYLE_TYPE,
 } from '@/inputs/buttons/icon-button/type';
 
 

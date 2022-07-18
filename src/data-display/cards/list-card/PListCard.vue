@@ -35,7 +35,7 @@ import {
 
 import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
 import PCard from '@/data-display/cards/card/PCard.vue';
-import { CardProps } from '@/data-display/cards/card/type';
+import type { CardProps } from '@/data-display/cards/card/type';
 import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
 interface Props extends CardProps {

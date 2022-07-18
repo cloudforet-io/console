@@ -116,6 +116,7 @@ module.exports = {
         '@typescript-eslint/no-unused-vars': ['error', { args: 'after-used' }],
         '@typescript-eslint/no-shadow': ['error'],
         '@typescript-eslint/ban-ts-comment': ['off'],
+        '@typescript-eslint/consistent-type-imports': ['error'],
 
         // eslint-plugin-import rules
         'import/order': [

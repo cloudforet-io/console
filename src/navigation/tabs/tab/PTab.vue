@@ -29,7 +29,7 @@ import {
 } from '@vue/composition-api';
 
 import { useTab } from '@/hooks/tab';
-import { TabItem, TabProps } from '@/navigation/tabs/tab/type';
+import type { TabItem, TabProps } from '@/navigation/tabs/tab/type';
 
 
 export default defineComponent<TabProps>({

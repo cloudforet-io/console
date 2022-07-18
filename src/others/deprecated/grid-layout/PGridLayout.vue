@@ -16,7 +16,7 @@
 <script lang="ts">
 import { reactive, computed, toRefs } from '@vue/composition-api';
 
-import { GridLayoutProps } from '@/others/deprecated/grid-layout/type';
+import type { GridLayoutProps } from '@/others/deprecated/grid-layout/type';
 
 export default {
     name: 'PGridLayout',

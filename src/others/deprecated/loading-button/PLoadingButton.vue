@@ -19,7 +19,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
-import { LoadingButtonProps } from '@/others/deprecated/loading-button/type';
+import type { LoadingButtonProps } from '@/others/deprecated/loading-button/type';
 
 export default {
     name: 'PLoadingButton',

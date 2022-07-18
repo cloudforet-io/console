@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 export const getLabelArgTypes = (): ArgTypes => ({
     label: {

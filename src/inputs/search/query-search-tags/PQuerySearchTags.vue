@@ -41,8 +41,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, defineComponent, PropType, ref, watch,
+    computed, defineComponent, ref, watch,
 } from '@vue/composition-api';
 
 import { VTooltip } from 'v-tooltip';
@@ -50,12 +51,12 @@ import { VTooltip } from 'v-tooltip';
 import PTag from '@/data-display/tags/PTag.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { defaultConverter, defaultValidator } from '@/inputs/search/query-search-tags/helper';
-import {
+import type {
     QuerySearchTagsFunctions,
     QuerySearchTagsProps,
     QueryTag, QueryTagConverter, QueryTagValidator,
 } from '@/inputs/search/query-search-tags/type';
-import { QueryItem } from '@/inputs/search/query-search/type';
+import type { QueryItem } from '@/inputs/search/query-search/type';
 import { i18n } from '@/translations';
 
 

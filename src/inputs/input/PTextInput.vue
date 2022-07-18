@@ -54,8 +54,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, PropType, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import vClickOutside from 'v-click-outside';
@@ -66,10 +67,10 @@ import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import { useProxyValue } from '@/hooks/proxy-state';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import { MenuItem } from '@/inputs/context-menu/type';
-import { SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
+import type { MenuItem } from '@/inputs/context-menu/type';
+import type { SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
 import { inputTypes } from '@/inputs/input/config';
-import { SelectedItem } from '@/inputs/input/type';
+import type { SelectedItem } from '@/inputs/input/type';
 
 
 export default {

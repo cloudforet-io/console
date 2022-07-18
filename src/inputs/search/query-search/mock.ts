@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { range } from 'lodash';
 
-import {
+import type {
     KeyItemSet,
     ValueHandler, ValueHandlerMap,
 } from '@/inputs/search/query-search/type';

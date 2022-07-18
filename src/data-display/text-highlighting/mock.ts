@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 
-import { TEXT_HIGHLIGHTING_STYLE_TYPE, TextHighlightingProps } from '@/data-display/text-highlighting/type';
+import type { TextHighlightingProps } from '@/data-display/text-highlighting/type';
+import { TEXT_HIGHLIGHTING_STYLE_TYPE } from '@/data-display/text-highlighting/type';
 
 export const getTextHighlightingProps = (): TextHighlightingProps => {
     const text = faker.lorem.sentence(20);

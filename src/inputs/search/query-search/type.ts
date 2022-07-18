@@ -1,4 +1,4 @@
-import { ContextMenuType } from '@/inputs/context-menu/type';
+import type { ContextMenuType } from '@/inputs/context-menu/type';
 
 
 export const dataTypes = ['string', 'integer', 'float', 'boolean', 'datetime', 'object'] as const;

@@ -25,7 +25,7 @@ import {
 
 import PI from '@/foundation/icons/PI.vue';
 import { SELECT_BUTTON_GROUP_THEME } from '@/inputs/buttons/select-button-group/config';
-import { SelectButtonGroupProps, SelectButtonType } from '@/inputs/buttons/select-button-group/type';
+import type { SelectButtonGroupProps, SelectButtonType } from '@/inputs/buttons/select-button-group/type';
 
 import { secondary } from '@/styles/colors';
 

@@ -28,10 +28,11 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed,
     defineComponent,
-    onUnmounted, PropType,
+    onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -42,7 +43,7 @@ import {
     DEFAULT_VALUE_OPTIONS, DYNAMIC_CHART_LIMIT_MAP,
     DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
-import {
+import type {
     DynamicChartFieldHandler,
     DynamicChartTemplateProps,
     DynamicChartTheme,

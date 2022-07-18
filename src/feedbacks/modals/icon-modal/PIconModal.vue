@@ -46,7 +46,7 @@
 <script lang="ts">
 import { reactive, toRefs } from '@vue/composition-api';
 
-import { IconModalProps } from '@/feedbacks/modals/icon-modal/type';
+import type { IconModalProps } from '@/feedbacks/modals/icon-modal/type';
 import PI from '@/foundation/icons/PI.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';

@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { SELECT_MARKERS } from '@/inputs/context-menu/context-menu-item/config';
 

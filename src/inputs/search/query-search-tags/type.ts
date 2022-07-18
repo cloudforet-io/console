@@ -1,4 +1,4 @@
-import { QueryItem } from '@/inputs/search/query-search/type';
+import type { QueryItem } from '@/inputs/search/query-search/type';
 
 
 export interface QueryTag extends QueryItem {

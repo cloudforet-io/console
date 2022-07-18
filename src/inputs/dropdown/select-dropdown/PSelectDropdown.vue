@@ -63,8 +63,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed,
     defineComponent,
     getCurrentInstance,
@@ -80,11 +80,11 @@ import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import { MenuItem } from '@/inputs/context-menu/type';
+import type { MenuItem } from '@/inputs/context-menu/type';
+import type { SelectDropdownProps } from '@/inputs/dropdown/select-dropdown/type';
 import {
     SELECT_DROPDOWN_STYLE_TYPE,
     CONTEXT_MENU_POSITION,
-    SelectDropdownProps,
 } from '@/inputs/dropdown/select-dropdown/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 

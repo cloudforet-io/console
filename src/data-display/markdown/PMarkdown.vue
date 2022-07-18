@@ -11,7 +11,7 @@ import { render } from 'ejs';
 import { get } from 'lodash';
 import { marked } from 'marked';
 
-import { MarkdownProps } from '@/data-display/markdown/type';
+import type { MarkdownProps } from '@/data-display/markdown/type';
 
 
 marked.setOptions({

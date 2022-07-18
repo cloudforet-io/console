@@ -49,22 +49,22 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { forEach } from 'lodash';
 
 import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
-import {
+import type {
     QuerySearchTagsFunctions,
     QuerySearchTagsListeners,
     QueryTag,
 } from '@/inputs/search/query-search-tags/type';
 import PQuerySearch from '@/inputs/search/query-search/PQuerySearch.vue';
-import { QueryItem } from '@/inputs/search/query-search/type';
-import { SearchGridLayoutProps, Options } from '@/others/deprecated/search-grid-layout/type';
+import type { QueryItem } from '@/inputs/search/query-search/type';
+import type { SearchGridLayoutProps, Options } from '@/others/deprecated/search-grid-layout/type';
 import PToolboxGridLayout from '@/others/deprecated/toolbox-grid-layout/PToolboxGridLayout.vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 

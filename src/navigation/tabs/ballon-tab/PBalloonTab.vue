@@ -35,8 +35,8 @@ import { useTab } from '@/hooks/tab';
 import {
     BALLOON_TAB_POSITION, BALLOON_TAB_SIZE, BALLOON_TAB_STYLE_TYPE,
 } from '@/navigation/tabs/ballon-tab/config';
-import { BalloonTabProps } from '@/navigation/tabs/ballon-tab/type';
-import { TabItem } from '@/navigation/tabs/tab/type';
+import type { BalloonTabProps } from '@/navigation/tabs/ballon-tab/type';
+import type { TabItem } from '@/navigation/tabs/tab/type';
 
 import screens from '@/styles/screens';
 

@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
 

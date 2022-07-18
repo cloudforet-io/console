@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 const sampleCodeObj = {
     server_id: 'server-283cd170d17d',

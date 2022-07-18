@@ -20,7 +20,7 @@
 import { defineComponent } from '@vue/composition-api';
 
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
-import { CardProps } from '@/data-display/cards/card/type';
+import type { CardProps } from '@/data-display/cards/card/type';
 
 
 export default defineComponent<CardProps>({

@@ -19,17 +19,18 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, defineComponent, PropType, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { map } from 'lodash';
 
-import { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
-import { RawTableDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw-table/type';
+import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
+import type { RawTableDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw-table/type';
 import PDynamicLayoutTable from '@/data-display/dynamic/dynamic-layout/templates/table/index.vue';
-import { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
-import { RawTableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
+import type { RawTableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 
 

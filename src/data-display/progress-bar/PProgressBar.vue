@@ -22,7 +22,7 @@ import {
 } from '@vue/composition-api';
 
 import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
-import { ProgressBarProps } from '@/data-display/progress-bar/type';
+import type { ProgressBarProps } from '@/data-display/progress-bar/type';
 
 
 export default defineComponent<ProgressBarProps>({

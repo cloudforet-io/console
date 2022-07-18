@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 

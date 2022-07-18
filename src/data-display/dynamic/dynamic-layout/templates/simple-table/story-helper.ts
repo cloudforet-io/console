@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import mock from '@/data-display/dynamic/dynamic-layout/mock';
 import { getDynamicLayoutArgTypes } from '@/data-display/dynamic/dynamic-layout/story-helper';

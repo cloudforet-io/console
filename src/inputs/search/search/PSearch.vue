@@ -28,16 +28,16 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { focus } from 'vue-focus';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import PI from '@/foundation/icons/PI.vue';
-import { SearchProps } from '@/inputs/search/search/type';
+import type { SearchProps } from '@/inputs/search/search/type';
 import { i18n } from '@/translations';
 import { makeByPassListeners, makeOptionalProxy } from '@/util/composition-helpers';
 

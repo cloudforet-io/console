@@ -14,7 +14,7 @@ import {
 
 import lottie from 'lottie-web';
 
-import { LottieProps } from '@/foundation/lottie/type';
+import type { LottieProps } from '@/foundation/lottie/type';
 
 /** <Default rendererSettings>
  *

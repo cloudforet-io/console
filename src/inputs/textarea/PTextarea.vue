@@ -7,8 +7,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, defineComponent, getCurrentInstance, reactive, toRefs,
+    defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { makeOptionalProxy } from '@/util/composition-helpers';

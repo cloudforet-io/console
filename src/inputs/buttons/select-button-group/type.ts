@@ -1,4 +1,4 @@
-import { ButtonProps } from '@/inputs/buttons/button/type';
+import type { ButtonProps } from '@/inputs/buttons/button/type';
 
 type ButtonType = 'default' | 'text';
 

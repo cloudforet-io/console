@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-import { MenuItem } from '@/inputs/context-menu/type';
+import type { MenuItem } from '@/inputs/context-menu/type';
 
 export const menuItems: MenuItem[] = [
     { type: 'header', label: 'Actions', name: 'actions' },

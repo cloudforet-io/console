@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 

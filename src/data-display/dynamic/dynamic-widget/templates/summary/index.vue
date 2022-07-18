@@ -17,15 +17,16 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed,
-    defineComponent, PropType,
+    defineComponent,
     reactive, toRefs,
 } from '@vue/composition-api';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { DEFAULT_VALUE_OPTIONS } from '@/data-display/dynamic/dynamic-widget/config';
-import {
+import type {
     DynamicWidgetFieldHandler,
     DynamicWidgetProps,
     DynamicWidgetSchemaOptions,

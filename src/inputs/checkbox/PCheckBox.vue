@@ -28,7 +28,8 @@ import {
 } from '@vue/composition-api';
 
 import PI from '@/foundation/icons/PI.vue';
-import { useMultiSelect, SelectProps } from '@/hooks/select';
+import type { SelectProps } from '@/hooks/select';
+import { useMultiSelect } from '@/hooks/select';
 
 interface CheckboxProps extends SelectProps {
     invalid?: boolean;

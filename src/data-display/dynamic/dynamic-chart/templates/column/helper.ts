@@ -1,9 +1,10 @@
+import type { XYChart } from '@amcharts/amcharts4/charts';
 import {
-    CategoryAxis, ValueAxis, ColumnSeries, LabelBullet, XYChart,
+    CategoryAxis, ValueAxis, ColumnSeries, LabelBullet,
 } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 
-import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 import { palette } from '@/styles/colors';
 

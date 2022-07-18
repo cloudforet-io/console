@@ -65,8 +65,8 @@ import { every, range, get } from 'lodash';
 import PEmpty from '@/data-display/empty/PEmpty.vue';
 import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
 import PDefinition from '@/data-display/tables/definition-table/definition/PDefinition.vue';
-import { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
-import {
+import type { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
+import type {
     DefinitionTableProps, DefinitionData, DefinitionField,
 } from '@/data-display/tables/definition-table/type';
 import PLottie from '@/foundation/lottie/PLottie.vue';

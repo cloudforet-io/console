@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-cycle
-import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import { KeyDataType } from '@/inputs/search/query-search/type';
+import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { KeyDataType } from '@/inputs/search/query-search/type';
 
 /** Search schema types */
 export interface SearchEnumItem {

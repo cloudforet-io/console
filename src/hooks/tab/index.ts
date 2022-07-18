@@ -1,8 +1,9 @@
+import type { UnwrapRef, ComputedRef } from '@vue/composition-api';
 import {
-    computed, reactive, toRefs, UnwrapRef, ComputedRef,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { TabItem } from '@/navigation/tabs/tab/type';
+import type { TabItem } from '@/navigation/tabs/tab/type';
 
 
 interface TabStateArgs {

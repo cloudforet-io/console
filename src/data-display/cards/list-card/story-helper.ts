@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 import { range } from 'lodash';
 
 import { getCardArgTypes } from '@/data-display/cards/card/story-helper';

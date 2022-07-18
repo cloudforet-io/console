@@ -1,5 +1,5 @@
 /** Props type for Dynamic field component */
-import {
+import type {
     DynamicFieldOptions,
     DynamicFieldType,
 } from '@/data-display/dynamic/dynamic-field/type/field-schema';

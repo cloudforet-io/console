@@ -36,7 +36,7 @@ import {
 
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import { themes } from '@/others/deprecated/selectable-item/config';
-import { SelectableItemPropsType } from '@/others/deprecated/selectable-item/type';
+import type { SelectableItemPropsType } from '@/others/deprecated/selectable-item/type';
 import { makeByPassListeners } from '@/util/composition-helpers';
 
 export default {

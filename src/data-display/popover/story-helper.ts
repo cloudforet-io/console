@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type';
 

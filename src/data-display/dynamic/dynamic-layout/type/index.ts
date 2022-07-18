@@ -1,11 +1,11 @@
-import {
+import type {
     DynamicFieldHandler,
     DynamicFieldTypeOptions,
 } from '@/data-display/dynamic/dynamic-field/type';
-import { DynamicField, DynamicFieldOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import { DynamicLayoutOptions, DynamicLayoutType } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { QueryTag } from '@/inputs/search/query-search-tags/type';
-import { KeyItemSet, ValueHandlerMap } from '@/inputs/search/query-search/type';
+import type { DynamicField, DynamicFieldOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicLayoutOptions, DynamicLayoutType } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { QueryTag } from '@/inputs/search/query-search-tags/type';
+import type { KeyItemSet, ValueHandlerMap } from '@/inputs/search/query-search/type';
 
 
 export interface DynamicLayoutFetchOptions {

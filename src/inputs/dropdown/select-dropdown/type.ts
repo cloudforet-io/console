@@ -1,4 +1,4 @@
-import { MenuItem } from '@/inputs/context-menu/type';
+import type { MenuItem } from '@/inputs/context-menu/type';
 
 export const CONTEXT_MENU_POSITION = Object.freeze({
     LEFT: 'left',

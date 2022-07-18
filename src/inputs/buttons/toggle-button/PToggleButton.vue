@@ -21,7 +21,7 @@ import {
 import { ToggleButton } from 'vue-js-toggle-button';
 
 import { TOGGLE_BUTTON_THEME } from '@/inputs/buttons/toggle-button/config';
-import { ToggleButtonProps } from '@/inputs/buttons/toggle-button/type';
+import type { ToggleButtonProps } from '@/inputs/buttons/toggle-button/type';
 
 import color from '@/styles/colors';
 

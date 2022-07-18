@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
 import { SizeMapping } from '@/feedbacks/modals/type';

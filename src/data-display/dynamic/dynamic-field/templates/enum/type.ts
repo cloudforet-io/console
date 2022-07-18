@@ -1,5 +1,5 @@
-import { DynamicFieldProps, DynamicFieldTypeOptions } from '@/data-display/dynamic/dynamic-field/type';
-import { EnumOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicFieldProps, DynamicFieldTypeOptions } from '@/data-display/dynamic/dynamic-field/type';
+import type { EnumOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 
 export type EnumTypeOptions = DynamicFieldTypeOptions;

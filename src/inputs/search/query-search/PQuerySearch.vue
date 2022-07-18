@@ -62,8 +62,9 @@
 </template>
 
 <script lang="ts">
+import type { WatchStopHandle } from '@vue/composition-api';
 import {
-    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch, WatchStopHandle,
+    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import dayjs from 'dayjs';
@@ -86,16 +87,18 @@ import {
     getRootKeyItemHandler, getKeyMenuForm,
     getValueMenuForm,
 } from '@/inputs/search/query-search/helper';
-import {
+import type {
     HandlerResponse,
     KeyItem,
     KeyMenuItem,
-    operators,
     OperatorType,
     QuerySearchProps,
     ValueHandler,
     ValueItem,
-    ValueMenuItem, MenuType, QueryItem, KeyDataType, OPERATOR,
+    ValueMenuItem, MenuType, QueryItem, KeyDataType,
+} from '@/inputs/search/query-search/type';
+import {
+    operators, OPERATOR,
 } from '@/inputs/search/query-search/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
 

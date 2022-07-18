@@ -1,4 +1,4 @@
-import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
+import type { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
 
 export interface CardProps {
     header?: string|boolean;

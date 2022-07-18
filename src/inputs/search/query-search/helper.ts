@@ -1,6 +1,6 @@
 import { find } from 'lodash';
 
-import {
+import type {
     HandlerResponse,
     KeyItem, KeyItemSet, KeyMenuItem, OperatorType, ValueHandler, ValueItem, ValueMenuItem,
 } from '@/inputs/search/query-search/type';

@@ -1,4 +1,4 @@
-import { themes } from '@/others/deprecated/selectable-item/config';
+import type { themes } from '@/others/deprecated/selectable-item/config';
 
 export type ThemeType = typeof themes[number];
 

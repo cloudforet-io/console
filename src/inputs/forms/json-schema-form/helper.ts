@@ -1,4 +1,5 @@
-import { INPUT_TYPE, JsonSchema, UiSchema } from '@/inputs/forms/json-schema-form/type';
+import type { JsonSchema, UiSchema } from '@/inputs/forms/json-schema-form/type';
+import { INPUT_TYPE } from '@/inputs/forms/json-schema-form/type';
 
 
 const getErrorUiSchemaByType = (key: string, value: JsonSchema, type: string): UiSchema => {

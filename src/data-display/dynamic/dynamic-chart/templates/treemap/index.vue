@@ -3,10 +3,11 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed,
     defineComponent,
-    onMounted, onUnmounted, PropType,
+    onMounted, onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -20,12 +21,12 @@ import {
     DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
 import { drawTreemapChart } from '@/data-display/dynamic/dynamic-chart/templates/treemap/helper';
-import {
+import type {
     DynamicChartFieldHandler,
     DynamicChartTemplateProps,
     DynamicChartTheme,
 } from '@/data-display/dynamic/dynamic-chart/type';
-import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 import { palette } from '@/styles/colors';
 

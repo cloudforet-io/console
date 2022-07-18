@@ -28,15 +28,15 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
-import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import {
+import type { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
+import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type {
     SimpleTableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/simple-table/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';

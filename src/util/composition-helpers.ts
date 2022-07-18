@@ -1,6 +1,6 @@
+import type { ComponentRenderProxy, Ref } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
-    computed, ref, Ref,
+    computed, ref,
 } from '@vue/composition-api';
 
 /**

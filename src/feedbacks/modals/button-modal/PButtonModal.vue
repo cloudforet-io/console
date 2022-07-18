@@ -77,7 +77,8 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { ButtonModalProps, THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
+import type { ButtonModalProps } from '@/feedbacks/modals/button-modal/type';
+import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
 import { SizeMapping } from '@/feedbacks/modals/type';
 import '@/feedbacks/modals/modal.pcss';
 import PLottie from '@/foundation/lottie/PLottie.vue';

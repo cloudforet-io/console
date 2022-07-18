@@ -16,20 +16,20 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
-import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import {
+import type { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
+import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type {
     ItemDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/item/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable.vue';
-import { DefinitionData, DefinitionField } from '@/data-display/tables/definition-table/type';
+import type { DefinitionData, DefinitionField } from '@/data-display/tables/definition-table/type';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 
 export default {

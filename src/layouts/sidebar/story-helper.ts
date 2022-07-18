@@ -1,4 +1,4 @@
-import { ArgTypes } from '@storybook/addons';
+import type { ArgTypes } from '@storybook/addons';
 
 import { STYLE_TYPE as SIDEBAR_STYLE_TYPE, SIZE as SIDEBAR_SIZE } from '@/layouts/sidebar/type';
 

@@ -1,6 +1,6 @@
-import { QueryTag } from '@/inputs/search/query-search-tags/type';
-import { KeyItemSet, ValueHandlerMap } from '@/inputs/search/query-search/type';
-import { GridLayoutProps } from '@/others/deprecated/grid-layout/type';
+import type { QueryTag } from '@/inputs/search/query-search-tags/type';
+import type { KeyItemSet, ValueHandlerMap } from '@/inputs/search/query-search/type';
+import type { GridLayoutProps } from '@/others/deprecated/grid-layout/type';
 
 
 export interface SearchGridLayoutProps extends GridLayoutProps {

@@ -1,5 +1,5 @@
-import { ContextMenuFixedStyleProps } from '@/hooks/context-menu-fixed-style';
-import { MenuItem } from '@/inputs/context-menu/type';
+import type { ContextMenuFixedStyleProps } from '@/hooks/context-menu-fixed-style';
+import type { MenuItem } from '@/inputs/context-menu/type';
 
 interface HandlerRes {
     results: MenuItem[];

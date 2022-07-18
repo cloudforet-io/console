@@ -1,5 +1,5 @@
-import { DynamicFieldProps, DynamicFieldTypeOptions } from '@/data-display/dynamic/dynamic-field/type';
-import { DictOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicFieldProps, DynamicFieldTypeOptions } from '@/data-display/dynamic/dynamic-field/type';
+import type { DictOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 
 export type DictTypeOptions = Pick<DynamicFieldTypeOptions, never>;

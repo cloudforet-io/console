@@ -1,4 +1,4 @@
-import { DateOption } from 'flatpickr/dist/types/options';
+import type { DateOption } from 'flatpickr/dist/types/options';
 
 
 export const SELECT_MODE = Object.freeze({
