@@ -37,7 +37,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { RoleData } from '@/services/administration/iam/role/type';
+import type { RoleData } from '@/services/administration/iam/role/type';
 import RoleUpdateForm from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
 
 export default {

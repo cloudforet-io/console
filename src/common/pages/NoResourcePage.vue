@@ -20,14 +20,15 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
     PLottie, PButton,
 } from '@spaceone/design-system';
-import { RouteConfig } from 'vue-router';
+import type { RouteConfig } from 'vue-router';
 
 import { i18n } from '@/translations';
 

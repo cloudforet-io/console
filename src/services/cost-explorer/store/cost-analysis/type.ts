@@ -1,4 +1,4 @@
-import {
+import type {
     CostQueryFilters, CostQuerySetModel, Period, Granularity, GroupBy,
 } from '@/services/cost-explorer/type';
 

@@ -30,7 +30,7 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 
 import AssetInventoryLNB from '@/services/asset-inventory/AssetInventoryLNB.vue';
 import { assetInventoryStoreModule, assetInventoryStore } from '@/services/asset-inventory/store';
-import { AssetInventoryState } from '@/services/asset-inventory/store/type';
+import type { AssetInventoryState } from '@/services/asset-inventory/store/type';
 
 
 export default defineComponent({

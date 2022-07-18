@@ -1,4 +1,4 @@
-import { PluginReferenceState } from '@/store/modules/reference/plugin/type';
+import type { PluginReferenceState } from '@/store/modules/reference/plugin/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

@@ -38,8 +38,9 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
@@ -60,7 +61,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import EscalationPolicyDataTable from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyDataTable.vue';
 import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
-import { EscalationPolicyFormModel } from '@/services/alert-manager/type';
+import type { EscalationPolicyFormModel } from '@/services/alert-manager/type';
 
 
 enum FORM_MODE {

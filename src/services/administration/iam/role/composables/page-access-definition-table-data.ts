@@ -1,18 +1,20 @@
-import { computed, ComputedRef } from '@vue/composition-api';
+import type { ComputedRef } from '@vue/composition-api';
+import { computed } from '@vue/composition-api';
 
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';
 
+import type { PagePermission, PagePermissionMap } from '@/lib/access-control/page-permission-helper';
 import {
-    getPagePermissionMap, getPermissionRequiredMenuIds, PagePermission, PagePermissionMap,
+    getPagePermissionMap, getPermissionRequiredMenuIds,
 } from '@/lib/access-control/page-permission-helper';
-import { Menu } from '@/lib/menu/config';
+import type { Menu } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 
-import { PageAccessDefinitionTableData } from '@/services/administration/iam/role/type';
+import type { PageAccessDefinitionTableData } from '@/services/administration/iam/role/type';
 
 const flattenPageAccessDefinitionData = (pagePermissionMap: PagePermissionMap, subMenuList: Menu[], labels: Array<string|TranslateResult> = []): PageAccessDefinitionTableData => {
     let result: PageAccessDefinitionTableData = {

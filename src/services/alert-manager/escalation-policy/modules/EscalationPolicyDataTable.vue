@@ -46,7 +46,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import {
     PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { capitalize } from 'lodash';
 
 

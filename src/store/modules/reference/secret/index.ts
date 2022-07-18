@@ -1,4 +1,4 @@
-import { SecretReferenceState } from '@/store/modules/reference/secret/type';
+import type { SecretReferenceState } from '@/store/modules/reference/secret/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

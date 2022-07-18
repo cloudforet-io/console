@@ -1,5 +1,6 @@
 declare module 'vue-fragment' {
-    import Vue, { AsyncComponent, ComponentOptions, PluginObject } from 'vue';
+    import type { AsyncComponent, ComponentOptions, PluginObject } from 'vue';
+import type Vue from 'vue';
 
     type Component = ComponentOptions<Vue> | typeof Vue | AsyncComponent
 

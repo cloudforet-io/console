@@ -1,9 +1,9 @@
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
-import { Currency } from '@/store/modules/display/config';
-import { CurrencyRates } from '@/store/modules/display/type';
+import type { Currency } from '@/store/modules/display/config';
+import type { CurrencyRates } from '@/store/modules/display/type';
 
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 
 /* widget spec */
 export interface ChartData {

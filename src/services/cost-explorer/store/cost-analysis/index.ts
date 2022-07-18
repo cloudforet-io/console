@@ -1,6 +1,6 @@
 import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { CostAnalysisStoreState } from '@/services/cost-explorer/store/cost-analysis/type';
+import type { CostAnalysisStoreState } from '@/services/cost-explorer/store/cost-analysis/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

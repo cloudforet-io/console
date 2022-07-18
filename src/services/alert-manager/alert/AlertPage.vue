@@ -17,8 +17,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
@@ -34,7 +34,7 @@ import AlertDataTable from '@/services/alert-manager/alert/modules/AlertDataTabl
 import AssignedAlertInfoPanel from '@/services/alert-manager/alert/modules/AssignedAlertInfoPanel.vue';
 import NewAssignedAlertListCard from '@/services/alert-manager/alert/modules/NewAssignedAlertListCard.vue';
 import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
-import {
+import type {
     AlertListPageUrlQuery, AlertListTableFilters,
 } from '@/services/alert-manager/type';
 

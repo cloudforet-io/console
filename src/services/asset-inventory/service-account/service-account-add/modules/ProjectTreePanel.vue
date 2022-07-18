@@ -45,9 +45,8 @@
 </template>
 
 <script lang="ts">
-import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+import type { ComponentRenderProxy } from '@vue/composition-api';
+import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
 
 import {
     PPaneLayout, PButton, PRadio,
@@ -55,9 +54,9 @@ import {
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { ProjectGroup } from '@/services/asset-inventory/service-account/type';
+import type { ProjectGroup } from '@/services/asset-inventory/service-account/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { ProjectGroupTreeItem } from '@/services/project/type';
+import type { ProjectGroupTreeItem } from '@/services/project/type';
 
 
 export default {

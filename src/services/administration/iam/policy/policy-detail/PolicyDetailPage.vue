@@ -96,7 +96,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
-import { PolicyDetailPageProps } from '@/services/administration/iam/policy/lib/type';
+import type { PolicyDetailPageProps } from '@/services/administration/iam/policy/lib/type';
 import PolicyDeleteModal from '@/services/administration/iam/policy/modules/PolicyDeleteModal.vue';
 import PolicyNameEditModal from '@/services/administration/iam/policy/modules/PolicyNameEditModal.vue';
 import { administrationStore } from '@/services/administration/store';

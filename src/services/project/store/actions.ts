@@ -1,7 +1,7 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { BadRequestError } from '@spaceone/console-core-lib/space-connector/error';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { Action } from 'vuex';
+import type { Action } from 'vuex';
 
 import { i18n } from '@/translations';
 
@@ -9,8 +9,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ProjectPageState } from '@/services/project/store/type';
-import { ProjectGroupTreeItem, ProjectItemResp } from '@/services/project/type';
+import type { ProjectPageState } from '@/services/project/store/type';
+import type { ProjectGroupTreeItem, ProjectItemResp } from '@/services/project/type';
 
 
 export const initRoot: Action<ProjectPageState, any> = ({ commit }, root) => {

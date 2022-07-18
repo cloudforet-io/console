@@ -52,12 +52,13 @@
 
 <script lang="ts">
 
+import type { PropType } from '@vue/composition-api';
 import {
-    defineComponent, onUnmounted, PropType, reactive, toRefs, watch,
+    defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
-import { XYChart } from '@amcharts/amcharts4/charts';
+import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
@@ -67,7 +68,7 @@ import { get } from 'lodash';
 
 import config from '@/lib/config';
 
-import { MetricChartProps, MonitoringResourceType, Unit } from '@/common/components/charts/metric-chart/type';
+import type { MetricChartProps, MonitoringResourceType, Unit } from '@/common/components/charts/metric-chart/type';
 
 import { gray } from '@/styles/colors';
 

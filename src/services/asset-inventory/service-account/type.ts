@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
-import { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
+import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
 
-import { Tags, TimeStamp } from '@/models';
+import type { Tags, TimeStamp } from '@/models';
 
-import { ProjectItemResp } from '@/services/project/type';
+import type { ProjectItemResp } from '@/services/project/type';
 
 const idField = 'provider';
 

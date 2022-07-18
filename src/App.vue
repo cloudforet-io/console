@@ -57,15 +57,16 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed,
+    computed,
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar,
 } from '@spaceone/design-system';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 import { store } from '@/store';
 

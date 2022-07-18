@@ -1,4 +1,4 @@
-import { ServiceAccountReferenceState } from '@/store/modules/reference/service-account/type';
+import type { ServiceAccountReferenceState } from '@/store/modules/reference/service-account/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

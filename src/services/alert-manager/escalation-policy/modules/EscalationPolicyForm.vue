@@ -108,7 +108,7 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import EscalationRulesInputForm from '@/services/alert-manager/escalation-policy/modules/EscalationRulesInputForm.vue';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
-import { EscalationPolicyFormModel } from '@/services/alert-manager/type';
+import type { EscalationPolicyFormModel } from '@/services/alert-manager/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 

@@ -80,11 +80,12 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertAssignModal from '@/services/alert-manager/alert/alert-detail/modules/alert-summary/modules/AlertAssignModal.vue';
+import type { AlertState, AlertUrgency } from '@/services/alert-manager/lib/config';
 import {
-    ALERT_STATE, ALERT_URGENCY, AlertState, AlertUrgency,
+    ALERT_STATE, ALERT_URGENCY,
 } from '@/services/alert-manager/lib/config';
 import { alertManagerStore } from '@/services/alert-manager/store';
-import { AlertDataModel } from '@/services/alert-manager/type';
+import type { AlertDataModel } from '@/services/alert-manager/type';
 
 
 // interface HeaderState {

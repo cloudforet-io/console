@@ -1,9 +1,9 @@
 import { getPermissionRequiredMenuIds } from '@/lib/access-control/page-permission-helper';
-import { Menu } from '@/lib/menu/config';
+import type { Menu } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
+import type { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 
 
 const flattenSubMenuList = (subMenuList?: Menu[], translationIds?: string[]): PageAccessMenuItem[] => {

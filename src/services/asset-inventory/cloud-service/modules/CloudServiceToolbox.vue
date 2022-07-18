@@ -38,23 +38,24 @@
 
 <script lang="ts">
 // package
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, defineComponent, PropType, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 // design system
-import { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PDivider, PButton,
     PToolbox,
 } from '@spaceone/design-system';
-import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
-import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 
 // core lib
 
@@ -62,8 +63,8 @@ import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/tool
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ExcelPayload } from '@/store/modules/file/actions';
-import { ExcelDataField } from '@/store/modules/file/type';
+import type { ExcelPayload } from '@/store/modules/file/actions';
+import type { ExcelDataField } from '@/store/modules/file/type';
 
 import {
     dynamicFieldsToExcelDataFields,

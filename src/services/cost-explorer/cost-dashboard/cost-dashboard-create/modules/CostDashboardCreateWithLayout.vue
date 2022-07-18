@@ -49,7 +49,7 @@ import {
 import { flattenDeep, startCase } from 'lodash';
 
 import { defaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/config';
-import { DefaultLayout, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import type { DefaultLayout, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 

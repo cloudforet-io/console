@@ -1,6 +1,6 @@
-import { Getter } from 'vuex';
+import type { Getter } from 'vuex';
 
-import { RegionReferenceItem, RegionReferenceState, SortedRegionReferenceItem } from '@/store/modules/reference/region/type';
+import type { RegionReferenceItem, RegionReferenceState, SortedRegionReferenceItem } from '@/store/modules/reference/region/type';
 
 
 export const regionsSortedByProvider: Getter<RegionReferenceState, any> = (state): SortedRegionReferenceItem[] => {

@@ -33,14 +33,16 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, defineComponent, PropType, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PDivider, PPaneLayout, PSkeleton } from '@spaceone/design-system';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
-import { CURRENCY_SYMBOL, CurrencySymbol } from '@/store/modules/display/config';
+import type { CurrencySymbol } from '@/store/modules/display/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 
 const UNIT_TYPE = Object.freeze({

@@ -1,6 +1,6 @@
-import { Module } from 'vuex';
+import type { Module } from 'vuex';
 
-import { AdministrationState, AdministrationStore } from '@/services/administration/store/type';
+import type { AdministrationState, AdministrationStore } from '@/services/administration/store/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

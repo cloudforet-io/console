@@ -1,8 +1,8 @@
-import { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 import { camelCase } from 'lodash';
 
 import API from '@/space-connector/api';
-import {
+import type {
     SessionTimeoutCallback, APIInfo, MockInfo, AxiosPostResponse,
 } from '@/space-connector/type';
 

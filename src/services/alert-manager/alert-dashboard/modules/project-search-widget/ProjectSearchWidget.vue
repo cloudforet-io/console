@@ -44,8 +44,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -56,11 +56,11 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PPaneLayout, PToolbox, PI, PDataLoader,
 } from '@spaceone/design-system';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import { store } from '@/store';
 
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

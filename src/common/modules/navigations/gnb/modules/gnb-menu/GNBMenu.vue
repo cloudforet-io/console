@@ -43,12 +43,12 @@
 </template>
 
 <script lang="ts">
-import { PropType } from '@vue/composition-api';
+import type { PropType } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
 import vClickOutside from 'v-click-outside';
 
-import { GNBMenu } from '@/store/modules/display/type';
+import type { GNBMenu } from '@/store/modules/display/type';
 
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 

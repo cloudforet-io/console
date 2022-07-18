@@ -90,7 +90,7 @@ import {
 } from '@spaceone/design-system';
 import bytes from 'bytes';
 import { range } from 'lodash';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 
 import { i18n } from '@/translations';

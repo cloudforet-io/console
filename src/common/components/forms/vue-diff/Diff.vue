@@ -28,8 +28,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, defineComponent, ref, toRaw, PropType,
+    computed, defineComponent, ref, toRaw,
 } from '@vue/composition-api';
 
 import { useVirtualScroll, useRender } from './hooks';

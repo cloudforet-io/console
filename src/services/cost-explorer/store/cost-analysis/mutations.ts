@@ -1,9 +1,9 @@
-import { Mutation } from 'vuex';
+import type { Mutation } from 'vuex';
 
-import {
+import type {
     CostAnalysisStoreState,
 } from '@/services/cost-explorer/store/cost-analysis/type';
-import {
+import type {
     CostQueryFilters, CostQuerySetModel, GroupBy, Period,
 } from '@/services/cost-explorer/type';
 

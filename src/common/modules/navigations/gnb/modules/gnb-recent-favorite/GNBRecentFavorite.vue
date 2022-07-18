@@ -31,7 +31,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import {
     PI, PTab,
 } from '@spaceone/design-system';
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import vClickOutside from 'v-click-outside';
 
 import { i18n } from '@/translations';

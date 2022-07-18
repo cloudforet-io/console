@@ -31,11 +31,12 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive,
+    computed, defineComponent, getCurrentInstance, reactive,
 } from '@vue/composition-api';
 
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { registerServiceStore } from '@/common/composables/register-service-store';

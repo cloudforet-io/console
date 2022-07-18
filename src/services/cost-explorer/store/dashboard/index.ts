@@ -1,9 +1,11 @@
-import {
+import type {
     CustomLayout,
-    DASHBOARD_PRIVACY_TYPE,
     WidgetInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
-import { CostDashboardState } from '@/services/cost-explorer/store/dashboard/type';
+import {
+    DASHBOARD_PRIVACY_TYPE,
+} from '@/services/cost-explorer/cost-dashboard/type';
+import type { CostDashboardState } from '@/services/cost-explorer/store/dashboard/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

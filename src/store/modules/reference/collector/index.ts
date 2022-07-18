@@ -1,4 +1,4 @@
-import { CollectorReferenceState } from '@/store/modules/reference/collector/type';
+import type { CollectorReferenceState } from '@/store/modules/reference/collector/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

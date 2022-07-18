@@ -51,7 +51,7 @@ import { PCheckBox, PSelectButton, PSelectStatus } from '@spaceone/design-system
 import { i18n } from '@/translations';
 
 import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
-import {
+import type {
     AlertBottomFilters,
 } from '@/services/alert-manager/type';
 

@@ -34,11 +34,12 @@ import { sortBy } from 'lodash';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import { GNBMenu } from '@/store/modules/display/type';
-import { RECENT_TYPE, RecentConfig, RecentItem } from '@/store/modules/recent/type';
-import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { GNBMenu } from '@/store/modules/display/type';
+import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
+import { RECENT_TYPE } from '@/store/modules/recent/type';
+import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
@@ -47,11 +48,13 @@ import {
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
-import { MENU_ID, MenuInfo } from '@/lib/menu/config';
+import type { MenuInfo } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import { SUGGESTION_TYPE, SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import type { SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';

@@ -74,7 +74,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 

@@ -95,23 +95,24 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
     PPaneLayout, PButton, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle, PSearchDropdown,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 import { map } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { languages, timezoneList } from '@/store/modules/user/config';
-import { LanguageCode, UpdateUserRequest } from '@/store/modules/user/type';
+import type { LanguageCode, UpdateUserRequest } from '@/store/modules/user/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 

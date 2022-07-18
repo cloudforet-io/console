@@ -112,7 +112,7 @@ import { getPageStart } from '@spaceone/console-core-lib/component-util/paginati
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
-import { KeyItemSet, QueryTag, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { KeyItemSet, QueryTag, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -121,7 +121,7 @@ import {
     PPageTitle, PPagination, PButtonModal, PLazyImg, PI,
     PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
-import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 import { capitalize } from 'lodash';
 
 import { SpaceRouter } from '@/router';

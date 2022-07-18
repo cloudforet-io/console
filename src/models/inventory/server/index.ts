@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-import { Tags, TimeStamp } from '@/models';
-import { CollectionInfo } from '@/models/inventory';
+import type { Tags, TimeStamp } from '@/models';
+import type { CollectionInfo } from '@/models/inventory';
 
 export interface ServerModel {
     server_id: string;

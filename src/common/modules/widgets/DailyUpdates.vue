@@ -94,12 +94,12 @@ import {
 } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PLazyImg, PSkeleton, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find, range } from 'lodash';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 import { store } from '@/store';
 

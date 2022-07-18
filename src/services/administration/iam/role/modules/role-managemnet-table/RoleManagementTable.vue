@@ -75,16 +75,16 @@ import {
 } from '@vue/composition-api';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
-import { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
+import type { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PToolboxTable, PSelectDropdown,
     PBadge, PButton, PI,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -98,7 +98,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { ROLE_TYPE_BADGE_OPTION, ROLE_TYPE_LABEL } from '@/services/administration/iam/role/config';
 import RoleDeleteModal
     from '@/services/administration/iam/role/modules/role-managemnet-table/modules/RoleDeleteModal.vue';
-import { RoleData } from '@/services/administration/iam/role/type';
+import type { RoleData } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { administrationStore } from '@/services/administration/store';
 

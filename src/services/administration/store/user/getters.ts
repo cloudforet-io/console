@@ -1,6 +1,6 @@
-import { Getter } from 'vuex';
+import type { Getter } from 'vuex';
 
-import { UserStoreState } from './type';
+import type { UserStoreState } from './type';
 
 export const isManagementModalVisible: Getter<UserStoreState, any> = ({ visibleManagementModal }): boolean => visibleManagementModal;
 export const isCreateModalVisible: Getter<UserStoreState, any> = ({ visibleCreateModal }): boolean => visibleCreateModal;

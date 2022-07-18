@@ -31,19 +31,21 @@
 
 <script lang="ts">
 
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, PropType, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import { find } from 'lodash';
 
+import type { PagePermission } from '@/lib/access-control/page-permission-helper';
 import {
-    getPagePermissionMap, PAGE_PERMISSION_TYPE, PagePermission,
+    getPagePermissionMap, PAGE_PERMISSION_TYPE,
 } from '@/lib/access-control/page-permission-helper';
 
 import { getPageAccessMenuList } from '@/services/administration/iam/role/lib/page-access-menu-list';
-import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
+import type { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
 

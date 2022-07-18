@@ -62,18 +62,18 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PCheckBox, PI, PRadio, PSearchDropdown, PSelectDropdown, PTag, PTree,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 
 import { store } from '@/store';
 
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import { ReferenceMap } from '@/store/modules/reference/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ProjectGroup } from '@/services/asset-inventory/service-account/type';
-import { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/type';
+import type { ProjectGroup } from '@/services/asset-inventory/service-account/type';
+import type { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/type';
 
 export default {
     name: 'ProjectSelectDropdown',

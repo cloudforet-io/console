@@ -50,7 +50,7 @@ import { reactive, toRefs, watch } from '@vue/composition-api';
 
 
 import { PButtonModal, PRadio } from '@spaceone/design-system';
-import Vue from 'vue';
+import type Vue from 'vue';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';

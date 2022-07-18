@@ -1,8 +1,8 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { Action } from 'vuex';
+import type { Action } from 'vuex';
 
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
-import { ProtocolReferenceMap, ProtocolReferenceState } from '@/store/modules/reference/protocol/type';
+import type { ProtocolReferenceMap, ProtocolReferenceState } from '@/store/modules/reference/protocol/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

@@ -69,8 +69,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy, UnwrapRef } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, UnwrapRef, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
@@ -79,11 +80,11 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PButton, PDataTable, PPaneLayout, PTableCheckModal, PStatus, PSelectDropdown,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { TranslateResult } from 'vue-i18n';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { TranslateResult } from 'vue-i18n';
 
 
-import { TimeStamp } from '@/models';
+import type { TimeStamp } from '@/models';
 import { store } from '@/store';
 
 import {

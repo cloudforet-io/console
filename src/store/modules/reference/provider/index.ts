@@ -1,4 +1,4 @@
-import { ProviderReferenceState } from '@/store/modules/reference/provider/type';
+import type { ProviderReferenceState } from '@/store/modules/reference/provider/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

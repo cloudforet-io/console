@@ -38,8 +38,8 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ProjectGroup } from '@/services/asset-inventory/service-account/type';
-import { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/type';
+import type { ProjectGroup } from '@/services/asset-inventory/service-account/type';
+import type { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/type';
 
 export default {
     name: 'EscalationPolicyProjectTree',

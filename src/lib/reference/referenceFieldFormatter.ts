@@ -1,11 +1,11 @@
 /* eslint-disable camelcase */
-import { DynamicFieldProps } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type';
+import type { DynamicFieldProps } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { Reference, ResourceType } from '@/lib/reference/type';
+import type { Reference, ResourceType } from '@/lib/reference/type';
 
 interface FieldFormatter {
     (data: string, reference: Reference): Partial<DynamicFieldProps>;

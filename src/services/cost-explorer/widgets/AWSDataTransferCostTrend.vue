@@ -32,17 +32,17 @@ import {
 } from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
-import { XYChart } from '@amcharts/amcharts4/charts';
+import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { byteFormatter, commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import bytes from 'bytes';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';
 
@@ -59,16 +59,16 @@ import {
 } from '@/styles/colors';
 
 import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 import {
     getTooltipText, getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
-import {
+import type {
     ChartData, CostAnalyzeModel, Legend, TrafficWidgetTableData, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
 

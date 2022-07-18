@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import {
+import type {
     ComponentInstance,
 } from '@vue/composition-api';
 

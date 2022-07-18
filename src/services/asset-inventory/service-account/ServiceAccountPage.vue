@@ -108,8 +108,9 @@
 </template>
 <script lang="ts">
 /* external library */
+import type { ComponentRenderProxy, Ref } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, ref, Ref, watch,
+    computed, getCurrentInstance, reactive, ref, watch,
 } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -119,16 +120,16 @@ import {
     PPageTitle, PHorizontalLayout, PButton,
     PTab, PDynamicLayout, PEmpty, PDoubleCheckModal, PSelectDropdown,
 } from '@spaceone/design-system';
-import {
+import type {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
-import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { render } from 'ejs';
 import { get } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 /* spaceone design system */
 
@@ -142,7 +143,7 @@ import {
     showSuccessMessage,
 } from '@/lib/helper/notice-alert-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { Reference } from '@/lib/reference/type';
+import type { Reference } from '@/lib/reference/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

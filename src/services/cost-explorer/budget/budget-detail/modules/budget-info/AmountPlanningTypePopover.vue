@@ -34,7 +34,8 @@ import { store } from '@/store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-import { BUDGET_TIME_UNIT, BudgetData } from '@/services/cost-explorer/budget/type';
+import type { BudgetData } from '@/services/cost-explorer/budget/type';
+import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
 
 export default {
     name: 'AmountPlanningTypePopover',

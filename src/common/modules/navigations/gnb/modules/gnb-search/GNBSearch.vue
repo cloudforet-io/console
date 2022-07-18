@@ -63,34 +63,38 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PI } from '@spaceone/design-system';
 import { laptop } from '@spaceone/design-system/src/styles/screens';
-import axios, { CancelTokenSource } from 'axios';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import { debounce, throttle } from 'lodash';
 import vClickOutside from 'v-click-outside';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import { RecentConfig } from '@/store/modules/recent/type';
-import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import type { RecentConfig } from '@/store/modules/recent/type';
+import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
     convertCloudServiceConfigToReferenceData,
     convertMenuConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
-import { getAllSuggestionMenuList, SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
-import { MENU_ID, MenuInfo } from '@/lib/menu/config';
+import type { SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
+import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
+import type { MenuInfo } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import {
-    SUGGESTION_TYPE, SuggestionItem, SuggestionType,
+    SUGGESTION_TYPE,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchDropdown.vue';
 import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
-import { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
+import type { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 

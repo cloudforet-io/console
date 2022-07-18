@@ -1,7 +1,8 @@
 import Hashids from 'hashids';
 import Vue from 'vue';
-import VueGtag, { VueGtag as VueGtagType } from 'vue-gtag';
-import { Route } from 'vue-router';
+import type { VueGtag as VueGtagType } from 'vue-gtag';
+import VueGtag from 'vue-gtag';
+import type { Route } from 'vue-router';
 
 import config from '@/lib/config';
 

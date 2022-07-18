@@ -99,21 +99,21 @@ import {
 } from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
-import { XYChart } from '@amcharts/amcharts4/charts';
+import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { byteFormatter, commaFormatter } from '@spaceone/console-core-lib';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PBalloonTab, PButton, PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
-import { Unit } from 'bytes';
+import type { Unit } from 'bytes';
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
-import { Location } from 'vue-router';
+import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router';
 
 
 import { store } from '@/store';
@@ -126,8 +126,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray, primary1, primary2 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import type { DateType, ServiceCategory } from '@/services/project/project-detail/project-summary/modules/config';
 import {
-    DATE_TYPE, DateType, SERVICE_CATEGORY, ServiceCategory,
+    DATE_TYPE, SERVICE_CATEGORY,
 } from '@/services/project/project-detail/project-summary/modules/config';
 import ProjectRegionService from '@/services/project/project-detail/project-summary/modules/ProjectRegionService.vue';
 

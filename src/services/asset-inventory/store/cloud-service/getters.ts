@@ -1,9 +1,9 @@
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { Getter } from 'vuex';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { Getter } from 'vuex';
 
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
-import { CloudServiceCategory } from '@/services/asset-inventory/cloud-service/type';
-import { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';
+import type { CloudServiceCategory } from '@/services/asset-inventory/cloud-service/type';
+import type { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';
 
 
 export const selectedCategories: Getter<CloudServiceStoreState, any> = (state): CloudServiceCategory[] => state.additionalFilters[CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY] ?? [];

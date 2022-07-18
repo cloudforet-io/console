@@ -41,11 +41,12 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import type { RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
 import {
-    REQUEST_TYPE, RequestType,
+    REQUEST_TYPE,
 } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { CostQuerySetModel } from '@/services/cost-explorer/type';
+import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 
 interface Props {

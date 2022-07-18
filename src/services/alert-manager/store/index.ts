@@ -1,6 +1,6 @@
-import { Module } from 'vuex';
+import type { Module } from 'vuex';
 
-import { AlertManagerState, AlertManagerStore } from '@/services/alert-manager/store/type';
+import type { AlertManagerState, AlertManagerStore } from '@/services/alert-manager/store/type';
 
 import * as actions from './actions';
 import alert from './alert';

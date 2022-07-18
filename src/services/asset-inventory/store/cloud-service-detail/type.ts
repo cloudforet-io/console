@@ -1,4 +1,4 @@
-import { CloudServiceTypeInfo } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
+import type { CloudServiceTypeInfo } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
 export interface CloudServiceDetailStoreState {
     provider: string;

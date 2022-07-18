@@ -36,8 +36,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 
@@ -46,12 +47,12 @@ import {
     PPanelTop, PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
 
-import { Tags } from '@/models';
+import type { Tags } from '@/models';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ProjectGroupReferenceItem } from '@/store/modules/reference/project-group/type';
-import { ProjectReferenceItem } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceItem } from '@/store/modules/reference/project-group/type';
+import type { ProjectReferenceItem } from '@/store/modules/reference/project/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 

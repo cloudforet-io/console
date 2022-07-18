@@ -114,8 +114,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -126,11 +126,12 @@ import {
 import {
     PI, PPageTitle, PBreadcrumbs, PButton, PSelectDropdown,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { store } from '@/store';
 
-import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
+import type { FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import {
     convertProjectConfigToReferenceData,
@@ -153,8 +154,8 @@ import ProjectSearch from '@/services/project/modules/ProjectSearch.vue';
 import ProjectTree from '@/services/project/modules/ProjectTree.vue';
 import ProjectGroupMember from '@/services/project/project-detail/project-member/modules/ProjectGroupMember.vue';
 import ProjectPageStoreModule from '@/services/project/store';
-import { ProjectPageState } from '@/services/project/store/type';
-import {
+import type { ProjectPageState } from '@/services/project/store/type';
+import type {
     ProjectGroup,
 } from '@/services/project/type';
 

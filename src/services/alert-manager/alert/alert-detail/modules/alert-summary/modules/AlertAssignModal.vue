@@ -51,7 +51,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { alertManagerStore } from '@/services/alert-manager/store';
-import { ProjectMember } from '@/services/alert-manager/type';
+import type { ProjectMember } from '@/services/alert-manager/type';
 
 
 export default {

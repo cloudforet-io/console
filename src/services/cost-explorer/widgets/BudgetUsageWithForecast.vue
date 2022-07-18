@@ -37,8 +37,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -47,16 +47,16 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDataTable, PI, PProgressBar,
 } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { CURRENCY } from '@/store/modules/display/config';
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -69,7 +69,7 @@ import { getConvertedBudgetFilter } from '@/services/cost-explorer/cost-analysis
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
-import { WidgetProps } from '@/services/cost-explorer/widgets/type';
+import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
 
 
 interface BudgetItem {

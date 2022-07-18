@@ -68,10 +68,10 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PQuerySearchTable, PPanelTop, PButton, PAnchor,
 } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 
-import { TimeStamp } from '@/models';
+import type { TimeStamp } from '@/models';
 import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';

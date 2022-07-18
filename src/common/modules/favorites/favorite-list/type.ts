@@ -1,4 +1,4 @@
-import { FavoriteItem } from '@/store/modules/favorite/type';
+import type { FavoriteItem } from '@/store/modules/favorite/type';
 
 export interface FavoriteListProps {
     items: FavoriteItem[];

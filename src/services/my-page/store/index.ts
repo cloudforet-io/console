@@ -1,7 +1,7 @@
 import * as actions from './actions';
 import * as getters from './getters';
 import * as mutations from './mutations';
-import { MyPageState } from './type';
+import type { MyPageState } from './type';
 
 const state: MyPageState = {
 };

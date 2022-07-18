@@ -34,9 +34,9 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
-import { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
+import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 
-import {
+import type {
     PublicDashboardInfo, UserDashboardInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';

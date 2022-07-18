@@ -39,16 +39,17 @@ import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 
 import BudgetFormAmountPlanLastMonthsCost
     from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
+import type { MonthAmountInputMap } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
 import BudgetFormAmountPlanMonthly
-, { MonthAmountInputMap } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
+    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
 import BudgetFormAmountPlanTotal
     from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanTotal.vue';
 import BudgetFormAmountPlanUnitSelect
     from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanUnitSelect.vue';
 import BudgetPeriodSelect
     from '@/services/cost-explorer/budget/modules/BudgetPeriodSelect.vue';
-import { BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
-import { CostQueryFilters, Period } from '@/services/cost-explorer/type';
+import type { BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
+import type { CostQueryFilters, Period } from '@/services/cost-explorer/type';
 
 export interface BudgetAmountPlanInfo {
     limit?: BudgetData['limit'];

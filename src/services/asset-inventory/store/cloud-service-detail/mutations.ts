@@ -1,7 +1,7 @@
-import { Mutation } from 'vuex';
+import type { Mutation } from 'vuex';
 
-import { CloudServiceTypeInfo } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
-import { CloudServiceDetailStoreState } from '@/services/asset-inventory/store/cloud-service-detail/type';
+import type { CloudServiceTypeInfo } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
+import type { CloudServiceDetailStoreState } from '@/services/asset-inventory/store/cloud-service-detail/type';
 
 
 export const setProvider: Mutation<CloudServiceDetailStoreState> = (state, provider: string) => {

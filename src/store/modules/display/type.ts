@@ -1,9 +1,9 @@
-import { TranslateResult } from 'vue-i18n';
-import { Location } from 'vue-router';
+import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router';
 
-import { SidebarType, Currency } from '@/store/modules/display/config';
+import type { SidebarType, Currency } from '@/store/modules/display/config';
 
-import { Menu } from '@/lib/menu/config';
+import type { Menu } from '@/lib/menu/config';
 
 export interface GNBMenu extends Menu {
     label: TranslateResult;

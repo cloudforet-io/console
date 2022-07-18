@@ -75,9 +75,9 @@ import {
     computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
+import type { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -85,6 +85,7 @@ import {
     PPanelTop, PToolbox, PDataLoader, PLottie,
 } from '@spaceone/design-system';
 import { useInfiniteScroll } from '@vueuse/core';
+import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import localeData from 'dayjs/plugin/localeData';
 
@@ -98,9 +99,8 @@ import CloudServiceHistoryDetailOverlay
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailOverlay.vue';
 import CloudServiceHistoryDateSelectDropdown
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistoryDateSelectDropdown.vue';
-import {
-    CloudServiceHistoryItem, HISTORY_ACTION_MAP,
-} from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
+import type { CloudServiceHistoryItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
+import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
 
 const DIFF_ITEM_LIMIT = 10;
@@ -189,6 +189,7 @@ export default {
 
         /* Api */
         const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.timezone = 'UTC';
         const listHistory = async (refresh = false) => {
             if (refresh) {
                 state.items = [];
@@ -197,8 +198,8 @@ export default {
             try {
                 state.loading = true;
                 apiQueryHelper.setPage(state.pageStart, DIFF_ITEM_LIMIT);
-                let startDate;
-                let endDate;
+                let startDate: Dayjs;
+                let endDate: Dayjs;
                 if (state.selectedMonth !== 'all') {
                     startDate = dayjs.utc(`${state.selectedYear}-${state.selectedMonth}`).startOf('month');
                     endDate = startDate.add(1, 'month');

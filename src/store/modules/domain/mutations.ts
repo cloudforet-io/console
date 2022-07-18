@@ -1,4 +1,4 @@
-import { DomainState } from './type';
+import type { DomainState } from './type';
 
 export const setDomain = (state: DomainState, domainInfo: DomainState): void => {
     state.domainId = domainInfo.domainId;

@@ -1,7 +1,7 @@
-import { RouteQueryString } from '@/lib/router-query-string';
+import type { RouteQueryString } from '@/lib/router-query-string';
 
-import { CostAnalysisPageUrlQueryKey } from '@/services/cost-explorer/cost-analysis/lib/config';
-import {
+import type { CostAnalysisPageUrlQueryKey } from '@/services/cost-explorer/cost-analysis/lib/config';
+import type {
     CostQueryFilters, Period, Granularity, GroupBy,
 } from '@/services/cost-explorer/type';
 

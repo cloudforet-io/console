@@ -40,21 +40,23 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed,
-    defineComponent, PropType,
+    defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PButton, PI } from '@spaceone/design-system';
 import { toPng } from 'html-to-image';
 import * as pdfMake from 'pdfmake/build/pdfmake';
-import { TCreatedPdf } from 'pdfmake/build/pdfmake';
+import type { TCreatedPdf } from 'pdfmake/build/pdfmake';
 // eslint-disable-next-line import/extensions,import/no-unresolved
-import { Content, Table, TableCell } from 'pdfmake/interfaces';
+import type { Content, Table, TableCell } from 'pdfmake/interfaces';
 
+import type { PdfFontFamily, Language } from '@/common/components/layouts/PdfDownloadOverlay/fonts';
 import {
-    pdfFontInfoMap, PdfFontFamily, Language, fontLanguages, pdfFontFamily,
+    pdfFontInfoMap, fontLanguages, pdfFontFamily,
 } from '@/common/components/layouts/PdfDownloadOverlay/fonts';
 
 import { gray, black, white } from '@/styles/colors';

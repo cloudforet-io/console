@@ -58,19 +58,20 @@ import {
     PSelectDropdown,
     PToggleButton,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { Currency, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { Granularity } from '@/services/cost-explorer/type';
+import type { Granularity } from '@/services/cost-explorer/type';
 
 
 export default {

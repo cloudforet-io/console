@@ -2,7 +2,7 @@
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
-import { ExtendedAuthType } from './type';
+import type { ExtendedAuthType } from './type';
 
 const EXTENDED_AUTH_TYPE_MAP = {
     google_oauth2: 'GOOGLE_OAUTH2',

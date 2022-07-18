@@ -26,31 +26,33 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed,
-    defineComponent, PropType,
+    defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PFieldGroup, PRadio, PSearchDropdown } from '@spaceone/design-system';
-import {
+import type {
     AutocompleteHandler,
     SearchDropdownMenuItem,
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
-import axios, { CancelTokenSource } from 'axios';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import { debounce } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ReferenceMap } from '@/store/modules/reference/type';
+import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { BudgetCostType, BudgetData, CostType } from '@/services/cost-explorer/budget/type';
+import type { BudgetCostType, BudgetData, CostType } from '@/services/cost-explorer/budget/type';
 
 
 type CostTypes = BudgetData['cost_types']

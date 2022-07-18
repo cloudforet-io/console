@@ -1,4 +1,4 @@
-import { ValueHandler } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { ValueHandler } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 export const makeCustomValueHandler = (distinctKey: string, cloudServiceId: string): ValueHandler => async (inputText: string) => {

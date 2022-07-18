@@ -124,8 +124,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    reactive, toRefs, ComponentRenderProxy, computed, getCurrentInstance, onActivated,
+    reactive, toRefs, computed, getCurrentInstance, onActivated,
 } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
@@ -146,9 +147,9 @@ import {
     PSelectDropdown,
     PTableCheckModal,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
-import { TranslateResult } from 'vue-i18n';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -162,7 +163,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-import { WEBHOOK_STATE, WebhookState } from '@/services/alert-manager/lib/config';
+import type { WebhookState } from '@/services/alert-manager/lib/config';
+import { WEBHOOK_STATE } from '@/services/alert-manager/lib/config';
 import WebhookAddFormModal from '@/services/project/project-detail/project-alert/project-webhook/modules/WebhookAddFormModal.vue';
 import WebhookUpdateFormModal from '@/services/project/project-detail/project-alert/project-webhook/modules/WebhookUpdateFormModal.vue';
 

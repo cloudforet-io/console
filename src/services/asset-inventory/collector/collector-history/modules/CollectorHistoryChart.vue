@@ -21,8 +21,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    reactive, watch, toRefs, computed, onUnmounted, getCurrentInstance, ComponentRenderProxy,
+    reactive, watch, toRefs, computed, onUnmounted, getCurrentInstance,
 } from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';

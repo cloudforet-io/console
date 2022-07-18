@@ -1,6 +1,6 @@
-import { ToolboxOptions } from '@/component-util/toolbox/type';
-import { ApiQueryHelper } from '@/space-connector/helper';
-import { Query } from '@/space-connector/type';
+import type { ToolboxOptions } from '@/component-util/toolbox/type';
+import type { ApiQueryHelper } from '@/space-connector/helper';
+import type { Query } from '@/space-connector/type';
 
 interface Options extends ToolboxOptions {
     sortDesc?: boolean;

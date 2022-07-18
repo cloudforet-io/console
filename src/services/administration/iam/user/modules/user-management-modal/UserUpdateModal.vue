@@ -92,28 +92,29 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
+    reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PSelectDropdown, PFieldGroup, PTextInput, PDivider,
 } from '@spaceone/design-system';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 
 import { store } from '@/store';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import { Tag } from '@/common/components/forms/tags-input-group/type';
+import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { Validation } from '@/services/administration/iam/user/lib/user-form-validations';
 import {
     checkEmailFormat, checkEmptyValue, checkMinLength, checkOneLowerCase, checkOneNumber, checkOneUpperCase, checkSamePassword,
-    Validation,
 } from '@/services/administration/iam/user/lib/user-form-validations';
-import { User } from '@/services/administration/iam/user/type';
+import type { User } from '@/services/administration/iam/user/type';
 import { administrationStore } from '@/services/administration/store';
 
 interface AuthType {

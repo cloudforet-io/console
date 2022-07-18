@@ -26,9 +26,10 @@ import {
 } from '@vue/composition-api';
 
 import { PBadge, PSelectDropdown } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import dayjs, { Dayjs } from 'dayjs';
-import { TranslateResult } from 'vue-i18n';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';
 
@@ -38,7 +39,7 @@ import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/help
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import CostManagementCustomRangeModal from '@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { Period, Granularity } from '@/services/cost-explorer/type';
+import type { Period, Granularity } from '@/services/cost-explorer/type';
 
 
 const today = dayjs.utc();

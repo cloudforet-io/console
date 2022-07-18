@@ -1,9 +1,9 @@
-import { TranslateResult } from 'vue-i18n';
-import { Location } from 'vue-router';
+import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router';
 
-import { FavoriteType } from '@/store/modules/favorite/type';
+import type { FavoriteType } from '@/store/modules/favorite/type';
 
-import { MenuId } from '@/lib/menu/config';
+import type { MenuId } from '@/lib/menu/config';
 
 export const MENU_ITEM_TYPE = Object.freeze({
     TITLE: 'title',

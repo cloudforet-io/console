@@ -18,7 +18,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
-import { LNBMenu } from '@/common/modules/navigations/lnb/type';
+import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 

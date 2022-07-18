@@ -55,7 +55,7 @@ import {
 import bytes from 'bytes';
 import Color from 'color';
 import { range, orderBy } from 'lodash';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 import { store } from '@/store';
 

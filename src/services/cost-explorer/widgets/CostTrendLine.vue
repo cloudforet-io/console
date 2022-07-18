@@ -34,14 +34,14 @@ import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
+import type { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
@@ -59,10 +59,10 @@ import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
 import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 import {
     getCurrencyAppliedChartData,
     getLegends,
@@ -71,7 +71,7 @@ import {
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
-import {
+import type {
     ChartData, CostAnalyzeModel, Legend, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
 

@@ -86,20 +86,22 @@
 <script lang="ts">
 
 
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
+    reactive, toRefs, computed, watch, getCurrentInstance,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PSearchDropdown, PFieldGroup, PRadio, PButton, PTextInput, PI, PSelectDropdown,
 } from '@spaceone/design-system';
-import { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
-import dayjs, { Dayjs } from 'dayjs';
+import type { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import {
     range, get, forEach, size, map,
 } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -111,7 +113,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/services/asset-inventory/collector/type';
+import type { ScheduleAddParameter, ScheduleUpdateParameter } from '@/services/asset-inventory/collector/type';
 
 
 interface ScheduleHours {

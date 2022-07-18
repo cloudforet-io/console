@@ -17,7 +17,8 @@ import { PRadio } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import { DASHBOARD_PRIVACY_TYPE, DashboardPrivacyType } from '@/services/cost-explorer/cost-dashboard/type';
+import type { DashboardPrivacyType } from '@/services/cost-explorer/cost-dashboard/type';
+import { DASHBOARD_PRIVACY_TYPE } from '@/services/cost-explorer/cost-dashboard/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const privacyList = [

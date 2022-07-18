@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import Vue from 'vue';
-import VueRouter, { RouteConfig } from 'vue-router';
+import type { RouteConfig } from 'vue-router';
+import VueRouter from 'vue-router';
 
 import { ERROR_ROUTE } from '@/router/error-routes';
 

@@ -1,9 +1,11 @@
 import { clone } from 'lodash';
-import { Route } from 'vue-router';
+import type { Route } from 'vue-router';
 
-import { AccessLevel, ACCESS_LEVEL } from '@/lib/access-control/config';
-import { PagePermissionTuple, PagePermissionType, PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
-import { MenuId } from '@/lib/menu/config';
+import type { AccessLevel } from '@/lib/access-control/config';
+import { ACCESS_LEVEL } from '@/lib/access-control/config';
+import type { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/page-permission-helper';
+import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
+import type { MenuId } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 

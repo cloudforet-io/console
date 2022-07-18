@@ -56,11 +56,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { fetchDefaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/helper';
-import {
-    CustomLayout,
-    DASHBOARD_PRIVACY_TYPE, DashboardCreateParam,
+import type {
+    CustomLayout, DashboardCreateParam,
     DashboardInfo,
-    DashboardPrivacyType, PERIOD_TYPE, PeriodType,
+    DashboardPrivacyType, PeriodType,
+} from '@/services/cost-explorer/cost-dashboard/type';
+import {
+    DASHBOARD_PRIVACY_TYPE, PERIOD_TYPE,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';

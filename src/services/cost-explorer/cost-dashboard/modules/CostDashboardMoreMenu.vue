@@ -36,7 +36,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import CostDashboardDuplicateModal
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardDuplicateModal.vue';
-import { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import type { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 

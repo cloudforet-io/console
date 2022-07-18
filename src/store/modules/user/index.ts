@@ -1,7 +1,7 @@
 import * as actions from './actions';
 import * as getters from './getters';
 import * as mutations from './mutations';
-import { UserState } from './type';
+import type { UserState } from './type';
 
 export const STORAGE_KEY = 'store/user';
 

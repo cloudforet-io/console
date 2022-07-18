@@ -40,7 +40,8 @@ import { reactive, toRefs } from '@vue/composition-api';
 
 import { PButtonModal, PButton } from '@spaceone/design-system';
 
-import { SIZE, Size } from '@/common/components/modals/config';
+import type { Size } from '@/common/components/modals/config';
+import { SIZE } from '@/common/components/modals/config';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 export default {

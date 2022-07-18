@@ -1,8 +1,9 @@
 import { convert as cashifyConvert } from 'cashify';
-import { NumberFormatOptions } from 'vue-i18n';
+import type { NumberFormatOptions } from 'vue-i18n';
 
-import { CURRENCY, Currency } from '@/store/modules/display/config';
-import { CurrencyRates } from '@/store/modules/display/type';
+import type { Currency } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/display/config';
+import type { CurrencyRates } from '@/store/modules/display/type';
 
 /** cashify library: https://www.npmjs.com/package/cashify */
 

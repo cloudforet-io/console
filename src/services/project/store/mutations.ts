@@ -1,7 +1,7 @@
-import { Mutation } from 'vuex';
+import type { Mutation } from 'vuex';
 
-import { ProjectPageState } from '@/services/project/store/type';
-import { ProjectGroupTreeItem } from '@/services/project/type';
+import type { ProjectPageState } from '@/services/project/store/type';
+import type { ProjectGroupTreeItem } from '@/services/project/type';
 
 export const setIsInitiated: Mutation<ProjectPageState> = (state, isInitiated: boolean) => {
     state.isInitiated = isInitiated;

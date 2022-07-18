@@ -77,7 +77,7 @@ import {
 } from '@vue/composition-api';
 
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
+import type { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
@@ -89,13 +89,13 @@ import {
     PTableCheckModal,
     PToolboxTable,
 } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -105,7 +105,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectMemberAddModal from '@/services/project/project-detail/project-member/modules/ProjectMemberAddModal.vue';
 import ProjectMemberUpdateModal
     from '@/services/project/project-detail/project-member/modules/ProjectMemberUpdateModal.vue';
-import { MemberItem } from '@/services/project/project-detail/project-member/type';
+import type { MemberItem } from '@/services/project/project-detail/project-member/type';
 
 
 interface MemberDataTableItem extends MemberItem {

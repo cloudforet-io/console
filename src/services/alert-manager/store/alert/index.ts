@@ -1,4 +1,4 @@
-import { AlertState } from '@/services/alert-manager/store/alert/type';
+import type { AlertState } from '@/services/alert-manager/store/alert/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

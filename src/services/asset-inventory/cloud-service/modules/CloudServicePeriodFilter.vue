@@ -16,7 +16,7 @@ import {
 import { PTag } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 
 interface Props {
     period?: Period;

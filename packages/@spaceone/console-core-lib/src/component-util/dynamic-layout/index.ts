@@ -1,15 +1,15 @@
 import { forEach } from 'lodash';
 
-import { EnumOptions } from '@/component-util/dynamic-layout/field-schema';
-import { DynamicLayoutType } from '@/component-util/dynamic-layout/layout-schema';
-import { ConsoleDynamicField, ConsoleSearchSchema, Reference } from '@/component-util/dynamic-layout/type';
+import type { EnumOptions } from '@/component-util/dynamic-layout/field-schema';
+import type { DynamicLayoutType } from '@/component-util/dynamic-layout/layout-schema';
+import type { ConsoleDynamicField, ConsoleSearchSchema, Reference } from '@/component-util/dynamic-layout/type';
 import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
     makeReferenceValueHandler,
 } from '@/component-util/query-search';
-import { KeyItemSet, ValueHandlerMap } from '@/component-util/query-search/type';
-import { Filter } from '@/space-connector/type';
+import type { KeyItemSet, ValueHandlerMap } from '@/component-util/query-search/type';
+import type { Filter } from '@/space-connector/type';
 
 interface ExcelDataField {
     key: string;

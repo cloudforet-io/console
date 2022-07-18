@@ -45,11 +45,12 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PSearchDropdown,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import {
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type {
     AutocompleteHandler, SearchDropdownMenuItem,
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
-import axios, { CancelTokenSource } from 'axios';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 
 
 import { store } from '@/store';

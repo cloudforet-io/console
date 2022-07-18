@@ -27,20 +27,20 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 
 import { commaFormatter, isNotEmpty } from '@spaceone/console-core-lib';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -50,12 +50,12 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
-import {
+import type {
     BudgetUsageAnalyzeRequestParam,
     BudgetUsageData,
     BudgetUsageRange,
 } from '@/services/cost-explorer/budget/type';
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 
 
 interface Props {

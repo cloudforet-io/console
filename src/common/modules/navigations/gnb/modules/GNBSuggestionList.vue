@@ -62,8 +62,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    defineComponent, onUnmounted, PropType,
+    defineComponent, onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -71,10 +72,9 @@ import { PContextMenu, PI, PLazyImg } from '@spaceone/design-system';
 
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import {
-    SuggestionItem, SUGGESTION_TYPE,
-} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import { FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
+import type { SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import type { FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
 
 
 interface Props {

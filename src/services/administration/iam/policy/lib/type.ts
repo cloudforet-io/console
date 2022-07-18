@@ -1,6 +1,6 @@
-import { Tags, TimeStamp } from '@/models';
+import type { Tags, TimeStamp } from '@/models';
 
-import { PolicyTypes, PolicyState } from '@/services/administration/iam/policy/lib/config';
+import type { PolicyTypes, PolicyState } from '@/services/administration/iam/policy/lib/config';
 
 
 interface RepositoryInfoDataModel {

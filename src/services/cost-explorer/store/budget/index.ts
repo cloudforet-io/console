@@ -1,4 +1,4 @@
-import { BudgetStoreState } from '@/services/cost-explorer/store/budget/type';
+import type { BudgetStoreState } from '@/services/cost-explorer/store/budget/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

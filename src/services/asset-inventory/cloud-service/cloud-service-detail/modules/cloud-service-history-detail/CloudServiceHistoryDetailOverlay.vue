@@ -58,16 +58,16 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy, PropType } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
-    computed, defineComponent, getCurrentInstance, onMounted, PropType, reactive, toRefs, watch,
+    computed, defineComponent, getCurrentInstance, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     PPaneLayout, PPageTitle, PTab, PLottie,
 } from '@spaceone/design-system';
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { useInfiniteScroll } from '@vueuse/core';
 
 import { i18n } from '@/translations';
@@ -81,9 +81,8 @@ import CloudServiceHistoryDetailNote
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailNoteTab.vue';
 import CloudServiceHistoryLogTab
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryLogTab.vue';
-import {
-    CloudServiceHistoryItem, HISTORY_ACTION_MAP,
-} from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
+import type { CloudServiceHistoryItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
+import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
 
 interface Props {

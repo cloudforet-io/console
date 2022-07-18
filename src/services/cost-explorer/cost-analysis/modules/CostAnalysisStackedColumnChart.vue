@@ -8,13 +8,13 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     getCurrentInstance,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { XYChart } from '@amcharts/amcharts4/charts';
+import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
@@ -37,11 +37,11 @@ import { gray } from '@/styles/colors';
 
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { Granularity } from '@/services/cost-explorer/type';
+import type { Granularity } from '@/services/cost-explorer/type';
 import {
     getStackedChartData, getCurrencyAppliedChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
-import {
+import type {
     Legend, XYChartData, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
 

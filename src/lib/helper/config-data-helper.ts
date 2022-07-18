@@ -1,11 +1,12 @@
 import { find } from 'lodash';
 
-import { GNBMenu } from '@/store/modules/display/type';
-import { FAVORITE_TYPE, FavoriteConfig, FavoriteItem } from '@/store/modules/favorite/type';
-import { RecentConfig, RecentItem } from '@/store/modules/recent/type';
-import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { GNBMenu } from '@/store/modules/display/type';
+import type { FavoriteConfig, FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
+import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 

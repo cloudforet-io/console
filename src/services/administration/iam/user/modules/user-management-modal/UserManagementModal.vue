@@ -34,8 +34,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -49,7 +50,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-import { User } from '@/services/administration/iam/user/type';
+import type { User } from '@/services/administration/iam/user/type';
 import { administrationStore } from '@/services/administration/store';
 
 export default {

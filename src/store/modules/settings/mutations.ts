@@ -1,4 +1,4 @@
-import { SettingsState, SetItemRequest } from './type';
+import type { SettingsState, SetItemRequest } from './type';
 
 export const setItem = (state: SettingsState, item: SetItemRequest): void => {
     if (!item.path) {

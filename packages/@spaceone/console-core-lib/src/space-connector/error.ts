@@ -1,6 +1,6 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 /* eslint-disable no-tabs */
-import { AxiosError } from 'axios';
+import type { AxiosError } from 'axios';
 
 import { RESPONSE } from '@/space-connector/type';
 

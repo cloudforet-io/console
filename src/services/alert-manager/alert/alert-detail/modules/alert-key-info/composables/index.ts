@@ -1,6 +1,5 @@
-import {
-    ComponentRenderProxy, getCurrentInstance, reactive,
-} from '@vue/composition-api';
+import type { ComponentRenderProxy } from '@vue/composition-api';
+import { getCurrentInstance, reactive } from '@vue/composition-api';
 
 import { cloneDeep } from 'lodash';
 
@@ -10,7 +9,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { EDIT_MODE, EditMode } from '@/services/alert-manager/lib/config';
+import type { EditMode } from '@/services/alert-manager/lib/config';
+import { EDIT_MODE } from '@/services/alert-manager/lib/config';
 import { alertManagerStore } from '@/services/alert-manager/store';
 
 interface AlertDetailItemState {

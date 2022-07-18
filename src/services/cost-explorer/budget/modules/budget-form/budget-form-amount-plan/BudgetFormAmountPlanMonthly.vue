@@ -34,13 +34,16 @@ import {
 } from '@vue/composition-api';
 
 import { PButton, PDivider, PLabel } from '@spaceone/design-system';
-import dayjs, { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
+import type { AutofillOptions } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanAutofillModal.vue';
 import BudgetFormAmountPlanAutofillModal
-, { AutofillOptions } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanAutofillModal.vue';
+    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanAutofillModal.vue';
+import type { MonthAmountInput } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthInput.vue';
 import BudgetFormAmountPlanMonthInput
-, { MonthAmountInput } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthInput.vue';
-import { Period } from '@/services/cost-explorer/type';
+    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthInput.vue';
+import type { Period } from '@/services/cost-explorer/type';
 
 
 interface Props {

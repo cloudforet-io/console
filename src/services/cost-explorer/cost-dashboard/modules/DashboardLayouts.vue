@@ -66,8 +66,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -88,7 +88,7 @@ import CostDashboardCustomizeWidgetModal
 import CostDashboardUpdateWidgetModal
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardUpdateWidgetModal.vue';
 import DynamicWidget from '@/services/cost-explorer/cost-dashboard/modules/DynamicWidget.vue';
-import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 

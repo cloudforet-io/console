@@ -1,4 +1,4 @@
-import { AccessLevel } from '@/lib/access-control/config';
+import type { AccessLevel } from '@/lib/access-control/config';
 
 export const MENU_ID = Object.freeze({
     PROJECT: 'project',

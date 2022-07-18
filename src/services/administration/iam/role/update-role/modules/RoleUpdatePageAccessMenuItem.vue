@@ -42,8 +42,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, PropType, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -53,7 +54,7 @@ import {
 import { i18n } from '@/translations';
 
 import { MANAGE_FEATURE_MAP } from '@/services/administration/iam/role/config';
-import { PageAccessMenuItem } from '@/services/administration/iam/role/type';
+import type { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 
 
 export default {

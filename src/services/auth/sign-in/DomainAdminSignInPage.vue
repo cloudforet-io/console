@@ -25,12 +25,13 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy,
+    toRefs, reactive, computed, getCurrentInstance,
 } from '@vue/composition-api';
 
 
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

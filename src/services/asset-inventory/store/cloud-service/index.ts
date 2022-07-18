@@ -1,5 +1,5 @@
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
-import { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';
+import type { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

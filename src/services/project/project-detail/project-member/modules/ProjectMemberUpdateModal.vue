@@ -56,16 +56,15 @@
 </template>
 
 <script lang="ts">
-import {
-    PropType, reactive, toRefs,
-} from '@vue/composition-api';
+import type { PropType } from '@vue/composition-api';
+import { reactive, toRefs } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PSearchDropdown, PTextInput,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
 
 import { i18n } from '@/translations';
 
@@ -75,7 +74,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { MemberItem } from '@/services/project/project-detail/project-member/type';
+import type { MemberItem } from '@/services/project/project-detail/project-member/type';
 
 
 interface Props {

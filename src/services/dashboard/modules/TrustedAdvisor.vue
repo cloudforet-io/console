@@ -73,7 +73,7 @@ import {
 } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PTextPagination, PI } from '@spaceone/design-system';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
@@ -84,8 +84,9 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { FAVORITE_TYPE, FavoriteItem } from '@/store/modules/favorite/type';
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';

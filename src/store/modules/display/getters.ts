@@ -1,5 +1,5 @@
-import VueRouter from 'vue-router';
-import { Getter } from 'vuex';
+import type VueRouter from 'vue-router';
+import type { Getter } from 'vuex';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
@@ -7,16 +7,15 @@ import { i18n } from '@/translations';
 import {
     CURRENCY_SYMBOL, SIDEBAR_TYPE,
 } from '@/store/modules/display/config';
-import {
+import type {
     DisplayState, GNBMenu, SidebarProps,
 } from '@/store/modules/display/type';
 
 
-import { PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
+import type { PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
 import config from '@/lib/config';
-import {
-    Menu, MENU_ID, MenuInfo,
-} from '@/lib/menu/config';
+import type { Menu, MenuInfo } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 

@@ -32,7 +32,7 @@ import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
+import type { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
@@ -41,7 +41,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 
 
@@ -60,13 +60,13 @@ import { gray } from '@/styles/colors';
 
 import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import { GroupBy, Period } from '@/services/cost-explorer/type';
+import type { GroupBy, Period } from '@/services/cost-explorer/type';
 import {
     getCurrencyAppliedChartData, getLegends, getTooltipText, getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardDataTable
     from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
-import {
+import type {
     ChartData, CostAnalyzeModel, Legend, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
 

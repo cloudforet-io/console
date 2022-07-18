@@ -1,10 +1,10 @@
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { isEmpty } from 'lodash';
-import { Action } from 'vuex';
+import type { Action } from 'vuex';
 
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
-import { CloudServiceCategory, CloudServiceFilterMap, Period } from '@/services/asset-inventory/cloud-service/type';
-import { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';
+import type { CloudServiceCategory, CloudServiceFilterMap, Period } from '@/services/asset-inventory/cloud-service/type';
+import type { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';
 
 export const setSelectedProvider: Action<CloudServiceStoreState, any> = async ({ commit, rootState, dispatch }, provider = 'all') => {
     let providers = rootState.reference.provider.items;

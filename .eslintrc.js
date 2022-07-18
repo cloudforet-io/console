@@ -120,6 +120,7 @@ module.exports = {
         '@typescript-eslint/no-explicit-any': ['off'],
         '@typescript-eslint/no-unused-vars': ['error'],
         '@typescript-eslint/no-shadow': ['error'],
+        '@typescript-eslint/consistent-type-imports': ['error'],
 
         // eslint-plugin-import rules
         'import/order': [

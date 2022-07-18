@@ -1,4 +1,4 @@
-import { BudgetData, BudgetUsageData } from '@/services/cost-explorer/budget/type';
+import type { BudgetData, BudgetUsageData } from '@/services/cost-explorer/budget/type';
 
 export interface BudgetStoreState {
 	budgetData: Partial<BudgetData>|null;

@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { ListType, Tags, TimeStamp } from '@/models';
+import type { ListType, Tags, TimeStamp } from '@/models';
 
 export enum COLLECT_MODE {
     all = 'ALL',

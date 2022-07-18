@@ -34,8 +34,8 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed,
     getCurrentInstance,
     onActivated,

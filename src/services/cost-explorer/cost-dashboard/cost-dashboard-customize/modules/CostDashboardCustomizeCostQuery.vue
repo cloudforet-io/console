@@ -68,10 +68,10 @@ import { getUUID } from '@/lib/component-util/getUUID';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { CHART_TYPE } from '@/services/cost-explorer/cost-analysis/type';
-import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { CostQuerySetModel } from '@/services/cost-explorer/type';
+import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 
 const LAYOUT = 100;

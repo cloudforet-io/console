@@ -58,7 +58,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

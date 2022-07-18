@@ -30,16 +30,18 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import CostDashboardCreateForm
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateForm.vue';
 import { fetchDefaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/helper';
-import {
+import type {
     CustomLayout,
-    DASHBOARD_PRIVACY_TYPE,
     DashboardCreateParam,
-    DashboardPrivacyType,
-    PERIOD_TYPE, PeriodType,
+    DashboardPrivacyType, PeriodType,
+} from '@/services/cost-explorer/cost-dashboard/type';
+import {
+    DASHBOARD_PRIVACY_TYPE,
+    PERIOD_TYPE,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 
 export default {
     name: 'CostDashboardCreatePage',

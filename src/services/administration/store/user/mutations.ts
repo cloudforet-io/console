@@ -1,6 +1,6 @@
-import { Mutation } from 'vuex';
+import type { Mutation } from 'vuex';
 
-import { UserStoreState } from './type';
+import type { UserStoreState } from './type';
 
 export const setSelectedIndex: Mutation<UserStoreState> = (state, selectedIndex: number[]): void => {
     state.selectedIndex = selectedIndex;

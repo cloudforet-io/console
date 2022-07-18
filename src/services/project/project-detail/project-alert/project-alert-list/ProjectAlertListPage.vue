@@ -15,8 +15,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     getCurrentInstance,
     onActivated, reactive, toRefs,
 } from '@vue/composition-api';
@@ -29,7 +29,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import AlertDataTable from '@/services/alert-manager/alert/modules/AlertDataTable.vue';
 import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
-import { AlertListPageUrlQuery, AlertListTableFilters } from '@/services/alert-manager/type';
+import type { AlertListPageUrlQuery, AlertListTableFilters } from '@/services/alert-manager/type';
 
 export default {
     name: 'ProjectAlertListPage',

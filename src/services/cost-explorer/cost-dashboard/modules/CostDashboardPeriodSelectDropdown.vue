@@ -46,7 +46,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PBadge, PSelectDropdown, PCheckBox, PI, PTooltip,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
@@ -61,7 +61,7 @@ import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import CostManagementCustomRangeModal
     from '@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue';
 import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 
 
 const initialPeriodStart = dayjs.utc().startOf('month').format('YYYY-MM-DD');

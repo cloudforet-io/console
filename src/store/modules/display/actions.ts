@@ -1,13 +1,14 @@
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import dayjs from 'dayjs';
-import { Action, Dispatch } from 'vuex';
+import type { Action, Dispatch } from 'vuex';
 
+import type { Currency } from '@/store/modules/display/config';
 import {
-    CURRENCY, DEFAULT_CURRENCY_RATES, SIDEBAR_TYPE, Currency,
+    CURRENCY, DEFAULT_CURRENCY_RATES, SIDEBAR_TYPE,
 } from '@/store/modules/display/config';
-import { CurrencyRates, DisplayState } from '@/store/modules/display/type';
+import type { CurrencyRates, DisplayState } from '@/store/modules/display/type';
 
 
 import {

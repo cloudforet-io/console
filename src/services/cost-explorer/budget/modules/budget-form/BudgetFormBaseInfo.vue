@@ -34,7 +34,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import BudgetCostTypeSelect from '@/services/cost-explorer/budget/modules/BudgetCostTypeSelect.vue';
 import BudgetTargetSelect from '@/services/cost-explorer/budget/modules/BudgetTargetSelect.vue';
-import { BudgetData } from '@/services/cost-explorer/budget/type';
+import type { BudgetData } from '@/services/cost-explorer/budget/type';
 
 
 export type BudgetBaseInfo = Pick<BudgetData, 'name'|'cost_types'|'project_group_id'|'project_id'>

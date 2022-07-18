@@ -1,5 +1,6 @@
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
-import { MENU_ID, MenuId, MenuInfo } from '@/lib/menu/config';
+import type { MenuId, MenuInfo } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     [MENU_ID.PROJECT]: {

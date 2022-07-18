@@ -1,8 +1,8 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { Action } from 'vuex';
+import type { Action } from 'vuex';
 
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
-import { ProviderReferenceMap, ProviderReferenceState } from '@/store/modules/reference/provider/type';
+import type { ProviderReferenceMap, ProviderReferenceState } from '@/store/modules/reference/provider/type';
 
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

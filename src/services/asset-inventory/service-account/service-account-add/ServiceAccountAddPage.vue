@@ -136,9 +136,9 @@ import {
     PPageTitle, PJsonSchemaForm, PTab, PFieldGroup, PLazyImg,
     PPaneLayout, PButton, PRadio, PMarkdown, PTextEditor, PTextInput,
 } from '@spaceone/design-system';
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { get } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -148,12 +148,12 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import { Tag } from '@/common/components/forms/tags-input-group/type';
+import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import InfoButton from '@/common/modules/portals/InfoButton.vue';
 
 import ProjectTreePanel from '@/services/asset-inventory/service-account/service-account-add/modules/ProjectTreePanel.vue';
-import { ProjectGroup, ProviderModel } from '@/services/asset-inventory/service-account/type';
+import type { ProjectGroup, ProviderModel } from '@/services/asset-inventory/service-account/type';
 
 
 export default {

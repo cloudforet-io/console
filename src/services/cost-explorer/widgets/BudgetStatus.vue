@@ -36,8 +36,8 @@
 
 <script lang="ts">
 
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -49,7 +49,7 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 import { i18n } from '@/translations';
 
@@ -63,7 +63,7 @@ import {
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
-import { WidgetProps } from '@/services/cost-explorer/widgets/type';
+import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
 
 interface ChartData {
     budgetId: string;

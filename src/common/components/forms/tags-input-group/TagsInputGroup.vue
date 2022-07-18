@@ -66,7 +66,7 @@ import { isEmpty } from 'lodash';
 
 import { i18n } from '@/translations';
 
-import {
+import type {
     Tag, TagItem, TagsInputGroupProps, ValidationData,
 } from '@/common/components/forms/tags-input-group/type';
 

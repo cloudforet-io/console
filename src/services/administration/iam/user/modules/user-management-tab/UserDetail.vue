@@ -33,8 +33,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
@@ -42,7 +43,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PPanelTop, PDefinitionTable, PStatus } from '@spaceone/design-system';
 
 
-import { Tags } from '@/models';
+import type { Tags } from '@/models';
 import { i18n } from '@/translations';
 
 

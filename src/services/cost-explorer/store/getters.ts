@@ -1,8 +1,8 @@
-import { Getter } from 'vuex';
+import type { Getter } from 'vuex';
 
 import { store } from '@/store';
 
-import { CostExplorerState } from '@/services/cost-explorer/store/type';
+import type { CostExplorerState } from '@/services/cost-explorer/store/type';
 
 export const dashboardList: Getter<CostExplorerState, any> = (state) => {
     const publicList = state.publicDashboardList.map(d => ({

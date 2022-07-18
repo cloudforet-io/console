@@ -1,5 +1,5 @@
-import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import {
+import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type {
     SearchKeyOptions,
     SearchSchema,
     SearchDataType,

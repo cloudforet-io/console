@@ -28,8 +28,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PRadio, PCheckBox } from '@spaceone/design-system';

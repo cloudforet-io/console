@@ -1,6 +1,6 @@
 /** Search schema types */
-import { DynamicField } from '@/component-util/dynamic-layout/field-schema';
-import { KeyDataType } from '@/component-util/query-search/type';
+import type { DynamicField } from '@/component-util/dynamic-layout/field-schema';
+import type { KeyDataType } from '@/component-util/query-search/type';
 
 export interface SearchEnumItem {
     label: string;

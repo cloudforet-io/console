@@ -1,4 +1,5 @@
-import { Menu, MENU_ID } from '@/lib/menu/config';
+import type { Menu } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 export const MENU_LIST: Menu[] = [
     { id: MENU_ID.PROJECT },

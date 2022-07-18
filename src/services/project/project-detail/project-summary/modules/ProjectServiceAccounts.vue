@@ -43,7 +43,7 @@ import { byteFormatter } from '@spaceone/console-core-lib';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataTable } from '@spaceone/design-system';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 
 import { store } from '@/store';

@@ -8,14 +8,14 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     getCurrentInstance,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
-import { PieChart } from '@amcharts/amcharts4/charts';
+import type { PieChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import {
     PDataLoader, PSkeleton,
@@ -29,7 +29,7 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { gray } from '@/styles/colors';
 
-import {
+import type {
     Legend, PieChartData, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
 
