@@ -1,3 +1,10 @@
+# [1.1.0-beta.350](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.349...v1.1.0-beta.350) (2022-07-18)
+
+
+### Bug Fixes
+
+* **ic_code:** icon size ([#1023](https://github.com/spaceone-dev/spaceone-design-system/issues/1023)) ([c8e3ac4](https://github.com/spaceone-dev/spaceone-design-system/commit/c8e3ac4d948cdd86dbfd445814101b91453b7362))
+
 # [1.1.0-beta.349](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.348...v1.1.0-beta.349) (2022-07-18)
 
 
