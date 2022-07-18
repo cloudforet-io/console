@@ -336,7 +336,7 @@ export default {
 
         watch([() => state.chartRef, () => state.loading], ([chartCtx, loading]) => {
             if (chartCtx && !loading) {
-                drawChart(chartCtx);
+                requestIdleCallback(() => drawChart(chartCtx));
             }
         }, { immediate: false });
 

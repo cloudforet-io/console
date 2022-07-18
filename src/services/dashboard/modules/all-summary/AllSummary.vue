@@ -472,7 +472,7 @@ export default {
         /* Watcher */
         watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
             if (!loading && chartContext) {
-                drawChart(chartContext);
+                requestIdleCallback(() => drawChart(chartContext));
             }
         }, { immediate: false });
         watch(() => state.activeTab, async (type) => {

@@ -353,7 +353,7 @@ export default defineComponent<WidgetProps>({
 
         watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
             if (!loading && chartContext) {
-                drawChart(chartContext);
+                requestIdleCallback(() => drawChart(chartContext));
             }
         }, { immediate: false });
 

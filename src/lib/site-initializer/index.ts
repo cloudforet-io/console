@@ -16,6 +16,7 @@ import { addAmchartsLicense, applyAmchartsGlobalSettings } from '@/lib/amcharts/
 import config from '@/lib/config';
 import { GTag } from '@/lib/gtag';
 import { Gtm } from '@/lib/gtm';
+import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -158,6 +159,7 @@ const init = async () => {
         initGtm();
         initAmcharts();
         initErrorHandler();
+        initRequestIdleCallback();
         checkSsoAccessToken();
     } else {
         initRouter();
