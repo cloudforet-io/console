@@ -64,5 +64,6 @@ export default defineComponent({
     word-wrap: break-word;
     word-break: break-all;
     white-space: pre-wrap;
+    font-family: monospace;
 }
 </style>

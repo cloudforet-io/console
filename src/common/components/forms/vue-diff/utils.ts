@@ -1,5 +1,6 @@
+import type { Ref } from '@vue/composition-api';
+
 import { diff_match_patch as DiffMatchPatch } from 'diff-match-patch';
-import type { Ref } from 'vue-demi';
 
 import hljs from './highlight';
 import type { Diffs, Lines, Mode } from './types';
@@ -8,15 +9,15 @@ const MODIFIED_START_TAG = '<vue-diff-modified>';
 const MODIFIED_CLOSE_TAG = '</vue-diff-modified>';
 
 enum DiffType {
-  removed = -1,
-  equal = 0,
-  added = 1,
-  disabled = 2,
+    removed = -1,
+    equal = 0,
+    added = 1,
+    disabled = 2,
 }
 
 /**
  * Get diff type
- * @param diff
+ * @param type
  */
 const getDiffType = (type: DiffType) => {
     if (!DiffType[type]) return 'disabled';

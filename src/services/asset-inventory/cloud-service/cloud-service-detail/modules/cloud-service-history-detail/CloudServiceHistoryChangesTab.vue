@@ -23,14 +23,13 @@
                             <div>
                                 <span>data</span>
                                 <p-i v-if="selectedKeyMenu" name="ic_arrow_right" color="#898995"
-                                     scale="0.8"
+                                     scale="0.7"
                                 />
                                 <span>{{ selectedKeyMenu }}</span>
                             </div>
-                            <div>
-                                <span>{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.HIDE_UNCHANGED') }}</span>
-                                <p-check-box v-model="folding" />
-                            </div>
+                            <p-i width="1rem" height="1rem" :name="folding ? 'ic_code-expand' : 'ic_code-collapse'"
+                                 class="cursor-pointer" @click="handleCodeDisplayType"
+                            />
                         </div>
                     </template>
                     <div class="secondary-header">
@@ -53,7 +52,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPanelTop, PCard, PContextMenu, PI, PCheckBox,
+    PPanelTop, PCard, PContextMenu, PI,
 } from '@spaceone/design-system';
 
 import vueDiff from '@/common/components/forms/vue-diff/Diff.vue';
@@ -70,7 +69,6 @@ export default defineComponent({
         PCard,
         PContextMenu,
         PI,
-        PCheckBox,
     },
     props: {
         selectedHistoryItem: {
@@ -90,13 +88,17 @@ export default defineComponent({
             filteredDiffItem: computed(() => props.selectedHistoryItem?.diffItems?.filter(d => d.key === state.selectedKeyMenu) ?? []),
             previousValue: computed(() => valueConverter(state.filteredDiffItem[0]?.previousValue)),
             changedValue: computed(() => valueConverter(state.filteredDiffItem[0]?.changedValue)),
-            folding: true,
+            folding: false,
         });
 
         const valueConverter = (value) => {
             if (typeof value === 'string' && value.length) {
                 if (value.startsWith('{') || value.startsWith('[')) {
-                    return JSON.stringify(JSON.parse(value), undefined, 2);
+                    try {
+                        return JSON.stringify(JSON.parse(value), undefined, 2);
+                    } catch {
+                        return undefined;
+                    }
                 }
                 return value;
             }
@@ -105,8 +107,11 @@ export default defineComponent({
 
         const handleSelect = (menu) => { state.selectedKeyMenu = menu.label; };
 
+        const handleCodeDisplayType = () => { state.folding = !state.folding; };
+
         return {
             ...toRefs(state),
+            handleCodeDisplayType,
             handleSelect,
         };
     },
@@ -177,7 +182,7 @@ export default defineComponent({
                     height: calc(100% - 1.5rem);
                 }
                 .cloud-service-history-changes-code-header-wrapper {
-                    @apply flex justify-between w-full align-middle;
+                    @apply flex justify-between w-full align-middle text-sm;
                 }
             }
         }
