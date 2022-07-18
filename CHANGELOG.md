@@ -1,3 +1,10 @@
+# [1.1.0-beta.351](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.350...v1.1.0-beta.351) (2022-07-18)
+
+
+### Bug Fixes
+
+* **icon:** wrong icon name ([#1024](https://github.com/spaceone-dev/spaceone-design-system/issues/1024)) ([e4b4448](https://github.com/spaceone-dev/spaceone-design-system/commit/e4b444889143aaf833f73918406d45041d05655a))
+
 # [1.1.0-beta.350](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.349...v1.1.0-beta.350) (2022-07-18)
 
 
