@@ -2,12 +2,12 @@
 	"ALS_S_ADD_MEMBER": "멤버 추가 완료",
 	"ALT_E_ADD_MEMBER": "멤버 추가 실패",
 	"ALT_E_DELETE_MEMBER": "멤버 삭제 실패",
-	"ALT_E_UPDATE_GROUP_MEMBER": "프로젝트 그룹 멤버 편집 실패",
-	"ALT_E_UPDATE_MEMBER": "멤버 편집 실패",
+	"ALT_E_UPDATE_GROUP_MEMBER": "프로젝트 그룹 멤버 수정 실패",
+	"ALT_E_UPDATE_MEMBER": "멤버 수정 실패",
 	"ALT_S_ADD_MEMBER": "멤버 추가 완료",
 	"ALT_S_DELETE_MEMBER": "멤버 삭제 완료",
-	"ALT_S_UPDATE_GROUP_MEMBER": "프로젝트 그룹 멤버 편집 완료",
-	"ALT_S_UPDATE_MEMBER": "멤버 편집 완료",
+	"ALT_S_UPDATE_GROUP_MEMBER": "프로젝트 그룹 멤버 수정 완료",
+	"ALT_S_UPDATE_MEMBER": "멤버 수정 완료",
 	"APP": {
 		"MAIN": {
 			"CLOSE": "닫기",
@@ -31,8 +31,8 @@
 		"RESET_PASSWORD_PAGE": {
 			"GO_TO_LOGIN_PAGE": "로그인 페이지로 이동",
 			"HELP_TEXT": "다음 계정의 새로운 비밀번호 입력 필요: ",
-			"HELP_TEXT_2": "",
-			"INVALID_LINK": "",
+			"HELP_TEXT_2": "요부분은 런칭이후 backend 프로세스 마련하여 기획후 진행예정입니다.",
+			"INVALID_LINK": "//",
 			"RESET_PASSWORD": "비밀번호 재설정"
 		}
 	},
@@ -674,7 +674,7 @@
 				"UPDATE_DASHBOARD": "대시보드 이름 변경"
 			},
 			"MAIN": {
-				"ALT_E_EDIT_FILTER": "필터 편집 실패",
+				"ALT_E_EDIT_FILTER": "필터 수정 실패",
 				"ALT_S_EDIT_FILTER": "필터 적용 완료",
 				"APPLIED_FILTER": "적용된 필터",
 				"BUDGET": "예산",
@@ -767,8 +767,8 @@
 		},
 		"GNB": {
 			"ACCOUNT": {
-				"ALT_E_UPDATE": "언어 편집 실패",
-				"ALT_S_UPDATE": "언어 편집 완료",
+				"ALT_E_UPDATE": "언어 변경 실패",
+				"ALT_S_UPDATE": "언어 변경 완료",
 				"GO_TO_MYPAGE": "마이페이지",
 				"LABEL_LANGUAGE": "언어",
 				"LABEL_PROFILE": "프로필",
@@ -838,8 +838,8 @@
 			"TIME_RANGE": "시간 범위"
 		},
 		"PROFILE": {
-			"ALT_E_UPDATE": "개인 정보 편집 실패",
-			"ALT_S_UPDATE": "개인 정보 편집 완료",
+			"ALT_E_UPDATE": "개인 정보 수정 실패",
+			"ALT_S_UPDATE": "개인 정보 수정 완료",
 			"EMAIL": "이메일",
 			"EMAIL_REQUIRED": "이메일을 입력해주세요.",
 			"GROUP": "소속",
@@ -888,8 +888,8 @@
 		"TAGS": {
 			"ADD_TAG": "태그 추가",
 			"ADD_TAG_DESC": "태그를 추가하여 리소스를 관리하세요.",
-			"ALT_E_UPDATE": "태그 편집 실패",
-			"ALT_S_UPDATE": "태그 편집 완료",
+			"ALT_E_UPDATE": "태그 수정 실패",
+			"ALT_S_UPDATE": "태그 수정 완료",
 			"CANCEL": "취소",
 			"CLICK_TO_ADD_TAG": "아래 버튼을 눌러 태그를 추가합니다.",
 			"EDIT": "편집",
@@ -1114,7 +1114,7 @@
 				"ROLE_TYPE": "역할(Role) 타입",
 				"SELECTED_DATA": "선택한 데이터"
 			},
-			"EDIT": "편집",
+			"EDIT": "수정",
 			"FORM": {
 				"ALL": "전체",
 				"ALT_E_CREATE_ROLE": "역할(Role) 생성 실패",
@@ -1321,7 +1321,7 @@
 				"TIMEZONE": "타임존",
 				"TIMEZONE_INVALID": "타임존이 잘못 설정되었습니다.",
 				"TOO_MANY_RESULTS": "검색결과가 너무 많습니다. 다른 검색어로 검색해보세요.",
-				"UPDATE_TITLE": "사용자 편집",
+				"UPDATE_TITLE": "사용자 수정",
 				"USER_ID": "아이디",
 				"USER_ID_DUPLICATED": "같은 아이디가 존재합니다",
 				"USER_ID_INVALID": "같은 아이디가 존재합니다.",
@@ -1358,7 +1358,7 @@
 				"ALT_E_DISABLE_API_KEY": "API Key 비활성화 실패",
 				"ALT_E_ENABLE": "사용자 활성화 실패",
 				"ALT_E_ENABLE_API_KEY": "API Key 활성화 실패",
-				"ALT_E_UPDATE_USER": "사용자 편집 실패",
+				"ALT_E_UPDATE_USER": "사용자 업데이트 실패",
 				"ALT_S_ADD_USER": "사용자 추가 완료",
 				"ALT_S_DELETE_API_KEY": "API Key 삭제 완료",
 				"ALT_S_DELETE_USER": "사용자 삭제 완료",
@@ -1404,7 +1404,7 @@
 				"TIMEZONE": "타임존",
 				"TITLE": "사용자",
 				"TODAY": "오늘 ",
-				"UPDATE": "편집",
+				"UPDATE": "수정",
 				"USER_ID": "아이디",
 				"USER_MANAGEMENT": "사용자 관리 ",
 				"YESTERDAY": "어제 "
@@ -1491,21 +1491,21 @@
 					"CHANGES": "변경 내역",
 					"CHANGES_TAB": {
 						"CHANGED": "변경 후",
-						"CHANGED_KEYS": "변경된 키 목록",
+						"CHANGED_KEYS": "키 목록",
 						"HIDE_UNCHANGED": "변경없는 항목 숨기기",
 						"PREVIOUS": "변경 전"
 					},
-					"HISTORY": "변경 이력 관리",
+					"HISTORY": "타임라인",
 					"HISTORY_DETAIL": "변경 이력 상세",
 					"LOG": "로그",
 					"LOG_TAB": {
 						"AUTO": "자동",
-						"LAST_12_HRS": "12시간 전",
-						"LAST_1_DAY": "1일 전",
-						"LAST_2_DAYS": "2일 전",
-						"LAST_6_HRS": "6시간 전",
+						"LAST_12_HRS": "지난 12시간",
+						"LAST_1_DAY": "지난 1일",
+						"LAST_2_DAYS": "지난 2일",
+						"LAST_6_HRS": "지난 6시간",
 						"NO_LOG_HELP_TEXT": "해당 클라우드 프로바이더는 현재 별도의 로그를 제공하고 있지 않습니다.",
-						"TIME_WITHIN": "시간 포함 기준"
+						"TIME_WITHIN": "조회 기간"
 					},
 					"NOTE": "노트",
 					"NOTE_TAB": {
@@ -1515,7 +1515,7 @@
 						"DELETE_HELP_TEXT": "선택한 노트를 삭제하시겠습니까?"
 					}
 				},
-				"HISTORY": "변경 기록"
+				"HISTORY": "변경 이력"
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "서비스 계정 추가",
@@ -1565,7 +1565,7 @@
 				"NO_SELECTED": "클라우드 서비스를 선택하면 자세한 정보를 볼 수 있습니다.",
 				"TAB_DATA": "데이터 ",
 				"TAB_DETAILS": "상세 정보",
-				"TAB_HISTORY": "변경 기록",
+				"TAB_HISTORY": "변경 이력",
 				"TAB_MEMBER": "연관된 멤버",
 				"TAB_MONITORING": "모니터링",
 				"TAB_SELECTED_DATA": "선택한 데이터 ",
@@ -1589,7 +1589,7 @@
 				"DELETE": "삭제",
 				"NO_SELECTED_SERVER": "서버를 선택하면 자세한 정보를 볼 수 있습니다.",
 				"TAB_DETAILS": "상세 정보",
-				"TAB_HISTORY": "변경 기록",
+				"TAB_HISTORY": "변경 이력",
 				"TAB_MEMBER": "연관된 멤버",
 				"TAB_MONITORING": "모니터링",
 				"TAB_SELECTED_DATA": "선택한 데이터",
@@ -1696,12 +1696,12 @@
 				"ALT_E_DELETE": "얼럿 삭제 실패",
 				"ALT_E_MERGE": "얼럿 병합 실패",
 				"ALT_E_STATE_CHANGED": "얼럿 상태 변경 실패",
-				"ALT_E_UPDATE": "얼럿 편집 실패",
+				"ALT_E_UPDATE": "얼럿 업데이트 실패",
 				"ALT_S_CREATE": "얼럿 생성 성공",
 				"ALT_S_DELETE": "얼럿 삭제 완료",
 				"ALT_S_MERGE": "얼럿 병합 성공",
 				"ALT_S_STATE_CHANGED": "얼럿 상태 변경 성공",
-				"ALT_S_UPDATE": "얼럿 편집 성공",
+				"ALT_S_UPDATE": "얼럿 업데이트 성공",
 				"ASSIGNED_TO_ME": "나에게 할당된 것만",
 				"ASSIGNED_TO_ME_TITLE": "나에게 할당된 새로운 얼럿",
 				"ASSIGNED_TO_YOU_TITLE": "나에게 할당된 새로운 얼럿",
@@ -1728,7 +1728,7 @@
 					"REQUIRED_TITLE": "제목을 입력해주세요.",
 					"SET_PROJECT_ALERT_NOW": "지금 바로 얼럿 설정하기",
 					"TITLE_CREATE": "얼럿 생성",
-					"TITLE_UPDATE": "얼럿 편집"
+					"TITLE_UPDATE": "얼럿 수정"
 				},
 				"HIGH": "높음",
 				"LOW": "낮음",
@@ -1949,8 +1949,8 @@
 				"PROJECT": "프로젝트",
 				"RESOLVED": "완료",
 				"SET_AS_DEFAULT": "기본으로 설정하기",
-				"UPDATE": "편집",
-				"UPDATE_MODAL_TITLE": "에스컬레이션 정책 편집"
+				"UPDATE": "수정",
+				"UPDATE_MODAL_TITLE": "에스컬레이션 정책 수정"
 			},
 			"MAIN": {
 				"ALERT": "얼럿",
@@ -2121,7 +2121,7 @@
 				"TAB_SERVICE_ACCOUNT": "서비스 계정",
 				"TAB_TAG": "태그",
 				"TITLE": "컬렉터",
-				"UPDATE": "편집",
+				"UPDATE": "수정",
 				"UPDATE_MODAL_NAME_DUPLICATED": "중복된 이름입니다.",
 				"UPDATE_MODAL_NAME_INVALID": "2 자 이상 입력해주세요.",
 				"UPDATE_MODAL_NAME_LABEL": "이름",
@@ -2129,7 +2129,7 @@
 				"UPDATE_MODAL_PRIORITY_MAX": "10 이하로 설정해주세요.",
 				"UPDATE_MODAL_PRIORITY_MIN": "1 이상으로 설정해주세요.",
 				"UPDATE_MODAL_RESET": "초기화",
-				"UPDATE_MODAL_TITLE": "컬렉터 편집",
+				"UPDATE_MODAL_TITLE": "컬렉터 수정",
 				"UPDATE_MODAL_VERSION_LABEL": "버전",
 				"VIEW_DETAIL": "상세 보기 "
 			},
@@ -2173,10 +2173,10 @@
 					"ACTION": "작업",
 					"ALT_E_CLOSE_MAINTENANCE_WINDOW": "유지 관리 기간 종료 실패",
 					"ALT_E_CREATE_MAINTENANCE_WINDOW": "유지 관리 기간 생성 실패",
-					"ALT_E_UPDATE_MAINTENANCE_WINDOW": "유지 관리 기간 편집 실패",
+					"ALT_E_UPDATE_MAINTENANCE_WINDOW": "유지 관리 기간 업데이트 실패",
 					"ALT_S_CLOSE_MAINTENANCE_WINDOW": "유지 관리 기간 종료 성공",
 					"ALT_S_CREATE_MAINTENANCE_WINDOW": "유지 관리 기간 생성 성공",
-					"ALT_S_UPDATE_MAINTENANCE_WINDOW": "유지 관리 기간 편집 성공",
+					"ALT_S_UPDATE_MAINTENANCE_WINDOW": "유지 관리 기간 업데이트 성공",
 					"CHECK_MODAL": {
 						"DESC_CLOSE": "선택한 유지 관리 기간을 삭제하시겠습니까?",
 						"TITLE_CLOSE": "유지 관리 기간 닫기"
@@ -2200,10 +2200,10 @@
 						"REQUIRED": "필수 입력 항목입니다.",
 						"START_AT_TIME": "예정된 시간에 시작하기",
 						"START_NOW": "지금 시작하고 끝내기",
-						"UPDATE_TITLE": "유지 관리 기간 편집"
+						"UPDATE_TITLE": "유지 관리 기간 수정"
 					},
 					"TITLE": "유지 관리 기간",
-					"UPDATE": "편집"
+					"UPDATE": "수정"
 				},
 				"MANUAL_OPERATION": "직접 완료하기",
 				"MINUTE": "분",
@@ -2223,7 +2223,7 @@
 				"SET_NOTIFICATION_POLICY_MODAL_TITLE": "알림 정책 설정",
 				"STEP": "단계",
 				"TIME": "번",
-				"UPDATE": "편집"
+				"UPDATE": "수정"
 			},
 			"ALT_E_ACTIVATE_ALERT": "얼럿 활성화 실패",
 			"ALT_E_ADD_MEMBER": "멤버 추가 실패",
@@ -2235,10 +2235,10 @@
 			"ALT_E_ENABLE_WEBHOOK": "웹훅 활성화 실패",
 			"ALT_E_PROJECT_INVALID_DESC": "프로젝트 목록을 확인해주세요.",
 			"ALT_E_PROJECT_INVALID_TITLE": "해당 프로젝트가 없습니다.",
-			"ALT_E_UPDATE_GROUP_MEMBER": "프로젝트 그룹 멤버 편집 실패",
-			"ALT_E_UPDATE_MEMBER": "멤버 편집 실패",
-			"ALT_E_UPDATE_PROJECT": "프로젝트 편집 실패",
-			"ALT_E_UPDATE_WEBHOOK": "프로젝트 편집 실패",
+			"ALT_E_UPDATE_GROUP_MEMBER": "프로젝트 그룹 멤버 업데이트 실패",
+			"ALT_E_UPDATE_MEMBER": "멤버 업데이트 실패",
+			"ALT_E_UPDATE_PROJECT": "프로젝트 업데이트 실패",
+			"ALT_E_UPDATE_WEBHOOK": "웹훅 업데이트 실패",
 			"ALT_S_ACTIVATE_ALERT": "얼럿 활성화 성공",
 			"ALT_S_ADD_MEMBER": "멤버 추가 완료",
 			"ALT_S_ADD_WEBHOOK": "웹훅 추가 성공",
@@ -2247,10 +2247,10 @@
 			"ALT_S_DELETE_WEBHOOK": "웹훅 삭제 완료",
 			"ALT_S_DISABLE_WEBHOOK": "웹훅 비활성화 완료",
 			"ALT_S_ENABLE_WEBHOOK": "웹훅 활성화 완료",
-			"ALT_S_UPDATE_GROUP_MEMBER": "프로젝트 그룹 멤버 편집 완료",
-			"ALT_S_UPDATE_MEMBER": "멤버 편집 완료",
-			"ALT_S_UPDATE_PROJECT": "프로젝트 편집 완료",
-			"ALT_S_UPDATE_WEBHOOK": "웹훅 편집 성공",
+			"ALT_S_UPDATE_GROUP_MEMBER": "프로젝트 그룹 멤버 업데이트 완료",
+			"ALT_S_UPDATE_MEMBER": "멤버 업데이트 완료",
+			"ALT_S_UPDATE_PROJECT": "프로젝트 업데이트 완료",
+			"ALT_S_UPDATE_WEBHOOK": "웹훅 업데이트 성공",
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
 			"MEMBER": {
@@ -2413,13 +2413,13 @@
 			"ALT_E_CREATE_PROJECT": "프로젝트 생성 실패",
 			"ALT_E_CREATE_PROJECT_GROUP": "프로젝트 그룹 생성 실패",
 			"ALT_E_DELETE_PROJECT_GROUP": "프로젝트 그룹 삭제 실패",
-			"ALT_E_UPDATE_PROJECT": "프로젝트 편집 실패",
-			"ALT_E_UPDATE_PROJECT_GROUP": "프로젝트 그룹 편집 실패",
+			"ALT_E_UPDATE_PROJECT": "프로젝트 업데이트 실패",
+			"ALT_E_UPDATE_PROJECT_GROUP": "프로젝트 그룹 업데이트 실패",
 			"ALT_S_CREATE_PROJECT": "프로젝트 생성 완료",
 			"ALT_S_CREATE_PROJECT_GROUP": "프로젝트 그룹 생성 완료",
 			"ALT_S_DELETE_PROJECT_GROUP": "프로젝트 그룹 삭제 완료",
-			"ALT_S_UPDATE_PROJECT": "프로젝트 편집 완료",
-			"ALT_S_UPDATE_PROJECT_GROUP": "프로젝트 그룹 편집 완료",
+			"ALT_S_UPDATE_PROJECT": "프로젝트 업데이트 완료",
+			"ALT_S_UPDATE_PROJECT_GROUP": "프로젝트 그룹 업데이트 완료",
 			"CLOUD_SERVICES": "클라우드 서비스 ",
 			"COMPUTE": "컴퓨트",
 			"CREATE": "생성 ",
@@ -2444,7 +2444,7 @@
 				"DESC": "{deleteAllSubProjects}해야 프로젝트 그룹을 삭제할 수 있습니다.",
 				"TITLE": "프로젝트 그룹 삭제 "
 			},
-			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 편집",
+			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 수정",
 			"PLACE_HOLDER_EXAMPLE": "예) 프로젝트/프로젝트 그룹",
 			"PLACE_HOLDER_PROJECT": "프로젝트 ",
 			"PLACE_HOLDER_SHOW_MORE": "더보기",
