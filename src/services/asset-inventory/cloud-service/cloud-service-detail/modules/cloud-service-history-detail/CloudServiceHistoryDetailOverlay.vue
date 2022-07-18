@@ -29,7 +29,7 @@
                     <div class="info-wrapper">
                         <div class="circle" :class="getTimelineColor(proxySelectedHistoryItem.action)" />
                         <span class="action-text">{{ HISTORY_ACTION_MAP[proxySelectedHistoryItem.action].label }}</span>
-                        <span class="date-text">({{ iso8601Formatter(selectedHistoryRecordDate) }})</span>
+                        <span class="date-text">({{ iso8601Formatter(selectedHistoryRecordDate, 'UTC') }})</span>
                     </div>
                     <p-tab :tabs="tabs"
                            :active-tab.sync="activeTab"
