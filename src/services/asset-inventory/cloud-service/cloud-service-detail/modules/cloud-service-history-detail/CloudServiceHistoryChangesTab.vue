@@ -115,18 +115,26 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .cloud-service-history-changes-tab {
+    height: 100%;
+    padding: 1rem;
+    .p-panel-top {
+        margin: 0.5rem 0 1rem 0;
+    }
     .cloud-service-history-changes-wrapper {
         @apply flex;
-        padding: 0 1rem;
+        height: calc(100% - 3.5rem);
         .cloud-service-history-changes-key-nav {
             width: 20%;
             .p-card::v-deep {
+                height: 100%;
+
                 header {
-                    @apply border-gray-200 border-solid border border-b h-8;
+                    @apply border-gray-200 border-solid border border-b;
+                    height: 2.25rem;
                     border-top-right-radius: 0;
                 }
                 .body {
-                    height: 50vh;
+                    height: calc(100% - 2.25rem);
                     border-bottom-right-radius: 0;
                 }
                 .p-context-menu {
@@ -141,13 +149,16 @@ export default defineComponent({
         .cloud-service-history-changes-code-nav {
             width: 80%;
             .p-card::v-deep {
+                height: 100%;
                 header {
-                    @apply flex items-center h-8 border border-b border-solid;
+                    @apply flex items-center border border-b border-solid;
+                    height: 2.25rem;
                     border-top-left-radius: 0;
                     border-left: 0;
                 }
                 .secondary-header {
                     @apply flex;
+                    height: 1.625rem;
                     & > :last-child {
                         @apply border-solid border-l;
                     }
@@ -157,9 +168,9 @@ export default defineComponent({
                     }
                 }
                 .body {
-                    height: 50vh;
                     border-bottom-left-radius: 0;
                     border-left: 0;
+                    height: calc(100% - 2.25rem);
                     padding: 0;
                 }
                 .cloud-service-history-changes-code-area {
@@ -173,31 +184,48 @@ export default defineComponent({
     }
 }
 
+@screen tablet {
+    .cloud-service-history-changes-tab {
+        height: 30rem;
+    }
+}
+
 @screen mobile {
-    .cloud-service-history-changes-wrapper {
-        flex-flow: column;
-        & nav {
-            width: 100% !important;
-        }
-        .cloud-service-history-changes-key-nav {
-            .p-card::v-deep {
-                & .body {
-                    max-height: 11.25rem;
-                    overflow-y: scroll;
+    .cloud-service-history-changes-tab {
+        height: 56rem;
+        .cloud-service-history-changes-wrapper {
+            flex-flow: column;
+            & nav {
+                width: 100% !important;
+            }
+            .cloud-service-history-changes-key-nav {
+                .p-card::v-deep {
+                    .body {
+                        max-height: 11.25rem;
+                        overflow-y: scroll;
+                        border-radius: 0;
+                    }
                 }
             }
-        }
-        .cloud-service-history-changes-code-nav {
-            .p-card::v-deep {
-                & header {
-                    height: 100% !important;
-                }
-                .cloud-service-history-changes-code-header-wrapper {
-                    @apply w-full align-middle flex-col gap-1;
-                    & div {
-                        display: inline-flex !important;
-                        &:last-child {
-                            @apply justify-end;
+            .cloud-service-history-changes-code-nav {
+                height: 3.5rem;
+                .p-card::v-deep {
+                    @apply border-l border-gray-200;
+                    header {
+                        height: 100%;
+                        border-radius: 0;
+                        border-top: none;
+                    }
+                    .body {
+                        height: 40rem;
+                    }
+                    .cloud-service-history-changes-code-header-wrapper {
+                        @apply w-full align-middle flex-col gap-1;
+                        & div {
+                            display: inline-flex !important;
+                            &:last-child {
+                                @apply justify-end;
+                            }
                         }
                     }
                 }
