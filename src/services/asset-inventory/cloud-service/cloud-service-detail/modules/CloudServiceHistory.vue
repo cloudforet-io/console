@@ -15,15 +15,8 @@
                    @refresh="handleChange()"
         >
             <template #left-area>
-                <p-select-dropdown class="month-select-dropdown"
-                                   :selected="selectedMonth"
-                                   :items="monthMenuItems"
-                                   @select="handleSelectMonth"
-                />
-                <p-select-dropdown class="year-select-dropdown"
-                                   :selected="selectedYear"
-                                   :items="yearMenuItems"
-                                   @select="handleSelectYear"
+                <cloud-service-history-date-select-dropdown :selected-year.sync="selectedYear"
+                                                            :selected-month.sync="selectedMonth"
                 />
             </template>
         </p-toolbox>
@@ -89,24 +82,22 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PPanelTop, PToolbox, PSelectDropdown, PDataLoader, PLottie,
+    PPanelTop, PToolbox, PDataLoader, PLottie,
 } from '@spaceone/design-system';
-import { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import { useInfiniteScroll } from '@vueuse/core';
 import dayjs from 'dayjs';
 import localeData from 'dayjs/plugin/localeData';
-import { range } from 'lodash';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import { makeCustomValueHandler } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/helper';
 import CloudServiceHistoryDetailOverlay
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailOverlay.vue';
+import CloudServiceHistoryDateSelectDropdown
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistoryDateSelectDropdown.vue';
 import {
     CloudServiceHistoryItem, HISTORY_ACTION_MAP,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
@@ -115,16 +106,15 @@ import {
 const DIFF_ITEM_LIMIT = 10;
 dayjs.extend(localeData);
 
-const { i18nDayjs } = useI18nDayjs();
 
 export default {
     name: 'CloudServiceHistory',
     components: {
+        CloudServiceHistoryDateSelectDropdown,
         CloudServiceHistoryDetailOverlay,
         VerticalTimeline,
         PPanelTop,
         PToolbox,
-        PSelectDropdown,
         PDataLoader,
         PLottie,
     },
@@ -145,27 +135,6 @@ export default {
             timezone: computed(() => store.state.user.timezone),
             selectedYear: dayjs.utc().format('YYYY'),
             selectedMonth: 'all',
-            yearMenuItems: computed<SelectDropdownMenu[]>(() => {
-                const currYear = dayjs.utc();
-                const menuItems: SelectDropdownMenu[] = [];
-                range(4).forEach((i) => {
-                    const date = currYear.subtract(i, 'year').format('YYYY');
-                    menuItems.push({ name: date, label: date });
-                });
-                return menuItems;
-            }),
-            monthMenuItems: computed<SelectDropdownMenu[]>(() => {
-                const months = i18nDayjs.value.months();
-                const menuItems = [
-                    { name: 'all', label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.ALL_MONTH') },
-                ];
-                months.forEach((month, idx) => {
-                    menuItems.push({
-                        name: `${idx + 1}`, label: month,
-                    });
-                });
-                return menuItems;
-            }),
             items: [] as CloudServiceHistoryItem[],
             selectedHistoryItem: undefined as undefined | CloudServiceHistoryItem,
             selectedKeyName: undefined as undefined | string,
@@ -281,12 +250,6 @@ export default {
         const handleLoadMore = () => {
             loadMoreHistoryData();
         };
-        const handleSelectMonth = (selectedMonth) => {
-            state.selectedMonth = selectedMonth;
-        };
-        const handleSelectYear = (selectedYear) => {
-            state.selectedYear = selectedYear;
-        };
 
         /* Init */
         (async () => {
@@ -319,8 +282,6 @@ export default {
             handleClickTimeline,
             handleCloseOverlay,
             handleChange,
-            handleSelectMonth,
-            handleSelectYear,
             handleLoadMore,
             handleClickKey,
         };
