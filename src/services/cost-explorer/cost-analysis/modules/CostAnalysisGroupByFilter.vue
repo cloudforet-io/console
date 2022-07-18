@@ -24,7 +24,7 @@ import {
 
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
+import type { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
 
 
 export default {

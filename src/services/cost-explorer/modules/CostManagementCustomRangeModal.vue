@@ -43,12 +43,12 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';
 
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 
 interface CustomRangeModalSettings {
     helpTextFrom?: TranslateResult | undefined;

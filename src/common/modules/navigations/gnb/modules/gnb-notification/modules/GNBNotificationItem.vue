@@ -37,7 +37,7 @@ import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     PCollapsiblePanel, PI, PAnchor,
 } from '@spaceone/design-system';
-import { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs';
 
 
 import { store } from '@/store';

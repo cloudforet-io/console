@@ -50,8 +50,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, PropType, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -63,8 +64,9 @@ import { i18n } from '@/translations';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 
-import { ROLE_TYPE, RoleType, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
-import { BaseInfoFormData } from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
+import type { RoleType } from '@/services/administration/iam/role/config';
+import { ROLE_TYPE, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
+import type { BaseInfoFormData } from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
 
 export default {
     name: 'RoleUpdatePageBaseInformation',

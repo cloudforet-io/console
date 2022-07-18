@@ -1,12 +1,12 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { find } from 'lodash';
-import { Action } from 'vuex';
+import type { Action } from 'vuex';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { CloudServiceDetailPageParams, CloudServiceTypeInfo } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
-import { CloudServiceDetailStoreState } from '@/services/asset-inventory/store/cloud-service-detail/type';
+import type { CloudServiceDetailPageParams, CloudServiceTypeInfo } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
+import type { CloudServiceDetailStoreState } from '@/services/asset-inventory/store/cloud-service-detail/type';
 
 
 export const setProviderGroupName: Action<CloudServiceDetailStoreState, any> = ({ commit }, { provider, group, name }: CloudServiceDetailPageParams) => {

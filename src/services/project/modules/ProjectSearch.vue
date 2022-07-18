@@ -47,8 +47,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -57,7 +57,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PAutocompleteSearch, PI, PTextHighlighting,
 } from '@spaceone/design-system';
-import { MenuItem as ContextMenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem as ContextMenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { debounce } from 'lodash';
 
 
@@ -65,7 +65,7 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ItemType } from '@/services/project/type';
+import type { ItemType } from '@/services/project/type';
 
 const LIMIT = 5;
 

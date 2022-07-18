@@ -141,27 +141,28 @@
 
 <script lang="ts">
 
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    reactive, computed, getCurrentInstance, ComponentRenderProxy, watch,
+    reactive, computed, getCurrentInstance, watch,
 } from '@vue/composition-api';
 
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PHorizontalLayout, PTab, PDynamicLayout,
     PPageTitle, PEmpty, PTableCheckModal, PButton,
 } from '@spaceone/design-system';
-import {
+import type {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
-import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import dayjs from 'dayjs';
 import { isEmpty, get } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -170,7 +171,7 @@ import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-lay
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { Reference } from '@/lib/reference/type';
+import type { Reference } from '@/lib/reference/type';
 import { objectToQueryString, queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string';
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
@@ -178,7 +179,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
-import { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
+import type { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
 import CloudServiceUsageOverview
@@ -188,7 +189,7 @@ import CloudServiceDetail from '@/services/asset-inventory/cloud-service/cloud-s
 import CloudServiceHistory from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistory.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 
 const DEFAULT_PAGE_SIZE = 15;
 

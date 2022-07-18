@@ -1,8 +1,9 @@
-import { Route } from 'vue-router';
+import type { Route } from 'vue-router';
 
-import { RECENT_TYPE, RecentConfig } from '@/store/modules/recent/type';
+import type { RecentConfig } from '@/store/modules/recent/type';
+import { RECENT_TYPE } from '@/store/modules/recent/type';
 
-import { MenuId } from '@/lib/menu/config';
+import type { MenuId } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';

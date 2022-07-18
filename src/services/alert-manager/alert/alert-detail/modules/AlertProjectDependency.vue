@@ -23,8 +23,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, PropType, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -35,7 +36,7 @@ import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import { AlertDataModel } from '@/services/alert-manager/type';
+import type { AlertDataModel } from '@/services/alert-manager/type';
 
 
 export default {

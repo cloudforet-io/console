@@ -30,8 +30,9 @@
     </p-list-card>
 </template>
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 
@@ -45,7 +46,7 @@ import { get } from 'lodash';
 
 import { store } from '@/store';
 
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

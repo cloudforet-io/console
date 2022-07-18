@@ -53,7 +53,7 @@ import {
 import am4geodataContinentsLow from '@amcharts/amcharts4-geodata/continentsLow';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { MapChart } from '@amcharts/amcharts4/maps';
+import type { MapChart } from '@amcharts/amcharts4/maps';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -85,7 +85,7 @@ import { getTooltipText } from '@/services/cost-explorer/widgets/lib/widget-data
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
-import { WidgetProps } from '@/services/cost-explorer/widgets/type';
+import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
 
 
 const CATEGORY_KEY = 'category';

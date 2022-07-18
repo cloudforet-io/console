@@ -26,10 +26,12 @@ import { PButtonModal } from '@spaceone/design-system';
 
 import CostDashboardCustomizeWidgetConfig
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
-import {
-    EDITABLE_WIDGET_OPTIONS,
+import type {
     EDITABLE_WIDGET_OPTIONS_TYPE,
     WidgetInfo,
+} from '@/services/cost-explorer/cost-dashboard/type';
+import {
+    EDITABLE_WIDGET_OPTIONS,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 

@@ -1,4 +1,4 @@
-import { ErrorState } from './type';
+import type { ErrorState } from './type';
 
 const getDefaultState = (): ErrorState => ({
     visibleSessionExpiredError: false,

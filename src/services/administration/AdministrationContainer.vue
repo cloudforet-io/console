@@ -28,8 +28,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, defineComponent,
+    computed, getCurrentInstance, reactive, defineComponent,
 } from '@vue/composition-api';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';

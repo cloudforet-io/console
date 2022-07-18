@@ -1,9 +1,9 @@
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { CustomLayout, DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import type { CustomLayout, DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { FILTER } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { CostQueryFilters } from '@/services/cost-explorer/type';
+import type { CostQueryFilters } from '@/services/cost-explorer/type';
 
 export const fetchDefaultLayoutData = async (layoutId: string) => {
     try {

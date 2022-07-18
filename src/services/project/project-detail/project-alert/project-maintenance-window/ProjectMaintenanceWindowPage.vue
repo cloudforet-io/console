@@ -68,8 +68,8 @@
 <script lang="ts">
 
 
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -83,7 +83,7 @@ import {
     PBadge, PButton,
     PPanelTop, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

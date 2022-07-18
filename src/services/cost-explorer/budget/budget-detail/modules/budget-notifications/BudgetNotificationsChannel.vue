@@ -54,7 +54,7 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { utcToTimezoneFormatter } from '@/services/administration/iam/user/lib/helper';
-import { ChannelItem } from '@/services/administration/iam/user/type';
+import type { ChannelItem } from '@/services/administration/iam/user/type';
 
 
 const getBadgeColor = (level: string) => {

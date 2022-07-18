@@ -1,4 +1,4 @@
-import { WebhookReferenceState } from '@/store/modules/reference/webhook/type';
+import type { WebhookReferenceState } from '@/store/modules/reference/webhook/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

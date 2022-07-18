@@ -1,4 +1,4 @@
-import { Reference } from '@/lib/reference/type';
+import type { Reference } from '@/lib/reference/type';
 
 export interface FileState {
     downloadSource?: string;

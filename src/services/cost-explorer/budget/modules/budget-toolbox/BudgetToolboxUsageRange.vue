@@ -21,7 +21,7 @@ import { i18n } from '@/translations';
 
 import { red, yellow, indigo } from '@/styles/colors';
 
-import { BudgetUsageRange } from '@/services/cost-explorer/budget/type';
+import type { BudgetUsageRange } from '@/services/cost-explorer/budget/type';
 
 const USAGE_RANGE = Object.freeze({
     overspent: 'overspent',

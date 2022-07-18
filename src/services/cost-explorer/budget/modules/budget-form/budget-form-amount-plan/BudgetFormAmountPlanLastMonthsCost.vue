@@ -12,10 +12,10 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { Query } from '@spaceone/console-core-lib/space-connector/type';
+import type { Query } from '@spaceone/console-core-lib/space-connector/type';
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
@@ -25,11 +25,12 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
-import { BUDGET_TIME_UNIT, BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
+import type { BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
+import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
 import {
     getConvertedFilter,
 } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { CostQueryFilters, Granularity } from '@/services/cost-explorer/type';
+import type { CostQueryFilters, Granularity } from '@/services/cost-explorer/type';
 
 
 interface Props {

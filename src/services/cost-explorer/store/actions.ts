@@ -1,11 +1,11 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { Action } from 'vuex';
+import type { Action } from 'vuex';
 
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { CostExplorerState } from '@/services/cost-explorer/store/type';
+import type { CostExplorerState } from '@/services/cost-explorer/store/type';
 
 
 export const setDashboardList: Action<CostExplorerState, any> = async ({ commit }): Promise<void> => {

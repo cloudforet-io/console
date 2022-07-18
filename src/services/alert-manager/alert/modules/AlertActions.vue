@@ -92,8 +92,9 @@ import AlertAcknowledgeModal from '@/services/alert-manager/alert/modules/AlertA
 import AlertResolveModal from '@/services/alert-manager/alert/modules/AlertResolveModal.vue';
 import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
 import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-urgency-i18n';
+import type { AlertAction } from '@/services/alert-manager/lib/config';
 import {
-    ALERT_ACTION, ALERT_URGENCY, ALERT_STATE, AlertAction,
+    ALERT_ACTION, ALERT_URGENCY, ALERT_STATE,
 } from '@/services/alert-manager/lib/config';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
 

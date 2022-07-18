@@ -60,7 +60,7 @@ import { PDataTable, PPanelTop, PCollapsibleToggle } from '@spaceone/design-syst
 
 import { resourceTypeLabels } from '@/lib/reference/type';
 
-import { JobTaskData, JobTaskError } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
+import type { JobTaskData, JobTaskError } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
 
 
 interface Props {

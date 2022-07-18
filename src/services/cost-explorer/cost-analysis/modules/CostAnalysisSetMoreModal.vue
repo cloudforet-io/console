@@ -56,7 +56,7 @@ import {
     PAutocompleteSearch,
     PTag,
 } from '@spaceone/design-system';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';
 

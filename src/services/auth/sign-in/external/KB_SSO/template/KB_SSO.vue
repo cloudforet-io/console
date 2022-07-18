@@ -19,8 +19,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, defineComponent, getCurrentInstance, computed, reactive, toRefs,
+    defineComponent, getCurrentInstance, computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PButton } from '@spaceone/design-system';

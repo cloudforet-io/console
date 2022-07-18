@@ -1,6 +1,6 @@
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
-import { GNBMenu } from '@/store/modules/display/type';
+import type { GNBMenu } from '@/store/modules/display/type';
 
 export interface SuggestionMenu {
     id: string;

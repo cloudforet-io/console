@@ -29,20 +29,20 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { PButtonTab, PDynamicLayout } from '@spaceone/design-system';
-import {
+import type {
     DynamicLayoutEventListener,
     DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
-import { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
 import { store } from '@/store';
@@ -53,7 +53,7 @@ import {
 } from '@/lib/component-util/dynamic-layout';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { Reference } from '@/lib/reference/type';
+import type { Reference } from '@/lib/reference/type';
 
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';

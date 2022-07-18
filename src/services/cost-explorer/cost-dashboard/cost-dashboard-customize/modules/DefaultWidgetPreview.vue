@@ -27,7 +27,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import CostDashboardCustomizeWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetPreview.vue';
-import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 
 
 export default {

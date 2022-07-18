@@ -1,4 +1,4 @@
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 export interface TagItem {
     key: string | number;

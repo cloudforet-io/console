@@ -1,5 +1,5 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 import { CONSOLE_ERROR_CODE } from '@/common/composables/error/type';
 

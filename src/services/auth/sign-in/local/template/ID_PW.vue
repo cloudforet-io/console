@@ -40,15 +40,16 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     getCurrentInstance,
     reactive,
     toRefs,
-    defineComponent, ComponentRenderProxy, computed,
+    defineComponent, computed,
 } from '@vue/composition-api';
 
 import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 

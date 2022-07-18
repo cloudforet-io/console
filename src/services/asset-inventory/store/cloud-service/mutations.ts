@@ -1,8 +1,8 @@
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { Mutation } from 'vuex';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { Mutation } from 'vuex';
 
-import { CloudServiceFilterMap, Period } from '@/services/asset-inventory/cloud-service/type';
-import { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';
+import type { CloudServiceFilterMap, Period } from '@/services/asset-inventory/cloud-service/type';
+import type { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';
 
 
 export const setSelectedProvider: Mutation<CloudServiceStoreState> = (state, provider: string) => {

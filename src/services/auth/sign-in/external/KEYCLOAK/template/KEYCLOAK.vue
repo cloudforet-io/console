@@ -12,8 +12,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 

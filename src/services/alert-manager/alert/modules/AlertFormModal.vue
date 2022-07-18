@@ -74,7 +74,7 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import { ALERT_URGENCY } from '@/services/alert-manager/lib/config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { ProjectItemResp } from '@/services/project/type';
+import type { ProjectItemResp } from '@/services/project/type';
 
 export default {
     name: 'AlertFormModal',

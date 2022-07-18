@@ -1,4 +1,4 @@
-import { RecentState } from '@/store/modules/recent/type';
+import type { RecentState } from '@/store/modules/recent/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

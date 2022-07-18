@@ -1,10 +1,10 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import axios from 'axios';
-import { Action } from 'vuex';
+import type { Action } from 'vuex';
 
 import { i18n } from '@/translations';
 
-import { ExcelDataField, FileState } from '@/store/modules/file/type';
+import type { ExcelDataField, FileState } from '@/store/modules/file/type';
 
 import config from '@/lib/config';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';

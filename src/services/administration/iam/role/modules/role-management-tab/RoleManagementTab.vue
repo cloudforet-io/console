@@ -59,15 +59,15 @@ import {
 import {
     PEmpty, PTab, PDataTable, PI, PBadge, PButton,
 } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
 import RoleDetail from '@/services/administration/iam/role/modules/role-management-tab/RoleDetail.vue';
-import { RoleData } from '@/services/administration/iam/role/type';
+import type { RoleData } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { administrationStore } from '@/services/administration/store';
 

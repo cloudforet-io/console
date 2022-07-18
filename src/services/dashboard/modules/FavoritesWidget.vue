@@ -45,15 +45,16 @@ import {
 } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { FAVORITE_TYPE, FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
-import { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import {
     convertCloudServiceConfigToReferenceData,

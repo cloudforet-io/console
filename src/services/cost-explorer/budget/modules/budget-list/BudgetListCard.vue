@@ -82,18 +82,18 @@ import {
 import {
     PDivider, PI, PSkeleton,
 } from '@spaceone/design-system';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 
 import { store } from '@/store';
 
-import { ProjectGroupReferenceItem } from '@/store/modules/reference/project-group/type';
-import { ProjectReferenceItem } from '@/store/modules/reference/project/type';
-import { ReferenceMap } from '@/store/modules/reference/type';
+import type { ProjectGroupReferenceItem } from '@/store/modules/reference/project-group/type';
+import type { ProjectReferenceItem } from '@/store/modules/reference/project/type';
+import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-import { BudgetUsageData } from '@/services/cost-explorer/budget/type';
+import type { BudgetUsageData } from '@/services/cost-explorer/budget/type';
 import BudgetUsageProgressBar from '@/services/cost-explorer/modules/BudgetUsageProgressBar.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 

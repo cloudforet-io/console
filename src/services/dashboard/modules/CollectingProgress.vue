@@ -55,8 +55,9 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 
@@ -67,13 +68,13 @@ import dayjs from 'dayjs';
 import { range } from 'lodash';
 
 
-import { TimeStamp } from '@/models';
+import type { TimeStamp } from '@/models';
 import { store } from '@/store';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { COLLECT_MODE, CollectorModel } from '@/services/asset-inventory/collector/type';
+import type { COLLECT_MODE, CollectorModel } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 enum JOB_STATE {

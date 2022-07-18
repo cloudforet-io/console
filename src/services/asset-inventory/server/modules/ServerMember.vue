@@ -34,7 +34,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PSearchTable, PBadge, PPanelTop,
 } from '@spaceone/design-system';
-import { SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
+import type { SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 
 
 import { store } from '@/store';

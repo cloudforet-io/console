@@ -48,7 +48,7 @@ import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { TreeMap } from '@amcharts/amcharts4/charts';
+import type { TreeMap } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -56,11 +56,12 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDataLoader, PSkeleton, PDataTable, PStatus,
 } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { sum } from 'lodash';
 
-import { CURRENCY, Currency } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/display/config';
 
 
 import config from '@/lib/config';
@@ -74,13 +75,13 @@ import {
 } from '@/styles/colors';
 
 import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { getPieChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
-import { CostAnalyzeModel, PieChartData, WidgetProps } from '@/services/cost-explorer/widgets/type';
+import type { CostAnalyzeModel, PieChartData, WidgetProps } from '@/services/cost-explorer/widgets/type';
 
 
 const CATEGORY_KEY = 'category';

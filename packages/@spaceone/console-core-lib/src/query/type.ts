@@ -1,4 +1,4 @@
-import { OperatorType } from '@/component-util/query-search/type';
+import type { OperatorType } from '@/component-util/query-search/type';
 
 export type RawQueryOperator = OperatorType | '<t' | '<=t' | '>t' | '>=t' | '=t'
 

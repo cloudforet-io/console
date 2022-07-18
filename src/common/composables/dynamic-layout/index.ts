@@ -1,15 +1,16 @@
+import type { ComputedRef } from '@vue/composition-api';
 import {
-    computed, ComputedRef, reactive,
+    computed, reactive,
 } from '@vue/composition-api';
 
 import { makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
-import { KeyItem, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
-import { Filter } from '@spaceone/console-core-lib/space-connector/type';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import type { KeyItem, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { Filter } from '@spaceone/console-core-lib/space-connector/type';
+import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import { store } from '@/store';
 
-import { ConsoleSearchSchema } from '@/lib/component-util/dynamic-layout/type';
+import type { ConsoleSearchSchema } from '@/lib/component-util/dynamic-layout/type';
 
 
 const getKeyItemSets = (schemaList: ConsoleSearchSchema[], storeState): KeyItemSet[] => {

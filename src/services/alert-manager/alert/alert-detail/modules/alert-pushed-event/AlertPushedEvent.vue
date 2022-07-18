@@ -103,7 +103,7 @@ import { copyAnyData } from '@/lib/helper/copy-helper';
 
 import AlertVerticalTimeline
     from '@/services/alert-manager/alert/alert-detail/modules/alert-pushed-event/modules/AlertVerticalTimeline.vue';
-import { Event } from '@/services/alert-manager/type';
+import type { Event } from '@/services/alert-manager/type';
 
 
 const PAGE_SIZE = 10;

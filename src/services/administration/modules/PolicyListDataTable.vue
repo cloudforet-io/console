@@ -66,18 +66,19 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, PropType, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
+import type { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PAnchor, PBadge, PSelectStatus, PToolboxTable,
 } from '@spaceone/design-system';
-import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { filter } from 'lodash';
 
 import { SpaceRouter } from '@/router';
@@ -85,14 +86,15 @@ import { store } from '@/store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
-import { POLICY_TYPES, PolicyTypes } from '@/services/administration/iam/policy/lib/config';
+import type { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
+import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
 import {
     makeCustomValueHandler,
     policyCreatedAtFormatter,
     policyTypeBadgeColorFormatter,
 } from '@/services/administration/iam/policy/lib/helper';
-import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
-import { Policy } from '@/services/administration/iam/role/type';
+import type { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
+import type { Policy } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { administrationStore } from '@/services/administration/store';
 

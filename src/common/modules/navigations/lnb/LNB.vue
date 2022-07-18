@@ -43,8 +43,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -55,7 +56,7 @@ import { getUUID } from '@/lib/component-util/getUUID';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import LNBMenuItem from '@/common/modules/navigations/lnb/modules/LNBMenuItem.vue';
-import {
+import type {
     BackLink, LNBMenu, TopTitle,
 } from '@/common/modules/navigations/lnb/type';
 

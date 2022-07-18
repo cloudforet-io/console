@@ -1,4 +1,4 @@
-import { Tags } from '@/models';
+import type { Tags } from '@/models';
 
 export interface CloudServiceTypeInfo {
     cloud_service_type_id: string;

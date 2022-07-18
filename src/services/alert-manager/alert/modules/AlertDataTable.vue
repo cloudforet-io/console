@@ -120,7 +120,7 @@ import {
 
 import { durationFormatter, iso8601Formatter, commaFormatter } from '@spaceone/console-core-lib';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
-import { KeyItemSet } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { KeyItemSet } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -152,7 +152,7 @@ import {
 } from '@/services/alert-manager/lib/config';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-import {
+import type {
     AlertBottomFilters, AlertListTableFilters,
 } from '@/services/alert-manager/type';
 

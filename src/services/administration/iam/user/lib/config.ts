@@ -2,7 +2,7 @@ import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
-import { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 
 import styles from '@/styles/colors';
 

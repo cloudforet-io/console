@@ -1,6 +1,7 @@
-import axios, {
+import type {
     AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse,
 } from 'axios';
+import axios from 'axios';
 import jwt from 'jsonwebtoken';
 
 import {
@@ -8,7 +9,7 @@ import {
     AuthorizationError, BadRequestError,
     NotFoundError,
 } from '@/space-connector/error';
-import {
+import type {
     AxiosPostResponse,
     SessionTimeoutCallback,
 } from '@/space-connector/type';

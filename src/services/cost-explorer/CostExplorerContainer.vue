@@ -28,7 +28,7 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 
 import CostExplorerLNB from '@/services/cost-explorer/CostExplorerLNB.vue';
 import { costExplorerStore, costExplorerStoreModule } from '@/services/cost-explorer/store';
-import { CostExplorerState } from '@/services/cost-explorer/store/type';
+import type { CostExplorerState } from '@/services/cost-explorer/store/type';
 
 
 export default {

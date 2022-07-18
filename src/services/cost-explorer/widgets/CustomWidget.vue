@@ -65,7 +65,7 @@ import {
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButton } from '@spaceone/design-system';
-import {
+import type {
     DataTableFieldType,
 } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
@@ -85,10 +85,10 @@ import {
 } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
-import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import {
+import type {
     CostQuerySetOption, Period, Granularity, GroupBy,
 } from '@/services/cost-explorer/type';
 import {
@@ -99,7 +99,7 @@ import {
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
-import {
+import type {
     CostAnalyzeModel,
     Legend, PieChartData, WidgetProps, XYChartData,
 } from '@/services/cost-explorer/widgets/type';

@@ -52,8 +52,9 @@
 
 <script lang="ts">
 
+import type { SetupContext, ComponentRenderProxy } from '@vue/composition-api';
 import {
-    toRefs, reactive, computed, SetupContext, watch, getCurrentInstance, ComponentRenderProxy,
+    toRefs, reactive, computed, watch, getCurrentInstance,
 } from '@vue/composition-api';
 
 
@@ -63,7 +64,7 @@ import {
 } from '@spaceone/design-system';
 import { get } from 'lodash';
 
-import { TimeStamp } from '@/models';
+import type { TimeStamp } from '@/models';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 

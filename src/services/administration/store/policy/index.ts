@@ -1,4 +1,4 @@
-import { PolicyState } from '@/services/administration/store/policy/type';
+import type { PolicyState } from '@/services/administration/store/policy/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

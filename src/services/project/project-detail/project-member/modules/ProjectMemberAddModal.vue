@@ -112,10 +112,10 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PBoxTab, PSearchDropdown, PTooltip, PI, PTextInput,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
 import { debounce } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -127,7 +127,8 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { checkEmailFormat } from '@/services/administration/iam/user/lib/user-form-validations';
-import { AUTH_TYPE, MemberItem } from '@/services/project/project-detail/project-member/type';
+import type { MemberItem } from '@/services/project/project-detail/project-member/type';
+import { AUTH_TYPE } from '@/services/project/project-detail/project-member/type';
 
 
 export default {

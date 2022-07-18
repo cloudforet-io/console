@@ -95,8 +95,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -116,7 +116,7 @@ import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
-import {
+import type {
     ProjectItemResp,
 } from '@/services/project/type';
 

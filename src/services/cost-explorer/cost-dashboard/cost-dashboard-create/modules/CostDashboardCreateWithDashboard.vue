@@ -46,7 +46,7 @@ import { getUUID } from '@/lib/component-util/getUUID';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { defaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/config';
-import {
+import type {
     DashboardInfo,
     PublicDashboardInfo,
     UserDashboardInfo,

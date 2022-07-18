@@ -1,5 +1,6 @@
+import type { Ref, SetupContext } from '@vue/composition-api';
 import {
-    computed, Ref, ref, SetupContext, watch,
+    computed, ref, watch,
 } from '@vue/composition-api';
 
 /**

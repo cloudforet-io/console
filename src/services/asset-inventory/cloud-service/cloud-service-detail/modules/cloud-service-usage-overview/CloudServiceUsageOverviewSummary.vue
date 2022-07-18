@@ -29,14 +29,14 @@ import {
 } from '@vue/composition-api';
 
 import { PDataLoader, PDynamicWidget, PSkeleton } from '@spaceone/design-system';
-import { DynamicWidgetFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
+import type { DynamicWidgetFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
 
 import { store } from '@/store';
 
 
 import { getUUID } from '@/lib/component-util/getUUID';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { Reference } from '@/lib/reference/type';
+import type { Reference } from '@/lib/reference/type';
 
 import { gray } from '@/styles/colors';
 

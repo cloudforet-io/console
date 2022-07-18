@@ -41,7 +41,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { PCollapsibleToggle, PDataTable } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import cloneDeep from 'lodash/cloneDeep';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 import { i18n } from '@/translations';
 
@@ -50,16 +50,19 @@ import { CURRENCY } from '@/store/modules/display/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
-import {
-    BUDGET_TIME_UNIT, BudgetData,
+import type {
+    BudgetData,
     BudgetTimeUnit,
     BudgetUsageData,
     CostType,
 } from '@/services/cost-explorer/budget/type';
+import {
+    BUDGET_TIME_UNIT,
+} from '@/services/cost-explorer/budget/type';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 import { getStackedChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 
 

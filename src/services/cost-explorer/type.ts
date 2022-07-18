@@ -1,4 +1,4 @@
-import { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
+import type { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 
 
 export interface Period {

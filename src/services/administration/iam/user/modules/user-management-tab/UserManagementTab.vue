@@ -74,14 +74,15 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
     PEmpty, PStatus, PTab, PDataTable, PPanelTop,
 } from '@spaceone/design-system';
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 
 import { store } from '@/store';
@@ -93,7 +94,7 @@ import { userStateFormatter } from '@/services/administration/iam/user/lib/helpe
 import UserAssignedRole from '@/services/administration/iam/user/modules/user-management-tab/UserAssignedRole.vue';
 import UserDetail from '@/services/administration/iam/user/modules/user-management-tab/UserDetail.vue';
 // import UserNotifications from '@/services/administration/iam/user/modules/user-management-tab/UserNotifications.vue';
-import { User } from '@/services/administration/iam/user/type';
+import type { User } from '@/services/administration/iam/user/type';
 import { administrationStore } from '@/services/administration/store';
 import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
 

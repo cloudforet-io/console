@@ -1,4 +1,4 @@
-import { RouteConfig } from 'vue-router';
+import type { RouteConfig } from 'vue-router';
 
 import { errorRoutes } from '@/router/error-routes';
 

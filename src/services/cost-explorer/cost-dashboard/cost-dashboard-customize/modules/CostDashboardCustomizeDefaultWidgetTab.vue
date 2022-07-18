@@ -69,10 +69,12 @@ import CostDashboardCustomizeWidgetConfig
 import DefaultWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/DefaultWidgetPreview.vue';
 import { chartTypeItemMap } from '@/services/cost-explorer/cost-dashboard/lib/config';
-import {
-    EDITABLE_WIDGET_OPTIONS,
+import type {
     EDITABLE_WIDGET_OPTIONS_TYPE,
     WidgetInfo, ChartType,
+} from '@/services/cost-explorer/cost-dashboard/type';
+import {
+    EDITABLE_WIDGET_OPTIONS,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';

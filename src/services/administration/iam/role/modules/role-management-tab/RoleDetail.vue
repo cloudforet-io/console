@@ -66,8 +66,8 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PAnchor, PBadge, PDataTable, PDefinitionTable, PPanelTop,
 } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import { TranslateResult } from 'vue-i18n';
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -78,14 +78,15 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { POLICY_TYPES, PolicyTypes } from '@/services/administration/iam/policy/lib/config';
+import type { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
+import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
 import { policyTypeBadgeColorFormatter } from '@/services/administration/iam/policy/lib/helper';
-import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
+import type { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 import {
     usePageAccessDefinitionTableData,
 } from '@/services/administration/iam/role/composables/page-access-definition-table-data';
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
-import { RoleData } from '@/services/administration/iam/role/type';
+import type { RoleData } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 

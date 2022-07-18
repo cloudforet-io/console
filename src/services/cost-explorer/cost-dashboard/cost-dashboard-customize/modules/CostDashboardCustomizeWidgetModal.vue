@@ -29,7 +29,7 @@ import {
 } from '@vue/composition-api';
 
 import { PButtonModal, PTab } from '@spaceone/design-system';
-import { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/type';
 
 import { i18n } from '@/translations';
 

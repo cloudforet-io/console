@@ -30,8 +30,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
+    reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
 
 import { includes } from 'lodash';
@@ -40,7 +41,7 @@ import vClickOutside from 'v-click-outside';
 
 import { store } from '@/store';
 
-import { GNBMenu as GNBMenuType } from '@/store/modules/display/type';
+import type { GNBMenu as GNBMenuType } from '@/store/modules/display/type';
 
 import GNBMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBMenu.vue';
 import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';

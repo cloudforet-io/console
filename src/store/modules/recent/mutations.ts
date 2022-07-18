@@ -1,4 +1,4 @@
-import { RecentConfig, RecentState } from '@/store/modules/recent/type';
+import type { RecentConfig, RecentState } from '@/store/modules/recent/type';
 
 
 /* Menu */

@@ -1,10 +1,11 @@
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { KeyDataType, ValueHandler, ValueItem } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { KeyDataType, ValueHandler, ValueItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 
-import { TimeStamp } from '@/models';
+import type { TimeStamp } from '@/models';
 
-import { PolicyTypes, POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
-import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
+import type { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
+import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
+import type { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 
 
 export const policyTypeBadgeColorFormatter = (policyType: PolicyTypes) => {

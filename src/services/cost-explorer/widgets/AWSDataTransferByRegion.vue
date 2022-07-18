@@ -46,12 +46,12 @@ import {
 
 import am4geodataContinentsLow from '@amcharts/amcharts4-geodata/continentsLow';
 import * as am4core from '@amcharts/amcharts4/core';
-import { MapChart } from '@amcharts/amcharts4/maps';
+import type { MapChart } from '@amcharts/amcharts4/maps';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataLoader } from '@spaceone/design-system';
-import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import bytes from 'bytes';
 import dayjs from 'dayjs';
 
@@ -68,12 +68,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray } from '@/styles/colors';
 
 import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
-import { TrafficWidgetTableData } from '@/services/cost-explorer/widgets/type';
+import type { TrafficWidgetTableData } from '@/services/cost-explorer/widgets/type';
 
 
 const valueName = 'value';

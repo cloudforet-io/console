@@ -1,4 +1,5 @@
-import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
+import type { TreeMap, XYChart } from '@amcharts/amcharts4/charts';
+import { PieChart } from '@amcharts/amcharts4/charts';
 
 type ToggleSeries = (chart: XYChart | PieChart | TreeMap, index: number) => void;
 type ToggleAllSeries = (chart: XYChart | PieChart | TreeMap) => void;

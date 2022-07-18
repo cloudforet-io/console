@@ -45,18 +45,20 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PI } from '@spaceone/design-system';
-import dayjs, { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 
-import { CURRENCY, CURRENCY_SYMBOL, Currency } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -68,7 +70,7 @@ import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/h
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import CostDashboardSimpleCardWidget from '@/services/cost-explorer/widgets/modules/CostDashboardSimpleCardWidget.vue';
-import { WidgetProps } from '@/services/cost-explorer/widgets/type';
+import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
 
 const thisDay = dayjs.utc().format('DD');
 const thisMonth = dayjs.utc().format('MM');

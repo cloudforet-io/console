@@ -1,4 +1,4 @@
-import { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
+import type { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 
 export interface PolicyState {
 	policyData: Partial<PolicyDataModel>|null;

@@ -69,8 +69,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, onActivated, reactive, toRefs,
+    computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -85,7 +86,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/administration/iam/user/type';
+import type { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/administration/iam/user/type';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 import NotificationChannelItem from '@/services/notification/modules/notification-channel-item/NotificationChannelItem.vue';
 import { PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';

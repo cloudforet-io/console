@@ -87,8 +87,8 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -97,7 +97,8 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PSelectButtonGroup, PSelectDropdown, PIconButton, PLottie, PButton, PAnchor,
 } from '@spaceone/design-system';
-import axios, { CancelTokenSource } from 'axios';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import {
     debounce, find, capitalize, chain, range, sortBy, get,
@@ -113,7 +114,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import {
     COLORS, MONITORING_TYPE, STATISTICS_TYPE, TIME_RANGE,
 } from '@/common/modules/monitoring/config';
-import {
+import type {
     AvailableResource,
     Metric, MetricChartData, MonitoringProps, StatisticsType, StatItem,
 } from '@/common/modules/monitoring/type';

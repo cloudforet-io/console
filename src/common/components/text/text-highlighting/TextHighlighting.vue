@@ -9,8 +9,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, defineComponent, PropType, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';

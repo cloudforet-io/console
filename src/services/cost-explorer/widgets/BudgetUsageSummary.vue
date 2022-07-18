@@ -14,7 +14,7 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 
 import { CURRENCY } from '@/store/modules/display/config';
 
@@ -26,7 +26,7 @@ import {
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
-import { WidgetProps } from '@/services/cost-explorer/widgets/type';
+import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
 
 
 export default {

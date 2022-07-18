@@ -1,11 +1,12 @@
-import { Getter } from 'vuex';
+import type { Getter } from 'vuex';
 
 import { languages } from '@/store/modules/user/config';
 
-import { getPagePermissionMap, PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
+import type { PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
+import { getPagePermissionMap } from '@/lib/access-control/page-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { UserState } from './type';
+import type { UserState } from './type';
 
 export const isDomainOwner = (state: UserState): boolean => state.userType === 'DOMAIN_OWNER';
 export const languageLabel = (state: UserState): string => languages[state.language as string] || state.language;

@@ -1,4 +1,4 @@
-import { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 
 export interface DropdownItem {
     itemType: SuggestionType;

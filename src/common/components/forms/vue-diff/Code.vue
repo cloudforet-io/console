@@ -5,8 +5,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    defineComponent, nextTick, onMounted, ref, watch, PropType,
+    defineComponent, nextTick, onMounted, ref, watch,
 } from '@vue/composition-api';
 
 import type { VirtualScroll } from './types';

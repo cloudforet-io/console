@@ -5,8 +5,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed,
     defineComponent,
     getCurrentInstance,
@@ -26,11 +26,11 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
-import {
+import type {
     BackLink, LNBItem, LNBMenu, TopTitle,
 } from '@/common/modules/navigations/lnb/type';
 
-import {
+import type {
     CloudServiceDetailPageParams,
     CloudServiceTypeInfo,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';

@@ -51,10 +51,10 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import CostDashboardCustomizeWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetPreview.vue';
 import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashboard/lib/helper';
-import { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { CostQuerySetModel } from '@/services/cost-explorer/type';
+import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 
 const LAYOUT = 100;

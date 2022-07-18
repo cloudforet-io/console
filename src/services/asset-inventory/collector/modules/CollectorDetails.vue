@@ -26,8 +26,9 @@
 
 <script lang="ts">
 
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, watch,
+    computed, getCurrentInstance, reactive, watch,
 } from '@vue/composition-api';
 
 

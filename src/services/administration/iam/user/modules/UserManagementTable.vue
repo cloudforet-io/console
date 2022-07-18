@@ -93,8 +93,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
@@ -106,8 +107,8 @@ import {
     PSelectDropdown,
     PStatus, PToolboxTable,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import { store } from '@/store';
 
@@ -123,7 +124,8 @@ import UserCreateModal from '@/services/administration/iam/user/modules/user-man
 import UserManagementModal
     from '@/services/administration/iam/user/modules/user-management-modal/UserManagementModal.vue';
 import UserUpdateModal from '@/services/administration/iam/user/modules/user-management-modal/UserUpdateModal.vue';
-import { User, USER_TYPE, UserType } from '@/services/administration/iam/user/type';
+import type { User, UserType } from '@/services/administration/iam/user/type';
+import { USER_TYPE } from '@/services/administration/iam/user/type';
 import { administrationStore } from '@/services/administration/store';
 import { MODAL_TYPE } from '@/services/administration/store/user/type';
 

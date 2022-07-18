@@ -3,8 +3,8 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
-import { PolicyDataModel, PolicyListDataModel } from '@/services/administration/iam/policy/lib/type';
-import { UpdatePolicyParams } from '@/services/administration/store/policy/type';
+import type { PolicyDataModel, PolicyListDataModel } from '@/services/administration/iam/policy/lib/type';
+import type { UpdatePolicyParams } from '@/services/administration/store/policy/type';
 
 export const fetchPolicyList = async ({ commit }, params: any): Promise<void|Error> => {
     commit('setPolicyListLoading', true);

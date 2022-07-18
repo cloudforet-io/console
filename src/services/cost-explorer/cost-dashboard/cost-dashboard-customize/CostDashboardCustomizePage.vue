@@ -47,14 +47,14 @@ import CostDashboardCustomizeSidebar
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeSidebar.vue';
 import { getDashboardLayout } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/DashboardLayouts.vue';
-import {
+import type {
     CustomLayout,
     DashboardInfo,
     DefaultLayout, PublicDashboardInfo, WidgetInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { CostQueryFilters, Period } from '@/services/cost-explorer/type';
+import type { CostQueryFilters, Period } from '@/services/cost-explorer/type';
 
 
 export default {

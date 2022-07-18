@@ -53,7 +53,7 @@ import { PPaneLayout, PAnchor } from '@spaceone/design-system';
 import { store } from '@/store';
 
 import { CURRENCY } from '@/store/modules/display/config';
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -62,8 +62,9 @@ import AmountPlanningTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
 import BudgetCostTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetCostTypePopover.vue';
+import type { BudgetData, CostType } from '@/services/cost-explorer/budget/type';
 import {
-    BUDGET_TIME_UNIT, BudgetData, CostType,
+    BUDGET_TIME_UNIT,
 } from '@/services/cost-explorer/budget/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 

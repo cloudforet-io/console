@@ -1,10 +1,10 @@
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 
-import { Tags, TimeStamp } from '@/models';
+import type { Tags, TimeStamp } from '@/models';
 
-import { RouteQueryString } from '@/lib/router-query-string';
+import type { RouteQueryString } from '@/lib/router-query-string';
 
-import {
+import type {
     FINISH_CONDITION, SCOPE,
     AlertState, AlertUrgency, AlertSeverity, AlertStateFilter, AssignedState,
 } from '@/services/alert-manager/lib/config';

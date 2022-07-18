@@ -74,7 +74,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PPageTitle, PButton, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

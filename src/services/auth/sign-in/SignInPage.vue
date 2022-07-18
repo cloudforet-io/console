@@ -35,8 +35,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy, watch,
+    toRefs, reactive, computed, getCurrentInstance, watch,
 } from '@vue/composition-api';
 
 import { isEmpty } from 'lodash';

@@ -62,7 +62,7 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import { Tag } from '@/common/components/forms/tags-input-group/type';
+import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props {

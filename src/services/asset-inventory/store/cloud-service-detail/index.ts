@@ -1,4 +1,4 @@
-import { CloudServiceDetailStoreState } from '@/services/asset-inventory/store/cloud-service-detail/type';
+import type { CloudServiceDetailStoreState } from '@/services/asset-inventory/store/cloud-service-detail/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

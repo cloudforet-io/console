@@ -17,10 +17,10 @@ import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { PToolbox } from '@spaceone/design-system';
-import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 
 
 import { store } from '@/store';

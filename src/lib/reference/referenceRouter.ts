@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { concat } from 'lodash';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
-import { Reference, ResourceType } from '@/lib/reference/type';
+import type { Reference, ResourceType } from '@/lib/reference/type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';

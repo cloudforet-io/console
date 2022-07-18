@@ -1,7 +1,7 @@
-import { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { forEach } from 'lodash';
 
-import { ConsoleDynamicField, Reference } from '@/lib/component-util/dynamic-layout/type';
+import type { ConsoleDynamicField, Reference } from '@/lib/component-util/dynamic-layout/type';
 
 interface ExcelDataField {
     key: string;

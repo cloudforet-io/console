@@ -44,8 +44,9 @@
 <script lang="ts">
 
 
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, PropType, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -55,7 +56,7 @@ import dayjs from 'dayjs';
 
 import { store } from '@/store';
 
-import { ReferenceItem } from '@/store/modules/reference/type';
+import type { ReferenceItem } from '@/store/modules/reference/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 

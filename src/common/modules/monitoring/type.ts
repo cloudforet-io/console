@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { STATISTICS_TYPE } from '@/common/modules/monitoring/config';
+import type { STATISTICS_TYPE } from '@/common/modules/monitoring/config';
 
 export interface Metric {
     key: string;

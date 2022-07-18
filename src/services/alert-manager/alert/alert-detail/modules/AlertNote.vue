@@ -50,7 +50,7 @@ import {
     PButton, PCollapsibleList, PPaneLayout, PPanelTop, PTextarea, PSelectDropdown,
 } from '@spaceone/design-system';
 
-import { TimeStamp } from '@/models';
+import type { TimeStamp } from '@/models';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 

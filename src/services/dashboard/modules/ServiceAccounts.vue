@@ -60,7 +60,7 @@ import {
     PDataLoader, PDataTable, PI, PSkeleton,
 } from '@spaceone/design-system';
 import { forEach, range, isEmpty } from 'lodash';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 
 import { store } from '@/store';

@@ -45,17 +45,19 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PI, PIconButton } from '@spaceone/design-system';
 
-import { FAVORITE_TYPE, FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
+import type { FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import { FavoriteListProps } from '@/common/modules/favorites/favorite-list/type';
+import type { FavoriteListProps } from '@/common/modules/favorites/favorite-list/type';
 
 const LIMIT_COUNT = 5;
 export default {

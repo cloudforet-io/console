@@ -55,8 +55,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, defineComponent, ref, PropType,
+    computed, defineComponent, ref,
 } from '@vue/composition-api';
 
 import { useResizeObserver, useThrottleFn } from '@vueuse/core';

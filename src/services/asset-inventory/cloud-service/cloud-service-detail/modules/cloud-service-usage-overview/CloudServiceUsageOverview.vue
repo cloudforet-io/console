@@ -37,16 +37,17 @@ import {
 
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { Filter } from '@spaceone/console-core-lib/space-connector/type';
+import type { Filter } from '@spaceone/console-core-lib/space-connector/type';
 import {
     PButton,
 } from '@spaceone/design-system';
-import {
+import type {
     DynamicWidgetSchema,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
-import axios, { CancelTokenSource } from 'axios';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import { debounce, isEmpty } from 'lodash';
 
@@ -56,10 +57,10 @@ import CloudServiceUsageOverviewDetailModal
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewDetailModal.vue';
 import CloudServiceUsageOverviewSummary
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewSummary.vue';
-import {
+import type {
     CloudServiceTypeInfo,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 
 
 interface Props {

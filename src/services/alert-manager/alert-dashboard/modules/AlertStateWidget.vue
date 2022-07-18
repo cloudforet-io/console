@@ -109,7 +109,7 @@ import {
 
 import { commaFormatter } from '@spaceone/console-core-lib';
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {

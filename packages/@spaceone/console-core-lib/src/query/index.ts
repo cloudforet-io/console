@@ -3,7 +3,7 @@ import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { flatten, forEach } from 'lodash';
 
-import {
+import type {
     QueryTag as Tag,
     KeyItem,
     KeyItemSet,
@@ -15,10 +15,10 @@ import {
     rawQueryOperatorToPluralApiQueryOperatorMap,
 } from '@/query/config';
 import { convertDatetimeQueryStoreFilterToFilters } from '@/query/helper';
-import {
+import type {
     QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
 } from '@/query/type';
-import { Filter, FilterOperator } from '@/space-connector/type';
+import type { Filter, FilterOperator } from '@/space-connector/type';
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -114,8 +114,14 @@ export class QueryHelper {
 
     private _orFilters: QueryStoreFilter[] = [];
 
+    private _timezone: string | undefined;
+
     static init(timezone: any) {
         QueryHelper.timezone = timezone;
+    }
+
+    set timezone(timezone: string|undefined) {
+        this._timezone = timezone;
     }
 
     setReference(referenceStore?: ReferenceStore): this {
@@ -263,8 +269,8 @@ export class QueryHelper {
     }
 
     get apiQuery() {
-        const { filter, keyword } = filterToApiQueryFilter(this._filters, QueryHelper.timezone?.value);
-        const { filter: filterOr } = filterToApiQueryFilter(this._orFilters, QueryHelper.timezone?.value);
+        const { filter, keyword } = filterToApiQueryFilter(this._filters, this._timezone ?? QueryHelper.timezone?.value);
+        const { filter: filterOr } = filterToApiQueryFilter(this._orFilters, this._timezone ?? QueryHelper.timezone?.value);
 
         return {
             filter,

@@ -1,4 +1,4 @@
-import { ProjectReferenceState } from '@/store/modules/reference/project/type';
+import type { ProjectReferenceState } from '@/store/modules/reference/project/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

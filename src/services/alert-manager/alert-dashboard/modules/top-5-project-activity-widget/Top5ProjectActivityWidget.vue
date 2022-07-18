@@ -58,8 +58,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -75,7 +75,7 @@ import { find } from 'lodash';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 

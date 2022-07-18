@@ -85,8 +85,9 @@
 
 <script lang="ts">
 
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
+    reactive, toRefs, computed, watch, getCurrentInstance,
 } from '@vue/composition-api';
 
 
@@ -97,8 +98,8 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PButton, PToolboxTable, PSelectDropdown, PTableCheckModal, PLottie, PPanelTop,
 } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { debounce, get } from 'lodash';
 

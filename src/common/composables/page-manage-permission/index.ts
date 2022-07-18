@@ -1,6 +1,5 @@
-import {
-    ComponentRenderProxy, computed, ComputedRef, getCurrentInstance,
-} from '@vue/composition-api';
+import type { ComponentRenderProxy, ComputedRef } from '@vue/composition-api';
+import { computed, getCurrentInstance } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 

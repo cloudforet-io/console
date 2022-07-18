@@ -48,7 +48,7 @@ import BudgetNotifications
 import BudgetSummary
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-summary/BudgetSummary.vue';
 import BudgetDeleteModal from '@/services/cost-explorer/budget/budget-detail/modules/BudgetDeleteModal.vue';
-import { BudgetData } from '@/services/cost-explorer/budget/type';
+import type { BudgetData } from '@/services/cost-explorer/budget/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 

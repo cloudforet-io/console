@@ -67,8 +67,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, PropType, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
@@ -92,7 +93,7 @@ import AlertTriggeredBy from '@/services/alert-manager/alert/modules/AlertTrigge
 import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/alert-manager/lib/config';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { alertManagerStore } from '@/services/alert-manager/store';
-import { AlertDataModel } from '@/services/alert-manager/type';
+import type { AlertDataModel } from '@/services/alert-manager/type';
 
 
 export default {

@@ -37,7 +37,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
-import { AlertStateUpdateParams } from '@/services/alert-manager/type';
+import type { AlertStateUpdateParams } from '@/services/alert-manager/type';
 
 
 export default {

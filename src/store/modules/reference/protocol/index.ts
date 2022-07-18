@@ -1,4 +1,4 @@
-import { ProtocolReferenceState } from '@/store/modules/reference/protocol/type';
+import type { ProtocolReferenceState } from '@/store/modules/reference/protocol/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

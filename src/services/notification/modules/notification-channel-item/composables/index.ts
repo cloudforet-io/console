@@ -1,4 +1,5 @@
-import { ComponentRenderProxy, getCurrentInstance, reactive } from '@vue/composition-api';
+import type { ComponentRenderProxy } from '@vue/composition-api';
+import { getCurrentInstance, reactive } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { cloneDeep } from 'lodash';
@@ -10,9 +11,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { ParamType } from '@/services/notification/modules/notification-channel-item/type';
 import {
     PARAM_KEY_TYPE,
-    ParamType,
 } from '@/services/notification/modules/notification-channel-item/type';
 
 interface NotificationItemState {

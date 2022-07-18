@@ -88,7 +88,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PButton, PButtonModal, PCheckBox, PDataLoader, PSearch,
 } from '@spaceone/design-system';
-import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 import { camelCase, uniq } from 'lodash';
 import draggable from 'vuedraggable';
 

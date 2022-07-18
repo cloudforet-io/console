@@ -34,21 +34,23 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, PropType, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PPanelTop } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import { PagePermission } from '@/lib/access-control/page-permission-helper';
+import type { PagePermission } from '@/lib/access-control/page-permission-helper';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
 
-import { RoleType, FORM_TYPE } from '@/services/administration/iam/role/config';
-import { Policy, RoleData } from '@/services/administration/iam/role/type';
+import type { RoleType } from '@/services/administration/iam/role/config';
+import { FORM_TYPE } from '@/services/administration/iam/role/config';
+import type { Policy, RoleData } from '@/services/administration/iam/role/type';
 import RoleUpdatePageAccessForm from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessForm.vue';
 import RoleUpdatePageBaseInformation from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageBaseInformation.vue';
 import PolicyListDataTable from '@/services/administration/modules/PolicyListDataTable.vue';

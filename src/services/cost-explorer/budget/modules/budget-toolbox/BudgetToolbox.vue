@@ -62,27 +62,27 @@ import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
-import { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import {
     PToolbox, PSelectStatus, PButton, PI, PSelectDropdown, PDivider,
 } from '@spaceone/design-system';
-import { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
-import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
-import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
+import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 import dayjs from 'dayjs';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import BudgetToolboxUsageRange
     from '@/services/cost-explorer/budget/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
-import { BudgetUsageAnalyzeRequestParam, BudgetUsageRange } from '@/services/cost-explorer/budget/type';
+import type { BudgetUsageAnalyzeRequestParam, BudgetUsageRange } from '@/services/cost-explorer/budget/type';
 import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 
 export interface Pagination {
     pageStart: number;

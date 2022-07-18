@@ -3,7 +3,7 @@ import {
     isInstanceOfAPIError, isInstanceOfAuthenticationError, isInstanceOfAuthorizationError,
     isInstanceOfBadRequestError,
 } from '@spaceone/console-core-lib/space-connector/error';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceRouter } from '@/router';
 

@@ -113,13 +113,13 @@ import {
 import {
     PToggleButton, PRadio, PButton, PCheckBox, PSelectDropdown, PSearchDropdown,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import { Tag } from '@/common/components/forms/tags-input-group/type';
+import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 

@@ -1,4 +1,4 @@
-import { UserReferenceState } from '@/store/modules/reference/user/type';
+import type { UserReferenceState } from '@/store/modules/reference/user/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

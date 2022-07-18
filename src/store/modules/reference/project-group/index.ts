@@ -1,4 +1,4 @@
-import { ProjectGroupReferenceState } from '@/store/modules/reference/project-group/type';
+import type { ProjectGroupReferenceState } from '@/store/modules/reference/project-group/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

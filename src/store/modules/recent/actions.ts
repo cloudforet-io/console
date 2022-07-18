@@ -1,8 +1,9 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { Action } from 'vuex';
+import type { Action } from 'vuex';
 
+import type { RecentConfig, RecentState, RecentType } from '@/store/modules/recent/type';
 import {
-    RECENT_TYPE, RecentConfig, RecentState, RecentType,
+    RECENT_TYPE,
 } from '@/store/modules/recent/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

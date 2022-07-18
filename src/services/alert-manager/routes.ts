@@ -1,4 +1,4 @@
-import { RouteConfig } from 'vue-router';
+import type { RouteConfig } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';

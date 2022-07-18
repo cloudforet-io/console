@@ -40,7 +40,7 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 
 
 interface Props {

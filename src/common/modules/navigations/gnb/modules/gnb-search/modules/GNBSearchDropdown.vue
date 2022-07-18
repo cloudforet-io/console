@@ -54,9 +54,10 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed,
-    defineComponent, PropType,
+    defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -65,10 +66,9 @@ import { PDataLoader } from '@spaceone/design-system';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import {
-    SuggestionItem, SUGGESTION_TYPE, SuggestionType,
-} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import {
+import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import type {
     DropdownItem, FocusingDirection,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';

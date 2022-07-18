@@ -1,6 +1,6 @@
 import { onMounted, onUnmounted } from '@vue/composition-api';
 
-import { Module } from 'vuex';
+import type { Module } from 'vuex';
 
 import { store } from '@/store';
 

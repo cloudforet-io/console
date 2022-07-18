@@ -16,7 +16,7 @@ import {
 } from '@vue/composition-api';
 
 import { PSelectDropdown } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { store } from '@/store';
 

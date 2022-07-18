@@ -40,12 +40,12 @@ import {
 
 import { store } from '@/store';
 
-import { ReferenceItem } from '@/store/modules/reference/type';
+import type { ReferenceItem } from '@/store/modules/reference/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
+import type { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
 
 
 const DASHBOARD_FILTERS = [FILTER.PROJECT_GROUP, FILTER.PROJECT, FILTER.SERVICE_ACCOUNT, FILTER.PROVIDER];

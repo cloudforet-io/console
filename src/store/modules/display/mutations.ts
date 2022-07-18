@@ -1,8 +1,8 @@
-import { Mutation } from 'vuex';
+import type { Mutation } from 'vuex';
 
-import { Currency, SidebarType } from '@/store/modules/display/config';
+import type { Currency, SidebarType } from '@/store/modules/display/config';
 
-import { CurrencyRates, DisplayState } from './type';
+import type { CurrencyRates, DisplayState } from './type';
 
 export const setVisibleSidebar: Mutation<DisplayState> = (state, visible: boolean): void => {
     state.visibleSidebar = visible;

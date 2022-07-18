@@ -63,7 +63,7 @@ import {
 } from '@spaceone/design-system';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { find } from 'lodash';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 
 import { store } from '@/store';
@@ -75,7 +75,7 @@ import { alert, secondary } from '@/styles/colors';
 
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
-import { AlertListPageUrlQuery } from '@/services/alert-manager/type';
+import type { AlertListPageUrlQuery } from '@/services/alert-manager/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 

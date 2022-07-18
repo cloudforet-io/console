@@ -63,14 +63,15 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, onActivated, onDeactivated, reactive, toRefs, watch,
+    computed, getCurrentInstance, onActivated, onDeactivated, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 
 import { iso8601Formatter, durationFormatter } from '@spaceone/console-core-lib';
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
-import { KeyItemSet } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { KeyItemSet } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {

@@ -1,5 +1,5 @@
-import { Badge } from '@spaceone/design-system/dist/src/data-display/badges/type';
-import { StatusProps } from '@spaceone/design-system/dist/src/data-display/status/type';
+import type { Badge } from '@spaceone/design-system/dist/src/data-display/badges/type';
+import type { StatusProps } from '@spaceone/design-system/dist/src/data-display/status/type';
 
 
 type Enum<T> = Record<string, T>

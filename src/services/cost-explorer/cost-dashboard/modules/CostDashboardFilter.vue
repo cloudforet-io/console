@@ -47,7 +47,7 @@ import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashb
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import SetFilterModal from '@/services/cost-explorer/modules/SetFilterModal.vue';
-import { CostQueryFilters } from '@/services/cost-explorer/type';
+import type { CostQueryFilters } from '@/services/cost-explorer/type';
 
 
 interface Props {

@@ -47,12 +47,13 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, defineComponent, PropType, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PDivider, PI } from '@spaceone/design-system';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -62,7 +63,8 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { LNBMenu, MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
+import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
+import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
 interface Props {
     menuData: LNBMenu;

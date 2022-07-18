@@ -1,4 +1,5 @@
-import { FAVORITE_TYPE, FavoriteState } from '@/store/modules/favorite/type';
+import type { FavoriteState } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

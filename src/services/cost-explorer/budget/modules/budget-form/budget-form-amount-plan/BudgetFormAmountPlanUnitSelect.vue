@@ -23,12 +23,12 @@ import {
 } from '@vue/composition-api';
 
 import { PLabel, PSelectCard } from '@spaceone/design-system';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 
 import { i18n } from '@/translations';
 
-import { BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
+import type { BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
 
 
 interface Plan {

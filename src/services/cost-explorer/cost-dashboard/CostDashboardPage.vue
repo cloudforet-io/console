@@ -96,7 +96,8 @@ import { store } from '@/store';
 
 
 import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
-import PdfDownloadOverlay, { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
+import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
+import PdfDownloadOverlay from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
@@ -112,10 +113,10 @@ import CostDashboardPreview from '@/services/cost-explorer/cost-dashboard/module
 import CostDashboardUpdateModal
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardUpdateModal.vue';
 import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/DashboardLayouts.vue';
-import { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import type { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { CostQueryFilters, Period } from '@/services/cost-explorer/type';
+import type { CostQueryFilters, Period } from '@/services/cost-explorer/type';
 
 const PUBLIC_ICON_COLOR = gray[500];
 

@@ -81,10 +81,10 @@ import CostDashboardCustomizeWidgetConfig
 import CustomWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CustomWidgetPreview.vue';
 import { chartTypeItemMap } from '@/services/cost-explorer/cost-dashboard/lib/config';
-import { WidgetInfo, ChartType } from '@/services/cost-explorer/cost-dashboard/type';
+import type { WidgetInfo, ChartType } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { CostQuerySetModel } from '@/services/cost-explorer/type';
+import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 
 const PAGE_SIZE = 6;

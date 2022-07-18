@@ -64,23 +64,23 @@ import {
     PButtonModal, PCollapsibleList, PTag,
 } from '@spaceone/design-system';
 import { sum } from 'lodash';
-import { TranslateResult } from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
 import CloudServiceFilterSearchDropdown from '@/services/asset-inventory/cloud-service/modules/CloudServiceFilterSearchDropdown.vue';
+import type { RegionMenuItem } from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
 import {
     getRegionFilterMenuItem,
-    RegionMenuItem,
 } from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
-import { CloudServiceFilterKey, CloudServiceFilterMap } from '@/services/asset-inventory/cloud-service/type';
+import type { CloudServiceFilterKey, CloudServiceFilterMap } from '@/services/asset-inventory/cloud-service/type';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
 
 interface FilterItem {

@@ -49,7 +49,7 @@ import CostDashboardFilter from '@/services/cost-explorer/cost-dashboard/modules
 import CostDashboardPeriodSelectDropdown
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
 import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/DashboardLayouts.vue';
-import { CustomLayout, DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import type { CustomLayout, DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
 const HEADER_ELEMENT = 1;

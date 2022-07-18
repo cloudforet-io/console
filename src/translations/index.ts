@@ -2,8 +2,9 @@ import componentEN from '@spaceone/design-system/src/translations/language-pack/
 import componentJA from '@spaceone/design-system/src/translations/language-pack/ja.json';
 import componentKO from '@spaceone/design-system/src/translations/language-pack/ko.json';
 import Vue from 'vue';
-import VueI18n, { IVueI18n, LocaleMessageObject } from 'vue-i18n';
-import { Store } from 'vuex';
+import type { IVueI18n, LocaleMessageObject } from 'vue-i18n';
+import VueI18n from 'vue-i18n';
+import type { Store } from 'vuex';
 
 
 import en from '@/translations/language-pack/en.json';

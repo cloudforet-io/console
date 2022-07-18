@@ -13,7 +13,7 @@ import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 import { SpaceRouter } from '@/router';
 
@@ -26,7 +26,7 @@ import {
     queryStringToString,
 } from '@/lib/router-query-string';
 
-import {
+import type {
     RequestType,
 } from '@/services/cost-explorer/cost-analysis/lib/config';
 import CostAnalysisChart from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChart.vue';
@@ -34,9 +34,9 @@ import CostAnalysisDataTable from '@/services/cost-explorer/cost-analysis/module
 import CostAnalysisGroupByFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilter.vue';
 import CostAnalysisHeader from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisHeader.vue';
 import CostAnalysisQueryFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFilter.vue';
-import { CostAnalysisPageUrlQuery } from '@/services/cost-explorer/cost-analysis/type';
+import type { CostAnalysisPageUrlQuery } from '@/services/cost-explorer/cost-analysis/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { CostQuerySetModel, CostQuerySetOption, GroupBy } from '@/services/cost-explorer/type';
+import type { CostQuerySetModel, CostQuerySetOption, GroupBy } from '@/services/cost-explorer/type';
 
 
 export interface SaveQueryEmitParam {

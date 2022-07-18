@@ -57,7 +57,7 @@ import { getUUID } from '@/lib/component-util/getUUID';
 
 import CostDashboardCustomizeWidgetModal
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetModal.vue';
-import { CustomLayout } from '@/services/cost-explorer/cost-dashboard/type';
+import type { CustomLayout } from '@/services/cost-explorer/cost-dashboard/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
 export default {

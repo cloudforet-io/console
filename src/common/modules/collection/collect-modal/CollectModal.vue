@@ -59,8 +59,9 @@
 
 <script lang="ts">
 
+import type { SetupContext, ComponentRenderProxy } from '@vue/composition-api';
 import {
-    toRefs, reactive, computed, watch, SetupContext, getCurrentInstance, ComponentRenderProxy,
+    toRefs, reactive, computed, watch, getCurrentInstance,
 } from '@vue/composition-api';
 
 
@@ -77,7 +78,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { CollectModalProps } from '@/common/modules/collection/collect-modal/type';
+import type { CollectModalProps } from '@/common/modules/collection/collect-modal/type';
 
 export default {
     name: 'CollectModal',

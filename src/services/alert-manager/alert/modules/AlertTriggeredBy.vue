@@ -10,15 +10,16 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, PropType, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { PAnchor } from '@spaceone/design-system';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
-import { ReferenceItem } from '@/store/modules/reference/type';
+import type { ReferenceItem } from '@/store/modules/reference/type';
 
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 

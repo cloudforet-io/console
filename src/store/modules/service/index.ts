@@ -1,4 +1,4 @@
-import { ServiceState } from '@/store/modules/service/type';
+import type { ServiceState } from '@/store/modules/service/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

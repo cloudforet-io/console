@@ -69,11 +69,11 @@ import {
 import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
-import { MapChart } from '@amcharts/amcharts4/maps';
+import type { MapChart } from '@amcharts/amcharts4/maps';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataLoader, PProgressBar } from '@spaceone/design-system';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 import { store } from '@/store';
 

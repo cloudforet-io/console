@@ -50,8 +50,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
+    reactive, toRefs, computed, getCurrentInstance,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -64,7 +65,7 @@ import { get, some } from 'lodash';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import { Tag } from '@/common/components/forms/tags-input-group/type';
+import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';

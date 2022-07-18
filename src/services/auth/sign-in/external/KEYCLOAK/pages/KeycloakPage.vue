@@ -3,9 +3,8 @@
 </template>
 
 <script lang="ts">
-import {
-    ComponentRenderProxy, defineComponent, getCurrentInstance, onMounted,
-} from '@vue/composition-api';
+import type { ComponentRenderProxy } from '@vue/composition-api';
+import { defineComponent, getCurrentInstance, onMounted } from '@vue/composition-api';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

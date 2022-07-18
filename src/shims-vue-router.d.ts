@@ -1,13 +1,15 @@
 declare module 'vue-router' {
-  import {
-      VueRouter,
+  import type {
       RouteConfigMultipleViews as OriginRouteConfigMultipleViews,
       RouteConfigSingleView as OriginRouteConfigSingleView,
       Route as OriginRoute,
       RouteRecord as OriginRouteRecord,
   } from 'vue-router/types/router';
+import {
+    VueRouter,
+} from 'vue-router/types/router';
 
-    import { AccessLevel } from '@/lib/access-control/config';
+    import type { AccessLevel } from '@/lib/access-control/config';
 
   interface RouteLabelFormatter {
     (route: Route): string;

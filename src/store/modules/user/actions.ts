@@ -1,7 +1,7 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import jwt from 'jsonwebtoken';
 
-import {
+import type {
     UserState, SignInRequest, UpdateUserRequest, UserRole,
 } from './type';
 

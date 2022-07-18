@@ -71,8 +71,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    toRefs, reactive, watch, computed, getCurrentInstance, ComponentRenderProxy,
+    toRefs, reactive, watch, computed, getCurrentInstance,
 } from '@vue/composition-api';
 
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
@@ -82,11 +83,11 @@ import {
     PPageTitle, PCardItem,
     PButton, PBadge, PI, PDivider, PDataLoader,
 } from '@spaceone/design-system';
-import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 import { get, range } from 'lodash';
 
 
-import { TimeStamp } from '@/models';
+import type { TimeStamp } from '@/models';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 

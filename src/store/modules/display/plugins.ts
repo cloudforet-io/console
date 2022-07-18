@@ -1,4 +1,4 @@
-import { Store } from 'vuex';
+import type { Store } from 'vuex';
 
 import { STORAGE_KEY } from '@/store/modules/display';
 

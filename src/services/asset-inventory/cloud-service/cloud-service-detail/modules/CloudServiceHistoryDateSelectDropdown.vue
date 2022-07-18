@@ -17,7 +17,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import {
     PSelectDropdown,
 } from '@spaceone/design-system';
-import { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 

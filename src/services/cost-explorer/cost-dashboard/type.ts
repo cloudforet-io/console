@@ -1,6 +1,6 @@
-import { Tags, TimeStamp } from '@/models';
+import type { Tags, TimeStamp } from '@/models';
 
-import {
+import type {
     CostQueryFilters, Period, Granularity, GroupBy,
 } from '@/services/cost-explorer/type';
 

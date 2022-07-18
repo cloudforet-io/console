@@ -55,8 +55,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import BudgetCostTypeSelect from '@/services/cost-explorer/budget/modules/BudgetCostTypeSelect.vue';
 import BudgetPeriodSelect from '@/services/cost-explorer/budget/modules/BudgetPeriodSelect.vue';
 import BudgetTargetSelect from '@/services/cost-explorer/budget/modules/BudgetTargetSelect.vue';
-import { BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
-import { Period } from '@/services/cost-explorer/type';
+import type { BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
+import type { Period } from '@/services/cost-explorer/type';
 
 
 type CostTypes = BudgetData['cost_types']

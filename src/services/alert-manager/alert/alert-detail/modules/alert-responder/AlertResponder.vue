@@ -54,7 +54,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PBadge, PCollapsibleList, PPaneLayout, PPanelTop, PSearchDropdown,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { difference } from 'lodash';
 import VueI18n from 'vue-i18n';
 
@@ -64,7 +64,7 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
-import {
+import type {
     AlertDataModel,
 } from '@/services/alert-manager/type';
 

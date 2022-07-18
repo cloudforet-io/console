@@ -47,9 +47,9 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { PLazyImg, PDivider } from '@spaceone/design-system';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 
 import { store } from '@/store';
@@ -58,7 +58,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { objectToQueryString } from '@/lib/router-query-string';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 
 interface Props {
     item: any;

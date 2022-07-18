@@ -51,13 +51,14 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
-    computed, PropType, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataTable, PBadge, PAnchor } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -72,9 +73,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
-import { RoleBindingType } from '@/services/administration/iam/role/modules/role-managemnet-table/modules/type';
-import { RoleData } from '@/services/administration/iam/role/type';
-import { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
+import type { RoleBindingType } from '@/services/administration/iam/role/modules/role-managemnet-table/modules/type';
+import type { RoleData } from '@/services/administration/iam/role/type';
+import type { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
 
 interface UnDeletableRole {
     roleName: string;

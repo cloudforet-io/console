@@ -119,8 +119,9 @@
 
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -130,7 +131,8 @@ import {
     PSkeleton, PI, PButton, PToolbox, PDataLoader,
 } from '@spaceone/design-system';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
-import axios, { CancelTokenSource } from 'axios';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import bytes from 'bytes';
 import { range, uniq } from 'lodash';
 
@@ -150,7 +152,8 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { SUMMARY_TYPE, SummaryType } from '@/services/project/type';
+import type { SummaryType } from '@/services/project/type';
+import { SUMMARY_TYPE } from '@/services/project/type';
 
 
 interface CardSummary {

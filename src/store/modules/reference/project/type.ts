@@ -1,4 +1,4 @@
-import { ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
+import type { ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
 
 export interface ProjectResourceItemData {
     groupInfo: {

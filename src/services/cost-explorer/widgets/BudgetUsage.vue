@@ -29,8 +29,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -39,7 +39,8 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { CURRENCY, Currency } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/display/config';
 
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';

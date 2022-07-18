@@ -1,4 +1,4 @@
-import { ProjectPageState } from '@/services/project/store/type';
+import type { ProjectPageState } from '@/services/project/store/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

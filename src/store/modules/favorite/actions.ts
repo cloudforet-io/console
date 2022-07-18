@@ -1,8 +1,9 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { Action } from 'vuex';
+import type { Action } from 'vuex';
 
+import type { FavoriteConfig, FavoriteState, FavoriteType } from '@/store/modules/favorite/type';
 import {
-    FAVORITE_TYPE, FavoriteConfig, FavoriteState, FavoriteType,
+    FAVORITE_TYPE,
 } from '@/store/modules/favorite/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

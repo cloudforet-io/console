@@ -114,13 +114,14 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
+import type { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton, PIconButton, PSelectDropdown, PStatus, PTag, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
-import axios, { CancelTokenSource } from 'axios';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import {
     cloneDeep, debounce, sum, isEmpty,
@@ -147,13 +148,13 @@ import {
     FILTER_ITEM_MAP, GRANULARITY,
 } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
+import type { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
 import {
     getLegends,
     getPieChartData,
     getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
-import {
+import type {
     Legend, PieChartData, XYChartData,
 } from '@/services/cost-explorer/widgets/type';
 

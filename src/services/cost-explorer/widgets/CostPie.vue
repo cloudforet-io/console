@@ -48,7 +48,7 @@ import {
 } from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
-import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
+import type { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -79,7 +79,7 @@ import {
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
-import { Legend, PieChartData, WidgetProps } from '@/services/cost-explorer/widgets/type';
+import type { Legend, PieChartData, WidgetProps } from '@/services/cost-explorer/widgets/type';
 
 
 const CATEGORY_KEY = 'category';

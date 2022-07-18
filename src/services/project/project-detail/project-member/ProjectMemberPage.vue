@@ -7,8 +7,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, getCurrentInstance, onActivated, reactive, toRefs,
+    getCurrentInstance, onActivated, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';

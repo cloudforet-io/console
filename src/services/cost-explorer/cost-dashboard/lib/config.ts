@@ -1,6 +1,7 @@
 import Layout1WidgetList from '@/services/cost-explorer/cost-dashboard/dashboard-layouts/layout-1.json';
 import Layout4WidgetList from '@/services/cost-explorer/cost-dashboard/dashboard-layouts/layout-4.json';
-import { CHART_TYPE, DefaultLayout } from '@/services/cost-explorer/cost-dashboard/type';
+import type { DefaultLayout } from '@/services/cost-explorer/cost-dashboard/type';
+import { CHART_TYPE } from '@/services/cost-explorer/cost-dashboard/type';
 
 export const defaultLayoutMap = {
     'layout-1': {

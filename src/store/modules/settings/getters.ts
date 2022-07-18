@@ -1,4 +1,4 @@
-import { SettingsState } from './type';
+import type { SettingsState } from './type';
 
 export const getItem = (state: SettingsState): any => {
     const items = state.items;

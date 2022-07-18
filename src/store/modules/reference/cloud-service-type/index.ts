@@ -1,4 +1,4 @@
-import { CloudServiceTypeReferenceState } from '@/store/modules/reference/cloud-service-type/type';
+import type { CloudServiceTypeReferenceState } from '@/store/modules/reference/cloud-service-type/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

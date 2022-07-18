@@ -56,7 +56,7 @@ import {
     PSkeleton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import Vue from 'vue';
+import type Vue from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

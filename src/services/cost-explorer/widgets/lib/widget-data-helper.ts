@@ -1,20 +1,20 @@
-import { TimeUnit } from '@amcharts/amcharts4/core';
+import type { TimeUnit } from '@amcharts/amcharts4/core';
 import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 
 import { store } from '@/store';
 
-import { Currency } from '@/store/modules/display/config';
-import { CurrencyRates } from '@/store/modules/display/type';
+import type { Currency } from '@/store/modules/display/config';
+import type { CurrencyRates } from '@/store/modules/display/type';
 
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
+import type { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
 import { DATE_FORMAT } from '@/services/cost-explorer/widgets/lib/config';
-import {
+import type {
     ChartData,
     CostAnalyzeModel,
     Legend,

@@ -59,32 +59,33 @@ import {
 
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PAnchor, PI, PToolboxTable, PDataTable,
 } from '@spaceone/design-system';
-import { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import axios, { CancelTokenSource } from 'axios';
+import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 // eslint-disable-next-line import/extensions,import/no-unresolved
-import { Table } from 'pdfmake/interfaces';
-import { Location } from 'vue-router';
+import type { Table } from 'pdfmake/interfaces';
+import type { Location } from 'vue-router';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ExcelDataField } from '@/store/modules/file/type';
-import { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import { ReferenceMap } from '@/store/modules/reference/type';
+import type { ExcelDataField } from '@/store/modules/file/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { objectToQueryString, primitiveToQueryString, arrayToQueryString } from '@/lib/router-query-string';
 
-import { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
+import type { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
@@ -93,8 +94,8 @@ import {
 } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
-import { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type';
+import type { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
+import type { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type';
 
 interface PrintModeFieldSet {
     widths?: Table['widths'];

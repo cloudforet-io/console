@@ -93,8 +93,8 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -105,10 +105,10 @@ import {
     PTab, PPageTitle, PButtonModal,
     PButton, PCopyButton, PBreadcrumbs, PIconButton, PBadge, PDataLoader,
 } from '@spaceone/design-system';
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { find } from 'lodash';
-import Vue from 'vue';
-import { TranslateResult } from 'vue-i18n';
+import type Vue from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 
 import { store } from '@/store';
@@ -135,9 +135,9 @@ import MaintenanceHappeningList from '@/services/project/project-detail/modules/
 import MaintenanceWindowFormModal from '@/services/project/project-detail/modules/MaintenanceWindowFormModal.vue';
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
 import ProjectDetailStoreModule from '@/services/project/project-detail/store';
-import { ProjectDetailState } from '@/services/project/project-detail/store/type';
+import type { ProjectDetailState } from '@/services/project/project-detail/store/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { ProjectModel } from '@/services/project/type';
+import type { ProjectModel } from '@/services/project/type';
 
 
 export default {

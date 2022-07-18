@@ -120,8 +120,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
+    computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -129,7 +130,7 @@ import {
 } from '@spaceone/design-system';
 import ejs from 'ejs';
 import vClickOutside from 'v-click-outside';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 
 import { SpaceRouter } from '@/router';

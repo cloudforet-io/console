@@ -1,9 +1,9 @@
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { Query } from '@spaceone/console-core-lib/space-connector/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { Query } from '@spaceone/console-core-lib/space-connector/type';
 
-import { Tags, TimeStamp } from '@/models';
+import type { Tags, TimeStamp } from '@/models';
 
-import { RouteQueryString } from '@/lib/router-query-string';
+import type { RouteQueryString } from '@/lib/router-query-string';
 
 interface BudgetPlannedLimit {
 	date: string;

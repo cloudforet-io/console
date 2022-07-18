@@ -22,14 +22,15 @@ import {
     onUnmounted, computed, reactive, toRefs, watch, defineComponent,
 } from '@vue/composition-api';
 
-import { XYChart } from '@amcharts/amcharts4/charts';
+import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import dayjs from 'dayjs';
 
-import { CURRENCY, CURRENCY_SYMBOL, Currency } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 
 import config from '@/lib/config';
@@ -46,7 +47,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { getXYChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardSimpleCardWidget
     from '@/services/cost-explorer/widgets/modules/CostDashboardSimpleCardWidget.vue';
-import { WidgetProps, XYChartData } from '@/services/cost-explorer/widgets/type';
+import type { WidgetProps, XYChartData } from '@/services/cost-explorer/widgets/type';
 
 
 const CATEGORY_KEY = 'date';

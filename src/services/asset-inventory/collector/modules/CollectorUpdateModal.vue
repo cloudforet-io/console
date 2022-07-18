@@ -59,8 +59,9 @@
 
 <script lang="ts">
 
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy, watch,
+    toRefs, reactive, computed, getCurrentInstance, watch,
 } from '@vue/composition-api';
 
 
@@ -80,7 +81,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { CollectorPluginModel, CollectorUpdateParameter, UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
+import type { CollectorPluginModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/type';
+import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 
 
 interface Props {

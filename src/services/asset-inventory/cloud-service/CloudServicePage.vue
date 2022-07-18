@@ -63,17 +63,18 @@ import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
-import { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
+import type { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
+import type { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PDataLoader, PDivider, PButton, PPageTitle,
 } from '@spaceone/design-system';
-import axios, { CancelTokenSource } from 'axios';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 
 import { SpaceRouter } from '@/router';
@@ -98,7 +99,7 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 import CloudServiceListCard
     from '@/services/asset-inventory/cloud-service/modules/cloud-service-list/CloudServiceListCard.vue';
 import CloudServiceToolbox from '@/services/asset-inventory/cloud-service/modules/CloudServiceToolbox.vue';
-import {
+import type {
     CloudServiceCategory, CloudServicePageUrlQuery,
     CloudServicePageUrlQueryValue,
     Period,

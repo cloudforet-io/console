@@ -66,10 +66,10 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PBalloonTab, PButton, PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
-import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
-import { Location } from 'vue-router';
+import type { Location } from 'vue-router';
 
 import { i18n } from '@/translations';
 
@@ -83,10 +83,11 @@ import { gray, primary, primary1 } from '@/styles/colors';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 import AllSummaryDataSummary from '@/services/dashboard/modules/all-summary/AllSummaryDataSummary.vue';
+import type { DateItem, DateType, DataType } from '@/services/dashboard/modules/type';
 import {
-    DATA_TYPE, DateItem, DateType, DataType,
+    DATA_TYPE,
 } from '@/services/dashboard/modules/type';
 
 
