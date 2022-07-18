@@ -125,7 +125,7 @@ export default defineComponent({
     height: 100%;
     padding: 1em 0;
     line-height: 1.5;
-    font-size: 16px;
+    font-size: 14px;
 
     .vue-diff-viewer-inner {
         position: relative;
