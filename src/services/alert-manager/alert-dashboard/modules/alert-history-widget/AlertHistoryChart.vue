@@ -17,8 +17,8 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { capitalize } from 'lodash';
 
+import { i18n } from '@/translations';
 
 import config from '@/lib/config';
 
@@ -68,6 +68,10 @@ export default {
             chartData: [] as ChartData[],
             currentMonthStart: computed(() => dayjs.utc(props.currentDate).startOf('month')),
             currentMonthEnd: computed(() => dayjs.utc(props.currentDate).endOf('month')),
+            alertStateLabel: computed(() => ({
+                [ALERT_STATE.OPEN]: i18n.t('MONITORING.ALERT.DASHBOARD.OPEN'),
+                [ALERT_STATE.RESOLVED]: i18n.t('MONITORING.ALERT.DASHBOARD.RESOLVED'),
+            })),
         }));
 
         /* util */
@@ -152,7 +156,7 @@ export default {
 
             const createSeries = (name, color) => {
                 const series = chart.series.push(new am4charts.ColumnSeries());
-                series.name = capitalize(name);
+                series.name = state.alertStateLabel[name];
                 series.stacked = true;
                 series.dataFields.categoryX = 'date';
                 series.dataFields.valueY = name;
@@ -164,8 +168,8 @@ export default {
 
                 // tooltip
                 if (name === ALERT_STATE.OPEN) {
-                    series.columns.template.tooltipText = `[${OPEN_COLOR}]Open: [${OPEN_COLOR}; bold]{open} ({openPercentage}%)
-[${RESOLVED_COLOR}]Resolved: [${RESOLVED_COLOR}; bold]{resolved} ({resolvedPercentage}%)`;
+                    series.columns.template.tooltipText = `[${OPEN_COLOR}]${state.alertStateLabel[ALERT_STATE.OPEN]}: [${OPEN_COLOR}; bold]{open} ({openPercentage}%)
+[${RESOLVED_COLOR}]${state.alertStateLabel[ALERT_STATE.RESOLVED]}: [${RESOLVED_COLOR}; bold]{resolved} ({resolvedPercentage}%)`;
                     series.tooltip.pointerOrientation = 'down';
                     series.columns.template.tooltipX = am4core.percent(50);
                     series.columns.template.tooltipY = am4core.percent(0);
@@ -212,7 +216,7 @@ export default {
             }
         };
 
-        watch([() => state.chartRef, () => state.chartData], ([chartContext, data]) => {
+        watch([() => state.chartRef, () => state.chartData, () => state.alertStateLabel], ([chartContext, data]) => {
             if (chartContext && data) {
                 drawChart(chartContext);
             }
