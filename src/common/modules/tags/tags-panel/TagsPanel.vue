@@ -18,6 +18,7 @@
                       :items="items"
                       :loading="loading"
                       :col-copy="true"
+                      beautify-text
         />
         <transition name="slide-up">
             <tags-overlay v-if="tagEditPageVisible"
