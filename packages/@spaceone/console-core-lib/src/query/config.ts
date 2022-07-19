@@ -7,12 +7,12 @@ export const rawQueryOperatorToApiQueryOperatorMap: Record<RawQueryOperator, Fil
     '!': 'not_contain',
     '=': 'eq',
     '!=': 'not',
+    '~': 'regex',
     /* single only */
     '>': 'gt',
     '>=': 'gte',
     '<': 'lt',
     '<=': 'lte',
-    '~': 'regex',
     /* datetime only */
     '>t': 'datetime_gt',
     '>=t': 'datetime_gte',
@@ -34,6 +34,7 @@ export const rawQueryOperatorToPluralApiQueryOperatorMap: Partial<Record<RawQuer
     '!': 'not_contain_in',
     '=': 'in',
     '!=': 'not_in',
+    '~': 'regex_in',
 };
 
 // export const pluralRawQueryOperatorToSingularRawQueryOperatorMap: Partial<Record<RawQueryOperator, RawQueryOperator>> = {

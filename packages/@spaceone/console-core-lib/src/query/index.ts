@@ -34,14 +34,14 @@ const filterToQueryTag = (
     if (filter.k === undefined || filter.k === null) {
         /* no key case */
         if (filter.v === null || filter.v === undefined) return null;
-        return { value: { label: filter.v.toString(), name: filter.v } };
+        return { value: { label: 'Null', name: filter.v } };
     }
     if (filter.v === null || filter.v === undefined) {
         /* null case */
         return {
             key: keyMap[filter.k] || { label: filter.k, name: filter.k },
             value: { label: 'Null', name: null },
-            operator: filter.o && filter.o.startsWith('!') ? '!' : '=',
+            operator: filter.o?.startsWith('!') ? '!=' : '=',
         };
     }
     if (datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string]) {
@@ -57,7 +57,10 @@ const filterToQueryTag = (
     /* general case */
     const reference = keyMap[filter.k]?.reference;
     const selectedReferenceStore = (reference && referenceStore) ? ((referenceStore[reference]) ?? undefined) : undefined;
-    const label = (selectedReferenceStore) ? selectedReferenceStore.value[filter.v.toString()]?.label : filter.v.toString();
+
+    let label;
+    if (selectedReferenceStore) label = selectedReferenceStore.value[filter.v.toString()]?.label;
+    else label = filter.v.toString();
     return {
         key: keyMap[filter.k] || { label: filter.k, name: filter.k },
         value: { label, name: filter.v },
@@ -70,26 +73,27 @@ const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') 
 
     _filters.forEach((f) => {
         if (f.k) {
-            if (datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
+            let op: RawQueryOperator;
+            /* null case */
+            if (f.v === null || f.v === undefined) op = f.o?.startsWith('!') ? '!=' : '=';
+            else op = f.o ?? '';
+
+            if (datetimeRawQueryOperatorToQueryTagOperatorMap[op]) {
                 /* datetime case */
                 const datetimeFilters = convertDatetimeQueryStoreFilterToFilters(f, timezone);
                 if (datetimeFilters) filter = filter.concat(datetimeFilters);
             } else if (Array.isArray(f.v)) {
                 /* plural case */
-                if (rawQueryOperatorToPluralApiQueryOperatorMap[f.o || '']) {
-                    filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToPluralApiQueryOperatorMap[f.o || ''] as FilterOperator });
+                if (rawQueryOperatorToPluralApiQueryOperatorMap[op]) {
+                    filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToPluralApiQueryOperatorMap[op] as FilterOperator });
                 } else {
                     f.v.forEach((v) => {
-                        filter.push({ k: f.k as string, v, o: rawQueryOperatorToApiQueryOperatorMap[f.o || ''] });
+                        filter.push({ k: f.k as string, v, o: rawQueryOperatorToApiQueryOperatorMap[op] });
                     });
                 }
-            } else if (f.v === null || f.v === undefined) {
-                /* null case */
-                const op = f.o && f.o.startsWith('!') ? '!' : '=';
-                filter.push({ k: f.k, v: null, o: rawQueryOperatorToApiQueryOperatorMap[op] });
             } else {
                 /* general case */
-                filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToApiQueryOperatorMap[f.o || ''] });
+                filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToApiQueryOperatorMap[op] });
             }
         } else if (f.v !== null && f.v !== undefined) {
             /* keyword case */
@@ -145,7 +149,12 @@ export class QueryHelper {
             if (!q.invalid) {
                 if (q.key && typeof q.key === 'object') {
                     const key = this._keyMap[q.key.name] || { ...q.key };
-                    const op = (key.dataType === 'datetime' ? `${q.operator}t` : q.operator) as RawQueryOperator;
+
+                    let op: RawQueryOperator;
+                    if (key.dataType === 'datetime') op = `${q.operator}t` as RawQueryOperator;
+                    else if (q.value.name === null || q.value.name === undefined) op = q.operator?.startsWith('!') ? '!=' : '=';
+                    else op = q.operator ?? '' as RawQueryOperator;
+
                     if (filterMap[key.name]) {
                         if (filterMap[key.name][op]) filterMap[key.name][op].push(q.value.name);
                         else filterMap[key.name][op] = [q.value.name];
