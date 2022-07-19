@@ -3,7 +3,7 @@ import { range } from 'lodash';
 
 const getUser = () => ({
     name: faker.name.firstName(),
-    phone: faker.phone.phoneNumberFormat(),
+    phone: faker.phone.number(),
     email: faker.internet.email(),
     cost: faker.commerce.price(),
     homepage: faker.internet.url(),
