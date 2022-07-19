@@ -2,7 +2,8 @@ import type {
     AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse,
 } from 'axios';
 import axios from 'axios';
-import jwt from 'jsonwebtoken';
+import type { JwtPayload } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 
 import {
     APIError, AuthenticationError,
@@ -121,8 +122,8 @@ class API {
     static getTokenExpirationTime(token?: string): number {
         if (token) {
             try {
-                const decodedToken = jwt.decode(token);
-                return decodedToken.exp;
+                const decodedToken = jwtDecode<JwtPayload>(token);
+                return decodedToken.exp ?? -1;
             } catch (e) {
                 console.error(`Decode token error: ${e}`);
                 return -1;

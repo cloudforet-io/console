@@ -65,7 +65,8 @@ import {
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButton, PFieldGroup, PTextInput } from '@spaceone/design-system';
-import jwt from 'jsonwebtoken';
+import type { JwtPayload } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -121,10 +122,10 @@ export default {
             const queryString = window.location.search;
             const params = new URLSearchParams(queryString);
             const ssoAccessToken = params.get('sso_access_token') as string;
-            const decodedToken = jwt.decode(ssoAccessToken);
+            const decodedToken = jwtDecode<JwtPayload>(ssoAccessToken);
             if (decodedToken) {
                 SpaceConnector.setToken(ssoAccessToken, '');
-                return decodedToken.aud;
+                return decodedToken.aud as string;
             }
             return undefined;
         };
