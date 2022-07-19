@@ -60,10 +60,9 @@
             </div>
             <div class="filters-wrapper">
                 <p-query-search-tags v-show="searchable && filtersVisible && searchType === SEARCH_TYPES.query"
-                                     ref="tagRef"
-                                     :tags="proxyState.queryTags"
+                                     :tags.sync="proxyState.queryTags"
                                      :timezone="timezone"
-
+                                     :converter="queryTagConverter"
                                      @change="onQueryTagsChange"
                 />
             </div>
@@ -74,7 +73,7 @@
 <script lang="ts">
 import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { groupBy } from 'lodash';
@@ -201,7 +200,7 @@ export default defineComponent<ToolboxProps>({
             pageSize: makeOptionalProxy<number>('pageSize', vm, initPageSize),
             sortBy: useProxyValue('sortBy', props, emit),
             searchText: makeOptionalProxy<string>('searchText', vm, ''),
-            queryTags: props.queryTags ?? [],
+            queryTags: useProxyValue('queryTags', props, emit),
         });
         const sortByOptionsData = (props.sortable ? groupBy(props.sortByOptions, 'name') : undefined);
         const state = reactive({
@@ -214,13 +213,24 @@ export default defineComponent<ToolboxProps>({
                 }));
             }),
             selectedSortBy: computed(() => ((sortByOptionsData && props.sortable) ? sortByOptionsData[proxyState.sortBy][0]?.label : proxyState.sortBy)),
-            tagRef: null as any,
             valueSetMap: computed(() => {
                 const valueSetMap = {};
                 (props.keyItemSets ?? []).forEach(keyItemSet => keyItemSet.items.forEach((item) => {
                     if (item.valueSet) valueSetMap[item.name] = item.valueSet;
                 }));
                 return valueSetMap;
+            }),
+            queryTagConverter: computed(() => {
+                const valueSetMap = state.valueSetMap;
+                return (queryTag: QueryItem) => {
+                    const { key, value } = queryTag;
+                    if (!key || !value) return queryTag;
+                    const valueSetLabel = valueSetMap[key.name]?.label;
+                    return {
+                        ...queryTag,
+                        value: { ...value, label: valueSetLabel ?? value.label ?? value.name },
+                    };
+                };
             }),
         });
 
@@ -248,11 +258,6 @@ export default defineComponent<ToolboxProps>({
             }
         };
 
-        const setQueryTags = (value: QueryItem[]) => {
-            proxyState.queryTags = value;
-            emit('update:query-tags', proxyState.queryTags);
-        };
-
         const onSearch = (val?: string|QueryItem) => {
             if (!val) {
                 proxyState.searchText = '';
@@ -266,17 +271,14 @@ export default defineComponent<ToolboxProps>({
                 vm.$nextTick(() => {
                     emitChange({ searchText: val, pageStart: state.pageStart });
                 });
-            } else if (state.tagRef) {
-                state.tagRef.addTag(val);
             } else {
-                proxyState.queryTags.push(val);
-                emit('update:query-tags', proxyState.queryTags);
+                proxyState.queryTags = [...proxyState.queryTags, val];
             }
         };
 
         const onQueryTagsChange = (tags: QueryTag[]) => {
             if (proxyState.queryTags !== tags) {
-                setQueryTags(tags);
+                proxyState.queryTags = tags;
                 proxyState.thisPage = 1;
                 vm.$nextTick(() => {
                     emitChange({ queryTags: tags, pageStart: state.pageStart });
@@ -284,24 +286,6 @@ export default defineComponent<ToolboxProps>({
             }
         };
 
-        const initQueryTags = () => {
-            const queryTags = props.queryTags ? props.queryTags.map((queryTag: QueryItem) => {
-                const { key, value } = queryTag;
-                if (!key || !value) return queryTag;
-                const valueSetLabel = state.valueSetMap[key.name]?.label;
-                return {
-                    ...queryTag,
-                    value: { ...value, label: valueSetLabel ?? value.label ?? value.name },
-                };
-            }) : [];
-            setQueryTags(queryTags);
-        };
-
-        watch([() => state.valueSetMap, () => props.queryTags], () => {
-            if (props.queryTags !== proxyState.queryTags) initQueryTags();
-        }, {
-            immediate: true,
-        });
         return {
             SEARCH_TYPES,
             proxyState,
