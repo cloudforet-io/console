@@ -1,5 +1,6 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import jwt from 'jsonwebtoken';
+import type { JwtPayload } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 
 import type {
     UserState, SignInRequest, UpdateUserRequest, UserRole,
@@ -56,9 +57,12 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     }
 };
 
+interface JWTPayload extends JwtPayload {
+    user_type: string
+}
 const getUserInfoFromToken = (token: string): string[] => {
-    const decodedToken = jwt.decode(token);
-    return [decodedToken.user_type, decodedToken.aud];
+    const decodedToken = jwtDecode<JWTPayload>(token);
+    return [decodedToken.user_type, decodedToken.aud as string];
 };
 
 const getUserRoleBindings = async (userId: string): Promise<Array<UserRole>> => {
