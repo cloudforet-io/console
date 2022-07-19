@@ -63,7 +63,7 @@
                                      ref="tagRef"
                                      :tags="proxyState.queryTags"
                                      :timezone="timezone"
-                                     @init="onQueryTagsInit"
+
                                      @change="onQueryTagsChange"
                 />
             </div>
@@ -274,16 +274,6 @@ export default defineComponent<ToolboxProps>({
             }
         };
 
-        const onQueryTagsInit = ({ tags }) => {
-            vm.$emit('init-tags', {
-                pageStart: state.pageStart,
-                pageLimit: proxyState.pageSize,
-                searchText: proxyState.searchText,
-                sortBy: proxyState.sortBy,
-                queryTags: tags,
-            } as ToolboxOptions);
-        };
-
         const onQueryTagsChange = (tags: QueryTag[]) => {
             if (proxyState.queryTags !== tags) {
                 setQueryTags(tags);
@@ -320,7 +310,6 @@ export default defineComponent<ToolboxProps>({
             onChangePageSize,
             onChangeSortBy,
             onSearch,
-            onQueryTagsInit,
             onQueryTagsChange,
         };
     },

@@ -124,10 +124,6 @@ export default defineComponent<QuerySearchTagsProps>({
             },
         };
 
-        emit('init', {
-            tags: _tags.value,
-            timezone: timezone.value,
-        } as QuerySearchTagsProps);
 
         watch(() => props.tags, (tags) => {
             _tags.value = getConvertedQueryTags(tags, []);
