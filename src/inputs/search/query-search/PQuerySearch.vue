@@ -310,11 +310,11 @@ export default defineComponent({
         };
 
         /* Event triggers */
-        const emitSearch = (valueItem: ValueItem) => {
+        const emitSearch = (valueItem: ValueItem, fixedOperator?: OperatorType) => {
             let queryItem: QueryItem|null = {
                 key: state.rootKey,
                 value: valueItem,
-                operator: state.operator,
+                operator: fixedOperator ?? state.operator,
             };
 
             if (formatterMap[state.rootKey?.dataType]) {
@@ -358,7 +358,8 @@ export default defineComponent({
             if (state.currentDataType === 'object') {
                 if (state.searchText) await findAndSetKey(state.searchText, false);
             } else if (state.rootKey) {
-                if (state.searchText === '') emitSearch({ label: 'Null', name: null });
+                // In null case, only '=', '!=' operators are available.
+                if (state.searchText === '') emitSearch({ label: 'Null', name: null }, state.operator.startsWith('!') ? '!=' : '=');
                 else emitSearch({ label: state.searchText, name: state.searchText });
             } else if (state.searchText) emitSearch({ label: state.searchText, name: state.searchText });
         };
