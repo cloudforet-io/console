@@ -439,17 +439,4 @@ export const getToolboxArgTypes = (): ArgTypes => ({
             },
         },
     },
-    onInitTags: {
-        name: 'init-tags',
-        description: 'Event emitted when query tags are initiated.',
-        table: {
-            type: {
-                summary: null,
-            },
-            category: 'events',
-            defaultValue: {
-                summary: null,
-            },
-        },
-    },
 });

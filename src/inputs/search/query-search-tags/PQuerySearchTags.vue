@@ -102,36 +102,52 @@ export default defineComponent<QuerySearchTagsProps>({
             return validatedTags;
         }, [...tags]);
 
-        const _tags = ref<QueryTag[]>(getConvertedQueryTags(props.tags as QueryItem[], []));
+        const _tags = ref<QueryTag[]>([]);
 
         const publicFunctions: QuerySearchTagsFunctions = {
             addTag(...queries: QueryItem[]) {
                 _tags.value = getConvertedQueryTags(queries, _tags.value);
                 emit('add', _tags.value);
                 emit('change', _tags.value);
+                emit('update:tags', _tags.value);
             },
             deleteTag(idx: number) {
                 _tags.value.splice(idx, 1);
                 emit('delete', _tags.value);
                 emit('delete:tag', _tags.value);
                 emit('change', _tags.value);
+                emit('update:tags', _tags.value);
             },
             deleteAllTags() {
                 _tags.value = [];
                 emit('delete', _tags.value);
                 emit('delete:all', _tags.value);
                 emit('change', _tags.value);
+                emit('update:tags', _tags.value);
             },
         };
 
-        emit('init', {
-            tags: _tags.value,
-            timezone: timezone.value,
-        } as QuerySearchTagsProps);
+        const isTagsSame = (tagsA: QueryTag[], tagsB: QueryTag[]) => {
+            if (tagsA.length !== tagsB.length) return false;
+            return tagsA.map(d => d.value.name).toString() === tagsB.map(d => d.value.name).toString();
+        };
 
         watch(() => props.tags, (tags) => {
-            _tags.value = getConvertedQueryTags(tags, []);
+            if (tags !== _tags.value) {
+                _tags.value = getConvertedQueryTags(tags, []);
+            }
+        }, { immediate: true });
+
+        watch([() => converter.value, () => validator.value, () => timezone.value], () => {
+            _tags.value = getConvertedQueryTags(_tags.value, []);
         });
+
+        watch(() => _tags.value, (tags, prevTags) => {
+            if (prevTags && !isTagsSame(tags, prevTags)) {
+                emit('change', tags);
+                emit('update:tags', tags);
+            }
+        }, { immediate: true });
 
         return {
             _tags,

@@ -20,7 +20,6 @@
                        :query-tags.sync="proxyState.queryTags"
                        :search-text.sync="proxyState.searchText"
                        :timezone="timezone"
-                       @init-tags="emitInitTags"
                        @change="emitChange"
                        @export="$emit('export')"
                        @refresh="$emit('refresh')"
@@ -78,7 +77,6 @@ import type { ToolboxTableOptions, ToolboxTableProps } from '@/data-display/tabl
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import PToolbox from '@/navigation/toolbox/PToolbox.vue';
-import type { ToolboxOptions } from '@/navigation/toolbox/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
 
@@ -269,14 +267,6 @@ export default defineComponent<ToolboxTableProps>({
             emitChange({ sortBy, sortDesc });
         };
 
-        const emitInitTags = (options: Required<ToolboxOptions>) => {
-            emit('init-tags', {
-                ...options,
-                sortBy: proxyState.sortBy,
-                sortDesc: proxyState.sortDesc,
-            });
-        };
-
         const checkSelectIndex = () => {
             if (!Array.isArray(props.items)) return;
             const selectIndex: number[] = [];
@@ -299,7 +289,6 @@ export default defineComponent<ToolboxTableProps>({
         return {
             proxyState,
             changeSort,
-            emitInitTags,
             emitChange,
         };
     },

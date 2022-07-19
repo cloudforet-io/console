@@ -68,7 +68,6 @@ export { default as PDynamicField } from './data-display/dynamic/dynamic-field/P
 export { default as PDynamicLayout } from './data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
 export { default as PJsonSchemaForm } from './inputs/forms/json-schema-form/PJsonSchemaForm.vue';
 export { default as PHorizontalLayout } from './layouts/horizontal-layout/PHorizontalLayout.vue';
-export { default as PSearchGridLayout } from './others/deprecated/search-grid-layout/PSearchGridLayout.vue';
 export { default as PToolboxGridLayout } from './others/deprecated/toolbox-grid-layout/PToolboxGridLayout.vue';
 export { default as PVerticalLayout } from './layouts/vertical-layout/PVerticalLayout.vue';
 export { default as PWidgetLayout } from './others/deprecated/widget-layout/PWidgetLayout.vue';

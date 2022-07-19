@@ -49,7 +49,6 @@ export const Template = (args, { argTypes }) => ({
         @export="onExport"
         @refresh="onRefresh"
         @click-settings="onClickSettings"
-        @init-tags="onInitTags"
     >
         <template v-if="leftAreaSlot" #left-area>
             <span v-html="leftAreaSlot"/>
