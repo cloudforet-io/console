@@ -1,3 +1,15 @@
+# [1.1.0-beta.353](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.352...v1.1.0-beta.353) (2022-07-19)
+
+
+### Bug Fixes
+
+* **toolbox:** make use value label when initiating query tags ([5cfc586](https://github.com/spaceone-dev/spaceone-design-system/commit/5cfc586893efa0872a4433f88e89954a1fc8ded9))
+
+
+### Features
+
+* **query search:** make only !. != operators available in null case ([d4c0d4a](https://github.com/spaceone-dev/spaceone-design-system/commit/d4c0d4a712b80c5d84682a9b9b0101dc709e4687))
+
 # [1.1.0-beta.352](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.351...v1.1.0-beta.352) (2022-07-19)
 
 
