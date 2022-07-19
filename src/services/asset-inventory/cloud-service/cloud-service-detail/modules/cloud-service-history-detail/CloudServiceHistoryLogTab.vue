@@ -279,6 +279,9 @@ export default defineComponent<Props>({
     .p-toolbox {
         padding-top: 0;
     }
+    .table-container {
+        max-height: 45vh;
+    }
 }
 .filter {
     @apply flex items-center items-end flex-wrap gap-4;
@@ -303,9 +306,4 @@ export default defineComponent<Props>({
     }
 }
 
-@screen tablet {
-    .cloud-service-history-log-tab {
-        height: 30rem;
-    }
-}
 </style>
