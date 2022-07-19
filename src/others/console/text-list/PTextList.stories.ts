@@ -2,11 +2,11 @@ import {
     toRefs, reactive,
 } from '@vue/composition-api';
 
+import { faker } from '@faker-js/faker';
 import {
     text, object, array, withKnobs,
 } from '@storybook/addon-knobs';
 
-import casual, { arrayOf } from '@/util/casual';
 
 import PTextList from './PTextList.vue';
 
@@ -96,10 +96,10 @@ export const objectArray = () => ({
     components: { PTextList },
     props: {
         items: {
-            default: object('items', arrayOf(10, () => ({
-                name: casual.name,
-                phone: casual.phone,
-                group: casual.random_element([undefined, casual.word]),
+            default: object('items', faker.datatype.array(10).map(() => ({
+                name: faker.name.firstName(),
+                phone: faker.phone.number(),
+                group: faker.helpers.arrayElement([undefined, faker.random.word()]),
             }))),
         },
         delimiter: {
@@ -136,10 +136,10 @@ export const defaultSlot = () => ({
     components: { PTextList },
     props: {
         items: {
-            default: object('items', arrayOf(10, () => ({
-                name: casual.name,
-                phone: casual.phone,
-                group: casual.random_element([undefined, casual.word]),
+            default: object('items', faker.datatype.array(10).map(() => ({
+                name: faker.name.firstName(),
+                phone: faker.phone.number(),
+                group: faker.helpers.arrayElement([undefined, faker.random.word()]),
             }))),
         },
         delimiter: {
