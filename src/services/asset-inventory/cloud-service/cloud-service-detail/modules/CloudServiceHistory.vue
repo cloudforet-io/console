@@ -41,7 +41,7 @@
                                 <div class="key-wrapper">
                                     {{ diffItem.key }}
                                 </div>
-                                <div v-if="item.action === 'UPDATE'" class="value-wrapper">
+                                <div v-if="item.action === 'UPDATE' && diffItem.changedValue" class="value-wrapper">
                                     {{ getConvertedChangedValue(diffItem.changedValue) }}
                                 </div>
                             </div>
