@@ -1,3 +1,16 @@
+# [1.1.0-beta.354](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.353...v1.1.0-beta.354) (2022-07-19)
+
+
+### Bug Fixes
+
+* **query search:** refine tags when props change and support sync ([a28ecdc](https://github.com/spaceone-dev/spaceone-design-system/commit/a28ecdc3c9fd978b846f8a8454ab60ed32187442))
+
+
+### Features
+
+* **query search grid layout:** remove component ([2308c48](https://github.com/spaceone-dev/spaceone-design-system/commit/2308c4876a0f454f5c36bcc777165862a0d5d2f3))
+* **query search, toolbox, toolbox table:** remove init, init-tags event ([726ae7b](https://github.com/spaceone-dev/spaceone-design-system/commit/726ae7b28dd0ce179383a68748627b386d76831a))
+
 # [1.1.0-beta.353](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.352...v1.1.0-beta.353) (2022-07-19)
 
 
