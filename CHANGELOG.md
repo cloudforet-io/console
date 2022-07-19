@@ -1,3 +1,11 @@
+# [1.1.0-beta.352](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.351...v1.1.0-beta.352) (2022-07-19)
+
+
+### Features
+
+* **icon:** update code collapse, expand icons ([13ec940](https://github.com/spaceone-dev/spaceone-design-system/commit/13ec940ba2cd3985fe3a5fdb8fa70daae902fed7))
+* **lottie:** add lottie_initializing ([d28370e](https://github.com/spaceone-dev/spaceone-design-system/commit/d28370ec102da7881ec42e5e964a8939536339d2))
+
 # [1.1.0-beta.351](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.350...v1.1.0-beta.351) (2022-07-18)
 
 
