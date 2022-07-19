@@ -298,9 +298,10 @@ export default defineComponent<ToolboxProps>({
             const queryTags = props.queryTags ? props.queryTags.map((queryTag: QueryItem) => {
                 const { key, value } = queryTag;
                 if (!key || !value) return queryTag;
+                const valueSetLabel = state.valueSetMap[key.name]?.label;
                 return {
                     ...queryTag,
-                    value: { ...value, label: (state.valueSetMap[key.name]) ? state.valueSetMap[key.name][value.name]?.label : value.name },
+                    value: { ...value, label: valueSetLabel ?? value.label ?? value.name },
                 };
             }) : [];
             setQueryTags(queryTags);
