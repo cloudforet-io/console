@@ -150,6 +150,7 @@ export default defineComponent({
                     border-bottom-right-radius: 0;
                 }
                 .p-context-menu {
+                    height: 100%;
                     border: none;
                 }
             }
@@ -230,7 +231,7 @@ export default defineComponent({
                     }
                     .body {
                         @apply border-gray-200 rounded-bl-md;
-                        height: 40rem;
+                        height: 33rem;
                         border-left-width: 1px;
                     }
                     .cloud-service-history-changes-code-header-wrapper {

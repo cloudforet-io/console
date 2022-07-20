@@ -33,7 +33,7 @@
                 >
                     <template v-if="item.diffItems && item.diffItems.length" #timeline-detail>
                         <div class="timeline-content-wrapper">
-                            <div v-for="(diffItem, kIdx) in item.diffItems"
+                            <div v-for="(diffItem, kIdx) in item.diffItems.slice(0, DIFF_ITEM_LIMIT)"
                                  :key="`key-value-item-${diffItem.key}-${kIdx}`"
                                  class="key-value-item"
                                  @click="handleClickKey(diffItem.key)"
@@ -165,7 +165,7 @@ export default {
             date: data.created_at,
             title: HISTORY_ACTION_MAP[data.action].label,
             action: data.action,
-            diffItems: data.diff.slice(0, DIFF_ITEM_LIMIT).map(d => ({
+            diffItems: data.diff.map(d => ({
                 key: d.key,
                 previousValue: d.before,
                 changedValue: d.after,
