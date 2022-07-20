@@ -173,8 +173,8 @@ export default defineComponent({
                     }
                 }
                 .body {
+                    @apply border-l-0;
                     border-bottom-left-radius: 0;
-                    border-left: 0;
                     height: calc(100% - 2.25rem);
                     padding: 0;
                 }
@@ -222,7 +222,9 @@ export default defineComponent({
                         border-top: none;
                     }
                     .body {
+                        @apply border-gray-200 rounded-bl-md;
                         height: 40rem;
+                        border-left-width: 1px;
                     }
                     .cloud-service-history-changes-code-header-wrapper {
                         @apply w-full align-middle flex-col gap-1;

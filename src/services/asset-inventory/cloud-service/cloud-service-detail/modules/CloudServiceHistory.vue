@@ -63,7 +63,6 @@
                                                   :total-count="totalCount"
                                                   :provider="provider"
                                                   :cloud-service-id="cloudServiceId"
-                                                  @close="handleCloseOverlay"
                                                   @load-more="handleLoadMore"
             />
         </transition>
@@ -71,8 +70,9 @@
 </template>
 
 <script lang="ts">
+import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    computed, onMounted, reactive, toRefs, watch,
+    computed, getCurrentInstance, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import type { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
@@ -89,6 +89,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import localeData from 'dayjs/plugin/localeData';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
@@ -103,6 +104,7 @@ import type { CloudServiceHistoryItem } from '@/services/asset-inventory/cloud-s
 import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
 
+const HISTORY_OVERLAY_HASH_NAME = 'history-detail';
 const DIFF_ITEM_LIMIT = 10;
 dayjs.extend(localeData);
 
@@ -129,6 +131,7 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             loading: true,
             timelineWrapperRef: null as null | HTMLElement,
@@ -138,7 +141,7 @@ export default {
             items: [] as CloudServiceHistoryItem[],
             selectedHistoryItem: undefined as undefined | CloudServiceHistoryItem,
             selectedKeyName: undefined as undefined | string,
-            showDetailOverlay: false,
+            showDetailOverlay: computed(() => vm.$route.hash === `#${HISTORY_OVERLAY_HASH_NAME}`),
             totalCount: 0,
             pageStart: 1,
             searchText: '',
@@ -233,13 +236,10 @@ export default {
         /* Event */
         const handleClickTimeline = (item: CloudServiceHistoryItem) => {
             state.selectedHistoryItem = item;
-            state.showDetailOverlay = true;
+            SpaceRouter.router.push({ hash: HISTORY_OVERLAY_HASH_NAME });
         };
         const handleClickKey = (keyName: string) => {
             state.selectedKeyName = keyName;
-        };
-        const handleCloseOverlay = () => {
-            state.showDetailOverlay = false;
         };
         const handleChange = async (options: ToolboxOptions = {}) => {
             setApiQueryWithToolboxOptions(apiQueryHelper, options);
@@ -281,7 +281,6 @@ export default {
             getTimelineColor,
             getConvertedChangedValue,
             handleClickTimeline,
-            handleCloseOverlay,
             handleChange,
             handleLoadMore,
             handleClickKey,

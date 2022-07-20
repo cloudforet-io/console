@@ -1,7 +1,16 @@
 <template>
     <div class="cloud-service-history-detail-overlay">
         <p-pane-layout class="page-wrapper">
-            <p-page-title :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')" child @goBack="handleGoBack" />
+            <p-page-title :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')" child @goBack="$router.go(-1)">
+                <template #title-right-extra>
+                    <div class="title-right-extra">
+                        <span class="label-text">ID: </span>
+                        <p-copy-button>
+                            {{ cloudServiceId }}
+                        </p-copy-button>
+                    </div>
+                </template>
+            </p-page-title>
             <div class="content-wrapper">
                 <div class="left-part">
                     <div class="title-wrapper">
@@ -65,7 +74,7 @@ import {
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
-    PPaneLayout, PPageTitle, PTab, PLottie,
+    PPaneLayout, PPageTitle, PTab, PLottie, PCopyButton,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { useInfiniteScroll } from '@vueuse/core';
@@ -111,6 +120,7 @@ export default defineComponent<Props>({
         PTab,
         CloudServiceHistoryDetailNote,
         PLottie,
+        PCopyButton,
     },
     props: {
         loading: {
@@ -162,10 +172,6 @@ export default defineComponent<Props>({
         const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
 
         /* Event */
-        const handleGoBack = () => {
-            // todo: hash 값으로 이동하도록 수정
-            emit('close');
-        };
         const handleClickTimeline = (selectedItem: SelectedCloudServiceHistoryItem) => {
             state.proxySelectedHistoryItem = selectedItem.cur;
             state.selectedPrevHistoryRecordDate = selectedItem.prev?.date;
@@ -192,7 +198,6 @@ export default defineComponent<Props>({
             ...toRefs(state),
             HISTORY_ACTION_MAP,
             getTimelineColor,
-            handleGoBack,
             handleClickTimeline,
             iso8601Formatter,
         };
@@ -223,11 +228,20 @@ export default defineComponent<Props>({
         border: none;
         flex-grow: 1;
 
-        .p-page-title {
+        .p-page-title::v-deep {
             height: 4rem;
-            padding-top: 1.5rem;
-            padding-left: 1.5rem;
+            padding: 1.5rem 1.5rem 0 1.5rem;
             margin: 0;
+            .title-right-extra {
+                display: flex;
+                align-items: center;
+                float: right;
+                font-size: 0.875rem;
+                .label-text {
+                    @apply text-gray-500;
+                    padding-right: 0.25rem;
+                }
+            }
         }
         .content-wrapper {
             @apply flex;
