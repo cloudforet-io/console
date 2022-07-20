@@ -68,7 +68,7 @@ export default {
 <style lang="postcss" scoped>
 .popover::v-deep {
     z-index: 99;
-    overflow: auto;
+    overflow-y: unset;
     .popper {
         z-index: 99;
         overflow: auto;

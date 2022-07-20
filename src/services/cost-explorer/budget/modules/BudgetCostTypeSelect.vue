@@ -7,6 +7,7 @@
     >
         <p-radio v-for="(costTypeLabel, costTypeKey) in costTypeItems" :key="costTypeKey"
                  :selected="selectedCostType" :value="costTypeKey"
+                 class="mr-4"
                  @change="setForm('selectedCostType', $event)"
         >
             {{ costTypeLabel }}
