@@ -7,6 +7,7 @@ import { makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandl
 import type { KeyItem, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 import type { Filter } from '@spaceone/console-core-lib/space-connector/type';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { debouncedWatch } from '@vueuse/core';
 
 import { store } from '@/store';
 
@@ -70,7 +71,7 @@ export function useQuerySearchPropsWithSearchSchema(
     searchSchema: ComputedRef<ConsoleSearchSchema[]>,
     resourceType: string,
     filters?: Filter[],
-): { keyItemSets: ComputedRef<KeyItemSet[]>, valueHandlerMap: ComputedRef<ValueHandlerMap> } {
+): { keyItemSets: ComputedRef<KeyItemSet[]>, valueHandlerMap: ComputedRef<ValueHandlerMap>, isAllLoaded: ComputedRef<boolean> } {
     (async () => {
         await store.dispatch('reference/loadAll');
     })();
@@ -88,8 +89,23 @@ export function useQuerySearchPropsWithSearchSchema(
         Protocol: computed(() => store.state.reference.protocol.items),
         Webhook: computed(() => store.state.reference.webhook.items),
     });
+
+    const state = reactive({
+        keyItemSets: [] as KeyItemSet[],
+    });
+
+
+    debouncedWatch([() => searchSchema.value, () => store.state.reference.isAllLoaded], (watchValue) => {
+        if (!watchValue) return;
+        const [schema, isAllLoaded] = watchValue;
+        if (isAllLoaded && schema.length) {
+            state.keyItemSets = getKeyItemSets(schema, storeState);
+        }
+    }, { immediate: true, debounce: 200 });
+
     return {
-        keyItemSets: computed(() => getKeyItemSets(searchSchema.value, storeState)),
+        isAllLoaded: computed(() => store.state.reference.isAllLoaded),
+        keyItemSets: computed(() => state.keyItemSets),
         valueHandlerMap: computed(() => getValueHandlerMap(searchSchema.value, resourceType, filters)),
     };
 }

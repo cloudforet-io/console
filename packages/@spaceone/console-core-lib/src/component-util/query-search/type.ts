@@ -34,6 +34,7 @@ export interface KeyItem {
     dataType?: KeyDataType;
     operators?: OperatorType[];
     reference?: string;
+    valueSet?: Record<string, ValueItem>
 }
 
 export interface QueryItem {

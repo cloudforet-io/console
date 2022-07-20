@@ -30,10 +30,20 @@
                                       :options="tableState.schema.options"
                                       :data="tableState.items"
                                       :fetch-options="fetchOptionState"
-                                      :type-options="typeOptionState"
+                                      :type-options="{
+                                          loading: typeOptionState.loading,
+                                          totalCount: typeOptionState.totalCount,
+                                          timezone: typeOptionState.timezone,
+                                          selectIndex: typeOptionState.selectIndex,
+                                          selectable: true,
+                                          colCopy: false,
+                                          settingsVisible: true,
+                                          keyItemSets: keyItemSets,
+                                          valueHandlerMap: valueHandlerMap
+                                      }"
                                       :style="{height: `${height}px`}"
                                       :field-handler="fieldHandler"
-                                      @fetch="fetchTableData"
+                                      @fetch="handleDynamicLayoutFetch"
                                       @select="handleSelect"
                                       @export="exportCloudServiceData"
                                       @click-settings="handleClickSettings"
@@ -156,6 +166,7 @@ import type {
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import { debouncedWatch } from '@vueuse/core';
 import dayjs from 'dayjs';
 import { isEmpty, get } from 'lodash';
 import type { TranslateResult } from 'vue-i18n';
@@ -252,9 +263,8 @@ export default {
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [] as number[],
-            selectable: true,
-            colCopy: false,
-            settingsVisible: true,
+            keyItemSets: computed(() => keyItemSets.value),
+            valueHandlerMap: computed(() => valueHandlerMap.value),
         });
 
         const tableHeight = store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX) ?? 0;
@@ -282,8 +292,9 @@ export default {
             visibleCustomFieldModal: false,
             searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
         });
+
         const schemaQueryHelper = new QueryHelper();
-        const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
+        const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSearchSchema(
             computed(() => tableState.schema?.options?.search ?? []),
             'inventory.CloudService',
             schemaQueryHelper.setFilters([
@@ -418,6 +429,11 @@ export default {
             typeOptionState.selectIndex = [];
         };
 
+        const handleDynamicLayoutFetch = (changed) => {
+            if (tableState.schema === null || !isAllLoaded.value) return;
+            fetchTableData(changed);
+        };
+
 
         const replaceQueryHelper = new QueryHelper();
         watch(() => tableState.searchFilters, (searchFilters) => {
@@ -531,15 +547,16 @@ export default {
         const checkIsEmpty = data => isEmpty(data);
 
         /* Watchers */
-        watch([() => props.group, () => props.name], async () => {
-            if (!props.name) return;
-            tableState.schema = await getTableSchema();
-            await fetchTableData();
-        }, { immediate: true });
         watch(() => keyItemSets.value, (after) => {
             // initiate queryTags with keyItemSets
             fetchOptionState.queryTags = queryHelper.setKeyItemSets(after).queryTags;
-        });
+        }, { immediate: true });
+        debouncedWatch([() => props.group, () => props.name], async () => {
+            if (!props.name) return;
+            tableState.schema = await getTableSchema();
+            await fetchTableData();
+        }, { immediate: true, debounce: 200 });
+
 
         return {
             /* Sidebar */
@@ -547,12 +564,14 @@ export default {
             /* Main Table */
             tableState,
             fetchOptionState,
-            typeOptionState: Object.assign(typeOptionState, { keyItemSets, valueHandlerMap }),
+            typeOptionState,
             checkTableModalState,
+            keyItemSets,
+            valueHandlerMap,
             handleTableHeightChange,
             handleSelect,
             exportCloudServiceData,
-            fetchTableData,
+            handleDynamicLayoutFetch,
             fieldHandler,
             reloadTable,
             handleClickSettings,
