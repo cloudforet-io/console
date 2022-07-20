@@ -23,14 +23,9 @@
             </div>
         </template>
         <template #extra>
-            <p-anchor :to="getViewQueryLink()"
-                      :icon-visible="false"
-                      class="btn-view-query"
-            >
-                <p-button style-type="primary1">
-                    <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.VIEW_QUERY') }}</span>
-                </p-button>
-            </p-anchor>
+            <p-button style-type="primary1" class="view-query-button" @click="handleClickViewQuery">
+                <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.VIEW_QUERY') }}</span>
+            </p-button>
         </template>
     </cost-dashboard-customize-widget-preview>
 </template>
@@ -39,11 +34,12 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PButton, PAnchor, PLabel,
+    PButton, PLabel,
 } from '@spaceone/design-system';
 import { capitalize } from 'lodash';
+import type { Location } from 'vue-router/types/router';
 
-
+import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -64,7 +60,6 @@ export default {
     components: {
         CostDashboardCustomizeWidgetPreview,
         PButton,
-        PAnchor,
         PLabel,
     },
     props: {
@@ -105,7 +100,7 @@ export default {
 
         /* Util */
         const getGranularityText = granularity => capitalize(granularity);
-        const getViewQueryLink = () => {
+        const _getViewQueryLink = (): Location => {
             const queryId = props.selectedItem?.cost_query_set_id;
             if (queryId) {
                 return {
@@ -125,12 +120,18 @@ export default {
             };
         };
 
+        /* Event */
+        const handleClickViewQuery = () => {
+            const route = SpaceRouter.router.resolve(_getViewQueryLink());
+            window.open(route.href, '_blank');
+        };
+
         return {
             ...toRefs(state),
             LAYOUT,
             COST_EXPLORER_ROUTE,
             getGranularityText,
-            getViewQueryLink,
+            handleClickViewQuery,
         };
     },
 };
@@ -139,10 +140,7 @@ export default {
 .p-label {
     @apply mb-0 mr-2;
 }
-.btn-view-query {
+.view-query-button {
     @apply mt-2 ml-auto mr-auto;
-    &:hover::v-deep .text {
-        text-decoration: none;
-    }
 }
 </style>

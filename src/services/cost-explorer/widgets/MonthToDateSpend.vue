@@ -138,8 +138,8 @@ export default defineComponent<WidgetProps>({
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         period: objectToQueryString({
-                            start: state.currentMonth.format('YYYY-MM'),
-                            end: state.currentMonth.format('YYYY-MM'),
+                            start: state.currentMonth.startOf('month').format('YYYY-MM-DD'),
+                            end: state.currentMonth.endOf('month').format('YYYY-MM-DD'),
                         }),
                     },
                 };

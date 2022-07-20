@@ -3,14 +3,10 @@
         <div class="title-wrapper">
             <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.COST_ANALYSIS_QUERY') }}</p-label>
             <template v-if="!loading && costQuerySetList.length">
-                <p-icon-button name="ic_refresh" @click="handleRefresh" />
-                <p-anchor :to="{ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME }"
-                          :icon-visible="false"
-                >
-                    <p-button style-type="primary1" icon="ic_plus_bold">
-                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}
-                    </p-button>
-                </p-anchor>
+                <p-icon-button name="ic_refresh" class="refresh-button" @click="handleRefresh" />
+                <p-button style-type="primary1" icon="ic_plus_bold" @click="handleClickCreateQuery">
+                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}
+                </p-button>
             </template>
         </div>
         <div class="content-wrapper">
@@ -39,14 +35,9 @@
                     <p class="help-text">
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_SAVED_QUERY_HELP_TEXT') }}
                     </p>
-                    <p-anchor :to="{ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME }"
-                              :icon-visible="false"
-                              class="btn-add-query"
-                    >
-                        <p-button style-type="primary1" icon="ic_plus_bold">
-                            <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}</span>
-                        </p-button>
-                    </p-anchor>
+                    <p-button style-type="primary1" icon="ic_plus_bold" @click="handleClickCreateQuery">
+                        <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}</span>
+                    </p-button>
                 </template>
             </p-data-loader>
         </div>
@@ -58,9 +49,10 @@ import { reactive, toRefs } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PAnchor, PDataLoader, PIconButton, PButton, PLabel,
+    PDataLoader, PIconButton, PButton, PLabel,
 } from '@spaceone/design-system';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import { getUUID } from '@/lib/component-util/getUUID';
@@ -81,7 +73,6 @@ export default {
     components: {
         PIconButton,
         PButton,
-        PAnchor,
         PDataLoader,
         PLabel,
     },
@@ -148,6 +139,10 @@ export default {
         const handleClickQueryItem = (query: CostQuerySetModel) => {
             emit('update:selected-query', query);
         };
+        const handleClickCreateQuery = () => {
+            const route = SpaceRouter.router.resolve({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME });
+            window.open(route.href, '_blank');
+        };
 
         /* Init */
         (() => {
@@ -160,6 +155,7 @@ export default {
             handleRefresh,
             handleClickQueryItem,
             handleAddToCustomWidget,
+            handleClickCreateQuery,
         };
     },
 };
@@ -172,6 +168,9 @@ export default {
 
     .title-wrapper {
         @apply flex items-center;
+        .refresh-button {
+            margin-right: 1rem;
+        }
         .p-label {
             @apply mr-auto;
         }
