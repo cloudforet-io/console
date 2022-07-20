@@ -164,6 +164,7 @@ export default {
             position: relative;
             .cost-type-content {
                 @apply truncate;
+                max-width: calc(100% - 4rem);
                 font-size: 0.875rem;
                 line-height: 130%;
             }

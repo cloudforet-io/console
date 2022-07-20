@@ -151,8 +151,9 @@ export default {
 
         const checkDeleteState = reactive({
             visible: false,
+            // song-lang
             headerTitle: 'Are you sure you want to delete the budget notifications?',
-            loading: true,
+            loading: false,
         });
         const handleDelete = () => {
             checkDeleteState.visible = true;
