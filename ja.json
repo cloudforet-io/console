@@ -752,6 +752,7 @@
 		"ERROR": {
 			"404_GO_BACK_1": "前のページに戻る",
 			"404_MSG": "内容が見つかりません",
+			"GO_BACK": "",
 			"NO_RESOURCE_GO_MAIN": "",
 			"NO_RESOURCE_MSG": "リソースが見つかりません",
 			"NO_RESOURCE_TITLE": "リソースがありません。"
