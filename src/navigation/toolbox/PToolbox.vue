@@ -82,10 +82,11 @@ import { useProxyValue } from '@/hooks/proxy-state';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
+import { defaultConverter } from '@/inputs/search/query-search-tags/helper';
 import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
 import type { QueryTag } from '@/inputs/search/query-search-tags/type';
 import PQuerySearch from '@/inputs/search/query-search/PQuerySearch.vue';
-import type { QueryItem } from '@/inputs/search/query-search/type';
+import type { QueryItem, ValueSet } from '@/inputs/search/query-search/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
 import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
@@ -180,7 +181,7 @@ export default defineComponent<ToolboxProps>({
         },
         queryTags: {
             type: Array,
-            default: undefined,
+            default: () => [],
         },
         searchText: {
             type: String,
@@ -213,8 +214,8 @@ export default defineComponent<ToolboxProps>({
                 }));
             }),
             selectedSortBy: computed(() => ((sortByOptionsData && props.sortable) ? sortByOptionsData[proxyState.sortBy][0]?.label : proxyState.sortBy)),
-            valueSetMap: computed(() => {
-                const valueSetMap = {};
+            valueSetMap: computed<Record<string, ValueSet>>(() => {
+                const valueSetMap: Record<string, ValueSet> = {};
                 (props.keyItemSets ?? []).forEach(keyItemSet => keyItemSet.items.forEach((item) => {
                     if (item.valueSet) valueSetMap[item.name] = item.valueSet;
                 }));
@@ -224,12 +225,14 @@ export default defineComponent<ToolboxProps>({
                 const valueSetMap = state.valueSetMap;
                 return (queryTag: QueryItem) => {
                     const { key, value } = queryTag;
-                    if (!key || !value) return queryTag;
-                    const valueSetLabel = valueSetMap[key.name]?.label;
-                    return {
-                        ...queryTag,
-                        value: { ...value, label: valueSetLabel ?? value.label ?? value.name },
-                    };
+                    if (key && value && valueSetMap[key.name]) {
+                        const valueLabel = valueSetMap[key.name]?.[value.name]?.label;
+                        return {
+                            ...queryTag,
+                            value: { ...value, label: valueLabel ?? value.label ?? value.name },
+                        };
+                    }
+                    return defaultConverter(queryTag, props.timezone);
                 };
             }),
         });
