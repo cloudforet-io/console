@@ -1,60 +1,72 @@
 <template>
     <section class="page-wrapper">
-        <div class="error-wrapper">
-            <article class="error-contents">
-                <p-lottie name="lottie_whoops" class="error-img"
-                          auto
-                          :size="16"
-                />
-                <h2 class="error-code">
-                    404
-                </h2>
-                <h3 class="error-message">
-                    {{ $t('COMMON.ERROR.404_MSG') }}
-                </h3>
-            </article>
-        </div>
-        <footer><img src="@/assets/images/SpaceONE_logo_bottom.png" class="footer-img"></footer>
+        <article class="error-contents">
+            <img class="error-img" src="@/assets/images/error/error-octos.gif">
+            <h2 class="error-code">
+                404
+            </h2>
+            <h3 class="error-message">
+                {{ $t('COMMON.ERROR.404_MSG') }}
+            </h3>
+            <p-button class="go-back-button" style-type="primary-dark" size="md"
+                      @click="$router.go(-1)"
+            >
+                {{ $t('COMMON.ERROR.GO_BACK') }}
+            </p-button>
+        </article>
     </section>
 </template>
 
 <script>
-import { PLottie } from '@spaceone/design-system';
+import { PButton } from '@spaceone/design-system';
 
 export default {
     name: 'ErrorPage',
-    components: { PLottie },
+    components: { PButton },
 };
 </script>
 
 
 <style lang="postcss" scoped>
 .page-wrapper {
-    @apply m-auto flex min-h-screen flex-col;
-}
+    @apply bg-gray-100;
+    display: flex;
+    height: 100%;
 
-.error-wrapper {
-    @apply flex-1 text-center;
     .error-contents {
-        padding-top: calc(70% - 2.5rem);
+        text-align: center;
+        margin: auto;
         .error-img {
             @apply mx-auto align-middle;
+            width: 20rem;
+            padding-bottom: 3.5rem;
         }
         .error-code {
-            @apply font-bold text-6xl text-primary pb-4;
-            line-height: 120%;
+            @apply text-primary1;
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1.25;
+            padding-bottom: 0.5rem;
         }
         .error-message {
-            @apply text-lg;
+            @apply text-gray-500;
+            font-size: 1rem;
             line-height: 150%;
-            a {
-                @apply text-blue-700;
-            }
+            padding-bottom: 2.25rem;
+        }
+        .go-back-button {
+            height: 2.5rem;
         }
     }
 }
 
-.footer-img {
-    @apply mx-auto w-24 align-middle pb-8;
+@screen mobile {
+    .page-wrapper {
+        .error-contents {
+            .error-img {
+                width: 60%;
+            }
+        }
+    }
 }
 </style>
