@@ -88,7 +88,7 @@ const converterMap: Record<KeyDataType, QueryTagConverter> = {
     object: objectConverter,
 };
 
-const defaultConverter = (query: QueryItem, timezone: string): QueryTag => {
+const defaultConverter = (query: QueryItem, timezone = 'UTC'): QueryTag => {
     if (query.key?.dataType) {
         const converter = converterMap[query.key.dataType];
         if (converter) return converter(query, timezone);

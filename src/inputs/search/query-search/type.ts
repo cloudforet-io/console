@@ -25,10 +25,12 @@ export interface ValueItem {
     name: any;
 }
 
+export type ValueSet = Record<string, ValueItem>
+
 export interface KeyItem {
     label: string;
     name: any;
-    valueSet?: Record<string, ValueItem>;
+    valueSet?: ValueSet;
     dataType?: KeyDataType;
     operators?: OperatorType[];
 }
