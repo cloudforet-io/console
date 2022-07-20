@@ -21,13 +21,13 @@
                     <template #header>
                         <div class="cloud-service-history-changes-code-header-wrapper">
                             <div>
-                                <span v-for="(key, index) in selectedKeyMenu.split('.')" :key="index">
+                                <span v-for="(path, index) in selectedKeyPath.split('.')" :key="index">
                                     <span class="text-gray-500">
                                         <p-i v-if="selectedKeyMenu && index !== 0" name="ic_arrow_right" color="inherit"
                                              scale="0.7"
                                         />
                                     </span>
-                                    <span>{{ key }}</span>
+                                    <span>{{ path }}</span>
                                 </span>
                             </div>
                             <p-i width="1rem" height="1rem" :name="folding ? 'ic_code-expand' : 'ic_code-collapse'"
@@ -85,12 +85,15 @@ export default defineComponent({
     },
     setup(props) {
         const state = reactive({
-            keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map(d => ({ label: d.key, name: d.key, updateType: d.type })) ?? []),
+            keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map(data => ({
+                label: data.key, name: data.key, updateType: data.type, path: data.path,
+            })) ?? []),
             selectedKeyMenu: props.selectedKeyName || props.selectedHistoryItem?.diffItems?.at(0)?.key || '',
-            changesCount: computed(() => props.selectedHistoryItem?.diffCount ?? 0),
+            selectedKeyPath: props.selectedHistoryItem?.diffItems?.at(0)?.path || '',
             filteredDiffItem: computed(() => props.selectedHistoryItem?.diffItems?.filter(d => d.key === state.selectedKeyMenu) ?? []),
             previousValue: computed(() => valueConverter(state.filteredDiffItem[0]?.previousValue)),
             changedValue: computed(() => valueConverter(state.filteredDiffItem[0]?.changedValue)),
+            changesCount: computed(() => props.selectedHistoryItem?.diffCount ?? 0),
             folding: false,
         });
 
@@ -108,7 +111,10 @@ export default defineComponent({
             return undefined;
         };
 
-        const handleSelect = (menu) => { state.selectedKeyMenu = menu.label; };
+        const handleSelect = (menu) => {
+            state.selectedKeyMenu = menu.label;
+            state.selectedKeyPath = menu.path;
+        };
 
         const handleCodeDisplayType = () => { state.folding = !state.folding; };
 

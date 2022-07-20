@@ -29,6 +29,7 @@ export const HISTORY_ACTION_MAP = {
 } as const;
 export interface DiffItem {
     key: string;
+    path: string;
     previousValue?: any;
     changedValue: any;
     type: string;
