@@ -8,8 +8,7 @@ export interface Metric {
         x: string;
         y: string;
     };
-    chart_type: string;
-    chart_options: any;
+    metric_query: any;
 }
 
 export interface MonitoringResourceType {
@@ -20,7 +19,6 @@ export interface MonitoringResourceType {
 
 export interface MonitoringProps {
     loading?: boolean;
-    resourceType: string;
     resources: MonitoringResourceType[];
     selectedMetrics?: Metric[];
     dataSourceId?: string;

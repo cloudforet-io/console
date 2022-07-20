@@ -144,10 +144,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        resourceType: {
-            type: String,
-            default: null,
-        },
         resources: {
             type: Array,
             default: () => [],
@@ -228,16 +224,11 @@ export default {
                     query: apiQuery.data,
                 });
                 state.dataTools = chain(res.results)
-                    .map((d) => {
-                        if (d.plugin_info.metadata.supported_resource_type.some(t => props.resourceType === t)) {
-                            return {
-                                id: d.data_source_id,
-                                name: d.name,
-                                statisticsTypes: get(d, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.AVERAGE]),
-                            };
-                        }
-                        return undefined;
-                    }).compact().uniqBy('id')
+                    .map(d => ({
+                        id: d.data_source_id,
+                        name: d.name,
+                        statisticsTypes: get(d, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.AVERAGE]),
+                    })).compact().uniqBy('id')
                     .value();
                 if (state.dataTools.length > 0) {
                     state.selectedToolId = state.dataTools[0].id;
@@ -249,6 +240,7 @@ export default {
         };
         let resourceToken: CancelTokenSource | undefined;
         const listMetrics = async () => {
+            if (!state.selectedToolId) return;
             if (resourceToken) {
                 resourceToken.cancel('Next request has been called.');
                 resourceToken = undefined;
@@ -258,7 +250,6 @@ export default {
                 state.metrics = [];
 
                 const res = await SpaceConnector.client.monitoring.metric.list({
-                    resource_type: props.resourceType,
                     data_source_id: state.selectedToolId,
                     resources: props.resources.map(d => d.id),
                 }, {
@@ -293,11 +284,10 @@ export default {
                 data.loading = true;
                 const res = await SpaceConnector.client.monitoring.metric.getData({
                     data_source_id: state.selectedToolId,
-                    resource_type: props.resourceType,
+                    metric_query: data.metric.metric_query,
                     stat: state.selectedStat,
                     end: dayjs.utc().toISOString(),
                     start: dayjs.utc().subtract(TIME_RANGE[state.selectedTimeRange], 'hour').toISOString(),
-                    resources: state.availableResources.map(d => d.id),
                     metric: data.metric.key,
                 });
                 data.labels = res.labels;

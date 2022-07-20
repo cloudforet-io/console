@@ -85,9 +85,7 @@
                 <cloud-service-history :cloud-service-id="tableState.selectedCloudServiceIds[0]" :provider="provider" />
             </template>
             <template #monitoring>
-                <monitoring :resource-type="monitoringState.resourceType"
-                            :resources="monitoringState.resources"
-                />
+                <monitoring :resources="monitoringState.resources" />
             </template>
         </p-tab>
         <p-tab v-else-if="typeOptionState.selectIndex.length > 1"
@@ -106,9 +104,7 @@
                 />
             </template>
             <template #monitoring>
-                <monitoring :resource-type="monitoringState.resourceType"
-                            :resources="monitoringState.resources"
-                />
+                <monitoring :resources="monitoringState.resources" />
             </template>
         </p-tab>
         <p-empty v-else style="height: auto; margin-top: 4rem;">
