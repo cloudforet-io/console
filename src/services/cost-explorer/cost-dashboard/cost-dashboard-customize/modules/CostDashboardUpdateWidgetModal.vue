@@ -89,3 +89,11 @@ export default defineComponent<Props>({
     },
 });
 </script>
+
+<style lang="postcss" scoped>
+.p-button-modal::v-deep {
+    .modal-body {
+        overflow: unset;
+    }
+}
+</style>
