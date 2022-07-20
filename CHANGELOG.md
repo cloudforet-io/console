@@ -1,3 +1,11 @@
+# [1.1.0-beta.355](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.354...v1.1.0-beta.355) (2022-07-20)
+
+
+### Bug Fixes
+
+* **query search tags:** do not watch array directly ([0205ee4](https://github.com/spaceone-dev/spaceone-design-system/commit/0205ee49275447d3b9bf4f77e1b2187b13dd770f))
+* **toolbox:** use default converter if value set is not exist ([a3b98a6](https://github.com/spaceone-dev/spaceone-design-system/commit/a3b98a67004d84384d545df02d22107c6531ba0a))
+
 # [1.1.0-beta.354](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.353...v1.1.0-beta.354) (2022-07-19)
 
 
