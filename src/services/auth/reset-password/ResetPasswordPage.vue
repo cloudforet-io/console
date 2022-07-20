@@ -5,7 +5,7 @@
                 {{ $t('AUTH.RESET_PASSWORD_PAGE.RESET_PASSWORD') }}
             </p>
             <p class="help-text">
-                {{ $t('AUTH.RESET_PASSWORD_PAGE.HELP_TEXT') }}<span class="text-gray-900">{{ userInfo.userId }}</span>
+                {{ $t('AUTH.RESET_PASSWORD_PAGE.HELP_TEXT') }}<span class="text-gray-900">{{ userId }}</span>
             </p>
             <div class="form-wrapper">
                 <p-field-group :label="$t('COMMON.PROFILE.PASSWORD')"
