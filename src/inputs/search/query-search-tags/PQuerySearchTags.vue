@@ -1,5 +1,5 @@
 <template>
-    <div v-if="_tags.length > 0" class="p-query-search-tags">
+    <div v-if="proxyTags.length > 0" class="p-query-search-tags">
         <div class="tags-container">
             <div class="left-wrapper">
                 <p-button v-if="!readOnly" class="delete-btn" :outline="true"
@@ -11,7 +11,7 @@
                 </p-button>
             </div>
             <div class="tags-wrapper">
-                <p-tag v-for="(tag, idx) in _tags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
+                <p-tag v-for="(tag, idx) in proxyTags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
                        class="tag"
                        :invalid="tag.invalid"
                        :deletable="!readOnly"
@@ -91,8 +91,9 @@ export default defineComponent<QuerySearchTagsProps>({
     },
     setup(props, { emit }) {
         const timezone = computed(() => props.timezone);
-        const validator = computed(() => props.validator || defaultValidator);
-        const converter = computed(() => props.converter || defaultConverter);
+        const validator = computed<QueryTagValidator>(() => props.validator ?? defaultValidator);
+        const converter = computed<QueryTagConverter>(() => props.converter ?? defaultConverter);
+        const proxyTags = ref<QueryTag[]>([]);
 
         const getConvertedQueryTags = (queries: QueryItem[], tags: QueryTag[]): QueryTag[] => queries.reduce((validatedTags, query) => {
             const converted = converter.value(query, timezone.value);
@@ -102,28 +103,20 @@ export default defineComponent<QuerySearchTagsProps>({
             return validatedTags;
         }, [...tags]);
 
-        const _tags = ref<QueryTag[]>([]);
-
         const publicFunctions: QuerySearchTagsFunctions = {
             addTag(...queries: QueryItem[]) {
-                _tags.value = getConvertedQueryTags(queries, _tags.value);
-                emit('add', _tags.value);
-                emit('change', _tags.value);
-                emit('update:tags', _tags.value);
+                proxyTags.value = getConvertedQueryTags(queries, proxyTags.value);
+                emit('add', proxyTags.value);
             },
             deleteTag(idx: number) {
-                _tags.value.splice(idx, 1);
-                emit('delete', _tags.value);
-                emit('delete:tag', _tags.value);
-                emit('change', _tags.value);
-                emit('update:tags', _tags.value);
+                proxyTags.value.splice(idx, 1);
+                emit('delete', proxyTags.value);
+                emit('delete:tag', proxyTags.value);
             },
             deleteAllTags() {
-                _tags.value = [];
-                emit('delete', _tags.value);
-                emit('delete:all', _tags.value);
-                emit('change', _tags.value);
-                emit('update:tags', _tags.value);
+                proxyTags.value = [];
+                emit('delete', proxyTags.value);
+                emit('delete:all', proxyTags.value);
             },
         };
 
@@ -133,16 +126,20 @@ export default defineComponent<QuerySearchTagsProps>({
         };
 
         watch(() => props.tags, (tags) => {
-            if (tags !== _tags.value) {
-                _tags.value = getConvertedQueryTags(tags, []);
+            if (tags !== proxyTags.value) {
+                proxyTags.value = getConvertedQueryTags(tags, []);
             }
         }, { immediate: true });
 
         watch([() => converter.value, () => validator.value, () => timezone.value], () => {
-            _tags.value = getConvertedQueryTags(_tags.value, []);
+            proxyTags.value = getConvertedQueryTags(proxyTags.value, []);
         });
 
-        watch(() => _tags.value, (tags, prevTags) => {
+        /*
+            CAUTION: Do not change it to watch proxyTags.value directly.
+            Related Issue: https://github.com/vuejs/core/issues/2116#issuecomment-718667557
+         */
+        watch(() => [...proxyTags.value], (tags, prevTags) => {
             if (prevTags && !isTagsSame(tags, prevTags)) {
                 emit('change', tags);
                 emit('update:tags', tags);
@@ -150,7 +147,7 @@ export default defineComponent<QuerySearchTagsProps>({
         }, { immediate: true });
 
         return {
-            _tags,
+            proxyTags,
             ...publicFunctions,
         };
     },
@@ -160,46 +157,46 @@ export default defineComponent<QuerySearchTagsProps>({
 <style lang="postcss">
 .p-query-search-tags {
     padding-bottom: 0.37rem;
-    .tags-container {
+    > .tags-container {
         @apply flex flex-row w-full;
         max-width: 100%;
         align-items: flex-start;
-    }
-    .left-wrapper {
-        @apply flex-shrink-0 inline-flex;
-        align-items: center;
-    }
-    .delete-btn {
-        @apply mr-2;
-        flex: 0 0 auto;
-        font-size: 0.875rem;
-    }
-    .tags-wrapper {
-        flex-grow: 1;
-        overflow-x: hidden;
-        display: flex;
-        flex-wrap: wrap;
-        .tag {
-            height: 1.5rem;
-            margin-bottom: 0.5rem;
-            .text {
-                @apply inline-flex;
-                .alert-icon {
-                    cursor: help;
-                    margin-right: 0.25rem;
-                    flex-shrink: 0;
-                }
-                .key-label {
-                    white-space: nowrap;
-                    font-weight: bold;
-                }
-                .operator {
-                    white-space: nowrap;
-                    margin-right: 0.125rem;
-                }
-                .value-label {
-                    white-space: normal;
-                    word-break: break-all;
+        > .left-wrapper {
+            @apply flex-shrink-0 inline-flex;
+            align-items: center;
+            > .delete-btn {
+                @apply mr-2;
+                flex: 0 0 auto;
+                font-size: 0.875rem;
+            }
+        }
+        > .tags-wrapper {
+            flex-grow: 1;
+            overflow-x: hidden;
+            display: flex;
+            flex-wrap: wrap;
+            > .tag {
+                height: 1.5rem;
+                margin-bottom: 0.5rem;
+                .text {
+                    @apply inline-flex;
+                    .alert-icon {
+                        cursor: help;
+                        margin-right: 0.25rem;
+                        flex-shrink: 0;
+                    }
+                    .key-label {
+                        white-space: nowrap;
+                        font-weight: bold;
+                    }
+                    .operator {
+                        white-space: nowrap;
+                        margin-right: 0.125rem;
+                    }
+                    .value-label {
+                        white-space: normal;
+                        word-break: break-all;
+                    }
                 }
             }
         }
