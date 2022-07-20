@@ -120,7 +120,7 @@ export default {
                 const startDate = dayjs.utc(state.startDate[0]);
                 if (props.granularity === GRANULARITY.DAILY) {
                     minDate = startDate.format('YYYY-MM-DD');
-                    maxDate = startDate.add(1, 'month').format('YYYY-MM-DD');
+                    maxDate = startDate.add(1, 'month').subtract(1, 'day').format('YYYY-MM-DD');
                 } else {
                     minDate = startDate.format('YYYY-MM');
                     maxDate = startDate.add(11, 'month').format('YYYY-MM');
