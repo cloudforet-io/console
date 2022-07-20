@@ -8,11 +8,11 @@
                     <div class="count">
                         <router-link :to="getAllSummaryTabLocation(name)" class="anchor">
                             <span class="number">
-                                <span v-if="name === 'billing'" class="dollar-sign">$</span>
+                                <span v-if="name === DATA_TYPE.BILLING" class="dollar-sign">$</span>
                                 <span>{{ count[name] }}</span>
                             </span>
                         </router-link>
-                        <span v-if="name === 'storage'" class="suffix">{{ storageBoxSuffix }}</span>
+                        <span v-if="name === DATA_TYPE.STORAGE" class="suffix">{{ storageBoxSuffix }}</span>
                     </div>
                     <div class="title">
                         {{ label }}
@@ -495,6 +495,7 @@ export default {
             handleChangeTab,
             handleChangeDateType,
             getAllSummaryTabLocation,
+            DATA_TYPE,
         };
     },
 };

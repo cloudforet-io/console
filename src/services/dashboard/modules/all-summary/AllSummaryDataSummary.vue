@@ -12,7 +12,7 @@
                     <div class="text-group">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
                     </div>
-                    <span class="count">{{ count }} {{ activeTab === 'storage' ? storageSuffix : '' }}</span>
+                    <span class="count">{{ count }} {{ activeTab === DATA_TYPE.STORAGE ? storageSuffix : '' }}</span>
                 </router-link>
                 <router-link v-for="(data, idx) of summaryData" :key="idx"
                              :to="data.to"
@@ -284,6 +284,7 @@ export default {
         return {
             ...toRefs(state),
             getAllServiceLocation,
+            DATA_TYPE,
         };
     },
 };
