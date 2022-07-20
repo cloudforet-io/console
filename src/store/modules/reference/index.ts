@@ -1,7 +1,10 @@
+import type { ReferenceRootState } from '@/store/modules/reference/type';
+
 import * as actions from './actions';
 import cloudServiceType from './cloud-service-type';
 import collector from './collector';
 import * as getters from './getters';
+import * as mutations from './mutations';
 import plugin from './plugin';
 import project from './project';
 import projectGroup from './project-group';
@@ -13,8 +16,17 @@ import serviceAccount from './service-account';
 import user from './user';
 import webhook from './webhook';
 
+// TODO: This is temporary state. It must be change to check each modules' items state is null.
+const state: ReferenceRootState = {
+    isAllLoaded: false,
+};
+
 export default {
     namespaced: true,
+    state,
+    mutations,
+    actions,
+    getters,
     modules: {
         project,
         projectGroup,
@@ -29,6 +41,4 @@ export default {
         protocol,
         webhook,
     },
-    actions,
-    getters,
 };

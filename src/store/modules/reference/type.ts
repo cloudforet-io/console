@@ -20,3 +20,7 @@ export type ReferenceMap<Item extends ReferenceItem = ReferenceItem> = Record<st
 export interface ReferenceState<Items = Record<string, any>> {
     items: Items;
 }
+
+export interface ReferenceRootState {
+    isAllLoaded: boolean;
+}
