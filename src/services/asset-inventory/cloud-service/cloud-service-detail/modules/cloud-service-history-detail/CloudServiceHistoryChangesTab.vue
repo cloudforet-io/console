@@ -21,11 +21,14 @@
                     <template #header>
                         <div class="cloud-service-history-changes-code-header-wrapper">
                             <div>
-                                <span>data</span>
-                                <p-i v-if="selectedKeyMenu" name="ic_arrow_right" color="#898995"
-                                     scale="0.7"
-                                />
-                                <span>{{ selectedKeyMenu }}</span>
+                                <span v-for="(key, index) in selectedKeyMenu.split('.')" :key="index">
+                                    <span class="text-gray-500">
+                                        <p-i v-if="selectedKeyMenu && index !== 0" name="ic_arrow_right" color="inherit"
+                                             scale="0.7"
+                                        />
+                                    </span>
+                                    <span>{{ key }}</span>
+                                </span>
                             </div>
                             <p-i width="1rem" height="1rem" :name="folding ? 'ic_code-expand' : 'ic_code-collapse'"
                                  class="cursor-pointer" @click="handleCodeDisplayType"
@@ -48,7 +51,7 @@
 <script lang="ts">
 import type { PropType } from '@vue/composition-api';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -108,6 +111,10 @@ export default defineComponent({
         const handleSelect = (menu) => { state.selectedKeyMenu = menu.label; };
 
         const handleCodeDisplayType = () => { state.folding = !state.folding; };
+
+        watch(() => props.selectedHistoryItem, (d) => {
+            state.selectedKeyMenu = props.selectedKeyName || d?.diffItems?.at(0)?.key || '';
+        });
 
         return {
             ...toRefs(state),

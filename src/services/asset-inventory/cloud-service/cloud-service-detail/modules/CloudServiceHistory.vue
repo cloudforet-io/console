@@ -39,7 +39,7 @@
                                  @click="handleClickKey(diffItem.key)"
                             >
                                 <div class="key-wrapper">
-                                    {{ diffItem.key }}
+                                    {{ diffItem.key.split('.').pop() }}
                                 </div>
                                 <div v-if="item.action === 'UPDATE' && diffItem.changedValue" class="value-wrapper">
                                     {{ getConvertedChangedValue(diffItem.changedValue) }}
@@ -166,7 +166,7 @@ export default {
             title: HISTORY_ACTION_MAP[data.action].label,
             action: data.action,
             diffItems: data.diff.slice(0, DIFF_ITEM_LIMIT).map(d => ({
-                key: d.key.split('.').pop(),
+                key: d.key,
                 previousValue: d.before,
                 changedValue: d.after,
                 type: d.type,
