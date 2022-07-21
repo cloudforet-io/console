@@ -347,6 +347,7 @@
 					"BUDGET_SUMMARY": "Budget Summary",
 					"CONDITION": "Condition",
 					"COST_TYPE": "Cost Type",
+					"DELETE_MODAL_TITLE": "Are you sure you want to delete the budget notifications?",
 					"DETAILS": "Details",
 					"FIELD": {
 						"ACTUAL_COST": "Actual Cost",
@@ -2097,7 +2098,7 @@
 				"SCHEDULE_EDIT_MODAL_NAME_PLACEHOLDER": "Schedule Name",
 				"SCHEDULE_EDIT_MODAL_TIMEZONE_LABEL": "Time Zone",
 				"SCHEDULE_EDIT_MODAL_TIME_ALL": "All",
-				"SCHEDULE_EDIT_MODAL_TIME_DESC": "Select the hourly schedule or Intervals.",
+				"SCHEDULE_EDIT_MODAL_TIME_DESC": "Select the hourly schedule or Intervals. (Based on selected Time-Zone, {timezone})",
 				"SCHEDULE_EDIT_MODAL_TIME_EVERY_LABEL": "Every",
 				"SCHEDULE_EDIT_MODAL_TIME_HOURLY_INVALID_REQUIRED": "Please Select the time.",
 				"SCHEDULE_EDIT_MODAL_TIME_HOURLY_LABEL": "Hourly schedule",
