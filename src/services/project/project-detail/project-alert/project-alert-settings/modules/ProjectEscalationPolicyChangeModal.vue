@@ -5,7 +5,7 @@
         fade
         :visible.sync="proxyVisible"
         :disabled="!isModalValid"
-        @confirm="onClickConfirm"
+        @confirm="handleClickConfirm"
     >
         <template #body>
             <div class="modal-content-wrapper">
@@ -16,7 +16,7 @@
                             :loading="tableState.loading"
                             :items="tableState.items"
                             :select-index.sync="tableState.selectIndex"
-                            @change="onChangeDataTable"
+                            @change="handleChangeDataTable"
                         />
                     </template>
                     <template #create>
@@ -27,7 +27,7 @@
                             :show-validation="formState.showValidation"
                             :is-all-valid.sync="formState.isAllValid"
                             :project-id="projectId"
-                            @change="onChangeInputModel"
+                            @change="handleChangeInputModel"
                         />
                     </template>
                 </p-box-tab>
@@ -37,10 +37,8 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
@@ -92,7 +90,6 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const tableState = reactive({
             loading: true,
             items: [] as any,
@@ -109,33 +106,35 @@ export default {
             tabs: computed(() => ([
                 {
                     name: FORM_MODE.select,
-                    label: vm.$t('PROJECT.DETAIL.ALERT.SELECT_POLICY'),
+                    label: i18n.t('PROJECT.DETAIL.ALERT.SELECT_POLICY'),
                 },
                 {
                     name: FORM_MODE.create,
-                    label: vm.$t('PROJECT.DETAIL.ALERT.CREATE_NEW_POLICY'),
+                    label: i18n.t('PROJECT.DETAIL.ALERT.CREATE_NEW_POLICY'),
                 },
             ])),
             activeTab: FORM_MODE.select,
-            changedEscalationPolicyId: undefined,
+            selectedEscalationPolicyId: undefined,
             isModalValid: computed(() => {
                 if (state.activeTab === FORM_MODE.select) return tableState.selectIndex.length;
                 return formState.isAllValid;
             }),
         });
 
-        /* util */
+        /* Util */
         const setSelectIndex = () => {
+            let selectedIndex;
             // eslint-disable-next-line consistent-return
             tableState.items.forEach((item, idx) => {
                 if (item.escalation_policy_id === props.escalationPolicyId) {
-                    tableState.selectIndex.push(idx);
+                    selectedIndex = idx;
                     return false;
                 }
             });
+            tableState.selectIndex = [selectedIndex];
         };
 
-        /* api */
+        /* Api */
         const escalationPolicyApiQueryHelper = new ApiQueryHelper()
             .setSort('created_at', true)
             .setFilters([{ k: 'project_id', v: [props.projectId, null], o: '=' }]);
@@ -143,10 +142,10 @@ export default {
         const listEscalationPolicies = async () => {
             try {
                 tableState.loading = true;
-                const res = await SpaceConnector.client.monitoring.escalationPolicy.list({
+                const { results } = await SpaceConnector.client.monitoring.escalationPolicy.list({
                     query: escalationPolicyApiQuery,
                 });
-                tableState.items = res.results.map(d => ({
+                tableState.items = results.map(d => ({
                     ...d,
                     name: {
                         label: d.name,
@@ -162,59 +161,67 @@ export default {
                 tableState.loading = false;
             }
         };
-        const createEscalationPolicy = async () => {
-            const res = await SpaceConnector.client.monitoring.escalationPolicy.create({
-                ...formState.inputModel,
-                project_id: props.projectId,
-            });
-            state.changedEscalationPolicyId = res.escalation_policy_id;
-        };
-        const updateEscalationPolicy = async () => {
-            await SpaceConnector.client.monitoring.projectAlertConfig.update({
-                project_id: props.projectId,
-                escalation_policy_id: state.changedEscalationPolicyId,
-            });
-        };
-
-        /* event */
-        const onClickConfirm = async () => {
+        const createEscalationPolicy = async (): Promise<string | undefined> => {
             try {
-                if (state.activeTab === FORM_MODE.create) {
-                    formState.showValidation = true;
-                    if (!formState.isAllValid) return;
-                    await createEscalationPolicy();
-                } else {
-                    state.changedEscalationPolicyId = tableState.items[tableState.selectIndex[0]].escalation_policy_id;
-                    await updateEscalationPolicy();
-                }
-                emit('confirm');
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_ESCALATION_POLICY'), '', root);
+                const { escalation_policy_id } = await SpaceConnector.client.monitoring.escalationPolicy.create({
+                    ...formState.inputModel,
+                    project_id: props.projectId,
+                });
+                return escalation_policy_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_ESCALATION_POLICY'));
-            } finally {
-                state.proxyVisible = false;
+                return undefined;
             }
         };
-        const onChangeInputModel = (inputModel) => {
+        const updateProjectAlertConfig = async (escalationPolicyId: string) => {
+            try {
+                await SpaceConnector.client.monitoring.projectAlertConfig.update({
+                    project_id: props.projectId,
+                    escalation_policy_id: escalationPolicyId,
+                });
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_ESCALATION_POLICY'));
+            }
+        };
+
+        /* Event */
+        const handleClickConfirm = async () => {
+            let newEscalationPolicyId;
+            if (state.activeTab === FORM_MODE.create) {
+                formState.showValidation = true;
+                if (!formState.isAllValid) return;
+                newEscalationPolicyId = await createEscalationPolicy();
+            } else {
+                newEscalationPolicyId = tableState.items[tableState.selectIndex[0]].escalation_policy_id;
+            }
+            if (newEscalationPolicyId) {
+                await updateProjectAlertConfig(newEscalationPolicyId);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_ESCALATION_POLICY'), '', root);
+            }
+            emit('confirm');
+            state.proxyVisible = false;
+        };
+        const handleChangeInputModel = (inputModel) => {
             formState.inputModel = inputModel;
         };
-        const onChangeDataTable = async (options: any = {}) => {
+        const handleChangeDataTable = async (options: any = {}) => {
             escalationPolicyApiQuery = getApiQueryWithToolboxOptions(escalationPolicyApiQueryHelper, options) ?? escalationPolicyApiQuery;
             await listEscalationPolicies();
         };
 
-        watch([() => props.projectId, () => props.escalationPolicyId], ([projectId, escalationPolicyId]) => {
-            if (projectId && escalationPolicyId) listEscalationPolicies();
-        }, { immediate: true });
+        /* Watcher */
+        watch(() => props.visible, (visible) => {
+            if (visible) listEscalationPolicies();
+        });
 
         return {
             ...toRefs(state),
             tableState,
             formState,
             FORM_MODE,
-            onClickConfirm,
-            onChangeInputModel,
-            onChangeDataTable,
+            handleClickConfirm,
+            handleChangeInputModel,
+            handleChangeDataTable,
         };
     },
 };
