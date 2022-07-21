@@ -1,3 +1,10 @@
+# [1.1.0-beta.358](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.357...v1.1.0-beta.358) (2022-07-21)
+
+
+### Bug Fixes
+
+* **tree:** make sure the selected state is in sync ([#1037](https://github.com/spaceone-dev/spaceone-design-system/issues/1037)) ([7a57b63](https://github.com/spaceone-dev/spaceone-design-system/commit/7a57b632ec6cdde4c54a50def2b0f77ea299dc4c))
+
 # [1.1.0-beta.357](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.356...v1.1.0-beta.357) (2022-07-21)
 
 
