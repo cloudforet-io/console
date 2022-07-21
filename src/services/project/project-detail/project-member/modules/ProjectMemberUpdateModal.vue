@@ -333,7 +333,4 @@ export default {
     @apply bg-white;
     max-width: 14rem;
 }
-.p-text-input {
-    width: 25rem;
-}
 </style>
