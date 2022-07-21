@@ -52,21 +52,13 @@ import {
     PButton, PCollapsibleList, PPaneLayout, PPanelTop, PTextarea, PSelectDropdown,
 } from '@spaceone/design-system';
 
-import type { TimeStamp } from '@/models';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-interface NoteModel {
-    note_id: string;
-    cloud_service_id: string;
-    note: string;
-    user_id: string;
-    project_id: string;
-    created_at: TimeStamp;
-}
+import type { NoteModel } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
 export default {
     name: 'CloudServiceHistoryDetailNote',

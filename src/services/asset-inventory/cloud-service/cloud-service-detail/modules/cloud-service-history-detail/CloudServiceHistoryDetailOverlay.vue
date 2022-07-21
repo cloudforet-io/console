@@ -27,8 +27,18 @@
                                            :color="getTimelineColor(item.action)"
                                            :selected="item.recordId === selectedHistoryRecordId"
                                            :is-last-item="idx === historyItems.length-1"
+                                           is-title-vertical
                                            @click-timeline="handleClickTimeline({cur: item, prev: historyItems[idx+1]})"
-                        />
+                        >
+                            <template #additional-title>
+                                <div v-if="item.noteItemMap.length">
+                                    <span class="title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}</span>
+                                    <p-badge style-type="gray200">
+                                        {{ item.noteItemMap.length }}
+                                    </p-badge>
+                                </div>
+                            </template>
+                        </vertical-timeline>
                         <p-lottie v-if="loading" name="thin-spinner" auto
                                   :size="2"
                         />
@@ -74,7 +84,7 @@ import {
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
-    PPaneLayout, PPageTitle, PTab, PLottie, PCopyButton,
+    PPaneLayout, PPageTitle, PTab, PLottie, PCopyButton, PBadge,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { useInfiniteScroll } from '@vueuse/core';
@@ -121,6 +131,7 @@ export default defineComponent<Props>({
         CloudServiceHistoryDetailNote,
         PLottie,
         PCopyButton,
+        PBadge,
     },
     props: {
         loading: {

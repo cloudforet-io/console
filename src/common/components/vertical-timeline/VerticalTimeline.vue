@@ -10,10 +10,15 @@
             </div>
             <div class="item-detail">
                 <div class="title-wrapper">
-                    <span class="title">{{ title }}</span>
-                    <p-badge v-if="count" :style-type="getBadgeStyleType(color)">
-                        {{ count }}
-                    </p-badge>
+                    <div class="title-left" :class="{ vertical: isTitleVertical }">
+                        <div>
+                            <span class="title">{{ title }}</span>
+                            <p-badge v-if="count" :style-type="getBadgeStyleType(color)">
+                                {{ count }}
+                            </p-badge>
+                        </div>
+                        <slot name="additional-title" />
+                    </div>
                     <slot name="title-right" />
                 </div>
                 <slot name="timeline-detail" />
@@ -40,6 +45,7 @@ interface Props {
     timezone: string;
     selected: boolean;
     isLastItem: boolean;
+    isTitleVertical: boolean;
 }
 
 export default defineComponent<Props>({
@@ -62,7 +68,7 @@ export default defineComponent<Props>({
         },
         color: {
             type: String,
-            default: 'GREEN',
+            default: 'GRAY',
         },
         timezone: {
             type: String,
@@ -73,6 +79,10 @@ export default defineComponent<Props>({
             default: false,
         },
         isLastItem: {
+            type: Boolean,
+            default: false,
+        },
+        isTitleVertical: {
             type: Boolean,
             default: false,
         },
@@ -180,8 +190,18 @@ export default defineComponent<Props>({
                 align-items: center;
                 gap: 0.25rem;
                 line-height: 1;
+                .title-left {
+                    @apply flex gap-4;
+                    & > div {
+                        white-space: nowrap;
+                    }
+                }
+                .vertical {
+                    @apply flex-col gap-2;
+                }
                 .title {
                     font-weight: bold;
+                    margin-right: 0.25rem;
                 }
             }
         }

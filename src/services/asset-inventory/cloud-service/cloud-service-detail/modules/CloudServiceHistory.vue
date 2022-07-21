@@ -48,6 +48,14 @@
                             <span v-if="item.diffCount > DIFF_ITEM_LIMIT" class="text-gray-500">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.AND_MORE') }}</span>
                         </div>
                     </template>
+                    <template #additional-title>
+                        <div v-if="item.noteItemMap.length">
+                            <span class="title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}</span>
+                            <p-badge style-type="gray200">
+                                {{ item.noteItemMap.length }}
+                            </p-badge>
+                        </div>
+                    </template>
                 </vertical-timeline>
                 <p-lottie v-if="loading && !!items.length" name="thin-spinner" auto
                           :size="2"
@@ -82,7 +90,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PPanelTop, PToolbox, PDataLoader, PLottie,
+    PPanelTop, PToolbox, PDataLoader, PLottie, PBadge,
 } from '@spaceone/design-system';
 import { useInfiniteScroll } from '@vueuse/core';
 import type { Dayjs } from 'dayjs';
@@ -100,7 +108,10 @@ import CloudServiceHistoryDetailOverlay
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailOverlay.vue';
 import CloudServiceHistoryDateSelectDropdown
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistoryDateSelectDropdown.vue';
-import type { CloudServiceHistoryItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
+import type {
+    CloudServiceHistoryItem,
+    NoteModel,
+} from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
 
@@ -119,6 +130,7 @@ export default {
         PToolbox,
         PDataLoader,
         PLottie,
+        PBadge,
     },
     props: {
         cloudServiceId: {
@@ -139,6 +151,7 @@ export default {
             selectedYear: dayjs.utc().format('YYYY'),
             selectedMonth: 'all',
             items: [] as CloudServiceHistoryItem[],
+            noteItemMap: {} as { [key: string]: NoteModel[] },
             selectedHistoryItem: undefined as undefined | CloudServiceHistoryItem,
             selectedKeyName: undefined as undefined | string,
             showDetailOverlay: computed(() => vm.$route.hash === `#${HISTORY_OVERLAY_HASH_NAME}`),
@@ -160,6 +173,19 @@ export default {
         const searchQueryHelper = new QueryHelper().setKeyItemSets(handlerState.keyItemSets);
 
         /* Util */
+        const groupNoteByHistoryRecordId = (noteList) => {
+            const noteMap = {};
+            noteList.forEach((note) => {
+                const id = note.record_id;
+                if (noteMap[id]) {
+                    noteMap[id].push(note);
+                } else {
+                    noteMap[id] = [note];
+                }
+            });
+            return noteMap;
+        };
+
         const getConvertedHistoryData = (rawData: any[]): CloudServiceHistoryItem[] => rawData.map(data => ({
             recordId: data.record_id,
             date: data.created_at,
@@ -173,6 +199,7 @@ export default {
                 type: d.type,
             })),
             diffCount: data.diff_count,
+            noteItemMap: Object.values(state.noteItemMap[data.record_id] ?? {}),
         }));
         const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
         const getConvertedChangedValue = (value) => {
@@ -192,6 +219,19 @@ export default {
         };
 
         /* Api */
+        const noteApiQueryHelper = new ApiQueryHelper();
+        const getNoteData = async (recordIdList) => {
+            try {
+                noteApiQueryHelper.setFilters([{ k: 'record_id', v: recordIdList, o: '=' }]);
+                const { results } = await SpaceConnector.client.inventory.note.list({
+                    query: noteApiQueryHelper.data,
+                });
+                return results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return [];
+            }
+        };
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.timezone = 'UTC';
         const listHistory = async (refresh = false) => {
@@ -222,6 +262,8 @@ export default {
                         ...apiQueryHelper.data,
                     },
                 });
+                const noteList = await getNoteData(results.map(history => history.record_id));
+                state.noteItemMap = groupNoteByHistoryRecordId(noteList);
                 const convertedData = getConvertedHistoryData(results);
                 state.items = state.items.concat(convertedData);
                 state.totalCount = total_count;
