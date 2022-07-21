@@ -50,12 +50,12 @@
 
         <project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" :is-project-group="isProjectGroup"
                                   :project-id="projectId"
-                                  :project-group-id="projectGroupId" @confirm="listMembers"
+                                  :project-group-id="projectGroupId" @confirm="handleConfirm"
         />
         <project-member-update-modal v-if="memberUpdateFormVisible" :visible.sync="memberUpdateFormVisible" :selected-member="selectedItems[0]"
                                      :project-id="projectId"
                                      :is-project-group="isProjectGroup" :project-group-id="projectGroupId"
-                                     @confirm="listMembers"
+                                     @confirm="handleConfirm"
         />
         <p-table-check-modal
             mode="delete"
@@ -304,6 +304,9 @@ export default {
             checkMemberDeleteState.visible = false;
             await listMembers(storeState.projects);
         };
+        const handleConfirm = () => {
+            listMembers(storeState.projects);
+        };
 
         /* Init */
         (async () => {
@@ -327,8 +330,8 @@ export default {
             handleClickInviteMember,
             handleSelectDropdown,
             handleConfirmDeleteMember,
-            listMembers,
             handleChangeTable,
+            handleConfirm,
             projectLinkFormatter,
         };
     },
