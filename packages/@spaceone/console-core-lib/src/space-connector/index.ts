@@ -71,10 +71,6 @@ export class SpaceConnector {
         return API.checkToken();
     }
 
-    static getExpirationTime(): number {
-        return API.getExpirationTime();
-    }
-
     protected async loadAPI(): Promise<void> {
         try {
             const response: AxiosPostResponse = await this.api.instance.post(API_REFLECTION_URL);

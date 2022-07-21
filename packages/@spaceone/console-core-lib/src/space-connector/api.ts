@@ -86,24 +86,32 @@ class API {
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
         if (API.checkRefreshingState() !== 'true') {
+            console.log('[API][refreshAccessToken] start refreshing token');
             try {
                 API.setRefreshingState();
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
                 this.setToken(response.data.access_token, response.data.refresh_token);
                 return true;
             } catch (e) {
+                console.log('[API][refreshAccessToken] token refresh failed!');
                 this.flushToken();
                 if (executeSessionTimeoutCallback) this.sessionTimeoutCallback();
                 return false;
             }
-        } else return undefined;
+        } else {
+            console.log('[API][refreshAccessToken] token refresh is already started');
+            return undefined;
+        }
     }
 
     async getActivatedToken() {
         if (this.accessToken) {
             const isTokenValid = API.checkToken();
+            console.log('[API][getActivatedToken] isTokenValid: ', isTokenValid);
             if (isTokenValid) this.accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
             else await this.refreshAccessToken();
+        } else {
+            console.log('[API][getActivatedToken] not executed!');
         }
     }
 
@@ -112,17 +120,11 @@ class API {
         return (API.getTokenExpirationTime(storedAccessToken) - API.getCurrentTime()) > 10;
     }
 
-    static getExpirationTime(): number {
-        const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY) || undefined;
-        const expirationTime = API.getTokenExpirationTime(storedAccessToken) - API.getCurrentTime();
-        if (expirationTime < 0) return 0;
-        return expirationTime;
-    }
-
     static getTokenExpirationTime(token?: string): number {
         if (token) {
             try {
                 const decodedToken = jwtDecode<JwtPayload>(token);
+                console.log('[API][getTokenExpirationTime] decodedToken: ', decodedToken);
                 return decodedToken.exp ?? -1;
             } catch (e) {
                 console.error(`Decode token error: ${e}`);
@@ -151,6 +153,7 @@ class API {
             throw new BadRequestError(error);
         }
         case 401: {
+            console.log('[API][handleRequestError] 401 error occurred');
             const res = this.refreshAccessToken();
             if (!res) throw new AuthenticationError(error);
             else break;
@@ -191,7 +194,7 @@ class API {
             return request;
         });
 
-        // Axios response interceptor with error handling
+        // Axios's response interceptor with error handling
         this.instance.interceptors.response.use(
             (response: AxiosResponse) => response,
             error => Promise.reject(this.handleRequestError(error)),
