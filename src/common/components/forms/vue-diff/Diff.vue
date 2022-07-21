@@ -123,7 +123,6 @@ export default defineComponent({
     overflow-y: auto;
     width: 100%;
     height: 100%;
-    padding: 1em 0;
     line-height: 1.5;
     font-size: 14px;
 
