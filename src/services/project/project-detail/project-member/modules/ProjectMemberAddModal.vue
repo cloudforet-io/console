@@ -71,6 +71,7 @@
                                  color="inherit"
                             />
                         </p-tooltip>
+                        <span v-if="showRoleWarning" class="role-warning-text">{{ $t('PROJECT.DETAIL.MEMBER.ROLE_WARNING') }}</span>
                     </template>
                     <template #default="{invalid}">
                         <p-search-dropdown
@@ -79,7 +80,7 @@
                             type="radioButton"
                             use-fixed-menu-style
                             :invalid="invalid"
-                            @update:selected="setForm('selectedRoleItems', $event)"
+                            @select="handleSelectRoleItems"
                         />
                     </template>
                 </p-field-group>
@@ -120,6 +121,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { getPagePermissionMap, PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -198,6 +200,7 @@ export default {
             existingMemberList: [] as string[],
             searchText: '',
             labelText: '',
+            showRoleWarning: false,
         });
         const {
             forms: {
@@ -309,6 +312,7 @@ export default {
                 type: 'item',
                 label: d.name,
                 name: d.role_id,
+                pagePermissions: d.page_permissions,
             }));
         };
         const addMember = async () => {
@@ -412,6 +416,12 @@ export default {
             _addedUserItem.invalidText = _invalidText;
             setForm('selectedExternalUserItems', [...selectedExternalUserItems.value, _addedUserItem]);
         };
+        const handleSelectRoleItems = (roleItemName) => {
+            const roleItem: any = state.roleItems.find(d => d.name === roleItemName);
+            const pagePermissionMap = getPagePermissionMap(roleItem.pagePermissions);
+            setForm('selectedRoleItems', roleItem);
+            state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
+        };
 
         /* Init */
         (async () => {
@@ -448,6 +458,7 @@ export default {
             handleSearchExternalUser,
             handleUpdateLabel,
             handleUpdateExternalUser,
+            handleSelectRoleItems,
         };
     },
 };
@@ -485,6 +496,11 @@ export default {
         }
         .help-icon {
             @apply text-gray-400;
+        }
+        .role-warning-text {
+            @apply text-red-500;
+            font-size: 0.75rem;
+            padding-left: 0.5rem;
         }
     }
 }

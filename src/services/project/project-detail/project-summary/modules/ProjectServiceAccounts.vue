@@ -37,14 +37,16 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import { byteFormatter } from '@spaceone/console-core-lib';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataTable } from '@spaceone/design-system';
+import { isEmpty } from 'lodash';
 import type { Location } from 'vue-router';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -174,12 +176,16 @@ export default {
 
         // LOAD REFERENCE STORE
         (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
-                store.dispatch('reference/region/load'),
-            ]);
-            await getData();
+            await store.dispatch('reference/provider/load');
         })();
+
+        /* Watcher */
+        watch(() => state.providers, (providers) => {
+            // todo: have to change to reference getters
+            if (!isEmpty(providers)) {
+                getData();
+            }
+        }, { immediate: true });
 
 
         return {

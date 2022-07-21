@@ -19,8 +19,7 @@
                         {{ userId }}
                     </span>
                 </p>
-                <p-field-group label="Role"
-                               required
+                <p-field-group :label="$t('PROJECT.DETAIL.MEMBER.ROLE')" required
                                :invalid="invalidState.selectedRoleItems"
                                :invalid-text="invalidTexts.selectedRoleItems"
                 >
@@ -31,8 +30,11 @@
                             type="radioButton"
                             use-fixed-menu-style
                             :invalid="invalid"
-                            @update:selected="setForm('selectedRoleItems', $event)"
+                            @select="handleSelectRoleItems"
                         />
+                    </template>
+                    <template #label-extra>
+                        <span v-if="showRoleWarning" class="role-warning-text">{{ $t('PROJECT.DETAIL.MEMBER.ROLE_WARNING') }}</span>
                     </template>
                 </p-field-group>
                 <p-field-group
@@ -68,6 +70,7 @@ import type { SelectedItem as InputItem } from '@spaceone/design-system/dist/src
 
 import { i18n } from '@/translations';
 
+import { getPagePermissionMap, PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -129,6 +132,7 @@ export default {
             roleItems: [] as MenuItem[],
             labelText: '',
             userId: '',
+            showRoleWarning: false,
         });
         const {
             forms: { labels, selectedRoleItems },
@@ -161,6 +165,7 @@ export default {
                     type: 'item',
                     label: d.name,
                     name: d.role_id,
+                    pagePermissions: d.page_permissions,
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -246,6 +251,12 @@ export default {
             emit('confirm');
             state.proxyVisible = false;
         };
+        const handleSelectRoleItems = (roleItemName) => {
+            const roleItem: any = state.roleItems.find(d => d.name === roleItemName);
+            const pagePermissionMap = getPagePermissionMap(roleItem.pagePermissions);
+            setForm('selectedRoleItems', roleItem);
+            state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
+        };
 
         /* Init */
         const initForm = () => {
@@ -272,6 +283,7 @@ export default {
             //
             handleConfirm,
             handleUpdateLabel,
+            handleSelectRoleItems,
         };
     },
 };
@@ -332,5 +344,11 @@ export default {
 .p-dropdown-menu-btn {
     @apply bg-white;
     max-width: 14rem;
+}
+
+.role-warning-text {
+    @apply text-red-500;
+    font-size: 0.75rem;
+    padding-left: 0.5rem;
 }
 </style>
