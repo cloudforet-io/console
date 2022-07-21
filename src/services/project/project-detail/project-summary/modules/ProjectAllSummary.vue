@@ -12,7 +12,10 @@
                 <div class="box" :class="{selected: name === activeTab}">
                     <span>{{ labelMap[name] }}</span>
                     <span v-if="name === SERVICE_CATEGORY.STORAGE" class="suffix">({{ storageSuffix }})</span>
-                    <span v-if="!summaryLoading" class="count"> {{ name === SERVICE_CATEGORY.STORAGE ? byteFormatter(countMap[name]).split(' ')[0] : commaFormatter(countMap[name]) }}</span>
+                    <p-lottie v-if="summaryLoading" name="thin-spinner" auto
+                              :size="1"
+                    />
+                    <span v-else class="count"> {{ name === SERVICE_CATEGORY.STORAGE ? byteFormatter(countMap[name]).split(' ')[0] : commaFormatter(countMap[name]) }}</span>
                 </div>
             </template>
         </p-balloon-tab>
@@ -93,7 +96,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -107,7 +109,7 @@ import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PBalloonTab, PButton, PDataLoader, PSkeleton,
+    PBalloonTab, PButton, PDataLoader, PSkeleton, PLottie,
 } from '@spaceone/design-system';
 import type { Unit } from 'bytes';
 import dayjs from 'dayjs';
@@ -154,6 +156,7 @@ export default {
         PSkeleton,
         PDataLoader,
         PBalloonTab,
+        PLottie,
     },
     props: {
         projectId: {
@@ -527,6 +530,8 @@ export default {
     }
 }
 .box {
+    display: flex;
+    align-items: center;
     .suffix {
         @apply text-gray-500;
         font-size: 0.75rem;
@@ -535,12 +540,16 @@ export default {
     .count {
         @apply text-primary1;
         font-weight: bold;
+        padding-left: 0.25rem;
     }
 
     &.selected {
         .suffix, .count {
             @apply text-white;
         }
+    }
+    .p-lottie {
+        padding-left: 0.25rem;
     }
 }
 .p-balloon-tab::v-deep {
