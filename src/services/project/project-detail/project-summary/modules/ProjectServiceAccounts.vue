@@ -49,8 +49,7 @@ import type { Location } from 'vue-router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { primitiveToQueryString } from '@/lib/router-query-string';
+import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -135,7 +134,13 @@ export default {
             },
             service_account: {
                 label: item.service_account_name,
-                to: referenceRouter(item.service_account_id, { resource_type: 'identity.ServiceAccount' }),
+                to: {
+                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+                    query: {
+                        provider: item.provider,
+                        filters: arrayToQueryString([item.service_account_id]),
+                    },
+                },
             },
             server: {
                 count: item.server_count || 0,
