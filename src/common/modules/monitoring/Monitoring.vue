@@ -291,7 +291,7 @@ export default {
                     metric: data.metric.key,
                 });
                 data.labels = res.labels;
-                data.dataset = res.resource_values;
+                data.dataset = res.values;
                 data.error = false;
                 data.resources = state.availableResources;
             } catch (e) {
