@@ -1,3 +1,10 @@
+# [1.1.0-beta.356](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.355...v1.1.0-beta.356) (2022-07-21)
+
+
+### Features
+
+* **tree:** add fold, unfold functions ([#1035](https://github.com/spaceone-dev/spaceone-design-system/issues/1035)) ([1c3359d](https://github.com/spaceone-dev/spaceone-design-system/commit/1c3359d59ee6d99fd7d9ae522bffcf0e27cd678e))
+
 # [1.1.0-beta.355](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.354...v1.1.0-beta.355) (2022-07-20)
 
 
