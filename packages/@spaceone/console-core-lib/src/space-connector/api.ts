@@ -88,6 +88,10 @@ class API {
         if (API.checkRefreshingState() !== 'true') {
             let decoded = this.refreshToken ? jwtDecode<any>(this.refreshToken) : undefined;
             console.log('[API][refreshAccessToken] start refreshing token. ttl: ', decoded ? decoded.ttl : 'no refresh token!!', ' decoded: ', decoded);
+            if (decoded) {
+                const current = API.getCurrentTime();
+                console.log('[API][refreshAccessToken] token exp: ', decoded.exp, ', current time: ', current, ', exp - current time: ', decoded.exp = current);
+            }
             try {
                 API.setRefreshingState();
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
