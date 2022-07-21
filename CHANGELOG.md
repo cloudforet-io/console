@@ -1,3 +1,10 @@
+# [1.1.0-beta.357](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.356...v1.1.0-beta.357) (2022-07-21)
+
+
+### Bug Fixes
+
+* change popup modal style of dynamic Layout ([#1036](https://github.com/spaceone-dev/spaceone-design-system/issues/1036)) ([d2b046b](https://github.com/spaceone-dev/spaceone-design-system/commit/d2b046b5db6a32a57a08f913eebf439f43c0b057))
+
 # [1.1.0-beta.356](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.355...v1.1.0-beta.356) (2022-07-21)
 
 
