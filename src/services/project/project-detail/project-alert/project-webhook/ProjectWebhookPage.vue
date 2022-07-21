@@ -37,7 +37,7 @@
                 </p-button>
                 <p-select-dropdown
                     :items="dropdown"
-                    :disabled="!isSelectedItem"
+                    :disabled="!hasManagePermission || !isSelectedItem"
                     @select="onSelectDropdown"
                 >
                     {{ $t('PROJECT.DETAIL.WEBHOOK_ACTION') }}

@@ -46,7 +46,7 @@
                               style-type="gray-border"
                               size="sm"
                               :outline="true"
-                              :disabled="escalationPolicy.scope === SCOPE.global"
+                              :disabled="!hasManagePermission || escalationPolicy.scope === SCOPE.global"
                               @click="onClickUpdateEscalationPolicy"
                     >
                         {{ $t('PROJECT.DETAIL.ALERT.UPDATE') }}
@@ -55,6 +55,7 @@
                               style-type="gray-border"
                               size="sm"
                               :outline="true"
+                              :disabled="!hasManagePermission"
                               @click="onClickChangeEscalationPolicy"
                     >
                         {{ $t('PROJECT.DETAIL.ALERT.CHANGE') }}
