@@ -12,7 +12,7 @@
                             <span class="date">{{ iso8601Formatter(noteList[index].created_at, timezone) }}</span>
                         </p>
                         <p-select-dropdown style-type="icon-button" button-icon="ic_more" :items="menuItems"
-                                           menu-position="left"
+                                           menu-position="right"
                                            :disabled="manageDisabled"
                                            @select="handleSelect(data.note_id)"
                         />
@@ -214,6 +214,11 @@ export default {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        .p-select-dropdown::v-deep {
+            .p-context-menu {
+                right: 0;
+            }
+        }
     }
     .note-content {
         white-space: pre-line;

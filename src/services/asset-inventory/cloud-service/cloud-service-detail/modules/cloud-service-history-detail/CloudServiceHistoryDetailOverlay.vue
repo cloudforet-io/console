@@ -297,7 +297,7 @@ export default defineComponent<Props>({
                 height: 100%;
                 display: flex;
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 1rem;
                 .p-tab {
                     flex-grow: 1;
                     .tab-item-wrapper {
