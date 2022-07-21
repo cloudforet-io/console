@@ -9,9 +9,14 @@
                     @confirm="handleUpdateVisible(false)"
     >
         <template #body>
-            <cloud-service-period-filter class="period-filter" read-only :period="period" />
+            <div class="flex items-center">
+                <span class="text-sm text-gray-900 font-bold mb-3 mr-2">Filter: </span>
+                <span class="text-sm text-gray-500 mb-3">{{ period ? '' : 'Auto (Overall period)' }}</span>
+                <cloud-service-period-filter class="period-filter" read-only :period="period" />
+                <p-divider v-if="queryTags.length" vertical class="!h-4 !ml-4 !mr-4 mb-3" />
+                <p-query-search-tags :tags="queryTags" read-only />
+            </div>
             <div class="modal-inner">
-                <p-query-search-tags :tags="queryTags" read-only class="pt-4 border-t border-gray-200" />
                 <cloud-service-usage-overview-summary v-if="summaryDataList.length"
                                                       :data-loading="dataLoading"
                                                       :data-list="summaryDataList"
@@ -50,7 +55,7 @@ import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import type { Filter } from '@spaceone/console-core-lib/space-connector/type';
 import {
-    PButtonModal, PDynamicWidget, PQuerySearchTags,
+    PButtonModal, PDynamicWidget, PQuerySearchTags, PDivider,
 } from '@spaceone/design-system';
 import type {
     DynamicWidgetFieldHandler,
@@ -98,6 +103,7 @@ export default defineComponent<Props>({
         PButtonModal: PButtonModal as any,
         PDynamicWidget,
         PQuerySearchTags,
+        PDivider,
     },
     model: {
         prop: 'visible',
