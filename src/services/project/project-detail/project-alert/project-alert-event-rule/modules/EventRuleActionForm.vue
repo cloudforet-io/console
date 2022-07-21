@@ -187,8 +187,8 @@ export default {
             dependentProjects: computed<string[]>({
                 get() { return props.actions.add_project_dependency || []; },
                 set(projectIds) {
-                    state.proxyOptions = {
-                        ...state.proxyOptions,
+                    state.proxyActions = {
+                        ...state.proxyActions,
                         add_project_dependency: projectIds,
                     };
                 },

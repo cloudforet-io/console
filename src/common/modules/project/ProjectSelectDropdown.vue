@@ -234,7 +234,6 @@ export default {
                 if (state.isFocused) state.isFocused = false;
             }
 
-            emit('update:selectedProjectIds', state._selectedProjectIds);
             emit('select', state.selectedProjects);
         };
 
@@ -262,6 +261,12 @@ export default {
                     const deletedIdx = state._selectedProjectIds.indexOf(deletedId);
                     handleDeleteTag(deletedId, deletedIdx);
                 }
+            }
+        });
+
+        watch(() => state._selectedProjectIds, (selectedProjectIds) => {
+            if (selectedProjectIds !== props.selectedProjectIds) {
+                emit('update:selectedProjectIds', selectedProjectIds);
             }
         });
 
