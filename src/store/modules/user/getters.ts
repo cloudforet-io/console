@@ -2,8 +2,8 @@ import type { Getter } from 'vuex';
 
 import { languages } from '@/store/modules/user/config';
 
-import type { PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
-import { getPagePermissionMap } from '@/lib/access-control/page-permission-helper';
+import type { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/page-permission-helper';
+import { getPagePermissionMap, PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
 import type { UserState } from './type';
@@ -67,4 +67,13 @@ export const pagePermissionList: Getter<UserState, any> = (state, getters): Page
     const permissions = state.roles?.flatMap(role => role.pagePermissions) ?? [];
     const roleBasePagePermissions = Object.entries(getPagePermissionMap(permissions));
     return roleBasePagePermissions.concat(defaultPagePermission);
+};
+
+export const pagePermissionMap: Getter<UserState, any> = (state, getters): Record<string, PagePermissionType> => {
+    const result: Record<string, PagePermissionType> = {};
+    getters.pagePermissionList.forEach(([page, permission]) => {
+        if (!result[page]) result[page] = permission;
+        else if (permission === PAGE_PERMISSION_TYPE.MANAGE) result[page] = PAGE_PERMISSION_TYPE.MANAGE;
+    });
+    return result;
 };

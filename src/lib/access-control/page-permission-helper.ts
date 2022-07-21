@@ -84,3 +84,20 @@ export const filterLNBMenuByPermission = (menuSet: LNBMenu[], pagePermissionList
 
     return results;
 }, [] as LNBMenu[]);
+
+export const getPermissionOfPage = (menuId: MenuId, pagePermissions: PagePermissionTuple[]): PagePermissionType|undefined => {
+    let result: PagePermissionType|undefined;
+    pagePermissions.some(([id, permission]) => {
+        if (id === menuId) {
+            result = permission;
+            return true;
+        }
+        // return VIEW permission if user has permission to children menu
+        if (id.startsWith(`${menuId}.`)) {
+            result = PAGE_PERMISSION_TYPE.VIEW;
+            return true;
+        }
+        return false;
+    });
+    return result;
+};

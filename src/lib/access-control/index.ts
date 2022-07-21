@@ -4,7 +4,7 @@ import type { Route } from 'vue-router';
 import type { AccessLevel } from '@/lib/access-control/config';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import type { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/page-permission-helper';
-import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
+import { getPermissionOfPage, PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -33,13 +33,14 @@ export const getRouteAccessLevel = (route: Route): AccessLevel => {
     if (!closestRoute) return ACCESS_LEVEL.AUTHENTICATED;
     return closestRoute.meta.accessLevel ?? ACCESS_LEVEL.AUTHENTICATED;
 };
+
 export const getUserAccessLevel = (routeName?: string|null, pagePermissions: PagePermissionTuple[] = [], isTokenAlive = true): AccessLevel => {
     if (!isTokenAlive) return ACCESS_LEVEL.EXCLUDE_AUTH;
 
     const menuId = getMenuIdByRouteName(routeName);
     if (!menuId) return ACCESS_LEVEL.AUTHENTICATED;
 
-    const [, permission] = pagePermissions.find(([id]) => id === menuId) ?? [];
+    const permission = getPermissionOfPage(menuId, pagePermissions);
     return getAccessTypeFromPermission(permission);
 };
 export const getMenuAccessLevel = (id: MenuId): AccessLevel => MENU_INFO_MAP[id]?.accessLevel ?? ACCESS_LEVEL.AUTHENTICATED;
