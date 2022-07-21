@@ -101,6 +101,7 @@
                         </p-button>
                     </div>
                     <div v-else-if="noProject" class="empty-project">
+                        <img class="img" src="@/assets/images/illust_star.svg">
                         <p class="text-primary2">
                             {{ $t('PROJECT.LANDING.EMPTY_PROJECT_MSG') }}
                         </p>
@@ -440,6 +441,9 @@ export default {
     }
     .empty-project {
         @apply text-gray-300 text-center text-base;
+        img {
+            margin: 0 auto 0.5rem;
+        }
     }
 }
 
