@@ -19,7 +19,6 @@ const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/refresh';
 const IS_REFRESHING_KEY = 'spaceConnector/isRefreshing';
-
 class API {
     instance: AxiosInstance;
 
@@ -58,6 +57,7 @@ class API {
         window.localStorage.removeItem(REFRESH_TOKEN_KEY);
         this.accessToken = undefined;
         this.refreshToken = undefined;
+        console.log('[API][flushToken] flush tokens');
     }
 
     setToken(accessToken: string, refreshToken: string): void {
@@ -86,11 +86,14 @@ class API {
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
         if (API.checkRefreshingState() !== 'true') {
-            console.log('[API][refreshAccessToken] start refreshing token');
+            let decoded = this.refreshToken ? jwtDecode<any>(this.refreshToken) : undefined;
+            console.log('[API][refreshAccessToken] start refreshing token. ttl: ', decoded ? decoded.ttl : 'no refresh token!!', ' decoded: ', decoded);
             try {
                 API.setRefreshingState();
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
                 this.setToken(response.data.access_token, response.data.refresh_token);
+                decoded = this.refreshToken ? jwtDecode<any>(this.refreshToken) : undefined;
+                console.log('[API][refreshAccessToken] refreshed token. ttl: ', decoded.ttl, ' decoded: ', decoded);
                 return true;
             } catch (e) {
                 console.log('[API][refreshAccessToken] token refresh failed!');
@@ -106,25 +109,26 @@ class API {
 
     async getActivatedToken() {
         if (this.accessToken) {
-            const isTokenValid = API.checkToken();
-            console.log('[API][getActivatedToken] isTokenValid: ', isTokenValid);
+            const isTokenValid = API.checkToken(true);
             if (isTokenValid) this.accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
             else await this.refreshAccessToken();
-        } else {
-            console.log('[API][getActivatedToken] not executed!');
         }
     }
 
-    static checkToken(): boolean {
+    static checkToken(verbose?: boolean): boolean {
         const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY) || undefined;
-        return (API.getTokenExpirationTime(storedAccessToken) - API.getCurrentTime()) > 10;
+        const tokenExpirationTime = API.getTokenExpirationTime(storedAccessToken);
+        const currentTime = API.getCurrentTime();
+        if (verbose) {
+            console.log('[API][checkToken] tokenExpirationTime: ', tokenExpirationTime, ' currentTime: ', currentTime, 'tokenExpirationTime - currentTime: ', tokenExpirationTime - currentTime);
+        }
+        return (tokenExpirationTime - currentTime) > 10;
     }
 
     static getTokenExpirationTime(token?: string): number {
         if (token) {
             try {
                 const decodedToken = jwtDecode<JwtPayload>(token);
-                console.log('[API][getTokenExpirationTime] decodedToken: ', decodedToken);
                 return decodedToken.exp ?? -1;
             } catch (e) {
                 console.error(`Decode token error: ${e}`);

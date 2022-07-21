@@ -242,8 +242,10 @@ export default {
         };
 
         const handleDeleteTag = (_, index: number) => {
-            const { node, path } = state.selectedProjectItems[index];
-            if (state.root) state.root.changeSelectState(node, path, false);
+            if (state.selectedProjectItems[index]) {
+                const { node, path } = state.selectedProjectItems[index];
+                if (state.root) state.root.changeSelectState(node, path, false);
+            }
         };
 
         const handleUpdateVisibleMenu = (value) => {
