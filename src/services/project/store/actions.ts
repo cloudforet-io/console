@@ -1,5 +1,4 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { BadRequestError } from '@spaceone/console-core-lib/space-connector/error';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import type { Action } from 'vuex';
 
@@ -79,7 +78,13 @@ export const createProjectGroup: Action<ProjectPageState, any> = async ({ state,
         };
         if (state.rootNode) {
             if (getters.actionTargetNodeData) {
-                state.rootNode.addChildNodeByPath(getters.actionTargetNodePath, newData);
+                const targetNode = state.rootNode.getNodeByPath(getters.actionTargetNodePath);
+                // fetch child data to show children nodes
+                await state.rootNode.fetchData(targetNode);
+                state.rootNode.unfold(targetNode);
+                // update selected item to prevent the case that selected node is updated by fetchData
+                const selectedNode = state.rootNode.getNodeByPath(getters.selectedNodePath);
+                state.rootNode.changeSelectState(selectedNode, getters.selectedNodePath);
             } else {
                 state.rootNode.addNode(newData);
             }
@@ -112,7 +117,7 @@ export const updateProjectGroup: Action<ProjectPageState, any> = async ({ state,
             { ...getters.actionTargetNodeData, ...projectGroupInfo });
     } catch (e: any) {
         ErrorHandler.handleError(e);
-        throw new Error(e);
+        throw e;
     } finally {
         commit('setActionTargetItem', {});
     }
@@ -127,9 +132,13 @@ export const deleteProjectGroup: Action<ProjectPageState, any> = async ({ state,
         await SpaceConnector.client.identity.projectGroup.delete({
             project_group_id: getters.actionTargetNodeData.id,
         });
+
         state.rootNode.deleteNodeByPath(getters.actionTargetNodePath);
+        // fetch data to update has child info
+        const targetNode = state.rootNode.getNodeByPath(getters.actionTargetNodePath);
+        await state.rootNode.fetchData(targetNode);
     } catch (e: any) {
-        throw new BadRequestError(e);
+        throw e;
     } finally {
         commit('setActionTargetItem', {});
     }
