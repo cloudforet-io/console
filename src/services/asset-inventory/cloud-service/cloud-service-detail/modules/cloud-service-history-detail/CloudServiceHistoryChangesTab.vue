@@ -27,7 +27,7 @@
                                              scale="0.7"
                                         />
                                     </span>
-                                    <span>{{ path }}</span>
+                                    <span :class="index === selectedKeyPath.split('.').length - 1 ? 'text-gray-900' : 'text-gray-700'">{{ path }}</span>
                                 </span>
                             </div>
                             <p-i width="1rem" height="1rem" :name="folding ? 'ic_code-expand' : 'ic_code-collapse'"
@@ -158,6 +158,9 @@ export default defineComponent({
                 .p-context-menu {
                     height: 100%;
                     border: none;
+                    & span {
+                        border-radius: 0.25rem;
+                    }
                 }
             }
             .p-i-ic_plus {

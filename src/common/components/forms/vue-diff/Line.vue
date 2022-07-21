@@ -8,7 +8,7 @@
         <!-- split view -->
         <template v-if="mode === 'split'">
             <template v-for="(line, index) in render">
-                <div :key="`line-${index}`" style="display: inline-flex;">
+                <div :key="`line-${index}`" class="vue-diff-line" style="display: inline-flex;">
                     <template v-if="isFoldLine">
                         <div class="lineNum vue-diff-cell-fold" />
                         <div class="code vue-diff-cell-fold" />
@@ -250,5 +250,9 @@ export default defineComponent({
             opacity: 0.8;
         }
     }
+}
+
+.vue-diff-line:nth-child(2) {
+    @apply border-gray-200 border-l;
 }
 </style>
