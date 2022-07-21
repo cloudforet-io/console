@@ -3,13 +3,18 @@
         <p-button-modal v-if="isInitiated"
                         :header-title="name"
                         :visible="popupVisible"
+                        hide-footer-close-button
                         @update:visible="handleUpdateVisible"
+                        @confirm="handleConfirm"
         >
             <template #body>
                 <p-dynamic-layout :type="layoutSchema.type"
                                   :options="layoutSchema.options"
                                   :data="data"
                 />
+            </template>
+            <template #confirm-button>
+                {{ $t('COMPONENT.BUTTON_MODAL.CLOSE') }}
             </template>
         </p-button-modal>
     </span>
@@ -74,6 +79,10 @@ export default defineComponent<PopupDynamicLayoutProps>({
             state.popupVisible = popupVisible;
             emit('update-popup-visible', popupVisible);
         };
+        const handleConfirm = () => {
+            state.popupVisible = false;
+            emit('update-popup-visible', false);
+        };
         watch(() => props.typeOptions, (typeOptions) => {
             if (typeOptions?.popupVisible !== state.popupVisible) {
                 if (!state.isInitiated) state.isInitiated = true;
@@ -84,6 +93,7 @@ export default defineComponent<PopupDynamicLayoutProps>({
         return {
             ...toRefs(state),
             handleUpdateVisible,
+            handleConfirm,
         };
     },
 });
