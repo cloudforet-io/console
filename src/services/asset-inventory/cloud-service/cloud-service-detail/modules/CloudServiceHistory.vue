@@ -191,7 +191,7 @@ export default {
             date: data.created_at,
             title: HISTORY_ACTION_MAP[data.action].label,
             action: data.action,
-            diffItems: data.diff.slice(0, DIFF_ITEM_LIMIT).map(d => ({
+            diffItems: data.diff.map(d => ({
                 key: d.key.split('.').pop(),
                 path: d.key,
                 previousValue: d.before,
