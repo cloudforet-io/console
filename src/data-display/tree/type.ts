@@ -81,4 +81,6 @@ export interface Tree<T=any> {
     getNodeByPath: (path: number[]) => TreeNode<T>;
     walkTreeData: (treeData: TreeNode<T>[]|null, handler: WalkTreeDataCallback, options?: {reverse: boolean}) => void;
     cloneTreeData(treeData: TreeNode<T>[]|null, options?: CloneTreeDataOptions): TreeNode[];
+    fold(node: TreeNode<T>): void;
+    unfold(node: TreeNode<T>): void;
 }

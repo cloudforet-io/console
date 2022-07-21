@@ -520,6 +520,8 @@ You can use tree methods by tree instance that passed by `init` event. <br/>
 |getNodeByPath| It returns node by path. |
 |walkTreeData| Iterate tree nodes <br/> Arguments: (treeData: TreeNode[](or null), handler: Function, options: {}) <br/> Handler: (node: TreeNode, index: number, parent: TreeNode(or null), path: number[]) <br/> - return false: stop walk <br/> - return 'skip children' <br/> - return 'skip siblings' <br/> Options: {Boolean} reverse|
 |cloneTreeData| Clones tree nodes <br/> options - afterNodeCreated: (newNode, {oldNode: node, index, parent, path}) |
+|fold| Fold node toggle|
+|unfold| Unfold node toggle|
 
 ```typescript
 interface Tree<T=any> {
@@ -543,6 +545,8 @@ interface Tree<T=any> {
     getNodeByPath: (path: number[]) => TreeNode<T>;
     walkTreeData: (treeData: TreeNode<T>[]|null, callback: walkTreeDataCallback, options?: {reverse: boolean}) => void;
     cloneTreeData(treeData: TreeNode<T>[]|null, options?: cloneTreeDataOptions): TreeNode[];
+    fold(node: TreeNode<T>): void;
+    unfold(node: TreeNode<T>): void;
 }
 
 interface Predicate<T=any> {

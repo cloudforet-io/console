@@ -614,6 +614,14 @@ export default defineComponent<Props>({
 
                 return cloneTreeData(treeData === null ? state.treeData : treeData, options) as TreeNode[];
             },
+            fold(node: TreeNode) {
+                if (!state.treeRef) return;
+                state.treeRef.fold(node);
+            },
+            unfold(node: TreeNode) {
+                if (!state.treeRef) return;
+                state.treeRef.unfold(node);
+            },
         };
 
         onMounted(() => {
