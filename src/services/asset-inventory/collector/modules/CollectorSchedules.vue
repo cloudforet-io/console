@@ -23,6 +23,7 @@
                          @changePageNumber="listSchedules"
                          @clickRefresh="listSchedules"
                          @changeSort="listSchedules"
+                         @change="handleChange"
         >
             <template slot="toolbox-left">
                 <p-button style-type="primary-dark"
@@ -93,6 +94,7 @@ import {
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
+import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
@@ -247,6 +249,10 @@ export default {
                 state.deleteVisible = false;
             }
         };
+        const handleChange = async (options = {}) => {
+            setApiQueryWithToolboxOptions(apiQuery, options);
+            await listSchedules();
+        };
 
         watch(() => props.collector, () => {
             listSchedules();
@@ -261,6 +267,7 @@ export default {
             onSelectDropdown,
             listSchedules,
             onConfirmDelete,
+            handleChange,
             intervalFormatter,
             iso8601Formatter,
         };
