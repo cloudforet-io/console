@@ -43,7 +43,7 @@ import { PPanelTop } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import type { PagePermission } from '@/lib/access-control/page-permission-helper';
+import type { RawPagePermission } from '@/lib/access-control/page-permission-helper';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -98,7 +98,7 @@ export default {
         const state = reactive({
             isBaseInformationValid: false,
             baseInfoFormData: {} as BaseInfoFormData,
-            pageAccessFormData: [] as PagePermission[],
+            pageAccessFormData: [] as RawPagePermission[],
             initialSelectedPolicyList: [] as Policy[],
             isAllValid: computed(() => isPolicySectionValid.value && state.isBaseInformationValid),
             formData: computed(() => ({

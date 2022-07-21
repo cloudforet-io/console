@@ -13,7 +13,7 @@ import { store } from '@/store';
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
-import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
+import {getDefaultRouteAfterSignIn} from "@/services/auth/lib/helper";
 
 
 export default defineComponent({
@@ -42,8 +42,10 @@ export default defineComponent({
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const onSignIn = async () => {
+            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasPermission']);
+
             if (!props.nextPath) {
-                await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                await vm.$router.push(defaultRoute);
                 return;
             }
 
@@ -52,7 +54,7 @@ export default defineComponent({
             if (isAccessible) {
                 await vm.$router.push(props.nextPath);
             } else {
-                await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                await vm.$router.push(defaultRoute);
             }
         };
 

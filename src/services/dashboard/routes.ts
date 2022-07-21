@@ -9,6 +9,6 @@ const Dashboard = () => import(/* webpackChunkName: "Dashboard" */ '@/services/d
 export default {
     path: 'dashboard',
     name: DASHBOARD_ROUTE._NAME,
-    meta: { accessLevel: ACCESS_LEVEL.AUTHENTICATED },
+    meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
     component: Dashboard,
 } as RouteConfig;

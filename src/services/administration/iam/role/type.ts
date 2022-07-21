@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { Tags } from '@/models';
 
-import type { PagePermission, PagePermissionType } from '@/lib/access-control/page-permission-helper';
+import type { RawPagePermission, PagePermissionType } from '@/lib/access-control/page-permission-helper';
 
 import type { RoleType } from '@/services/administration/iam/role/config';
 
@@ -19,7 +19,7 @@ export interface RoleData {
     domain_id: string;
     name: string;
     policies?: Policy[];
-    page_permissions: PagePermission[];
+    page_permissions: RawPagePermission[];
     role_id: string;
     role_type: RoleType;
     tags?: Tags; // [ description: string ]

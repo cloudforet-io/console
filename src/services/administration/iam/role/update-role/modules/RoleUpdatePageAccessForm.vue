@@ -39,9 +39,9 @@ import {
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import { find } from 'lodash';
 
-import type { PagePermission } from '@/lib/access-control/page-permission-helper';
+import type { RawPagePermission } from '@/lib/access-control/page-permission-helper';
 import {
-    getPagePermissionMap, PAGE_PERMISSION_TYPE,
+    getPagePermissionMapFromRaw, PAGE_PERMISSION_TYPE,
 } from '@/lib/access-control/page-permission-helper';
 
 import { getPageAccessMenuList } from '@/services/administration/iam/role/lib/page-access-menu-list';
@@ -50,11 +50,11 @@ import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
 
 
-const getPagePermissions = (menuItems: PageAccessMenuItem[]): PagePermission[] => {
+const getPagePermissions = (menuItems: PageAccessMenuItem[]): RawPagePermission[] => {
     const allItem = find(menuItems, { id: 'all' });
     if (allItem && allItem.isManaged) return [{ page: '*', permission: PAGE_PERMISSION_TYPE.MANAGE }];
 
-    const results: PagePermission[] = [];
+    const results: RawPagePermission[] = [];
     menuItems.forEach((menu) => {
         if (menu.id === 'all' && menu.isViewed) results.push({ page: '*', permission: PAGE_PERMISSION_TYPE.VIEW });
         else if (menu.isManaged) results.push({ page: `${menu.id}.*`, permission: PAGE_PERMISSION_TYPE.MANAGE });
@@ -80,7 +80,7 @@ export default {
     },
     props: {
         initialPagePermissions: {
-            type: Array as PropType<PagePermission[]>,
+            type: Array as PropType<RawPagePermission[]>,
             default: () => ([]),
         },
     },
@@ -96,7 +96,7 @@ export default {
         });
         const state = reactive({
             hideAllMenu: computed(() => formState.menuItems.find(d => d.id === 'all')?.hideMenu),
-            pagePermissions: computed<PagePermission[]>(() => getPagePermissions(formState.menuItems)),
+            pagePermissions: computed<RawPagePermission[]>(() => getPagePermissions(formState.menuItems)),
         });
 
         /* Util */
@@ -146,7 +146,7 @@ export default {
         });
         watch(() => props.initialPagePermissions, (initialPagePermissions) => {
             // init formState.menuItems
-            const pagePermissions = getPagePermissionMap(initialPagePermissions);
+            const pagePermissions = getPagePermissionMapFromRaw(initialPagePermissions);
             // eslint-disable-next-line no-restricted-syntax
             for (const [itemId, key] of Object.entries(pagePermissions)) {
                 const itemAttribute = (key === PAGE_PERMISSION_TYPE.MANAGE) ? 'isManaged' : 'isViewed';

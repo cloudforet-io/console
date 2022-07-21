@@ -44,6 +44,7 @@ export default defineComponent({
     setup() {
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            hasPermission: computed(() => store.getters['user/hasPermission']),
             hasDomainRole: computed(() => store.getters['user/hasDomainRole']),
             userType: computed(() => store.state.user.backend) as unknown as string,
             userName: computed(() => store.state.user.name),
@@ -74,7 +75,7 @@ export default defineComponent({
                         to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME },
                     },
                 ];
-                const allLnbMenu: LNBMenu[] = state.isDomainOwner ? defaultMenuSet : [
+                const allLnbMenu: LNBMenu[] = (state.isDomainOwner || !state.hasPermission) ? defaultMenuSet : [
                     ...defaultMenuSet,
                     {
                         type: 'item',

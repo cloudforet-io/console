@@ -121,7 +121,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { getPagePermissionMap, PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
+import { getPagePermissionMapFromRaw, PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -418,7 +418,7 @@ export default {
         };
         const handleSelectRoleItems = (roleItemName) => {
             const roleItem: any = state.roleItems.find(d => d.name === roleItemName);
-            const pagePermissionMap = getPagePermissionMap(roleItem.pagePermissions);
+            const pagePermissionMap = getPagePermissionMapFromRaw(roleItem.pagePermissions);
             setForm('selectedRoleItems', roleItem);
             state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
         };

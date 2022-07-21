@@ -38,10 +38,10 @@ import { store } from '@/store';
 
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 import config from '@/lib/config';
-import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { getDefaultRouteAfterSignIn } from '@/services/auth/lib/helper';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import IDPWSignIn from '@/services/auth/sign-in/local/template/ID_PW.vue';
 import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftContainer.vue';
@@ -97,8 +97,10 @@ export default {
         });
         const onSignIn = async () => {
             try {
+                const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasPermission']);
+
                 if (!props.nextPath) {
-                    await vm.$router.push({ name: MENU_ID.ADMINISTRATION_USER });
+                    await vm.$router.push(defaultRoute);
                     return;
                 }
 
@@ -107,7 +109,7 @@ export default {
                 if (isAccessible) {
                     await vm.$router.push(props.nextPath);
                 } else {
-                    await vm.$router.push({ name: MENU_ID.ADMINISTRATION_USER });
+                    await vm.$router.push(defaultRoute);
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);

@@ -42,7 +42,6 @@ import {
 
 import { isEmpty } from 'lodash';
 
-
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
@@ -51,10 +50,10 @@ import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { getDefaultRouteAfterSignIn } from '@/services/auth/lib/helper';
 import IDPWSignIn from '@/services/auth/sign-in/local/template/ID_PW.vue';
 import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftContainer.vue';
 import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightContainer.vue';
-import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 export default {
     name: 'SignInPage',
@@ -119,17 +118,19 @@ export default {
         });
         const onSignIn = async () => {
             try {
+                const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasPermission']);
+
                 if (!props.nextPath) {
-                    await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                    await vm.$router.push(defaultRoute);
                     return;
                 }
 
                 const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
                 const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/pagePermissionList']);
                 if (isAccessible) {
-                    await vm.$router.push(props.nextPath);
+                    await vm.$router.push(resolvedRoute.location);
                 } else {
-                    await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                    await vm.$router.push(defaultRoute);
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);

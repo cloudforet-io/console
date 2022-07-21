@@ -3,6 +3,10 @@ import type { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
+    [MENU_ID.DASHBOARD]: {
+        translationId: 'MENU.DASHBOARD',
+        accessLevel: ACCESS_LEVEL.VIEW_PERMISSION,
+    },
     [MENU_ID.PROJECT]: {
         translationId: 'MENU.PROJECT',
         icon: 'ic_project',

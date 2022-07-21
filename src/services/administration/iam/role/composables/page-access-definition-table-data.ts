@@ -5,9 +5,9 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';
 
-import type { PagePermission, PagePermissionMap } from '@/lib/access-control/page-permission-helper';
+import type { RawPagePermission, PagePermissionMap } from '@/lib/access-control/page-permission-helper';
 import {
-    getPagePermissionMap, getPermissionRequiredMenuIds,
+    getPagePermissionMapFromRaw, getPermissionRequiredMenuIds,
 } from '@/lib/access-control/page-permission-helper';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
@@ -38,8 +38,9 @@ const flattenPageAccessDefinitionData = (pagePermissionMap: PagePermissionMap, s
     });
     return result;
 };
-export const usePageAccessDefinitionTableData = (pagePermissionData: ComputedRef<PagePermission[]>): ComputedRef<PageAccessDefinitionTableData[]> => computed<PageAccessDefinitionTableData[]>(() => {
-    const pagePermissionMap = getPagePermissionMap(pagePermissionData.value);
+// eslint-disable-next-line max-len
+export const usePageAccessDefinitionTableData = (pagePermissionData: ComputedRef<RawPagePermission[]>): ComputedRef<PageAccessDefinitionTableData[]> => computed<PageAccessDefinitionTableData[]>(() => {
+    const pagePermissionMap = getPagePermissionMapFromRaw(pagePermissionData.value);
     const results: PageAccessDefinitionTableData[] = [];
     MENU_LIST.forEach((menu) => {
         const permissionRequiredMenuIdList = getPermissionRequiredMenuIds();

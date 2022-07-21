@@ -1,6 +1,9 @@
 import type { RouteConfig } from 'vue-router';
 
+import { store } from '@/store';
+
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
+import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -22,7 +25,7 @@ const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
     meta: { menuId: MENU_ID.COST_EXPLORER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: '/cost-explorer/dashboard',
+    redirect: () => getRedirectRouteByPagePermission(MENU_ID.COST_EXPLORER, store.getters['user/pagePermissionMap']),
     component: CostExplorerContainer,
     children: [
         {

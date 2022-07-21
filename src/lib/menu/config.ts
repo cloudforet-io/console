@@ -1,6 +1,8 @@
 import type { AccessLevel } from '@/lib/access-control/config';
 
+// Menu Ids' Rule: All menu ids are dot-delimited in depth, up to two depths.
 export const MENU_ID = Object.freeze({
+    DASHBOARD: 'dashboard',
     PROJECT: 'project',
     ASSET_INVENTORY: 'asset_inventory',
     ASSET_INVENTORY_CLOUD_SERVICE: 'asset_inventory.cloud_service',

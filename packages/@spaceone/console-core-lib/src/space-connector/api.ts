@@ -91,12 +91,13 @@ class API {
             try {
                 API.setRefreshingState();
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
+                console.log('[API][refreshAccessToken] refreshed token succeed. response: ', response);
                 this.setToken(response.data.access_token, response.data.refresh_token);
                 decoded = this.refreshToken ? jwtDecode<any>(this.refreshToken) : undefined;
-                console.log('[API][refreshAccessToken] refreshed token. ttl: ', decoded.ttl, ' decoded: ', decoded);
+                console.log('[API][refreshAccessToken] refreshed token is set. ttl: ', decoded.ttl, ' decoded: ', decoded);
                 return true;
             } catch (e) {
-                console.log('[API][refreshAccessToken] token refresh failed!');
+                console.log('[API][refreshAccessToken] token refresh failed! error: ', e);
                 this.flushToken();
                 if (executeSessionTimeoutCallback) this.sessionTimeoutCallback();
                 return false;
@@ -190,13 +191,21 @@ class API {
         this.refreshInstance.interceptors.request.use((request) => {
             const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY);
             if (!storedRefreshToken) {
-                throw new Error('Session has expired.');
+                throw new Error('Session has expired. No stored refresh token.');
             }
             if (!request.headers) request.headers = {};
 
             request.headers.Authorization = `Bearer ${storedRefreshToken}`;
+            console.log('[API][refreshInstance interceptors] request: ', request);
             return request;
         });
+        this.refreshInstance.interceptors.response.use(
+            (response: AxiosResponse) => response,
+            (error) => {
+                console.log('[API][refreshInstance interceptors] response error occurred! error: ', error);
+                return Promise.reject(error);
+            },
+        );
 
         // Axios's response interceptor with error handling
         this.instance.interceptors.response.use(

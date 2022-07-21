@@ -1,6 +1,9 @@
 import type { RouteConfig } from 'vue-router';
 
+import { store } from '@/store';
+
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
+import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
@@ -16,7 +19,7 @@ const alertManagerRoutes: RouteConfig = {
     path: 'alert-manager',
     name: ALERT_MANAGER_ROUTE._NAME,
     meta: { menuId: MENU_ID.ALERT_MANAGER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: '/alert-manager/dashboard',
+    redirect: () => getRedirectRouteByPagePermission(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionMap']),
     component: AlertManagerContainer,
     children: [
         {

@@ -3,8 +3,11 @@ import type { Getter } from 'vuex';
 import { languages } from '@/store/modules/user/config';
 
 import type { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/page-permission-helper';
-import { getPagePermissionMap, PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
-import { MENU_ID } from '@/lib/menu/config';
+import {
+    getDefaultPagePermissionList,
+    getPagePermissionMapFromRaw, getProperPermissionType,
+    PAGE_PERMISSION_TYPE,
+} from '@/lib/access-control/page-permission-helper';
 
 import type { UserState } from './type';
 
@@ -49,24 +52,17 @@ export const hasDomainRole = (state: UserState): boolean => {
 
 export const hasPermission = (state: UserState): boolean => !!state.roles?.length;
 
-const defaultPagePermission: PagePermissionTuple[] = [
-    [MENU_ID.MY_PAGE_ACCOUNT_PROFILE, 'MANAGE'],
-    [MENU_ID.MY_PAGE_NOTIFICATIONS, 'MANAGE'],
-    [MENU_ID.MY_PAGE_API_KEY, 'MANAGE'],
-];
-
 export const pagePermissionList: Getter<UserState, any> = (state, getters): PagePermissionTuple[] => {
     if (getters.isDomainOwner) {
-        return [
-            [MENU_ID.ADMINISTRATION_ROLE, 'MANAGE'],
-            [MENU_ID.ADMINISTRATION_POLICY, 'MANAGE'],
-            [MENU_ID.ADMINISTRATION_USER, 'MANAGE'],
-            [MENU_ID.MY_PAGE_ACCOUNT_PROFILE, 'MANAGE'],
-        ];
+        return getDefaultPagePermissionList(true, true);
     }
-    const permissions = state.roles?.flatMap(role => role.pagePermissions) ?? [];
-    const roleBasePagePermissions = Object.entries(getPagePermissionMap(permissions));
-    return roleBasePagePermissions.concat(defaultPagePermission);
+    const roleBasePagePermissions = state.roles?.flatMap(role => role.pagePermissions) ?? [];
+    const pagePermissionMap = getPagePermissionMapFromRaw(roleBasePagePermissions);
+    // merge role based page permissions and default page permissions
+    getDefaultPagePermissionList(false, getters.hasPermission).forEach(([page, permission]) => {
+        pagePermissionMap[page] = getProperPermissionType(permission, pagePermissionMap[page]);
+    });
+    return Object.entries(pagePermissionMap);
 };
 
 export const pagePermissionMap: Getter<UserState, any> = (state, getters): Record<string, PagePermissionType> => {

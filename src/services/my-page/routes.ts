@@ -1,6 +1,9 @@
 import type { RouteConfig } from 'vue-router';
 
+import { store } from '@/store';
+
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
+import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
@@ -17,15 +20,15 @@ const NotificationAddPage = () => import(/* webpackChunkName: "NotificationAddPa
 const myPageRoutes: RouteConfig = {
     path: 'my-page',
     name: MY_PAGE_ROUTE._NAME,
-    meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: '/my-page/account',
+    meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.NO_PERMISSION },
+    redirect: () => getRedirectRouteByPagePermission(MENU_ID.MY_PAGE, store.getters['user/pagePermissionMap']),
     component: MyPageContainer,
     children: [
         {
             path: 'account',
             name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
             meta: { menuId: MENU_ID.MY_PAGE_ACCOUNT },
-            redirect: '/my-page/account/profile',
+            redirect: () => getRedirectRouteByPagePermission(MENU_ID.MY_PAGE_ACCOUNT, store.getters['user/pagePermissionMap']),
             component: { template: '<router-view />' },
             children: [
                 {

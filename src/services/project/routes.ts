@@ -38,6 +38,7 @@ export default {
         {
             path: ':id',
             name: PROJECT_ROUTE.DETAIL._NAME,
+            meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
             redirect: ':id/summary',
             props: true,
             component: { template: '<keep-alive><router-view /></keep-alive>' },

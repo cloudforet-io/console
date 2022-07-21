@@ -1,7 +1,10 @@
 import { upperCase } from 'lodash';
 import type { RouteConfig } from 'vue-router';
 
+import { store } from '@/store';
+
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
+import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
@@ -32,7 +35,7 @@ const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
     meta: { menuId: MENU_ID.ASSET_INVENTORY, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: '/asset-inventory/cloud-service',
+    redirect: () => getRedirectRouteByPagePermission(MENU_ID.ASSET_INVENTORY, store.getters['user/pagePermissionMap']),
     component: AssetInventoryContainer,
     children: [
         {

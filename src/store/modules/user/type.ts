@@ -1,4 +1,4 @@
-import type { PagePermission } from '@/lib/access-control/page-permission-helper';
+import type { RawPagePermission } from '@/lib/access-control/page-permission-helper';
 
 type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
 type UserBackend = 'LOCAL' | 'EXTERNAL';
@@ -10,7 +10,7 @@ export interface UserRole {
     roleId?: string;
     name: string;
     roleType: RoleType;
-    pagePermissions: PagePermission[];
+    pagePermissions: RawPagePermission[];
 }
 
 export interface UserState {

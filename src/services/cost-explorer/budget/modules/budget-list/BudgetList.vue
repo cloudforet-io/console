@@ -107,7 +107,6 @@ export default {
         const fetchBudgetUsages = async () => {
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
-                console.debug('fetchBudgetUsages', results);
                 state.budgetUsages = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
