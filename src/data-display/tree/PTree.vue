@@ -8,6 +8,7 @@
           :ondragstart="onDragStart"
           :ondragend="onDragEnd"
           :unfold-when-dragover="true"
+          :selected-paths="selectedPaths"
           @drop="handleDrop"
     >
         <template #default="{node, path}">
@@ -183,9 +184,6 @@ export default defineComponent<Props>({
         const getSelectState = (path: number[]) => !!state.selectedPaths.find(d => d.toString() === path.toString());
 
         const resetSelect = () => {
-            state.selectedItems.forEach((d) => {
-                d.node.$nodeBackClass = '';
-            });
             state.selectedItems = [];
         };
 
@@ -200,20 +198,15 @@ export default defineComponent<Props>({
                 if (idx === -1) {
                     if (value) {
                         state.selectedItems = [...state.selectedItems, { node, path }];
-                        node.$nodeBackClass = 'selected';
                     }
                 } else {
                     state.selectedItems.splice(idx, 1);
-                    node.$nodeBackClass = '';
                 }
                 return;
             }
-
             // single select
             if (value) {
-                if (state.selectedItems[0]) state.selectedItems[0].node.$nodeBackClass = '';
                 state.selectedItems = [{ node, path }];
-                node.$nodeBackClass = 'selected';
             } else {
                 resetSelect();
             }
@@ -236,14 +229,8 @@ export default defineComponent<Props>({
 
                 targetItems = unionBy(state.selectedItems, targetItems, d => d.path.toString());
                 if (value) {
-                    targetItems.forEach(({ node }) => {
-                        node.$nodeBackClass = 'selected';
-                    });
                     state.selectedItems = targetItems;
                 } else {
-                    targetItems.forEach(({ node }) => {
-                        node.$nodeBackClass = '';
-                    });
                     state.selectedItems = [];
                 }
 
@@ -252,10 +239,8 @@ export default defineComponent<Props>({
 
             // single select
             if (value) {
-                if (state.selectedItems[0]) state.selectedItems[0].node.$nodeBackClass = '';
                 if (targetItems[0]) {
                     state.selectedItems = [targetItems[0]];
-                    targetItems[0].node.$nodeBackClass = 'selected';
                 }
             } else {
                 resetSelect();
@@ -272,7 +257,6 @@ export default defineComponent<Props>({
 
         const changeSelectState = (node: TreeNode, path: number[], value = true): void => {
             if (props.selectOptions.disabled) return;
-
             setSelectItem(node, path, value);
         };
 
@@ -385,9 +369,8 @@ export default defineComponent<Props>({
                     node.children = [];
 
                     if (props.dataFetcher) {
-                        state.selectedItems = state.selectedItems.filter(({ node: selectedNode, path: selectedPath }) => {
+                        state.selectedItems = state.selectedItems.filter(({ path: selectedPath }) => {
                             const isChildOfToggledNode = selectedPath.length > path.length && path.every((d, i) => selectedPath[i] === d);
-                            if (isChildOfToggledNode) selectedNode.$nodeBackClass = '';
                             return !isChildOfToggledNode;
                         });
                     }

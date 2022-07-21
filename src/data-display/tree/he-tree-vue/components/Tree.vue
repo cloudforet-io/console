@@ -6,6 +6,7 @@
                        :parent-path="[]"
                        :root-node="rootNode"
                        :rtl="rtl"
+                       :selected-paths="selectedPaths"
         >
             <template #default="scope">
               <slot v-bind="scope" />
@@ -52,6 +53,10 @@ export default defineComponent({
           type: Object,
           default: () => ({})
         },
+        selectedPaths: {
+            type: Array,
+            default: () => []
+        }
     },
     mixins: [
       updatablePropsEvenUnbound({

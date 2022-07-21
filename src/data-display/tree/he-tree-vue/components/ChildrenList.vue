@@ -5,7 +5,7 @@
              :class="{'he-tree--hidden': node.$hidden}"
              :data-tree-node-path="getTreeNodePath(index).join(',')"
         >
-            <div class="tree-node-back" :class="node.$nodeBackClass" :style="indentStyle">
+            <div class="tree-node-back" :class="{selected: getSelectedState(index)}" :style="indentStyle">
                 <div class="tree-node">
                     <slot v-bind="{node, index, path: getTreeNodePath(index)}">
                         {{ node.text ? node.text : node.data }}
@@ -20,6 +20,7 @@
                                :parent-path="getTreeNodePath(index)"
                                :root-node="rootNode"
                                :rtl="rtl"
+                               :selected-paths="selectedPaths"
                 >
                     <template #default="scope">
                         <slot v-bind="scope" />
@@ -43,6 +44,7 @@ interface ChildrenListProps {
   nodes: any[];
   parent: any;
   rootNode: any;
+  selectedPaths: number[][];
 }
 export default defineComponent<ChildrenListProps>({
     name: 'ChildrenList',
@@ -71,6 +73,10 @@ export default defineComponent<ChildrenListProps>({
             type: Object,
             default: () => ({}),
         },
+        selectedPaths: {
+            type: Array,
+            default: () => [],
+        },
     },
     setup(props) {
         const state = reactive({
@@ -79,9 +85,14 @@ export default defineComponent<ChildrenListProps>({
             })),
         });
         const getTreeNodePath = (index: number) => [...props.parentPath, index];
+        const getSelectedState = (index: number): boolean => {
+            const path = JSON.stringify(getTreeNodePath(index));
+            return props.selectedPaths.some(p => JSON.stringify(p) === path);
+        };
         return {
             ...toRefs(state),
             getTreeNodePath,
+            getSelectedState,
         };
     },
 });
