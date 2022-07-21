@@ -48,10 +48,12 @@
                         </p-select-dropdown>
                     </template>
                     <template #col-plugin_info.plugin_id-format="{item}">
-                        <p-lazy-img :src="item.plugin_icon"
-                                    width="1rem" height="1rem" class="mr-2"
-                        />
-                        {{ item.plugin_name }}
+                        <div class="plugin-info-col">
+                            <p-lazy-img :src="item.plugin_icon"
+                                        width="1rem" height="1rem" class="mr-2"
+                            />
+                            {{ item.plugin_name }}
+                        </div>
                     </template>
                     <template #col-state-format="data">
                         <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
@@ -107,10 +109,12 @@
                               class="selected-data-tab"
                 >
                     <template #col-plugin_info.plugin_id-format="{item}">
-                        <p-lazy-img :src="item.plugin_icon"
-                                    width="1.5rem" height="1.5rem" class="mr-2"
-                        />
-                        {{ item.plugin_name }}
+                        <div class="plugin-info-col">
+                            <p-lazy-img :src="item.plugin_icon"
+                                        width="1.5rem" height="1.5rem" class="mr-2"
+                            />
+                            {{ item.plugin_name }}
+                        </div>
                     </template>
                     <template #col-state-format="data">
                         <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
@@ -154,10 +158,12 @@
                              @confirm="checkModalConfirm"
         >
             <template #col-plugin_info.plugin_id-format="{item}">
-                <p-lazy-img :src="item.plugin_icon"
-                            width="1.5rem" height="1.5rem" class="mr-2"
-                />
-                {{ item.plugin_name }}
+                <div class="plugin-info-col">
+                    <p-lazy-img :src="item.plugin_icon"
+                                width="1.5rem" height="1.5rem" class="mr-2"
+                    />
+                    {{ item.plugin_name }}
+                </div>
             </template>
             <template #col-state-format="data">
                 <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
@@ -576,5 +582,8 @@ li {
     text-align: center;
     margin-bottom: 0.5rem;
     font-size: 1.5rem;
+}
+.plugin-info-col {
+    @apply flex items-center;
 }
 </style>
