@@ -14,7 +14,7 @@
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_LABEL')">
                 <p-text-input v-model="formState.name" class="name" :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_PLACEHOLDER')" />
             </p-field-group>
-            <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIMEZONE_LABEL')">
+            <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIMEZONE_LABEL')" required>
                 <p-search-dropdown :selected.sync="formState.timezone" :menu="timezones"
                                    class="timezone"
                                    use-fixed-menu-style
@@ -27,7 +27,7 @@
                            :invalid-text="validationState.invalidText"
             >
                 <template #label-extra>
-                    <span class="label-help-text">{{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_DESC') }}</span>
+                    <span class="label-help-text">{{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_DESC',{ timezone: formState.timezone[0].label}) }}</span>
                 </template>
                 <div v-for="(type, idx) in Object.keys(scheduleTypes)" :key="idx"
                      class="time-schedule-wrapper block lg:flex h-48 lg:h-40"

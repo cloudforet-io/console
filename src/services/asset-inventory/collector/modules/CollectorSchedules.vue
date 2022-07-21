@@ -42,6 +42,9 @@
                     {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_ACTION') }}
                 </p-select-dropdown>
             </template>
+            <template #th-schedule-format="{ field }">
+                {{ field.label }} ({{ timezone }})
+            </template>
             <template #col-schedule-format="{value}">
                 <span v-if="value.hours.length > 0">
                     {{ getTimezoneHours(value.hours) }}

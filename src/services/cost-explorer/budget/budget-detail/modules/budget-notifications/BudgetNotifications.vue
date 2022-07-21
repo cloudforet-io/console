@@ -100,6 +100,8 @@ import {
     PAnchor, PBadge, PButton, PCard, PIconButton, PLottie,
 } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
 import { getUUID } from '@/lib/component-util/getUUID';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -151,8 +153,7 @@ export default {
 
         const checkDeleteState = reactive({
             visible: false,
-            // song-lang
-            headerTitle: 'Are you sure you want to delete the budget notifications?',
+            headerTitle: computed(() => i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DELETE_MODAL_TITLE')),
             loading: false,
         });
         const handleDelete = () => {
