@@ -10,9 +10,9 @@
         >
             <template #tab="{name}">
                 <div class="box" :class="{selected: name === activeTab}">
-                    <span>{{ dataMap[name].label }}</span>
+                    <span>{{ labelMap[name] }}</span>
                     <span v-if="name === SERVICE_CATEGORY.STORAGE" class="suffix">({{ storageSuffix }})</span>
-                    <span class="count"> {{ name === SERVICE_CATEGORY.STORAGE ? byteFormatter(dataMap[name].count).split(' ')[0] : commaFormatter(dataMap[name].count) }}</span>
+                    <span v-if="!summaryLoading" class="count"> {{ name === SERVICE_CATEGORY.STORAGE ? byteFormatter(countMap[name]).split(' ')[0] : commaFormatter(countMap[name]) }}</span>
                 </div>
             </template>
         </p-balloon-tab>
@@ -41,7 +41,7 @@
                 </div>
                 <div class="summary-wrapper">
                     <div class="sub-title">
-                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataMap[activeTab].label }) }}
+                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: labelMap[activeTab] }) }}
                     </div>
                     <template v-if="!loading && summaryData.length > 0">
                         <div class="summary-content-wrapper">
@@ -51,7 +51,7 @@
                                 <div class="text-group">
                                     <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
                                 </div>
-                                <span class="count">{{ activeTab === SERVICE_CATEGORY.STORAGE ? byteFormatter(dataMap[activeTab].count) : commaFormatter(dataMap[activeTab].count) }}</span>
+                                <span class="count">{{ activeTab === SERVICE_CATEGORY.STORAGE ? byteFormatter(countMap[activeTab]) : commaFormatter(countMap[activeTab]) }}</span>
                             </router-link>
                             <router-link v-for="(data, idx) of summaryData" :key="idx"
                                          :to="data.to"
@@ -70,7 +70,7 @@
                             <div class="m-auto">
                                 <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
                                 <p class="text">
-                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: dataMap[activeTab].label }) }}
+                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: labelMap[activeTab] }) }}
                                 </p>
                             </div>
                         </div>
@@ -85,7 +85,7 @@
                     <div class="sub-title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE_TITLE') }}</span>
                     </div>
-                    <project-region-service :project-id="projectId" :label="activeTab" :count="dataMap[activeTab].count" />
+                    <project-region-service :project-id="projectId" :label="activeTab" :count="countMap[activeTab]" />
                 </div>
             </div>
         </div>
@@ -98,8 +98,8 @@ import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import * as am4charts from '@amcharts/amcharts4/charts';
 import type { XYChart } from '@amcharts/amcharts4/charts';
+import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { byteFormatter, commaFormatter } from '@spaceone/console-core-lib';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -127,9 +127,7 @@ import { gray, primary1, primary2 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import type { DateType, ServiceCategory } from '@/services/project/project-detail/project-summary/modules/config';
-import {
-    DATE_TYPE, SERVICE_CATEGORY,
-} from '@/services/project/project-detail/project-summary/modules/config';
+import { DATE_TYPE, SERVICE_CATEGORY } from '@/services/project/project-detail/project-summary/modules/config';
 import ProjectRegionService from '@/services/project/project-detail/project-summary/modules/ProjectRegionService.vue';
 
 
@@ -167,6 +165,7 @@ export default {
         const queryHelper = new QueryHelper();
         const state = reactive({
             loading: true,
+            summaryLoading: true,
             chart: null as XYChart | null,
             chartRef: null as HTMLElement | null,
             skeletons: range(4),
@@ -182,40 +181,17 @@ export default {
             storageTrendSuffix: 'TB' as Unit,
             tabs: Object.values(SERVICE_CATEGORY),
             activeTab: SERVICE_CATEGORY.SERVER as ServiceCategory,
-            dataMap: computed(() => ({
-                [SERVICE_CATEGORY.SERVER]: {
-                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.SERVER'),
-                    count: 0,
-                },
-                [SERVICE_CATEGORY.CONTAINER]: {
-                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.CONTAINER'),
-                    count: 0,
-                },
-                [SERVICE_CATEGORY.DATABASE]: {
-                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE'),
-                    count: 0,
-                },
-                [SERVICE_CATEGORY.NETWORKING]: {
-                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.NETWORKING'),
-                    count: 0,
-                },
-                [SERVICE_CATEGORY.STORAGE]: {
-                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE'),
-                    count: 0,
-                },
-                [SERVICE_CATEGORY.SECURITY]: {
-                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.SECURITY'),
-                    count: 0,
-                },
-                [SERVICE_CATEGORY.ANALYTICS]: {
-                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.ANALYTICS'),
-                    count: 0,
-                },
-                [SERVICE_CATEGORY.ALL]: {
-                    label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.ALL'),
-                    count: 0,
-                },
+            labelMap: computed(() => ({
+                [SERVICE_CATEGORY.SERVER]: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.SERVER'),
+                [SERVICE_CATEGORY.CONTAINER]: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.CONTAINER'),
+                [SERVICE_CATEGORY.DATABASE]: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE'),
+                [SERVICE_CATEGORY.NETWORKING]: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.NETWORKING'),
+                [SERVICE_CATEGORY.STORAGE]: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE'),
+                [SERVICE_CATEGORY.SECURITY]: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.SECURITY'),
+                [SERVICE_CATEGORY.ANALYTICS]: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.ANALYTICS'),
+                [SERVICE_CATEGORY.ALL]: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.ALL'),
             })),
+            countMap: {},
             summaryData: [] as SummaryData[],
         });
         const chartState = reactive({
@@ -322,23 +298,28 @@ export default {
         };
 
         /* Api */
-        const getCount = async () => {
+        const getCloudServiceSummary = async () => {
             try {
+                state.summaryLoading = true;
                 const { results } = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
                     project_id: props.projectId,
                     labels: Object.values(SERVICE_CATEGORY),
                 });
 
-                results.forEach((result) => {
-                    const count = result.total || 0;
-                    const label: ServiceCategory = result.label;
-                    if (label === SERVICE_CATEGORY.STORAGE) {
+                state.countMap = {};
+                Object.values(SERVICE_CATEGORY).forEach((serviceName) => {
+                    const result = results.find(d => d.label === serviceName);
+                    const count = result?.total || 0;
+                    state.countMap[serviceName] = count;
+                    if (serviceName === SERVICE_CATEGORY.STORAGE) {
                         state.storageSuffix = byteFormatter(count).split(' ')[1] as Unit;
                     }
-                    state.dataMap[label].count = count;
                 });
             } catch (e) {
+                state.countMap = {};
                 ErrorHandler.handleError(e);
+            } finally {
+                state.summaryLoading = false;
             }
         };
         const getTrend = async (type) => {
@@ -483,17 +464,15 @@ export default {
         };
 
         /* Init */
-        const init = async () => {
-            await getCount();
-            // await Promise.allSettled(Object.values(SERVICE_CATEGORY).map(d => getCount(d)));
-        };
+        (async () => {
+            await getCloudServiceSummary();
+        })();
         const chartInit = async () => {
             await getTrend(SERVICE_CATEGORY.SERVER);
             setTimeout(() => {
                 chartState.loading = false;
             }, 300);
         };
-        init();
         chartInit();
 
         /* Watcher */
