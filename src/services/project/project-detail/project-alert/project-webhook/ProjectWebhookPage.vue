@@ -44,11 +44,13 @@
                 </p-select-dropdown>
             </template>
             <template #col-plugin_info.plugin_id-format="{value}">
-                <p-lazy-img :src="plugins[value] ? plugins[value].icon : 'ic_webhook'"
-                            error-icon="ic_webhook"
-                            width="1.5rem" height="1.5rem" class="mr-2"
-                />
-                {{ plugins[value] ? plugins[value].label : value }}
+                <div class="col-type">
+                    <p-lazy-img :src="plugins[value] ? plugins[value].icon : 'ic_webhook'"
+                                error-icon="ic_webhook"
+                                width="1.5rem" height="1.5rem" class="mr-2"
+                    />
+                    {{ plugins[value] ? plugins[value].label : value }}
+                </div>
             </template>
             <template #col-state-format="{ value }">
                 <p-status
@@ -444,6 +446,10 @@ export default {
     .p-toolbox-table::v-deep {
         .p-toolbox {
             padding-top: 0;
+        }
+        .col-type {
+            display: flex;
+            align-items: center;
         }
     }
     .p-button-modal::v-deep {
