@@ -124,8 +124,9 @@ export class QueryHelper {
         QueryHelper.timezone = timezone;
     }
 
-    set timezone(timezone: string|undefined) {
+    setTimezone(timezone: string|undefined): this {
         this._timezone = timezone;
+        return this;
     }
 
     setReference(referenceStore?: ReferenceStore): this {

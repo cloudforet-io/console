@@ -232,8 +232,7 @@ export default {
                 return [];
             }
         };
-        const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.timezone = 'UTC';
+        const apiQueryHelper = new ApiQueryHelper().setTimezone('UTC');
         const listHistory = async (refresh = false) => {
             if (refresh) {
                 state.items = [];
