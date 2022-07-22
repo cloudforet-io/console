@@ -29,9 +29,9 @@
 	},
 	"AUTH": {
 		"RESET_PASSWORD_PAGE": {
+			"ALREADY_RESET_TEXT": "パスワードはすでにリセットされています。",
 			"GO_TO_LOGIN_PAGE": "ログインページへ移動",
 			"HELP_TEXT": "アカウントの新しいパスワード入力:",
-			"HELP_TEXT_2": "",
 			"INVALID_LINK": "",
 			"RESET_PASSWORD": "パスワード再設定"
 		}
