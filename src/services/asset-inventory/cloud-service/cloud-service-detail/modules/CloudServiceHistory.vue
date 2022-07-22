@@ -310,6 +310,9 @@ export default {
         watch([() => state.selectedMonth, () => state.selectedYear], () => {
             listHistory(true);
         }, { immediate: false });
+        watch(() => state.showDetailOverlay, (visible) => {
+            if (!visible) state.selectedKeyName = '';
+        });
 
         onMounted(() => {
             useInfiniteScroll(state.timelineWrapperRef, () => {
