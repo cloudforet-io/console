@@ -4,6 +4,11 @@
             <p-page-title :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')" child @goBack="$router.go(-1)">
                 <template #title-right-extra>
                     <div class="title-right-extra">
+                        <template v-if="cloudServiceItem.name">
+                            <span class="label-text">Name: </span>
+                            {{ cloudServiceItem.name }}
+                            <p-divider :vertical="true" />
+                        </template>
                         <span class="label-text">ID: </span>
                         <p-copy-button>
                             {{ cloudServiceId }}
@@ -86,7 +91,7 @@ import {
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
-    PPaneLayout, PPageTitle, PTab, PLottie, PCopyButton, PBadge,
+    PPaneLayout, PPageTitle, PTab, PLottie, PCopyButton, PBadge, PDivider,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { useInfiniteScroll } from '@vueuse/core';
@@ -114,7 +119,7 @@ interface Props {
     selectedKeyName?: string;
     totalCount: number;
     provider: string;
-    cloudServiceId: string;
+    cloudServiceItem: any;
 }
 
 interface SelectedCloudServiceHistoryItem {
@@ -135,6 +140,7 @@ export default defineComponent<Props>({
         PLottie,
         PCopyButton,
         PBadge,
+        PDivider,
     },
     props: {
         loading: {
@@ -161,14 +167,15 @@ export default defineComponent<Props>({
             type: String,
             default: '',
         },
-        cloudServiceId: {
-            type: String,
-            default: '',
+        cloudServiceItem: {
+            type: Object,
+            default: () => ({}),
         },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
+            cloudServiceId: computed(() => props.cloudServiceItem.cloud_service_id),
             timelineWrapperRef: null as null | HTMLElement,
             selectedHistoryRecordId: '',
             selectedHistoryRecordDate: '',
@@ -258,6 +265,9 @@ export default defineComponent<Props>({
                 align-items: center;
                 float: right;
                 font-size: 0.875rem;
+                .p-divider {
+                    margin: 0 0.75rem;
+                }
                 .label-text {
                     @apply text-gray-500;
                     padding-right: 0.25rem;
