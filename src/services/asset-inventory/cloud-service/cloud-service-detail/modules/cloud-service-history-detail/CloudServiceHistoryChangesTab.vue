@@ -158,6 +158,7 @@ export default defineComponent({
                 .p-context-menu {
                     height: 100%;
                     border: none;
+                    max-height: unset;
                     & span {
                         border-radius: 0.25rem;
                     }
