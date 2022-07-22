@@ -21,6 +21,8 @@ import { initDayjs } from '@/lib/site-initializer/dayjs';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { loadAuth } from '@/services/auth/authenticator/loader';
+
 
 const initConfig = async () => {
     await config.init();
@@ -131,12 +133,24 @@ const initErrorHandler = () => {
     });
 };
 
-const checkSsoAccessToken = () => {
+const checkSsoAccessToken = async () => {
     if (window.location.pathname === '/reset-password') return;
     const queryString = window.location.search;
     const params = new URLSearchParams(queryString);
     const ssoAccessToken = params.get('sso_access_token');
-    if (ssoAccessToken) window.location.pathname = 'reset-password';
+    // signOut
+    if (ssoAccessToken) {
+        if (SpaceConnector.isTokenAlive) {
+            try {
+                const authType = store.state.domain.extendedAuthType;
+                await loadAuth(authType).signOut();
+                await store.dispatch('user/setIsSessionExpired', true);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        }
+        window.location.pathname = 'reset-password';
+    }
 };
 
 const removeInitializer = () => {
@@ -160,7 +174,7 @@ const init = async () => {
         initAmcharts();
         initErrorHandler();
         initRequestIdleCallback();
-        checkSsoAccessToken();
+        await checkSsoAccessToken();
     } else {
         initRouter();
         throw new Error('Site initialization failed: No matched domain');
