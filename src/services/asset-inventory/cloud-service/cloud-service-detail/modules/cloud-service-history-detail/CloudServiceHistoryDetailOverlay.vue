@@ -32,7 +32,7 @@
                         >
                             <template #additional-title>
                                 <div v-if="item.noteItemMap.length">
-                                    <span class="title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}</span>
+                                    <span class="additional-title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}</span>
                                     <p-badge style-type="gray200">
                                         {{ item.noteItemMap.length }}
                                     </p-badge>
@@ -270,8 +270,7 @@ export default defineComponent<Props>({
                 .title-wrapper {
                     font-size: 1rem;
                     padding-bottom: 0.75rem;
-                    .title {
-                        font-weight: bold;
+                    .additional-title {
                         padding-right: 0.25rem;
                     }
                     .total-count {
