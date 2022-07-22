@@ -73,3 +73,5 @@ export const pagePermissionMap: Getter<UserState, any> = (state, getters): Recor
     });
     return result;
 };
+
+export const isUserNeedPasswordReset: Getter<UserState, any> = (state): boolean => !!state.requiredActions?.includes('UPDATE_PASSWORD');
