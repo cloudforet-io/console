@@ -55,20 +55,29 @@ export class SpaceRouter {
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             nextPath = to.fullPath;
             const isTokenAlive = SpaceConnector.isTokenAlive;
+            const userPagePermissions = SpaceRouter.router.app.$store.getters['user/pagePermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
-            const userAccessLevel = getUserAccessLevel(to.name, SpaceRouter.router.app.$store.getters['user/pagePermissionList'], isTokenAlive);
+            const userAccessLevel = getUserAccessLevel(to.name, userPagePermissions, isTokenAlive);
+            const userNeedPwdReset = SpaceRouter.router.app.$store.getters['user/isUserNeedPasswordReset'];
             let nextLocation;
 
+            // When a user is authenticated
             if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
-                if (to.meta?.isSignInPage) {
+                // When a user need to reset password and tries to go to other pages, redirect to reset password page
+                if (userNeedPwdReset && to.name !== AUTH_ROUTE.RESET_PASSWORD._NAME) {
+                    nextLocation = { name: AUTH_ROUTE.RESET_PASSWORD._NAME };
+                // When a user is already signed in and tries to go to sign in page, redirect to dashboard page
+                } else if (to.meta?.isSignInPage) {
                     nextLocation = { name: DASHBOARD_ROUTE._NAME };
+                // When a user tries to go to inaccessible page, Rrdirect to error page
                 } else if (userAccessLevel < routeAccessLevel) {
                     nextLocation = { name: ERROR_ROUTE._NAME };
                 }
+            // When an unauthenticated(or token expired) user tries to access a page that only authenticated users can enter, refresh token
             } else if (routeAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
                 const res = await SpaceConnector.refreshAccessToken(false);
+                // When refreshing token is failed, redirect to sign in page
                 if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
-                else nextLocation = { name: to.name, params: to.params };
             }
 
             next(nextLocation);
