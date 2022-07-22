@@ -32,7 +32,7 @@
 			"GO_TO_LOGIN_PAGE": "로그인 페이지로 이동",
 			"HELP_TEXT": "다음 계정의 새로운 비밀번호 입력 필요: ",
 			"HELP_TEXT_2": "요부분은 런칭이후 backend 프로세스 마련하여 기획후 진행예정입니다.",
-			"INVALID_LINK": "//",
+			"INVALID_LINK": "잘못된 링크입니다.",
 			"RESET_PASSWORD": "비밀번호 재설정"
 		}
 	},
