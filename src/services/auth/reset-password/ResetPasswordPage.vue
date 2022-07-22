@@ -1,5 +1,5 @@
 <template>
-    <div class="reset-password-page">
+    <p-data-loader class="reset-password-page" :loading="loading">
         <div v-if="showResetPassword" class="reset-password-wrapper">
             <p class="title">
                 {{ $t('AUTH.RESET_PASSWORD_PAGE.RESET_PASSWORD') }}
@@ -42,11 +42,8 @@
         </div>
         <div v-else class="invalid-link-wrapper">
             <img class="logo-character" src="@/assets/images/brand-asset_no-file_opacity50.svg">
-            <p class="title">
-                {{ $t('AUTH.RESET_PASSWORD_PAGE.INVALID_LINK') }}
-            </p>
             <p class="help-text">
-                {{ $t('AUTH.RESET_PASSWORD_PAGE.HELP_TEXT_2') }}
+                {{ $t('AUTH.RESET_PASSWORD_PAGE.INVALID_LINK') }}
             </p>
             <p-button style-type="primary" size="md" class="reset-button"
                       @click="handleGoToLoginPage"
@@ -54,7 +51,7 @@
                 {{ $t('AUTH.RESET_PASSWORD_PAGE.GO_TO_LOGIN_PAGE') }}
             </p-button>
         </div>
-    </div>
+    </p-data-loader>
 </template>
 
 <script lang="ts">
@@ -64,7 +61,9 @@ import {
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { PButton, PFieldGroup, PTextInput } from '@spaceone/design-system';
+import {
+    PButton, PFieldGroup, PTextInput, PDataLoader,
+} from '@spaceone/design-system';
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
 
@@ -75,9 +74,8 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { getPasswordValidationInfo } from '@/services/auth/lib/helper';
+import { getDefaultRouteAfterSignIn, getPasswordValidationInfo } from '@/services/auth/lib/helper';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
-import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 
 const UPDATE_PASSWORD_ACTION = 'UPDATE_PASSWORD';
@@ -88,14 +86,16 @@ export default {
         PFieldGroup,
         PTextInput,
         PButton,
+        PDataLoader,
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
+            loading: true,
             userId: '',
             userType: '',
             showResetPassword: false,
-            isLoginUser: computed(() => !!store.state.user.userId),
+            isSessionExpired: computed(() => !!store.state.user.isSessionExpired),
         });
 
         const {
@@ -133,11 +133,23 @@ export default {
         /* Api */
         const getUserInfo = async () => {
             try {
-                const result = await SpaceConnector.client.identity.user.get({
+                const response = await SpaceConnector.client.identity.user.get({
                     user_id: state.userId,
                 });
-                state.userType = result.user_type || 'USER';
-                const requiredActions = result.required_actions;
+                const userInfo = {
+                    userId: response.user_id,
+                    userType: 'USER',
+                    backend: response.backend,
+                    name: response.name,
+                    email: response.email,
+                    language: response.language,
+                    timezone: response.timezone,
+                    requiredActions: response.required_actions,
+                };
+                await store.dispatch('user/setUser', userInfo);
+                //
+                const requiredActions = response.required_actions;
+                state.userType = response.user_type || 'USER';
                 state.showResetPassword = requiredActions.includes(UPDATE_PASSWORD_ACTION);
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -173,7 +185,9 @@ export default {
 
             await updateUser();
             await signIn();
-            await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+
+            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasPermission']);
+            await vm.$router.push(defaultRoute);
         };
         const handleGoToLoginPage = () => {
             SpaceRouter.router.push({ name: AUTH_ROUTE.SIGN_IN._NAME });
@@ -181,14 +195,15 @@ export default {
 
         /* Init */
         (async () => {
-            if (state.isLoginUser) {
+            if (!state.isSessionExpired) {
                 if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
                     state.userId = store.state.user.userId;
                     state.userType = store.state.user.userType;
                     state.showResetPassword = true;
                 } else {
-                    await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                    state.showResetPassword = false;
                 }
+                state.loading = false;
             } else {
                 const userId = getUserIdFromToken();
                 if (userId) {
@@ -197,6 +212,7 @@ export default {
                 } else {
                     state.showResetPassword = false;
                 }
+                state.loading = false;
             }
         })();
 

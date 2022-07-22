@@ -88,6 +88,10 @@ class API {
         if (API.checkRefreshingState() !== 'true') {
             let decoded = this.refreshToken ? jwtDecode<any>(this.refreshToken) : undefined;
             console.log('[API][refreshAccessToken] start refreshing token. ttl: ', decoded ? decoded.ttl : 'no refresh token!!', ' decoded: ', decoded);
+            if (decoded) {
+                const current = API.getCurrentTime();
+                console.log('[API][refreshAccessToken] token exp: ', decoded.exp, ', current time: ', current, ', exp - current time: ', decoded.exp - current);
+            }
             try {
                 API.setRefreshingState();
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
@@ -97,7 +101,7 @@ class API {
                 console.log('[API][refreshAccessToken] refreshed token is set. ttl: ', decoded.ttl, ' decoded: ', decoded);
                 return true;
             } catch (e) {
-                console.log('[API][refreshAccessToken] token refresh failed! error: ', e);
+                console.error('[API][refreshAccessToken] token refresh failed! error: ', e);
                 this.flushToken();
                 if (executeSessionTimeoutCallback) this.sessionTimeoutCallback();
                 return false;
@@ -202,7 +206,7 @@ class API {
         this.refreshInstance.interceptors.response.use(
             (response: AxiosResponse) => response,
             (error) => {
-                console.log('[API][refreshInstance interceptors] response error occurred! error: ', error);
+                console.error('[API][refreshInstance interceptors] response error occurred! error: ', error);
                 return Promise.reject(error);
             },
         );

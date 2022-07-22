@@ -119,7 +119,7 @@ export default defineComponent({
         const handleCodeDisplayType = () => { state.folding = !state.folding; };
 
         watch(() => props.selectedHistoryItem, (d) => {
-            state.selectedKeyMenu = props.selectedKeyName || d?.diffItems?.at(0)?.key || '';
+            state.selectedKeyMenu = d?.diffItems?.at(0)?.key || '';
         });
 
         return {

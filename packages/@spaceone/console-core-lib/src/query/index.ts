@@ -34,7 +34,7 @@ const filterToQueryTag = (
     if (filter.k === undefined || filter.k === null) {
         /* no key case */
         if (filter.v === null || filter.v === undefined) return null;
-        return { value: { label: 'Null', name: filter.v } };
+        return { value: { label: filter.v?.toString() ?? 'Null', name: filter.v } };
     }
     if (filter.v === null || filter.v === undefined) {
         /* null case */
@@ -124,8 +124,9 @@ export class QueryHelper {
         QueryHelper.timezone = timezone;
     }
 
-    set timezone(timezone: string|undefined) {
+    setTimezone(timezone: string|undefined): this {
         this._timezone = timezone;
+        return this;
     }
 
     setReference(referenceStore?: ReferenceStore): this {

@@ -32,7 +32,7 @@
                         >
                             <template #additional-title>
                                 <div v-if="item.noteItemMap.length">
-                                    <span class="title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}</span>
+                                    <span class="additional-title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}</span>
                                     <p-badge style-type="gray200">
                                         {{ item.noteItemMap.length }}
                                     </p-badge>
@@ -67,7 +67,9 @@
                             />
                         </template>
                         <template #note>
-                            <cloud-service-history-detail-note :record-id="selectedHistoryRecordId" />
+                            <cloud-service-history-detail-note :record-id="selectedHistoryRecordId"
+                                                               @refresh-note-count="handleRefreshNoteCount"
+                            />
                         </template>
                     </p-tab>
                 </div>
@@ -103,6 +105,7 @@ import CloudServiceHistoryLogTab
 import type { CloudServiceHistoryItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
+const TIMELINE_ITEM_LIMIT = 10;
 
 interface Props {
     loading: boolean;
@@ -187,6 +190,9 @@ export default defineComponent<Props>({
             state.proxySelectedHistoryItem = selectedItem.cur;
             state.selectedPrevHistoryRecordDate = selectedItem.prev?.date;
         };
+        const handleRefreshNoteCount = () => {
+            emit('refresh-note-count');
+        };
 
         /* Watcher */
         watch(() => props.selectedHistoryItem, (selectedTimelineItem: CloudServiceHistoryItem) => {
@@ -200,6 +206,9 @@ export default defineComponent<Props>({
                 const selectedEl: HTMLElement = selectedRef[0].$el;
                 selectedEl.scrollIntoView();
             }
+            if (props.historyItems.length === TIMELINE_ITEM_LIMIT) {
+                emit('load-more');
+            }
             useInfiniteScroll(state.timelineWrapperRef, () => {
                 emit('load-more');
             });
@@ -210,6 +219,7 @@ export default defineComponent<Props>({
             HISTORY_ACTION_MAP,
             getTimelineColor,
             handleClickTimeline,
+            handleRefreshNoteCount,
             iso8601Formatter,
         };
     },
@@ -265,13 +275,13 @@ export default defineComponent<Props>({
                 @apply bg-white border border-gray-200 rounded-md;
                 display: flex;
                 flex-direction: column;
+                min-width: 17.75rem;
                 height: 100%;
                 padding: 1.5rem 1rem 0 1rem;
                 .title-wrapper {
                     font-size: 1rem;
                     padding-bottom: 0.75rem;
-                    .title {
-                        font-weight: bold;
+                    .additional-title {
                         padding-right: 0.25rem;
                     }
                     .total-count {

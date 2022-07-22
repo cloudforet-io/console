@@ -50,7 +50,7 @@
                     </template>
                     <template #additional-title>
                         <div v-if="item.noteItemMap.length">
-                            <span class="title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}</span>
+                            <span class="additional-title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}</span>
                             <p-badge style-type="gray200">
                                 {{ item.noteItemMap.length }}
                             </p-badge>
@@ -72,6 +72,7 @@
                                                   :provider="provider"
                                                   :cloud-service-id="cloudServiceId"
                                                   @load-more="handleLoadMore"
+                                                  @refresh-note-count="handleRefreshNoteCount"
             />
         </transition>
     </div>
@@ -117,6 +118,7 @@ import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/cloud-service/clo
 
 const HISTORY_OVERLAY_HASH_NAME = 'history-detail';
 const DIFF_ITEM_LIMIT = 10;
+const TIMELINE_ITEM_LIMIT = 10;
 dayjs.extend(localeData);
 
 
@@ -209,7 +211,7 @@ export default {
         };
         const delay = time => new Promise(resolve => setTimeout(resolve, time));
         const loadMoreHistoryData = async () => {
-            const newPageStart = state.pageStart + DIFF_ITEM_LIMIT;
+            const newPageStart = state.pageStart + TIMELINE_ITEM_LIMIT;
             if (state.totalCount < newPageStart) return;
 
             state.pageStart = newPageStart;
@@ -232,8 +234,7 @@ export default {
                 return [];
             }
         };
-        const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.timezone = 'UTC';
+        const apiQueryHelper = new ApiQueryHelper().setTimezone('UTC');
         const listHistory = async (refresh = false) => {
             if (refresh) {
                 state.items = [];
@@ -241,7 +242,7 @@ export default {
             }
             try {
                 state.loading = true;
-                apiQueryHelper.setPage(state.pageStart, DIFF_ITEM_LIMIT);
+                apiQueryHelper.setPage(state.pageStart, TIMELINE_ITEM_LIMIT);
                 let startDate: Dayjs;
                 let endDate: Dayjs;
                 if (state.selectedMonth !== 'all') {
@@ -294,6 +295,9 @@ export default {
         const handleLoadMore = () => {
             loadMoreHistoryData();
         };
+        const handleRefreshNoteCount = async () => {
+            await listHistory(true);
+        };
 
         /* Init */
         (async () => {
@@ -310,6 +314,9 @@ export default {
         watch([() => state.selectedMonth, () => state.selectedYear], () => {
             listHistory(true);
         }, { immediate: false });
+        watch(() => state.showDetailOverlay, (visible) => {
+            if (!visible) state.selectedKeyName = '';
+        });
 
         onMounted(() => {
             useInfiniteScroll(state.timelineWrapperRef, () => {
@@ -327,6 +334,7 @@ export default {
             handleChange,
             handleLoadMore,
             handleClickKey,
+            handleRefreshNoteCount,
         };
     },
 };
@@ -359,6 +367,9 @@ export default {
             height: 5rem;
             justify-content: center;
             align-items: center;
+        }
+        .additional-title {
+            padding-right: 0.25rem;
         }
     }
     .vertical-timeline {
