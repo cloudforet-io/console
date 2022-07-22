@@ -26,6 +26,8 @@ const DEFAULT_MOCK_CONFIG = Object.freeze({ mockMode: false });
 export class SpaceConnector {
     private static instance: SpaceConnector;
 
+    private apiTokenCheckInterval?: ReturnType<typeof setInterval>;
+
     private readonly api: API;
 
     private _client: any = {};
@@ -38,7 +40,19 @@ export class SpaceConnector {
         this.mockInfo = mockInfo;
         this.api = new API(endpoint, sessionTimeoutCallback);
         this.afterCallApiMap = afterCallApiMap;
-        setInterval(() => this.api.getActivatedToken(), CHECK_TOKEN_TIME);
+        this.setApiTokenCheckInterval();
+    }
+
+    private setApiTokenCheckInterval() {
+        if (this.apiTokenCheckInterval) clearInterval(this.apiTokenCheckInterval);
+        this.apiTokenCheckInterval = setInterval(() => this.api.getActivatedToken(), CHECK_TOKEN_TIME);
+    }
+
+    private clearApiTokenCheckInterval() {
+        if (this.apiTokenCheckInterval) {
+            clearInterval(this.apiTokenCheckInterval);
+            this.apiTokenCheckInterval = undefined;
+        }
     }
 
     static async init(endpoint: string, sessionTimeoutCallback?: SessionTimeoutCallback, mockInfo: MockInfo = {}, afterCallApiMap: AfterCallApiMap = {}): Promise<void> {
@@ -57,9 +71,11 @@ export class SpaceConnector {
 
     static setToken(accessToken: string, refreshToken: string): void {
         SpaceConnector.instance.api.setToken(accessToken, refreshToken);
+        SpaceConnector.instance.setApiTokenCheckInterval();
     }
 
     static flushToken(): void {
+        SpaceConnector.instance.clearApiTokenCheckInterval();
         SpaceConnector.instance.api.flushToken();
     }
 

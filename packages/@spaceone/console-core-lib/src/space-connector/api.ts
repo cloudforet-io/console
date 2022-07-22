@@ -85,34 +85,46 @@ class API {
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
         if (API.checkRefreshingState() !== 'true') {
+            let decoded = this.refreshToken ? jwtDecode<any>(this.refreshToken) : undefined;
+            if (decoded) {
+                const current = API.getCurrentTime();
+                console.log('[API][refreshAccessToken] refresh token ttl, exp: ', decoded.ttl, decoded.exp, ', current time: ', current, ', exp - current time: ', decoded.exp - current);
+            }
             try {
                 API.setRefreshingState();
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
+                console.log('[API][refreshAccessToken] refreshed token succeed');
                 this.setToken(response.data.access_token, response.data.refresh_token);
+                decoded = this.refreshToken ? jwtDecode<any>(this.refreshToken) : undefined;
+                console.log('[API][refreshAccessToken] refreshed token is set. ttl: ', decoded.ttl);
                 return true;
             } catch (e) {
-                console.error('[API][refreshAccessToken] token refresh failed! error: ', e);
+                console.error('[API][refreshAccessToken] token refresh failed! flush tokens. error: ', e);
                 this.flushToken();
                 if (executeSessionTimeoutCallback) this.sessionTimeoutCallback();
                 return false;
             }
         } else {
+            console.log('[API][refreshAccessToken] token refresh is already started');
             return undefined;
         }
     }
 
     async getActivatedToken() {
-        if (this.accessToken) {
-            const isTokenValid = API.checkToken();
+        if (this.accessToken && this.refreshToken) {
+            const isTokenValid = API.checkToken(true);
             if (isTokenValid) this.accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
             else await this.refreshAccessToken();
         }
     }
 
-    static checkToken(): boolean {
+    static checkToken(verbose?: boolean): boolean {
         const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY) || undefined;
         const tokenExpirationTime = API.getTokenExpirationTime(storedAccessToken);
         const currentTime = API.getCurrentTime();
+        if (verbose) {
+            console.log('[API][checkToken] tokenExpirationTime: ', tokenExpirationTime, ' currentTime: ', currentTime, 'tokenExpirationTime - currentTime: ', tokenExpirationTime - currentTime);
+        }
         return (tokenExpirationTime - currentTime) > 10;
     }
 
@@ -148,6 +160,7 @@ class API {
             throw new BadRequestError(error);
         }
         case 401: {
+            console.log('[API][handleRequestError] 401 error occurred');
             const res = this.refreshAccessToken();
             if (!res) throw new AuthenticationError(error);
             else break;
@@ -189,10 +202,7 @@ class API {
         });
         this.refreshInstance.interceptors.response.use(
             (response: AxiosResponse) => response,
-            (error) => {
-                console.error('[API][refreshInstance interceptors] response error occurred! error: ', error);
-                return Promise.reject(error);
-            },
+            error => Promise.reject(error),
         );
 
         // Axios's response interceptor with error handling
