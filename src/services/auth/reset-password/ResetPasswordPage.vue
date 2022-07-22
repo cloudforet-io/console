@@ -147,7 +147,7 @@ export default {
                     timezone: response.timezone,
                     requiredActions: response.required_actions,
                 };
-                await store.dispatch('user/setUser', userInfo);
+                await store.commit('user/setUser', userInfo);
                 //
                 const requiredActions = response.required_actions;
                 state.userType = response.user_type || 'USER';
