@@ -2282,7 +2282,7 @@
 				"ROLE": "Role",
 				"ROLE_HELP_TEXT": "Set a role for selected member",
 				"ROLE_TOOLTIP": "List of Role varies depending on the role type granted to your account.",
-				"ROLE_WARNING": "The role, you’d like to assign to selected member(s), is limited to invite(or edit) them.",
+				"ROLE_WARNING": "If you invite and assign a role to yourself, you may have limited permission for this project.",
 				"TOO_MANY_RESULTS": "Too many search results. Try a different keyword.",
 				"USER_ID": "User ID"
 			},
