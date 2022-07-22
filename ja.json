@@ -29,7 +29,7 @@
 	},
 	"AUTH": {
 		"RESET_PASSWORD_PAGE": {
-			"ALREADY_RESET_TEXT": "パスワードはすでにリセットされています。",
+			"ALREADY_RESET_TEXT": "パスワードが既に変更されました。変更されたパスワードでログインしください。",
 			"GO_TO_LOGIN_PAGE": "ログインページへ移動",
 			"HELP_TEXT": "アカウントの新しいパスワード入力:",
 			"INVALID_LINK": "",
