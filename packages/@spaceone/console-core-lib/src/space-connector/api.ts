@@ -113,7 +113,7 @@ class API {
     }
 
     async getActivatedToken() {
-        if (this.accessToken) {
+        if (this.accessToken && this.refreshToken) {
             const isTokenValid = API.checkToken(true);
             if (isTokenValid) this.accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
             else await this.refreshAccessToken();
