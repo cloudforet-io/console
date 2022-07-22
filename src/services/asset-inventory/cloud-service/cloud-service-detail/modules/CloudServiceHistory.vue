@@ -118,6 +118,7 @@ import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/cloud-service/clo
 
 const HISTORY_OVERLAY_HASH_NAME = 'history-detail';
 const DIFF_ITEM_LIMIT = 10;
+const TIMELINE_ITEM_LIMIT = 10;
 dayjs.extend(localeData);
 
 
@@ -210,7 +211,7 @@ export default {
         };
         const delay = time => new Promise(resolve => setTimeout(resolve, time));
         const loadMoreHistoryData = async () => {
-            const newPageStart = state.pageStart + DIFF_ITEM_LIMIT;
+            const newPageStart = state.pageStart + TIMELINE_ITEM_LIMIT;
             if (state.totalCount < newPageStart) return;
 
             state.pageStart = newPageStart;
@@ -241,7 +242,7 @@ export default {
             }
             try {
                 state.loading = true;
-                apiQueryHelper.setPage(state.pageStart, DIFF_ITEM_LIMIT);
+                apiQueryHelper.setPage(state.pageStart, TIMELINE_ITEM_LIMIT);
                 let startDate: Dayjs;
                 let endDate: Dayjs;
                 if (state.selectedMonth !== 'all') {

@@ -105,6 +105,7 @@ import CloudServiceHistoryLogTab
 import type { CloudServiceHistoryItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
+const TIMELINE_ITEM_LIMIT = 10;
 
 interface Props {
     loading: boolean;
@@ -204,6 +205,9 @@ export default defineComponent<Props>({
             if (selectedRef) {
                 const selectedEl: HTMLElement = selectedRef[0].$el;
                 selectedEl.scrollIntoView();
+            }
+            if (props.historyItems.length === TIMELINE_ITEM_LIMIT) {
+                emit('load-more');
             }
             useInfiniteScroll(state.timelineWrapperRef, () => {
                 emit('load-more');
