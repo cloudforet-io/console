@@ -43,7 +43,7 @@
         <div v-else class="invalid-link-wrapper">
             <img class="logo-character" src="@/assets/images/brand-asset_no-file_opacity50.svg">
             <p class="help-text">
-                {{ $t('AUTH.RESET_PASSWORD_PAGE.INVALID_LINK') }}
+                {{ warningMessage }}
             </p>
             <p-button style-type="primary" size="md" class="reset-button"
                       @click="handleGoToLoginPage"
@@ -96,6 +96,7 @@ export default {
             userType: '',
             showResetPassword: false,
             isSessionExpired: computed(() => !!store.state.user.isSessionExpired),
+            warningMessage: i18n.t('AUTH.RESET_PASSWORD_PAGE.INVALID_LINK'),
         });
 
         const {
@@ -151,6 +152,9 @@ export default {
                 const requiredActions = response.required_actions;
                 state.userType = response.user_type || 'USER';
                 state.showResetPassword = requiredActions.includes(UPDATE_PASSWORD_ACTION);
+                if (!state.showResetPassword) {
+                    state.warningMessage = i18n.t('AUTH.RESET_PASSWORD_PAGE.ALREADY_RESET_TEXT');
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.showResetPassword = false;
@@ -189,8 +193,8 @@ export default {
             const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasPermission']);
             await vm.$router.push(defaultRoute);
         };
-        const handleGoToLoginPage = () => {
-            SpaceRouter.router.push({ name: AUTH_ROUTE.SIGN_IN._NAME });
+        const handleGoToLoginPage = async () => {
+            await SpaceRouter.router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
         };
 
         /* Init */
@@ -202,6 +206,7 @@ export default {
                     state.showResetPassword = true;
                 } else {
                     state.showResetPassword = false;
+                    state.warningMessage = i18n.t('AUTH.RESET_PASSWORD_PAGE.ALREADY_RESET_TEXT');
                 }
                 state.loading = false;
             } else {
