@@ -219,8 +219,11 @@ export default {
             series.tooltip.label.fontSize = 14;
             series.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                    const rawBytes = Number(target.tooltipDataItem.dataContext[legend.name] ?? 0);
-                    return getTooltipText('name', undefined, byteFormatter(rawBytes));
+                    const rawNumber = Number(target.tooltipDataItem.dataContext[legend.name] ?? 0);
+                    if (legend.name === 'data-transfer.out') {
+                        return getTooltipText('name', undefined, byteFormatter(rawNumber));
+                    }
+                    return getTooltipText('name', undefined, rawNumber);
                 }
                 return tooltipText;
             });
@@ -313,7 +316,7 @@ export default {
                     results.push({
                         resourceId,
                         groupBy: getReferenceLabel(resourceId, state.groupBy),
-                        [item.usage_type]: item.usd_cost,
+                        [item.usage_type]: usageQuantity,
                         [usageType[item.usage_type]]: {
                             usd_cost: item.usd_cost,
                             usage_quantity: usageQuantity,

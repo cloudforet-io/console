@@ -18,7 +18,7 @@
                 <p-search-dropdown :selected.sync="formState.timezone" :menu="timezones"
                                    class="timezone"
                                    use-fixed-menu-style
-                                   @select="changeTimezone"
+                                   @update:selected="changeTimezone"
                 />
             </p-field-group>
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_LABEL')"
