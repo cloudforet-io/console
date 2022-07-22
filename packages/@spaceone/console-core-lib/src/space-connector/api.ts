@@ -57,7 +57,6 @@ class API {
         window.localStorage.removeItem(REFRESH_TOKEN_KEY);
         this.accessToken = undefined;
         this.refreshToken = undefined;
-        console.log('[API][flushToken] flush tokens');
     }
 
     setToken(accessToken: string, refreshToken: string): void {
@@ -87,21 +86,20 @@ class API {
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
         if (API.checkRefreshingState() !== 'true') {
             let decoded = this.refreshToken ? jwtDecode<any>(this.refreshToken) : undefined;
-            console.log('[API][refreshAccessToken] start refreshing token. ttl: ', decoded ? decoded.ttl : 'no refresh token!!', ' decoded: ', decoded);
             if (decoded) {
                 const current = API.getCurrentTime();
-                console.log('[API][refreshAccessToken] token exp: ', decoded.exp, ', current time: ', current, ', exp - current time: ', decoded.exp - current);
+                console.log('[API][refreshAccessToken] refresh token ttl, exp: ', decoded.ttl, decoded.exp, ', current time: ', current, ', exp - current time: ', decoded.exp - current);
             }
             try {
                 API.setRefreshingState();
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
-                console.log('[API][refreshAccessToken] refreshed token succeed. response: ', response);
+                console.log('[API][refreshAccessToken] refreshed token succeed');
                 this.setToken(response.data.access_token, response.data.refresh_token);
                 decoded = this.refreshToken ? jwtDecode<any>(this.refreshToken) : undefined;
-                console.log('[API][refreshAccessToken] refreshed token is set. ttl: ', decoded.ttl, ' decoded: ', decoded);
+                console.log('[API][refreshAccessToken] refreshed token is set. ttl: ', decoded.ttl);
                 return true;
             } catch (e) {
-                console.error('[API][refreshAccessToken] token refresh failed! error: ', e);
+                console.error('[API][refreshAccessToken] token refresh failed! flush tokens. error: ', e);
                 this.flushToken();
                 if (executeSessionTimeoutCallback) this.sessionTimeoutCallback();
                 return false;
@@ -200,15 +198,11 @@ class API {
             if (!request.headers) request.headers = {};
 
             request.headers.Authorization = `Bearer ${storedRefreshToken}`;
-            console.log('[API][refreshInstance interceptors] request: ', request);
             return request;
         });
         this.refreshInstance.interceptors.response.use(
             (response: AxiosResponse) => response,
-            (error) => {
-                console.error('[API][refreshInstance interceptors] response error occurred! error: ', error);
-                return Promise.reject(error);
-            },
+            error => Promise.reject(error),
         );
 
         // Axios's response interceptor with error handling
