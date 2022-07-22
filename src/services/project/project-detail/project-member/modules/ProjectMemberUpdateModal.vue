@@ -30,7 +30,7 @@
                             type="radioButton"
                             use-fixed-menu-style
                             :invalid="invalid"
-                            @select="handleSelectRoleItems"
+                            @update:selected="handleSelectRoleItems"
                         />
                     </template>
                     <template #label-extra>
@@ -251,10 +251,11 @@ export default {
             emit('confirm');
             state.proxyVisible = false;
         };
-        const handleSelectRoleItems = (roleItemName) => {
-            const roleItem: any = state.roleItems.find(d => d.name === roleItemName);
+        const handleSelectRoleItems = (roleItems) => {
+            if (!roleItems.length) return;
+            const roleItem: any = state.roleItems.find(d => d?.name === roleItems[0]?.name);
             const pagePermissionMap = getPagePermissionMapFromRaw(roleItem.pagePermissions);
-            setForm('selectedRoleItems', roleItem);
+            setForm('selectedRoleItems', [roleItem]);
             state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
         };
 
