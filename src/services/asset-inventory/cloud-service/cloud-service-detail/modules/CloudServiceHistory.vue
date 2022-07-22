@@ -70,7 +70,7 @@
                                                   :selected-key-name="selectedKeyName"
                                                   :total-count="totalCount"
                                                   :provider="provider"
-                                                  :cloud-service-id="cloudServiceId"
+                                                  :cloud-service-item="cloudServiceItem"
                                                   @load-more="handleLoadMore"
                                                   @refresh-note-count="handleRefreshNoteCount"
             />
@@ -135,9 +135,9 @@ export default {
         PBadge,
     },
     props: {
-        cloudServiceId: {
-            type: String,
-            default: '',
+        cloudServiceItem: {
+            type: Object,
+            default: () => ({}),
         },
         provider: {
             type: String,
@@ -169,7 +169,7 @@ export default {
                 ] as KeyItem[],
             }],
             valueHandlerMap: {
-                'diff.key': makeCustomValueHandler('diff.key', props.cloudServiceId),
+                'diff.key': makeCustomValueHandler('diff.key', props.cloudServiceItem.cloud_service_id),
             },
         });
         const searchQueryHelper = new QueryHelper().setKeyItemSets(handlerState.keyItemSets);
@@ -203,7 +203,7 @@ export default {
             diffCount: data.diff_count,
             noteItemMap: Object.values(state.noteItemMap[data.record_id] ?? {}),
         }));
-        const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
+        const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action]?.color;
         const getConvertedChangedValue = (value) => {
             if (value?.startsWith('[')) return '[ ... ]';
             if (value?.startsWith('{')) return '{ ... }';
@@ -258,7 +258,7 @@ export default {
                     ...searchQueryHelper.filters,
                 ]);
                 const { results, total_count } = await SpaceConnector.client.inventory.changeHistory.list({
-                    cloud_service_id: props.cloudServiceId,
+                    cloud_service_id: props.cloudServiceItem.cloud_service_id,
                     query: {
                         ...apiQueryHelper.data,
                     },
@@ -305,8 +305,8 @@ export default {
         })();
 
         /* Watcher */
-        watch(() => props.cloudServiceId, (after, before) => {
-            if (after !== before) {
+        watch(() => props.cloudServiceItem, (after, before) => {
+            if (after?.cloud_service_id !== before?.cloud_service_id) {
                 state.searchText = '';
                 listHistory(true);
             }

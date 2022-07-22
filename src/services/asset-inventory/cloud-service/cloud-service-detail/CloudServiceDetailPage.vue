@@ -92,7 +92,7 @@
                 <cloud-service-admin :cloud-service-project-id="tableState.selectedItems[0].project_id" />
             </template>
             <template #history>
-                <cloud-service-history :cloud-service-id="tableState.selectedCloudServiceIds[0]" :provider="provider" />
+                <cloud-service-history :cloud-service-item="tableState.selectedItems[0]" :provider="provider" />
             </template>
             <template #monitoring>
                 <monitoring :resources="monitoringState.resources" />
