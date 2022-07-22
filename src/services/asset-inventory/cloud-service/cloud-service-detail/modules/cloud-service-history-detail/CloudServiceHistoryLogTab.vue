@@ -163,6 +163,7 @@ export default defineComponent<Props>({
             layouts: [] as DynamicLayout[],
             currentLayout: computed(() => state.layouts.find(layout => layout.name === state.activeTab)),
             dataSourceIds: {} as { [key: string]: string },
+            totalLayoutCount: 0,
             data: [],
         });
         const handleChangeTab = (tab) => {
@@ -194,7 +195,8 @@ export default defineComponent<Props>({
                     monitoring_type: 'LOG',
                     provider: props.provider,
                 });
-                if (!total_count) return total_count;
+                state.totalLayoutCount = total_count;
+                if (!total_count) return;
                 const layouts:DynamicLayout[] = [];
                 const dataSourceIds = {};
                 state.tabs = (results ?? []).map((dataSource) => {
@@ -206,12 +208,11 @@ export default defineComponent<Props>({
                 state.activeTab = state.tabs[0]?.name;
                 state.layouts = layouts;
                 state.dataSourceIds = dataSourceIds;
-                return total_count;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.layouts = [];
                 state.dataSourceIds = {};
-                return 0;
+                state.totalLayoutCount = 0;
             }
         };
 
@@ -248,14 +249,14 @@ export default defineComponent<Props>({
         };
         // init
         (async () => {
-            const totalLayoutCount = await getSchema();
-            if (totalLayoutCount) await getLogData();
+            await getSchema();
+            if (state.totalLayoutCount) await getLogData();
             state.loading = false;
         })();
 
         // watcher
         watch([() => state.selectedTimeWithin, () => props.date], () => {
-            getLogData();
+            if (state.totalLayoutCount) getLogData();
         });
         return {
             ...toRefs(state),
