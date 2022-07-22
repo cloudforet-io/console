@@ -67,7 +67,9 @@
                             />
                         </template>
                         <template #note>
-                            <cloud-service-history-detail-note :record-id="selectedHistoryRecordId" />
+                            <cloud-service-history-detail-note :record-id="selectedHistoryRecordId"
+                                                               @refresh-note-count="handleRefreshNoteCount"
+                            />
                         </template>
                     </p-tab>
                 </div>
@@ -187,6 +189,9 @@ export default defineComponent<Props>({
             state.proxySelectedHistoryItem = selectedItem.cur;
             state.selectedPrevHistoryRecordDate = selectedItem.prev?.date;
         };
+        const handleRefreshNoteCount = () => {
+            emit('refresh-note-count');
+        };
 
         /* Watcher */
         watch(() => props.selectedHistoryItem, (selectedTimelineItem: CloudServiceHistoryItem) => {
@@ -210,6 +215,7 @@ export default defineComponent<Props>({
             HISTORY_ACTION_MAP,
             getTimelineColor,
             handleClickTimeline,
+            handleRefreshNoteCount,
             iso8601Formatter,
         };
     },
@@ -265,6 +271,7 @@ export default defineComponent<Props>({
                 @apply bg-white border border-gray-200 rounded-md;
                 display: flex;
                 flex-direction: column;
+                min-width: 17.75rem;
                 height: 100%;
                 padding: 1.5rem 1rem 0 1rem;
                 .title-wrapper {

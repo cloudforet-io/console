@@ -72,6 +72,7 @@
                                                   :provider="provider"
                                                   :cloud-service-id="cloudServiceId"
                                                   @load-more="handleLoadMore"
+                                                  @refresh-note-count="handleRefreshNoteCount"
             />
         </transition>
     </div>
@@ -293,6 +294,9 @@ export default {
         const handleLoadMore = () => {
             loadMoreHistoryData();
         };
+        const handleRefreshNoteCount = async () => {
+            await listHistory(true);
+        };
 
         /* Init */
         (async () => {
@@ -329,6 +333,7 @@ export default {
             handleChange,
             handleLoadMore,
             handleClickKey,
+            handleRefreshNoteCount,
         };
     },
 };

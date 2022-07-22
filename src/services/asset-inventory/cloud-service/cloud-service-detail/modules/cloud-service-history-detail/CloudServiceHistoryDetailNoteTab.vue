@@ -81,7 +81,7 @@ export default {
             default: false,
         },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const state = reactive({
             id: '',
             noteInput: '',
@@ -139,6 +139,7 @@ export default {
             } finally {
                 state.noteInput = '';
                 await listNote();
+                emit('refresh-note-count');
             }
         };
 
@@ -169,6 +170,7 @@ export default {
                 checkDeleteState.loading = false;
                 checkDeleteState.visible = false;
                 await listNote();
+                emit('refresh-note-count');
             }
         };
 
