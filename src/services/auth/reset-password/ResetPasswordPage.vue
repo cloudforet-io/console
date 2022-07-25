@@ -128,16 +128,15 @@ export default {
         });
 
         /* Util */
-        const getUserIdFromToken = (): string | undefined => {
+        const getSSOTokenFromUrl = (): string|undefined => {
             const queryString = window.location.search;
             const params = new URLSearchParams(queryString);
-            const ssoAccessToken = params.get('sso_access_token') as string;
+            return params.get('sso_access_token') as string;
+        };
+        const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
             if (!ssoAccessToken) return undefined;
             const decodedToken = jwtDecode<JwtPayload>(ssoAccessToken);
-            if (decodedToken) {
-                SpaceConnector.setToken(ssoAccessToken, '');
-                return decodedToken.aud as string;
-            }
+            if (decodedToken) return decodedToken.aud as string;
             return undefined;
         };
 
@@ -199,6 +198,34 @@ export default {
             await SpaceRouter.router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
         };
 
+        const initStatesByUrlSSOToken = async () => {
+            const ssoAccessToken = getSSOTokenFromUrl();
+
+            // When sso access token is not exist in url query string
+            if (!ssoAccessToken) return;
+
+            SpaceConnector.setToken(ssoAccessToken, '');
+            const userId = getUserIdFromToken(ssoAccessToken);
+            // When there is no user id in sso access token
+            if (!userId) return;
+
+            state.userId = userId;
+            const userInfo = await getUserInfo();
+            // When user info doesnt exist
+            if (!userInfo) return;
+
+            await store.commit('user/setUser', userInfo);
+            const requiredActions = userInfo.requiredActions;
+            state.userType = userInfo.userType || 'USER';
+            // When a user has already updated password
+            if (!requiredActions?.includes(UPDATE_PASSWORD_ACTION)) {
+                state.showResetPassword = false;
+                state.warningMessage = i18n.t('AUTH.RESET_PASSWORD_PAGE.ALREADY_RESET_TEXT');
+            } else {
+                state.showResetPassword = true;
+            }
+        };
+
         /* Init */
         (async () => {
             // When signed-in user needs to update password
@@ -213,31 +240,7 @@ export default {
                 }
             // When a user accessed by sso token
             } else {
-                const userId = getUserIdFromToken();
-                if (userId) {
-                    state.userId = userId;
-                    const userInfo = await getUserInfo();
-
-                    // When user info exists
-                    if (userInfo) {
-                        await store.commit('user/setUser', userInfo);
-                        const requiredActions = userInfo.requiredActions;
-                        state.userType = userInfo.userType || 'USER';
-
-                        // When a user has already updated password
-                        if (!requiredActions?.includes(UPDATE_PASSWORD_ACTION)) {
-                            state.showResetPassword = false;
-                            state.warningMessage = i18n.t('AUTH.RESET_PASSWORD_PAGE.ALREADY_RESET_TEXT');
-                        } else {
-                            state.showResetPassword = true;
-                        }
-                        // When user info doesn't exist
-                    } else {
-                        state.showResetPassword = false;
-                    }
-                } else {
-                    state.showResetPassword = false;
-                }
+                await initStatesByUrlSSOToken();
             }
             state.loading = false;
         })();

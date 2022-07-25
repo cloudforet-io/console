@@ -199,3 +199,7 @@ export const loadCurrencyRates: Action<DisplayState, any> = async ({
     commit('setCurrencyRates', rates);
     storeCurrencyRates(rates, dispatch);
 };
+
+export const showMobileGuideModal: Action<DisplayState, any> = ({ commit }) => {
+    commit('setVisibleMobileGuideModal', true);
+};

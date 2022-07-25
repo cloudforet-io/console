@@ -35,3 +35,7 @@ export const setCurrency: Mutation<DisplayState> = (state, currency: Currency): 
 export const setCurrencyRates: Mutation<DisplayState> = (state, rates: CurrencyRates): void => {
     state.currencyRates = rates;
 };
+
+export const setVisibleMobileGuideModal: Mutation<DisplayState> = (state, visibleMobileGuideModal: boolean): void => {
+    state.visibleMobileGuideModal = visibleMobileGuideModal;
+};

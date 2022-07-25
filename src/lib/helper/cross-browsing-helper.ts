@@ -12,3 +12,15 @@ export const supportsBrowser = (): boolean => {
     const isDesktopChrome = agent.includes('chrome') && !isWhale && !isAndroid && !isIphone && !isOpera && !isBrave;
     return (isDesktopChrome || isEdge);
 };
+
+export const isMobile = () => {
+    const user = window.navigator.userAgent.toLowerCase();
+    let _isMobile = false;
+
+    if (user.includes('iphone')
+        || user.includes('android')
+        || user.includes('ipad')
+        || user.includes('ipod')
+    ) _isMobile = true;
+    return _isMobile;
+};
