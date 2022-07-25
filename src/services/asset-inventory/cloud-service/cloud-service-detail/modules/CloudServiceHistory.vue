@@ -28,7 +28,7 @@
                                    :title="item.title"
                                    :count="item.diffCount"
                                    :color="getTimelineColor(item.action)"
-                                   :is-last-item="idx === items.length-1"
+                                   :is-last-item="idx === items.length - 1"
                                    @click-timeline="handleClickTimeline(item)"
                 >
                     <template v-if="item.diffItems && item.diffItems.length" #timeline-detail>
@@ -175,6 +175,8 @@ export default {
         const searchQueryHelper = new QueryHelper().setKeyItemSets(handlerState.keyItemSets);
 
         /* Util */
+        const getDiffItemsKey = (fullKey: string) => fullKey.split('.')?.pop() ?? '';
+
         const groupNoteByHistoryRecordId = (noteList) => {
             const noteMap = {};
             noteList.forEach((note) => {
@@ -193,8 +195,10 @@ export default {
             date: data.created_at,
             title: HISTORY_ACTION_MAP[data.action].label,
             action: data.action,
-            diffItems: data.diff.map(d => ({
-                key: d.key.split('.').pop(),
+            diffItems: data.diff.map((d, i, array) => ({
+                // If the key is duplicated, shows full path
+                key: array.filter(d2 => getDiffItemsKey(d2.key) === getDiffItemsKey(d.key)).length >= 2
+                    ? d.key : getDiffItemsKey(d.key),
                 path: d.key,
                 previousValue: d.before,
                 changedValue: d.after,
