@@ -24,6 +24,7 @@ const state: DisplayState = {
     isSignInFailed: storedDisplayState.isSignInFailed ?? false,
     currency: storedDisplayState.currency ?? 'USD',
     currencyRates: storedDisplayState.currencyRates ?? DEFAULT_CURRENCY_RATES,
+    visibleMobileGuideModal: false,
 };
 
 

@@ -27,6 +27,7 @@ export interface DisplayState {
     isSignInFailed: boolean;
     currency: Currency;
     currencyRates: CurrencyRates;
+    visibleMobileGuideModal: boolean;
 }
 
 export interface SidebarProps {

@@ -53,6 +53,7 @@
         />
         <!-- Modal for Cross Browsing -->
         <recommended-browser-modal v-if="showsBrowserRecommendation()" />
+        <mobile-guide-modal v-if="$store.state.display.visibleMobileGuideModal" />
     </div>
 </template>
 
@@ -81,6 +82,7 @@ import GNB from '@/common/modules/navigations/gnb/GNB.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
 
+import MobileGuideModal from '@/services/auth/reset-password/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 // import SurveyModal from '@/common/modules/survey/SurveyModal.vue';
 
@@ -88,6 +90,7 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 export default defineComponent({
     name: 'App',
     components: {
+        MobileGuideModal,
         // SurveyModal,
         RecommendedBrowserModal,
         TopNotification,

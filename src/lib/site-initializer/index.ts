@@ -16,6 +16,7 @@ import { addAmchartsLicense, applyAmchartsGlobalSettings } from '@/lib/amcharts/
 import config from '@/lib/config';
 import { GTag } from '@/lib/gtag';
 import { Gtm } from '@/lib/gtm';
+import { isMobile } from '@/lib/helper/cross-browsing-helper';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 
@@ -134,7 +135,10 @@ const initErrorHandler = () => {
 };
 
 const checkSsoAccessToken = async () => {
-    if (window.location.pathname === '/reset-password') return;
+    if (window.location.pathname === '/reset-password') {
+        if (isMobile()) store.dispatch('display/showMobileGuideModal');
+        return;
+    }
     const queryString = window.location.search;
     const params = new URLSearchParams(queryString);
     const ssoAccessToken = params.get('sso_access_token');
@@ -149,7 +153,8 @@ const checkSsoAccessToken = async () => {
                 ErrorHandler.handleError(e);
             }
         }
-        window.location.pathname = 'reset-password';
+        if (isMobile()) store.dispatch('display/showMobileGuideModal');
+        else window.location.pathname = 'reset-password';
     }
 };
 
