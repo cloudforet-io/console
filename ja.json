@@ -34,6 +34,8 @@
 			"GO_TO_LOGIN_WITHOUT_CHANGE": "",
 			"HELP_TEXT": "アカウントの新しいパスワード入力:",
 			"INVALID_LINK": "",
+			"MOBILE_GUIDE_MODAL_DESC": "",
+			"MOBILE_GUIDE_MODAL_TITLE": "",
 			"RESET_PASSWORD": "パスワード再設定"
 		}
 	},

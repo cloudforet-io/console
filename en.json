@@ -34,6 +34,8 @@
 			"GO_TO_LOGIN_WITHOUT_CHANGE": "Go to Login without Changing Password",
 			"HELP_TEXT": "Enter a new password for account: ",
 			"INVALID_LINK": "Invalid Link",
+			"MOBILE_GUIDE_MODAL_DESC": "You must reset password on computer instead of mobile before logging on the first time.",
+			"MOBILE_GUIDE_MODAL_TITLE": "You have accessed from a mobile environment.",
 			"RESET_PASSWORD": "Reset Password"
 		}
 	},
