@@ -21,7 +21,9 @@
                     <template #header>
                         <div class="cloud-service-history-changes-code-header-wrapper">
                             <div>
-                                <span v-for="(path, index) in selectedKeyPath.split('.')" :key="index">
+                                <span v-for="(path, index) in selectedKeyPath.split('.')" :key="index"
+                                      class="inline-flex items-center"
+                                >
                                     <span class="text-gray-500">
                                         <p-i v-if="selectedKeyMenu && index !== 0" name="ic_arrow_right" color="inherit"
                                              scale="0.7"
