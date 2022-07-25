@@ -31,6 +31,7 @@
 		"RESET_PASSWORD_PAGE": {
 			"ALREADY_RESET_TEXT": "パスワードが既に変更されました。変更されたパスワードでログインしください。",
 			"GO_TO_LOGIN_PAGE": "ログインページへ移動",
+			"GO_TO_LOGIN_WITHOUT_CHANGE": "",
 			"HELP_TEXT": "アカウントの新しいパスワード入力:",
 			"INVALID_LINK": "",
 			"RESET_PASSWORD": "パスワード再設定"

@@ -31,6 +31,7 @@
 		"RESET_PASSWORD_PAGE": {
 			"ALREADY_RESET_TEXT": "패스워드가 이미 변경되었습니다. 변경된 패스워드로 로그인하세요.",
 			"GO_TO_LOGIN_PAGE": "로그인 페이지로 이동",
+			"GO_TO_LOGIN_WITHOUT_CHANGE": "변경하지 않고 로그인으로 돌아가기",
 			"HELP_TEXT": "다음 계정의 새로운 비밀번호 입력 필요: ",
 			"INVALID_LINK": "잘못된 링크입니다.",
 			"RESET_PASSWORD": "비밀번호 재설정"

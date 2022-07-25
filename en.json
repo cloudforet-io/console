@@ -31,6 +31,7 @@
 		"RESET_PASSWORD_PAGE": {
 			"ALREADY_RESET_TEXT": "Your password has already been reset.",
 			"GO_TO_LOGIN_PAGE": "Go to Login",
+			"GO_TO_LOGIN_WITHOUT_CHANGE": "Go to Login without Changing Password",
 			"HELP_TEXT": "Enter a new password for account: ",
 			"INVALID_LINK": "Invalid Link",
 			"RESET_PASSWORD": "Reset Password"
