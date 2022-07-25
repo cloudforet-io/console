@@ -33,11 +33,18 @@
                     </template>
                 </p-field-group>
             </div>
-            <p-button :disabled="!isAllValid" style-type="primary" size="md"
-                      class="reset-button"
+            <p-button :disabled="!isAllValid" style-type="primary" size="lg"
+                      :block="true"
                       @click="handleResetPassword"
             >
                 {{ $t('AUTH.RESET_PASSWORD_PAGE.RESET_PASSWORD') }}
+            </p-button>
+            <p-button style-type="primary" size="lg" :outline="true"
+                      :block="true"
+                      class="not-change-button"
+                      @click="handleGoToLoginPage"
+            >
+                {{ $t('AUTH.RESET_PASSWORD_PAGE.GO_TO_LOGIN_WITHOUT_CHANGE') }}
             </p-button>
         </div>
         <div v-else class="invalid-link-wrapper">
@@ -45,7 +52,7 @@
             <p class="help-text">
                 {{ warningMessage }}
             </p>
-            <p-button style-type="primary" size="md" class="reset-button"
+            <p-button style-type="primary" size="lg" class="mt-8"
                       @click="handleGoToLoginPage"
             >
                 {{ $t('AUTH.RESET_PASSWORD_PAGE.GO_TO_LOGIN_PAGE') }}
@@ -70,6 +77,8 @@ import jwtDecode from 'jwt-decode';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { UserState } from '@/store/modules/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -123,6 +132,7 @@ export default {
             const queryString = window.location.search;
             const params = new URLSearchParams(queryString);
             const ssoAccessToken = params.get('sso_access_token') as string;
+            if (!ssoAccessToken) return undefined;
             const decodedToken = jwtDecode<JwtPayload>(ssoAccessToken);
             if (decodedToken) {
                 SpaceConnector.setToken(ssoAccessToken, '');
@@ -132,12 +142,12 @@ export default {
         };
 
         /* Api */
-        const getUserInfo = async () => {
+        const getUserInfo = async (): Promise<UserState|undefined> => {
             try {
                 const response = await SpaceConnector.client.identity.user.get({
                     user_id: state.userId,
                 });
-                const userInfo = {
+                return {
                     userId: response.user_id,
                     userType: 'USER',
                     backend: response.backend,
@@ -147,17 +157,9 @@ export default {
                     timezone: response.timezone,
                     requiredActions: response.required_actions,
                 };
-                await store.commit('user/setUser', userInfo);
-                //
-                const requiredActions = response.required_actions;
-                state.userType = response.user_type || 'USER';
-                state.showResetPassword = requiredActions.includes(UPDATE_PASSWORD_ACTION);
-                if (!state.showResetPassword) {
-                    state.warningMessage = i18n.t('AUTH.RESET_PASSWORD_PAGE.ALREADY_RESET_TEXT');
-                }
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.showResetPassword = false;
+                return undefined;
             }
         };
         const updateUser = async () => {
@@ -199,6 +201,7 @@ export default {
 
         /* Init */
         (async () => {
+            // When signed-in user needs to update password
             if (!state.isSessionExpired) {
                 if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
                     state.userId = store.state.user.userId;
@@ -208,17 +211,35 @@ export default {
                     state.showResetPassword = false;
                     state.warningMessage = i18n.t('AUTH.RESET_PASSWORD_PAGE.ALREADY_RESET_TEXT');
                 }
-                state.loading = false;
+            // When a user accessed by sso token
             } else {
                 const userId = getUserIdFromToken();
                 if (userId) {
                     state.userId = userId;
-                    await getUserInfo();
+                    const userInfo = await getUserInfo();
+
+                    // When user info exists
+                    if (userInfo) {
+                        await store.commit('user/setUser', userInfo);
+                        const requiredActions = userInfo.requiredActions;
+                        state.userType = userInfo.userType || 'USER';
+
+                        // When a user has already updated password
+                        if (!requiredActions?.includes(UPDATE_PASSWORD_ACTION)) {
+                            state.showResetPassword = false;
+                            state.warningMessage = i18n.t('AUTH.RESET_PASSWORD_PAGE.ALREADY_RESET_TEXT');
+                        } else {
+                            state.showResetPassword = true;
+                        }
+                        // When user info doesn't exist
+                    } else {
+                        state.showResetPassword = false;
+                    }
                 } else {
                     state.showResetPassword = false;
                 }
-                state.loading = false;
             }
+            state.loading = false;
         })();
 
         return {
@@ -270,10 +291,8 @@ export default {
                 width: 100%;
             }
         }
-        .reset-button {
-            width: 100%;
-            height: 2.5rem;
-            font-size: 1rem;
+        .not-change-button {
+            margin-top: 1.5rem;
         }
     }
     .invalid-link-wrapper {
@@ -300,11 +319,6 @@ export default {
             @apply text-gray-500;
             font-size: 1rem;
             line-height: 1.5;
-        }
-        .reset-button {
-            height: 2.5rem;
-            font-size: 1rem;
-            margin-top: 2rem;
         }
     }
 

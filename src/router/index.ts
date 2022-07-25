@@ -64,12 +64,12 @@ export class SpaceRouter {
             // When a user is authenticated
             if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
                 // When a user need to reset password and tries to go to other pages, redirect to reset password page
-                if (userNeedPwdReset && to.name !== AUTH_ROUTE.RESET_PASSWORD._NAME) {
+                if (userNeedPwdReset && to.name !== AUTH_ROUTE.RESET_PASSWORD._NAME && to.name !== AUTH_ROUTE.SIGN_OUT._NAME) {
                     nextLocation = { name: AUTH_ROUTE.RESET_PASSWORD._NAME };
                 // When a user is already signed in and tries to go to sign in page, redirect to dashboard page
                 } else if (to.meta?.isSignInPage) {
                     nextLocation = { name: DASHBOARD_ROUTE._NAME };
-                // When a user tries to go to inaccessible page, Rrdirect to error page
+                // When a user tries to go to inaccessible page, redirect to error page
                 } else if (userAccessLevel < routeAccessLevel) {
                     nextLocation = { name: ERROR_ROUTE._NAME };
                 }
