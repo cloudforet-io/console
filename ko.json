@@ -34,8 +34,10 @@
 			"GO_TO_LOGIN_WITHOUT_CHANGE": "변경하지 않고 로그인으로 돌아가기",
 			"HELP_TEXT": "다음 계정의 새로운 비밀번호 입력 필요: ",
 			"INVALID_LINK": "잘못된 링크입니다.",
-			"MOBILE_GUIDE_MODAL_DESC": "데모콘솔 최초 진입시에는 PC에서 필히 비밀번호 재설정후에 로그인이 가능합니다.",
-			"MOBILE_GUIDE_MODAL_TITLE": "모바일 환경에서 접속하셨습니다.",
+			"MOBILE_GUIDE_MODAL_DESC_1": "초기 진입 시, ",
+			"MOBILE_GUIDE_MODAL_DESC_2": "PC환경에서 먼저 비밀번호 재설정 후",
+			"MOBILE_GUIDE_MODAL_DESC_3": "이용하실 수 있습니다.",
+			"MOBILE_GUIDE_MODAL_TITLE": "모바일 환경 이용 불가",
 			"RESET_PASSWORD": "비밀번호 재설정"
 		}
 	},
