@@ -14,10 +14,10 @@
             </template>
         </p-field-group>
         <add-notification-level v-if="projectId" @change="onChangeLevel" />
-        <p-json-schema-form
-            :model="schemaModel" :schema="schema" :is-valid.sync="isSchemaModelValid"
-            class="schema-form"
-            @update:model="onChangeModel"
+        <p-json-schema-form v-if="isJsonSchema" :key="protocolId"
+                            :model="schemaModel" :schema="schema" :is-valid.sync="isSchemaModelValid"
+                            class="schema-form"
+                            @update:model="onChangeModel"
         />
         <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER">
             <p-field-group :label="$t('MENU.ADMINISTRATION_USER')" required>
@@ -33,7 +33,7 @@
 
 import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    computed, getCurrentInstance, onActivated, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -95,7 +95,7 @@ export default {
             channelName: undefined,
             notificationLevel: 'LV1',
             schemaModel: {},
-            schema: {},
+            schema: null as null|object,
             isSchemaModelValid: false,
             nameInvalidText: computed(() => {
                 if (state.channelName !== undefined && state.channelName.length === 0) {
@@ -108,7 +108,7 @@ export default {
             }),
             isNameInvalid: computed(() => !!state.nameInvalidText),
             //
-            isJsonSchema: computed(() => Object.keys(state.schema).length !== 0),
+            isJsonSchema: computed(() => (state.schema ? Object.keys(state.schema).length !== 0 : false)),
             isInputNotEmpty: computed(() => state.channelName !== undefined && Object.keys(state.schemaModel).length !== 0),
             isInputValid: computed(() => state.isInputNotEmpty && (state.isSchemaModelValid && !state.isNameInvalid)),
             isDataValid: computed(() => (!state.isJsonSchema && !state.isNameInvalid) || (state.isJsonSchema && state.isInputValid)),
@@ -116,16 +116,16 @@ export default {
         });
 
         const apiQuery = new ApiQueryHelper();
-        apiQuery.setFilters([{ k: 'protocol_id', v: props.protocolId, o: '=' }]);
-        const getSchema = async () => {
+        const getSchema = async (): Promise<object|null> => {
             try {
+                apiQuery.setFilters([{ k: 'protocol_id', v: props.protocolId, o: '=' }]);
                 const res = await SpaceConnector.client.notification.protocol.list({
                     query: apiQuery.data,
                 });
-                state.schema = res.results[0].plugin_info.metadata.data.schema;
+                return res.results[0]?.plugin_info.metadata.data.schema ?? {};
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.schema = {};
+                return null;
             }
         };
 
@@ -158,13 +158,23 @@ export default {
             emitChange();
         };
 
-        (async () => {
-            if (props.supportedSchema && props.protocolType === PROTOCOL_TYPE.EXTERNAL) await getSchema();
-        })();
 
-        onActivated(() => {
-            if (props.supportedSchema && props.protocolType === PROTOCOL_TYPE.EXTERNAL) getSchema();
-        });
+        const initStates = () => {
+            state.channelName = undefined;
+            state.notificationLevel = 'LV1';
+            state.schemaModel = {};
+            state.isSchemaModelValid = false;
+            state.selectedMember = [];
+            state.schema = null;
+        };
+
+
+        watch([() => props.protocolId, () => props.supportedSchema, () => props.protocolType], async ([protocolId, supportedSchema, protocolType]) => {
+            if (!protocolId) return;
+            initStates();
+            if (!supportedSchema || protocolType !== PROTOCOL_TYPE.EXTERNAL) return;
+            state.schema = await getSchema();
+        }, { immediate: true });
 
         return {
             protocol,

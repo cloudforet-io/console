@@ -1,12 +1,13 @@
 <template>
-    <div>
+    <general-page-layout>
+        <p-breadcrumbs v-if="routeState.routes.length" class="flex-grow" :routes="routeState.routes" />
         <p-page-title child :title="pageTitle" class="page-title"
                       @goBack="$router.go(-1)"
         />
-        <notification-add-form :protocol-id="protocolId" :protocol-type="protocolType"
+        <notification-add-form :project-id="projectId" :protocol-id="protocolId" :protocol-type="protocolType"
                                :supported-schema="supportedSchema" :user-id="userId"
         />
-    </div>
+    </general-page-layout>
 </template>
 
 <script lang="ts">
@@ -16,19 +17,23 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPageTitle,
+    PBreadcrumbs, PPageTitle,
 } from '@spaceone/design-system';
 import VueI18n from 'vue-i18n';
+
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import NotificationAddForm from '@/services/notification/notification-add/modules/NotificationAddForm.vue';
 
 import TranslateResult = VueI18n.TranslateResult;
 
 export default {
-    name: 'NotificationAddPage',
+    name: 'ProjectNotificationAddPage',
     components: {
         NotificationAddForm,
+        PBreadcrumbs,
         PPageTitle,
+        GeneralPageLayout,
     },
 
     setup() {
@@ -37,11 +42,20 @@ export default {
             pageTitle: '' as TranslateResult,
             //
             userId: decodeURIComponent(vm.$route.params.userId),
+            projectId: computed(() => vm.$route.query.projectId),
             protocolId: computed(() => vm.$route.params.protocolId),
             protocolType: computed(() => vm.$route.query.protocolType),
             supportedSchema: computed(() => vm.$route.query.supported_schema),
         });
 
+
+        const routeState = reactive({
+            projectRoutes: computed(() => [
+                { name: 'Project', path: `/project/${state.projectId}` },
+                { name: 'Add Notifications Channel' },
+            ]),
+            routes: computed(() => (state.projectId ? routeState.projectRoutes : [])),
+        });
 
         (async () => {
             const protocolLabel = decodeURIComponent(vm.$route.query?.protocolLabel as any);
@@ -55,6 +69,7 @@ export default {
 
         return {
             ...toRefs(state),
+            routeState,
         };
     },
 };
