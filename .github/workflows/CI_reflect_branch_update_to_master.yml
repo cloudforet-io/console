@@ -45,7 +45,7 @@ jobs:
         run: |
           echo ${{ env.VERSION }} > src/VERSION
           if [[ $(cat src/VERSION) =~ v[0-9]\.[0-9]?[0-9]\.[0-9]?[0-9]\.([0-9]+) ]];
-            then npm --no-git-tag-version version $(echo $(cat src/VERSION | cut -d'v' -f2 | cut -d '-' -f 1)-$(cat src/VERSION | cut -d'.' -f4))
+            then npm --no-git-tag-version version $(echo $(cat src/VERSION | cut -d'v' -f2 | cut -d '.' -f 1-3)-$(cat src/VERSION | cut -d'.' -f4))
             else npm --no-git-tag-version version $(cat src/VERSION | cut -d'v' -f2)
           fi
           git config user.name github-actions
