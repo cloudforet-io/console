@@ -226,15 +226,15 @@ export default {
     props: {
         provider: {
             type: String,
-            required: true,
+            default: '',
         },
         group: {
             type: String,
-            required: true,
+            default: '',
         },
         name: {
             type: String,
-            default: undefined,
+            default: '',
         },
         isServerPage: {
             type: Boolean,
@@ -297,11 +297,15 @@ export default {
         const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSearchSchema(
             computed(() => tableState.schema?.options?.search ?? []),
             'inventory.CloudService',
-            schemaQueryHelper.setFilters([
-                { k: 'provider', o: '=', v: props.provider },
-                { k: 'cloud_service_group', o: '=', v: props.group },
-                { k: 'cloud_service_type', o: '=', v: props.name },
-            ]).apiQuery.filter,
+            props.isServerPage
+                ? schemaQueryHelper.setFilters([
+                    { k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' },
+                ]).apiQuery.filter
+                : schemaQueryHelper.setFilters([
+                    { k: 'provider', o: '=', v: props.provider },
+                    { k: 'cloud_service_group', o: '=', v: props.group },
+                    { k: 'cloud_service_type', o: '=', v: props.name },
+                ]).apiQuery.filter,
         );
 
 
@@ -360,15 +364,16 @@ export default {
         const getQuery = (schema?) => {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilters(tableState.searchFilters)
-                .addFilter(
+                .setFilters(tableState.searchFilters);
+
+            if (props.isServerPage) {
+                apiQuery.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' });
+            } else {
+                apiQuery.addFilter(
                     { k: 'provider', o: '=', v: props.provider },
                     { k: 'cloud_service_group', o: '=', v: props.group },
                     { k: 'cloud_service_type', o: '=', v: props.name },
                 );
-
-            if (props.isServerPage) {
-                apiQuery.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' });
             }
             const fields = schema?.options?.fields || tableState.schema?.options?.fields;
             if (fields) {
@@ -378,7 +383,7 @@ export default {
             return apiQuery.data;
         };
 
-        const getCloudServiceTableData = async (schema?): Promise<{items: any[]; totalCount: number}> => {
+        const listCloudServiceTableData = async (schema?): Promise<{items: any[]; totalCount: number}> => {
             typeOptionState.loading = true;
             try {
                 const res = await SpaceConnector.client.inventory.cloudService.list({
@@ -423,7 +428,7 @@ export default {
                 fetchOptionState.queryTags = changed.queryTags;
             }
 
-            const { items, totalCount } = await getCloudServiceTableData();
+            const { items, totalCount } = await listCloudServiceTableData();
             tableState.items = items;
             typeOptionState.totalCount = totalCount;
             typeOptionState.selectIndex = [];
@@ -522,7 +527,7 @@ export default {
                 typeOptionState.selectIndex = [];
                 resetCheckTableModalState();
                 await fetchTableData();
-                // await getCloudServiceTableData();
+                // await listCloudServiceTableData();
             }
         };
 
@@ -552,7 +557,7 @@ export default {
             fetchOptionState.queryTags = queryHelper.setKeyItemSets(after).queryTags;
         }, { immediate: true });
         debouncedWatch([() => props.group, () => props.name], async () => {
-            if (!props.name) return;
+            if (!props.isServerPage && !props.name) return;
             tableState.schema = await getTableSchema();
             await fetchTableData();
         }, { immediate: true, debounce: 200 });
