@@ -15,7 +15,7 @@ const ProjectNotificationsPage = () => import(/* webpackChunkName: "ProjectNotif
 const ProjectTagPage = () => import(/* webpackChunkName: "ProjectTagPage" */ '@/services/project/project-detail/project-tag/ProjectTagPage.vue');
 // eslint-disable-next-line max-len
 const ProjectAlertEventRulePage = () => import(/* webpackChunkName: "ProjectAlertEventRulePage" */ '@/services/project/project-detail/project-alert/project-alert-event-rule/ProjectAlertEventRulePage.vue');
-const AddNotificationPage = () => import(/* webpackChunkName: "AddNotificationPage" */ '@/services/notification/notification-add/NotificationAddPage.vue');
+const ProjectNotificationAddPage = () => import(/* webpackChunkName: "ProjectNotificationAddPage" */ '@/services/project/project-detail/project-notification/ProjectNotificationAddPage.vue');
 
 const ProjectAlertListPage = () => import(/* webpackChunkName: "ProjectAlertListPage" */ '@/services/project/project-detail/project-alert/project-alert-list/ProjectAlertListPage.vue');
 // eslint-disable-next-line max-len
@@ -122,7 +122,7 @@ export default {
                 {
                     path: 'notification/:protocol/:protocolId/:userId',
                     name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
-                    component: AddNotificationPage,
+                    component: ProjectNotificationAddPage,
                     props: true,
                 },
             ],
