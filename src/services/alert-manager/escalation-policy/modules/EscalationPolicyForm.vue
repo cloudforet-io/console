@@ -34,7 +34,6 @@
                         (<p-anchor :to="referenceRouter(inputModel.project_id,{ resource_type: 'identity.Project' })"
                                    :text="projects[inputModel.project_id] ? projects[inputModel.project_id].label : inputModel.project_id"
                                    highlight
-                                   class="align-top"
                         />)
                     </span>
                 </span>
@@ -292,9 +291,6 @@ export default {
         text-transform: capitalize;
         font-weight: normal;
         padding-left: 0.5rem;
-        .p-anchor {
-            vertical-align: top;
-        }
     }
     .help-text {
         @apply text-gray-900;
