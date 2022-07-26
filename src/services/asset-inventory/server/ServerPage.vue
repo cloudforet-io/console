@@ -1,9 +1,5 @@
 <template>
-    <cloud-service-detail-page :group="CLOUD_SERVICE_GROUP"
-                               :provider="PROVIDER"
-                               :name="CLOUD_SERVICE_NAME"
-                               :is-server-page="true"
-    />
+    <cloud-service-detail-page :is-server-page="true" />
 </template>
 
 <script lang="ts">
