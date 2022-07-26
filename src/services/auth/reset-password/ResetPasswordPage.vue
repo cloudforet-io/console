@@ -69,7 +69,7 @@ import {
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PButton, PFieldGroup, PTextInput, PDataLoader,
+    PButton, PDataLoader, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
@@ -129,9 +129,8 @@ export default {
 
         /* Util */
         const getSSOTokenFromUrl = (): string|undefined => {
-            const queryString = window.location.search;
-            const params = new URLSearchParams(queryString);
-            return params.get('sso_access_token') as string;
+            const queryString = vm.$router.currentRoute.query;
+            return queryString.sso_access_token as string;
         };
         const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
             if (!ssoAccessToken) return undefined;
