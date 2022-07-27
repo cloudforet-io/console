@@ -1,3 +1,11 @@
+# [1.1.0-beta.359](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.358...v1.1.0-beta.359) (2022-07-27)
+
+
+### Bug Fixes
+
+* **anchor:** do not use inline-flex to anchor ([#1039](https://github.com/spaceone-dev/spaceone-design-system/issues/1039)) ([3850073](https://github.com/spaceone-dev/spaceone-design-system/commit/3850073fb58ed101c68b1fe6a2214ca5a5adbd4d))
+* **dynamic-field:** make update component every time on props changes ([#1038](https://github.com/spaceone-dev/spaceone-design-system/issues/1038)) ([a1215bd](https://github.com/spaceone-dev/spaceone-design-system/commit/a1215bd5e6ff82b8b0e1868f930ddae4020d91c0))
+
 # [1.1.0-beta.358](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.357...v1.1.0-beta.358) (2022-07-21)
 
 
