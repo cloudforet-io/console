@@ -503,7 +503,6 @@ export default {
 
 <style lang="postcss" scoped>
 .p-balloon-tab::v-deep {
-    margin-bottom: 1rem;
     .balloon-group {
         flex-wrap: nowrap;
         justify-content: space-evenly;
@@ -513,6 +512,9 @@ export default {
                 @apply border-transparent;
             }
         }
+    }
+    .tab-pane {
+        margin-top: 1.25rem;
     }
 
     @screen mobile {
