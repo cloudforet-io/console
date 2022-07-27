@@ -3,17 +3,23 @@
         <template #default="{href: toHref, navigate}">
             <span>
                 <a ref="anchorRef" class="p-anchor"
-                   :class="{disabled, highlight, [iconPosition]: true, [size]: true}"
+                   :class="{disabled, highlight, [size]: true}"
                    :target="validateTarget()"
                    :href="to ? (toHref || href ): href"
                    @click.stop="navigate"
                 >
+                    <p-i v-if="iconVisible && hasText && iconPosition === IconPosition.left"
+                         :name="iconName"
+                         height="1.1em" width="1.1em"
+                         color="inherit"
+                         class="icon"
+                    />
                     <span class="text">
                         <slot v-bind="{...$props}">
                             {{ text }}
                         </slot>
                     </span>
-                    <p-i v-if="iconVisible && hasText"
+                    <p-i v-if="iconVisible && hasText && iconPosition === IconPosition.right"
                          :name="iconName"
                          height="1.1em" width="1.1em"
                          color="inherit"
@@ -110,6 +116,7 @@ export default defineComponent<Props>({
             validateTarget,
             anchorRef,
             hasText,
+            IconPosition,
         };
     },
 });
@@ -117,26 +124,21 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-anchor {
-    @apply cursor-pointer inline-flex items-end;
-    vertical-align: middle;
-    line-height: inherit;
-    font-size: 0.875rem;
+    /* Do not change this to inline-flex style, because it must be used with inline texts. */
+    @apply cursor-pointer inline-block items-end;
+    font-size: inherit;
+    vertical-align: baseline;
+    line-height: 1.25;
     > .text {
         font-weight: inherit;
         font-size: inherit;
         color: inherit;
         word-break: break-all;
+        vertical-align: baseline;
     }
     > .icon {
-        margin-left: 0.125rem;
-        margin-bottom: 0.1rem;
-    }
-    &.left {
-        @apply flex-row-reverse;
-        .icon {
-            margin-left: unset;
-            margin-right: 0.125rem;
-        }
+        margin: 0 0.125em;
+        vertical-align: top;
     }
     &.disabled {
         @apply text-gray-400;

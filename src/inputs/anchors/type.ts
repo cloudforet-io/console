@@ -1,12 +1,12 @@
-export const IconPosition = Object.freeze({
+export const IconPosition = {
     left: 'left',
     right: 'right',
-} as const);
+} as const;
 export type IconPosition = typeof IconPosition[keyof typeof IconPosition];
 
-export const AnchorSize = Object.freeze({
+export const AnchorSize = {
     sm: 'sm',
     md: 'md',
     lg: 'lg',
-} as const);
+} as const;
 export type AnchorSize = typeof AnchorSize[keyof typeof AnchorSize]
