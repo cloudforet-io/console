@@ -23,7 +23,7 @@
                                 <span class="severity">[{{ item.severity }}]</span>
                                 <span>{{ item.title }}</span>
                                 <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                                     color="inherit"
+                                     color="inherit" class="svg-icon"
                                 />
                             </div>
                             <p class="desc">
@@ -214,8 +214,10 @@ export default {
         }
     }
     .list-item-title {
-        @apply flex items-center;
-        height: 1.315rem;
+        min-height: 1.315rem;
+        .svg-icon {
+            margin-bottom: 0.125rem;
+        }
     }
     .desc {
         @apply text-gray-500;
