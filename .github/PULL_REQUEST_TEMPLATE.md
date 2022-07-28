@@ -1,7 +1,8 @@
-## To Reviewers
-- [ ] Skipping reviews is not a problem
+### To Reviewers
+- [ ] Skipping review is not a problem (```style```, ```chore``` ONLY)
+- [ ] Not that difficult
 
-## Type of Change
+### Type of Change
 - [ ] New feature
 - [ ] Bug fixes
 - [ ] Feature improvement
@@ -9,6 +10,10 @@
 - [ ] Others (performance improvement, refactoring, CI/CD, etc.)
 
 
-## Description
+### Checklist
+- [ ] Updated Storybook documents
+- [ ] Tested with console
 
-## Things to Talk About
+### Description
+
+### Things to Talk About
