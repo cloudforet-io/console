@@ -593,6 +593,7 @@ export default {
     position: relative;
     height: 17.5rem;
     grid-gap: 0.5rem;
+    margin-top: 0.75rem;
     padding: 1.25rem 1.5rem;
 
     @screen tablet {
