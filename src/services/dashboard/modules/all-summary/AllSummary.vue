@@ -513,9 +513,6 @@ export default {
             }
         }
     }
-    .tab-pane {
-        margin-top: 1.25rem;
-    }
 
     @screen mobile {
         .balloon-group {
