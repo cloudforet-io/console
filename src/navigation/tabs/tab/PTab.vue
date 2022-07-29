@@ -2,7 +2,7 @@
     <div class="p-tab">
         <ul class="tab-item-wrapper" :class="{stretch}">
             <li v-for="(tab, idx) in tabItems" :key="tab.name"
-                :class="{active: activeTab === tab.name, single: tabs.length === 1}"
+                :class="{active: activeTab === tab.name}"
                 @click="handleClickTab(tab, idx)"
             >
                 <span class="label">
@@ -110,11 +110,7 @@ export default defineComponent<TabProps>({
                 @apply text-gray-900;
             }
             &.active {
-                @apply text-primary;
-
-                &:not(.single) {
-                    @apply border-primary;
-                }
+                @apply text-primary border-primary;
             }
             .label {
                 @apply w-full;
