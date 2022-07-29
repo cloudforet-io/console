@@ -1,3 +1,10 @@
+# [1.1.0-beta.360](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.359...v1.1.0-beta.360) (2022-07-29)
+
+
+### Bug Fixes
+
+* **tab:** add border-bottom to single tab ([#1043](https://github.com/spaceone-dev/spaceone-design-system/issues/1043)) ([ac6bb0f](https://github.com/spaceone-dev/spaceone-design-system/commit/ac6bb0f6b4fd2faf39db395ba742360f96953e69))
+
 # [1.1.0-beta.359](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.358...v1.1.0-beta.359) (2022-07-27)
 
 
