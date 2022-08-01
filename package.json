@@ -6,7 +6,9 @@
   "author": "SpaceONE",
   "scripts": {
     "serve": "vue-cli-service serve",
+    "serve:init": "npm install && npm run build --workspace=@spaceone/console-core-lib && npm run serve",
     "build": "NODE_OPTIONS=--max_old_space_size=4096 vue-cli-service build",
+    "build:watch:core": "cd ./packages/@spaceone/console-core-lib && npm run build:watch --workpsace=@spaceone/console-core-lib",
     "test:unit": "vue-cli-service test:unit",
     "test:unit:watch": "vue-cli-service test:unit --watchAll",
     "eslint": "eslint --ext .js,.vue,.ts .",
