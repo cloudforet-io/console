@@ -3,7 +3,7 @@
         <g-n-b-notification-date-header v-if="dateHeader" :value="dateHeader" />
         <slot name="relative-time" />
         <div class="item-wrapper" :class="{'link-hover': isLinkMouseEntered}">
-            <new-mark v-if="isNew" class="new-mark" />
+            <span v-if="isNew" class="new-circle" />
             <div class="contents-wrapper">
                 <p class="title">
                     <p-i v-if="icon" :name="icon" width="1rem"
@@ -26,6 +26,11 @@
                     {{ occurred }}
                 </div>
             </div>
+            <p-icon-button class="delete-button"
+                           name="ic_delete"
+                           size="sm"
+                           @click="handleClickDeleteButton"
+            />
         </div>
     </div>
 </template>
@@ -35,7 +40,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
-    PCollapsiblePanel, PI, PAnchor,
+    PCollapsiblePanel, PI, PAnchor, PIconButton,
 } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 
@@ -43,7 +48,6 @@ import type { Dayjs } from 'dayjs';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import NewMark from '@/common/components/marks/NewMark.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationDateHeader.vue';
 
@@ -58,10 +62,10 @@ export default {
     name: 'GNBNotificationItem',
     components: {
         GNBNotificationDateHeader,
-        NewMark,
         PI,
         PAnchor,
         PCollapsiblePanel,
+        PIconButton,
     },
     props: {
         data: {
@@ -73,7 +77,7 @@ export default {
             default: null,
         },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const { i18nDayjs } = useI18nDayjs();
 
         const dataHeaderFormatter = (time: string, timezone: string) => {
@@ -117,9 +121,17 @@ export default {
         const changeLinkMouseEnterState = (value: boolean) => {
             if (state.isLinkMouseEntered !== value) state.isLinkMouseEntered = value;
         };
+
+        /* Event */
+        const handleClickDeleteButton = () => {
+            emit('delete');
+            console.log('delete!');
+        };
+
         return {
             ...toRefs(state),
             changeLinkMouseEnterState,
+            handleClickDeleteButton,
         };
     },
 };
@@ -130,19 +142,36 @@ export default {
     .item-wrapper {
         @apply rounded-lg;
         display: flex;
-        padding: 0.5rem;
+        position: relative;
         align-items: baseline;
+        padding: 0.25rem 2rem 0.25rem 1rem;
         &.link-hover {
             @apply bg-violet-100;
         }
-        .new-mark {
-            flex-shrink: 0;
-            margin-right: 0.25rem;
-            margin-left: 0;
-            line-height: 1.2;
+        &:hover {
+            @apply bg-blue-100;
+            .delete-button {
+                visibility: visible;
+            }
+        }
+        .new-circle {
+            @apply bg-blue-500;
+            position: absolute;
+            left: 0.375rem;
+            top: 0.625rem;
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            margin-right: 0.125rem;
         }
         .contents-wrapper {
             flex-grow: 1;
+        }
+        .delete-button {
+            visibility: hidden;
+            position: absolute;
+            top: 0.25rem;
+            right: 0.5rem;
         }
         .p-collapsible-panel {
             display: block;

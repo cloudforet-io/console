@@ -26,6 +26,6 @@ export default {
     line-height: 1.5;
     margin-top: 1rem;
     margin-bottom: 0.5rem;
-    padding: 0 0.5rem;
+    padding: 0 0.75rem;
 }
 </style>

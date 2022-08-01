@@ -2,15 +2,6 @@
     <div ref="containerRef" class="gnb-notifications">
         <div class="top-wrapper">
             <span class="title">{{ $t('COMMON.GNB.NOTIFICATION.TITLE') }}</span>
-            <!--            <p-select-dropdown class="more-button" :items="moreMenuItems"-->
-            <!--                               type="icon-button" button-icon="ic_more"-->
-            <!--            />-->
-            <!--            <router-link :to="{name: ADMINISTRATION_ROUTE.IAM.USER.NOTIFICATION._NAME}"-->
-            <!--                         class="inline-flex"-->
-            <!--                         @click.native="$emit('click-settings')"-->
-            <!--            >-->
-            <!--                <p-icon-button class="settings-button" name="ic_setting" color="inherit" />-->
-            <!--            </router-link>-->
         </div>
         <div class="contents-wrapper">
             <template v-if="notifications.length === 0">
@@ -238,11 +229,8 @@ export default {
         }
     }
     .contents-wrapper {
-        padding: 0.25rem 0 0.5rem 0;
+        padding: 0.25rem 0.5rem 0.5rem 0.5rem;
         line-height: 1;
-        .notification-item {
-            margin: 0 0.5rem;
-        }
     }
     .no-data {
         display: flex;
