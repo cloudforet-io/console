@@ -1687,6 +1687,8 @@
 		"MY_PAGE_ACCOUNT": "My Account",
 		"MY_PAGE_ACCOUNT_PROFILE": "Account & Profile",
 		"MY_PAGE_API_KEY": "Access with API & CLI",
+		"MY_PAGE_INFO": "Info",
+		"MY_PAGE_NOTICE": "Notice",
 		"MY_PAGE_NOTIFICATIONS": "Notifications Channel",
 		"PROJECT": "Project"
 	},

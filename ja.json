@@ -1687,6 +1687,8 @@
 		"MY_PAGE_ACCOUNT": "マイアカウント",
 		"MY_PAGE_ACCOUNT_PROFILE": "アカウント&プロフィール",
 		"MY_PAGE_API_KEY": "アクセス設定(API&CLI)",
+		"MY_PAGE_INFO": "",
+		"MY_PAGE_NOTICE": "",
 		"MY_PAGE_NOTIFICATIONS": "お知らせチャンネル",
 		"PROJECT": "プロジェクト"
 	},
