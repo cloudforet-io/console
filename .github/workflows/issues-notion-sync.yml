@@ -1,20 +1,20 @@
 name: Notion Sync
 on:
   workflow_dispatch:
-  issues:
-    types:
-        [
-          opened,
-          edited,
-          labeled,
-          unlabeled,
-          assigned,
-          unassigned,
-          milestoned,
-          demilestoned,
-          reopened,
-          closed,
-        ]
+##  issues:
+##    types:
+##        [
+##          opened,
+##          edited,
+##          labeled,
+##          unlabeled,
+##          assigned,
+##          unassigned,
+##          milestoned,
+##          demilestoned,
+##          reopened,
+##          closed,
+##        ]
 jobs:
   build:
     runs-on: ubuntu-latest
