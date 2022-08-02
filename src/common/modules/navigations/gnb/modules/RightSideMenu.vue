@@ -10,20 +10,11 @@
                                :visible-dropdown="openedMenu === 'recentFavorite'"
                                @update:visibleDropdown="toggleMenu('recentFavorite')"
         />
-        <div v-if="!userState.isDomainOwner" class="menu-wrapper">
-            <div class="menu-button notifications" tabindex="0"
-                 @click.stop="toggleMenu('notifications')"
-            >
-                <p-i class="menu-icon"
-                     :name="hasNotifications ? 'ic_bell_noti' : 'ic_bell'"
-                     :color="hasNotifications ? undefined : 'inherit'"
-                />
-            </div>
-            <g-n-b-notifications v-if="openedMenu === 'notifications'"
-                                 v-click-outside="hideMenu"
-                                 @click-settings="hideMenu"
-            />
-        </div>
+        <g-n-b-notifications-notice v-if="!userState.isDomainOwner"
+                                    v-click-outside="hideMenu"
+                                    :visible-dropdown="openedMenu === 'notifications'"
+                                    @update:visibleDropdown="toggleMenu('notifications')"
+        />
         <div class="menu-wrapper account">
             <div class="menu-button account" tabindex="0"
                  @click.stop="toggleMenu('account')"
@@ -142,7 +133,7 @@ import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import GNBNotifications from '@/common/modules/navigations/gnb/modules/gnb-notification/GNBNotifications.vue';
+import GNBNotificationsNotice from '@/common/modules/navigations/gnb/modules/gnb-notifications-notice/GNBNotificationsNotice.vue';
 import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
 import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
 
@@ -156,7 +147,7 @@ export default {
     components: {
         GNBRecentFavorite,
         GNBSearch,
-        GNBNotifications,
+        GNBNotificationsNotice,
         PDivider,
         PI,
         PButton,

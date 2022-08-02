@@ -38,18 +38,17 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     PCollapsiblePanel, PI, PAnchor, PIconButton,
 } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
-
+import dayjs from 'dayjs';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationDateHeader.vue';
+import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notifications-notice/modules/GNBNotificationDateHeader.vue';
 
 const NOTIFICATION_TYPE_ICONS = {
     INFO: '',
@@ -83,9 +82,8 @@ export default {
         const dataHeaderFormatter = (time: string, timezone: string) => {
             if (!time) return '';
 
-            const dayjs = i18nDayjs.value;
-            const occurredTime: Dayjs = dayjs.tz(dayjs(time), timezone);
-            const now: Dayjs = dayjs.tz(dayjs(), timezone);
+            const occurredTime: Dayjs = i18nDayjs.value.tz(i18nDayjs.value(time), timezone);
+            const now: Dayjs = i18nDayjs.value.tz(i18nDayjs.value(), timezone);
 
             if (occurredTime.isSame(now, 'day')) {
                 return i18n.t('COMMON.GNB.NOTIFICATION.TODAY');
@@ -112,8 +110,7 @@ export default {
             contents: computed(() => props.data.message?.description),
             occurred: computed(() => {
                 if (!props.data.created_at) return '';
-
-                return iso8601Formatter(props.data.created_at, state.timezone);
+                return dayjs.tz(dayjs.utc(props.data.created_at), state.timezone).format('YYYY-MM-DD HH:mm');
             }),
             isLinkMouseEntered: false,
             isCollapsed: true,
@@ -124,8 +121,7 @@ export default {
 
         /* Event */
         const handleClickDeleteButton = () => {
-            emit('delete');
-            console.log('delete!');
+            emit('delete', props.data.notification_id);
         };
 
         return {
@@ -139,6 +135,7 @@ export default {
 
 <style lang="postcss" scoped>
 .notification-item {
+    margin: 0.125rem 0;
     .item-wrapper {
         @apply rounded-lg;
         display: flex;
@@ -196,7 +193,7 @@ export default {
         }
         .title {
             font-size: 0.875rem;
-            line-height: 1.5;
+            line-height: 1.25;
             font-weight: bold;
             text-transform: capitalize;
             vertical-align: middle;

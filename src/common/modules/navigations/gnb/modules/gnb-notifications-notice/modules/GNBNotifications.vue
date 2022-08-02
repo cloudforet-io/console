@@ -1,8 +1,5 @@
 <template>
     <div ref="containerRef" class="gnb-notifications">
-        <div class="top-wrapper">
-            <span class="title">{{ $t('COMMON.GNB.NOTIFICATION.TITLE') }}</span>
-        </div>
         <div class="contents-wrapper">
             <template v-if="notifications.length === 0">
                 <template v-if="loading">
@@ -27,6 +24,7 @@
                                          ref="notificationItemRefs"
                                          :data="item"
                                          :before-data="i === 0 ? null : notifications[i - 1]"
+                                         @delete="handleDeleteNotification"
                 />
                 <div v-if="loading" class="px-4 py-2">
                     <p-skeleton height="40px" />
@@ -53,8 +51,8 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationDateHeader.vue';
-import GNBNotificationItem from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationItem.vue';
+import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notifications-notice/modules/GNBNotificationDateHeader.vue';
+import GNBNotificationItem from '@/common/modules/navigations/gnb/modules/gnb-notifications-notice/modules/GNBNotificationItem.vue';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
@@ -104,6 +102,7 @@ export default {
                 { k: 'user_id', v: store.state.user.userId, o: '=' },
             ]);
 
+        /* Api */
         const listNotifications = async () => {
             if (state.loading) return;
 
@@ -147,6 +146,9 @@ export default {
             notificationApiHelper.setPageStart(pageStart);
             listNotifications();
         };
+        const handleDeleteNotification = (notificationId: string) => {
+            console.log('delete!', notificationId);
+        };
 
         onMounted(() => {
             if (!state.containerRef || intersectionObserver) return;
@@ -183,6 +185,7 @@ export default {
         return {
             ...toRefs(state),
             ADMINISTRATION_ROUTE,
+            handleDeleteNotification,
         };
     },
 };
@@ -190,44 +193,12 @@ export default {
 
 <style lang="postcss" scoped>
 .gnb-notifications {
-    @apply bg-white border border-gray-200 rounded-xs;
-    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
+    @apply bg-white;
     display: flex;
     flex-direction: column;
     max-width: 480px;
-    width: 100vw;
-    height: 100vh;
     max-height: calc(100vh - $gnb-height - 24px);
     overflow-y: scroll;
-    .top-wrapper {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        padding: 1rem 1rem 0 1rem;
-        .title {
-            @apply text-gray-dark;
-            flex-grow: 1;
-            flex-shrink: 0;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-        .more-button::v-deep {
-            flex-shrink: 0;
-            margin-right: 0.75rem;
-            line-height: 1;
-            &:not(.active) {
-                .dropdown-button .dropdown-icon:not(:hover) {
-                    @apply text-gray-700;
-                }
-            }
-        }
-        .settings-button {
-            flex-shrink: 0;
-            &:not(:hover) {
-                @apply text-gray-700;
-            }
-        }
-    }
     .contents-wrapper {
         padding: 0.25rem 0.5rem 0.5rem 0.5rem;
         line-height: 1;
