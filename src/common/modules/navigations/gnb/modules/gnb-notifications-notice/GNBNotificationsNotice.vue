@@ -11,13 +11,13 @@
                :tabs="tabs"
                :active-tab.sync="activeTab"
         >
-            <!--            <template #extra="tab">-->
-            <!--                <p-badge v-if="counts[ALERT_STATE.TRIGGERED] !== 0" style-type="primary3">-->
-            <!--                    {{ commaFormatter(counts[ALERT_STATE.TRIGGERED]) }}-->
-            <!--                </p-badge>-->
-            <!--            </template>-->
+            <template #extra="tab">
+                <p-badge v-if="count[tab.name] !== 0" style-type="primary3">
+                    {{ commaFormatter(count[tab.name]) }}
+                </p-badge>
+            </template>
             <template #notifications>
-                <g-n-b-notifications />
+                <g-n-b-notifications :count.sync="count.notifications" />
             </template>
             <template #notice>
                 notice
@@ -31,10 +31,10 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { commaFormatter } from '@spaceone/console-core-lib';
 import {
-    PI, PTab,
+    PI, PTab, PBadge,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import vClickOutside from 'v-click-outside';
+import { vOnClickOutside } from '@vueuse/components';
 
 import { store } from '@/store';
 
@@ -47,10 +47,11 @@ export default {
     components: {
         PI,
         PTab,
+        PBadge,
         GNBNotifications,
     },
     directives: {
-        clickOutside: vClickOutside.directive,
+        clickOutside: vOnClickOutside,
     },
     props: {
         visibleDropdown: {
@@ -64,10 +65,14 @@ export default {
             hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
             tabs: computed(() => ([
                 // song-lang
-                { label: 'Notifications', name: 'notifications', keepAlive: true },
-                { label: 'Notice', name: 'notice', keepAlive: true },
+                { label: 'Notifications', name: 'notifications' },
+                { label: 'Notice', name: 'notice' },
             ] as TabItem[])),
             activeTab: 'notifications',
+            count: {
+                notifications: 0,
+                notice: 0,
+            },
         });
 
         /* Event */

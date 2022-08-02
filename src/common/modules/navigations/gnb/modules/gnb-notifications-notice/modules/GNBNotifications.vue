@@ -51,6 +51,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notifications-notice/modules/GNBNotificationDateHeader.vue';
 import GNBNotificationItem from '@/common/modules/navigations/gnb/modules/gnb-notifications-notice/modules/GNBNotificationItem.vue';
 
@@ -64,7 +65,13 @@ export default {
         GNBNotificationItem,
         PSkeleton,
     },
-    setup() {
+    props: {
+        count: {
+            type: Number,
+            default: 0,
+        },
+    },
+    setup(props, { emit }) {
         const state = reactive({
             containerRef: null as Element|null,
             notificationItemRefs: [] as Vue[],
@@ -74,6 +81,7 @@ export default {
                 { name: 'delete', label: 'Delete All' },
             ]),
             timezone: computed(() => store.state.user.timezone),
+            proxyCount: useProxyValue('count', props, emit),
         });
 
         const setReadNotifications = async (notifications: any[]) => {
@@ -113,9 +121,10 @@ export default {
                     query: notificationApiHelper.data,
                 });
 
+                state.proxyCount = total_count;
                 totalCount = total_count;
                 state.notifications = state.notifications.concat(results);
-                setReadNotifications(results);
+                await setReadNotifications(results);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
             } finally {
