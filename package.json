@@ -24,7 +24,7 @@
     "@amcharts/amcharts4": "^4.10.10",
     "@amcharts/amcharts4-geodata": "^4.1.18",
     "@gtm-support/vue2-gtm": "^1.3.0",
-    "@spaceone/design-system": "^1.1.0-beta.358",
+    "@spaceone/design-system": "^1.1.0-beta.360",
     "@vue/composition-api": "^1.6.2",
     "@vueuse/core": "^8.3.1",
     "@vvo/tzdb": "^6.4.1",
