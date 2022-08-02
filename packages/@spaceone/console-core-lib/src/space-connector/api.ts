@@ -64,7 +64,6 @@ class API {
         this.refreshToken = refreshToken;
         window.localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
         window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-        API.unsetRefreshingState();
     }
 
     getRefreshToken(): string|undefined {
@@ -84,6 +83,10 @@ class API {
     }
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
+        if (!this.refreshToken) {
+            console.log('[API][refreshAccessToken] no refresh token! do not execute token refreshing.');
+            return undefined;
+        }
         if (API.checkRefreshingState() !== 'true') {
             let decoded = this.refreshToken ? jwtDecode<any>(this.refreshToken) : undefined;
             if (decoded) {
@@ -96,13 +99,16 @@ class API {
                 console.log('[API][refreshAccessToken] refreshed token succeed');
                 this.setToken(response.data.access_token, response.data.refresh_token);
                 decoded = this.refreshToken ? jwtDecode<any>(this.refreshToken) : undefined;
-                console.log('[API][refreshAccessToken] refreshed token is set. ttl: ', decoded.ttl);
+                const current = API.getCurrentTime();
+                console.log('[API][refreshAccessToken] refreshed token is set. ttl, exp: ', decoded.ttl, decoded.exp, ', exp - current time: ', decoded.exp - current);
                 return true;
             } catch (e) {
                 console.error('[API][refreshAccessToken] token refresh failed! flush tokens. error: ', e);
                 this.flushToken();
                 if (executeSessionTimeoutCallback) this.sessionTimeoutCallback();
                 return false;
+            } finally {
+                API.unsetRefreshingState();
             }
         } else {
             console.log('[API][refreshAccessToken] token refresh is already started');
@@ -198,6 +204,7 @@ class API {
             if (!request.headers) request.headers = {};
 
             request.headers.Authorization = `Bearer ${storedRefreshToken}`;
+            console.log('[API][refreshInstance.interceptors.request] request.headers.Authorization', request.headers.Authorization);
             return request;
         });
         this.refreshInstance.interceptors.response.use(
