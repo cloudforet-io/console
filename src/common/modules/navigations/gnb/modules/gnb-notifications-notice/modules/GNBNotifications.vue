@@ -24,6 +24,7 @@
                                          ref="notificationItemRefs"
                                          :data="item"
                                          :before-data="i === 0 ? null : notifications[i - 1]"
+                                         @select="handleSelectNotification"
                                          @delete="handleDeleteNotification"
                 />
                 <div v-if="loading" class="px-4 py-2">
@@ -155,6 +156,9 @@ export default {
             notificationApiHelper.setPageStart(pageStart);
             listNotifications();
         };
+        const handleSelectNotification = (notificationId: string) => {
+            console.log('select!', notificationId);
+        };
         const handleDeleteNotification = (notificationId: string) => {
             console.log('delete!', notificationId);
         };
@@ -194,6 +198,7 @@ export default {
         return {
             ...toRefs(state),
             ADMINISTRATION_ROUTE,
+            handleSelectNotification,
             handleDeleteNotification,
         };
     },

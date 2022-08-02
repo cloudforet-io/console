@@ -2,7 +2,7 @@
     <div class="notification-item">
         <g-n-b-notification-date-header v-if="dateHeader" :value="dateHeader" />
         <slot name="relative-time" />
-        <div class="item-wrapper" :class="{'link-hover': isLinkMouseEntered}">
+        <div class="item-wrapper" @click="handleClickNotificationItem">
             <span v-if="isNew" class="new-circle" />
             <div class="contents-wrapper">
                 <p class="title">
@@ -12,16 +12,6 @@
                     />
                     <span>{{ title }}</span>
                 </p>
-                <p-collapsible-panel v-model="isCollapsed" :line-clamp="3">
-                    <component :is="link ? 'a' : 'span'" :class="{collapsed: isCollapsed, 'link': link}"
-                               :href="link" target="_self"
-                               class="contents"
-                               @mouseenter="link ? changeLinkMouseEnterState(true) : undefined"
-                               @mouseleave="link ? changeLinkMouseEnterState(false) : undefined"
-                    >
-                        <span>{{ contents }}</span>
-                    </component>
-                </p-collapsible-panel>
                 <div class="datetime">
                     {{ occurred }}
                 </div>
@@ -36,10 +26,12 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs,
+} from '@vue/composition-api';
 
 import {
-    PCollapsiblePanel, PI, PAnchor, PIconButton,
+    PI, PIconButton,
 } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
@@ -62,8 +54,6 @@ export default {
     components: {
         GNBNotificationDateHeader,
         PI,
-        PAnchor,
-        PCollapsiblePanel,
         PIconButton,
     },
     props: {
@@ -94,7 +84,6 @@ export default {
             return occurredTime.from(now);
         };
 
-
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             beforeDataHeader: computed(() => dataHeaderFormatter(props.beforeData?.created_at || '', state.timezone)),
@@ -106,27 +95,23 @@ export default {
             isNew: computed(() => !props.data.is_read),
             icon: computed(() => NOTIFICATION_TYPE_ICONS[props.data.notification_type]),
             title: computed(() => props.data.message?.title),
-            link: computed(() => props.data.message?.link),
-            contents: computed(() => props.data.message?.description),
             occurred: computed(() => {
                 if (!props.data.created_at) return '';
                 return dayjs.tz(dayjs.utc(props.data.created_at), state.timezone).format('YYYY-MM-DD HH:mm');
             }),
-            isLinkMouseEntered: false,
-            isCollapsed: true,
         });
-        const changeLinkMouseEnterState = (value: boolean) => {
-            if (state.isLinkMouseEntered !== value) state.isLinkMouseEntered = value;
-        };
 
         /* Event */
+        const handleClickNotificationItem = () => {
+            emit('select', props.data.notification_id);
+        };
         const handleClickDeleteButton = () => {
             emit('delete', props.data.notification_id);
         };
 
         return {
             ...toRefs(state),
-            changeLinkMouseEnterState,
+            handleClickNotificationItem,
             handleClickDeleteButton,
         };
     },
@@ -141,10 +126,8 @@ export default {
         display: flex;
         position: relative;
         align-items: baseline;
-        padding: 0.25rem 2rem 0.25rem 1rem;
-        &.link-hover {
-            @apply bg-violet-100;
-        }
+        cursor: pointer;
+        padding: 0.5rem 2rem 0.5rem 1rem;
         &:hover {
             @apply bg-blue-100;
             .delete-button {
@@ -163,47 +146,29 @@ export default {
         }
         .contents-wrapper {
             flex-grow: 1;
+            .title {
+                font-size: 0.875rem;
+                line-height: 1.25;
+                font-weight: bold;
+                text-transform: capitalize;
+                vertical-align: middle;
+                margin-bottom: 0.125rem;
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+            .datetime {
+                @apply text-gray-400;
+                margin-top: 0.125rem;
+                font-size: 0.75rem;
+                line-height: 1.5;
+            }
         }
         .delete-button {
             visibility: hidden;
             position: absolute;
             top: 0.25rem;
             right: 0.5rem;
-        }
-        .p-collapsible-panel {
-            display: block;
-            font-size: 0.875rem;
-            margin-bottom: 0.125rem;
-            padding: 0;
-        }
-        .contents {
-            opacity: 0.8;
-            white-space: pre-line;
-
-            &.link {
-                @apply text-blue-800;
-            }
-
-            @media (hover: hover) {
-                &.link:hover {
-                    opacity: 1;
-                    text-decoration: underline;
-                }
-            }
-        }
-        .title {
-            font-size: 0.875rem;
-            line-height: 1.25;
-            font-weight: bold;
-            text-transform: capitalize;
-            vertical-align: middle;
-            margin-bottom: 0.125rem;
-        }
-        .datetime {
-            @apply text-gray-400;
-            margin-top: 0.125rem;
-            font-size: 0.75rem;
-            line-height: 1.5;
         }
     }
 }
