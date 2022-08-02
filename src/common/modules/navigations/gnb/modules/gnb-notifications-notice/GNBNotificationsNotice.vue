@@ -34,7 +34,6 @@ import {
     PI, PTab, PBadge,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import { vOnClickOutside } from '@vueuse/components';
 
 import { store } from '@/store';
 
@@ -49,9 +48,6 @@ export default {
         PTab,
         PBadge,
         GNBNotifications,
-    },
-    directives: {
-        clickOutside: vOnClickOutside,
     },
     props: {
         visibleDropdown: {
@@ -76,21 +72,13 @@ export default {
         });
 
         /* Event */
-        const handleClickOutside = () => {
-            state.proxyVisibleDropdown = false;
-        };
         const handleClickButton = () => {
             state.proxyVisibleDropdown = !state.proxyVisibleDropdown;
-        };
-        const handleCloseDropdown = () => {
-            state.proxyVisibleDropdown = false;
         };
 
         return {
             ...toRefs(state),
-            handleClickOutside,
             handleClickButton,
-            handleCloseDropdown,
             commaFormatter,
         };
     },

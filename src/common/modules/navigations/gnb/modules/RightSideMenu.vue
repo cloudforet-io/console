@@ -119,13 +119,13 @@ import {
 import {
     PI, PDivider, PButton,
 } from '@spaceone/design-system';
+import { vOnClickOutside } from '@vueuse/components';
 import ejs from 'ejs';
-import vClickOutside from 'v-click-outside';
 import type { Location } from 'vue-router';
-
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { languages } from '@/store/modules/user/config';
 
@@ -136,7 +136,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import GNBNotificationsNotice from '@/common/modules/navigations/gnb/modules/gnb-notifications-notice/GNBNotificationsNotice.vue';
 import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
 import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
-
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
@@ -153,7 +152,7 @@ export default {
         PButton,
     },
     directives: {
-        clickOutside: vClickOutside.directive,
+        clickOutside: vOnClickOutside,
     },
     props: {
         openedMenu: {
@@ -176,8 +175,6 @@ export default {
             languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
                 label: v, name: k,
             }))),
-            isNewIconHidden: store.getters['settings/getItem']('hide_new_icon', '/gnb'),
-            hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
         });
         const userState = reactive({
             name: computed(() => store.state.user.name),
@@ -216,16 +213,6 @@ export default {
         const toggleLanguageMenu = () => {
             state.showLanguageMenu = !state.showLanguageMenu;
         };
-        const hideNewIcon = () => {
-            if (!state.isNewIconHidden) {
-                state.isNewIconHidden = true;
-                store.dispatch('settings/setItem', {
-                    key: 'hide_new_icon',
-                    value: true,
-                    path: '/gnb',
-                });
-            }
-        };
 
 
         /* action */
@@ -243,11 +230,11 @@ export default {
                     timezone: userState.timezone,
                 });
                 vm.$nextTick(() => {
-                    showSuccessMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '', root);
+                    showSuccessMessage(i18n.t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '', root);
                 });
                 emit('hide-menu');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
+                ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
             }
         };
 
@@ -273,7 +260,6 @@ export default {
             toggleMenu,
             openProfile,
             toggleLanguageMenu,
-            hideNewIcon,
         };
     },
 };
