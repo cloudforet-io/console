@@ -27,6 +27,8 @@ export const MENU_ID = Object.freeze({
     MY_PAGE_ACCOUNT_PROFILE: 'my_page.account_profile',
     MY_PAGE_API_KEY: 'my_page.api_key',
     MY_PAGE_NOTIFICATIONS: 'my_page.notifications',
+    MY_PAGE_INFO: 'my_page.info',
+    MY_PAGE_NOTICE: 'my_page.notice',
 } as const);
 
 export type MenuId = typeof MENU_ID[keyof typeof MENU_ID];

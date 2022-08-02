@@ -110,4 +110,14 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         isNew: true,
         accessLevel: ACCESS_LEVEL.AUTHENTICATED,
     },
+    [MENU_ID.MY_PAGE_INFO]: {
+        translationId: 'MENU.MY_PAGE_INFO',
+        isNew: true,
+        accessLevel: ACCESS_LEVEL.AUTHENTICATED,
+    },
+    [MENU_ID.MY_PAGE_NOTICE]: {
+        translationId: 'MENU.MY_PAGE_NOTICE',
+        isNew: true,
+        accessLevel: ACCESS_LEVEL.AUTHENTICATED,
+    },
 });
