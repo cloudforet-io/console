@@ -39,9 +39,10 @@ import {
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import { find } from 'lodash';
 
-import type { RawPagePermission } from '@/lib/access-control/page-permission-helper';
+import type { RawPagePermission } from '@/lib/access-control/config';
+import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import {
-    getPagePermissionMapFromRaw, PAGE_PERMISSION_TYPE,
+    getPagePermissionMapFromRaw,
 } from '@/lib/access-control/page-permission-helper';
 
 import { getPageAccessMenuList } from '@/services/administration/iam/role/lib/page-access-menu-list';

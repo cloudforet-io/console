@@ -11,8 +11,7 @@ import type {
     DisplayState, GNBMenu, SidebarProps,
 } from '@/store/modules/display/type';
 
-
-import type { PagePermissionTuple } from '@/lib/access-control/page-permission-helper';
+import type { PagePermissionTuple } from '@/lib/access-control/config';
 import config from '@/lib/config';
 import type { Menu, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';

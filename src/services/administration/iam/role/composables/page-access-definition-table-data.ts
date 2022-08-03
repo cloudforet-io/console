@@ -5,7 +5,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';
 
-import type { RawPagePermission, PagePermissionMap } from '@/lib/access-control/page-permission-helper';
+import type { PagePermissionMap, RawPagePermission } from '@/lib/access-control/config';
 import {
     getPagePermissionMapFromRaw, getPermissionRequiredMenuIds,
 } from '@/lib/access-control/page-permission-helper';

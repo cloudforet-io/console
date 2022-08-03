@@ -2,7 +2,7 @@ import type { Location } from 'vue-router/types/router';
 
 import { ERROR_ROUTE } from '@/router/error-routes';
 
-import type { PagePermissionType } from '@/lib/access-control/page-permission-helper';
+import type { PagePermissionType } from '@/lib/access-control/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 

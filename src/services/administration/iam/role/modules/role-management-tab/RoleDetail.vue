@@ -72,9 +72,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import {
-    PAGE_PERMISSION_TYPE,
-} from '@/lib/access-control/page-permission-helper';
+import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

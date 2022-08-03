@@ -2,12 +2,14 @@ import type { Getter } from 'vuex';
 
 import { languages } from '@/store/modules/user/config';
 
-import type { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/page-permission-helper';
+import type { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/config';
+import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import {
     getDefaultPagePermissionList,
     getPagePermissionMapFromRaw, getProperPermissionType,
-    PAGE_PERMISSION_TYPE,
 } from '@/lib/access-control/page-permission-helper';
+
+import type { RoleType } from '@/services/administration/iam/role/config';
 
 import type { UserState } from './type';
 
@@ -50,16 +52,28 @@ export const hasDomainRole = (state: UserState): boolean => {
     return false;
 };
 
+export const hasSystemRole = (state: UserState): boolean => {
+    if (state.roles) {
+        return state.roles.some(role => role.roleType === 'SYSTEM');
+    }
+
+    return false;
+};
+
 export const hasPermission = (state: UserState): boolean => !!state.roles?.length;
 
 export const pagePermissionList: Getter<UserState, any> = (state, getters): PagePermissionTuple[] => {
     if (getters.isDomainOwner) {
-        return getDefaultPagePermissionList(true, true);
+        return getDefaultPagePermissionList(true);
     }
     const roleBasePagePermissions = state.roles?.flatMap(role => role.pagePermissions) ?? [];
     const pagePermissionMap = getPagePermissionMapFromRaw(roleBasePagePermissions);
     // merge role based page permissions and default page permissions
-    getDefaultPagePermissionList(false, getters.hasPermission).forEach(([page, permission]) => {
+    let roleType: RoleType|undefined;
+    if (getters.hasSystemRole) roleType = 'SYSTEM';
+    else if (getters.hasDomainRole) roleType = 'DOMAIN';
+    else if (getters.hasPermission) roleType = 'PROJECT';
+    getDefaultPagePermissionList(false, roleType).forEach(([page, permission]) => {
         pagePermissionMap[page] = getProperPermissionType(permission, pagePermissionMap[page]);
     });
     return Object.entries(pagePermissionMap);

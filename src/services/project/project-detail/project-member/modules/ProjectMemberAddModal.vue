@@ -121,7 +121,8 @@ import type { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { getPagePermissionMapFromRaw, PAGE_PERMISSION_TYPE } from '@/lib/access-control/page-permission-helper';
+import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
+import { getPagePermissionMapFromRaw } from '@/lib/access-control/page-permission-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

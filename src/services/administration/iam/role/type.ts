@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { Tags } from '@/models';
 
-import type { RawPagePermission, PagePermissionType } from '@/lib/access-control/page-permission-helper';
+import type { PagePermissionType, RawPagePermission } from '@/lib/access-control/config';
 
 import type { RoleType } from '@/services/administration/iam/role/config';
 

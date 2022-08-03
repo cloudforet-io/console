@@ -95,7 +95,7 @@ const myPageRoutes: RouteConfig = {
                         {
                             path: '/',
                             name: MY_PAGE_ROUTE.INFO.NOTICE._NAME,
-                            meta: { lnbVisible: true },
+                            meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
                             component: NoticePage as any,
                         },
                         {

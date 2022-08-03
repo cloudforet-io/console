@@ -43,7 +43,7 @@ import { PPanelTop } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import type { RawPagePermission } from '@/lib/access-control/page-permission-helper';
+import type { RawPagePermission } from '@/lib/access-control/config';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
