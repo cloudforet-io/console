@@ -204,7 +204,6 @@ class API {
             if (!request.headers) request.headers = {};
 
             request.headers.Authorization = `Bearer ${storedRefreshToken}`;
-            console.log('[API][refreshInstance.interceptors.request] request.headers.Authorization', request.headers.Authorization);
             return request;
         });
         this.refreshInstance.interceptors.response.use(
