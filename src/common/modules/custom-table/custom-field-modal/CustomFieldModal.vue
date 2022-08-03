@@ -109,7 +109,7 @@ interface Props {
     isServerPage: boolean;
 }
 
-type SelectedColumnMap = Record<string, DynamicField>
+type SelectedColumnMap = Record<string, DynamicField>;
 
 /**
  * @description Merge two field lists. Duplicate check is performed based on key, and the field list given as the first parameter takes precedence.

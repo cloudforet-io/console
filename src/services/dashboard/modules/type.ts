@@ -17,4 +17,4 @@ export const DATA_TYPE = {
     STORAGE: 'Storage',
     BILLING: 'Billing',
 } as const;
-export type DataType = typeof DATA_TYPE[keyof typeof DATA_TYPE]
+export type DataType = typeof DATA_TYPE[keyof typeof DATA_TYPE];

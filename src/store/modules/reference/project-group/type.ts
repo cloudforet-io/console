@@ -7,8 +7,8 @@ export interface ProjectGroupResourceItemData {
     };
 }
 
-export type ProjectGroupReferenceItem = Required<Pick<ReferenceItem<ProjectGroupResourceItemData>, 'label'|'name'|'data'>>
+export type ProjectGroupReferenceItem = Required<Pick<ReferenceItem<ProjectGroupResourceItemData>, 'label'|'name'|'data'>>;
 
-export type ProjectGroupReferenceMap = ReferenceMap<ProjectGroupReferenceItem>
+export type ProjectGroupReferenceMap = ReferenceMap<ProjectGroupReferenceItem>;
 
-export type ProjectGroupReferenceState = ReferenceState<ProjectGroupReferenceMap>
+export type ProjectGroupReferenceState = ReferenceState<ProjectGroupReferenceMap>;

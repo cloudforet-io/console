@@ -111,4 +111,4 @@ export const DASHBOARD_PRIVACY_TYPE = Object.freeze({
     PUBLIC: 'PUBLIC',
     USER: 'USER',
 } as const);
-export type DashboardPrivacyType = typeof DASHBOARD_PRIVACY_TYPE[keyof typeof DASHBOARD_PRIVACY_TYPE]
+export type DashboardPrivacyType = typeof DASHBOARD_PRIVACY_TYPE[keyof typeof DASHBOARD_PRIVACY_TYPE];

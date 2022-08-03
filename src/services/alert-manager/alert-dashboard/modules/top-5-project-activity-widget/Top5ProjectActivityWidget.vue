@@ -92,7 +92,7 @@ const ACTIVITY = {
     LOW: 'LOW',
     // MAINTENANCE: 'MAINTENANCE',
 } as const;
-export type AlertActivity = typeof ACTIVITY[keyof typeof ACTIVITY]
+export type AlertActivity = typeof ACTIVITY[keyof typeof ACTIVITY];
 const ACTIVITY_COLOR = Object.freeze({
     HIGH: red[400],
     LOW: red[200],

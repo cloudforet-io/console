@@ -28,9 +28,9 @@ const USAGE_RANGE = Object.freeze({
     between90And100: 'between90And100',
     lessThan90: 'lessThan90',
 } as const);
-type UsageRange = typeof USAGE_RANGE[keyof typeof USAGE_RANGE]
+type UsageRange = typeof USAGE_RANGE[keyof typeof USAGE_RANGE];
 
-type SelectedMap = Partial<Record<UsageRange, boolean>>
+type SelectedMap = Partial<Record<UsageRange, boolean>>;
 
 export default {
     name: 'BudgetToolboxUsageRange',

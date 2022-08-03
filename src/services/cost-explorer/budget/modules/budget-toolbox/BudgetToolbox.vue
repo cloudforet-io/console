@@ -91,7 +91,7 @@ export interface Pagination {
 
 type I18nSelectDropdownMenu = SelectDropdownMenu | {
     label: string | TranslateResult;
-}
+};
 
 type Sort = BudgetUsageAnalyzeRequestParam['sort'];
 export default {

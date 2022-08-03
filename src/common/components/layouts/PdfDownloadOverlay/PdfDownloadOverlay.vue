@@ -70,11 +70,11 @@ const orientations = ['portrait', 'landscape'] as const;
 const EMPTY_ROW_COUNT = 5;
 
 type PaperSize = typeof paperSizes[number];
-type Mode = typeof modes[number]
-type Orientation = typeof orientations[number]
-type PaperSizeInfo = {width: number; height: number}
+type Mode = typeof modes[number];
+type Orientation = typeof orientations[number];
+type PaperSizeInfo = {width: number; height: number};
 
-type ItemType = 'data-table'|'image'
+type ItemType = 'data-table'|'image';
 
 const paperSizeInfoMap: Record<PaperSize, PaperSizeInfo> = Object.freeze({
     A4: { width: 595.28, height: 841.89 },

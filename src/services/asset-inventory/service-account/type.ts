@@ -24,4 +24,4 @@ export interface ProviderModel extends Tags, IdParameter{
     created_at: TimeStamp;
 }
 
-export type ProjectGroup = ProjectItemResp
+export type ProjectGroup = ProjectItemResp;

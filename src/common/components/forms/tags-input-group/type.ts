@@ -12,7 +12,7 @@ export interface Tag {
 export type ValidationData = {
     isValid: boolean;
     message: string | TranslateResult;
-}
+};
 
 export interface TagsInputGroupProps {
     tags: Tag;

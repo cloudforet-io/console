@@ -36,7 +36,7 @@ import {
   export interface RouteRecord extends OriginRouteRecord {
     meta: RouteMeta;
   }
-  export type RouteConfig = RouteConfigSingleView | RouteConfigMultipleViews
+  export type RouteConfig = RouteConfigSingleView | RouteConfigMultipleViews;
   export interface Route extends OriginRoute {
     meta?: RouteMeta;
     matched: RouteRecord[];

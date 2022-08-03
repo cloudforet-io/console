@@ -90,7 +90,7 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 type DataTableTranslationField = DataTableField | {
     label?: TranslateResult | string;
-}
+};
 
 
 export default {

@@ -13,8 +13,8 @@ import type {
 import { SpaceConnector } from '@/space-connector';
 import type { Filter } from '@/space-connector/type';
 
-type KeyTuple = [string, string|undefined, KeyDataType|undefined] // name, label, dataType
-type KeyParam = Array<KeyTuple | string | KeyItemSet>
+type KeyTuple = [string, string|undefined, KeyDataType|undefined]; // name, label, dataType
+type KeyParam = Array<KeyTuple | string | KeyItemSet>;
 
 const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number, dataType?: KeyDataType) => {
     if (d === undefined || d === null) {

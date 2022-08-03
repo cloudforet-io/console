@@ -92,7 +92,7 @@ interface CategoryMenuItem { name: string; label: string }
 type CloudServiceFilterItemsMap = {
     [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: CategoryMenuItem[];
     [CLOUD_SERVICE_FILTER_KEY.REGION]: RegionMenuItem[];
-}
+};
 
 interface Props {
     visible: boolean;

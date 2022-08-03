@@ -71,7 +71,7 @@ const EDIT_MODE = Object.freeze({
 type Responder = {
     resource_type: string;
     resource_id: string;
-}
+};
 interface Actions {
     change_assignee: string;
     change_urgency?: string;

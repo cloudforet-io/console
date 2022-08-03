@@ -6,7 +6,7 @@ export const FAVORITE_TYPE = Object.freeze({
     PROJECT: 'PROJECT',
     PROJECT_GROUP: 'PROJECT_GROUP',
 } as const);
-export type FavoriteType = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE]
+export type FavoriteType = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE];
 
 export interface FavoriteConfig {
     itemType: FavoriteType;

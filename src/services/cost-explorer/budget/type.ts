@@ -15,9 +15,9 @@ interface BudgetMonthlyCost {
 	usd_cost: number|string;
 }
 
-export type CostType = 'provider' | 'region_code' | 'service_account_id' | 'product'
+export type CostType = 'provider' | 'region_code' | 'service_account_id' | 'product';
 
-export type BudgetCostType = 'all'| CostType
+export type BudgetCostType = 'all'| CostType;
 
 
 export const BUDGET_TIME_UNIT = Object.freeze({
@@ -81,7 +81,7 @@ export interface BudgetUsageData {
 	cost_types?: Partial<Record<CostType, string[]>>;
 }
 
-export type BudgetPageUrlQuery = Partial<Record<'filters', RouteQueryString>>
+export type BudgetPageUrlQuery = Partial<Record<'filters', RouteQueryString>>;
 
 export interface BudgetPageQueryValue {
 	filters?: QueryStoreFilter[];

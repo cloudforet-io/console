@@ -65,7 +65,7 @@ class GoogleAuth extends Authenticator {
                 },
             });
         });
-    }
+    };
 
     private static loadGapi = async () => {
         try {
@@ -74,7 +74,7 @@ class GoogleAuth extends Authenticator {
             console.error('Failed to load gapi', e);
             throw e;
         }
-    }
+    };
 
     private static getAuth2 = (clientId: string): Promise<any> => new Promise(((resolve, reject) => {
         if (!gapi.auth2) {

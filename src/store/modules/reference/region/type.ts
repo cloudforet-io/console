@@ -4,11 +4,11 @@ export interface RegionResourceItemData {
     provider: string;
 }
 
-export type RegionReferenceItem = Required<Pick<ReferenceItem<RegionResourceItemData>, 'label'|'name'|'data'|'continent'|'longitude'|'latitude'>>
+export type RegionReferenceItem = Required<Pick<ReferenceItem<RegionResourceItemData>, 'label'|'name'|'data'|'continent'|'longitude'|'latitude'>>;
 
-export type RegionReferenceMap = ReferenceMap<RegionReferenceItem>
+export type RegionReferenceMap = ReferenceMap<RegionReferenceItem>;
 
-export type RegionReferenceState = ReferenceState<RegionReferenceMap>
+export type RegionReferenceState = ReferenceState<RegionReferenceMap>;
 
 export interface SortedRegionReferenceItem extends RegionReferenceItem {
     id: string;

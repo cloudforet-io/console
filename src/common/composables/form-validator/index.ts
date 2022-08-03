@@ -7,9 +7,9 @@ import { clone } from 'lodash';
 import type { TranslateResult } from 'vue-i18n';
 
 
-type ValidatorResult = boolean|TranslateResult
+type ValidatorResult = boolean|TranslateResult;
 interface Validator { (value?: any): ValidatorResult }
-type ValidationResult = boolean
+type ValidationResult = boolean;
 
 function useValueValidator<T = any>(
     value: T,
@@ -78,39 +78,39 @@ function useValueValidator<T = any>(
 
 type Forms<T> = {
     [K in keyof T]: ComputedRef<T[K]>
-}
+};
 
 type Validators<T> = {
     [K in keyof T]: Validator
-}
+};
 
 type ValueSetters<T> = {
     [K in keyof T]: (val: T[K]) => void
-}
+};
 
 type InvalidTexts<T> = {
     [K in keyof T]: ComputedRef<TranslateResult>
-}
+};
 
 type InvalidState<T> = {
     [K in keyof T]: ComputedRef<ValidationResult|undefined>
-}
+};
 
 type ValidationResults<T> = {
     [K in keyof T]: ComputedRef<ValidationResult>
-}
+};
 
 type Resets<T> = {
     [K in keyof T]: () => void
-}
+};
 
 type Validates<T> = {
     [K in keyof T]: () => void
-}
+};
 
 type ImmediateMap<T> = {
     [K in keyof T]: boolean
-}
+};
 
 /**
  * @param _forms

@@ -6,7 +6,7 @@ import type {
 } from '@/services/cost-explorer/type';
 
 
-export type CostAnalysisPageUrlQuery = Partial<Record<CostAnalysisPageUrlQueryKey, RouteQueryString>>
+export type CostAnalysisPageUrlQuery = Partial<Record<CostAnalysisPageUrlQueryKey, RouteQueryString>>;
 
 export interface CostAnalysisPageQueryValue {
     period?: Period;

@@ -7,7 +7,7 @@ export const SUGGESTION_TYPE = Object.freeze({
     ...FAVORITE_TYPE,
     ...RECENT_TYPE,
 } as const);
-export type SuggestionType = typeof SUGGESTION_TYPE[keyof typeof SUGGESTION_TYPE]
+export type SuggestionType = typeof SUGGESTION_TYPE[keyof typeof SUGGESTION_TYPE];
 
 export interface SuggestionItem extends MenuItem {
     itemType?: SuggestionType;

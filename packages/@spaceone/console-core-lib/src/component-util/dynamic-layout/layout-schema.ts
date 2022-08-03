@@ -9,8 +9,8 @@ export interface SearchEnumItem {
         color?: string;
     };
 }
-export type SearchDataType = KeyDataType
-export type SearchEnums = Record<string, SearchEnumItem|string>|string[]
+export type SearchDataType = KeyDataType;
+export type SearchEnums = Record<string, SearchEnumItem|string>|string[];
 
 export interface SearchKeyOptions {
     key: string; // Key to retrieve actual data
@@ -57,11 +57,11 @@ export interface QuerySearchTableOptions extends CommonOptions {
     search: SearchSchema;
 }
 
-export type RawOptions = CommonOptions
+export type RawOptions = CommonOptions;
 
-export type RawTableOptions = CommonOptions
+export type RawTableOptions = CommonOptions;
 
-export type HtmlOptions = CommonOptions
+export type HtmlOptions = CommonOptions;
 
 export interface MarkdownOptions extends CommonOptions {
     markdown: string|{

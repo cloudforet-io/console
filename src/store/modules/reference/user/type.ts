@@ -1,7 +1,7 @@
 import type { ReferenceItem, ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
 
-export type UserReferenceItem = Required<Pick<ReferenceItem<undefined>, 'label'|'name'>>
+export type UserReferenceItem = Required<Pick<ReferenceItem<undefined>, 'label'|'name'>>;
 
-export type UserReferenceMap = ReferenceMap<UserReferenceItem>
+export type UserReferenceMap = ReferenceMap<UserReferenceItem>;
 
-export type UserReferenceState = ReferenceState<UserReferenceMap>
+export type UserReferenceState = ReferenceState<UserReferenceMap>;

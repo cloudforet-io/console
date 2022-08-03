@@ -66,16 +66,16 @@ export type EnumOptions = {
 } | {
     items?: Record<string, EnumValue>;
     default?: any;
-} & CommonOptions
+} & CommonOptions;
 
 export interface SizeOptions extends CommonOptions {
     display_unit?: 'BYTES | KB | MB | GB | TB | PB';
     source_unit?: 'BYTES | KB | MB | GB | TB | PB';
 }
 
-export type DictOptions = CommonOptions
+export type DictOptions = CommonOptions;
 
-export type TextOptions = CommonOptions
+export type TextOptions = CommonOptions;
 
 export type DynamicFieldOptions =
     | BadgeOptions
@@ -85,7 +85,7 @@ export type DynamicFieldOptions =
     | ListOptions
     | StateOptions
     | TextOptions
-    | SizeOptions
+    | SizeOptions;
 
 export interface DynamicField {
     key: string;

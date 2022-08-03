@@ -11,7 +11,7 @@ interface FieldFormatter {
     (data: string, reference: Reference): Partial<DynamicFieldProps>;
 }
 
-type FormatterMap = Record<ResourceType, FieldFormatter>
+type FormatterMap = Record<ResourceType, FieldFormatter>;
 /**
  * getter - reference/fieldItems
  *

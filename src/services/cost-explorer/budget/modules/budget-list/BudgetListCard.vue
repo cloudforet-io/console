@@ -106,14 +106,14 @@ interface Props {
 type ResourceItemMap = {
     label: string;
     items: ReferenceMap;
-}
+};
 
-type CostTypeResourceItemMap = Record<string, ResourceItemMap>
+type CostTypeResourceItemMap = Record<string, ResourceItemMap>;
 
 type CostTypeResourceListMap = Record<string, {
     costTypeLabel: string;
     resourceList: string[];
-}>
+}>;
 
 
 export default {

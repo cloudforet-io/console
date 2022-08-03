@@ -3,7 +3,7 @@ import type { RouteQueryString } from '@/lib/router-query-string';
 import type { RoleData } from '@/services/administration/iam/role/type';
 import type { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
 
-export type ProjectMemberPageUrlQuery = Partial<Record<'filters', RouteQueryString>>
+export type ProjectMemberPageUrlQuery = Partial<Record<'filters', RouteQueryString>>;
 
 export interface MemberItem {
     resource_id: string;

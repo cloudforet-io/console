@@ -81,7 +81,7 @@ interface BudgetItem {
 }
 type I18nDataTableField = DataTableField | {
     label: string | TranslateResult;
-}
+};
 export default {
     name: 'BudgetUsageWithForecast',
     components: {

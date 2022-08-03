@@ -181,7 +181,7 @@ class API {
             throw new APIError(error);
         }
         }
-    }
+    };
 
     private setAxiosInterceptors(): void {
         // Axios request interceptor

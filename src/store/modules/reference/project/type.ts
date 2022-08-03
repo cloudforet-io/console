@@ -7,9 +7,9 @@ export interface ProjectResourceItemData {
     };
 }
 
-export type ProjectReferenceItem = Required<Pick<ReferenceItem<ProjectResourceItemData>, 'label'|'name'|'data'>>
+export type ProjectReferenceItem = Required<Pick<ReferenceItem<ProjectResourceItemData>, 'label'|'name'|'data'>>;
 
-export type ProjectReferenceMap = ReferenceMap<ProjectReferenceItem>
+export type ProjectReferenceMap = ReferenceMap<ProjectReferenceItem>;
 
 // export type ProjectReferenceState = ReferenceState<ProjectReferenceMap>
 

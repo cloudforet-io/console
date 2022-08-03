@@ -14,4 +14,4 @@ export type CostExplorerStore = Store<CostExplorerState& {
     dashboard: CostDashboardState;
     costAnalysis: CostAnalysisStoreState;
     budget: BudgetStoreState;
-}>
+}>;

@@ -7,7 +7,7 @@ import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 
 
-type FlattenedMenuMap = Partial<Record<MenuId, MenuId[]>>
+type FlattenedMenuMap = Partial<Record<MenuId, MenuId[]>>;
 const getSubMenuIdsToMap = (menu: Menu, flattenedMenuMap: FlattenedMenuMap = {}): FlattenedMenuMap => {
     let results: MenuId[] = [];
     const subMenuList = menu.subMenuList;

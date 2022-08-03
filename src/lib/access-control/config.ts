@@ -7,7 +7,7 @@ export const ACCESS_LEVEL = {
     MANAGE_PERMISSION: 3,
 } as const;
 
-export type AccessLevel = typeof ACCESS_LEVEL[keyof typeof ACCESS_LEVEL]
+export type AccessLevel = typeof ACCESS_LEVEL[keyof typeof ACCESS_LEVEL];
 
 export const PAGE_PERMISSION_TYPE = {
     VIEW: 'VIEW',

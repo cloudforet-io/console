@@ -63,7 +63,7 @@ import {
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 
-type Item = Record<string, {label: TranslateResult; favorites: FavoriteItem[]}>
+type Item = Record<string, {label: TranslateResult; favorites: FavoriteItem[]}>;
 
 const LIMIT_COUNT = 5;
 export default {

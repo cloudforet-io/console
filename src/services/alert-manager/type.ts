@@ -27,7 +27,7 @@ export interface EscalationPolicyFormModel {
 type Responder = {
     resource_type: string;
     resource_id: string;
-}
+};
 
 interface ResourceModel {
     resource_id?: string;
@@ -100,7 +100,7 @@ export interface AlertStateUpdateParams {
     note?: string;
 }
 
-export type AlertListPageUrlQuery = Partial<Record<'state' | 'urgency' | 'assigned' | 'filters', RouteQueryString>>
+export type AlertListPageUrlQuery = Partial<Record<'state' | 'urgency' | 'assigned' | 'filters', RouteQueryString>>;
 
 export interface ProjectMember {
     created_at: TimeStamp;

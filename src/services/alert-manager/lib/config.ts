@@ -21,7 +21,7 @@ export const ALERT_ACTION = {
     merge: 'merge',
     delete: 'delete',
 } as const;
-export type AlertAction = typeof ALERT_ACTION[keyof typeof ALERT_ACTION]
+export type AlertAction = typeof ALERT_ACTION[keyof typeof ALERT_ACTION];
 
 export enum SCOPE {
     global = 'GLOBAL',

@@ -10,4 +10,4 @@ export interface AssetInventoryState {
 export type AssetInventoryStore = Store<AssetInventoryState & {
     cloudService: CloudServiceStoreState;
     cloudServiceDetail: CloudServiceDetailStoreState;
-}>
+}>;

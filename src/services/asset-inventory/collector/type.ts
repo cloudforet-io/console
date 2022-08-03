@@ -126,5 +126,5 @@ export interface ScheduleGetParameter {
     schedule_id: string;
 }
 
-export type CollectorListResp = ListType<CollectorModel>
-export type CollectorScheduleListResp = ListType<CollectorScheduleModel>
+export type CollectorListResp = ListType<CollectorModel>;
+export type CollectorScheduleListResp = ListType<CollectorScheduleModel>;

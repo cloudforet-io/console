@@ -56,14 +56,14 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import type { BudgetCostType, BudgetData, CostType } from '@/services/cost-explorer/budget/type';
 
 
-type CostTypes = BudgetData['cost_types']
+type CostTypes = BudgetData['cost_types'];
 
 interface Props {
     costTypes?: CostTypes;
     disableValidation?: boolean;
 }
 
-type BudgetCostTypes = Record<BudgetCostType, TranslateResult>
+type BudgetCostTypes = Record<BudgetCostType, TranslateResult>;
 interface DistinctResult {
     results?: {name: string; key: string}[];
     total_count?: number;

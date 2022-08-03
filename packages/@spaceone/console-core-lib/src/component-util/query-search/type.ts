@@ -43,7 +43,7 @@ export interface QueryItem {
     value: ValueItem;
 }
 
-export type MenuType ='ROOT_KEY'|'KEY'|'VALUE'|'OPERATOR'
+export type MenuType ='ROOT_KEY'|'KEY'|'VALUE'|'OPERATOR';
 
 export interface MenuItem<T> {
     type?: CONTEXT_MENU_TYPE;

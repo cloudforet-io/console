@@ -25,7 +25,7 @@ export interface MonitoringProps {
     responsive?: boolean;
 }
 
-export type StatisticsType = typeof STATISTICS_TYPE[keyof typeof STATISTICS_TYPE]
+export type StatisticsType = typeof STATISTICS_TYPE[keyof typeof STATISTICS_TYPE];
 
 export interface MetricChartData {
     loading: boolean;

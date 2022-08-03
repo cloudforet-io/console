@@ -9,7 +9,7 @@ const resourceTypes = ['inventory.Server', 'identity.Project', 'identity.Project
     'inventory.Collector', 'identity.ServiceAccount', 'identity.Provider',
     'inventory.Region', 'inventory.CloudService', 'inventory.CloudServiceType',
     'secret.Secret'];
-export type ResourceType = typeof resourceTypes[number]
+export type ResourceType = typeof resourceTypes[number];
 
 export const resourceTypeLabels = Object.freeze({
     'inventory.Server': 'Server',

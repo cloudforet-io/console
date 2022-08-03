@@ -37,9 +37,9 @@ import BudgetTargetSelect from '@/services/cost-explorer/budget/modules/BudgetTa
 import type { BudgetData } from '@/services/cost-explorer/budget/type';
 
 
-export type BudgetBaseInfo = Pick<BudgetData, 'name'|'cost_types'|'project_group_id'|'project_id'>
+export type BudgetBaseInfo = Pick<BudgetData, 'name'|'cost_types'|'project_group_id'|'project_id'>;
 
-type CostTypes = BudgetData['cost_types']
+type CostTypes = BudgetData['cost_types'];
 
 export default {
     name: 'BudgetFormBaseInfo',

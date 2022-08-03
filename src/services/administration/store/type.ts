@@ -11,4 +11,4 @@ export type AdministrationStore = Store<AdministrationState & {
     user: UserStoreState;
     role: RoleStoreState;
     policy: PolicyState;
-}>
+}>;

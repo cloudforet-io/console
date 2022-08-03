@@ -59,7 +59,7 @@ import type { BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget
 import type { Period } from '@/services/cost-explorer/type';
 
 
-type CostTypes = BudgetData['cost_types']
+type CostTypes = BudgetData['cost_types'];
 interface BudgetBulkCreateTemplateSource {
     start?: string;
     end?: string;

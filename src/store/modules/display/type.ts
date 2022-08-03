@@ -16,7 +16,7 @@ export interface GNBMenu extends Menu {
 
 export type CurrencyRates = {
     [K in Currency]: number;
-}
+};
 
 export interface DisplayState {
     visibleSidebar: boolean;

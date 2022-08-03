@@ -144,7 +144,7 @@ type ExchangeRateData = {
     rate: number;
     is_default: boolean;
     state: string;
-}
+};
 
 const getCurrencyRates = async (): Promise<CurrencyRates> => {
     try {

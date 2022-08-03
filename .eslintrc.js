@@ -122,6 +122,9 @@ module.exports = {
         '@typescript-eslint/no-shadow': ['error'],
         '@typescript-eslint/consistent-type-imports': ['error'],
 
+        semi: 'off',
+        '@typescript-eslint/semi': ['error'],
+
         // eslint-plugin-import rules
         'import/order': [
             'error',

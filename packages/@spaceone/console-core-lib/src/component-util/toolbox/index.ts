@@ -6,7 +6,7 @@ interface Options extends ToolboxOptions {
     sortDesc?: boolean;
 }
 
-type Exclude = Partial<Record<keyof Options, boolean>>
+type Exclude = Partial<Record<keyof Options, boolean>>;
 
 export const setApiQueryWithToolboxOptions = (apiQueryHelper: ApiQueryHelper, options: Options = {}, exclude: Exclude = {}): ApiQueryHelper => {
     if (!Object.keys(options).length) return apiQueryHelper;

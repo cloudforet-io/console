@@ -19,7 +19,7 @@ interface AfterCallApi {
     (data?: any): Promise<void>|void
 }
 
-type AfterCallApiMap = Record<string, AfterCallApi>
+type AfterCallApiMap = Record<string, AfterCallApi>;
 
 const DEFAULT_MOCK_CONFIG = Object.freeze({ mockMode: false });
 

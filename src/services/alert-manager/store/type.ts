@@ -7,4 +7,4 @@ export interface AlertManagerState {}
 
 export type AlertManagerStore = Store<AlertManagerState & {
     alert: AlertState;
-}>
+}>;

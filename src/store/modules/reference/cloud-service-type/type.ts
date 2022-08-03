@@ -6,8 +6,8 @@ export interface CloudServiceTypeResourceItemData {
     cloudServiceTypeKey?: string;
 }
 
-export type CloudServiceTypeReferenceItem = Required<Pick<ReferenceItem<CloudServiceTypeResourceItemData>, 'label'|'name'|'icon'|'data'>>
+export type CloudServiceTypeReferenceItem = Required<Pick<ReferenceItem<CloudServiceTypeResourceItemData>, 'label'|'name'|'icon'|'data'>>;
 
-export type CloudServiceTypeReferenceMap = ReferenceMap<CloudServiceTypeReferenceItem>
+export type CloudServiceTypeReferenceMap = ReferenceMap<CloudServiceTypeReferenceItem>;
 
-export type CloudServiceTypeReferenceState = ReferenceState<CloudServiceTypeReferenceMap>
+export type CloudServiceTypeReferenceState = ReferenceState<CloudServiceTypeReferenceMap>;

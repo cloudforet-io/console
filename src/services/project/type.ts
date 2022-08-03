@@ -2,7 +2,7 @@ import type { TreeItem, Tree } from '@spaceone/design-system/dist/src/data-displ
 
 import type { TimeStamp } from '@/models';
 
-export type ItemType = 'PROJECT_GROUP'|'PROJECT'
+export type ItemType = 'PROJECT_GROUP'|'PROJECT';
 
 export interface ProjectGroupInfo {
     project_group_id: string;
@@ -42,11 +42,11 @@ export interface ProjectGroup {
 }
 
 
-export type ProjectTreeItem = TreeItem<ProjectItemResp>
+export type ProjectTreeItem = TreeItem<ProjectItemResp>;
 
-export type ProjectTreeRoot = Tree<ProjectItemResp>
+export type ProjectTreeRoot = Tree<ProjectItemResp>;
 
-export type ProjectGroupTreeItem = Partial<ProjectTreeItem>
+export type ProjectGroupTreeItem = Partial<ProjectTreeItem>;
 
 
 export const SUMMARY_TYPE = {

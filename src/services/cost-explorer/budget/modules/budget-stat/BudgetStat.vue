@@ -69,7 +69,7 @@ const UNIT = Object.freeze({
     currency: 'currency',
     percent: 'percent',
 } as const);
-type Unit = typeof UNIT[keyof typeof UNIT]
+type Unit = typeof UNIT[keyof typeof UNIT];
 
 interface Card {
     title: TranslateResult;
