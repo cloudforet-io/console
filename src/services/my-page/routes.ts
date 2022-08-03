@@ -25,7 +25,7 @@ const NoticeUpdatePage = () => import(/* webpackChunkName: "NoticeUpdatePage" */
 const myPageRoutes: RouteConfig = {
     path: 'my-page',
     name: MY_PAGE_ROUTE._NAME,
-    meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.NO_PERMISSION },
+    meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: () => getRedirectRouteByPagePermission(MENU_ID.MY_PAGE, store.getters['user/pagePermissionMap']),
     component: MyPageContainer,
     children: [
@@ -116,7 +116,7 @@ const myPageRoutes: RouteConfig = {
                             path: 'detail',
                             name: MY_PAGE_ROUTE.INFO.NOTICE.DETAIL._NAME,
                             // song-lang
-                            meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                            meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
                             component: NoticeDetailPage as any,
                         },
                     ],

@@ -53,7 +53,12 @@ export const MENU_LIST: Menu[] = [
                     { id: MENU_ID.MY_PAGE_NOTIFICATIONS },
                 ],
             },
-
+            {
+                id: MENU_ID.MY_PAGE_INFO,
+                subMenuList: [
+                    { id: MENU_ID.MY_PAGE_NOTICE },
+                ],
+            },
         ],
     },
 ];

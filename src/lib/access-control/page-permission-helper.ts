@@ -1,5 +1,4 @@
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
-import type { MenuId, MenuInfo } from '@/lib/menu/config';
+import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -60,10 +59,7 @@ export const getProperPermissionType = (permissionA: PagePermissionType = PAGE_P
 };
 
 const menuIdList = Object.keys(MENU_INFO_MAP) as MenuId[];
-export const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter((id) => {
-    const info = MENU_INFO_MAP[id];
-    return info.accessLevel >= ACCESS_LEVEL.VIEW_PERMISSION;
-});
+export const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter(id => MENU_INFO_MAP[id]?.needPermissionByRole);
 
 const permissionRequiredMenuIds: MenuId[] = getPermissionRequiredMenuIds();
 export const getPagePermissionMapFromRaw = (pagePermissions: RawPagePermission[]): PagePermissionMap => {
@@ -91,21 +87,8 @@ export const getPagePermissionMapFromRaw = (pagePermissions: RawPagePermission[]
     return result;
 };
 
-const getPermissionRequiredMenuInfo = (): Partial<Record<MenuId, MenuInfo>> => {
-    const result: Partial<Record<MenuId, MenuInfo>> = {};
-    menuIdList.forEach((id) => {
-        const info = MENU_INFO_MAP[id];
-        if (info.accessLevel >= ACCESS_LEVEL.VIEW_PERMISSION) {
-            result[id] = info;
-        }
-    });
-    return result;
-};
-
-const permissionRequiredMenuInfoMap = getPermissionRequiredMenuInfo();
 const hasPermissionToLNBItem = (lnbItem: LNBItem, pagePermissionList: PagePermissionTuple[]): boolean => {
     const { id } = lnbItem;
-    if (!permissionRequiredMenuInfoMap[id ?? '']) return true;
     return pagePermissionList.some(([permissionMenuId]) => permissionMenuId === id);
 };
 export const filterLNBMenuByPermission = (menuSet: LNBMenu[], pagePermissionList: PagePermissionTuple[]): LNBMenu[] => menuSet.reduce((results, menuData) => {

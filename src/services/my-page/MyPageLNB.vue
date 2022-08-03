@@ -61,7 +61,7 @@ export default defineComponent({
             }),
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId)),
             menuSet: computed<LNBMenu[]>(() => {
-                const defaultMenuSet: LNBMenu[] = [
+                const allLnbMenu: LNBMenu[] = [
                     {
                         type: 'title',
                         label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_ACCOUNT].translationId),
@@ -74,9 +74,6 @@ export default defineComponent({
                         id: MENU_ID.MY_PAGE_ACCOUNT_PROFILE,
                         to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME },
                     },
-                ];
-                const allLnbMenu: LNBMenu[] = (state.isDomainOwner || !state.hasPermission) ? defaultMenuSet : [
-                    ...defaultMenuSet,
                     {
                         type: 'item',
                         label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_API_KEY].translationId),

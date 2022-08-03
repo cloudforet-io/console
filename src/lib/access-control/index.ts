@@ -43,7 +43,7 @@ export const getUserAccessLevel = (routeName?: string|null, pagePermissions: Pag
     const permission = getPermissionOfPage(menuId, pagePermissions);
     return getAccessTypeFromPermission(permission);
 };
-export const getMenuAccessLevel = (id: MenuId): AccessLevel => MENU_INFO_MAP[id]?.accessLevel ?? ACCESS_LEVEL.AUTHENTICATED;
+export const getMenuAccessLevel = (id: MenuId): AccessLevel => (MENU_INFO_MAP[id]?.needPermissionByRole ? ACCESS_LEVEL.VIEW_PERMISSION : ACCESS_LEVEL.AUTHENTICATED);
 
 
 export const isUserAccessibleToMenu = (menuId: MenuId, pagePermissions: PagePermissionTuple[] = []): boolean => {
