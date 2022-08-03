@@ -1,21 +1,21 @@
 <template>
     <div class="notice-update-page">
-        update-page
+        <p-page-title title="Edit Notice" @go-back="$router.go(-1)" />
+        <notice-form type="EDIT" />
     </div>
 </template>
 
 <script lang="ts">
-import {
-    reactive, toRefs,
-} from '@vue/composition-api';
+import { PPageTitle } from '@spaceone/design-system';
+
+import NoticeForm from '@/services/my-page/notice/modules/NoticeForm.vue';
+
 
 export default {
     name: 'NoticeUpdatePage',
-    setup() {
-        const state = reactive({});
-        return {
-            ...toRefs(state),
-        };
+    components: {
+        NoticeForm,
+        PPageTitle,
     },
 };
 </script>
