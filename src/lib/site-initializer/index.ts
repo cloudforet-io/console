@@ -8,7 +8,6 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { initI18n } from '@/translations';
 
-import { adminDomainServiceRoutes } from '@/router/admin-domain-service-routes';
 import { errorRoutes } from '@/router/error-routes';
 import { serviceRoutes } from '@/router/service-routes';
 
@@ -103,8 +102,6 @@ const initQueryHelper = () => {
 const initRouter = (domainName?: string) => {
     if (!domainName) {
         SpaceRouter.init(errorRoutes);
-    } else if (domainName === config.get('ADMIN_DOMAIN')) {
-        SpaceRouter.init(adminDomainServiceRoutes);
     } else {
         SpaceRouter.init(serviceRoutes);
     }
