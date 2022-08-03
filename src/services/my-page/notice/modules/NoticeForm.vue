@@ -5,7 +5,7 @@
                 <!--            song-lang-->
                 <p-label>Author</p-label>
                 <p class="text-sm text-gray-900">
-                    <!--            FIXME:: apply js-->
+                    <!--            TODO:: apply js-->
                     시스템 운영자
                 </p>
             </p-field-group>
@@ -14,17 +14,27 @@
                 <p-text-input v-model="writerNameState" class="" />
             </p-field-group>
             <!--                song-lang-->
-            <p-field-group class="notice-label-wrapper" label="Viewer" required>
-                <p-radio class="mr-4">
+            <!--            TODO:: below ```v-show``` -->
+            <p-field-group v-show="userType" class="notice-label-wrapper" label="Viewer"
+                           required
+            >
+                <p-radio :selected="isAllDomainSelectedState" class="mr-4" @click="handleClickAllDomainRadio">
                     <!--                    song-lang-->
                     <span>All Domains</span>
                 </p-radio>
-                <p-radio>
+                <p-radio :selected="!isAllDomainSelectedState" @click="handleClickSelectDomainRadio">
                     <!--                    song-lang-->
                     <span>Selected Domains</span>
                 </p-radio>
                 <br>
-                <p-select-dropdown class="mt-2 w-1/2" />
+                <!--                FIXME:: add loading-->
+                <p-search-dropdown class="mt-2 w-1/2"
+                                   multi-selectable
+                                   :menu="domainList"
+                                   :selected="selectedDomainsState"
+                                   :disabled="isAllDomainSelectedState"
+                                   @update:selected="handleSelectDomain"
+                />
             </p-field-group>
             <!--            song-lang-->
             <p-field-group class="notice-label-wrapper" label="Title" required
@@ -38,7 +48,7 @@
                 </template>
             </p-field-group>
             <p-field-group class="notice-label-wrapper" label="Content" required>
-                <!--                FIXME:: textInput -> textEditor-->
+                <!--                TODO:: textInput -> textEditor-->
                 <p-text-input v-model="contentState" class="" />
             </p-field-group>
             <div class="notice-create-options-wrapper">
@@ -77,12 +87,17 @@
 <script lang="ts">
 import type { PropType } from '@vue/composition-api';
 import {
-    reactive, toRefs,
+    computed,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PPaneLayout, PLabel, PFieldGroup, PTextInput, PRadio, PSelectDropdown, PCheckBox, PButton,
+    PPaneLayout, PLabel, PFieldGroup, PTextInput, PRadio, PSearchDropdown, PCheckBox, PButton,
 } from '@spaceone/design-system';
+
+
+import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -98,7 +113,7 @@ export default {
         PFieldGroup,
         PTextInput,
         PRadio,
-        PSelectDropdown,
+        PSearchDropdown,
         PCheckBox,
         PButton,
     },
@@ -111,10 +126,6 @@ export default {
             default: '',
             type: String,
         },
-        viewer: {
-            default: () => ([]),
-            type: Array,
-        },
         noticeTitle: {
             default: '',
             type: String,
@@ -126,6 +137,14 @@ export default {
         isPopup: {
             default: false,
             type: Boolean,
+        },
+        isAllDomainSelected: {
+            default: false,
+            type: Boolean,
+        },
+        selectedDomains: {
+            default: () => ([]),
+            type: Array,
         },
         content: {
             default: '',
@@ -148,11 +167,14 @@ export default {
         });
 
         const state = reactive({
-            writerNameState: props.writerName || '',
-            viewerState: props.viewer || [],
-            isPinState: props.isPin || false,
-            isPopupState: props.isPopup || false,
-            contentState: props.content || '',
+            userType: computed(() => store.state.user.userType),
+            writerNameState: props.writerName ?? '',
+            isPinState: props.isPin ?? false,
+            isPopupState: props.isPopup ?? false,
+            contentState: props.content ?? '',
+            isAllDomainSelectedState: props.isAllDomainSelected ?? true,
+            domainList: [],
+            selectedDomainsState: props.selectedDomains.length ? props.selectedDomains : [],
         });
 
         const handleConfirm = () => {
@@ -175,9 +197,43 @@ export default {
             }
         };
 
+        const handleClickAllDomainRadio = () => { state.isAllDomainSelectedState = true; };
+        const handleClickSelectDomainRadio = () => { state.isAllDomainSelectedState = false; };
+
+        const handleSelectDomain = (domains) => {
+            if (!state.isAllDomainSelectedState) {
+                state.selectedDomainsState = domains;
+            }
+        };
+
+        const getDomainList = async () => {
+            try {
+                const { results } = await SpaceConnector.client.identity.domain.list();
+                state.domainList = results.map(d => ({
+                    name: d.domain_id,
+                    label: d.name,
+                }));
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.domainList = [];
+            }
+        };
+
+        watch(() => state.isAllDomainSelectedState, (isAllDomain) => {
+            if (isAllDomain) state.selectedDomainsState = [];
+        });
+
+        (async () => {
+            // TODO:: fill out below ```if```
+            if (state.userType) await getDomainList();
+        })();
+
         return {
             ...toRefs(state),
             handleConfirm,
+            handleClickAllDomainRadio,
+            handleClickSelectDomainRadio,
+            handleSelectDomain,
             noticeTitleState,
             setForm,
             invalidState,
