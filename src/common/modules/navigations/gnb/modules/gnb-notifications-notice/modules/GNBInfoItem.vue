@@ -1,0 +1,163 @@
+<template>
+    <div class="gnb-info-item">
+        <p v-if="dateHeader" class="date-header">
+            {{ dateHeader }}
+        </p>
+        <div class="item-wrapper" @click="handleClickItem">
+            <span v-if="isNew" class="new-icon" />
+            <div class="contents-wrapper">
+                <p class="title">
+                    <p-i v-if="icon" :name="icon" width="1rem"
+                         height="1rem"
+                         class="mr-1"
+                    />
+                    <span>{{ title }}</span>
+                </p>
+                <div class="additional-text">
+                    {{ occurred }} <span v-if="writerName">· {{ writerName }}</span>
+                </div>
+            </div>
+            <p-icon-button v-if="deletable"
+                           class="delete-button"
+                           name="ic_delete"
+                           size="sm"
+                           @click="handleClickDeleteButton"
+            />
+        </div>
+    </div>
+</template>
+
+<script lang="ts">
+import {
+    defineComponent,
+} from '@vue/composition-api';
+
+import {
+    PI, PIconButton,
+} from '@spaceone/design-system';
+
+
+interface Props {
+    isNew: boolean;
+    title: string;
+    occurred: string;
+    dateHeader?: string;
+    icon?: string;
+    writerName?: string;
+    deletable: boolean;
+}
+
+export default defineComponent<Props>({
+    name: 'GNBInfoItem',
+    components: {
+        PI,
+        PIconButton,
+    },
+    props: {
+        isNew: {
+            type: Boolean,
+            default: false,
+        },
+        title: {
+            type: String,
+            default: '',
+        },
+        occurred: {
+            type: String,
+            default: '',
+        },
+        dateHeader: {
+            type: String,
+            default: undefined,
+        },
+        icon: {
+            type: String,
+            default: undefined,
+        },
+        writerName: {
+            type: String,
+            default: undefined,
+        },
+        deletable: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props, { emit }) {
+        /* Event */
+        const handleClickItem = () => {
+            emit('select');
+        };
+        const handleClickDeleteButton = () => {
+            emit('delete');
+        };
+
+        return {
+            handleClickItem,
+            handleClickDeleteButton,
+        };
+    },
+});
+</script>
+
+<style lang="postcss" scoped>
+.gnb-info-item {
+    margin: 0.125rem 0;
+    .date-header {
+        @apply text-gray-500;
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1.5;
+        margin-top: 0.75rem;
+        margin-bottom: 0.25rem;
+        padding: 0 0.75rem;
+    }
+    .item-wrapper {
+        @apply rounded-lg;
+        display: flex;
+        position: relative;
+        align-items: baseline;
+        cursor: pointer;
+        padding: 0.5rem;
+        &:hover {
+            @apply bg-blue-100;
+            .delete-button {
+                visibility: visible;
+            }
+        }
+        .new-icon {
+            @apply bg-blue-500;
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            margin-right: 0.125rem;
+        }
+        .contents-wrapper {
+            flex-grow: 1;
+            .title {
+                font-size: 0.875rem;
+                line-height: 1.25;
+                font-weight: bold;
+                text-transform: capitalize;
+                vertical-align: middle;
+                margin-bottom: 0.125rem;
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+            .additional-text {
+                @apply text-gray-400;
+                margin-top: 0.125rem;
+                font-size: 0.75rem;
+                line-height: 1.5;
+            }
+        }
+        .delete-button {
+            visibility: hidden;
+            position: absolute;
+            top: 0.25rem;
+            right: 0.5rem;
+        }
+    }
+}
+</style>
