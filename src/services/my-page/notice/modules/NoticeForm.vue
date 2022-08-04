@@ -5,8 +5,8 @@
                 <!--            song-lang-->
                 <p-label>Author</p-label>
                 <p class="text-sm text-gray-900">
-                    <!--            TODO:: apply js-->
-                    시스템 운영자
+                    <!--                    song-lang-->
+                    {{ hasSystemRole ? '시스템 운영자' : '도메인 관리자' }}
                 </p>
             </p-field-group>
             <!--                song-lang-->
@@ -14,8 +14,7 @@
                 <p-text-input v-model="writerNameState" class="" />
             </p-field-group>
             <!--                song-lang-->
-            <!--            TODO:: below ```v-show``` -->
-            <p-field-group v-show="userType" class="notice-label-wrapper" label="Viewer"
+            <p-field-group v-if="hasSystemRole" class="notice-label-wrapper" label="Viewer"
                            required
             >
                 <p-radio :selected="isAllDomainSelectedState" class="mr-4" @click="handleClickAllDomainRadio">
@@ -27,7 +26,7 @@
                     <span>Selected Domains</span>
                 </p-radio>
                 <br>
-                <!--                FIXME:: add loading-->
+                <!--                TODO:: add loading-->
                 <p-search-dropdown class="mt-2 w-1/2"
                                    multi-selectable
                                    :menu="domainList"
@@ -164,11 +163,12 @@ export default {
         } = useFormValidator({
             noticeTitleState: props.noticeTitle,
         }, {
-            noticeTitleState(value: string) { return value.trim().length ? '' : 'Title required'; },
+            // song-lang
+            noticeTitleState(value: string) { return value.trim().length ? '' : 'Title is required'; },
         });
 
         const state = reactive({
-            userType: computed(() => store.state.user.userType),
+            hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
             writerNameState: props.writerName ?? '',
             isPinState: props.isPin ?? false,
             isPopupState: props.isPopup ?? false,
@@ -187,6 +187,7 @@ export default {
             try {
                 await console.log('create', state.writerNameState, noticeTitleState.value, state.isPinState, state.isPopupState);
             } catch (e) {
+                // song-lang
                 ErrorHandler.handleRequestError(e, 'Failed to create notice');
             }
         };
@@ -194,6 +195,7 @@ export default {
             try {
                 await console.log('edit', state.writerNameState, noticeTitleState.value, state.isPinState, state.isPopupState);
             } catch (e) {
+                // song-lang
                 ErrorHandler.handleRequestError(e, 'Failed to edit notice');
             }
         };
@@ -232,8 +234,7 @@ export default {
         });
 
         (async () => {
-            // TODO:: fill out below ```if```
-            if (state.userType) await getDomainList();
+            if (state.hasSystemRole) await getDomainList();
         })();
 
         return {
