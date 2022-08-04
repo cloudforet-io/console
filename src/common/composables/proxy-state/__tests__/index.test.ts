@@ -11,6 +11,7 @@ const localVue = createLocalVue();
 localVue.use(CompositionApi);
 
 describe('Proxy State Composable', () => {
+    // eslint-disable-next-line vue/one-component-per-file
     const ChildComponent = defineComponent({
         props: {
             visible: {
@@ -40,6 +41,7 @@ describe('Proxy State Composable', () => {
         `,
 
     });
+    // eslint-disable-next-line vue/one-component-per-file
     const ParentComponent = defineComponent({
         components: {
             ChildComponent,

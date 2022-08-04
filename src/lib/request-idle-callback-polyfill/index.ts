@@ -7,7 +7,7 @@ type RequestIdleCallbackId = number;
 
 export const initRequestIdleCallback = () => {
     window.requestIdleCallback = window.requestIdleCallback
-    || function (cb: (deadline: RequestIdleCallback) => any) {
+    || ((cb: (deadline: RequestIdleCallback) => any) => {
         const start = Date.now();
         return setTimeout(() => {
             cb({
@@ -17,10 +17,10 @@ export const initRequestIdleCallback = () => {
                 },
             });
         }, 1);
-    };
+    });
 
     window.cancelIdleCallback = window.cancelIdleCallback
-    || function (id: RequestIdleCallbackId) {
+    || ((id: RequestIdleCallbackId) => {
         clearTimeout(id);
-    };
+    });
 };
