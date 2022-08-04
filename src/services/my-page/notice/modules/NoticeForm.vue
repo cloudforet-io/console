@@ -48,8 +48,7 @@
                 </template>
             </p-field-group>
             <p-field-group class="notice-label-wrapper" label="Content" required>
-                <!--                TODO:: textInput -> textEditor-->
-                <p-text-input v-model="contentState" class="" />
+                <text-editor v-model="contentState" />
             </p-field-group>
             <div class="notice-create-options-wrapper">
                 <p-check-box v-model="isPinState">
@@ -99,6 +98,7 @@ import {
 
 import { store } from '@/store';
 
+import TextEditor from '@/common/components/editor/TextEditor.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -108,6 +108,7 @@ type noticeFormType = 'CREATE' | 'EDIT';
 export default {
     name: 'NoticeForm',
     components: {
+        TextEditor,
         PPaneLayout,
         PLabel,
         PFieldGroup,
