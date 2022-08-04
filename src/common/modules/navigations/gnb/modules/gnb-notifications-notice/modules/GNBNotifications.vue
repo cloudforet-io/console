@@ -1,15 +1,20 @@
 <template>
-    <div ref="containerRef" class="gnb-notifications">
-        <div class="contents-wrapper">
-            <template v-if="notifications.length === 0">
-                <template v-if="loading">
-                    <g-n-b-notification-date-header :value="$t('COMMON.GNB.NOTIFICATION.TODAY')" class="ml-2" />
-                    <div v-for="i in [0, 1]" :key="`${i}-skeleton`" class="px-4 py-2">
-                        <p-skeleton height="40px" />
-                    </div>
-                </template>
-                <div v-else class="no-data">
-                    <img src="@/assets/images/illust_astronaut_radio.svg">
+    <div class="gnb-notifications-tab">
+        <p-data-loader :data="items"
+                       :loading="loading"
+                       :class="{ loading: loading && !items.length }"
+        >
+            <div ref="notificationItemsRef" class="content-wrapper">
+                <g-n-b-notification-item v-for="(item, i) in items" :key="`${item.notification_id}-${i}`"
+                                         :data="item"
+                                         :before-data="i === 0 ? null : items[i - 1]"
+                                         @select="handleSelectNotification"
+                                         @delete="handleDeleteNotification"
+                />
+            </div>
+            <template #no-data>
+                <div class="no-data">
+                    <img class="img" src="@/assets/images/illust_astronaut_radio.svg">
                     <p class="title">
                         {{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION') }}
                     </p>
@@ -19,54 +24,46 @@
                     </p>
                 </div>
             </template>
-            <template v-else>
-                <g-n-b-notification-item v-for="(item, i) in notifications" :key="`${item.notification_id}-${i}`"
-                                         ref="notificationItemRefs"
-                                         :data="item"
-                                         :before-data="i === 0 ? null : notifications[i - 1]"
-                                         @select="handleSelectNotification"
-                                         @delete="handleDeleteNotification"
-                />
-                <div v-if="loading" class="px-4 py-2">
-                    <p-skeleton height="40px" />
-                </div>
-            </template>
-        </div>
+        </p-data-loader>
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive, toRefs, watch,
+    onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PSkeleton,
+    PDataLoader,
 } from '@spaceone/design-system';
+import { useInfiniteScroll } from '@vueuse/core';
 import dayjs from 'dayjs';
-import type Vue from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notifications-notice/modules/GNBNotificationDateHeader.vue';
 import GNBNotificationItem from '@/common/modules/navigations/gnb/modules/gnb-notifications-notice/modules/GNBNotificationItem.vue';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 
+const NOTIFICATIONS_ITEM_LIMIT = 15;
+
 export default {
     name: 'GNBNotifications',
     components: {
-        GNBNotificationDateHeader,
         GNBNotificationItem,
-        PSkeleton,
+        PDataLoader,
     },
     props: {
+        visible: {
+            type: Boolean,
+            default: false,
+        },
         count: {
             type: Number,
             default: 0,
@@ -74,15 +71,11 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            containerRef: null as Element|null,
-            notificationItemRefs: [] as Vue[],
-            loading: false,
-            notifications: [],
-            moreMenuItems: computed(() => [
-                { name: 'delete', label: 'Delete All' },
-            ]),
-            timezone: computed(() => store.state.user.timezone),
+            loading: true,
+            notificationItemsRef: null as HTMLElement|null,
+            items: [],
             proxyCount: useProxyValue('count', props, emit),
+            pageStart: 1,
         });
 
         const setReadNotifications = async (notifications: any[]) => {
@@ -98,62 +91,39 @@ export default {
             }
         };
 
-        const currentTime = dayjs();
-        let totalCount: number|undefined;
-        let pageStart = 1;
-        const pageLimit = 15;
-        const notificationApiHelper = new ApiQueryHelper()
-            .setPage(pageStart, pageLimit)
-            .setSort('created_at', true)
-            .setFilters([
-                { k: 'created_at', v: currentTime.subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
-                { k: 'created_at', v: currentTime.format('YYYY-MM-DD HH:mm:ss'), o: '<t' },
-                { k: 'user_id', v: store.state.user.userId, o: '=' },
-            ]);
-
         /* Api */
+        const initApiHelper = (apiHelper: ApiQueryHelper) => {
+            apiHelper
+                .setPage(1, NOTIFICATIONS_ITEM_LIMIT)
+                .setSort('created_at', true)
+                .setFilters([
+                    { k: 'created_at', v: dayjs().subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
+                    { k: 'created_at', v: dayjs().format('YYYY-MM-DD HH:mm:ss'), o: '<t' },
+                    { k: 'user_id', v: store.state.user.userId, o: '=' },
+                ]);
+        };
+        const notificationApiHelper = new ApiQueryHelper();
+        initApiHelper(notificationApiHelper);
         const listNotifications = async () => {
-            if (state.loading) return;
-
-            state.loading = true;
-
             try {
                 const { results, total_count } = await SpaceConnector.client.notification.notification.list({
                     query: notificationApiHelper.data,
                 });
-
                 state.proxyCount = total_count;
-                totalCount = total_count;
-                state.notifications = state.notifications.concat(results);
+                state.items = state.items.concat(results);
                 await setReadNotifications(results);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
-            } finally {
-                state.loading = false;
             }
         };
 
-        /* Intersection Observe */
-        let intersectionObserver: IntersectionObserver|undefined;
-        let observedElement: Element|undefined;
-
-        const updateObservingElement = (el: Element) => {
-            if (!intersectionObserver) return;
-
-            if (observedElement) intersectionObserver.unobserve(observedElement);
-            intersectionObserver.observe(el);
-            observedElement = el;
-        };
-
-        const onElementObserved = (entries: IntersectionObserverEntry[]) => {
+        /* Event */
+        const loadMoreNotifications = () => {
             if (state.loading) return;
-            if (typeof totalCount === 'number' && state.notifications.length >= totalCount) return;
+            if (state.items.length >= state.proxyCount) return;
 
-            const lastEntry = entries[entries.length - 1];
-            if (!lastEntry.isIntersecting) return;
-
-            pageStart += pageLimit;
-            notificationApiHelper.setPageStart(pageStart);
+            state.pageStart += NOTIFICATIONS_ITEM_LIMIT;
+            notificationApiHelper.setPageStart(state.pageStart);
             listNotifications();
         };
         const handleSelectNotification = (notificationId: string) => {
@@ -163,37 +133,29 @@ export default {
             console.log('delete!', notificationId);
         };
 
-        onMounted(() => {
-            if (!state.containerRef || intersectionObserver) return;
+        /* Init */
+        const init = async () => {
+            if (state.notificationItemsRef) state.notificationItemsRef.scrollTop = 0;
+            state.items = [];
+            state.pageStart = 1;
+            initApiHelper(notificationApiHelper);
+            await listNotifications();
+        };
 
-            intersectionObserver = new IntersectionObserver((entries) => {
-                onElementObserved(entries);
-            }, {
-                root: state.containerRef,
-                threshold: 0.6,
+        /* Watcher */
+        watch(() => props.visible, async (visible) => {
+            if (visible) {
+                state.loading = true;
+                await init();
+                state.loading = false;
+            }
+        });
+
+        onMounted(() => {
+            useInfiniteScroll(state.notificationItemsRef, () => {
+                loadMoreNotifications();
             });
         });
-
-        onUnmounted(() => {
-            if (intersectionObserver) {
-                intersectionObserver.disconnect();
-                intersectionObserver = undefined;
-            }
-        });
-
-        watch(() => state.notificationItemRefs, (items) => {
-            if (items.length !== state.notifications.length) return;
-
-            const lastElement = items[items.length - 1]?.$el;
-            if (lastElement) {
-                updateObservingElement(lastElement);
-            }
-        });
-
-        /* Init */
-        (async () => {
-            await listNotifications();
-        })();
 
         return {
             ...toRefs(state),
@@ -206,44 +168,50 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.gnb-notifications {
+.gnb-notifications-tab {
     @apply bg-white;
     display: flex;
     flex-direction: column;
-    max-width: 480px;
-    max-height: calc(100vh - $gnb-height - 24px);
-    overflow-y: scroll;
-    .contents-wrapper {
+
+    .p-data-loader::v-deep {
+        &.loading {
+            height: 13rem;
+        }
+        .data-loader-container {
+            .no-data-wrapper {
+                max-height: inherit;
+            }
+        }
+    }
+    .content-wrapper {
+        max-height: calc(100vh - $gnb-height - 1.5rem - 2.75rem);
+        overflow-y: scroll;
         padding: 0.25rem 0.5rem 0.5rem 0.5rem;
-        line-height: 1;
     }
     .no-data {
-        display: flex;
-        flex-direction: column;
-        flex-wrap: wrap;
-        align-items: center;
-        img {
-            margin-top: 130px;
-            max-height: 160px;
+        text-align: center;
+        padding: 4rem 3.25rem;
+        .img {
+            margin: auto;
+            padding-bottom: 1.5rem;
         }
         .title {
             @apply text-violet-300;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
             font-size: 1.125rem;
-            line-height: 1.6;
+            font-weight: 700;
+            opacity: 0.8;
+            line-height: 1.25;
+            margin-bottom: 0.25rem;
         }
         .desc {
             @apply text-gray-400;
             font-size: 0.875rem;
-            line-height: 1.6;
-            text-align: center;
+            line-height: 1.5;
         }
     }
 
     @screen mobile {
-        .no-data {
+        .no-data-wrapper {
             img {
                 margin-top: 40px;
                 max-height: 140px;

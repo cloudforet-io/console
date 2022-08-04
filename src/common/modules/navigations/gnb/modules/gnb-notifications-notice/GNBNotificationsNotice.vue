@@ -17,7 +17,9 @@
                 </p-badge>
             </template>
             <template #notifications>
-                <g-n-b-notifications :count.sync="count.notifications" />
+                <g-n-b-notifications :visible="proxyVisibleDropdown && activeTab === 'notifications'"
+                                     :count.sync="count.notifications"
+                />
             </template>
             <template #notice>
                 notice
@@ -61,8 +63,8 @@ export default {
             hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
             tabs: computed(() => ([
                 // song-lang
-                { label: 'Notifications', name: 'notifications' },
-                { label: 'Notice', name: 'notice' },
+                { label: 'Notifications', name: 'notifications', keepAlive: true },
+                { label: 'Notice', name: 'notice', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'notifications',
             count: {
@@ -108,7 +110,7 @@ export default {
         @apply absolute bg-white rounded-xs border border-gray-200;
         display: flex;
         flex-direction: column;
-        width: 27.5rem;
+        width: 30rem;
         min-height: auto;
         top: 100%;
         right: 0;
