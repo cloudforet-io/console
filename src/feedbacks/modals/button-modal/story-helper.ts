@@ -258,6 +258,24 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    absolute: {
+        name: 'absolute',
+        type: { name: 'number' },
+        description: 'set position by absolute, with [{top: {absolute}rem}, {left: {absolute}rem}]',
+        defaultValue: 0,
+        table: {
+            type: {
+                summary: 'number',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 0,
+            },
+        },
+        control: {
+            type: 'number',
+        },
+    },
     // model
     'v-model': {
         name: 'v-model',

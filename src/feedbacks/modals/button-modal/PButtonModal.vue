@@ -1,7 +1,10 @@
 <template>
     <section class="p-button-modal">
         <transition v-if="visible" name="modal">
-            <div class="modal-mask" :class="{'no-backdrop':!backdrop}">
+            <div class="modal-mask"
+                 :class="[{'no-backdrop':!backdrop}, {'absolute': !!absolute}]"
+                 :style="absolute ? [{'top': `${absolute}rem`}, {'left': `${absolute}rem`}] : {}"
+            >
                 <div class="modal-wrapper" :class="dialogClassObject"
                      role="dialog"
                      aria-modal="true"
@@ -115,6 +118,10 @@ export default defineComponent<ButtonModalProps>({
         backdrop: {
             type: Boolean,
             default: true,
+        },
+        absolute: {
+            type: Number,
+            default: undefined,
         },
         themeColor: {
             type: String,
@@ -338,5 +345,13 @@ export default defineComponent<ButtonModalProps>({
 .modal-alert { @mixin modal-color theme('colors.alert'); }
 .modal-gray900 { @mixin modal-color theme('colors.gray.900'); }
 .modal-gray { @mixin modal-color theme('colors.gray.default'); }
+
+@screen mobile {
+    .modal-mask {
+        &.absolute {
+            left: 0.75rem !important;
+        }
+    }
+}
 
 </style>
