@@ -48,7 +48,7 @@ interface Props {
 }
 
 export default defineComponent<Props>({
-    name: 'GNBInfoItem',
+    name: 'GNBNotiItem',
     components: {
         PI,
         PIconButton,

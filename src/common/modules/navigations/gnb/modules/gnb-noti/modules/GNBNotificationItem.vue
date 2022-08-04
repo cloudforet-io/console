@@ -40,7 +40,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notifications-notice/modules/GNBNotificationDateHeader.vue';
+import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationDateHeader.vue';
 
 const NOTIFICATION_TYPE_ICONS = {
     INFO: '',

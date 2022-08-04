@@ -10,10 +10,10 @@
                                :visible-dropdown="openedMenu === 'recentFavorite'"
                                @update:visibleDropdown="toggleMenu('recentFavorite')"
         />
-        <g-n-b-notifications-notice v-if="!userState.isDomainOwner"
-                                    v-click-outside="hideMenu"
-                                    :visible-dropdown="openedMenu === 'notifications'"
-                                    @update:visibleDropdown="toggleMenu('notifications')"
+        <g-n-b-noti v-if="!userState.isDomainOwner"
+                    v-click-outside="hideMenu"
+                    :visible-dropdown="openedMenu === 'notifications'"
+                    @update:visibleDropdown="toggleMenu('notifications')"
         />
         <div class="menu-wrapper account">
             <div class="menu-button account" tabindex="0"
@@ -133,7 +133,7 @@ import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import GNBNotificationsNotice from '@/common/modules/navigations/gnb/modules/gnb-notifications-notice/GNBNotificationsNotice.vue';
+import GNBNoti from '@/common/modules/navigations/gnb/modules/gnb-noti/GNBNoti.vue';
 import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
 import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
 
@@ -146,7 +146,7 @@ export default {
     components: {
         GNBRecentFavorite,
         GNBSearch,
-        GNBNotificationsNotice,
+        GNBNoti,
         PDivider,
         PI,
         PButton,

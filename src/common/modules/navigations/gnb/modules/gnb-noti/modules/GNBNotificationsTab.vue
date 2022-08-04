@@ -46,7 +46,7 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import GNBNotificationItem from '@/common/modules/navigations/gnb/modules/gnb-notifications-notice/modules/GNBNotificationItem.vue';
+import GNBNotificationItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationItem.vue';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
@@ -54,7 +54,7 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 const NOTIFICATIONS_ITEM_LIMIT = 15;
 
 export default {
-    name: 'GNBNotifications',
+    name: 'GNBNotificationsTab',
     components: {
         GNBNotificationItem,
         PDataLoader,
