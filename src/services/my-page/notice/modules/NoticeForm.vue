@@ -48,7 +48,7 @@
                 </template>
             </p-field-group>
             <p-field-group class="notice-label-wrapper" label="Content" required>
-                <text-editor v-model="contentState" />
+                <text-editor v-model.lazy="contentState" :image-uploader="uploadImage" />
             </p-field-group>
             <div class="notice-create-options-wrapper">
                 <p-check-box v-model="isPinState">
@@ -220,6 +220,13 @@ export default {
             }
         };
 
+        // TODO: api binding. must return Promise<string>
+        const uploadImage = (): Promise<string> => new Promise((resolve) => {
+            setTimeout(() => {
+                resolve('https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/spaceone.svg');
+            }, 1000);
+        });
+
         watch(() => state.isAllDomainSelectedState, (isAllDomain) => {
             if (isAllDomain) state.selectedDomainsState = [];
         });
@@ -240,6 +247,7 @@ export default {
             invalidState,
             invalidTexts,
             isAllValid,
+            uploadImage,
         };
     },
 };

@@ -1,10 +1,9 @@
 <template>
-    <div class="text-editor">
-        <editor-content class="editor-content" :editor="editor" />
-    </div>
+    <editor-content class="text-editor" :editor="editor" />
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     defineComponent, onBeforeUnmount, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -16,9 +15,13 @@ import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
 import { Editor, EditorContent } from '@tiptap/vue-2';
 
+import { createImageExtension } from '@/common/components/editor/extensions/image';
+import type { UploadFn } from '@/common/components/editor/extensions/plugins/drop-image';
+
 
 interface Props {
-    value: string
+    value: string;
+    imageUploader: UploadFn;
 }
 
 export default defineComponent<Props>({
@@ -34,6 +37,10 @@ export default defineComponent<Props>({
         value: {
             type: String,
             default: '',
+        },
+        imageUploader: {
+            type: Function as PropType<UploadFn>,
+            default: () => Promise.resolve(''),
         },
     },
     setup(props, { emit }) {
@@ -59,6 +66,7 @@ export default defineComponent<Props>({
                     Text,
                     Image,
                     Dropcursor,
+                    createImageExtension(props.imageUploader),
                 ],
                 onUpdate: () => { emit('update:value', state.editor?.getHTML() ?? ''); },
             });
@@ -83,13 +91,25 @@ export default defineComponent<Props>({
 });
 </script>
 
+<style lang="postcss">
+.ProseMirror {
+    min-height: inherit;
+    &:focus {
+        @apply outline-none;
+    }
+}
+</style>
 <style lang="postcss" scoped>
 .text-editor {
     @apply bg-white border border-gray-200 rounded-lg;
     min-height: 356px;
-    .editor-content {
-        height: 100%;
-        min-height: inherit;
+    &:focus-within {
+        @apply border-secondary;
+    }
+    p {
+        &:focus {
+            @apply outline-none;
+        }
     }
 }
 </style>
