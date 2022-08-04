@@ -5,11 +5,15 @@
                        :class="{ loading: loading && !items.length }"
         >
             <div ref="notificationItemsRef" class="content-wrapper">
-                <g-n-b-notification-item v-for="(item, i) in items" :key="`${item.notification_id}-${i}`"
-                                         :data="item"
-                                         :before-data="i === 0 ? null : items[i - 1]"
-                                         @select="handleSelectNotification"
-                                         @delete="handleDeleteNotification"
+                <g-n-b-noti-item v-for="(item, idx) in items" :key="`${item.title}-${idx}`"
+                                 :is-read="item.isRead"
+                                 :title="item.title"
+                                 :icon="item.icon"
+                                 :created-at="item.createdAt"
+                                 :date-header="item.dateHeader"
+                                 :deletable="true"
+                                 @select="handleSelectNotification"
+                                 @delete="handleDeleteNotification"
                 />
             </div>
             <template #no-data>
@@ -30,6 +34,7 @@
 
 <script lang="ts">
 import {
+    computed,
     onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -39,24 +44,42 @@ import {
     PDataLoader,
 } from '@spaceone/design-system';
 import { useInfiniteScroll } from '@vueuse/core';
+import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import GNBNotificationItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationItem.vue';
+import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 
+interface NotificationItem {
+    createdAt: string;
+    dateHeader?: TranslateResult | string;
+    isRead: boolean;
+    title?: string;
+    icon: string;
+    message: any;
+}
+
+const NOTIFICATION_TYPE_ICONS = {
+    INFO: '',
+    ERROR: 'ic_alert',
+    SUCCESS: 'ic_state_active',
+    WARNING: 'ic_state_duplicated',
+} as const;
 const NOTIFICATIONS_ITEM_LIMIT = 15;
 
 export default {
     name: 'GNBNotificationsTab',
     components: {
-        GNBNotificationItem,
+        GNBNotiItem,
         PDataLoader,
     },
     props: {
@@ -70,25 +93,52 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const { i18nDayjs } = useI18nDayjs();
         const state = reactive({
             loading: true,
+            timezone: computed(() => store.state.user.timezone),
             notificationItemsRef: null as HTMLElement|null,
-            items: [],
+            items: [] as NotificationItem[],
             proxyCount: useProxyValue('count', props, emit),
             pageStart: 1,
         });
 
-        const setReadNotifications = async (notifications: any[]) => {
-            const ids = notifications.filter(d => !d.is_read).map(d => d.notification_id);
-            if (ids.length === 0) return;
+        /* Util */
+        const dataHeaderFormatter = (time: string, timezone: string): TranslateResult => {
+            if (!time) return '';
 
-            try {
-                await SpaceConnector.client.notification.notification.setRead({
-                    notifications: ids,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
+            const occurredTime: Dayjs = i18nDayjs.value.tz(i18nDayjs.value(time), timezone);
+            const now: Dayjs = i18nDayjs.value.tz(i18nDayjs.value(), timezone);
+
+            if (occurredTime.isSame(now, 'day')) {
+                return i18n.t('COMMON.GNB.NOTIFICATION.TODAY');
             }
+            if (now.subtract(1, 'day').isSame(occurredTime, 'day')) {
+                return i18n.t('COMMON.GNB.NOTIFICATION.YESTERDAY');
+            }
+            return occurredTime.from(now);
+        };
+        const getDateHeader = (createdAt: string, previousCreatedAt?: string): TranslateResult | string => {
+            let beforeDataHeader;
+            if (previousCreatedAt) beforeDataHeader = dataHeaderFormatter(previousCreatedAt, state.timezone);
+            let dateHeader = dataHeaderFormatter(createdAt, state.timezone);
+            if (beforeDataHeader && beforeDataHeader === dateHeader) dateHeader = '';
+            return dateHeader;
+        };
+        const convertNotificationItem = (rawData: any[]) => {
+            const results: NotificationItem[] = [];
+            rawData.forEach((d, idx) => {
+                const result: NotificationItem = {
+                    dateHeader: getDateHeader(d.created_at, rawData[idx - 1]?.created_at),
+                    createdAt: d.created_at,
+                    isRead: d.is_read,
+                    title: d.message?.title,
+                    icon: NOTIFICATION_TYPE_ICONS[d.notification_type],
+                    message: d.message,
+                };
+                results.push(result);
+            });
+            return results;
         };
 
         /* Api */
@@ -105,15 +155,30 @@ export default {
         const notificationApiHelper = new ApiQueryHelper();
         initApiHelper(notificationApiHelper);
         const listNotifications = async () => {
+            state.loading = true;
             try {
                 const { results, total_count } = await SpaceConnector.client.notification.notification.list({
                     query: notificationApiHelper.data,
                 });
                 state.proxyCount = total_count;
-                state.items = state.items.concat(results);
+                state.items = state.items.concat(convertNotificationItem(results));
                 await setReadNotifications(results);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
+            } finally {
+                state.loading = false;
+            }
+        };
+        const setReadNotifications = async (notifications: any[]) => {
+            const ids = notifications.filter(d => !d.is_read).map(d => d.notification_id);
+            if (ids.length === 0) return;
+
+            try {
+                await SpaceConnector.client.notification.notification.setRead({
+                    notifications: ids,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -143,12 +208,8 @@ export default {
         };
 
         /* Watcher */
-        watch(() => props.visible, async (visible) => {
-            if (visible) {
-                state.loading = true;
-                await init();
-                state.loading = false;
-            }
+        watch(() => props.visible, (visible) => {
+            if (visible) init();
         });
 
         onMounted(() => {

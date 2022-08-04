@@ -1,10 +1,10 @@
 <template>
-    <div class="gnb-info-item">
+    <div class="gnb-noti-item">
         <p v-if="dateHeader" class="date-header">
             {{ dateHeader }}
         </p>
         <div class="item-wrapper" @click="handleClickItem">
-            <span v-if="isNew" class="new-icon" />
+            <span v-if="!isRead" class="new-icon" />
             <div class="contents-wrapper">
                 <p class="title">
                     <p-i v-if="icon" :name="icon" width="1rem"
@@ -29,19 +29,24 @@
 
 <script lang="ts">
 import {
-    defineComponent,
+    computed,
+    defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
     PI, PIconButton,
 } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import type { TranslateResult } from 'vue-i18n';
+
+import { store } from '@/store';
 
 
 interface Props {
-    isNew: boolean;
+    isRead: boolean;
     title: string;
-    occurred: string;
-    dateHeader?: string;
+    createdAt: string;
+    dateHeader?: TranslateResult | string;
     icon?: string;
     writerName?: string;
     deletable: boolean;
@@ -54,7 +59,7 @@ export default defineComponent<Props>({
         PIconButton,
     },
     props: {
-        isNew: {
+        isRead: {
             type: Boolean,
             default: false,
         },
@@ -62,7 +67,7 @@ export default defineComponent<Props>({
             type: String,
             default: '',
         },
-        occurred: {
+        createdAt: {
             type: String,
             default: '',
         },
@@ -84,6 +89,14 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
+        const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
+            occurred: computed(() => {
+                if (!props.createdAt) return '';
+                return dayjs.tz(dayjs.utc(props.createdAt), state.timezone).format('YYYY-MM-DD HH:mm');
+            }),
+        });
+
         /* Event */
         const handleClickItem = () => {
             emit('select');
@@ -93,6 +106,7 @@ export default defineComponent<Props>({
         };
 
         return {
+            ...toRefs(state),
             handleClickItem,
             handleClickDeleteButton,
         };
@@ -101,7 +115,7 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss" scoped>
-.gnb-info-item {
+.gnb-noti-item {
     margin: 0.125rem 0;
     .date-header {
         @apply text-gray-500;
