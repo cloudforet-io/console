@@ -3,10 +3,10 @@
 // @ts-ignore
 import icon from 'vue-svgicon'
 icon.register({
-  'ic_undo': {
+  'ic_text-italic': {
     width: 32,
     height: 32,
     viewBox: '0 0 32 32',
-    data: '<path pid="0" d="M20 10H7.815l3.587-3.586L10 5l-6 6 6 6 1.402-1.415L7.818 12H20a6 6 0 110 12h-8v2h8a8 8 0 000-16z" _fill="#232533"/>'
+    data: '<path pid="0" d="M25 9V7H12v2h5.14l-4.37 14H7v2h13v-2h-5.14l4.37-14H25z" _fill="#232533"/>'
   }
 })
