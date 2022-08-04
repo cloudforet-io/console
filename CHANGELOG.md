@@ -1,3 +1,10 @@
+# [1.1.0-beta.363](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.362...v1.1.0-beta.363) (2022-08-04)
+
+
+### Features
+
+* **button-modal:** add spec of ```position``` for popup ([#1048](https://github.com/spaceone-dev/spaceone-design-system/issues/1048)) ([a2fc2c7](https://github.com/spaceone-dev/spaceone-design-system/commit/a2fc2c757de1ee3c3e56e53e896347cabcdd2f01))
+
 # [1.1.0-beta.362](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.361...v1.1.0-beta.362) (2022-08-04)
 
 
