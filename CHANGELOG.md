@@ -1,3 +1,10 @@
+# [1.1.0-beta.361](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.360...v1.1.0-beta.361) (2022-08-04)
+
+
+### Features
+
+* **search-dropdown:** hide menu by force when disabled ([#1045](https://github.com/spaceone-dev/spaceone-design-system/issues/1045)) ([34c2332](https://github.com/spaceone-dev/spaceone-design-system/commit/34c233201918d90137a58978ac9200446198696a))
+
 # [1.1.0-beta.360](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.359...v1.1.0-beta.360) (2022-07-29)
 
 
