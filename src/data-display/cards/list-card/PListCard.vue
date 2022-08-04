@@ -45,7 +45,6 @@ interface Props extends CardProps {
     hoverable?: boolean;
 }
 
-
 export default defineComponent<Props>({
     name: 'PListCard',
     components: { PDataLoader, PCard },
