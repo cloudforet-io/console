@@ -1,5 +1,8 @@
 <template>
-    <editor-content class="text-editor" :editor="editor" />
+    <div class="text-editor">
+        <menu-bar />
+        <editor-content class="editor-content" :editor="editor" />
+    </div>
 </template>
 
 <script lang="ts">
@@ -8,15 +11,12 @@ import {
     defineComponent, onBeforeUnmount, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import Document from '@tiptap/extension-document';
-import Dropcursor from '@tiptap/extension-dropcursor';
-import Image from '@tiptap/extension-image';
-import Paragraph from '@tiptap/extension-paragraph';
-import Text from '@tiptap/extension-text';
+import StarterKit from '@tiptap/starter-kit';
 import { Editor, EditorContent } from '@tiptap/vue-2';
 
 import { createImageExtension } from '@/common/components/editor/extensions/image';
 import type { UploadFn } from '@/common/components/editor/extensions/plugins/drop-image';
+import MenuBar from '@/common/components/editor/MenuBar.vue';
 
 
 interface Props {
@@ -27,6 +27,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'TextEditor',
     components: {
+        MenuBar,
         EditorContent,
     },
     model: {
@@ -48,24 +49,13 @@ export default defineComponent<Props>({
             editor: null as null|Editor,
         });
 
-        const addImage = () => {
-            if (!state.editor) return;
-            const url = window.prompt('URL');
-
-            if (url) {
-                state.editor.chain().focus().setImage({ src: url }).run();
-            }
-        };
-
         onMounted(() => {
             state.editor = new Editor({
                 content: props.value,
                 extensions: [
-                    Document,
-                    Paragraph,
-                    Text,
-                    Image,
-                    Dropcursor,
+                    StarterKit.configure({
+
+                    }),
                     createImageExtension(props.imageUploader),
                 ],
                 onUpdate: () => { emit('update:value', state.editor?.getHTML() ?? ''); },
@@ -85,7 +75,6 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            addImage,
         };
     },
 });
@@ -103,6 +92,9 @@ export default defineComponent<Props>({
 .text-editor {
     @apply bg-white border border-gray-200 rounded-lg;
     min-height: 356px;
+    > .editor-content {
+        min-height: inherit;
+    }
     &:focus-within {
         @apply border-secondary;
     }
