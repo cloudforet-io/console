@@ -492,6 +492,11 @@ export default defineComponent<SearchDropdownProps>({
                 state._placeholder = '';
             }
         }, { immediate: true });
+
+        watch(() => props.disabled, (disabled) => {
+            if (disabled === true) forceHideMenu();
+        });
+
         return {
             ...toRefs(state),
             ...toRefs(contextMenuFixedStyleState),
