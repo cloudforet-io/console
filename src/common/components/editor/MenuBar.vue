@@ -31,14 +31,7 @@
             </template>
         </p-select-dropdown>
         <p-divider class="menu-divider" vertical />
-        <!-- TODO: add color picker -->
-        <p-select-dropdown v-model="selectedTextColor" class="menu-dropdown" style-type="transparent"
-                           :items="textColorItems"
-                           index-mode
-                           @select="handleTextColorSelect"
-        >
-            <p-i name="ic_text-color" color="inherit" />
-        </p-select-dropdown>
+        <color-picker class="menu-dropdown" @select="handleTextColorSelect" />
         <p-divider class="menu-divider" vertical />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_text-bold"
                        @click="handleTextBoldClick"
@@ -93,14 +86,18 @@ import {
 } from '@spaceone/design-system';
 import type { Editor } from '@tiptap/vue-2';
 
+import ColorPicker from '@/common/components/editor/ColorPicker.vue';
+
 
 interface Props {
     editor: Editor|null
 }
 
+
 export default defineComponent<Props>({
     name: 'MenuBar',
     components: {
+        ColorPicker,
         PIconButton,
         PDivider,
         PSelectDropdown,
@@ -128,12 +125,8 @@ export default defineComponent<Props>({
                 { name: 'right', label: 'Right', icon: 'ic_text-align-right' },
                 { name: 'justify', label: 'Justify', icon: 'ic_text-align-justify' },
             ]),
-            textColorItems: computed(() => [
-
-            ]),
             selectedTextStyle: 0,
             selectedTextAlign: 0,
-            selectedTextColor: 0,
         });
 
         /* Event Handlers */

@@ -94,6 +94,7 @@ export default defineComponent<Props>({
     min-height: 356px;
     > .editor-content {
         min-height: inherit;
+        padding: 0.75rem 1rem 1.125rem 1rem;
     }
     &:focus-within {
         @apply border-secondary;
