@@ -294,6 +294,18 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
         control: null,
     },
     // slots
+    header: {
+        name: 'header',
+        description: 'Slot for header',
+        defaultValue: 'Modal Header',
+        table: {
+            type: {
+                summary: 'Modal Header',
+            },
+            category: 'slots',
+            defaultValue: 'Modal Header',
+        },
+    },
     body: {
         name: 'body',
         description: 'Slot for body content',

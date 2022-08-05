@@ -13,14 +13,16 @@
                 >
                     <article class="modal-content" :class="[`modal-${themeColor}`, {'no-footer': hideFooter}]">
                         <h3 class="header">
-                            <div v-if="!hideHeader" class="modal-header">
-                                <span class="alert-icon">
-                                    <p-lottie name="lottie_error" auto :size="1.5"
-                                              :class="[`modal-${themeColor}`]" class="header-lottie"
-                                    />
-                                </span>
-                                <span>{{ headerTitle }}</span>
-                            </div>
+                            <slot v-if="!hideHeader" name="header">
+                                <div class="modal-header">
+                                    <span class="alert-icon">
+                                        <p-lottie name="lottie_error" auto :size="1.5"
+                                                  :class="[`modal-${themeColor}`]" class="header-lottie"
+                                        />
+                                    </span>
+                                    <span>{{ headerTitle }}</span>
+                                </div>
+                            </slot>
                             <p-icon-button v-if="!hideHeaderCloseButton"
                                            name="ic_delete" color="inherit"
                                            class="close-button"
