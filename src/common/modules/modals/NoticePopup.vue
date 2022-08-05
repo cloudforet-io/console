@@ -6,20 +6,21 @@
                     hide-footer-close-button
                     size="sm"
                     :absolute="popupIndex * 1.5 + (isMobile() ? 0.75 : 7.5)"
+                    class="notice-popup"
                     @confirm="handleClose"
     >
         <template #body>
-            <h1 class="font-bold mb-2">
+            <h1 class="notice-popup-title">
                 {{ noticeItem.notice_title }}
             </h1>
-            <div class="flex items-center">
+            <div class="notice-popup-info">
                 <p-badge outline>
                     {{ noticeItem.notice_type }}
                 </p-badge>
-                <span class="text-sm ml-1 text-gray-600">{{ noticeItem.created_at }} · {{ noticeItem.author_type }}</span>
+                <span class="notice-popup-author">{{ noticeItem.created_at }} · {{ noticeItem.author_type }}</span>
             </div>
             <p-divider class="my-4" />
-            <p class="whitespace-pre-line text-sm leading-normal text-gray-900">
+            <p class="notice-popup-contents">
                 {{ noticeItem.contents }}
             </p>
         </template>
@@ -93,3 +94,19 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.notice-popup {
+    .notice-popup-title {
+        @apply font-bold mb-2;
+    }
+    .notice-popup-info {
+        @apply flex items-center;
+    }
+    .notice-popup-author {
+        @apply text-sm ml-1 text-gray-600;
+    }
+    .notice-popup-contents {
+        @apply whitespace-pre-line text-sm leading-normal text-gray-900;
+    }
+}
+</style>
