@@ -22,7 +22,9 @@
                 />
             </template>
             <template #notice>
-                notice
+                <g-n-b-notice-tab :visible="proxyVisibleDropdown && activeTab === 'notice'"
+                                  :count.sync="count.notice"
+                />
             </template>
         </p-tab>
     </div>
@@ -40,12 +42,14 @@ import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/t
 import { store } from '@/store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import GNBNoticeTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNoticeTab.vue';
 import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationsTab.vue';
 
 
 export default {
     name: 'GNBNoti',
     components: {
+        GNBNoticeTab,
         PI,
         PTab,
         PBadge,

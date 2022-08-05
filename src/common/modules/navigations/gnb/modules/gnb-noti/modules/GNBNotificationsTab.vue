@@ -23,8 +23,7 @@
                         {{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION') }}
                     </p>
                     <p class="desc">
-                        <span>{{ $t('COMMON.GNB.NOTIFICATION.NO_NOTI_DESC_1') }}&nbsp;</span>
-                        <span>{{ $t('COMMON.GNB.NOTIFICATION.NO_NOTI_DESC_2') }}</span>
+                        <span>{{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION_DESC') }}</span>
                     </p>
                 </div>
             </template>
@@ -274,8 +273,8 @@ export default {
     @screen mobile {
         .no-data-wrapper {
             img {
-                margin-top: 40px;
-                max-height: 140px;
+                margin-top: 2.5rem;
+                max-height: 8.75rem;
             }
             .title {
                 font-weight: normal;
