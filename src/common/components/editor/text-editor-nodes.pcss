@@ -1,0 +1,135 @@
+@define-mixin text-style {
+    /* normal text */
+    p {
+        padding-bottom: 0.75rem;
+        line-height: 1.5;
+        font-size: 0.875rem;
+        font-weight: normal;
+        &:focus {
+            @apply outline-none;
+        }
+    }
+
+    /* heading 1 */
+    h1 {
+        padding-top: 1rem;
+        line-height: 1.25;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    /* heading 2 */
+    h2 {
+        padding-top: 0.75rem;
+        line-height: 1.25;
+        font-size: 1.125rem;
+        font-weight: 700;
+    }
+
+    /* heading 3 */
+    h3 {
+        padding-top: 0.75rem;
+        line-height: 1.25;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+}
+
+@define-mixin all-nodes-style {
+    @mixin text-style;
+
+    $font-code: 'Inconsolata, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace';
+
+    /* inline code */
+    code.inline-code {
+        @apply bg-gray-100 rounded;
+        padding: 0.125rem 0.5rem;
+        line-height: 1.5;
+        font-family: $font-code;
+    }
+
+    /* bullet list */
+    ul {
+        padding-top: 0.75rem;
+        padding-left: 1rem;
+        list-style-type: disc;
+        > li {
+            display: list-item;
+            > ul {
+                padding-top: 0;
+                list-style-type: circle;
+                > li > ul {
+                    list-style-type: square;
+                }
+            }
+        }
+    }
+
+    /* number list */
+    ol {
+        padding-top: 0.75rem;
+        padding-left: 1rem;
+        list-style-type: decimal;
+        > li {
+            display: list-item;
+            > ol {
+                padding-top: 0;
+                list-style-type: lower-alpha;
+                > li > ol {
+                    list-style-type: lower-roman;
+                }
+            }
+        }
+    }
+
+    /* link */
+    a {
+        @apply text-blue-700;
+        padding-top: 0.75rem;
+        cursor: pointer;
+
+        @media (hover: hover) {
+            &:hover {
+                @apply underline;
+            }
+        }
+    }
+
+    /* image */
+    img {
+        padding-top: 0.75rem;
+    }
+
+    /* code block */
+    pre {
+        @apply bg-gray-100 rounded-lg;
+        margin-top: 0.75rem;
+        padding: 0.5rem 1rem;
+        > code {
+            font-family: $font-code;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+    }
+
+    /* quotes block */
+    blockquote {
+        @apply border-gray-200;
+        margin-top: 0.75rem;
+        margin-bottom: 0.75rem;
+        padding-left: 1rem;
+        border-left-width: 0.125rem;
+        line-height: 1.5;
+        font-size: 0.875rem;
+        > p, h1, h2, h3 {
+            padding: 0;
+            font-size: inherit;
+            font-weight: normal;
+        }
+    }
+
+    /* horizontal rule */
+    hr {
+        padding-top: 0.75rem;
+    }
+}

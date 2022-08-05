@@ -62,6 +62,11 @@ export default defineComponent<Props>({
                         heading: {
                             levels: [1, 2, 3],
                         },
+                        code: {
+                            HTMLAttributes: {
+                                class: 'inline-code',
+                            },
+                        },
                     }),
                     Underline,
                     Link,
@@ -95,7 +100,7 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss">
-@import './text-style-node.pcss';
+@import './text-editor-nodes.pcss';
 .text-editor {
     > .editor-content {
         .ProseMirror {
@@ -104,7 +109,7 @@ export default defineComponent<Props>({
                 @apply outline-none;
             }
 
-            @mixin text-style;
+            @mixin all-nodes-style;
         }
     }
 }

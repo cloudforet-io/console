@@ -47,7 +47,6 @@
 
         <p-icon-button class="menu-button" style-type="transparent" name="ic_text-bold"
                        :class="{ 'selected': editor.isActive('bold') }"
-                       :disabled="!editor.can().setBold()"
                        @click="editor.chain().focus().toggleBold().run()"
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_text-italic"
@@ -64,7 +63,8 @@
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_inline-code"
                        :class="{ 'selected': editor.isActive('code') }"
-                       @click="editor.chain().focus().setCode().run()"
+                       :disabled="!editor.can().setCode()"
+                       @click="editor.chain().focus().toggleCode().run()"
         />
 
         <p-divider class="menu-divider" vertical />
@@ -91,13 +91,16 @@
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_editor-code"
                        :class="{ 'selected': editor.isActive('codeBlock') }"
+                       :disabled="!editor.can().setCodeBlock()"
                        @click="editor.chain().focus().toggleCodeBlock().run()"
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_quotes"
                        :class="{ 'selected': editor.isActive('blockquote') }"
+                       :disabled="!editor.can().setBlockquote()"
                        @click="editor.chain().focus().toggleBlockquote().run()"
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_horizontal-rule"
+                       :disabled="!editor.can().setHorizontalRule()"
                        @click="editor.chain().focus().setHorizontalRule().run()"
         />
     </div>
@@ -241,7 +244,7 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss" scoped>
-@import './text-style-node.pcss';
+@import './text-editor-nodes.pcss';
 .menu-bar {
     display: flex;
     flex-wrap: wrap;
@@ -264,7 +267,7 @@ export default defineComponent<Props>({
 
         @mixin text-style;
         .text-style-node {
-            margin: 0;
+            padding: 0;
         }
     }
 
