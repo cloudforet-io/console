@@ -83,7 +83,7 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import type { ComputedRef, PropType } from '@vue/composition-api';
 import {
     computed,
     reactive, toRefs, watch,
@@ -94,12 +94,16 @@ import {
     PPaneLayout, PLabel, PFieldGroup, PTextInput, PRadio, PSearchDropdown, PCheckBox, PButton,
 } from '@spaceone/design-system';
 
-
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 
 type noticeFormType = 'CREATE' | 'EDIT';
@@ -118,6 +122,10 @@ export default {
         PButton,
     },
     props: {
+        boardId: {
+            default: '',
+            type: String,
+        },
         type: {
             default: 'CREATE',
             type: String as PropType<noticeFormType>,
@@ -178,6 +186,20 @@ export default {
             selectedDomainsState: props.selectedDomains.length ? props.selectedDomains : [],
         });
 
+        const formData:ComputedRef = computed(() => ({
+            // FIXME:: Below `board_id` is DUMMY
+            board_id: props.boardId || 'board-14a09a71f504',
+            title: noticeTitleState.value,
+            // TODO:: Ask for how to post `domainList` ?
+            // TODO:: Ask for `writer` as english
+            writer: `${state.hasSystemRole ? '시스템 관리자' : '도메인 관리자'} ${state.writerNameState}`,
+            contents: state.contentState,
+            options: {
+                is_pinned: state.isPinState,
+                is_popup: state.isPopupState,
+            },
+        }));
+
         const handleConfirm = () => {
             if (props.type === 'CREATE') handleCreateNotice();
             if (props.type === 'EDIT') handleEditNotice();
@@ -185,7 +207,10 @@ export default {
 
         const handleCreateNotice = async () => {
             try {
-                await console.log('create', state.writerNameState, noticeTitleState.value, state.isPinState, state.isPopupState);
+                await SpaceConnector.client.board.post.create(formData.value);
+                // song-lang
+                showSuccessMessage('Successfully created notice', '');
+                await SpaceRouter.router.push({ name: MY_PAGE_ROUTE.INFO.NOTICE._NAME, query: {} });
             } catch (e) {
                 // song-lang
                 ErrorHandler.handleRequestError(e, 'Failed to create notice');
@@ -193,7 +218,11 @@ export default {
         };
         const handleEditNotice = async () => {
             try {
-                await console.log('edit', state.writerNameState, noticeTitleState.value, state.isPinState, state.isPopupState);
+                await SpaceConnector.client.board.post.update(formData.value);
+                // song-lang
+                showSuccessMessage('Successfully edited notice', '');
+                // TODO:: add below `query`
+                await SpaceRouter.router.push({ name: MY_PAGE_ROUTE.INFO.NOTICE.DETAIL._NAME, query: {} });
             } catch (e) {
                 // song-lang
                 ErrorHandler.handleRequestError(e, 'Failed to edit notice');
@@ -268,12 +297,9 @@ export default {
     }
 }
 .notice-create-buttons-wrapper {
-    @apply inline-flex;
-    float: right;
-    margin-top: 1rem;
-
+    @apply inline-flex float-right mt-4;
     & .p-button {
-        margin-left: 1rem;
+        @apply ml-4;
     }
 }
 </style>
