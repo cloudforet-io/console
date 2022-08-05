@@ -134,10 +134,13 @@ export default defineComponent<Props>({
         align-items: baseline;
         cursor: pointer;
         padding: 0.5rem;
-        &:hover {
-            @apply bg-blue-100;
-            .delete-button {
-                visibility: visible;
+
+        @media (hover: hover) {
+            &:hover {
+                @apply bg-blue-100;
+                .delete-button {
+                    visibility: visible;
+                }
             }
         }
         .new-icon {
@@ -156,8 +159,11 @@ export default defineComponent<Props>({
                 text-transform: capitalize;
                 vertical-align: middle;
                 margin-bottom: 0.125rem;
-                &:hover {
-                    text-decoration: underline;
+
+                @media (hover: hover) {
+                    &:hover {
+                        text-decoration: underline;
+                    }
                 }
             }
             .additional-text {

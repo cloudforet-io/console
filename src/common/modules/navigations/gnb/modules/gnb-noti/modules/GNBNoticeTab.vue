@@ -202,8 +202,11 @@ export default {
             height: 100%;
             align-items: center;
             justify-content: center;
-            &:hover {
-                @apply bg-primary-4 text-primary rounded;
+
+            @media (hover: hover) {
+                &:hover {
+                    @apply bg-primary-4 text-primary rounded;
+                }
             }
         }
     }

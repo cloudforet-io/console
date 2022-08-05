@@ -5,15 +5,15 @@
                        :class="{ loading: loading && !items.length }"
         >
             <div ref="notificationItemsRef" class="content-wrapper">
-                <g-n-b-noti-item v-for="(item, idx) in items" :key="`${item.title}-${idx}`"
+                <g-n-b-noti-item v-for="(item, idx) in items" :key="`${item.notificationId}-${idx}`"
                                  :is-read="item.isRead"
                                  :title="item.title"
                                  :icon="item.icon"
                                  :created-at="item.createdAt"
                                  :date-header="item.dateHeader"
                                  :deletable="true"
-                                 @select="handleSelectNotification"
-                                 @delete="handleDeleteNotification"
+                                 @select="handleSelectNotification(item)"
+                                 @delete="handleDeleteNotification(item.notificationId)"
                 />
             </div>
             <template #no-data>
@@ -28,6 +28,52 @@
                 </div>
             </template>
         </p-data-loader>
+        <p-button-modal class="notification-modal"
+                        size="md"
+                        :visible.sync="modalVisible"
+                        hide-header-close-button
+                        hide-footer-close-button
+                        @confirm="handleCloseNotificationModal"
+        >
+            <template #header>
+                <div class="header-wrapper">
+                    <p-i v-if="selectedItem.icon" :name="selectedItem.icon"
+                         width="1.5rem" height="1.5rem"
+                         class="mr-2"
+                    />
+                    <span>{{ selectedItem.title }}</span>
+                </div>
+            </template>
+            <template #body>
+                <div class="meta-data-wrapper">
+                    <div>
+                        <!--song-lang-->
+                        <b>Occurred Time: </b>
+                        <span>{{ iso8601Formatter(selectedItem.createdAt, timezone) }}</span>
+                    </div>
+                    <div v-if="selectedItem.message.link">
+                        <!--song-lang-->
+                        <b>Detail Link: </b>
+                        <p-anchor :href="selectedItem.message.link">
+                            {{ selectedItem.message.link }}
+                        </p-anchor>
+                    </div>
+                </div>
+                <div v-if="selectedItem.message.description" class="description-wrapper">
+                    {{ selectedItem.message.description }}
+                </div>
+                <div v-if="definitionData">
+                    <p-definition-table :fields="definitionFields" :data="definitionData"
+                                        :skeleton-rows="4"
+                                        block
+                                        disable-copy
+                    />
+                </div>
+            </template>
+            <template #confirm-button>
+                {{ $t('APP.MAIN.CLOSE') }}
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
@@ -37,10 +83,11 @@ import {
     onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PDataLoader,
+    PDataLoader, PButtonModal, PI, PAnchor, PDefinitionTable,
 } from '@spaceone/design-system';
 import { useInfiniteScroll } from '@vueuse/core';
 import type { Dayjs } from 'dayjs';
@@ -59,6 +106,7 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 
 interface NotificationItem {
+    notificationId: string;
     createdAt: string;
     dateHeader?: TranslateResult | string;
     isRead: boolean;
@@ -80,6 +128,10 @@ export default {
     components: {
         GNBNotiItem,
         PDataLoader,
+        PButtonModal,
+        PI,
+        PAnchor,
+        PDefinitionTable,
     },
     props: {
         visible: {
@@ -100,6 +152,21 @@ export default {
             items: [] as NotificationItem[],
             proxyCount: useProxyValue('count', props, emit),
             pageStart: 1,
+            //
+            modalVisible: false,
+            selectedItem: {} as NotificationItem,
+            definitionFields: computed(() => state.selectedItem?.message?.tags.map(d => ({
+                name: d.key, label: d.key,
+            }))),
+            definitionData: computed(() => {
+                const result = {};
+                if (Array.isArray(state.selectedItem?.message?.tags)) {
+                    state.selectedItem.message.tags.forEach((d) => {
+                        result[d.key] = d.value;
+                    });
+                }
+                return result;
+            }),
         });
 
         /* Util */
@@ -128,6 +195,7 @@ export default {
             const results: NotificationItem[] = [];
             rawData.forEach((d, idx) => {
                 const result: NotificationItem = {
+                    notificationId: d.notification_id,
                     dateHeader: getDateHeader(d.created_at, rawData[idx - 1]?.created_at),
                     createdAt: d.created_at,
                     isRead: d.is_read,
@@ -190,11 +258,17 @@ export default {
             notificationApiHelper.setPageStart(state.pageStart);
             listNotifications();
         };
-        const handleSelectNotification = (notificationId: string) => {
-            console.log('select!', notificationId);
+        const handleSelectNotification = (notificationItem: NotificationItem) => {
+            state.selectedItem = notificationItem;
+            state.modalVisible = true;
         };
         const handleDeleteNotification = (notificationId: string) => {
+            // todo
             console.log('delete!', notificationId);
+        };
+        const handleCloseNotificationModal = () => {
+            state.selectedItem = {};
+            state.modalVisible = false;
         };
 
         /* Init */
@@ -222,6 +296,8 @@ export default {
             ADMINISTRATION_ROUTE,
             handleSelectNotification,
             handleDeleteNotification,
+            handleCloseNotificationModal,
+            iso8601Formatter,
         };
     },
 };
@@ -267,6 +343,29 @@ export default {
             @apply text-gray-400;
             font-size: 0.875rem;
             line-height: 1.5;
+        }
+    }
+    .notification-modal {
+        .header-wrapper {
+            display: flex;
+            align-items: center;
+            font-size: 1.375rem;
+            line-height: 1.25;
+            margin-bottom: 1rem;
+        }
+        .meta-data-wrapper {
+            display: grid;
+            gap: 0.25rem;
+            font-size: 12px;
+            line-height: 1.25;
+            margin-bottom: 1.375rem;
+        }
+        .description-wrapper {
+            @apply bg-violet-100;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
         }
     }
 
