@@ -7,6 +7,8 @@ import {
     defineComponent,
 } from '@vue/composition-api';
 
+import { loadMonospaceFonts } from '@/styles/fonts';
+
 
 interface Props {
     contents: string
@@ -20,6 +22,10 @@ export default defineComponent<Props>({
             type: String,
             default: '',
         },
+    },
+    setup() {
+        loadMonospaceFonts();
+        return {};
     },
 });
 </script>

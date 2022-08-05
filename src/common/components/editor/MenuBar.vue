@@ -276,7 +276,7 @@ export default defineComponent<Props>({
         @apply rounded text-gray-900 outline-none;
 
         &.disabled {
-            @apply text-gray-500;
+            @apply text-gray-300;
         }
 
         @media (hover: hover) {

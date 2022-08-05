@@ -12,6 +12,11 @@ const robotoConfig: FontConfig = {
     urlPrefix: 'fonts/roboto/roboto-v27-latin-',
     formats: ['woff2', 'woff'],
 };
+const inconsolataConfig: FontConfig = {
+    family: 'Inconsolata',
+    urlPrefix: 'fonts/inconsolata/Inconsolata-VariableFont_wdth,wght',
+    formats: ['ttf'],
+};
 
 export const notoSansConfigMap: Record<string, FontConfig> = {
     en: {
@@ -31,12 +36,12 @@ export const notoSansConfigMap: Record<string, FontConfig> = {
     },
 };
 
-const getSources = ({ urlPrefix, formats }, name) => formats.map(format => `url(${urlPrefix}${name}.${format})`).join(', ');
+const getSources = ({ urlPrefix, formats }: FontConfig, name = '') => formats.map(format => `url(${urlPrefix}${name}.${format})`).join(', ');
 
 interface FontInfo {
     family: string;
     source: string;
-    descriptors: any;
+    descriptors?: object;
 }
 
 export const fontInfoMap: Record<string, FontInfo[]> = {
@@ -134,6 +139,24 @@ export const fontInfoMap: Record<string, FontInfo[]> = {
             },
         },
     ],
+    monospace: [
+        {
+            family: inconsolataConfig.family,
+            source: getSources(inconsolataConfig),
+            descriptors: {
+                weight: 400,
+                variationSettings: ' \'wght\' 400, \'wdth\' 100',
+            },
+        },
+        {
+            family: inconsolataConfig.family,
+            source: getSources(inconsolataConfig),
+            descriptors: {
+                weight: 600,
+                variationSettings: ' \'wght\' 600, \'wdth\' 100',
+            },
+        },
+    ],
 };
 
 export const loadFont = async (fontsInfo: FontInfo[]) => {
@@ -143,10 +166,17 @@ export const loadFont = async (fontsInfo: FontInfo[]) => {
         return font;
     });
 
-    await Promise.all(fonts.map(d => d.load()));
-
-    fonts.forEach((d) => {
-        (document as any).fonts.add(d);
+    const results = await Promise.allSettled(fonts.map(d => d.load()));
+    results.forEach((result, idx) => {
+        if (result.status === 'fulfilled') {
+            (document as any).fonts.add(result.value);
+        } else {
+            console.error(`Failed to load fonts. 
+            family: ${fontsInfo[idx].family}
+            source: ${fontsInfo[idx].source}
+            descriptors: ${JSON.stringify(fontsInfo[idx].descriptors)}
+            Error: `, result.reason);
+        }
     });
 };
 
@@ -171,5 +201,21 @@ export const loadFonts = async (lang) => {
         console.error(`Failed to load fonts for ${lang}.`, e);
     } finally {
         document.body.lang = lang;
+    }
+};
+
+export const loadMonospaceFonts = async () => {
+    try {
+        let fontsInfo: FontInfo[] = [];
+
+        if (!loaded.monospace) {
+            fontsInfo = fontsInfo.concat(fontInfoMap.monospace);
+        }
+
+        await loadFont(fontsInfo);
+
+        if (!loaded.monospace) loaded.monospace = true;
+    } catch (e) {
+        console.error('Failed to load monospace fonts.', e);
     }
 };

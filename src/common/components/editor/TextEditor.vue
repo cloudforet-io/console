@@ -23,6 +23,8 @@ import { createImageExtension } from '@/common/components/editor/extensions/imag
 import type { UploadFn } from '@/common/components/editor/extensions/plugins/drop-image';
 import MenuBar from '@/common/components/editor/MenuBar.vue';
 
+import { loadMonospaceFonts } from '@/styles/fonts';
+
 
 interface Props {
     value: string;
@@ -50,6 +52,8 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
+        loadMonospaceFonts();
+
         const state = reactive({
             editor: null as null|Editor,
         });
