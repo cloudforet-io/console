@@ -45,6 +45,8 @@
                           :outline="false"
                           @clickButton="goToSignIn"
             />
+            <notice-popup :popup-index="0" />
+            <notice-popup :popup-index="1" />
             <!--            <survey-modal />-->
         </template>
         <!-- Iframe for file download -->
@@ -77,6 +79,7 @@ import { getRouteAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
+import NoticePopup from '@/common/modules/modals/NoticePopup.vue';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
 import GNB from '@/common/modules/navigations/gnb/GNB.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
@@ -90,6 +93,7 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 export default defineComponent({
     name: 'App',
     components: {
+        NoticePopup,
         MobileGuideModal,
         // SurveyModal,
         RecommendedBrowserModal,
