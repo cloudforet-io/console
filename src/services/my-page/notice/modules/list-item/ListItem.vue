@@ -108,6 +108,7 @@ export default defineComponent<Props>({
     @media (hover: hover) {
         &:hover {
             @apply bg-blue-100;
+            cursor: pointer;
         }
     }
 }

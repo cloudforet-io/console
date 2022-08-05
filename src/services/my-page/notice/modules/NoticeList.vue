@@ -10,15 +10,14 @@
         <ul v-if="noticeItems.length" class="list-wrapper">
             <!-- // todo: item.[id]-->
             <list-item v-for="(item, index) in noticeItems"
-                       :key="`notice-${item}-${index}`"
+                       :key="`notice-${item.id}-${index}`"
                        class="list-item"
                        :title="item.title"
                        :notice-type="item.noticeType"
                        :is-new="item.isNew"
                        :is-pinned="item.isPinned"
-            >
-                {{ item }}
-            </list-item>
+                       @click.native="handleClickNotice(item.id)"
+            />
         </ul>
         <div v-else class="no-data">
             <img src="@/assets/images/illust_satellite.svg" class="no-data-img">
@@ -45,8 +44,11 @@ import {
     PPagination, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
 
+import { SpaceRouter } from '@/router';
+
 import { NOTICE_TYPE } from '@/services/my-page/notice/config';
 import ListItem from '@/services/my-page/notice/modules/list-item/ListItem.vue';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 interface Props {
     noticeItems: any[];
@@ -92,8 +94,14 @@ export default defineComponent<Props>({
             ],
             selectedItem: 'ALL',
         });
+
+        const handleClickNotice = (id: string) => {
+            SpaceRouter.router.push({ name: MY_PAGE_ROUTE.INFO.NOTICE.DETAIL._NAME, params: { id } });
+        };
+
         return {
             ...toRefs(state),
+            handleClickNotice,
         };
     },
 });

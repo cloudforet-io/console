@@ -113,7 +113,7 @@ const myPageRoutes: RouteConfig = {
                             component: NoticeUpdatePage as any,
                         },
                         {
-                            path: 'detail',
+                            path: ':id',
                             name: MY_PAGE_ROUTE.INFO.NOTICE.DETAIL._NAME,
                             // song-lang
                             meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
