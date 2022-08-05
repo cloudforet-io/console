@@ -11,7 +11,7 @@
                     >
                         <span class="chip-fill" />
                         <span class="chip-border" />
-                        <p-i v-if="selectedColor === color" name="ic_check" class="chip-check-mark"
+                        <p-i v-if="editor.isActive('textStyle', {color})" name="ic_check" class="chip-check-mark"
                              height="16px"
                              width="16px" color="inherit"
                         />
@@ -25,11 +25,13 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PI, PSelectDropdown } from '@spaceone/design-system';
+import type { Editor } from '@tiptap/core';
 
 import {
     blue, coral, gray, green, peacock, red, violet, yellow,
@@ -41,20 +43,27 @@ const COLOR_PICKER_COLOR_SETS = [
     [gray[500], violet[700], blue[700], peacock[700], green[700], yellow[700], coral[700], red[700]],
 ];
 
-export default defineComponent({
+interface Props {
+    editor: Editor
+}
+export default defineComponent<Props>({
     name: 'ColorPicker',
     components: {
         PSelectDropdown,
         PI,
     },
+    props: {
+        editor: {
+            type: Object as PropType<Editor>,
+            required: true,
+        },
+    },
     setup(props, { emit }) {
         const state = reactive({
-            selectedColor: COLOR_PICKER_COLOR_SETS[0][0],
             textColorItems: COLOR_PICKER_COLOR_SETS.flatMap(color => ({ name: color })),
         });
 
         const handleColorClick = async (color: string) => {
-            state.selectedColor = color;
             emit('select', color);
         };
 

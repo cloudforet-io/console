@@ -1,6 +1,6 @@
 <template>
-    <div class="text-editor">
-        <menu-bar />
+    <div v-if="editor" class="text-editor">
+        <menu-bar :editor="editor" />
         <editor-content class="editor-content" :editor="editor" />
     </div>
 </template>
@@ -11,6 +11,11 @@ import {
     defineComponent, onBeforeUnmount, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { Color } from '@tiptap/extension-color';
+import Link from '@tiptap/extension-link';
+import TextAlign from '@tiptap/extension-text-align';
+import TextStyle from '@tiptap/extension-text-style';
+import Underline from '@tiptap/extension-underline';
 import StarterKit from '@tiptap/starter-kit';
 import { Editor, EditorContent } from '@tiptap/vue-2';
 
@@ -54,7 +59,21 @@ export default defineComponent<Props>({
                 content: props.value,
                 extensions: [
                     StarterKit.configure({
-
+                        paragraph: {
+                            HTMLAttributes: {
+                                class: 'normal-text',
+                            },
+                        },
+                        heading: {
+                            levels: [1, 2, 3],
+                        },
+                    }),
+                    Underline,
+                    Link,
+                    TextStyle,
+                    Color,
+                    TextAlign.configure({
+                        types: ['heading', 'paragraph'],
                     }),
                     createImageExtension(props.imageUploader),
                 ],
@@ -98,11 +117,6 @@ export default defineComponent<Props>({
     }
     &:focus-within {
         @apply border-secondary;
-    }
-    p {
-        &:focus {
-            @apply outline-none;
-        }
     }
 }
 </style>

@@ -1,14 +1,17 @@
 <template>
     <div class="menu-bar">
         <p-icon-button class="menu-button" style-type="transparent" name="ic_undo"
-                       @click="handleUndoClick"
+                       :disabled="!editor.can().undo()"
+                       @click="editor.chain().focus().undo().run()"
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_redo"
-                       @click="handleRedoClick"
+                       :disabled="!editor.can().redo()"
+                       @click="editor.chain().focus().redo().run()"
         />
+
         <p-divider class="menu-divider" vertical />
-        <p-select-dropdown v-model="selectedTextStyle" class="menu-dropdown" style-type="transparent"
-                           index-mode
+
+        <p-select-dropdown :selected="selectedTextStyle" class="menu-dropdown text-style" style-type="transparent"
                            :items="textStyleItems"
                            @select="handleTextStyleSelect"
         >
@@ -16,60 +19,84 @@
                 <span class="text-style-node">{{ item.label }}</span>
             </template>
         </p-select-dropdown>
+
         <p-divider class="menu-divider" vertical />
-        <p-select-dropdown v-model="selectedTextAlign" class="menu-dropdown" style-type="transparent"
+
+        <p-select-dropdown :selected="selectedTextAlign" class="menu-dropdown" style-type="transparent"
                            :items="textAlignItems"
-                           index-mode
                            @select="handleTextAlignSelect"
         >
             <template #default>
-                <p-i :name="textAlignItems[selectedTextAlign].icon" color="inherit" />
+                <p-i :name="TEXT_ALIGN_ICONS[selectedTextAlign]" color="inherit" />
             </template>
             <template #menu-item--format="{item}">
-                <p-i :name="item.icon" />
+                <p-i :name="TEXT_ALIGN_ICONS[item.name]" />
                 {{ item.label }}
             </template>
         </p-select-dropdown>
+
         <p-divider class="menu-divider" vertical />
-        <color-picker class="menu-dropdown" @select="handleTextColorSelect" />
+
+        <color-picker class="menu-dropdown" :editor="editor"
+                      @select="editor.chain().focus().setColor($event).run()"
+        />
+
         <p-divider class="menu-divider" vertical />
+
         <p-icon-button class="menu-button" style-type="transparent" name="ic_text-bold"
-                       @click="handleTextBoldClick"
+                       :class="{ 'selected': editor.isActive('bold') }"
+                       :disabled="!editor.can().setBold()"
+                       @click="editor.chain().focus().toggleBold().run()"
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_text-italic"
-                       @click="handleTextItalicClick"
+                       :class="{ 'selected': editor.isActive('italic') }"
+                       @click="editor.chain().focus().toggleItalic().run()"
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_text-underline"
-                       @click="handleTextUnderlineClick"
+                       :class="{ 'selected': editor.isActive('underline') }"
+                       @click="editor.chain().focus().toggleUnderline().run()"
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_text-strikethrough"
-                       @click="handleTextStrikethroughClick"
+                       :class="{ 'selected': editor.isActive('strike') }"
+                       @click="editor.chain().focus().toggleStrike().run()"
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_inline-code"
-                       @click="handleInlineCodeClick"
+                       :class="{ 'selected': editor.isActive('code') }"
+                       @click="editor.chain().focus().setCode().run()"
         />
+
         <p-divider class="menu-divider" vertical />
+
         <p-icon-button class="menu-button" style-type="transparent" name="ic_list-bulleted"
-                       @click="handleBulletListClick"
+                       :class="{ 'selected': editor.isActive('bulletList') }"
+                       @click="editor.chain().focus().toggleBulletList().run()"
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_list-numbered"
-                       @click="handleNumberListClick"
+                       :class="{ 'selected': editor.isActive('orderedList') }"
+                       @click="editor.chain().focus().toggleOrderedList().run()"
         />
+
         <p-divider class="menu-divider" vertical />
+
         <p-icon-button class="menu-button" style-type="transparent" name="ic_link"
+                       :class="{ 'selected': editor.isActive('link') }"
                        @click="handleLinkClick"
         />
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_image"
-                       @click="handleImageClick"
+        <!-- song-lang -->
+        <p-icon-button v-tooltip.bottom="'copy & paste, drag & drop 으로 이미지 추가 가능하다는 안내 메시지 들어와야 함. 보경님께서 아직 안주심..'"
+                       class="menu-button" style-type="transparent"
+                       name="ic_image"
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_editor-code"
-                       @click="handleCodeBlockClick"
+                       :class="{ 'selected': editor.isActive('codeBlock') }"
+                       @click="editor.chain().focus().toggleCodeBlock().run()"
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_quotes"
-                       @click="handleQuotesClick"
+                       :class="{ 'selected': editor.isActive('blockquote') }"
+                       @click="editor.chain().focus().toggleBlockquote().run()"
         />
         <p-icon-button class="menu-button" style-type="transparent" name="ic_horizontal-rule"
-                       @click="handleHorizontalRuleClick"
+                       @click="editor.chain().focus().setHorizontalRule().run()"
         />
     </div>
 </template>
@@ -90,9 +117,15 @@ import ColorPicker from '@/common/components/editor/ColorPicker.vue';
 
 
 interface Props {
-    editor: Editor|null
+    editor: Editor
 }
 
+const TEXT_ALIGN_ICONS = {
+    left: 'ic_text-align-left',
+    center: 'ic_text-align-center',
+    right: 'ic_text-align-right',
+    justify: 'ic_text-align-justify',
+};
 
 export default defineComponent<Props>({
     name: 'MenuBar',
@@ -105,11 +138,11 @@ export default defineComponent<Props>({
     },
     props: {
         editor: {
-            type: Object as PropType<Editor|null>,
-            default: null,
+            type: Object as PropType<Editor>,
+            required: true,
         },
     },
-    setup() {
+    setup(props) {
         const state = reactive({
             textStyleItems: computed(() => [
                 // song-lang
@@ -120,67 +153,78 @@ export default defineComponent<Props>({
             ]),
             textAlignItems: computed(() => [
                 // song-lang
-                { name: 'left', label: 'Left', icon: 'ic_text-align-left' },
-                { name: 'center', label: 'Center', icon: 'ic_text-align-center' },
-                { name: 'right', label: 'Right', icon: 'ic_text-align-right' },
-                { name: 'justify', label: 'Justify', icon: 'ic_text-align-justify' },
+                { name: 'left', label: 'Left' },
+                { name: 'center', label: 'Center' },
+                { name: 'right', label: 'Right' },
+                { name: 'justify', label: 'Justify' },
             ]),
-            selectedTextStyle: 0,
-            selectedTextAlign: 0,
+            selectedTextStyle: computed(() => {
+                if (props.editor.isActive('paragraph')) return 'normal';
+                if (props.editor.isActive('heading', { level: 1 })) return 'heading1';
+                if (props.editor.isActive('heading', { level: 2 })) return 'heading2';
+                if (props.editor.isActive('heading', { level: 3 })) return 'heading3';
+                return 'normal';
+            }),
+            selectedTextAlign: computed(() => {
+                if (props.editor.isActive({ textAlign: 'left' })) return 'left';
+                if (props.editor.isActive({ textAlign: 'center' })) return 'center';
+                if (props.editor.isActive({ textAlign: 'right' })) return 'right';
+                if (props.editor.isActive({ textAlign: 'justify' })) return 'justify';
+                return 'left';
+            }),
         });
 
         /* Event Handlers */
+        const handleTextStyleSelect = (style: string) => {
+            switch (style) {
+            case 'normal': props.editor.chain().focus().setParagraph().run(); break;
+            case 'heading1': props.editor.chain().focus().toggleHeading({ level: 1 }).run(); break;
+            case 'heading2': props.editor.chain().focus().toggleHeading({ level: 2 }).run(); break;
+            case 'heading3': props.editor.chain().focus().toggleHeading({ level: 3 }).run(); break;
+            default: props.editor.chain().focus().setParagraph().run(); break;
+            }
+        };
+        const handleTextAlignSelect = (align: string) => {
+            props.editor.chain().focus().setTextAlign(align).run();
+        };
+        const handleLinkClick = () => {
+            if (props.editor.isActive('link')) {
+                props.editor.chain().focus().unsetLink().run();
+            } else {
+                const previousUrl = props.editor.getAttributes('link').href;
+                const url = window.prompt('URL', previousUrl);
 
-        // history
-        const handleUndoClick = () => {};
-        const handleRedoClick = () => {};
+                // cancelled
+                if (url === null) return;
 
-        // text style
-        const handleTextStyleSelect = () => {};
+                // empty
+                if (url === '') {
+                    props.editor
+                        .chain()
+                        .focus()
+                        .extendMarkRange('link')
+                        .unsetLink()
+                        .run();
 
-        // text align
-        const handleTextAlignSelect = () => {};
+                    return;
+                }
 
-        // set color
-        const handleTextColorSelect = () => {};
-
-        // formatting
-        const handleTextBoldClick = () => {};
-        const handleTextItalicClick = () => {};
-        const handleTextUnderlineClick = () => {};
-        const handleTextStrikethroughClick = () => {};
-        const handleInlineCodeClick = () => {};
-
-        // list
-        const handleBulletListClick = () => {};
-        const handleNumberListClick = () => {};
-
-        // etc
-        const handleLinkClick = () => {};
-        const handleImageClick = () => {};
-        const handleCodeBlockClick = () => {};
-        const handleQuotesClick = () => {};
-        const handleHorizontalRuleClick = () => {};
+                // update link
+                props.editor
+                    .chain()
+                    .focus()
+                    .extendMarkRange('link')
+                    .setLink({ href: url })
+                    .run();
+            }
+        };
 
         return {
             ...toRefs(state),
-            handleUndoClick,
-            handleRedoClick,
             handleTextStyleSelect,
             handleTextAlignSelect,
-            handleTextColorSelect,
-            handleTextBoldClick,
-            handleTextItalicClick,
-            handleTextUnderlineClick,
-            handleTextStrikethroughClick,
-            handleInlineCodeClick,
-            handleBulletListClick,
-            handleNumberListClick,
             handleLinkClick,
-            handleImageClick,
-            handleCodeBlockClick,
-            handleQuotesClick,
-            handleHorizontalRuleClick,
+            TEXT_ALIGN_ICONS,
         };
     },
 });
@@ -203,19 +247,26 @@ export default defineComponent<Props>({
         &:not(:last-of-type) {
             margin-right: 0.125rem;
         }
+        &.text-style {
+            width: 110px;
+        }
     }
 
     /* custom design-system component - p-icon-button */
     > .menu-button.p-icon-button::v-deep {
         @apply rounded text-gray-900 outline-none;
 
+        &.disabled {
+            @apply text-gray-500;
+        }
+
         @media (hover: hover) {
-            &:hover {
+            &:hover:not(.disabled) {
                 @apply bg-gray-200 text-gray-900;
             }
         }
 
-        &:active, &.selected {
+        &:active:not(.disabled), &.selected:not(.disabled) {
             @apply bg-gray-700 text-white outline-none;
         }
     }
