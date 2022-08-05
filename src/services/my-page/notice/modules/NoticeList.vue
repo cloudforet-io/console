@@ -7,13 +7,18 @@
                 </template>
             </p-toolbox>
         </div>
-        <!-- todo: list-item-->
         <ul v-if="noticeItems.length" class="list-wrapper">
-            <li v-for="(item, index) in noticeItems"
-                :key="`notice-${item}-${index}`"
+            <!-- // todo: item.[id]-->
+            <list-item v-for="(item, index) in noticeItems"
+                       :key="`notice-${item}-${index}`"
+                       class="list-item"
+                       :title="item.title"
+                       :notice-type="item.noticeType"
+                       :is-new="item.isNew"
+                       :is-pinned="item.isPinned"
             >
                 {{ item }}
-            </li>
+            </list-item>
         </ul>
         <div v-else class="no-data">
             <img src="@/assets/images/illust_satellite.svg" class="no-data-img">
@@ -34,18 +39,27 @@
 
 <script lang="ts">
 
-import { reactive, toRefs } from '@vue/composition-api';
+import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 
 import {
     PPagination, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
 
-export default {
+import { NOTICE_TYPE } from '@/services/my-page/notice/config';
+import ListItem from '@/services/my-page/notice/modules/list-item/ListItem.vue';
+
+interface Props {
+    noticeItems: any[];
+    loading: boolean;
+}
+
+export default defineComponent<Props>({
     name: 'NoticeList',
     components: {
         PToolbox,
         PSelectDropdown,
         PPagination,
+        ListItem,
     },
     props: {
         noticeItems: {
@@ -63,26 +77,26 @@ export default {
                 {
                     // song-lang
                     label: '전체 공지',
-                    name: 'all',
+                    name: 'ALL',
                 },
                 {
                     // song-lang
                     label: '시스템 공지',
-                    name: 'system',
+                    name: NOTICE_TYPE.SYSTEM,
                 },
                 {
                     // song-lang
                     label: '내부 공지',
-                    name: 'internal',
+                    name: NOTICE_TYPE.DOMAIN,
                 },
             ],
-            selectedItem: 'all',
+            selectedItem: 'ALL',
         });
         return {
             ...toRefs(state),
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .notice-list {
@@ -95,15 +109,6 @@ export default {
 }
 .list-wrapper {
     @apply border-t border-b border-gray-200 rounded-none;
-    li {
-        @apply border-b border-gray-200;
-        &:hover {
-            @apply bg-blue-100;
-        }
-    }
-    li:last-child {
-        @apply border-b-0;
-    }
 }
 .pagination-wrapper {
     @apply flex justify-center;

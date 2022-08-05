@@ -9,13 +9,7 @@
                 </p-button>
             </template>
         </p-page-title>
-        <notice-list :notice-items="noticeItems" :loading="false">
-            <template #header>
-                <div class="notice-header">
-                    header
-                </div>
-            </template>
-        </notice-list>
+        <notice-list :notice-items="noticeItems" :loading="false" />
     </div>
 </template>
 
@@ -28,6 +22,7 @@ import {
     PButton, PPageTitle,
 } from '@spaceone/design-system';
 
+import { NOTICE_TYPE } from '@/services/my-page/notice/config';
 import NoticeList from '@/services/my-page/notice/modules/NoticeList.vue';
 
 export default {
@@ -41,19 +36,24 @@ export default {
         const state = reactive({
             noticeItems: [
                 {
-                    title: 'title1',
+                    title: 'long title long title long title long title long title long title long title long title long title long title long title long title ',
                     type: 'type1',
                     createdAt: 'createdAt1',
+                    noticeType: NOTICE_TYPE.DOMAIN,
+                    isNew: true,
+                    isPinned: true,
                 },
                 {
                     title: 'title2',
                     type: 'type2',
                     createdAt: 'createdAt2',
+                    noticeType: NOTICE_TYPE.SYSTEM,
                 },
                 {
                     title: 'title3',
                     type: 'type3',
                     createdAt: 'createdAt3',
+                    noticeType: NOTICE_TYPE.DOMAIN,
                 },
             ],
         });
