@@ -16,7 +16,9 @@
                            @select="handleTextStyleSelect"
         >
             <template #menu-item--format="{item}">
-                <span class="text-style-node">{{ item.label }}</span>
+                <component :is="TEXT_STYLE_TAGS[item.name]" class="text-style-node">
+                    {{ item.label }}
+                </component>
             </template>
         </p-select-dropdown>
 
@@ -127,6 +129,13 @@ const TEXT_ALIGN_ICONS = {
     justify: 'ic_text-align-justify',
 };
 
+const TEXT_STYLE_TAGS = {
+    normal: 'p',
+    heading1: 'h1',
+    heading2: 'h2',
+    heading3: 'h3',
+};
+
 export default defineComponent<Props>({
     name: 'MenuBar',
     components: {
@@ -225,12 +234,14 @@ export default defineComponent<Props>({
             handleTextAlignSelect,
             handleLinkClick,
             TEXT_ALIGN_ICONS,
+            TEXT_STYLE_TAGS,
         };
     },
 });
 </script>
 
 <style lang="postcss" scoped>
+@import './text-style-node.pcss';
 .menu-bar {
     display: flex;
     flex-wrap: wrap;
@@ -249,6 +260,11 @@ export default defineComponent<Props>({
         }
         &.text-style {
             width: 110px;
+        }
+
+        @mixin text-style;
+        .text-style-node {
+            margin: 0;
         }
     }
 

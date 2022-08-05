@@ -59,11 +59,6 @@ export default defineComponent<Props>({
                 content: props.value,
                 extensions: [
                     StarterKit.configure({
-                        paragraph: {
-                            HTMLAttributes: {
-                                class: 'normal-text',
-                            },
-                        },
                         heading: {
                             levels: [1, 2, 3],
                         },
@@ -100,10 +95,17 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss">
-.ProseMirror {
-    min-height: inherit;
-    &:focus {
-        @apply outline-none;
+@import './text-style-node.pcss';
+.text-editor {
+    > .editor-content {
+        .ProseMirror {
+            min-height: inherit;
+            &:focus {
+                @apply outline-none;
+            }
+
+            @mixin text-style;
+        }
     }
 }
 </style>

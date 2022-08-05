@@ -1,1 +1,29 @@
-/* TODO: add text style node's style */
+@define-mixin text-style {
+    p {
+        margin-bottom: 0.75rem;
+        line-height: 1.5;
+        font-size: 0.875rem;
+        font-weight: normal;
+        &:focus {
+            @apply outline-none;
+        }
+    }
+    h1 {
+        margin-top: 1rem;
+        line-height: 1.25;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    h2 {
+        margin-top: 0.75rem;
+        line-height: 1.25;
+        font-size: 1.125rem;
+        font-weight: 700;
+    }
+    h3 {
+        margin-top: 0.75rem;
+        line-height: 1.25;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+}
