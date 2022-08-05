@@ -1,3 +1,10 @@
+# [1.1.0-beta.364](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.363...v1.1.0-beta.364) (2022-08-05)
+
+
+### Bug Fixes
+
+* **button-modal:** add header slot ([#1049](https://github.com/spaceone-dev/spaceone-design-system/issues/1049)) ([230b964](https://github.com/spaceone-dev/spaceone-design-system/commit/230b9644dc51ecd22cf2ddd400e342c4f9cbd1e0))
+
 # [1.1.0-beta.363](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.362...v1.1.0-beta.363) (2022-08-04)
 
 
