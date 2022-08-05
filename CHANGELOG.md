@@ -1,3 +1,10 @@
+# [1.1.0-beta.366](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.365...v1.1.0-beta.366) (2022-08-05)
+
+
+### Features
+
+* **images:** update images ([#1051](https://github.com/spaceone-dev/spaceone-design-system/issues/1051)) ([b31333e](https://github.com/spaceone-dev/spaceone-design-system/commit/b31333ee75298ae55e534cd6db949840c48b0c00))
+
 # [1.1.0-beta.365](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.364...v1.1.0-beta.365) (2022-08-05)
 
 
