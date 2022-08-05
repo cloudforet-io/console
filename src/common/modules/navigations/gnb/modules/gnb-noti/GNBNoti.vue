@@ -22,8 +22,8 @@
                 />
             </template>
             <template #notice>
-                <g-n-b-notice-tab :visible="proxyVisibleDropdown && activeTab === 'notice'"
-                                  :count.sync="count.notice"
+                <g-n-b-notice-tab :count.sync="count.notice"
+                                  @close="handleCloseDropdown"
                 />
             </template>
         </p-tab>
@@ -81,10 +81,14 @@ export default {
         const handleClickButton = () => {
             state.proxyVisibleDropdown = !state.proxyVisibleDropdown;
         };
+        const handleCloseDropdown = () => {
+            state.proxyVisibleDropdown = false;
+        };
 
         return {
             ...toRefs(state),
             handleClickButton,
+            handleCloseDropdown,
             commaFormatter,
         };
     },

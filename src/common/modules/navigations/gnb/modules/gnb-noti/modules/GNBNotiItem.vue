@@ -14,7 +14,7 @@
                     <span>{{ title }}</span>
                 </p>
                 <div class="additional-text">
-                    {{ occurred }} <span v-if="writerName">· {{ writerName }}</span>
+                    {{ occurred }} <span v-if="writer">· {{ writer }}</span>
                 </div>
             </div>
             <p-icon-button v-if="deletable"
@@ -48,7 +48,7 @@ interface Props {
     createdAt: string;
     dateHeader?: TranslateResult | string;
     icon?: string;
-    writerName?: string;
+    writer?: string;
     deletable: boolean;
 }
 
@@ -79,7 +79,7 @@ export default defineComponent<Props>({
             type: String,
             default: undefined,
         },
-        writerName: {
+        writer: {
             type: String,
             default: undefined,
         },
@@ -101,7 +101,8 @@ export default defineComponent<Props>({
         const handleClickItem = () => {
             emit('select');
         };
-        const handleClickDeleteButton = () => {
+        const handleClickDeleteButton = (event) => {
+            event.stopPropagation();
             emit('delete');
         };
 

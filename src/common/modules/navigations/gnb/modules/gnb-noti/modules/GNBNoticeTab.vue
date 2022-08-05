@@ -8,9 +8,16 @@
                 <g-n-b-noti-item v-for="(item, idx) in items" :key="`${item.postId}-${idx}`"
                                  :title="item.title"
                                  :created-at="item.createdAt"
+                                 :is-read="true"
+                                 :writer="item.writer"
                                  @select="handleSelectNotice(item.postId)"
-                                 @delete="handleDeleteNotice(item.postId)"
                 />
+            </div>
+            <div class="view-all-button-wrapper">
+                <!--song-lang-->
+                <div class="view-all-button" @click="handleClickViewAllNotice">
+                    View all notice
+                </div>
             </div>
             <template #no-data>
                 <div class="no-data">
@@ -31,16 +38,16 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
-// import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-// import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PDataLoader,
 } from '@spaceone/design-system';
-// import dayjs from 'dayjs';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -49,6 +56,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 
 interface NoticeItem {
@@ -58,7 +66,8 @@ interface NoticeItem {
     writer: string;
 }
 
-// const NOTICE_ITEM_LIMIT = 15;
+const NOTICE_BOARD_NAME = 'Notice';
+const NOTICE_ITEM_LIMIT = 15;
 
 export default {
     name: 'GNBNoticeTab',
@@ -86,36 +95,38 @@ export default {
         });
 
         /* Util */
-        // const convertNoticeItem = (rawData: any[]) => {
-        //     const results: NoticeItem[] = [];
-        //     rawData.forEach((d) => {
-        //         const result: NoticeItem = {
-        //             postId: d.postId,
-        //             createdAt: d.created_at,
-        //             title: d.title,
-        //             writer: d.writer,
-        //         };
-        //         results.push(result);
-        //     });
-        //     return results;
-        // };
+        const convertNoticeItem = (rawData: any[]): NoticeItem[] => rawData.map(d => ({
+            postId: d.postId,
+            createdAt: d.created_at,
+            title: d.title,
+            writer: d.writer,
+        }));
 
         /* Api */
-        // const noticeApiHelper = new ApiQueryHelper()
-        //     .setPage(1, NOTICE_ITEM_LIMIT)
-        //     .setSort('created_at', true);
-        const listNotice = async () => {
-            state.loading = true;
+        const getNoticeBoardId = async (): Promise<undefined|string> => {
             try {
-                // const { results, total_count } = await SpaceConnector.client.board.board.list({
-                //     query: noticeApiHelper.data,
-                // });
-                // state.proxyCount = total_count;
-                // state.items = convertNoticeItem(results);
+                const { results } = await SpaceConnector.client.board.board.list({
+                    name: NOTICE_BOARD_NAME,
+                });
+                if (results.length) return results[0].board_id;
+                return undefined;
+            } catch (e) {
+                return undefined;
+            }
+        };
+        const noticeApiHelper = new ApiQueryHelper()
+            .setPage(1, NOTICE_ITEM_LIMIT)
+            .setSort('created_at', true);
+        const listNotice = async (boardId: string) => {
+            try {
+                const { results, total_count } = await SpaceConnector.client.board.post.list({
+                    board_id: boardId,
+                    query: noticeApiHelper.data,
+                });
+                state.proxyCount = total_count;
+                state.items = convertNoticeItem(results);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
-            } finally {
-                state.loading = false;
                 state.proxyCount = 0;
                 state.items = [];
             }
@@ -123,28 +134,33 @@ export default {
 
         /* Event */
         const handleSelectNotice = (postId: string) => {
-            console.log('select!', postId);
+            emit('close');
+            SpaceRouter.router.push({
+                name: MY_PAGE_ROUTE.INFO.NOTICE.DETAIL._NAME,
+                params: { id: postId },
+            }).catch(() => {});
         };
-        const handleDeleteNotice = (postId: string) => {
-            console.log('delete!', postId);
+        const handleClickViewAllNotice = () => {
+            emit('close');
+            SpaceRouter.router.push({ name: MY_PAGE_ROUTE.INFO.NOTICE._NAME }).catch(() => {});
         };
 
         /* Init */
         const init = async () => {
-            if (state.noticeItemsRef) state.noticeItemsRef.scrollTop = 0;
-            await listNotice();
+            state.loading = true;
+            const boardId = await getNoticeBoardId();
+            if (boardId) await listNotice(boardId);
+            state.loading = false;
         };
-
-        /* Watcher */
-        watch(() => props.visible, (visible) => {
-            if (visible) init();
-        });
+        (async () => {
+            await init();
+        })();
 
         return {
             ...toRefs(state),
             ADMINISTRATION_ROUTE,
             handleSelectNotice,
-            handleDeleteNotice,
+            handleClickViewAllNotice,
         };
     },
 };
@@ -162,6 +178,7 @@ export default {
         }
         .data-loader-container {
             .no-data-wrapper {
+                position: relative;
                 max-height: inherit;
             }
         }
@@ -169,7 +186,26 @@ export default {
     .content-wrapper {
         max-height: calc(100vh - $gnb-height - 1.5rem - 2.75rem);
         overflow-y: scroll;
-        padding: 0.25rem 0.5rem 0.5rem 0.5rem;
+        padding: 0.25rem 0.5rem 3.5rem 0.5rem;
+    }
+    .view-all-button-wrapper {
+        @apply border-t border-gray-200;
+        position: absolute;
+        bottom: 0;
+        height: 3rem;
+        width: 100%;
+        padding: 0.5rem;
+        .view-all-button {
+            display: flex;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            &:hover {
+                @apply bg-primary-4 text-primary rounded;
+            }
+        }
     }
     .no-data {
         text-align: center;
