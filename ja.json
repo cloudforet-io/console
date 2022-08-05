@@ -799,8 +799,7 @@
 			"NOTIFICATION": {
 				"ALT_E_LIST_NOTIFICATION": "通知の一覧表示に失敗",
 				"NO_NOTIFICATION": "通知がありません。",
-				"NO_NOTI_DESC_1": "通知を受け取ったら、",
-				"NO_NOTI_DESC_2": "ここに表示されます。",
+				"NO_NOTIFICATION_DESC": "通知を受け取ったら、ここに表示されます。",
 				"TITLE": "通知",
 				"TODAY": "今日",
 				"YESTERDAY": "昨日"
