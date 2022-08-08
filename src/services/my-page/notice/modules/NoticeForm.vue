@@ -1,17 +1,15 @@
 <template>
     <div class="notice-form">
         <p-pane-layout class="notice-form-wrapper">
-            <p-field-group class="notice-label-wrapper">
-                <!--            song-lang-->
-                <p-label>Author</p-label>
-                <p class="text-sm text-gray-900">
-                    <!--                    song-lang-->
-                    {{ hasSystemRole ? '시스템 운영자' : '도메인 관리자' }}
-                </p>
-            </p-field-group>
             <!--                song-lang-->
-            <p-field-group class="notice-label-wrapper" label="Writer Name" required>
-                <p-text-input v-model="writerNameState" class="" />
+            <p-field-group class="notice-label-wrapper writer-name-input" label="Writer Name" required>
+                <template #default="{invalid}">
+                    <!--                    song-lang-->
+                    <p-text-input :value="writerNameState" :invalid="invalid"
+                                  :placeholder="$store.state.user.name || 'Required'"
+                                  @input="setForm('writerNameState', $event)"
+                    />
+                </template>
             </p-field-group>
             <!--                song-lang-->
             <p-field-group v-if="hasSystemRole" class="notice-label-wrapper" label="Viewer"
@@ -27,11 +25,12 @@
                 </p-radio>
                 <br>
                 <!--                TODO:: add loading-->
+                <!--               song-lang -->
                 <p-search-dropdown class="mt-2 w-1/2"
-                                   multi-selectable
                                    :menu="domainList"
-                                   :selected="selectedDomainsState"
+                                   :selected="selectedDomainState"
                                    :disabled="isAllDomainSelectedState"
+                                   :placeholder="isAllDomainSelectedState ? 'All' : ''"
                                    @update:selected="handleSelectDomain"
                 />
             </p-field-group>
@@ -42,6 +41,7 @@
             >
                 <template #default="{invalid}">
                     <p-text-input :value="noticeTitleState" :invalid="invalid"
+                                  class="w-full"
                                   @input="setForm('noticeTitleState', $event)"
                     />
                 </template>
@@ -91,7 +91,7 @@ import {
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PPaneLayout, PLabel, PFieldGroup, PTextInput, PRadio, PSearchDropdown, PCheckBox, PButton,
+    PPaneLayout, PFieldGroup, PTextInput, PRadio, PSearchDropdown, PCheckBox, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -113,7 +113,6 @@ export default {
     components: {
         TextEditor,
         PPaneLayout,
-        PLabel,
         PFieldGroup,
         PTextInput,
         PRadio,
@@ -160,9 +159,21 @@ export default {
         },
     },
     setup(props) {
+        const state = reactive({
+            hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
+            userName: computed<string>(() => store.state.user.name),
+            isPinState: props.isPin ?? false,
+            isPopupState: props.isPopup ?? false,
+            contentState: props.content ?? '',
+            isAllDomainSelectedState: props.isAllDomainSelected ?? true,
+            domainList: [],
+            selectedDomainState: props.selectedDomains.length ? props.selectedDomains : [],
+        });
+
         const {
             forms: {
                 noticeTitleState,
+                writerNameState,
             },
             setForm,
             invalidState,
@@ -170,29 +181,19 @@ export default {
             isAllValid,
         } = useFormValidator({
             noticeTitleState: props.noticeTitle,
+            writerNameState: props.writerName || state.userName || '',
         }, {
             // song-lang
             noticeTitleState(value: string) { return value.trim().length ? '' : 'Title is required'; },
-        });
-
-        const state = reactive({
-            hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
-            writerNameState: props.writerName ?? '',
-            isPinState: props.isPin ?? false,
-            isPopupState: props.isPopup ?? false,
-            contentState: props.content ?? '',
-            isAllDomainSelectedState: props.isAllDomainSelected ?? true,
-            domainList: [],
-            selectedDomainsState: props.selectedDomains.length ? props.selectedDomains : [],
+            // song-lang
+            writerNameState(value: string) { return value.trim().length ? '' : 'Writer name is required'; },
         });
 
         const formData:ComputedRef = computed(() => ({
             // FIXME:: Below `board_id` is DUMMY
             board_id: props.boardId || 'board-14a09a71f504',
             title: noticeTitleState.value,
-            // TODO:: Ask for how to post `domainList` ?
-            // TODO:: Ask for `writer` as english
-            writer: `${state.hasSystemRole ? '시스템 관리자' : '도메인 관리자'} ${state.writerNameState}`,
+            writer: writerNameState.value,
             contents: state.contentState,
             options: {
                 is_pinned: state.isPinState,
@@ -232,9 +233,9 @@ export default {
         const handleClickAllDomainRadio = () => { state.isAllDomainSelectedState = true; };
         const handleClickSelectDomainRadio = () => { state.isAllDomainSelectedState = false; };
 
-        const handleSelectDomain = (domains) => {
+        const handleSelectDomain = (domain: Array<string>) => {
             if (!state.isAllDomainSelectedState) {
-                state.selectedDomainsState = domains;
+                state.selectedDomainState = domain;
             }
         };
 
@@ -259,7 +260,7 @@ export default {
         });
 
         watch(() => state.isAllDomainSelectedState, (isAllDomain) => {
-            if (isAllDomain) state.selectedDomainsState = [];
+            if (isAllDomain) state.selectedDomainState = [];
         });
 
         (async () => {
@@ -273,6 +274,7 @@ export default {
             handleClickSelectDomainRadio,
             handleSelectDomain,
             noticeTitleState,
+            writerNameState,
             setForm,
             invalidState,
             invalidTexts,
@@ -290,6 +292,14 @@ export default {
         @apply mb-4;
         .p-radio {
             @apply inline-flex gap-1;
+        }
+    }
+    .writer-name-input {
+        .p-text-input::v-deep {
+            @apply w-1/2;
+            .input-container {
+                @apply w-full;
+            }
         }
     }
     .notice-create-options-wrapper {
