@@ -24,16 +24,16 @@ import {
 } from '@vue/composition-api';
 
 import { PBadge, PI } from '@spaceone/design-system';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
-
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 
 import type { NoticeType } from '@/services/my-page/notice/config';
-import { NOTICE_TYPE } from '@/services/my-page/notice/config';
+import { getPostBadgeInfo } from '@/services/my-page/notice/helper';
+
 
 interface Props {
     title: string;
@@ -75,22 +75,7 @@ export default defineComponent<Props>({
     },
     setup(props) {
         const state = reactive({
-            // song-lang
-            noticeTypeBadge: computed(() => {
-                switch (props.noticeType) {
-                case NOTICE_TYPE.SYSTEM:
-                    return {
-                        label: i18n.t('시스템 공지'),
-                        style: 'primary',
-                    };
-                case NOTICE_TYPE.DOMAIN:
-                    return {
-                        label: i18n.t('내부 공지'),
-                        style: 'gray',
-                    };
-                default: return '';
-                }
-            }),
+            noticeTypeBadge: computed<{ label?: TranslateResult; style?: string }>(() => getPostBadgeInfo(props.noticeType)),
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
         });
         return {

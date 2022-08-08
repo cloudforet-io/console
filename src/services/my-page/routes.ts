@@ -116,7 +116,9 @@ const myPageRoutes: RouteConfig = {
                             path: ':id',
                             name: MY_PAGE_ROUTE.INFO.NOTICE.DETAIL._NAME,
                             // song-lang
-                            meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+                            meta: {
+                                lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION, label: ({ params }) => params.id, copiable: true,
+                            },
                             component: NoticeDetailPage as any,
                         },
                     ],
