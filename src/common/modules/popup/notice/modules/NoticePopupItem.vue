@@ -40,14 +40,20 @@
 <script lang="ts">
 import { reactive, toRefs } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PCheckBox, PBadge, PDivider,
 } from '@spaceone/design-system';
 
+
+import { store } from '@/store';
+
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 export default {
-    name: 'NoticePopup',
+    name: 'NoticePopupItem',
     components: {
         PButtonModal,
         PCheckBox,
@@ -84,7 +90,22 @@ export default {
             },
         });
 
-        const handleClose = () => { state.popupVisible = false; };
+        const handleClose = async () => {
+            state.popupVisible = false;
+            if (state.isDontShowChecked) {
+                try {
+                    await SpaceConnector.client.config.userConfig.set({
+                        user_id: store.state.user.userId,
+                        // name: `console:board:${BOARD_ID}:${POST_ID}`,
+                        data: {
+                            show_popup: state.isDontShowChecked,
+                        },
+                    });
+                } catch (e) {
+                    ErrorHandler.handleError(e);
+                }
+            }
+        };
 
         return {
             ...toRefs(state),
