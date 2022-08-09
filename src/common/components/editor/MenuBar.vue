@@ -84,11 +84,21 @@
                        :class="{ 'selected': editor.isActive('link') }"
                        @click="handleLinkClick"
         />
-        <!-- song-lang -->
-        <p-icon-button v-tooltip.bottom="'copy & paste, drag & drop 으로 이미지 추가 가능하다는 안내 메시지 들어와야 함. 보경님께서 아직 안주심..'"
-                       class="menu-button" style-type="transparent"
-                       name="ic_image"
-        />
+        <p-popover v-model="imagePopoverVisible" position="bottom">
+            <p-icon-button class="menu-button" style-type="transparent"
+                           name="ic_image" :class="{selected: imagePopoverVisible}"
+            />
+            <template #content>
+                <!-- song-lang -->
+                <div class="image-popover">
+                    <p>
+                        Copy&Paste or Drag&Drop images directly into body content.
+                    </p>
+                    <img src="@/assets/images/illust_insert-image.svg">
+                </div>
+            </template>
+        </p-popover>
+
         <p-icon-button class="menu-button" style-type="transparent" name="ic_editor-code"
                        :class="{ 'selected': editor.isActive('codeBlock') }"
                        :disabled="!editor.can().setCodeBlock()"
@@ -114,7 +124,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PDivider, PI, PIconButton, PSelectDropdown,
+    PDivider, PI, PIconButton, PPopover, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { Editor } from '@tiptap/vue-2';
 
@@ -147,6 +157,7 @@ export default defineComponent<Props>({
         PDivider,
         PSelectDropdown,
         PI,
+        PPopover,
     },
     props: {
         editor: {
@@ -184,6 +195,7 @@ export default defineComponent<Props>({
                 if (props.editor.isActive({ textAlign: 'justify' })) return 'justify';
                 return 'left';
             }),
+            imagePopoverVisible: false,
         });
 
         /* Event Handlers */
@@ -254,7 +266,7 @@ export default defineComponent<Props>({
         margin: 0.25rem 0.5rem;
     }
 
-    > .menu-button, .menu-dropdown {
+    .menu-button, .menu-dropdown {
         &:not(:first-of-type) {
             margin-left: 0.125rem;
         }
@@ -272,7 +284,7 @@ export default defineComponent<Props>({
     }
 
     /* custom design-system component - p-icon-button */
-    > .menu-button.p-icon-button::v-deep {
+    .menu-button.p-icon-button::v-deep {
         @apply rounded text-gray-900 outline-none;
 
         &.disabled {
@@ -291,7 +303,7 @@ export default defineComponent<Props>({
     }
 
     /* custom design-system component - p-select-dropdown */
-    > .menu-dropdown.p-select-dropdown:not(.invalid):not(.disabled):not(.read-only).transparent::v-deep {
+    .menu-dropdown.p-select-dropdown:not(.invalid):not(.disabled):not(.read-only).transparent::v-deep {
         > .dropdown-button {
             @apply rounded text-gray-900 outline-none;
             padding-left: 0.5rem;
@@ -308,6 +320,17 @@ export default defineComponent<Props>({
         }
         &.active > .dropdown-button {
             @apply bg-gray-700 text-white outline-none;
+        }
+    }
+
+    .image-popover {
+        > p {
+            line-height: 1.5;
+            font-size: 0.875rem;
+        }
+        > img {
+            margin-top: 0.75rem;
+            width: 100%;
         }
     }
 }
