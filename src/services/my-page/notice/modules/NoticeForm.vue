@@ -106,6 +106,11 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 
+interface DomainItem {
+    name: string;
+    label: string;
+}
+
 type noticeFormType = 'CREATE' | 'EDIT';
 
 export default {
@@ -122,8 +127,8 @@ export default {
     },
     props: {
         boardId: {
-            default: '',
-            type: String,
+            default: () => ([]),
+            type: Array,
         },
         type: {
             default: 'CREATE',
@@ -166,7 +171,8 @@ export default {
             isPopupState: props.isPopup ?? false,
             contentState: props.content ?? '',
             isAllDomainSelectedState: props.isAllDomainSelected ?? true,
-            domainList: [],
+            domainList: [] as Array<DomainItem>,
+            boardIdList: props.boardId as Array<string>,
             selectedDomainState: props.selectedDomains.length ? props.selectedDomains : [],
         });
 
@@ -190,8 +196,7 @@ export default {
         });
 
         const formData:ComputedRef = computed(() => ({
-            // FIXME:: Below `board_id` is DUMMY
-            board_id: props.boardId || 'board-14a09a71f504',
+            board_id: state.boardIdList,
             title: noticeTitleState.value,
             writer: writerNameState.value,
             contents: state.contentState,
@@ -252,6 +257,19 @@ export default {
             }
         };
 
+        const getBoardList = async () => {
+            try {
+                const { results } = await SpaceConnector.client.board.board.list({
+                    domain_id: state.domainList.length ? state.domainList.map(d => d.name)
+                        : store.state.domain.domainId,
+                });
+                state.boardIdList = results.map(d => d.board_id);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.boardIdList = [];
+            }
+        };
+
         // TODO: api binding. must return Promise<string>
         const uploadImage = (): Promise<string> => new Promise((resolve) => {
             setTimeout(() => {
@@ -265,6 +283,7 @@ export default {
 
         (async () => {
             if (state.hasSystemRole) await getDomainList();
+            await getBoardList();
         })();
 
         return {
