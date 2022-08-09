@@ -21,7 +21,7 @@ import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import NoticePopupItem from '@/common/modules/popup/notice/modules/NoticePopupItem.vue';
 
-import type { NoticePostModel } from '@/services/my-page/notice/type';
+import type { NoticePostModel } from '@/services/info/notice/type';
 
 
 export default {

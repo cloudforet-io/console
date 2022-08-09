@@ -52,7 +52,8 @@ import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { NoticePostModel } from '@/services/my-page/notice/type';
+import type { NoticePostModel } from '@/services/info/notice/type';
+
 
 export default {
     name: 'NoticePopupItem',
