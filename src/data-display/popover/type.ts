@@ -1,4 +1,4 @@
-export const POPOVER_PLACEMENT = Object.freeze({
+export const POPOVER_PLACEMENT = {
     BOTTOM_START: 'bottom-start',
     BOTTOM_END: 'bottom-end',
     BOTTOM: 'bottom',
@@ -11,14 +11,14 @@ export const POPOVER_PLACEMENT = Object.freeze({
     RIGHT_START: 'right-start',
     RIGHT_END: 'right-end',
     RIGHT: 'right',
-} as const);
+} as const;
 
-export type POPOVER_PLACEMENT = typeof POPOVER_PLACEMENT[keyof typeof POPOVER_PLACEMENT];
+export type PopoverPlacement = typeof POPOVER_PLACEMENT[keyof typeof POPOVER_PLACEMENT];
 
-export const POPOVER_TRIGGER = Object.freeze({
+export const POPOVER_TRIGGER = {
     CLICK: 'click',
     HOVER: 'hover',
     FOCUS: 'focus',
-} as const);
+} as const;
 
-export type POPOVER_TRIGGER = typeof POPOVER_TRIGGER[keyof typeof POPOVER_TRIGGER];
+export type PopoverTrigger = typeof POPOVER_TRIGGER[keyof typeof POPOVER_TRIGGER];

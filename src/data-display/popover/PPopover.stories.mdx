@@ -22,7 +22,7 @@ export const Template = (args, { argTypes }) => ({
             <p-popover :position="_position" :isVisible="_isVisible"
                        :ignore-target-click="ignoreTargetClick" :trigger="trigger">
                 <div v-if="defaultSlot" v-html="defaultSlot" />
-                <p-button v-else style-type="primary" :outline="true" @click="onClick">default</p-button>
+                <p-button v-else style-type="primary" :outline="true" @click="handleClick">default</p-button>
                 <template #content>
                     <div v-if="contentRefSlot" v-html="contentRefSlot" />
                     <div v-else>
@@ -38,28 +38,28 @@ export const Template = (args, { argTypes }) => ({
             _isVisible: props.isVisible,
             defautlContentValue: faker.lorem.sentence(10),
         })
-        const onClick = () => {
+        const handleClick = () => {
             alert('default slot clicked')
         }
         return {
             ...toRefs(state),
-            onClick,
+            handleClick,
         }
     }
 });
 
 
-# PPopover
+# Popover
 <br/>
 <br/>
 
-## Trigger
+## Basic
 
 <br/>
 <br/>
 
 <Canvas>
-    <Story name="Trigger">
+    <Story name="Basic">
         {{
             components: { PPopover, PTextInput, PButton },
             template: `

@@ -9,7 +9,7 @@
         >
             <slot />
         </span>
-        <div ref="contentRef" class="popper" :class="{ 'visible': isVisible }">
+        <div ref="contentRef" class="popper" :class="{ 'visible': proxyIsVisible }">
             <div class="popper-content-wrapper">
                 <slot name="content" />
                 <p-icon-button name="ic_delete" color="inherit" size="sm"
@@ -22,27 +22,30 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
+    defineComponent,
     onMounted, onUnmounted, reactive, toRefs,
 } from '@vue/composition-api';
-import type { PropType } from 'vue';
 
 import type { Instance } from '@popperjs/core';
 import { createPopper } from '@popperjs/core';
 import vClickOutside from 'v-click-outside';
 
+import type { PopoverPlacement, PopoverTrigger } from '@/data-display/popover/type';
 import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type';
+import { useProxyValue } from '@/hooks';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
 interface PopoverProps {
-    tag: string;
-    position: POPOVER_PLACEMENT;
     isVisible: boolean;
-    trigger: POPOVER_TRIGGER;
+    tag: string;
+    position?: PopoverPlacement;
+    trigger?: PopoverTrigger;
     ignoreTargetClick: boolean;
 }
 
-export default {
+export default defineComponent<PopoverProps>({
     name: 'PPopover',
     components: {
         PIconButton,
@@ -50,23 +53,31 @@ export default {
     directives: {
         clickOutside: vClickOutside.directive,
     },
+    model: {
+        prop: 'isVisible',
+        event: 'update:isVisible',
+    },
     props: {
+        isVisible: {
+            type: Boolean,
+            default: false,
+        },
         tag: {
             type: String,
             default: 'span',
         },
         position: {
-            type: String as PropType<POPOVER_PLACEMENT>,
-            validator(value) {
-                if (value === undefined) return POPOVER_PLACEMENT.BOTTOM_END;
+            type: String as PropType<PopoverPlacement>,
+            validator(value?: PopoverPlacement) {
+                if (value === undefined) return true;
                 return Object.values(POPOVER_PLACEMENT).includes(value);
             },
             default: POPOVER_PLACEMENT.BOTTOM_END,
         },
         trigger: {
-            type: String as PropType<POPOVER_TRIGGER>,
-            validator(value) {
-                if (value === undefined) return POPOVER_TRIGGER.CLICK;
+            type: String as PropType<PopoverTrigger>,
+            validator(value?: PopoverTrigger) {
+                if (value === undefined) return true;
                 return Object.values(POPOVER_TRIGGER).includes(value);
             },
             default: POPOVER_TRIGGER.CLICK,
@@ -76,15 +87,15 @@ export default {
             default: true,
         },
     },
-    setup(props: PopoverProps) {
+    setup(props, { emit }) {
         const state = reactive({
-            isVisible: false,
+            proxyIsVisible: useProxyValue('isVisible', props, emit),
             contentRef: null as null|HTMLElement,
             targetRef: null as null|HTMLElement,
             popperObject: {} as Instance,
         });
         const hidePopover = () => {
-            state.isVisible = false;
+            state.proxyIsVisible = false;
             return state.contentRef?.removeAttribute('data-show');
         };
         const showPopover = () => {
@@ -94,7 +105,7 @@ export default {
             return state.popperObject?.setOptions({ placement: props.position });
         };
         const handleClickTargetRef = (e) => {
-            state.isVisible = !state.isVisible;
+            state.proxyIsVisible = !state.proxyIsVisible;
             if (props.ignoreTargetClick) e.stopPropagation();
             return state.popperObject?.setOptions({ placement: props.position });
         };
@@ -136,6 +147,7 @@ export default {
         });
 
         onUnmounted(() => state.popperObject?.destroy());
+
         return {
             ...toRefs(state),
             handleClickTargetRef,
@@ -143,13 +155,13 @@ export default {
             handleClickDeleteIcon,
         };
     },
-};
+});
 
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 .p-popover {
-    .popper {
+    > .popper {
         @apply bg-white border rounded-md border-gray-300 py-3 pl-4 pr-2;
         display: none;
         filter: drop-shadow(0 0 0.5rem rgba(0, 0, 0, 0.08));
@@ -158,7 +170,7 @@ export default {
         &[data-show] {
             display: block;
         }
-        .popper-content-wrapper {
+        > .popper-content-wrapper {
             @apply flex w-full;
 
             .delete-icon {
@@ -166,8 +178,8 @@ export default {
             }
         }
 
-        .arrow,
-        .arrow::before {
+        > .arrow,
+        > .arrow::before {
             @apply border-gray-300 border;
             position: absolute;
             width: 1rem;
@@ -175,11 +187,11 @@ export default {
             background: inherit;
         }
 
-        .arrow {
+        > .arrow {
             visibility: hidden;
         }
 
-        .arrow::before {
+        > .arrow::before {
             visibility: visible;
             content: '';
             transform: rotate(45deg);
@@ -227,7 +239,7 @@ export default {
     }
 
     @screen mobile {
-        .popper {
+        > .popper {
             max-width: 17rem;
         }
     }
