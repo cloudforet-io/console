@@ -4,6 +4,43 @@ import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type'
 
 export const getPopoverArgTypes = () => {
     const argTypes: ArgTypes = {
+        // props
+        isVisible: {
+            name: 'isVisible',
+            type: { name: 'boolean' },
+            description: 'Whether to show popover or not. support two way binding with `sync`.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
+        tag: {
+            name: 'tag',
+            type: { name: 'string' },
+            description: 'root element tag',
+            defaultValue: 'span',
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'span',
+                },
+            },
+            control: {
+                type: 'text',
+            },
+        },
         position: {
             name: 'position',
             type: { name: 'string' },
@@ -62,6 +99,24 @@ export const getPopoverArgTypes = () => {
                 type: 'boolean',
             },
         },
+        // model
+        'v-model': {
+            name: 'v-model',
+            type: { name: 'boolean', required: false },
+            description: 'Two way binding for `isVisible` props with `update:isVisible` event.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'model',
+                defaultValue: {
+                    summary: null,
+                },
+            },
+            control: null,
+        },
+        // slots
         defaultSlot: {
             name: 'default',
             description: 'Slot of components to which popover will be applied.',
@@ -93,6 +148,67 @@ export const getPopoverArgTypes = () => {
             },
             control: {
                 type: 'text',
+            },
+        },
+        // events
+        onClick: {
+            name: 'click',
+            description: 'Emitted when the trigger is clicked.',
+            table: {
+                type: {
+                    summary: null,
+                },
+                category: 'events',
+            },
+        },
+        onMouseenter: {
+            name: 'mouseenter',
+            description: 'Emitted when the mouse is entered to the trigger.',
+            table: {
+                type: {
+                    summary: null,
+                },
+                category: 'events',
+            },
+        },
+        onMouseleave: {
+            name: 'mouseleave',
+            description: 'Emitted when the mouse is leaved from the trigger.',
+            table: {
+                type: {
+                    summary: null,
+                },
+                category: 'events',
+            },
+        },
+        onFocus: {
+            name: 'focus',
+            description: 'Emitted when the trigger is focused.',
+            table: {
+                type: {
+                    summary: null,
+                },
+                category: 'events',
+            },
+        },
+        onBlur: {
+            name: 'blur',
+            description: 'Emitted when the trigger is blurred.',
+            table: {
+                type: {
+                    summary: null,
+                },
+                category: 'events',
+            },
+        },
+        'onUpdate:isVisible': {
+            name: 'update:is-visible',
+            description: 'Emitted when the popover visibility is updated. Event parameter - `visible: boolean`',
+            table: {
+                type: {
+                    summary: null,
+                },
+                category: 'events',
             },
         },
     };
