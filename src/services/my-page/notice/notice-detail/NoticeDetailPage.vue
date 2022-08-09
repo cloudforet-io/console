@@ -34,6 +34,32 @@
                 <text-editor-viewer :contents="contents" />
             </p-data-loader>
         </p-pane-layout>
+        <p-pane-layout class="post-router">
+            <div class="post-router-item">
+                <list-item class="" :title="nextNoticePost.title"
+                           post-direction="next"
+                           :notice-type="nextNoticePost.scope"
+                           :is-pinned="nextNoticePost.options.is_pinned"
+                />
+            </div>
+            <p-divider />
+            <div class="post-router-item">
+                <list-item class="" :title="nextNoticePost.title"
+                           post-direction="prev"
+                           :notice-type="nextNoticePost.scope"
+                           :is-pinned="nextNoticePost.options.is_pinned"
+                />
+            </div>
+        </p-pane-layout>
+        <section class="back-to-list-button-section">
+            <p-button class="back-to-list-button" :outline="true"
+                      style-type="gray-border"
+                      @click="handleBackToListButtonClick"
+            >
+                <!-- song-lang-->
+                {{ $t('Back to List') }}
+            </p-button>
+        </section>
     </section>
 </template>
 
@@ -48,12 +74,15 @@ import {
 } from '@spaceone/design-system';
 import type { TranslateResult } from 'vue-i18n';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 
 import { getPostBadgeInfo } from '@/services/my-page/notice/helper';
+import ListItem from '@/services/my-page/notice/modules/list-item/ListItem.vue';
 import type { NoticePostModel } from '@/services/my-page/notice/type';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 
 export default {
@@ -67,6 +96,7 @@ export default {
         PDivider,
         PPageTitle,
         PButton,
+        ListItem,
     },
     setup() {
         const state = reactive({
@@ -90,6 +120,34 @@ export default {
                 created_at: '2022-08-05T10:53:04.918Z',
                 updated_at: '2022-08-05T10:53:04.918Z',
             } as NoticePostModel|unknown,
+            prevNoticePost: {
+                board_id: 'board-14a09a71f504',
+                post_id: 'post-d4e6373b3c3f',
+                title: '[작업 공지] 시스템 안정화를 위해 작업을 진행합니다.',
+                contents: '',
+                view_count: 1,
+                writer: 'sulmo',
+                scope: 'DOMAIN',
+                created_at: '2022-08-05T10:53:04.918Z',
+                updated_at: '2022-08-05T10:53:04.918Z',
+                options: {
+                    is_pinned: true,
+                },
+            },
+            nextNoticePost: {
+                board_id: 'board-14a09a71f504',
+                post_id: 'post-d4e6373b3c3f',
+                title: '[작업 공지] 시스템 안정화를 위해 작업을 진행합니다.',
+                contents: '',
+                view_count: 1,
+                writer: 'sulmo',
+                scope: 'DOMAIN',
+                created_at: '2022-08-05T10:53:04.918Z',
+                updated_at: '2022-08-05T10:53:04.918Z',
+                options: {
+                    is_pinned: true,
+                },
+            },
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
             noticeTypeBadgeInfo: computed<{ label?: TranslateResult; style?: string }>(() => getPostBadgeInfo(state.noticePostData?.scope)),
             // eslint-disable-next-line max-len
@@ -98,6 +156,10 @@ export default {
 
         const getNoticePostData = async () => {};
 
+        const handleBackToListButtonClick = () => {
+            SpaceRouter.router.push({ name: MY_PAGE_ROUTE.INFO.NOTICE._NAME });
+        };
+
         (async () => {
             state.loading = true;
             await getNoticePostData();
@@ -105,6 +167,7 @@ export default {
         })();
         return {
             ...toRefs(state),
+            handleBackToListButtonClick,
         };
     },
 };
@@ -126,6 +189,21 @@ export default {
             @apply flex items-center;
             gap: 0.125rem;
         }
+    }
+}
+
+.post-router {
+    margin-top: 1.5rem;
+    .post-router-item {
+        margin: 0.5rem 0;
+    }
+}
+
+.back-to-list-button-section {
+    text-align: center;
+    margin-top: 1.5rem;
+    .back-to-list-button {
+        width: 10.9375rem;
     }
 }
 </style>

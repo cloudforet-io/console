@@ -1,20 +1,30 @@
 <template>
-    <li class="list-item">
-        <div class="title">
-            <p-i v-if="isPinned" class="pin" name="ic_pin"
-                 width="1.125rem"
-            />
-            <text-highlighting class="title" :term="inputText" :text="title" />
-            <new-mark v-if="isNew" class="new-mark" />
+    <component :is="postDirection ? 'div' : 'li'" class="list-item">
+        <!-- song-lang -->
+        <div v-if="postDirection" class="post-direction">
+            <span>{{ postDirectionLabel }}</span><p-i name="ic_arrow-top-alt" width="1rem" />
         </div>
-        <div class="info">
-            <p-badge outline :style-type="noticeTypeBadge.style">
-                {{ noticeTypeBadge.label }}
-            </p-badge><span>date</span><p-i width="0.125rem" name="ic_divider-dot" />
-            <span>writer</span><p-i v-if="hasDomainRoleUser" width="0.125rem" name="ic_divider-dot" />
-            <span v-if="hasDomainRoleUser" class="view-count"><p-i name="ic_view" width="1.125rem" /> 1,234</span>
+        <div v-if="isPostExist">
+            <div class="title">
+                <p-i v-if="isPinned" class="pin" name="ic_pin"
+                     width="1.125rem"
+                />
+                <text-highlighting class="title" :term="inputText" :text="title" />
+                <new-mark v-if="isNew" class="new-mark" />
+            </div>
+            <div class="info">
+                <p-badge outline :style-type="noticeTypeBadge.style">
+                    {{ noticeTypeBadge.label }}
+                </p-badge><span>date</span><p-i width="0.125rem" name="ic_divider-dot" />
+                <span>writer</span><p-i v-if="hasDomainRoleUser" width="0.125rem" name="ic_divider-dot" />
+                <span v-if="hasDomainRoleUser" class="view-count"><p-i name="ic_view" width="1.125rem" /> 1,234</span>
+            </div>
         </div>
-    </li>
+        <div v-else class="not-exist-item">
+            <!-- song-lang -->
+            {{ $t('다음 게시물이 없습니다. Next notice does not exist.') }}
+        </div>
+    </component>
 </template>
 
 <script lang="ts">
@@ -27,6 +37,7 @@ import { PBadge, PI } from '@spaceone/design-system';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
@@ -41,6 +52,7 @@ interface Props {
     inputText: string;
     isNew: boolean;
     isPinned: boolean;
+    postDirection: 'prev' | 'next' | undefined;
 }
 
 export default defineComponent<Props>({
@@ -72,11 +84,21 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
+        isPostExist: {
+            type: Boolean,
+            default: true,
+        },
+        postDirection: {
+            type: String as PropType<'prev' | 'next' | undefined>,
+            default: undefined,
+        },
     },
     setup(props) {
         const state = reactive({
             noticeTypeBadge: computed<{ label?: TranslateResult; style?: string }>(() => getPostBadgeInfo(props.noticeType)),
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
+            // song-lang
+            postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? i18n.t('Prev') : i18n.t('Next'))),
         });
         return {
             ...toRefs(state),
@@ -87,7 +109,7 @@ export default defineComponent<Props>({
 
 <style scoped lang="postcss">
 .list-item {
-    @apply border-b border-gray-200;
+    @apply border-b border-gray-200 flex;
     padding: 1rem;
 
     @media (hover: hover) {
@@ -96,33 +118,50 @@ export default defineComponent<Props>({
             cursor: pointer;
         }
     }
-}
-.list-item:last-child {
-    @apply border-b-0;
-}
-.title {
-    margin-bottom: 0.375rem;
-    vertical-align: baseline;
-    .pin {
-        margin-right: 0.125rem;
-        margin-bottom: 0.1875rem;
-    }
+
     .title {
-        @apply text-gray-900 font-bold;
+        margin-bottom: 0.375rem;
+        vertical-align: baseline;
+        .pin {
+            margin-right: 0.125rem;
+            margin-bottom: 0.1875rem;
+        }
+        .title {
+            @apply text-gray-900 font-bold;
+            line-height: 1.25;
+        }
+        .new-mark {
+            display: inline-block;
+            margin-top: 0.1875rem;
+        }
+    }
+    .info {
+        @apply flex flex-wrap gap-2 items-center text-gray-600;
+        font-size: 0.875rem;
+        line-height: 1.25;
+        .view-count {
+            @apply flex items-center;
+            gap: 0.125rem;
+        }
+    }
+
+    .not-exist-item {
+        @apply text-gray-300;
+        font-weight: 700;
+        font-size: 0.875rem;
+        padding: 0.8125rem 0;
         line-height: 1.25;
     }
-    .new-mark {
-        display: inline-block;
-        margin-top: 0.1875rem;
+
+    .post-direction {
+        @apply flex items-center text-gray-700;
+        font-size: 0.75rem;
+        line-height: 1.25;
+        padding: 1rem;
     }
 }
-.info {
-    @apply flex flex-wrap gap-2 items-center text-gray-600;
-    font-size: 0.875rem;
-    line-height: 1.25;
-    .view-count {
-        @apply flex items-center;
-        gap: 0.125rem;
-    }
+
+.list-item:last-child {
+    @apply border-b-0;
 }
 </style>
