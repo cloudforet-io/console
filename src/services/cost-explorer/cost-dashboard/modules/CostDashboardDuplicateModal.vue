@@ -190,7 +190,7 @@ export default defineComponent<Props>({
         };
 
         const init = () => {
-            initForm('name', `CLONE - ${props.dashboard.name}`);
+            initForm('name', `Copy - ${props.dashboard.name}`);
             initForm('visibility', '');
         };
 

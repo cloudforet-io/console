@@ -69,7 +69,7 @@ export default {
         };
 
         const makeDashboardCreateParam = async (): Promise<DashboardCreateParam> => ({
-            name: 'Untitled Dashboard',
+            name: state.selectedTemplate?.name?.toString() ?? 'Untitled Dashboard',
             custom_layouts: await getCustomLayouts(),
             period_type: state.selectedTemplate.period_type as PeriodType ?? PERIOD_TYPE.AUTO,
             period: state.selectedTemplate.period as Period,
