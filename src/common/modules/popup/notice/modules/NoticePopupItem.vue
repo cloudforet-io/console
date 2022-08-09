@@ -11,21 +11,21 @@
     >
         <template #body>
             <h1 class="notice-popup-title">
-                {{ noticeItem.notice_title }}
+                {{ item.title }}
             </h1>
             <div class="notice-popup-info">
                 <p-badge outline>
-                    {{ noticeItem.notice_type }}
+                    {{ item.scope }}
                 </p-badge>
-                <span class="notice-popup-author">{{ noticeItem.created_at }} · {{ noticeItem.author_type }}</span>
+                <span class="notice-popup-author">{{ item.updated_at }} · {{ item.writer }}</span>
             </div>
             <p-divider class="my-4" />
             <p class="notice-popup-contents">
-                {{ noticeItem.contents }}
+                {{ item.contents }}
             </p>
         </template>
         <template #footer-extra>
-            <p-check-box v-model="isDontShowChecked">
+            <p-check-box v-model="neverShowPopup">
                 <!--            song-lang-->
                 Don't show me again
             </p-check-box>
@@ -38,6 +38,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import { reactive, toRefs } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -45,12 +46,13 @@ import {
     PButtonModal, PCheckBox, PBadge, PDivider,
 } from '@spaceone/design-system';
 
-
 import { store } from '@/store';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import type { NoticePostModel } from '@/services/my-page/notice/type';
 
 export default {
     name: 'NoticePopupItem',
@@ -65,40 +67,26 @@ export default {
             type: Number,
             default: undefined,
         },
+        item: {
+            type: Object as PropType<NoticePostModel>,
+            default: undefined,
+        },
     },
-    setup() {
+    setup(props) {
         const state = reactive({
             popupVisible: true,
-            isDontShowChecked: false,
-            // below is dummy
-            noticeItem: {
-                notice_title: '[SpaceONE 작업 공지] SpaceONE 네트워크 작업 안내',
-                notice_type: 'System Notice',
-                created_at: '2022-01-01 12:14:16',
-                author_type: 'SpaceONE SYSTEM',
-                contents: '안녕하세요 SpaceONE 서비스 관리자 입니다.\n'
-                    + '금일 아래의 일정으로, 서비스 안정성 향상을 위한 네트워크 작업을 진행 하오니 서비스 이용에 참고 부탁 드리겠습니다.\n'
-                    + '\n'
-                    + '작업 내역은 아래와 같습니다.\n'
-                    + '\n'
-                    + '- 일시 : 2022.01.12 19:00 ~ 2022.01.12 23:00(KST)\n'
-                    + '- 작업 내용 : SpaceONE Console 서비스 방화벽 작업\n'
-                    + '- 서비스 영향도 : 작업 시간내 간헐적 SpaceONE Console 접속 끊김\n'
-                    + '\n'
-                    + '작업을 통해 편리하고 안정적인 SpaceONE 이용이 될 수 있도록 최선을 다하겠습니다.\n'
-                    + '감사합니다.',
-            },
+            neverShowPopup: false,
         });
 
         const handleClose = async () => {
             state.popupVisible = false;
-            if (state.isDontShowChecked) {
+            if (state.neverShowPopup) {
                 try {
                     await SpaceConnector.client.config.userConfig.set({
                         user_id: store.state.user.userId,
-                        // name: `console:board:${BOARD_ID}:${POST_ID}`,
+                        name: `console:board:${props.item.board_id}:${props.item.post_id}`,
                         data: {
-                            show_popup: state.isDontShowChecked,
+                            show_popup: false,
                         },
                     });
                 } catch (e) {
