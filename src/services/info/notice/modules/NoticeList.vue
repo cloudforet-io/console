@@ -46,9 +46,9 @@ import {
 
 import { SpaceRouter } from '@/router';
 
-import { NOTICE_TYPE } from '@/services/my-page/notice/config';
-import ListItem from '@/services/my-page/notice/modules/list-item/ListItem.vue';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import { NOTICE_TYPE } from '@/services/info/notice/config';
+import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
+import { INFO_ROUTE } from '@/services/info/route-config';
 
 interface Props {
     noticeItems: any[];
@@ -96,7 +96,7 @@ export default defineComponent<Props>({
         });
 
         const handleClickNotice = (id: string) => {
-            SpaceRouter.router.push({ name: MY_PAGE_ROUTE.INFO.NOTICE.DETAIL._NAME, params: { id } });
+            SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE.DETAIL._NAME, params: { id } });
         };
 
         return {

@@ -56,7 +56,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import { INFO_ROUTE } from '@/services/info/route-config';
 
 
 interface NoticeItem {
@@ -136,13 +136,13 @@ export default {
         const handleSelectNotice = (postId: string) => {
             emit('close');
             SpaceRouter.router.push({
-                name: MY_PAGE_ROUTE.INFO.NOTICE.DETAIL._NAME,
+                name: INFO_ROUTE.NOTICE.DETAIL._NAME,
                 params: { id: postId },
             }).catch(() => {});
         };
         const handleClickViewAllNotice = () => {
             emit('close');
-            SpaceRouter.router.push({ name: MY_PAGE_ROUTE.INFO.NOTICE._NAME }).catch(() => {});
+            SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME }).catch(() => {});
         };
 
         /* Init */

@@ -26,8 +26,9 @@ import {
 
 import { SpaceRouter } from '@/router';
 
-import { NOTICE_TYPE } from '@/services/my-page/notice/config';
-import NoticeList from '@/services/my-page/notice/modules/NoticeList.vue';
+import { NOTICE_TYPE } from '@/services/info/notice/config';
+import NoticeList from '@/services/info/notice/modules/NoticeList.vue';
+import { INFO_ROUTE } from '@/services/info/route-config';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 export default {
@@ -67,7 +68,7 @@ export default {
         });
 
         const handleCreateNotice = () => {
-            SpaceRouter.router.push({ name: MY_PAGE_ROUTE.INFO.NOTICE.CREATE._NAME });
+            SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE.CREATE._NAME });
         };
 
         return {

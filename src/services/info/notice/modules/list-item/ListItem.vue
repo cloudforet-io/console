@@ -42,8 +42,8 @@ import { i18n } from '@/translations';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 
-import type { NoticeType } from '@/services/my-page/notice/config';
-import { getPostBadgeInfo } from '@/services/my-page/notice/helper';
+import type { NoticeType } from '@/services/info/notice/config';
+import { getPostBadgeInfo } from '@/services/info/notice/helper';
 
 
 interface Props {

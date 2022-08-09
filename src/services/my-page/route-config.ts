@@ -13,12 +13,12 @@ export const MY_PAGE_ROUTE = Object.freeze({
         },
     },
     INFO: {
-        _NAME: MENU_ID.MY_PAGE_INFO,
+        _NAME: MENU_ID.INFO,
         NOTICE: {
-            _NAME: MENU_ID.MY_PAGE_NOTICE,
-            CREATE: { _NAME: `${MENU_ID.MY_PAGE_NOTICE}.create` },
-            UPDATE: { _NAME: `${MENU_ID.MY_PAGE_NOTICE}.update` },
-            DETAIL: { _NAME: `${MENU_ID.MY_PAGE_NOTICE}.detail` },
+            _NAME: MENU_ID.INFO_NOTICE,
+            CREATE: { _NAME: `${MENU_ID.INFO_NOTICE}.create` },
+            UPDATE: { _NAME: `${MENU_ID.INFO_NOTICE}.update` },
+            DETAIL: { _NAME: `${MENU_ID.INFO_NOTICE}.detail` },
         },
     },
 });

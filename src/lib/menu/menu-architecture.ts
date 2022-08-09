@@ -54,9 +54,9 @@ export const MENU_LIST: Menu[] = [
                 ],
             },
             {
-                id: MENU_ID.MY_PAGE_INFO,
+                id: MENU_ID.INFO,
                 subMenuList: [
-                    { id: MENU_ID.MY_PAGE_NOTICE },
+                    { id: MENU_ID.INFO_NOTICE },
                 ],
             },
         ],

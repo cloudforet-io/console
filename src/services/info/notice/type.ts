@@ -1,6 +1,6 @@
 import type { TimeStamp } from '@/models';
 
-import type { NoticeType } from '@/services/my-page/notice/config';
+import type { NoticeType } from '@/services/info/notice/config';
 
 export interface NoticePostModel {
     board_id: string;

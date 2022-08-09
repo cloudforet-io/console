@@ -21,10 +21,10 @@
                         @hide="hideMenu"
             />
         </div>
-        <right-side-menu class="right-part"
-                         :opened-menu="openedMenu"
-                         @toggle-menu="toggleMenu"
-                         @hide-menu="hideMenu"
+        <g-n-b-toolset class="right-part"
+                       :opened-menu="openedMenu"
+                       @toggle-menu="toggleMenu"
+                       @hide-menu="hideMenu"
         />
     </div>
 </template>
@@ -45,7 +45,7 @@ import type { GNBMenu as GNBMenuType } from '@/store/modules/display/type';
 
 import GNBMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBMenu.vue';
 import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';
-import RightSideMenu from '@/common/modules/navigations/gnb/modules/RightSideMenu.vue';
+import GNBToolset from '@/common/modules/navigations/gnb/modules/GNBToolset.vue';
 import SiteMap from '@/common/modules/navigations/gnb/modules/SiteMap.vue';
 
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
@@ -59,7 +59,7 @@ export default {
         GNBLogo,
         GNBMenu,
         SiteMap,
-        RightSideMenu,
+        GNBToolset,
     },
     directives: {
         clickOutside: vClickOutside.directive,

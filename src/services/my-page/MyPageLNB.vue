@@ -87,18 +87,6 @@ export default defineComponent({
                         to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME },
                         isBeta: true,
                     },
-                    {
-                        type: 'title',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_INFO].translationId),
-                        id: MENU_ID.MY_PAGE_INFO,
-                        foldable: false,
-                    },
-                    {
-                        type: 'item',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_NOTICE].translationId),
-                        id: MENU_ID.MY_PAGE_NOTICE,
-                        to: { name: MY_PAGE_ROUTE.INFO.NOTICE._NAME },
-                    },
                 ];
                 return filterLNBMenuByPermission(allLnbMenu, store.getters['user/pagePermissionList']);
             }),

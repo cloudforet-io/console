@@ -14,10 +14,6 @@ const UserAccountPage = () => import(/* webpackChunkName: "UserAccountPage" */ '
 const UserAPIKeyPage = () => import(/* webpackChunkName: "UserAPIKeyPage" */ '@/services/my-page/my-account/user-api-key/UserAPIKeyPage.vue');
 const UserNotificationPage = () => import(/* webpackChunkName: "UserNotificationPage" */ '@/services/my-page/my-account/user-notification/UserNotificationPage.vue');
 const NotificationAddPage = () => import(/* webpackChunkName: "NotificationAddPage" */ '@/services/notification/notification-add/NotificationAddPage.vue');
-const NoticePage = () => import(/* webpackChunkName: "NoticePage" */ '@/services/my-page/notice/NoticePage.vue');
-const NoticeDetailPage = () => import(/* webpackChunkName: "NoticeDetailPage" */ '@/services/my-page/notice/notice-detail/NoticeDetailPage.vue');
-const NoticeCreatePage = () => import(/* webpackChunkName: "NoticeCreatePage" */ '@/services/my-page/notice/notice-create/NoticeCreatePage.vue');
-const NoticeUpdatePage = () => import(/* webpackChunkName: "NoticeUpdatePage" */ '@/services/my-page/notice/notice-update/NoticeUpdatePage.vue');
 
 // eslint-disable-next-line max-len
 // const ManageUserNotificationPage = () => import(/* webpackChunkName: "ManageUserNotificationPage" */ '@/services/administration/iam/user/manage-user-notification/ManageUserNotificationPage.vue');
@@ -72,54 +68,6 @@ const myPageRoutes: RouteConfig = {
                             meta: { translationId: 'MY_PAGE.NOTIFICATION.ADD_CHANNEL' },
                             props: true,
                             component: NotificationAddPage as any,
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            path: 'info',
-            name: MY_PAGE_ROUTE.INFO._NAME,
-            meta: { menuId: MENU_ID.MY_PAGE_INFO },
-            redirect: () => getRedirectRouteByPagePermission(MENU_ID.MY_PAGE_INFO, store.getters['user/pagePermissionMap']),
-            component: { template: '<router-view />' },
-            children: [
-                {
-                    path: 'notice',
-                    meta: {
-                        lnbVisible: true,
-                        menuId: MENU_ID.MY_PAGE_NOTICE,
-                    },
-                    component: { template: '<router-view />' },
-                    children: [
-                        {
-                            path: '/',
-                            name: MY_PAGE_ROUTE.INFO.NOTICE._NAME,
-                            meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-                            component: NoticePage as any,
-                        },
-                        {
-                            path: 'create',
-                            name: MY_PAGE_ROUTE.INFO.NOTICE.CREATE._NAME,
-                            // song-lang
-                            meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
-                            component: NoticeCreatePage as any,
-                        },
-                        {
-                            path: 'update',
-                            name: MY_PAGE_ROUTE.INFO.NOTICE.UPDATE._NAME,
-                            // song-lang
-                            meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
-                            component: NoticeUpdatePage as any,
-                        },
-                        {
-                            path: ':id',
-                            name: MY_PAGE_ROUTE.INFO.NOTICE.DETAIL._NAME,
-                            // song-lang
-                            meta: {
-                                lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION, label: ({ params }) => params.id, copiable: true,
-                            },
-                            component: NoticeDetailPage as any,
                         },
                     ],
                 },

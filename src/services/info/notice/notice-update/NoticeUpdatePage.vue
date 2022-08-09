@@ -8,7 +8,7 @@
 <script lang="ts">
 import { PPageTitle } from '@spaceone/design-system';
 
-import NoticeForm from '@/services/my-page/notice/modules/NoticeForm.vue';
+import NoticeForm from '@/services/info/notice/modules/NoticeForm.vue';
 
 
 export default {

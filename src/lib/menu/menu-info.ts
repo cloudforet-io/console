@@ -103,11 +103,11 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.MY_PAGE_NOTIFICATIONS',
         isNew: true,
     },
-    [MENU_ID.MY_PAGE_INFO]: {
+    [MENU_ID.INFO]: {
         translationId: 'MENU.MY_PAGE_INFO',
         isNew: true,
     },
-    [MENU_ID.MY_PAGE_NOTICE]: {
+    [MENU_ID.INFO_NOTICE]: {
         translationId: 'MENU.MY_PAGE_NOTICE',
         isNew: true,
     },

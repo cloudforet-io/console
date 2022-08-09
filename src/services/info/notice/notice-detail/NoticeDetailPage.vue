@@ -79,10 +79,10 @@ import { store } from '@/store';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 
-import { getPostBadgeInfo } from '@/services/my-page/notice/helper';
-import ListItem from '@/services/my-page/notice/modules/list-item/ListItem.vue';
-import type { NoticePostModel } from '@/services/my-page/notice/type';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import { getPostBadgeInfo } from '@/services/info/notice/helper';
+import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
+import type { NoticePostModel } from '@/services/info/notice/type';
+import { INFO_ROUTE } from '@/services/info/route-config';
 
 
 export default {
@@ -157,7 +157,7 @@ export default {
         const getNoticePostData = async () => {};
 
         const handleBackToListButtonClick = () => {
-            SpaceRouter.router.push({ name: MY_PAGE_ROUTE.INFO.NOTICE._NAME });
+            SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME });
         };
 
         (async () => {

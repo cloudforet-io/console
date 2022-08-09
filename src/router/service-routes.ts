@@ -10,6 +10,7 @@ import authRoutes from '@/services/auth/routes';
 import costExplorerRoute from '@/services/cost-explorer/routes';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 import dashboardRoute from '@/services/dashboard/routes';
+import infoRoute from '@/services/info/routes';
 import myPageRoute from '@/services/my-page/routes';
 import projectRoute from '@/services/project/routes';
 
@@ -33,6 +34,7 @@ export const serviceRoutes: RouteConfig[] = [
             alertManagerRoute,
             costExplorerRoute,
             myPageRoute,
+            infoRoute,
         ],
     },
     ...errorRoutes,

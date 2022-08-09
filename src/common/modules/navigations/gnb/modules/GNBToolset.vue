@@ -142,7 +142,7 @@ import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 
 export default {
-    name: 'RightSideMenu',
+    name: 'GNBToolset',
     components: {
         GNBRecentFavorite,
         GNBSearch,

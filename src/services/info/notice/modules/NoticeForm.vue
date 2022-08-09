@@ -103,7 +103,7 @@ import TextEditor from '@/common/components/editor/TextEditor.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import { INFO_ROUTE } from '@/services/info/route-config';
 
 
 interface DomainItem {
@@ -216,7 +216,7 @@ export default {
                 await SpaceConnector.client.board.post.create(formData.value);
                 // song-lang
                 showSuccessMessage('Successfully created notice', '');
-                await SpaceRouter.router.push({ name: MY_PAGE_ROUTE.INFO.NOTICE._NAME, query: {} });
+                await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME, query: {} });
             } catch (e) {
                 // song-lang
                 ErrorHandler.handleRequestError(e, 'Failed to create notice');
@@ -228,7 +228,7 @@ export default {
                 // song-lang
                 showSuccessMessage('Successfully edited notice', '');
                 // TODO:: add below `query`
-                await SpaceRouter.router.push({ name: MY_PAGE_ROUTE.INFO.NOTICE.DETAIL._NAME, query: {} });
+                await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE.DETAIL._NAME, query: {} });
             } catch (e) {
                 // song-lang
                 ErrorHandler.handleRequestError(e, 'Failed to edit notice');
