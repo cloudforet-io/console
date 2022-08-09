@@ -1,3 +1,11 @@
+# [1.1.0-beta.367](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.366...v1.1.0-beta.367) (2022-08-09)
+
+
+### Features
+
+* **images:** update images ([0edeab1](https://github.com/spaceone-dev/spaceone-design-system/commit/0edeab1ffa1e3641c4f1e729353854543a5d09cd))
+* **popover:** add isVisible prop to Popover component ([35a7b6a](https://github.com/spaceone-dev/spaceone-design-system/commit/35a7b6aefca362152221ecd9439c3bf8fb0ed491))
+
 # [1.1.0-beta.366](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.365...v1.1.0-beta.366) (2022-08-05)
 
 
