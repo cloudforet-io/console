@@ -248,6 +248,17 @@ export default {
                 ErrorHandler.handleError(e);
             }
         };
+        const deleteNotification = async (notificationId: string) => {
+            try {
+                await SpaceConnector.client.notification.notification.delete({
+                    notification_id: notificationId,
+                });
+                state.items = state.items.filter(d => d.notificationId !== notificationId);
+                state.proxyCount -= 1;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
 
         /* Event */
         const loadMoreNotifications = () => {
@@ -262,9 +273,8 @@ export default {
             state.selectedItem = notificationItem;
             state.modalVisible = true;
         };
-        const handleDeleteNotification = (notificationId: string) => {
-            // todo
-            console.log('delete!', notificationId);
+        const handleDeleteNotification = async (notificationId: string) => {
+            await deleteNotification(notificationId);
         };
         const handleCloseNotificationModal = () => {
             state.selectedItem = {};
