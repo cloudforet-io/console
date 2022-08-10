@@ -15,6 +15,7 @@ import {
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
@@ -35,21 +36,21 @@ export default {
             popupList: [] as Array<NoticePostModel>,
         });
 
+
+        const apiQuery = new ApiQueryHelper().setFilters([{
+            k: 'name',
+            v: 'console:board',
+            o: '',
+        }, {
+            k: 'data.show_popup',
+            v: false,
+            o: '=',
+        }]).data;
         const getUserConfigBoardPostIdList = async (): Promise<Array<string>> => {
             try {
                 const { results } = await SpaceConnector.client.config.userConfig.list({
                     user_id: store.state.user.userId,
-                    query: {
-                        filter: [{
-                            k: 'name',
-                            v: 'console:board',
-                            o: 'contain',
-                        }, {
-                            k: 'data.show_popup',
-                            v: false,
-                            o: 'eq',
-                        }],
-                    },
+                    query: apiQuery,
                 });
                 // console:board:{boardId}:{postId}
                 return results.map(d => d.name.split(':')[3]);
