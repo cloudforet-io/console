@@ -1,0 +1,384 @@
+<template>
+    <div class="gnb-profile">
+        <div class="menu-button" :tabindex="0" @click.stop="openProfileMenu">
+            <p-i :name="userIcon" class="menu-icon" />
+        </div>
+        <div v-if="visible"
+             ref="profileMenuRef"
+             v-click-outside="hideProfileMenu"
+             class="profile-menu-wrapper"
+        >
+            <div class="user-info">
+                <p-i :name="userIcon" />
+                <span class="value">{{ userId }}</span>
+            </div>
+            <div class="info-wrapper">
+                <div class="info-menu">
+                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
+                    <span class="value">{{ role }}</span>
+                </div>
+                <div v-click-outside="handleClickOutsideLanguageMenu"
+                     class="info-menu language"
+                     @click.stop="showLanguageMenu"
+                >
+                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
+                    <div class="value">
+                        <span>{{ language }}</span>
+                        <div v-if="languageMenuVisible" class="language-menu-wrapper">
+                            <div class="sub-menu-wrapper">
+                                <div v-for="(item, index) in languageMenu" :key="index" class="sub-menu"
+                                     @click.stop="handleLanguageClick(item.name)"
+                                >
+                                    <span>{{ item.label }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p-i :name="languageMenuVisible ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                         class="arrow-icon"
+                         width="1rem" height="1rem"
+                    />
+                </div>
+                <div class="info-menu">
+                    <span class="label">{{ $t('COMMON.PROFILE.TIMEZONE') }}</span>
+                    <span class="value">{{ timezone }}</span>
+                </div>
+                <div class="info-menu">
+                    <router-link :to="{name: MY_PAGE_ROUTE._NAME }" @click.native="hideProfileMenu">
+                        <p-button style-type="primary" :outline="true" size="sm"
+                                  class="my-page-button"
+                        >
+                            {{ $t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
+                        </p-button>
+                    </router-link>
+                </div>
+            </div>
+            <template v-if="!isDomainOwner">
+                <p-divider class="divider" />
+                <div class="sub-menu-wrapper">
+                    <div class="sub-menu">
+                        <router-link :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}" @click.native="hideProfileMenu">
+                            {{ $t('MENU.MY_PAGE_API_KEY') }}
+                        </router-link>
+                    </div>
+                </div>
+            </template>
+            <p-divider class="divider" />
+            <div class="sub-menu-wrapper">
+                <div v-for="{ link, label} in supportedMenu" :key="label" class="sub-menu">
+                    <a :href="link" target="_blank" class="support-menu"
+                       @click="hideProfileMenu"
+                    >
+                        <span>{{ label }}</span>
+                        <p-i name="ic_external-link"
+                             height="1em" width="1em"
+                             color="inherit"
+                             class="external-icon"
+                        />
+                    </a>
+                </div>
+            </div>
+            <p-divider class="divider" />
+            <div class="sub-menu-wrapper">
+                <div class="sub-menu" @click="handleClickSignOut">
+                    <span>{{ $t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script lang="ts">
+import {
+    computed,
+    defineComponent, reactive, toRefs,
+} from '@vue/composition-api';
+
+import {
+    PI, PDivider, PButton,
+} from '@spaceone/design-system';
+import { vOnClickOutside } from '@vueuse/components';
+import ejs from 'ejs';
+import type { DirectiveFunction } from 'vue';
+import type { Location } from 'vue-router';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { languages } from '@/store/modules/user/config';
+
+import config from '@/lib/config';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { AUTH_ROUTE } from '@/services/auth/route-config';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+
+
+export default defineComponent({
+    name: 'GNBProfile',
+    components: {
+        PDivider,
+        PI,
+        PButton,
+    },
+    directives: {
+        clickOutside: vOnClickOutside as DirectiveFunction,
+    },
+    props: {},
+    setup(props, { emit, root }) {
+        const state = reactive({
+            visible: false,
+            userIcon: computed(() => {
+                if (state.isDomainOwner) return 'root-account';
+                if (state.hasDomainRole) return 'admin';
+                return 'user';
+            }),
+            name: computed(() => store.state.user.name),
+            email: computed(() => store.state.user.email),
+            role: computed(() => {
+                const roleArray = store.getters['user/roleNames'];
+                return roleArray.join(', ');
+            }),
+            language: computed(() => store.getters['user/languageLabel']),
+            timezone: computed(() => store.state.user.timezone),
+            userId: computed(() => store.state.user.userId),
+            hasDomainRole: computed((() => store.getters['user/hasDomainRole'])),
+            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            languageMenuVisible: false,
+            supportedMenu: computed(() => {
+                const docsList = config.get('DOCS') ?? [];
+                const data = { lang: store.state.user.language };
+                return docsList.map(d => ({
+                    label: ejs.render(d?.label ?? '', data),
+                    link: ejs.render(d?.link ?? '', data),
+                }));
+            }),
+            languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
+                label: v, name: k,
+            }))),
+            profileMenuRef: null as null|HTMLElement,
+        });
+
+        const openProfileMenu = () => {
+            state.visible = true;
+            emit('open-menu');
+        };
+        const hideProfileMenu = () => {
+            state.visible = false;
+            if (state.languageMenuVisible) state.languageMenuVisible = false;
+            emit('hide-menu');
+        };
+        const showLanguageMenu = () => {
+            state.languageMenuVisible = true;
+        };
+        const handleClickOutsideLanguageMenu = (e: PointerEvent) => {
+            const profileMenuRef = state.profileMenuRef;
+            if (!profileMenuRef) return;
+            const target = e.target as HTMLElement;
+            state.languageMenuVisible = false;
+            /*
+                v-on-click-outside directive stops click event bubbling.
+                So when this function is called, hideProfileMenu function will never be called which is bound to profileMenuRef's v-on-click-outside directive.
+                The code below closes the profile menu when the user clicks outside the profileMenuRef.
+             */
+            if (!profileMenuRef.contains(target)) hideProfileMenu();
+        };
+        const handleLanguageClick = async (language) => {
+            try {
+                await store.dispatch('user/setUser', {
+                    language,
+                    timezone: state.timezone,
+                });
+                await root.$nextTick();
+                showSuccessMessage(i18n.t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '', root);
+                hideProfileMenu();
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
+            }
+        };
+        const handleClickGoToMyPage = () => {
+            hideProfileMenu();
+            root.$router.push({ name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME });
+        };
+        const handleClickSignOut = async () => {
+            const res: Location = {
+                name: AUTH_ROUTE.SIGN_OUT._NAME,
+                query: { nextPath: root.$route.fullPath },
+            };
+            await root.$router.push(res);
+        };
+
+        return {
+            ...toRefs(state),
+            openProfileMenu,
+            hideProfileMenu,
+            showLanguageMenu,
+            handleClickOutsideLanguageMenu,
+            handleClickGoToMyPage,
+            handleLanguageClick,
+            handleClickSignOut,
+            MY_PAGE_ROUTE,
+        };
+    },
+});
+</script>
+
+<style lang="postcss" scoped>
+.gnb-profile {
+    position: relative;
+    margin-left: 1.5rem;
+
+    &:first-of-type {
+        margin-left: 0;
+    }
+
+    .menu-button {
+        @apply text-gray-500;
+        cursor: pointer;
+        line-height: $gnb-height;
+
+        &.opened {
+            @apply text-violet-400;
+        }
+
+        .menu-icon {
+            @apply rounded-xl;
+        }
+
+        @media (hover: hover) {
+            &:hover {
+                @apply text-violet-400;
+            }
+        }
+    }
+
+    @define-mixin menu-dropdown {
+        @apply bg-white border border-gray-200 rounded-xs;
+        position: absolute;
+        top: 100%;
+        right: -0.5rem;
+        left: auto;
+        margin-top: -0.5rem;
+        max-width: 17.5rem;
+        box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
+    }
+    .profile-menu-wrapper {
+        @mixin menu-dropdown;
+        min-width: 15.125rem;
+
+        .user-info {
+            @apply flex items-center;
+            padding: 1.25rem 1rem 0.25rem;
+
+            .p-i-icon {
+                @apply rounded-lg flex-shrink-0;
+            }
+
+            .value {
+                @apply font-bold break-all;
+                margin-left: 0.5rem;
+                font-size: 0.875rem;
+                line-height: 125%;
+            }
+        }
+
+        .info-wrapper {
+            padding: 0.5rem;
+
+            .info-menu {
+                position: relative;
+                width: 100%;
+                padding: 0 0.5rem;
+                line-height: 1.5rem;
+                font-size: 0.75rem;
+                letter-spacing: 0.02em;
+
+                .label {
+                    @apply text-gray-500 font-bold;
+                    padding-right: 0.5rem;
+                }
+
+                .my-page-button {
+                    @apply w-full;
+                    margin-top: 0.75rem;
+                    margin-bottom: 0.5rem;
+                }
+
+                &.language {
+                    display: inline-flex;
+                    cursor: pointer;
+                    &:hover, &:focus {
+                        @apply bg-violet-100 text-violet-600 rounded-xs;
+                    }
+                    .arrow-icon {
+                        display: inline-block;
+                        margin-top: 0.25rem;
+                    }
+                    .value {
+                        position: relative;
+                        .language-menu-wrapper {
+                            @mixin menu-dropdown;
+                            left: -1rem;
+                            min-width: 9.25rem;
+                            max-height: 21rem;
+                            margin-top: -0.125rem;
+                            overflow-y: auto;
+                            z-index: 10;
+                        }
+                    }
+                }
+            }
+        }
+
+        .sub-menu-wrapper {
+            padding: 0.5rem;
+
+            .sub-menu {
+                @apply text-gray-900 rounded;
+                position: relative;
+                display: inline-flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                height: 2rem;
+                padding: 0 0.5rem;
+                font-size: 0.875rem;
+                text-decoration: none;
+                white-space: nowrap;
+                cursor: pointer;
+
+                &:hover, &:focus {
+                    @apply bg-violet-100 text-violet-600;
+                }
+
+                &:active {
+                    @apply bg-white;
+                }
+
+                &.p-anchor::v-deep:hover .text {
+                    text-decoration: none;
+                }
+
+                .support-menu {
+                    @apply justify-between;
+                    display: flex;
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    @screen laptop {
+        margin-left: 1.25rem;
+    }
+
+    @screen tablet {
+        .profile-menu-wrapper {
+            width: 13.1875rem;
+        }
+    }
+}
+
+</style>

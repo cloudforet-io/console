@@ -5,7 +5,7 @@
                  opened: subMenuList.length > 0 && isOpened,
                  selected: isSelected,
              }]"
-             @click.stop="emitToggle"
+             @click.stop="openMenu"
         >
             <span v-if="subMenuList.length > 0" tabindex="0">
                 <span>{{ label }}</span>
@@ -26,7 +26,7 @@
             </component>
 
             <div v-if="isOpened && subMenuList.length > 0"
-                 v-click-outside="emitHide"
+                 v-click-outside="hideMenu"
                  class="sub-menu-wrapper"
             >
                 <g-n-b-sub-menu v-for="(subMenu, index) in subMenuList"
@@ -97,17 +97,17 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const emitToggle = () => {
-            emit('toggle', props.name);
+        const openMenu = () => {
+            emit('open-menu', props.name);
         };
 
-        const emitHide = () => {
-            emit('hide');
+        const hideMenu = () => {
+            emit('hide-menu');
         };
 
         return {
-            emitToggle,
-            emitHide,
+            openMenu,
+            hideMenu,
         };
     },
 };

@@ -17,13 +17,13 @@
                         :has-permission="hasPermission"
                         :is-opened="openedMenu === menu.id"
                         :is-selected="selectedMenu === menu.id"
-                        @toggle="toggleMenu"
-                        @hide="hideMenu"
+                        @open-menu="handleOpenMenu"
+                        @hide-menu="hideMenu"
             />
         </div>
         <g-n-b-toolset class="right-part"
                        :opened-menu="openedMenu"
-                       @toggle-menu="toggleMenu"
+                       @open-menu="handleOpenMenu"
                        @hide-menu="hideMenu"
         />
     </div>
@@ -51,7 +51,7 @@ import SiteMap from '@/common/modules/navigations/gnb/modules/SiteMap.vue';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 
-const ALLOWED_MENUS_FOR_ALL_USERS = ['support', 'account', 'notifications'];
+const ALLOWED_MENUS_FOR_ALL_USERS = ['notifications', 'support', 'profile'];
 
 export default {
     name: 'GNB',
@@ -83,7 +83,7 @@ export default {
         const hideMenu = () => {
             state.openedMenu = '';
         };
-        const toggleMenu = (menuName: string) => {
+        const handleOpenMenu = (menuName: string) => {
             if (state.openedMenu === menuName) {
                 hideMenu();
             } else if (state.hasPermission || includes(ALLOWED_MENUS_FOR_ALL_USERS, menuName)) {
@@ -95,7 +95,7 @@ export default {
         return {
             ...toRefs(state),
             hideMenu,
-            toggleMenu,
+            handleOpenMenu,
         };
     },
 };
