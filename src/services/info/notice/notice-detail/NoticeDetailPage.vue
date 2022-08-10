@@ -6,13 +6,14 @@
         >
             <template #extra>
                 <div v-if="hasDomainRoleUser" class="button-group">
+                    <!--                    song-lang-->
                     <p-button :outline="true" style-type="gray-border" icon="ic_edit">
                         {{ $t('Edit') }}
                     </p-button>
                     <p-button :outline="true" style-type="gray-border" icon="ic_send">
                         {{ $t('Send Email') }}
                     </p-button>
-                    <p-button :outline="true" style-type="alert">
+                    <p-button :outline="true" style-type="alert" @click="onClickDelete">
                         {{ $t('Delete') }}
                     </p-button>
                 </div>
@@ -60,6 +61,12 @@
                 {{ $t('Back to List') }}
             </p-button>
         </section>
+        <!--song-lang-->
+        <delete-modal :header-title="$t('Delete Notice')"
+                      :visible.sync="deleteModalVisible"
+                      :contents="$t('Are you sure you want to delete the notice?')"
+                      @confirm="handleDeleteNoticeConfirm"
+        />
     </section>
 </template>
 
@@ -78,6 +85,7 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import { getPostBadgeInfo } from '@/services/info/notice/helper';
 import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
@@ -97,6 +105,7 @@ export default {
         PPageTitle,
         PButton,
         ListItem,
+        DeleteModal,
     },
     setup() {
         const state = reactive({
@@ -153,11 +162,27 @@ export default {
             // eslint-disable-next-line max-len
             contents: '<p>normal text</p><h1>h1</h1><h2>h2</h2><h3>h3</h3><p style="text-align: center">align center</p><p style="text-align: right">align right</p><p style="text-align: justify">align justify</p><p style="text-align: justify">color1 <span style="color: #7D5DD2">color2</span> <span style="color: #49A7F7">color3</span> ...</p><p style="text-align: justify"><strong>bold </strong></p><p style="text-align: justify"><em>italic</em></p><p style="text-align: justify"><u>underline</u></p><p style="text-align: justify"><s>strike</s></p><p style="text-align: justify"><code class="inline-code">this is inline code</code></p><ul><li><p style="text-align: justify">bullet</p><ul><li><p style="text-align: justify">bullet2</p><ul><li><p style="text-align: justify">bullet3</p></li></ul></li></ul></li><li><p style="text-align: justify">bullet4</p></li></ul><ol><li><p style="text-align: justify">number</p><ol><li><p style="text-align: justify">number1</p><ol><li><p style="text-align: justify">number2</p></li></ol></li></ol></li><li><p style="text-align: justify">number3</p><ol><li><p style="text-align: justify">number4</p></li></ol></li></ol><p style="text-align: justify"><a target="_blank" rel="noopener noreferrer nofollow" href="http://www.google.com">http://www.google.com</a></p><p style="text-align: justify"><img src="https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/spaceone.svg"></p><pre><code>const a = \'This is Code Block!\'nconsole.log(a)</code></pre><blockquote><p>This is Quote Block!</p></blockquote><hr><p></p><p>Good bye...!</p>',
         });
+        const modalState = reactive({
+            deleteModalVisible: false,
+            // TODD:: send email modal state here
+        });
 
         const getNoticePostData = async () => {};
 
         const handleBackToListButtonClick = () => {
             SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME });
+        };
+        const handleDeleteNoticeConfirm = () => {
+            try {
+                // TODD:: Notice delete API
+            } catch (e) {
+                // TODD:: Error Handling
+            } finally {
+                modalState.deleteModalVisible = false;
+            }
+        };
+        const onClickDelete = () => {
+            modalState.deleteModalVisible = true;
         };
 
         (async () => {
@@ -167,7 +192,10 @@ export default {
         })();
         return {
             ...toRefs(state),
+            ...toRefs(modalState),
             handleBackToListButtonClick,
+            handleDeleteNoticeConfirm,
+            onClickDelete,
         };
     },
 };
@@ -206,4 +234,5 @@ export default {
         width: 10.9375rem;
     }
 }
+
 </style>
