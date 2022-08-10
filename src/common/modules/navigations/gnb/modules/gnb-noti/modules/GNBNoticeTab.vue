@@ -69,6 +69,8 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { getNoticeBoardId } from '@/lib/helper/notice-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
@@ -85,7 +87,6 @@ interface NoticeItem {
     isPinned: boolean;
 }
 
-const NOTICE_BOARD_NAME = 'Notice';
 const NOTICE_ITEM_LIMIT = 15;
 
 export default {
@@ -135,17 +136,6 @@ export default {
         };
 
         /* Api */
-        const getNoticeBoardId = async (): Promise<undefined|string> => {
-            try {
-                const { results } = await SpaceConnector.client.board.board.list({
-                    name: NOTICE_BOARD_NAME,
-                });
-                if (results.length) return results[0].board_id;
-                return undefined;
-            } catch (e) {
-                return undefined;
-            }
-        };
         const noticeApiHelper = new ApiQueryHelper()
             .setPage(1, NOTICE_ITEM_LIMIT)
             .setSort('created_at', true);

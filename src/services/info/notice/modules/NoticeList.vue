@@ -7,32 +7,34 @@
                 </template>
             </p-toolbox>
         </div>
-        <ul v-if="noticeItems.length" class="list-wrapper">
-            <!-- // todo: item.[id]-->
-            <list-item v-for="(item, index) in noticeItems"
-                       :key="`notice-${item.id}-${index}`"
-                       class="list-item"
-                       :title="item.title"
-                       :notice-type="item.noticeType"
-                       :is-new="item.isNew"
-                       :is-pinned="item.isPinned"
-                       @click.native="handleClickNotice(item.id)"
-            />
-        </ul>
-        <div v-else class="no-data">
-            <img src="@/assets/images/illust_satellite.svg" class="no-data-img">
-            <p class="no-data-text">
-                <!--song-lang-->
-                {{ $t('No notices') }}
-            </p>
-        </div>
-        <div class="pagination-wrapper">
-            <p-pagination class="pagination"
-                          :total-count="noticeItems.length"
-                          :page-size="10"
-                          :current-page="1"
-            />
-        </div>
+        <p-data-loader :data="noticeItems" :loading="loading">
+            <ul v-if="noticeItems.length" class="list-wrapper">
+                <!-- // todo: item.[id]-->
+                <list-item v-for="(item, index) in noticeItems"
+                           :key="`notice-${item.post_id}-${index}`"
+                           class="list-item"
+                           :post="item"
+                           :notice-type="item.scope"
+                           :is-new="false"
+                           :is-pinned="item.options.is_pinned"
+                           @click.native="handleClickNotice(item.post_id)"
+                />
+            </ul>
+            <div v-else class="no-data">
+                <img src="@/assets/images/illust_satellite.svg" class="no-data-img">
+                <p class="no-data-text">
+                    <!--song-lang-->
+                    {{ $t('No notices') }}
+                </p>
+            </div>
+            <div class="pagination-wrapper">
+                <p-pagination class="pagination"
+                              :total-count="noticeItems.length"
+                              :page-size="10"
+                              :current-page="1"
+                />
+            </div>
+        </p-data-loader>
     </div>
 </template>
 
@@ -40,20 +42,31 @@
 
 import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
+    PDataLoader,
     PPagination, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 
+import { getNoticeBoardId } from '@/lib/helper/notice-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { NOTICE_TYPE } from '@/services/info/notice/config';
 import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
+import type { NoticePostModel } from '@/services/info/notice/type';
 import { INFO_ROUTE } from '@/services/info/route-config';
+
 
 interface Props {
     noticeItems: any[];
     loading: boolean;
 }
+
+const NOTICE_ITEM_LIMIT = 10;
 
 export default defineComponent<Props>({
     name: 'NoticeList',
@@ -61,17 +74,8 @@ export default defineComponent<Props>({
         PToolbox,
         PSelectDropdown,
         PPagination,
+        PDataLoader,
         ListItem,
-    },
-    props: {
-        noticeItems: {
-            type: Array,
-            default: () => [],
-        },
-        loading: {
-            type: Boolean,
-            default: true,
-        },
     },
     setup() {
         const state = reactive({
@@ -93,11 +97,37 @@ export default defineComponent<Props>({
                 },
             ],
             selectedItem: 'ALL',
+            loading: false,
+            noticeItems: [] as NoticePostModel[],
         });
+
+        /* Api */
+        const noticeApiHelper = new ApiQueryHelper()
+            .setPage(1, NOTICE_ITEM_LIMIT)
+            .setSort('created_at', true);
+        const listNotice = async (boardId: string) => {
+            try {
+                const { results } = await SpaceConnector.client.board.post.list({
+                    board_id: boardId,
+                    query: noticeApiHelper.data,
+                });
+                state.noticeItems = results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.noticeItems = [];
+            }
+        };
 
         const handleClickNotice = (id: string) => {
             SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE.DETAIL._NAME, params: { id } });
         };
+
+        (async () => {
+            state.loading = true;
+            const boardId = await getNoticeBoardId();
+            if (boardId) await listNotice(boardId);
+            state.loading = false;
+        })();
 
         return {
             ...toRefs(state),

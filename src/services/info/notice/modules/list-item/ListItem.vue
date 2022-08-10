@@ -9,15 +9,15 @@
                 <p-i v-if="isPinned" class="pin" name="ic_pin"
                      width="1.125rem"
                 />
-                <text-highlighting class="title" :term="inputText" :text="title" />
+                <text-highlighting class="title" :term="inputText" :text="post.title" />
                 <new-mark v-if="isNew" class="new-mark" />
             </div>
             <div class="info">
                 <p-badge outline :style-type="noticeTypeBadge.style">
                     {{ noticeTypeBadge.label }}
-                </p-badge><span>date</span><p-i width="0.125rem" name="ic_divider-dot" />
-                <span>writer</span><p-i v-if="hasDomainRoleUser" width="0.125rem" name="ic_divider-dot" />
-                <span v-if="hasDomainRoleUser" class="view-count"><p-i name="ic_view" width="1.125rem" /> 1,234</span>
+                </p-badge><span>{{ date }}</span><p-i width="0.125rem" name="ic_divider-dot" />
+                <span>{{ post.writer }}</span><p-i v-if="hasDomainRoleUser" width="0.125rem" name="ic_divider-dot" />
+                <span v-if="hasDomainRoleUser" class="view-count"><p-i name="ic_view" width="1.125rem" /> {{ post.view_count }}</span>
             </div>
         </div>
         <div v-else class="not-exist-item">
@@ -34,6 +34,7 @@ import {
 } from '@vue/composition-api';
 
 import { PBadge, PI } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
@@ -44,15 +45,16 @@ import TextHighlighting from '@/common/components/text/text-highlighting/TextHig
 
 import type { NoticeType } from '@/services/info/notice/config';
 import { getPostBadgeInfo } from '@/services/info/notice/helper';
+import type { NoticePostModel } from '@/services/info/notice/type';
 
 
 interface Props {
-    title: string;
     noticeType: string;
     inputText: string;
     isNew: boolean;
     isPinned: boolean;
     postDirection: 'prev' | 'next' | undefined;
+    post: NoticePostModel;
 }
 
 export default defineComponent<Props>({
@@ -64,9 +66,9 @@ export default defineComponent<Props>({
         TextHighlighting,
     },
     props: {
-        title: {
-            type: String,
-            default: '',
+        post: {
+            type: Object as PropType<NoticePostModel>,
+            default: () => ({}),
         },
         noticeType: {
             type: String as PropType<NoticeType>,
@@ -99,7 +101,11 @@ export default defineComponent<Props>({
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
             // song-lang
             postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? i18n.t('Prev') : i18n.t('Next'))),
+            timezone: computed(() => store.state.user.timezone || 'UTC'),
+            date: computed(() => dateFormatter(props.post?.created_at)),
         });
+
+        const dateFormatter = date => dayjs.tz(dayjs.utc(date), state.timezone).format('YYYY-MM-DD');
         return {
             ...toRefs(state),
         };
