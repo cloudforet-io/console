@@ -5,6 +5,24 @@
                        :class="{ loading: loading && !items.length }"
         >
             <div ref="noticeItemsRef" class="content-wrapper">
+                <template v-if="!!pinnedItems.length">
+                    <div class="pinned-header-wrapper">
+                        <p-i name="ic_pin"
+                             width="1rem" height="1rem"
+                             class="mr-1"
+                        />
+                        <!--song-lang-->
+                        <span class="label">Pinned notice</span>
+                    </div>
+                    <g-n-b-noti-item v-for="(item, idx) in pinnedItems" :key="`${item.postId}-${idx}`"
+                                     :title="item.title"
+                                     :created-at="item.createdAt"
+                                     :is-read="true"
+                                     :writer="item.writer"
+                                     @select="handleSelectNotice(item.postId)"
+                    />
+                    <p-divider />
+                </template>
                 <g-n-b-noti-item v-for="(item, idx) in items" :key="`${item.postId}-${idx}`"
                                  :title="item.title"
                                  :created-at="item.createdAt"
@@ -44,7 +62,7 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PDataLoader,
+    PDataLoader, PI, PDivider,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -64,6 +82,7 @@ interface NoticeItem {
     createdAt: string;
     title: string;
     writer: string;
+    isPinned: boolean;
 }
 
 const NOTICE_BOARD_NAME = 'Notice';
@@ -74,6 +93,8 @@ export default {
     components: {
         GNBNotiItem,
         PDataLoader,
+        PI,
+        PDivider,
     },
     props: {
         visible: {
@@ -90,17 +111,28 @@ export default {
             loading: true,
             timezone: computed(() => store.state.user.timezone),
             noticeItemsRef: null as HTMLElement|null,
+            pinnedItems: [] as NoticeItem[],
             items: [] as NoticeItem[],
             proxyCount: useProxyValue('count', props, emit),
         });
 
         /* Util */
-        const convertNoticeItem = (rawData: any[]): NoticeItem[] => rawData.map(d => ({
-            postId: d.postId,
-            createdAt: d.created_at,
-            title: d.title,
-            writer: d.writer,
-        }));
+        const convertNoticeItem = (rawData: any[]): [NoticeItem[], NoticeItem[]] => {
+            const items: NoticeItem[] = [];
+            const pinnedItems: NoticeItem[] = [];
+            rawData.forEach((d) => {
+                const item = {
+                    postId: d.post_id,
+                    createdAt: d.created_at,
+                    title: d.title,
+                    writer: d.writer,
+                    isPinned: d.options.is_pinned,
+                };
+                if (d.options.is_pinned) pinnedItems.push(item);
+                else items.push(item);
+            });
+            return [items, pinnedItems];
+        };
 
         /* Api */
         const getNoticeBoardId = async (): Promise<undefined|string> => {
@@ -124,11 +156,12 @@ export default {
                     query: noticeApiHelper.data,
                 });
                 state.proxyCount = total_count;
-                state.items = convertNoticeItem(results);
+                [state.items, state.pinnedItems] = convertNoticeItem(results);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
                 state.proxyCount = 0;
                 state.items = [];
+                state.pinnedItems = [];
             }
         };
 
@@ -187,6 +220,15 @@ export default {
         max-height: calc(100vh - $gnb-height - 1.5rem - 2.75rem);
         overflow-y: scroll;
         padding: 0.25rem 0.5rem 3.5rem 0.5rem;
+        .pinned-header-wrapper {
+            @apply text-gray-500;
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1.5;
+            margin-top: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding: 0 0.75rem;
+        }
     }
     .view-all-button-wrapper {
         @apply border-t border-gray-200;
