@@ -51,13 +51,14 @@ const infoRoute: RouteConfig = {
                     component: NoticeUpdatePage as any,
                 },
                 {
-                    path: ':id',
+                    path: ':noticeId',
                     name: INFO_ROUTE.NOTICE.DETAIL._NAME,
                     // song-lang
                     meta: {
                         lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION, label: ({ params }) => params.id, copiable: true,
                     },
                     component: NoticeDetailPage as any,
+                    props: true,
                 },
             ],
         },
