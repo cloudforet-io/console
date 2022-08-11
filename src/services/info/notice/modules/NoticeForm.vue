@@ -50,7 +50,7 @@
                 <text-editor v-model.lazy="contentState" :image-uploader="uploadImage" />
             </p-field-group>
             <div class="notice-create-options-wrapper">
-                <p-check-box v-model="isPinState">
+                <p-check-box v-model="isPinnedState">
                     <!--                song-lang-->
                     <span>Pin Notice</span>
                 </p-check-box>
@@ -127,8 +127,8 @@ export default {
     },
     props: {
         boardId: {
-            default: () => ([]),
-            type: Array,
+            type: String,
+            default: undefined,
         },
         type: {
             default: 'CREATE',
@@ -142,7 +142,7 @@ export default {
             default: '',
             type: String,
         },
-        isPin: {
+        isPinned: {
             default: false,
             type: Boolean,
         },
@@ -167,7 +167,7 @@ export default {
         const state = reactive({
             hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
             userName: computed<string>(() => store.state.user.name),
-            isPinState: props.isPin ?? false,
+            isPinnedState: props.isPinned ?? false,
             isPopupState: props.isPopup ?? false,
             contentState: props.content ?? '',
             isAllDomainSelectedState: props.isAllDomainSelected ?? true,
@@ -196,12 +196,12 @@ export default {
         });
 
         const formData:ComputedRef = computed(() => ({
-            board_id: state.boardIdList,
+            board_id: props.boardId,
             title: noticeTitleState.value,
             writer: writerNameState.value,
             contents: state.contentState,
             options: {
-                is_pinned: state.isPinState,
+                is_pinned: state.isPinnedState,
                 is_popup: state.isPopupState,
             },
         }));

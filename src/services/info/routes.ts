@@ -44,11 +44,12 @@ const infoRoute: RouteConfig = {
                     component: NoticeCreatePage as any,
                 },
                 {
-                    path: 'update',
+                    path: 'update/:boardId/:postId',
                     name: INFO_ROUTE.NOTICE.UPDATE._NAME,
                     // song-lang
                     meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                     component: NoticeUpdatePage as any,
+                    props: true,
                 },
                 {
                     path: ':boardId/:postId',

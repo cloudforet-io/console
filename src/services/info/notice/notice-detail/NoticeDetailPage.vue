@@ -7,7 +7,9 @@
             <template #extra>
                 <div v-if="hasDomainRoleUser" class="button-group">
                     <!--                    song-lang-->
-                    <p-button :outline="true" style-type="gray-border" icon="ic_edit">
+                    <p-button :outline="true" style-type="gray-border" icon="ic_edit"
+                              @click="handleClickEditButton"
+                    >
                         {{ $t('Edit') }}
                     </p-button>
                     <p-button :outline="true" style-type="gray-border" icon="ic_send"
@@ -212,6 +214,12 @@ export default {
                 modalState.deleteModalVisible = false;
             }
         };
+        const handleClickEditButton = () => {
+            SpaceRouter.router.push({
+                name: INFO_ROUTE.NOTICE.UPDATE._NAME,
+                params: { boardId: props.boardId, postId: props.postId },
+            });
+        };
         const handleSendEmailModalOpen = () => {
             modalState.sendEmailModalVisible = true;
         };
@@ -231,6 +239,7 @@ export default {
             handleBackToListButtonClick,
             handleSendEmailConfirm,
             handleDeleteNoticeConfirm,
+            handleClickEditButton,
             handleSendEmailModalOpen,
             handleDeleteModalOpen,
         };
