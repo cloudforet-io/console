@@ -113,6 +113,7 @@ export default {
         const state = reactive({
             loading: true,
             timezone: computed(() => store.state.user.timezone),
+            boardId: undefined as undefined | string,
             noticeItemsRef: null as HTMLElement|null,
             noticeData: [] as NoticePostModel[],
             items: computed<NoticeItem[]>(() => {
@@ -139,10 +140,10 @@ export default {
         const noticeApiHelper = new ApiQueryHelper()
             .setPage(1, NOTICE_ITEM_LIMIT)
             .setSort('created_at', true);
-        const listNotice = async (boardId: string) => {
+        const listNotice = async () => {
             try {
                 const { results, total_count } = await SpaceConnector.client.board.post.list({
-                    board_id: boardId,
+                    board_id: state.boardId,
                     query: noticeApiHelper.data,
                 });
                 state.proxyCount = total_count;
@@ -159,7 +160,7 @@ export default {
             emit('close');
             SpaceRouter.router.push({
                 name: INFO_ROUTE.NOTICE.DETAIL._NAME,
-                params: { id: postId },
+                params: { boardId: state.boardId, postId },
             }).catch(() => {});
         };
         const handleClickViewAllNotice = () => {
@@ -170,8 +171,8 @@ export default {
         /* Init */
         const init = async () => {
             state.loading = true;
-            const boardId = await getNoticeBoardId();
-            if (boardId) await listNotice(boardId);
+            state.boardId = await getNoticeBoardId();
+            if (state.boardId) await listNotice();
             state.loading = false;
         };
         (async () => {

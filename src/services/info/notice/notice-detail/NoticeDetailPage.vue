@@ -101,8 +101,6 @@ import type { TranslateResult } from 'vue-i18n';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import { getNoticeBoardId } from '@/lib/helper/notice-helper';
-
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -129,7 +127,11 @@ export default {
         DeleteModal,
     },
     props: {
-        noticeId: {
+        boardId: {
+            type: String,
+            default: undefined,
+        },
+        postId: {
             type: String,
             default: undefined,
         },
@@ -138,7 +140,6 @@ export default {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             loading: true,
-            boardId: '',
             noticePostData: {} as NoticePostModel|unknown,
             prevNoticePost: {
                 board_id: 'board-14a09a71f504',
@@ -181,8 +182,8 @@ export default {
         const getNoticePostData = async () => {
             try {
                 state.noticePostData = await SpaceConnector.client.board.post.get({
-                    board_id: state.boardId,
-                    post_id: props.noticeId,
+                    board_id: props.boardId,
+                    post_id: props.postId,
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -220,7 +221,6 @@ export default {
 
         (async () => {
             state.loading = true;
-            state.boardId = await getNoticeBoardId();
             await getNoticePostData();
             state.loading = false;
         })();

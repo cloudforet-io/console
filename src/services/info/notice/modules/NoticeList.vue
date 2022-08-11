@@ -111,10 +111,10 @@ export default defineComponent<Props>({
         let noticeApiHelper = new ApiQueryHelper()
             .setPage(1, NOTICE_ITEM_LIMIT)
             .setSort('created_at', true);
-        const listNotice = async (boardId: string) => {
+        const listNotice = async () => {
             try {
                 const { results } = await SpaceConnector.client.board.post.list({
-                    board_id: boardId,
+                    board_id: state.boardId,
                     query: noticeApiHelper.data,
                 });
                 state.noticeItems = results;
@@ -139,16 +139,22 @@ export default defineComponent<Props>({
         /* event */
         const handleChange = async (options: ToolboxOptions = {}) => {
             noticeApiHelper = getSearchFilter(options);
-            if (state.boardId) await listNotice(state.boardId);
+            if (state.boardId) await listNotice();
         };
-        const handleClickNotice = (id: string) => {
-            SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE.DETAIL._NAME, params: { id } });
+        const handleClickNotice = (postId: string) => {
+            SpaceRouter.router.push({
+                name: INFO_ROUTE.NOTICE.DETAIL._NAME,
+                params: {
+                    boardId: state.boardId ?? '',
+                    postId,
+                },
+            });
         };
 
         (async () => {
             state.loading = true;
             state.boardId = await getNoticeBoardId();
-            if (state.boardId) await listNotice(state.boardId);
+            if (state.boardId) await listNotice();
             state.loading = false;
         })();
 

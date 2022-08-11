@@ -51,7 +51,7 @@ const infoRoute: RouteConfig = {
                     component: NoticeUpdatePage as any,
                 },
                 {
-                    path: ':noticeId',
+                    path: ':boardId/:postId',
                     name: INFO_ROUTE.NOTICE.DETAIL._NAME,
                     // song-lang
                     meta: {
