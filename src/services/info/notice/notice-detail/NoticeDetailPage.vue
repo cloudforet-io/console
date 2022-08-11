@@ -102,6 +102,9 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -111,7 +114,6 @@ import { getPostBadgeInfo } from '@/services/info/notice/helper';
 import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
 import type { NoticePostModel } from '@/services/info/notice/type';
 import { INFO_ROUTE } from '@/services/info/route-config';
-
 
 export default {
     name: 'NoticeDetailPage',
@@ -196,20 +198,34 @@ export default {
         const handleBackToListButtonClick = () => {
             SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME });
         };
-        const handleSendEmailConfirm = () => {
+        const handleSendEmailConfirm = async () => {
             try {
-                // TODD:: Notice send email API
+                // TODO:추후 확인 필요
+                await SpaceConnector.client.board.post.sendNotification({
+                    post_id: props.postId,
+                    board_id: props.boardId,
+                });
+                // song-lang
+                showSuccessMessage(i18n.t('Successfully Sent Email'), '');
             } catch (e) {
-                // TODD:: Error Handling
+                // song-lang
+                ErrorHandler.handleRequestError(e, i18n.t('에러 메시지!'));
             } finally {
                 modalState.sendEmailModalVisible = false;
             }
         };
-        const handleDeleteNoticeConfirm = () => {
+        const handleDeleteNoticeConfirm = async () => {
             try {
-                // TODD:: Notice delete API
+                await SpaceConnector.client.board.post.delete({
+                    post_id: props.postId,
+                    board_id: props.boardId,
+                });
+                // song-lang
+                showSuccessMessage(i18n.t('Successfully Deleted Notice'), '');
+                SpaceRouter.router.go(-1);
             } catch (e) {
-                // TODD:: Error Handling
+                // song-lang
+                ErrorHandler.handleRequestError(e, i18n.t('에러 메시지!'));
             } finally {
                 modalState.deleteModalVisible = false;
             }
