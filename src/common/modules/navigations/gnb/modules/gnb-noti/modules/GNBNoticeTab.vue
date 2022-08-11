@@ -21,7 +21,7 @@
                                      :writer="item.writer"
                                      @select="handleSelectNotice(item.postId)"
                     />
-                    <p-divider />
+                    <p-divider class="divider" />
                 </template>
                 <g-n-b-noti-item v-for="(item, idx) in items" :key="`${item.postId}-${idx}`"
                                  :title="item.title"
@@ -65,6 +65,7 @@ import {
     PDataLoader, PI, PDivider,
 } from '@spaceone/design-system';
 
+import type { TimeStamp } from '@/models';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -76,12 +77,13 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import type { NoticePostModel } from '@/services/info/notice/type';
 import { INFO_ROUTE } from '@/services/info/route-config';
 
 
 interface NoticeItem {
     postId: string;
-    createdAt: string;
+    createdAt: TimeStamp;
     title: string;
     writer: string;
     isPinned: boolean;
@@ -112,28 +114,26 @@ export default {
             loading: true,
             timezone: computed(() => store.state.user.timezone),
             noticeItemsRef: null as HTMLElement|null,
-            pinnedItems: [] as NoticeItem[],
-            items: [] as NoticeItem[],
+            noticeData: [] as NoticePostModel[],
+            items: computed<NoticeItem[]>(() => {
+                const filteredData = state.noticeData.filter(d => !d.options.is_pinned);
+                return convertNoticeItem(filteredData);
+            }),
+            pinnedItems: computed<NoticeItem[]>(() => {
+                const filteredData = state.noticeData.filter(d => d.options.is_pinned);
+                return convertNoticeItem(filteredData);
+            }),
             proxyCount: useProxyValue('count', props, emit),
         });
 
         /* Util */
-        const convertNoticeItem = (rawData: any[]): [NoticeItem[], NoticeItem[]] => {
-            const items: NoticeItem[] = [];
-            const pinnedItems: NoticeItem[] = [];
-            rawData.forEach((d) => {
-                const item = {
-                    postId: d.post_id,
-                    createdAt: d.created_at,
-                    title: d.title,
-                    writer: d.writer,
-                    isPinned: d.options.is_pinned,
-                };
-                if (d.options.is_pinned) pinnedItems.push(item);
-                else items.push(item);
-            });
-            return [items, pinnedItems];
-        };
+        const convertNoticeItem = (rawData: NoticePostModel[]): NoticeItem[] => rawData.map(d => ({
+            postId: d.post_id,
+            createdAt: d.created_at,
+            title: d.title,
+            writer: d.writer,
+            isPinned: d.options.is_pinned,
+        }));
 
         /* Api */
         const noticeApiHelper = new ApiQueryHelper()
@@ -146,12 +146,11 @@ export default {
                     query: noticeApiHelper.data,
                 });
                 state.proxyCount = total_count;
-                [state.items, state.pinnedItems] = convertNoticeItem(results);
+                state.noticeData = results;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
                 state.proxyCount = 0;
-                state.items = [];
-                state.pinnedItems = [];
+                state.noticeData = [];
             }
         };
 
@@ -218,6 +217,9 @@ export default {
             margin-top: 0.75rem;
             margin-bottom: 0.75rem;
             padding: 0 0.75rem;
+        }
+        .divider {
+            margin: 0.5rem 0;
         }
     }
     .view-all-button-wrapper {
