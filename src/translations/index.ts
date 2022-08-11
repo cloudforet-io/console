@@ -4,7 +4,6 @@ import componentKO from '@spaceone/design-system/src/translations/language-pack/
 import Vue from 'vue';
 import type { IVueI18n, LocaleMessageObject } from 'vue-i18n';
 import VueI18n from 'vue-i18n';
-import type { Store } from 'vuex';
 
 
 import en from '@/translations/language-pack/en.json';
@@ -50,16 +49,15 @@ export const i18n = new VueI18n({
     silentFallbackWarn: true,
 });
 
-/* Init */
-
-export const initI18n = (store: Store<any>) => {
-    store.watch(state => state.user.language, async (lang: string) => {
-        if (!supportLanguages.includes(lang as SupportLanguage)) throw new Error(`Not supported language: ${lang}`);
-        await loadLocaleFiles(lang);
-        i18n.locale = lang as string;
-    }, { immediate: true });
+export const setI18nLocale = async (_lang: string) => {
+    let lang = _lang;
+    if (!supportLanguages.includes(lang as SupportLanguage)) {
+        console.error(`Not supported language: ${lang}`);
+        lang = 'en';
+    }
+    await loadLocaleFiles(lang);
+    i18n.locale = lang as string;
 };
-
 
 /** ******************* */
 /** Type Declaration * */

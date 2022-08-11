@@ -6,7 +6,7 @@ import Vue from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { initI18n } from '@/translations';
+import { setI18nLocale } from '@/translations';
 
 import { errorRoutes } from '@/router/error-routes';
 import { serviceRoutes } from '@/router/service-routes';
@@ -107,6 +107,10 @@ const initRouter = (domainName?: string) => {
     }
 };
 
+const initI18n = () => {
+    setI18nLocale(store.state.user.language);
+};
+
 const initAmcharts = () => {
     if (config.get('AMCHARTS_LICENSE.ENABLED')) {
         addAmchartsLicense([
@@ -168,7 +172,7 @@ const init = async () => {
 
     if (domainName) {
         initRouter(domainName);
-        initI18n(store);
+        initI18n();
         initDayjs();
         initQueryHelper();
         initGtag();

@@ -2,6 +2,8 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
 
+import { setI18nLocale } from '@/translations';
+
 import type {
     UserState, SignInRequest, UpdateUserRequest, UserRole,
 } from './type';
@@ -131,7 +133,10 @@ export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest)
     await updateUser(state.userId, state.userType, userRequest);
     commit('setUser', { ...state, ...userRequest });
     commit('setTimezone', userRequest.timezone);
-    commit('setLanguage', userRequest.language);
+    if (userRequest.language) {
+        commit('setLanguage', userRequest.language);
+        await setI18nLocale(userRequest.language);
+    }
 };
 
 export const setTimezone = async ({ commit, state }, timezone: string): Promise<void> => {
@@ -142,6 +147,7 @@ export const setTimezone = async ({ commit, state }, timezone: string): Promise<
 export const setLanguage = async ({ commit, state }, language: string): Promise<void> => {
     await updateUser(state.userId, state.userType, { language });
     commit('setLanguage', language);
+    await setI18nLocale(language);
 };
 
 export const getUser = async ({ commit, state }, userId): Promise<void> => {

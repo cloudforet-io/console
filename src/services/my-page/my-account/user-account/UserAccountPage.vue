@@ -95,9 +95,8 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -139,8 +138,6 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
-
         const state = reactive({
             userId: computed(() => store.state.user.userId),
             userRole: computed(() => {
@@ -213,10 +210,6 @@ export default {
         const updateUser = async (userParam) => {
             try {
                 await store.dispatch('user/setUser', userParam);
-
-                if (userParam.language) {
-                    vm.$i18n.locale = userParam.language as string;
-                }
                 showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
@@ -265,6 +258,12 @@ export default {
                 ErrorHandler.handleError(e);
             }
         };
+
+        watch(() => store.state.user.language, (language) => {
+            if (language !== formState.language) {
+                formState.language = language;
+            }
+        });
 
         const init = async () => {
             await getProfile();
