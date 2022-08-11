@@ -1,4 +1,5 @@
 <template>
+    <!--        eslint-disable-next-line vue/no-v-html-->
     <div class="text-editor-contents" v-html="contents" />
 </template>
 

@@ -216,6 +216,7 @@ export default defineComponent<Props>({
                 props.editor.chain().focus().unsetLink().run();
             } else {
                 const previousUrl = props.editor.getAttributes('link').href;
+                // eslint-disable-next-line no-alert
                 const url = window.prompt('URL', previousUrl);
 
                 // cancelled
