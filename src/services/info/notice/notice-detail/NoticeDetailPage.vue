@@ -10,10 +10,12 @@
                     <p-button :outline="true" style-type="gray-border" icon="ic_edit">
                         {{ $t('Edit') }}
                     </p-button>
-                    <p-button :outline="true" style-type="gray-border" icon="ic_send">
+                    <p-button :outline="true" style-type="gray-border" icon="ic_send"
+                              @click="handleSendEmailModalOpen"
+                    >
                         {{ $t('Send Email') }}
                     </p-button>
-                    <p-button :outline="true" style-type="alert" @click="onClickDelete">
+                    <p-button :outline="true" style-type="alert" @click="handleDeleteModalOpen">
                         {{ $t('Delete') }}
                     </p-button>
                 </div>
@@ -62,6 +64,20 @@
             </p-button>
         </section>
         <!--song-lang-->
+        <p-button-modal :header-title="$t('Send the mail')"
+                        :visible.sync="sendEmailModalVisible"
+                        size="sm"
+                        :scrollable="true"
+                        @confirm="handleSendEmailConfirm"
+        >
+            <template #body>
+                <i18n path="song-lang" tag="p" class="desc">
+                    <template #domainText>
+                        <strong>{{ domainName }}</strong>
+                    </template>
+                </i18n>
+            </template>
+        </p-button-modal>
         <delete-modal :header-title="$t('Delete Notice')"
                       :visible.sync="deleteModalVisible"
                       :contents="$t('Are you sure you want to delete the notice?')"
@@ -77,7 +93,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBadge, PButton, PDataLoader, PDivider, PI, PPageTitle, PPaneLayout,
+    PBadge, PButton, PDataLoader, PDivider, PI, PPageTitle, PPaneLayout, PButtonModal,
 } from '@spaceone/design-system';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -104,6 +120,7 @@ export default {
         PDivider,
         PPageTitle,
         PButton,
+        PButtonModal,
         ListItem,
         DeleteModal,
     },
@@ -161,16 +178,26 @@ export default {
             noticeTypeBadgeInfo: computed<{ label?: TranslateResult; style?: string }>(() => getPostBadgeInfo(state.noticePostData?.scope)),
             // eslint-disable-next-line max-len
             contents: '<p>normal text</p><h1>h1</h1><h2>h2</h2><h3>h3</h3><p style="text-align: center">align center</p><p style="text-align: right">align right</p><p style="text-align: justify">align justify</p><p style="text-align: justify">color1 <span style="color: #7D5DD2">color2</span> <span style="color: #49A7F7">color3</span> ...</p><p style="text-align: justify"><strong>bold </strong></p><p style="text-align: justify"><em>italic</em></p><p style="text-align: justify"><u>underline</u></p><p style="text-align: justify"><s>strike</s></p><p style="text-align: justify"><code class="inline-code">this is inline code</code></p><ul><li><p style="text-align: justify">bullet</p><ul><li><p style="text-align: justify">bullet2</p><ul><li><p style="text-align: justify">bullet3</p></li></ul></li></ul></li><li><p style="text-align: justify">bullet4</p></li></ul><ol><li><p style="text-align: justify">number</p><ol><li><p style="text-align: justify">number1</p><ol><li><p style="text-align: justify">number2</p></li></ol></li></ol></li><li><p style="text-align: justify">number3</p><ol><li><p style="text-align: justify">number4</p></li></ol></li></ol><p style="text-align: justify"><a target="_blank" rel="noopener noreferrer nofollow" href="http://www.google.com">http://www.google.com</a></p><p style="text-align: justify"><img src="https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/spaceone.svg"></p><pre><code>const a = \'This is Code Block!\'nconsole.log(a)</code></pre><blockquote><p>This is Quote Block!</p></blockquote><hr><p></p><p>Good bye...!</p>',
+            domainName: 'Samsung',
         });
         const modalState = reactive({
             deleteModalVisible: false,
-            // TODD:: send email modal state here
+            sendEmailModalVisible: false,
         });
 
         const getNoticePostData = async () => {};
 
         const handleBackToListButtonClick = () => {
             SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME });
+        };
+        const handleSendEmailConfirm = () => {
+            try {
+                // TODD:: Notice send email API
+            } catch (e) {
+                // TODD:: Error Handling
+            } finally {
+                modalState.sendEmailModalVisible = false;
+            }
         };
         const handleDeleteNoticeConfirm = () => {
             try {
@@ -181,7 +208,10 @@ export default {
                 modalState.deleteModalVisible = false;
             }
         };
-        const onClickDelete = () => {
+        const handleSendEmailModalOpen = () => {
+            modalState.sendEmailModalVisible = true;
+        };
+        const handleDeleteModalOpen = () => {
             modalState.deleteModalVisible = true;
         };
 
@@ -194,8 +224,10 @@ export default {
             ...toRefs(state),
             ...toRefs(modalState),
             handleBackToListButtonClick,
+            handleSendEmailConfirm,
             handleDeleteNoticeConfirm,
-            onClickDelete,
+            handleSendEmailModalOpen,
+            handleDeleteModalOpen,
         };
     },
 };
