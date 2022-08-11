@@ -32,9 +32,10 @@
             </template>
             <div class="pagination-wrapper">
                 <p-pagination class="pagination"
-                              :total-count="noticeItems.length"
+                              :total-count="noticeItemTotalCount"
                               :page-size="10"
                               :current-page="1"
+                              @change="handlePageChange"
                 />
             </div>
         </p-data-loader>
@@ -45,6 +46,7 @@
 
 import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 
+import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
@@ -104,6 +106,7 @@ export default defineComponent<Props>({
             selectedScope: 'ALL',
             loading: false,
             noticeItems: [] as NoticePostModel[],
+            noticeItemTotalCount: 0,
             boardId: undefined as undefined | string,
         });
 
@@ -113,14 +116,16 @@ export default defineComponent<Props>({
             .setSort('created_at', true);
         const listNotice = async () => {
             try {
-                const { results } = await SpaceConnector.client.board.post.list({
+                const { results, total_count } = await SpaceConnector.client.board.post.list({
                     board_id: state.boardId,
                     query: noticeApiHelper.data,
                 });
                 state.noticeItems = results;
+                state.noticeItemTotalCount = total_count;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.noticeItems = [];
+                state.noticeItemTotalCount = 0;
             }
         };
 
@@ -150,6 +155,10 @@ export default defineComponent<Props>({
                 },
             });
         };
+        const handlePageChange = (page: number) => {
+            noticeApiHelper.setPage(getPageStart(page, NOTICE_ITEM_LIMIT), NOTICE_ITEM_LIMIT);
+            if (state.boardId) listNotice();
+        };
 
         (async () => {
             state.loading = true;
@@ -162,6 +171,7 @@ export default defineComponent<Props>({
             ...toRefs(state),
             handleChange,
             handleClickNotice,
+            handlePageChange,
         };
     },
 });
