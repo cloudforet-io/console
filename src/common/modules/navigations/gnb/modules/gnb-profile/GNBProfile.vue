@@ -19,7 +19,7 @@
                 </div>
                 <div v-click-outside="handleClickOutsideLanguageMenu"
                      class="info-menu language"
-                     @click.stop="showLanguageMenu"
+                     @click.stop="toggleLanguageMenu()"
                 >
                     <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
                     <div class="value">
@@ -53,35 +53,39 @@
                     </router-link>
                 </div>
             </div>
-            <template v-if="!isDomainOwner">
-                <p-divider class="divider" />
+            <template v-if="hasPermission">
+                <p-divider />
                 <div class="sub-menu-wrapper">
-                    <div class="sub-menu">
-                        <router-link :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}" @click.native="hideProfileMenu">
-                            {{ $t('MENU.MY_PAGE_API_KEY') }}
-                        </router-link>
-                    </div>
+                    <router-link class="sub-menu" :to="{name: INFO_ROUTE.NOTICE._NAME}" @click.native="hideProfileMenu">
+                        {{ $t('MENU.MY_PAGE_NOTICE') }}
+                    </router-link>
                 </div>
             </template>
-            <p-divider class="divider" />
-            <div class="sub-menu-wrapper">
-                <div v-for="{ link, label} in supportedMenu" :key="label" class="sub-menu">
-                    <a :href="link" target="_blank" class="support-menu"
-                       @click="hideProfileMenu"
-                    >
-                        <span>{{ label }}</span>
-                        <p-i name="ic_external-link"
-                             height="1em" width="1em"
-                             color="inherit"
-                             class="external-icon"
-                        />
-                    </a>
+            <template v-if="hasPermission && !isDomainOwner">
+                <p-divider />
+                <div class="sub-menu-wrapper">
+                    <router-link class="sub-menu" :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}" @click.native="hideProfileMenu">
+                        {{ $t('MENU.MY_PAGE_API_KEY') }}
+                    </router-link>
                 </div>
+            </template>
+            <p-divider />
+            <div class="sub-menu-wrapper">
+                <a v-for="{ link, label } in supportedMenu" :key="label" class="sub-menu support-menu"
+                   :href="link" target="_blank" @click="hideProfileMenu"
+                >
+                    <span>{{ label }}</span>
+                    <p-i name="ic_external-link"
+                         height="1em" width="1em"
+                         color="inherit"
+                         class="external-icon"
+                    />
+                </a>
             </div>
-            <p-divider class="divider" />
+            <p-divider />
             <div class="sub-menu-wrapper">
                 <div class="sub-menu" @click="handleClickSignOut">
-                    <span>{{ $t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}</span>
+                    {{ $t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}
                 </div>
             </div>
         </div>
@@ -113,6 +117,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
+import { INFO_ROUTE } from '@/services/info/route-config';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 
@@ -146,6 +151,7 @@ export default defineComponent({
             userId: computed(() => store.state.user.userId),
             hasDomainRole: computed((() => store.getters['user/hasDomainRole'])),
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            hasPermission: computed(() => store.getters['user/hasPermission']),
             languageMenuVisible: false,
             supportedMenu: computed(() => {
                 const docsList = config.get('DOCS') ?? [];
@@ -170,14 +176,14 @@ export default defineComponent({
             if (state.languageMenuVisible) state.languageMenuVisible = false;
             emit('hide-menu');
         };
-        const showLanguageMenu = () => {
-            state.languageMenuVisible = true;
+        const toggleLanguageMenu = (visible?: boolean) => {
+            state.languageMenuVisible = visible ?? !state.languageMenuVisible;
         };
         const handleClickOutsideLanguageMenu = (e: PointerEvent) => {
             const profileMenuRef = state.profileMenuRef;
             if (!profileMenuRef) return;
             const target = e.target as HTMLElement;
-            state.languageMenuVisible = false;
+            toggleLanguageMenu(false);
             /*
                 v-on-click-outside directive stops click event bubbling.
                 So when this function is called, hideProfileMenu function will never be called which is bound to profileMenuRef's v-on-click-outside directive.
@@ -185,15 +191,18 @@ export default defineComponent({
              */
             if (!profileMenuRef.contains(target)) hideProfileMenu();
         };
+
         const handleLanguageClick = async (language) => {
             try {
+                if (store.state.user.language === language) return;
+
                 await store.dispatch('user/setUser', {
                     language,
                     timezone: state.timezone,
                 });
-                await root.$nextTick();
-                showSuccessMessage(i18n.t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '', root);
-                hideProfileMenu();
+
+                toggleLanguageMenu(false);
+                showSuccessMessage(i18n.t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
             }
@@ -214,12 +223,13 @@ export default defineComponent({
             ...toRefs(state),
             openProfileMenu,
             hideProfileMenu,
-            showLanguageMenu,
+            toggleLanguageMenu,
             handleClickOutsideLanguageMenu,
             handleClickGoToMyPage,
             handleLanguageClick,
             handleClickSignOut,
             MY_PAGE_ROUTE,
+            INFO_ROUTE,
         };
     },
 });
@@ -288,7 +298,6 @@ export default defineComponent({
             padding: 0.5rem;
 
             .info-menu {
-                position: relative;
                 width: 100%;
                 padding: 0 0.5rem;
                 line-height: 1.5rem;
