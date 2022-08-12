@@ -12,9 +12,7 @@
                     >
                         {{ $t('Edit') }}
                     </p-button>
-                    <p-button :outline="true" style-type="gray-border" icon="ic_send"
-                              @click="handleSendEmailModalOpen"
-                    >
+                    <p-button :outline="true" style-type="gray-border" icon="ic_send">
                         {{ $t('Send Email') }}
                     </p-button>
                     <p-button :outline="true" style-type="alert" @click="handleDeleteModalOpen">
@@ -83,7 +81,7 @@
         <!--            </template>-->
         <!--        </p-button-modal>-->
 
-        <!--song-lang-->\
+        <!--song-lang-->
         <delete-modal :header-title="$t('Delete Notice')"
                       :visible.sync="deleteModalVisible"
                       :contents="$t('Are you sure you want to delete the notice?')"
