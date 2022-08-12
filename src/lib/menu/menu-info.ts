@@ -4,6 +4,7 @@ import { MENU_ID } from '@/lib/menu/config';
 export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     [MENU_ID.DASHBOARD]: {
         translationId: 'MENU.DASHBOARD',
+        icon: 'ic_dashboard',
     },
     [MENU_ID.PROJECT]: {
         translationId: 'MENU.PROJECT',
@@ -101,14 +102,14 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.MY_PAGE_NOTIFICATIONS]: {
         translationId: 'MENU.MY_PAGE_NOTIFICATIONS',
-        isNew: true,
     },
     [MENU_ID.INFO]: {
-        translationId: 'MENU.MY_PAGE_INFO',
+        translationId: 'MENU.INFO',
         isNew: true,
+        icon: 'ic_info-menu',
     },
     [MENU_ID.INFO_NOTICE]: {
-        translationId: 'MENU.MY_PAGE_NOTICE',
+        translationId: 'MENU.INFO_NOTICE',
         isNew: true,
     },
 });

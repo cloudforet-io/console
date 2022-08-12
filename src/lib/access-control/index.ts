@@ -42,14 +42,15 @@ export const getUserAccessLevel = (routeName?: string|null, pagePermissions: Pag
     const permission = getPermissionOfPage(menuId, pagePermissions);
     return getAccessTypeFromPermission(permission);
 };
-export const getMenuAccessLevel = (id: MenuId): AccessLevel => (MENU_INFO_MAP[id]?.needPermissionByRole ? ACCESS_LEVEL.VIEW_PERMISSION : ACCESS_LEVEL.AUTHENTICATED);
+const getMenuAccessLevel = (id: MenuId): AccessLevel => (MENU_INFO_MAP[id]?.needPermissionByRole ? ACCESS_LEVEL.VIEW_PERMISSION : ACCESS_LEVEL.AUTHENTICATED);
 
 
-export const isUserAccessibleToMenu = (menuId: MenuId, pagePermissions: PagePermissionTuple[] = []): boolean => {
+export const isUserAccessibleToMenu = (menuId: MenuId, pagePermissions: PagePermissionTuple[]): boolean => {
     const [, permission] = pagePermissions.find(([id]) => id === menuId) ?? [];
+    if (!permission) return false;
     return getAccessTypeFromPermission(permission) >= getMenuAccessLevel(menuId);
 };
-export const isUserAccessibleToRoute = (route: Route, pagePermissions: PagePermissionTuple[] = []): boolean => {
+export const isUserAccessibleToRoute = (route: Route, pagePermissions: PagePermissionTuple[]): boolean => {
     const routeAccessLevel = getRouteAccessLevel(route);
     const userAccessLevel = getUserAccessLevel(route.name, pagePermissions);
     return userAccessLevel >= routeAccessLevel;

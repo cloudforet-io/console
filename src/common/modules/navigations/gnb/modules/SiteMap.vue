@@ -150,14 +150,24 @@ export default {
                     @apply text-primary-dark;
                     margin-right: 0.25rem;
                 }
+
+                @media (hover: hover) {
+                    &:hover {
+                        @apply text-violet-500;
+                        transition: color ease 0.4s;
+                    }
+                }
             }
             &.submenu {
                 @apply text-gray-500;
                 line-height: 1.75rem;
                 padding-left: 3.5rem;
-                &:hover {
-                    @apply text-violet-500;
-                    transition: color ease 0.4s;
+
+                @media (hover: hover) {
+                    &:hover {
+                        @apply text-violet-500;
+                        transition: color ease 0.4s;
+                    }
                 }
             }
         }

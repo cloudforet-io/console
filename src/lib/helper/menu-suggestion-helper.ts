@@ -37,6 +37,7 @@ export const getAllSuggestionMenuList = (menuList: DisplayMenu[], parent?: Sugge
             results.push({
                 id: menu.id,
                 label: menu.label,
+                icon: menu.icon,
             });
         }
     });

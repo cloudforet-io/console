@@ -16,14 +16,14 @@
 
 <script lang="ts">
 import {
-    computed,
+    computed, defineComponent,
     reactive, toRefs,
 } from '@vue/composition-api';
 
 import config from '@/lib/config';
 
 
-export default {
+export default defineComponent({
     name: 'GNBLogo',
     props: {
         to: {
@@ -41,7 +41,7 @@ export default {
             ...toRefs(state),
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

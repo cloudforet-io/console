@@ -5,7 +5,7 @@
                 <site-map :menu-list="siteMapMenuList" :visible.sync="showSiteMap" :disabled="!hasPermission" />
             </div>
 
-            <g-n-b-logo :to="dashboardLink" />
+            <g-n-b-logo :to="logoLink" />
 
             <g-n-b-menu v-for="(menu, idx) in gnbMenuList"
                         :key="idx"
@@ -32,16 +32,18 @@
 <script lang="ts">
 import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    reactive, toRefs, computed, getCurrentInstance,
+    reactive, toRefs, computed, getCurrentInstance, defineComponent,
 } from '@vue/composition-api';
 
 import { includes } from 'lodash';
-import vClickOutside from 'v-click-outside';
 
 
 import { store } from '@/store';
 
 import type { DisplayMenu as GNBMenuType } from '@/store/modules/display/type';
+
+import { isUserAccessibleToMenu } from '@/lib/access-control';
+import { MENU_ID } from '@/lib/menu/config';
 
 import GNBMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBMenu.vue';
 import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';
@@ -53,16 +55,13 @@ import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 const ALLOWED_MENUS_FOR_ALL_USERS = ['notifications', 'support', 'profile'];
 
-export default {
+export default defineComponent({
     name: 'GNB',
     components: {
         GNBLogo,
         GNBMenu,
         SiteMap,
         GNBToolset,
-    },
-    directives: {
-        clickOutside: vClickOutside.directive,
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
@@ -71,7 +70,7 @@ export default {
             openedMenu: '',
             showSiteMap: false,
             hasPermission: computed((() => store.getters['user/hasPermission'])),
-            dashboardLink: computed(() => (state.hasPermission ? { name: DASHBOARD_ROUTE._NAME } : undefined)),
+            logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.DASHBOARD, store.getters['user/pagePermissionList']) ? { name: DASHBOARD_ROUTE._NAME } : null)),
             gnbMenuList: computed<GNBMenuType[]>(() => store.getters['display/GNBMenuList']),
             siteMapMenuList: computed<GNBMenuType[]>(() => store.getters['display/siteMapMenuList']),
             selectedMenu: computed(() => {
@@ -99,7 +98,7 @@ export default {
             handleOpenMenu,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

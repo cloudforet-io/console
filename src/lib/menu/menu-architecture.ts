@@ -2,6 +2,10 @@ import type { Menu } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 export const MENU_LIST: Menu[] = [
+    {
+        id: MENU_ID.DASHBOARD,
+        hideOnGNB: true,
+    },
     { id: MENU_ID.PROJECT },
     {
         id: MENU_ID.ASSET_INVENTORY,
@@ -43,6 +47,7 @@ export const MENU_LIST: Menu[] = [
     },
     {
         id: MENU_ID.MY_PAGE,
+        hideOnGNB: true,
         hideOnSiteMap: true,
         subMenuList: [
             {
@@ -57,6 +62,7 @@ export const MENU_LIST: Menu[] = [
     },
     {
         id: MENU_ID.INFO,
+        hideOnGNB: true,
         hideOnSiteMap: true,
         subMenuList: [
             { id: MENU_ID.INFO_NOTICE },

@@ -55,7 +55,7 @@
                 <p-divider />
                 <div class="sub-menu-wrapper">
                     <router-link class="sub-menu" :to="{name: INFO_ROUTE.NOTICE._NAME}" @click.native="hideProfileMenu">
-                        {{ $t('MENU.MY_PAGE_NOTICE') }}
+                        {{ $t('MENU.INFO_NOTICE') }}
                     </router-link>
                 </div>
             </template>

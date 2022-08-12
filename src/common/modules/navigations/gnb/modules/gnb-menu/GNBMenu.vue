@@ -1,5 +1,7 @@
 <template>
-    <div v-if="show" class="gnb-menu" :class="{disabled: !hasPermission}">
+    <div v-if="show" v-click-outside="hideMenu" class="gnb-menu"
+         :class="{disabled: !hasPermission}"
+    >
         <div class="menu-button"
              :class="[{
                  opened: subMenuList.length > 0 && isOpened,
@@ -26,12 +28,12 @@
             </component>
 
             <div v-if="isOpened && subMenuList.length > 0"
-                 v-click-outside="hideMenu"
                  class="sub-menu-wrapper"
+                 @click.stop="hideMenu"
             >
                 <g-n-b-sub-menu v-for="(subMenu, index) in subMenuList"
                                 :key="index"
-                                :show="!subMenu.optional"
+                                :show="!subMenu.hideOnGNB"
                                 :label="subMenu.label"
                                 :to="subMenu.to"
                                 :is-beta="subMenu.isBeta"
@@ -44,23 +46,25 @@
 
 <script lang="ts">
 import type { PropType } from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
-import vClickOutside from 'v-click-outside';
+import { vOnClickOutside } from '@vueuse/components';
+import type { DirectiveFunction } from 'vue';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 
 
-export default {
+export default defineComponent({
     name: 'GNBMenu',
     components: {
         PI,
         GNBSubMenu,
     },
     directives: {
-        clickOutside: vClickOutside.directive,
+        clickOutside: vOnClickOutside as DirectiveFunction,
     },
     props: {
         show: {
@@ -110,7 +114,7 @@ export default {
             hideMenu,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
