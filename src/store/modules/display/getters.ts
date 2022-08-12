@@ -8,7 +8,7 @@ import {
     CURRENCY_SYMBOL, SIDEBAR_TYPE,
 } from '@/store/modules/display/config';
 import type {
-    DisplayState, GNBMenu, SidebarProps,
+    DisplayState, DisplayMenu, SidebarProps,
 } from '@/store/modules/display/type';
 
 import type { PagePermissionTuple } from '@/lib/access-control/config';
@@ -52,7 +52,7 @@ export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarP
     return { styleType: 'primary', disableButton: false, size: 'md' };
 };
 
-const filterMenuByRoute = (menuList: GNBMenu[], router: VueRouter): GNBMenu[] => menuList.reduce((results, _menu) => {
+const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
     const menu = { ..._menu };
     if (menu.subMenuList) {
         menu.subMenuList = filterMenuByRoute(menu.subMenuList, router);
@@ -66,9 +66,9 @@ const filterMenuByRoute = (menuList: GNBMenu[], router: VueRouter): GNBMenu[] =>
     if (link?.href !== '/') results.push(menu);
 
     return results;
-}, [] as GNBMenu[]);
+}, [] as DisplayMenu[]);
 
-const filterMenuByPermission = (menuList: GNBMenu[], pagePermissionList: PagePermissionTuple[]): GNBMenu[] => menuList.reduce((results, _menu) => {
+const filterMenuByPermission = (menuList: DisplayMenu[], pagePermissionList: PagePermissionTuple[]): DisplayMenu[] => menuList.reduce((results, _menu) => {
     const menu = { ..._menu };
 
     if (menu.subMenuList) {
@@ -82,9 +82,9 @@ const filterMenuByPermission = (menuList: GNBMenu[], pagePermissionList: PagePer
     }
 
     return results;
-}, [] as GNBMenu[]);
+}, [] as DisplayMenu[]);
 
-const getGnbMenuList = (menuList: Menu[]): GNBMenu[] => menuList.map((d) => {
+const getGnbMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
     return {
         ...d,
@@ -94,17 +94,17 @@ const getGnbMenuList = (menuList: Menu[]): GNBMenu[] => menuList.map((d) => {
         isBeta: menuInfo.isBeta,
         to: { name: d.id },
         subMenuList: d.subMenuList ? getGnbMenuList(d.subMenuList) : [],
-    } as GNBMenu;
+    } as DisplayMenu;
 });
-export const allGnbMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): GNBMenu[] => {
+export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
     const billingAccessibleDomainList: string[] = config.get('BILLING_ENABLED') ?? [];
     const _showBilling = billingAccessibleDomainList.includes(rootState.domain.domainId);
     const menuList = _showBilling ? MENU_LIST : MENU_LIST.filter(d => d.id !== MENU_ID.COST_EXPLORER);
 
-    let _allGnbMenuList: GNBMenu[] = getGnbMenuList(menuList);
+    let _allGnbMenuList: DisplayMenu[] = getGnbMenuList(menuList);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
     _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
     return _allGnbMenuList;
 };
 
-export const GNBMenuList: Getter<DisplayState, any> = (state, getters): GNBMenu[] => getters.allGnbMenuList.filter(d => !d.optional);
+export const GNBMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter(d => !d.optional);

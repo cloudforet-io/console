@@ -50,7 +50,7 @@ import {
 import { PI } from '@spaceone/design-system';
 import vClickOutside from 'v-click-outside';
 
-import type { GNBMenu } from '@/store/modules/display/type';
+import type { DisplayMenu } from '@/store/modules/display/type';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
@@ -77,14 +77,14 @@ export default {
             default: false,
         },
         menuList: {
-            type: Array as PropType<GNBMenu[]>,
+            type: Array as PropType<DisplayMenu[]>,
             default: () => ([]),
         },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
-            siteMapMenuList: computed<GNBMenu[]>(() => ([
+            siteMapMenuList: computed<DisplayMenu[]>(() => ([
                 {
                     id: DASHBOARD_ROUTE._NAME,
                     label: vm.$t('MENU.DASHBOARD'),

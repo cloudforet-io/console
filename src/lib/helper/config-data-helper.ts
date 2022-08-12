@@ -1,6 +1,6 @@
 import { find } from 'lodash';
 
-import type { GNBMenu } from '@/store/modules/display/type';
+import type { DisplayMenu } from '@/store/modules/display/type';
 import type { FavoriteConfig, FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
@@ -18,7 +18,7 @@ interface ReferenceData extends FavoriteItem, RecentItem {
     [key: string]: any;
 }
 
-export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menuList: GNBMenu[]): ReferenceData[] => {
+export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menuList: DisplayMenu[]): ReferenceData[] => {
     const allMenuList = getAllSuggestionMenuList(menuList);
     const results: ReferenceData[] = [];
     if (config) {

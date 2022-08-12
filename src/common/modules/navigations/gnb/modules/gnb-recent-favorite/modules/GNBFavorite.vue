@@ -166,7 +166,7 @@ export default {
             //
             favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
                 store.state.favorite.menuItems,
-                store.getters['display/allGnbMenuList'],
+                store.getters['display/allMenuList'],
             )),
             favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE, store.getters['user/pagePermissionList']);

@@ -134,12 +134,12 @@ export default defineComponent({
         const dataState = reactive({
             // menu
             recentMenuList: [] as RecentConfig[],
-            allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allGnbMenuList'])),
+            allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allMenuList'])),
             filteredMenuList: [] as SuggestionMenu[],
             _menuTotalCount: 0,
             _menuSuggestions: computed<SuggestionItem[]>(() => {
                 if (state.showRecent) {
-                    return convertMenuConfigToReferenceData(dataState.recentMenuList, store.getters['display/allGnbMenuList']);
+                    return convertMenuConfigToReferenceData(dataState.recentMenuList, store.getters['display/allMenuList']);
                 }
                 return dataState.filteredMenuList.map(d => ({
                     itemType: SUGGESTION_TYPE.MENU,

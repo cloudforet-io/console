@@ -48,7 +48,7 @@ import type { PropType } from '@vue/composition-api';
 import { PI } from '@spaceone/design-system';
 import vClickOutside from 'v-click-outside';
 
-import type { GNBMenu } from '@/store/modules/display/type';
+import type { DisplayMenu } from '@/store/modules/display/type';
 
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 
@@ -92,7 +92,7 @@ export default {
             default: false,
         },
         subMenuList: {
-            type: Array as PropType<GNBMenu[]>,
+            type: Array as PropType<DisplayMenu[]>,
             default: () => [],
         },
     },

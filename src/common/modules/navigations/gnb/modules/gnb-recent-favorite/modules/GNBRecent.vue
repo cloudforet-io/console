@@ -34,7 +34,7 @@ import { sortBy } from 'lodash';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import type { GNBMenu } from '@/store/modules/display/type';
+import type { DisplayMenu } from '@/store/modules/display/type';
 import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import { RECENT_TYPE } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
@@ -76,7 +76,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const storeState = reactive({
-            menuItems: computed<GNBMenu[]>(() => store.getters['display/allGnbMenuList']),
+            menuItems: computed<DisplayMenu[]>(() => store.getters['display/allMenuList']),
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.state.reference.projectGroup.items),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.state.reference.cloudServiceType.items),

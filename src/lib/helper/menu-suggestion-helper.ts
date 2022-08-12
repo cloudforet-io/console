@@ -1,6 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { GNBMenu } from '@/store/modules/display/type';
+import type { DisplayMenu } from '@/store/modules/display/type';
 
 export interface SuggestionMenu {
     id: string;
@@ -9,7 +9,7 @@ export interface SuggestionMenu {
     icon?: string;
 }
 
-export const getAllSuggestionMenuList = (menuList: GNBMenu[], parent?: SuggestionMenu): SuggestionMenu[] => {
+export const getAllSuggestionMenuList = (menuList: DisplayMenu[], parent?: SuggestionMenu): SuggestionMenu[] => {
     const results: SuggestionMenu[] = [];
     if (parent) {
         results.push({

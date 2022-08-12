@@ -5,13 +5,13 @@ import type { SidebarType, Currency } from '@/store/modules/display/config';
 
 import type { Menu } from '@/lib/menu/config';
 
-export interface GNBMenu extends Menu {
+export interface DisplayMenu extends Menu {
     label: TranslateResult;
     icon?: string;
     isNew?: boolean;
     isBeta?: boolean;
     to: Location;
-    subMenuList?: GNBMenu[];
+    subMenuList?: DisplayMenu[];
 }
 
 export type CurrencyRates = {
