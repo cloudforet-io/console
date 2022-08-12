@@ -3,17 +3,13 @@
         <p-page-title title="Edit Notice" @go-back="$router.go(-1)" />
         <notice-form :board-id="boardId"
                      type="EDIT"
-                     :writer-name="noticePostData.writer"
-                     :notice-title="noticePostData.title"
-                     :is-pinned="isPinned"
-                     :is-popup="isPopup"
-                     :content="noticePostData.contents"
+                     :notice-post-data="noticePostData"
         />
     </div>
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PPageTitle } from '@spaceone/design-system';
@@ -42,9 +38,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            noticePostData: {} as NoticePostModel,
-            isPinned: computed(() => !!state.noticePostData?.options?.is_pinned),
-            isPopup: computed(() => !!state.noticePostData?.options?.is_popup),
+            noticePostData: {} as Partial<NoticePostModel>,
         });
 
         /* Api */
@@ -56,6 +50,7 @@ export default {
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
+                state.noticePostData = {};
             }
         };
 

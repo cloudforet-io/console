@@ -15,7 +15,8 @@ export interface NoticePostModel {
     view_count: 0,
     writer: string;
     scope: NoticeType;
-    domain_id: string;
+    // `domain_id` should & would not exist when the post is as SYSTEM
+    domain_id?: string;
     user_id: string;
     user_domain_id: string;
     created_at: TimeStamp;

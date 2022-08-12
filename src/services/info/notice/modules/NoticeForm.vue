@@ -5,9 +5,9 @@
             <p-field-group class="notice-label-wrapper writer-name-input" label="Writer Name" required>
                 <template #default="{invalid}">
                     <!--                    song-lang-->
-                    <p-text-input :value="writerNameState" :invalid="invalid"
+                    <p-text-input :value="writerName" :invalid="invalid"
                                   :placeholder="$store.state.user.name || 'Required'"
-                                  @input="setForm('writerNameState', $event)"
+                                  @input="setForm('writerName', $event)"
                     />
                 </template>
             </p-field-group>
@@ -15,46 +15,45 @@
             <p-field-group v-if="hasSystemRole" class="notice-label-wrapper" label="Viewer"
                            required
             >
-                <p-radio :selected="isAllDomainSelectedState" class="mr-4" @click="handleClickAllDomainRadio">
+                <p-radio :selected="isAllDomainSelected" class="mr-4" @click="handleClickAllDomainRadio">
                     <!--                    song-lang-->
                     <span>All Domains</span>
                 </p-radio>
-                <p-radio :selected="!isAllDomainSelectedState" @click="handleClickSelectDomainRadio">
+                <p-radio :selected="!isAllDomainSelected" @click="handleClickSelectDomainRadio">
                     <!--                    song-lang-->
-                    <span>Selected Domains</span>
+                    <span>Selected Domain</span>
                 </p-radio>
                 <br>
-                <!--                TODO:: add loading-->
                 <!--               song-lang -->
                 <p-search-dropdown class="mt-2 w-1/2"
                                    :menu="domainList"
-                                   :selected="selectedDomainState"
-                                   :disabled="isAllDomainSelectedState"
-                                   :placeholder="isAllDomainSelectedState ? 'All' : ''"
+                                   :selected="selectedDomain"
+                                   :disabled="isAllDomainSelected"
+                                   :placeholder="isAllDomainSelected ? 'All' : ''"
                                    @update:selected="handleSelectDomain"
                 />
             </p-field-group>
             <!--            song-lang-->
             <p-field-group class="notice-label-wrapper" label="Title" required
-                           :invalid="invalidState.noticeTitleState"
-                           :invalid-text="invalidTexts.noticeTitleState"
+                           :invalid="invalidState.noticeTitle"
+                           :invalid-text="invalidTexts.noticeTitle"
             >
                 <template #default="{invalid}">
-                    <p-text-input :value="noticeTitleState" :invalid="invalid"
+                    <p-text-input :value="noticeTitle" :invalid="invalid"
                                   class="w-full"
-                                  @input="setForm('noticeTitleState', $event)"
+                                  @input="setForm('noticeTitle', $event)"
                     />
                 </template>
             </p-field-group>
             <p-field-group class="notice-label-wrapper" label="Content" required>
-                <text-editor v-model.lazy="contentState" :image-uploader="uploadImage" />
+                <text-editor v-model.lazy="contents" :image-uploader="uploadImage" />
             </p-field-group>
             <div class="notice-create-options-wrapper">
-                <p-check-box v-model="isPinnedState">
+                <p-check-box v-model="isPinned">
                     <!--                song-lang-->
                     <span>Pin Notice</span>
                 </p-check-box>
-                <p-check-box v-model="isPopupState">
+                <p-check-box v-model="isPopup">
                     <!--                song-lang-->
                     <span>Display in pop-up</span>
                 </p-check-box>
@@ -103,6 +102,7 @@ import TextEditor from '@/common/components/editor/TextEditor.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import type { NoticePostModel } from '@/services/info/notice/type';
 import { INFO_ROUTE } from '@/services/info/route-config';
 
 
@@ -111,7 +111,7 @@ interface DomainItem {
     label: string;
 }
 
-type noticeFormType = 'CREATE' | 'EDIT';
+type NoticeFormType = 'CREATE' | 'EDIT';
 
 export default {
     name: 'NoticeForm',
@@ -132,77 +132,56 @@ export default {
         },
         type: {
             default: 'CREATE',
-            type: String as PropType<noticeFormType>,
+            type: String as PropType<NoticeFormType>,
         },
-        writerName: {
-            default: '',
-            type: String,
-        },
-        noticeTitle: {
-            default: '',
-            type: String,
-        },
-        isPinned: {
-            default: false,
-            type: Boolean,
-        },
-        isPopup: {
-            default: false,
-            type: Boolean,
-        },
-        isAllDomainSelected: {
-            default: false,
-            type: Boolean,
-        },
-        selectedDomains: {
-            default: () => ([]),
-            type: Array,
-        },
-        content: {
-            default: '',
-            type: String,
+        noticePostData: {
+            default: () => {},
+            type: Object as PropType<NoticePostModel>,
         },
     },
     setup(props) {
         const state = reactive({
             hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
             userName: computed<string>(() => store.state.user.name),
-            isPinnedState: props.isPinned ?? false,
-            isPopupState: props.isPopup ?? false,
-            contentState: props.content ?? '',
-            isAllDomainSelectedState: props.isAllDomainSelected ?? true,
+            // FIXME:: below props.noticePostData could be undefined because of async get method
+            isPinned: props.noticePostData?.options.is_pinned ?? false,
+            isPopup: props.noticePostData?.options.is_popup ?? false,
+            contents: props.noticePostData?.contents ?? '',
+            isAllDomainSelected: !!props.noticePostData?.domain_id,
+            boardIdState: props.noticePostData?.board_id ?? '',
             domainList: [] as Array<DomainItem>,
-            boardIdList: props.boardId as Array<string>,
-            selectedDomainState: props.selectedDomains.length ? props.selectedDomains : [],
+            selectedDomain: props.noticePostData?.selectedDomain?.length
+                ? [{ name: props.noticePostData.domain_id, label: props.noticePostData.domain_id }]
+                : [{ name: store.state.domain.domainId, label: store.state.domain.domainId }] as Array<DomainItem>,
         });
 
         const {
             forms: {
-                noticeTitleState,
-                writerNameState,
+                noticeTitle,
+                writerName,
             },
             setForm,
             invalidState,
             invalidTexts,
             isAllValid,
         } = useFormValidator({
-            noticeTitleState: props.noticeTitle,
-            writerNameState: props.writerName || state.userName || '',
+            noticeTitle: props.noticePostData?.title ?? '',
+            writerName: props.noticePostData?.writer || state.userName || '',
         }, {
             // song-lang
-            noticeTitleState(value: string) { return value.trim().length ? '' : 'Title is required'; },
+            noticeTitle(value: string) { return value.trim().length ? '' : 'Title is required'; },
             // song-lang
-            writerNameState(value: string) { return value.trim().length ? '' : 'Writer name is required'; },
+            writerName(value: string) { return value.trim().length ? '' : 'Writer name is required'; },
         });
 
         const formData:ComputedRef = computed(() => ({
-            board_id: props.boardId,
-            title: noticeTitleState.value,
-            writer: writerNameState.value,
-            contents: state.contentState,
+            board_id: state.boardIdState,
+            title: noticeTitle.value,
+            writer: writerName.value,
+            contents: state.contents,
             options: {
-                is_pinned: state.isPinnedState,
-                is_popup: state.isPopupState,
+                is_pinned: state.isPinned,
+                is_popup: state.isPopup,
             },
         }));
 
@@ -213,7 +192,10 @@ export default {
 
         const handleCreateNotice = async () => {
             try {
-                await SpaceConnector.client.board.post.create(formData.value);
+                await SpaceConnector.client.board.post.create(
+                    state.isAllDomainSelected ? formData.value
+                        : { ...formData.value, domain_id: state.selectedDomain[0].name },
+                );
                 // song-lang
                 showSuccessMessage('Successfully created notice', '');
                 await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME, query: {} });
@@ -224,23 +206,25 @@ export default {
         };
         const handleEditNotice = async () => {
             try {
-                await SpaceConnector.client.board.post.update(formData.value);
+                await SpaceConnector.client.board.post.update(
+                    state.isAllDomainSelected ? formData.value
+                        : { ...formData.value, domain_id: state.selectedDomain[0].name },
+                );
                 // song-lang
                 showSuccessMessage('Successfully edited notice', '');
-                // TODO:: add below `query`
-                await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE.DETAIL._NAME, query: {} });
+                await SpaceRouter.router.back();
             } catch (e) {
                 // song-lang
                 ErrorHandler.handleRequestError(e, 'Failed to edit notice');
             }
         };
 
-        const handleClickAllDomainRadio = () => { state.isAllDomainSelectedState = true; };
-        const handleClickSelectDomainRadio = () => { state.isAllDomainSelectedState = false; };
+        const handleClickAllDomainRadio = () => { state.isAllDomainSelected = true; };
+        const handleClickSelectDomainRadio = () => { state.isAllDomainSelected = false; };
 
-        const handleSelectDomain = (domain: Array<string>) => {
-            if (!state.isAllDomainSelectedState) {
-                state.selectedDomainState = domain;
+        const handleSelectDomain = (domain: Array<DomainItem>) => {
+            if (!state.isAllDomainSelected) {
+                state.selectedDomain = domain;
             }
         };
 
@@ -263,10 +247,10 @@ export default {
                     domain_id: state.domainList.length ? state.domainList.map(d => d.name)
                         : store.state.domain.domainId,
                 });
-                state.boardIdList = results.map(d => d.board_id);
+                state.boardIdState = results.filter(d => d.name === 'Notice')[0]?.board_id ?? '';
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.boardIdList = [];
+                state.boardIdState = '';
             }
         };
 
@@ -277,8 +261,8 @@ export default {
             }, 1000);
         });
 
-        watch(() => state.isAllDomainSelectedState, (isAllDomain) => {
-            if (isAllDomain) state.selectedDomainState = [];
+        watch(() => state.isAllDomainSelected, (isAllDomain: boolean) => {
+            if (isAllDomain) state.selectedDomain = [];
         });
 
         (async () => {
@@ -292,8 +276,8 @@ export default {
             handleClickAllDomainRadio,
             handleClickSelectDomainRadio,
             handleSelectDomain,
-            noticeTitleState,
-            writerNameState,
+            noticeTitle,
+            writerName,
             setForm,
             invalidState,
             invalidTexts,
