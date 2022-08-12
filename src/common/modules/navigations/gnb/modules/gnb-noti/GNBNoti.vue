@@ -1,5 +1,5 @@
 <template>
-    <div class="gnb-notifications-notice" @click.stop>
+    <div v-click-outside="handleClickOutside" class="gnb-notifications-notice" @click.stop>
         <span class="menu-button" tabindex="0">
             <p-i class="menu-icon"
                  :name="hasNotifications ? 'ic_bell_noti' : 'ic_bell'"
@@ -7,7 +7,7 @@
                  @click.stop="handleClickButton"
             />
         </span>
-        <p-tab v-show="proxyVisibleDropdown"
+        <p-tab v-show="visibleDropdown"
                :tabs="tabs"
                :active-tab.sync="activeTab"
         >
@@ -17,7 +17,7 @@
                 </p-badge>
             </template>
             <template #notifications>
-                <g-n-b-notifications-tab :visible="proxyVisibleDropdown && activeTab === 'notifications'"
+                <g-n-b-notifications-tab :visible="visibleDropdown && activeTab === 'notifications'"
                                          :count.sync="count.notifications"
                 />
             </template>
@@ -31,22 +31,25 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import { commaFormatter } from '@spaceone/console-core-lib';
 import {
     PI, PTab, PBadge,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { vOnClickOutside } from '@vueuse/components';
+import type { DirectiveFunction } from 'vue';
 
 import { store } from '@/store';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import GNBNoticeTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNoticeTab.vue';
 import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationsTab.vue';
 
 
-export default {
+export default defineComponent({
     name: 'GNBNoti',
     components: {
         GNBNoticeTab,
@@ -55,15 +58,12 @@ export default {
         PBadge,
         GNBNotificationsTab,
     },
-    props: {
-        visibleDropdown: {
-            type: Boolean,
-            default: false,
-        },
+    directives: {
+        clickOutside: vOnClickOutside as DirectiveFunction,
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyVisibleDropdown: useProxyValue('visibleDropdown', props, emit),
+            visibleDropdown: false,
             hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
             tabs: computed(() => ([
                 // song-lang
@@ -77,22 +77,48 @@ export default {
             },
         });
 
+        const setVisibleDropdown = (visible: boolean) => {
+            state.visibleDropdown = visible;
+            if (visible) {
+                emit('open-menu');
+                store.dispatch('display/stopCheckNotification');
+            } else {
+                emit('hide-menu');
+                store.dispatch('display/startCheckNotification');
+            }
+        };
+
         /* Event */
+        const handleClickOutside = () => {
+            setVisibleDropdown(false);
+        };
         const handleClickButton = () => {
-            state.proxyVisibleDropdown = !state.proxyVisibleDropdown;
+            setVisibleDropdown(!state.visibleDropdown);
         };
         const handleCloseDropdown = () => {
-            state.proxyVisibleDropdown = false;
+            setVisibleDropdown(false);
         };
+
+        onMounted(() => {
+            store.dispatch('display/startCheckNotification');
+        });
+        onUnmounted(() => {
+            store.dispatch('display/stopCheckNotification');
+        });
+
+        watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
+            if (isSessionExpired) store.dispatch('display/stopCheckNotification');
+        });
 
         return {
             ...toRefs(state),
+            handleClickOutside,
             handleClickButton,
             handleCloseDropdown,
             commaFormatter,
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .gnb-notifications-notice {

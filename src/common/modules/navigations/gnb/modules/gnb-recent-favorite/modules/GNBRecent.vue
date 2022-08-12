@@ -24,7 +24,7 @@
 <script lang="ts">
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PDataLoader } from '@spaceone/design-system';
@@ -62,7 +62,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const RECENT_LIMIT = 30;
 
-export default {
+export default defineComponent({
     name: 'GNBRecent',
     components: {
         GNBSuggestionList,
@@ -166,7 +166,7 @@ export default {
             handleSelect,
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .gnb-recent {

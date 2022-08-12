@@ -1,11 +1,9 @@
 <template>
-    <div class="gnb-profile">
-        <div class="menu-button" :tabindex="0" @click.stop="openProfileMenu">
+    <div ref="profileMenuRef" v-click-outside="hideProfileMenu" class="gnb-profile">
+        <div class="menu-button" :tabindex="0" @click.stop="handleClickButton">
             <p-i :name="userIcon" class="menu-icon" />
         </div>
         <div v-if="visible"
-             ref="profileMenuRef"
-             v-click-outside="hideProfileMenu"
              class="profile-menu-wrapper"
         >
             <div class="user-info">
@@ -19,7 +17,7 @@
                 </div>
                 <div v-click-outside="handleClickOutsideLanguageMenu"
                      class="info-menu language"
-                     @click.stop="toggleLanguageMenu()"
+                     @click.stop="handleLanguageDropdownClick"
                 >
                     <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
                     <div class="value">
@@ -167,29 +165,39 @@ export default defineComponent({
             profileMenuRef: null as null|HTMLElement,
         });
 
+        const setVisible = (visible: boolean) => {
+            state.visible = visible;
+            if (visible) emit('open-menu');
+            else emit('hide-menu');
+        };
         const openProfileMenu = () => {
-            state.visible = true;
-            emit('open-menu');
+            setVisible(true);
         };
         const hideProfileMenu = () => {
-            state.visible = false;
             if (state.languageMenuVisible) state.languageMenuVisible = false;
-            emit('hide-menu');
+            setVisible(false);
         };
-        const toggleLanguageMenu = (visible?: boolean) => {
-            state.languageMenuVisible = visible ?? !state.languageMenuVisible;
+        const setLanguageMenuVisible = (visible: boolean) => {
+            state.languageMenuVisible = visible;
+        };
+        const handleClickButton = () => {
+            setVisible(!state.visible);
         };
         const handleClickOutsideLanguageMenu = (e: PointerEvent) => {
             const profileMenuRef = state.profileMenuRef;
             if (!profileMenuRef) return;
             const target = e.target as HTMLElement;
-            toggleLanguageMenu(false);
+            setLanguageMenuVisible(false);
             /*
                 v-on-click-outside directive stops click event bubbling.
                 So when this function is called, hideProfileMenu function will never be called which is bound to profileMenuRef's v-on-click-outside directive.
                 The code below closes the profile menu when the user clicks outside the profileMenuRef.
              */
             if (!profileMenuRef.contains(target)) hideProfileMenu();
+        };
+
+        const handleLanguageDropdownClick = () => {
+            setLanguageMenuVisible(!state.languageMenuVisible);
         };
 
         const handleLanguageClick = async (language) => {
@@ -201,7 +209,7 @@ export default defineComponent({
                     timezone: state.timezone,
                 });
 
-                toggleLanguageMenu(false);
+                setLanguageMenuVisible(false);
                 showSuccessMessage(i18n.t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
@@ -223,8 +231,10 @@ export default defineComponent({
             ...toRefs(state),
             openProfileMenu,
             hideProfileMenu,
-            toggleLanguageMenu,
+            setLanguageMenuVisible,
+            handleClickButton,
             handleClickOutsideLanguageMenu,
+            handleLanguageDropdownClick,
             handleClickGoToMyPage,
             handleLanguageClick,
             handleClickSignOut,

@@ -1,5 +1,5 @@
 <template>
-    <div class="gnb-recent-favorite" @click.stop>
+    <div v-click-outside="handleClickOutside" class="gnb-recent-favorite" @click.stop>
         <span class="menu-button" tabindex="0">
             <p-i class="menu-icon"
                  name="ic_recent_and_favorite"
@@ -8,12 +8,12 @@
                  @click.stop="handleClickButton"
             />
         </span>
-        <p-tab v-show="proxyVisibleDropdown"
+        <p-tab v-show="visibleDropdown"
                :tabs="tabs"
                :active-tab.sync="activeTab"
         >
             <template #recent>
-                <g-n-b-recent :visible="proxyVisibleDropdown && activeTab === 'recent'"
+                <g-n-b-recent :visible="visibleDropdown && activeTab === 'recent'"
                               @close="handleCloseDropdown"
                 />
             </template>
@@ -25,21 +25,23 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from '@vue/composition-api';
 
 import {
     PI, PTab,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { vOnClickOutside } from '@vueuse/components';
+import type { DirectiveFunction } from 'vue';
 
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import GNBFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBFavorite.vue';
 import GNBRecent from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBRecent.vue';
 
-
-export default {
+export default defineComponent({
     name: 'GNBRecentFavorite',
     components: {
         GNBRecent,
@@ -47,15 +49,12 @@ export default {
         PI,
         PTab,
     },
-    props: {
-        visibleDropdown: {
-            type: Boolean,
-            default: false,
-        },
+    directives: {
+        clickOutside: vOnClickOutside as DirectiveFunction,
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyVisibleDropdown: useProxyValue('visibleDropdown', props, emit),
+            visibleDropdown: false,
             tabs: computed(() => ([
                 { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
                 { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
@@ -63,15 +62,21 @@ export default {
             activeTab: 'recent',
         });
 
+        const setVisibleDropdown = (visible: boolean) => {
+            state.visibleDropdown = visible;
+            if (visible) emit('open-menu');
+            else emit('hide-menu');
+        };
+
         /* Event */
         const handleClickOutside = () => {
-            state.proxyVisibleDropdown = false;
+            setVisibleDropdown(false);
         };
         const handleClickButton = () => {
-            state.proxyVisibleDropdown = !state.proxyVisibleDropdown;
+            setVisibleDropdown(!state.visibleDropdown);
         };
         const handleCloseDropdown = () => {
-            state.proxyVisibleDropdown = false;
+            setVisibleDropdown(false);
         };
 
         return {
@@ -81,7 +86,7 @@ export default {
             handleCloseDropdown,
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .gnb-recent-favorite {

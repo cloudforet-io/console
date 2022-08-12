@@ -1,5 +1,5 @@
 <template>
-    <div v-click-outside="handleClickOutside" class="gnb-search">
+    <div v-click-outside="handleClickOutside" class="gnb-search" @click.stop>
         <g-n-b-search-input v-if="isOverLaptopSize" v-model="inputText"
                             :is-focused.sync="isFocusOnInput"
                             @click="showSuggestion"
@@ -12,20 +12,13 @@
         <span v-else
               class="menu-button" tabindex="0"
         >
-            <p-i v-if="dataState.proxyVisibleSuggestion"
-                 name="ic_delete--bold"
+            <p-i name="ic_search--bold"
                  height="1.5rem" width="1.5rem"
                  color="inherit"
-                 @click.stop="hideSuggestion"
-            />
-            <p-i v-else
-                 name="ic_search--bold"
-                 height="1.5rem" width="1.5rem"
-                 color="inherit"
-                 @click.stop="showSuggestion"
+                 @click.stop="handleClickButton"
             />
         </span>
-        <g-n-b-search-dropdown v-show="proxyVisibleSuggestion"
+        <g-n-b-search-dropdown v-show="visibleSuggestion"
                                :input-text="trimmedInputText"
                                :loading="loading"
                                :items="dataState.dropdownItems"
@@ -63,10 +56,11 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PI } from '@spaceone/design-system';
 import { laptop } from '@spaceone/design-system/src/styles/screens';
+import { vOnClickOutside } from '@vueuse/components';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce, throttle } from 'lodash';
-import vClickOutside from 'v-click-outside';
+import type { DirectiveFunction } from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -87,7 +81,6 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import {
     SUGGESTION_TYPE,
@@ -109,14 +102,10 @@ interface CloudServiceData {
 
 const LAPTOP_WINDOW_SIZE = laptop.max;
 
-interface Props {
-    visibleSuggestion: boolean;
-}
-
 const RECENT_LIMIT = 5;
 const SEARCH_LIMIT = 15;
 
-export default defineComponent<Props>({
+export default defineComponent({
     name: 'GNBSearch',
     components: {
         GNBSearchDropdown,
@@ -124,17 +113,11 @@ export default defineComponent<Props>({
         PI,
     },
     directives: {
-        clickOutside: vClickOutside.directive,
-    },
-    props: {
-        visibleSuggestion: {
-            type: Boolean,
-            default: false,
-        },
+        clickOutside: vOnClickOutside as DirectiveFunction,
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyVisibleSuggestion: useProxyValue('visibleSuggestion', props, emit),
+            visibleSuggestion: false,
             isFocusOnInput: false,
             isFocusOnSuggestion: false,
             focusingDirection: 'DOWNWARD',
@@ -205,6 +188,12 @@ export default defineComponent<Props>({
                 return items;
             }),
         });
+
+        const setVisibleSuggestion = (visible: boolean) => {
+            state.visibleSuggestion = visible;
+            if (visible) emit('open-menu');
+            else emit('hide-menu');
+        };
 
         const filterMenuItemsBySearchTerm = (menu: SuggestionMenu[], searchTerm?: string): SuggestionMenu[] => {
             const regex = getTextHighlightRegex(searchTerm);
@@ -289,16 +278,16 @@ export default defineComponent<Props>({
         const showSuggestion = async () => {
             state.isFocusOnSuggestion = false;
             if (!state.isFocusOnInput) state.isFocusOnInput = true;
-            if (!state.proxyVisibleSuggestion) {
+            if (!state.visibleSuggestion) {
                 state.loading = true;
-                state.proxyVisibleSuggestion = true;
                 state.loading = false;
+                setVisibleSuggestion(true);
             }
         };
 
         const hideSuggestion = () => {
-            if (state.proxyVisibleSuggestion) {
-                state.proxyVisibleSuggestion = false;
+            if (state.visibleSuggestion) {
+                setVisibleSuggestion(false);
                 state.inputText = '';
                 state.isFocusOnInput = false;
                 state.isFocusOnSuggestion = false;
@@ -308,10 +297,15 @@ export default defineComponent<Props>({
         };
 
         const moveFocusToSuggestion = (focusingDirection: FocusingDirection) => {
-            if (!state.proxyVisibleSuggestion) state.proxyVisibleSuggestion = true;
+            if (!state.visibleSuggestion) setVisibleSuggestion(true);
             state.focusingDirection = focusingDirection;
             state.isFocusOnInput = false;
             state.isFocusOnSuggestion = true;
+        };
+
+        const handleClickButton = () => {
+            if (!state.visibleSuggestion) showSuggestion();
+            else hideSuggestion();
         };
 
         const handleMoveFocusEnd = () => {
@@ -365,7 +359,8 @@ export default defineComponent<Props>({
         };
 
         const handleClickOutside = () => {
-            if (!state.isOverLaptopSize) hideSuggestion();
+            console.debug('handleClickOutside');
+            hideSuggestion();
         };
 
         const onWindowResize = throttle(() => {
@@ -387,7 +382,7 @@ export default defineComponent<Props>({
         })();
 
         /* Watcher */
-        watch(() => state.proxyVisibleSuggestion, async (visible) => {
+        watch(() => state.visibleSuggestion, async (visible) => {
             if (visible) {
                 await Promise.allSettled([
                     listSearchRecent(SUGGESTION_TYPE.MENU),
@@ -403,6 +398,7 @@ export default defineComponent<Props>({
             showSuggestion,
             hideSuggestion,
             moveFocusToSuggestion,
+            handleClickButton,
             handleMoveFocusEnd,
             handleUpdateInput,
             handleSelect,
@@ -415,7 +411,6 @@ export default defineComponent<Props>({
 <style lang="postcss" scoped>
 .gnb-search {
     @apply relative;
-
     .menu-button {
         @apply text-gray-500;
         line-height: $gnb-height;

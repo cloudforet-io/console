@@ -208,6 +208,7 @@ export default defineComponent<Props>({
         flex-grow: 1;
         .data-loader-container {
             max-height: calc(100vh - $gnb-height - 5rem);
+            min-height: 14.875rem;
             overflow-y: auto;
             padding-bottom: 1rem;
         }

@@ -1,19 +1,16 @@
 <template>
     <div class="gnb-toolset" @click.stop>
         <g-n-b-search v-if="!isDomainOwner"
-                      v-click-outside="hideMenu"
-                      :visible-suggestion="openedMenu === 'search'"
-                      @update:visibleSuggestion="openMenu('search')"
+                      @open-menu="openMenu('search')"
+                      @hide-menu="hideMenu"
         />
         <g-n-b-recent-favorite v-if="!isDomainOwner"
-                               v-click-outside="hideMenu"
-                               :visible-dropdown="openedMenu === 'recentFavorite'"
-                               @update:visibleDropdown="openMenu('recentFavorite')"
+                               @open-menu="openMenu('recentFavorite')"
+                               @hide-menu="hideMenu"
         />
         <g-n-b-noti v-if="!isDomainOwner"
-                    v-click-outside="hideMenu"
-                    :visible-dropdown="openedMenu === 'notifications'"
-                    @update:visibleDropdown="openMenu('notifications')"
+                    @open-menu="openMenu('notifications')"
+                    @hide-menu="hideMenu"
         />
         <g-n-b-profile @open-menu="openMenu('profile')"
                        @hide-menu="hideMenu"
@@ -22,14 +19,9 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
-    computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
-
-
-import { vOnClickOutside } from '@vueuse/components';
-import type { DirectiveFunction } from 'vue';
 
 import { store } from '@/store';
 
@@ -41,16 +33,13 @@ import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSe
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 
-export default {
+export default defineComponent({
     name: 'GNBToolset',
     components: {
         GNBProfile,
         GNBRecentFavorite,
         GNBSearch,
         GNBNoti,
-    },
-    directives: {
-        clickOutside: vOnClickOutside as DirectiveFunction,
     },
     props: {
         openedMenu: {
@@ -59,7 +48,6 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             timezone: computed(() => store.state.user.timezone),
@@ -67,31 +55,11 @@ export default {
 
         /* event */
         const hideMenu = () => {
-            if (props.openedMenu === 'notifications') {
-                store.dispatch('display/startCheckNotification');
-            }
-
             emit('hide-menu');
         };
         const openMenu = (menu) => {
-            if (menu === 'notifications') {
-                store.dispatch('display/stopCheckNotification');
-            }
             emit('open-menu', menu);
         };
-
-
-        onMounted(() => {
-            store.dispatch('display/startCheckNotification');
-        });
-
-        onUnmounted(() => {
-            store.dispatch('display/stopCheckNotification');
-        });
-
-        watch(() => vm.$store.state.user.isSessionExpired, (isSessionExpired) => {
-            if (isSessionExpired) store.dispatch('display/stopCheckNotification');
-        });
 
         return {
             ...toRefs(state),
@@ -100,5 +68,5 @@ export default {
             openMenu,
         };
     },
-};
+});
 </script>
