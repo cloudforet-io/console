@@ -67,21 +67,23 @@
                 {{ $t('Back to List') }}
             </p-button>
         </section>
-        <!--song-lang-->
-        <p-button-modal :header-title="$t('Send the mail')"
-                        :visible.sync="sendEmailModalVisible"
-                        size="sm"
-                        :scrollable="true"
-                        @confirm="handleSendEmailConfirm"
-        >
-            <template #body>
-                <i18n path="song-lang" tag="p" class="desc">
-                    <template #domainText>
-                        <strong>{{ domainName }}</strong>
-                    </template>
-                </i18n>
-            </template>
-        </p-button-modal>
+        <!--        TODO: 이미지 URL 이슈로 인해 v1.10.1에서 제외-->
+        <!--        <p-button-modal :header-title="$t('Send the mail')"-->
+        <!--                        :visible.sync="sendEmailModalVisible"-->
+        <!--                        size="sm"-->
+        <!--                        :scrollable="true"-->
+        <!--                        @confirm="handleSendEmailConfirm"-->
+        <!--        >-->
+        <!--            <template #body>-->
+        <!--                <i18n path="song-lang" tag="p" class="desc">-->
+        <!--                    <template #domainText>-->
+        <!--                        <strong>{{ domainName }}</strong>-->
+        <!--                    </template>-->
+        <!--                </i18n>-->
+        <!--            </template>-->
+        <!--        </p-button-modal>-->
+
+        <!--song-lang-->\
         <delete-modal :header-title="$t('Delete Notice')"
                       :visible.sync="deleteModalVisible"
                       :contents="$t('Are you sure you want to delete the notice?')"
@@ -96,7 +98,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PBadge, PButton, PButtonModal, PDataLoader, PDivider, PI, PPageTitle, PPaneLayout,
+    PBadge, PButton, PDataLoader, PDivider, PI, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -126,7 +128,6 @@ export default {
         PDivider,
         PPageTitle,
         PButton,
-        PButtonModal,
         ListItem,
         DeleteModal,
     },
@@ -175,11 +176,10 @@ export default {
             },
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
             noticeTypeBadgeInfo: computed<{ label?: TranslateResult; style?: string }>(() => getPostBadgeInfo(state.noticePostData?.scope)),
-            domainName: 'Samsung',
         });
         const modalState = reactive({
             deleteModalVisible: false,
-            sendEmailModalVisible: false,
+            // TODO: send email open state
         });
 
         /* Api */
@@ -198,22 +198,22 @@ export default {
         const handleBackToListButtonClick = () => {
             SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME });
         };
-        const handleSendEmailConfirm = async () => {
-            try {
-                // TODO:추후 확인 필요
-                await SpaceConnector.client.board.post.sendNotification({
-                    post_id: props.postId,
-                    board_id: props.boardId,
-                });
-                // song-lang
-                showSuccessMessage(i18n.t('Successfully Sent Email'), '');
-            } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, i18n.t('에러 메시지!'));
-            } finally {
-                modalState.sendEmailModalVisible = false;
-            }
-        };
+        // TODO: 이미지 URL 이슈로 인해 v1.10.1에서 제외
+        // const handleSendEmailConfirm = async () => {
+        //     try {
+        //         await SpaceConnector.client.board.post.sendNotification({
+        //             post_id: props.postId,
+        //             board_id: props.boardId,
+        //         });
+        //         // song-lang
+        //         showSuccessMessage(i18n.t('Successfully Sent Email'), '');
+        //     } catch (e) {
+        //         // song-lang
+        //         ErrorHandler.handleRequestError(e, i18n.t('에러 메시지!'));
+        //     } finally {
+        //         modalState.sendEmailModalVisible = false;
+        //     }
+        // };
         const handleDeleteNoticeConfirm = async () => {
             try {
                 await SpaceConnector.client.board.post.delete({
@@ -236,9 +236,10 @@ export default {
                 params: { boardId: props.boardId, postId: props.postId },
             });
         };
-        const handleSendEmailModalOpen = () => {
-            modalState.sendEmailModalVisible = true;
-        };
+        // TODO: 이미지 URL 이슈로 인해 v1.10.1에서 제외
+        // const handleSendEmailModalOpen = () => {
+        //     modalState.sendEmailModalVisible = true;
+        // };
         const handleDeleteModalOpen = () => {
             modalState.deleteModalVisible = true;
         };
@@ -253,10 +254,8 @@ export default {
             ...toRefs(modalState),
             iso8601Formatter,
             handleBackToListButtonClick,
-            handleSendEmailConfirm,
             handleDeleteNoticeConfirm,
             handleClickEditButton,
-            handleSendEmailModalOpen,
             handleDeleteModalOpen,
         };
     },
