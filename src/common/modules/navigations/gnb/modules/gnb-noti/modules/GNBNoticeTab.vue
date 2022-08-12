@@ -224,7 +224,7 @@ export default {
         }
     }
     .view-all-button-wrapper {
-        @apply border-t border-gray-200;
+        @apply bg-white border-t border-gray-200;
         position: absolute;
         bottom: 0;
         height: 3rem;
