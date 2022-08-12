@@ -359,7 +359,6 @@ export default defineComponent({
         };
 
         const handleClickOutside = () => {
-            console.debug('handleClickOutside');
             hideSuggestion();
         };
 

@@ -33,6 +33,11 @@ export const getAllSuggestionMenuList = (menuList: GNBMenu[], parent?: Suggestio
             }
         } else if (menu?.subMenuList?.length) {
             results.push(...getAllSuggestionMenuList(menu.subMenuList, menu));
+        } else {
+            results.push({
+                id: menu.id,
+                label: menu.label,
+            });
         }
     });
     return results;

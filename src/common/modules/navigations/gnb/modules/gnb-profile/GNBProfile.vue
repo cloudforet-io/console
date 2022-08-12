@@ -231,7 +231,6 @@ export default defineComponent({
             ...toRefs(state),
             openProfileMenu,
             hideProfileMenu,
-            setLanguageMenuVisible,
             handleClickButton,
             handleClickOutsideLanguageMenu,
             handleLanguageDropdownClick,
