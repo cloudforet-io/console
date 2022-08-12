@@ -84,7 +84,7 @@ const filterMenuByPermission = (menuList: DisplayMenu[], pagePermissionList: Pag
     return results;
 }, [] as DisplayMenu[]);
 
-const getGnbMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d) => {
+const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
     return {
         ...d,
@@ -93,7 +93,7 @@ const getGnbMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d) => 
         isNew: menuInfo.isNew,
         isBeta: menuInfo.isBeta,
         to: { name: d.id },
-        subMenuList: d.subMenuList ? getGnbMenuList(d.subMenuList) : [],
+        subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList) : [],
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
@@ -101,10 +101,12 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
     const _showBilling = billingAccessibleDomainList.includes(rootState.domain.domainId);
     const menuList = _showBilling ? MENU_LIST : MENU_LIST.filter(d => d.id !== MENU_ID.COST_EXPLORER);
 
-    let _allGnbMenuList: DisplayMenu[] = getGnbMenuList(menuList);
+    let _allGnbMenuList: DisplayMenu[] = getDisplayMenuList(menuList);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
     _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
     return _allGnbMenuList;
 };
 
-export const GNBMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter(d => !d.optional);
+export const GNBMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter(d => !d.hideOnGNB);
+
+export const siteMapMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter(d => !d.hideOnSiteMap);

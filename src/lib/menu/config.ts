@@ -34,7 +34,8 @@ export type MenuId = typeof MENU_ID[keyof typeof MENU_ID];
 export interface Menu {
     id: MenuId;
     subMenuList?: Menu[];
-    optional?: boolean;
+    hideOnGNB?: boolean;
+    hideOnSiteMap?: boolean;
 }
 
 export interface MenuInfo {

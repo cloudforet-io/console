@@ -2,12 +2,12 @@
     <div class="gnb">
         <div class="left-part">
             <div class="site-map-wrapper">
-                <site-map :menu-list="menuList" :visible.sync="showSiteMap" :disabled="!hasPermission" />
+                <site-map :menu-list="siteMapMenuList" :visible.sync="showSiteMap" :disabled="!hasPermission" />
             </div>
 
             <g-n-b-logo :to="dashboardLink" />
 
-            <g-n-b-menu v-for="(menu, idx) in menuList"
+            <g-n-b-menu v-for="(menu, idx) in gnbMenuList"
                         :key="idx"
                         :show="menu.show"
                         :name="menu.id"
@@ -72,7 +72,8 @@ export default {
             showSiteMap: false,
             hasPermission: computed((() => store.getters['user/hasPermission'])),
             dashboardLink: computed(() => (state.hasPermission ? { name: DASHBOARD_ROUTE._NAME } : undefined)),
-            menuList: computed<GNBMenuType[]>(() => store.getters['display/GNBMenuList']),
+            gnbMenuList: computed<GNBMenuType[]>(() => store.getters['display/GNBMenuList']),
+            siteMapMenuList: computed<GNBMenuType[]>(() => store.getters['display/siteMapMenuList']),
             selectedMenu: computed(() => {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;

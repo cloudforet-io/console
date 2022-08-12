@@ -7,7 +7,7 @@
             />
         </div>
         <div v-if="visible" v-click-outside="hideMenu" class="sitemap">
-            <ul v-for="(menu, aIdx) in siteMapMenuList"
+            <ul v-for="(menu, aIdx) in menuList"
                 :key="aIdx"
             >
                 <template v-if="menu.show !== false">
@@ -42,10 +42,7 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy, PropType } from '@vue/composition-api';
-import {
-    reactive, toRefs, computed, getCurrentInstance,
-} from '@vue/composition-api';
+import type { PropType } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
 import vClickOutside from 'v-click-outside';
@@ -54,8 +51,6 @@ import type { DisplayMenu } from '@/store/modules/display/type';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
-
-import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 
 export default {
     name: 'SiteMap',
@@ -82,19 +77,6 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
-        const state = reactive({
-            siteMapMenuList: computed<DisplayMenu[]>(() => ([
-                {
-                    id: DASHBOARD_ROUTE._NAME,
-                    label: vm.$t('MENU.DASHBOARD'),
-                    to: { name: DASHBOARD_ROUTE._NAME },
-                    subMenuList: [],
-                },
-                ...props.menuList,
-            ])),
-        });
-
         const hideMenu = () => {
             emit('update:visible', false);
         };
@@ -105,7 +87,6 @@ export default {
         };
 
         return {
-            ...toRefs(state),
             hideMenu,
             toggleMenu,
         };
