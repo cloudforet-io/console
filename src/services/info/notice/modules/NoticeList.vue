@@ -113,7 +113,7 @@ export default defineComponent<Props>({
         /* Api */
         let noticeApiHelper = new ApiQueryHelper()
             .setPage(1, NOTICE_ITEM_LIMIT)
-            .setSort('created_at', true);
+            .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
         const listNotice = async () => {
             try {
                 const { results, total_count } = await SpaceConnector.client.board.post.list({

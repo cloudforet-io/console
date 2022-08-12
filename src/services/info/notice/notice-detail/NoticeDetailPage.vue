@@ -12,9 +12,10 @@
                     >
                         {{ $t('Edit') }}
                     </p-button>
-                    <p-button :outline="true" style-type="gray-border" icon="ic_send">
-                        {{ $t('Send Email') }}
-                    </p-button>
+                    <!--        TODO: 이미지 URL 이슈로 인해 v1.10.1에서 제외-->
+                    <!--                    <p-button :outline="true" style-type="gray-border" icon="ic_send">-->
+                    <!--                        {{ $t('Send Email') }}-->
+                    <!--                    </p-button>-->
                     <p-button :outline="true" style-type="alert" @click="handleDeleteModalOpen">
                         {{ $t('Delete') }}
                     </p-button>
@@ -36,7 +37,9 @@
                     </span>
                 </div>
                 <p-divider />
-                <text-editor-viewer :contents="noticePostData.contents" />
+                <div class="text-editor-wrapper">
+                    <text-editor-viewer :contents="noticePostData.contents" />
+                </div>
             </p-data-loader>
         </p-pane-layout>
         <p-pane-layout class="post-router">
@@ -276,6 +279,9 @@ export default {
             @apply flex items-center;
             gap: 0.125rem;
         }
+    }
+    .text-editor-wrapper {
+        margin-top: 1rem;
     }
 }
 
