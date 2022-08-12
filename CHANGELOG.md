@@ -1,3 +1,10 @@
+# [1.1.0-beta.368](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.367...v1.1.0-beta.368) (2022-08-12)
+
+
+### Features
+
+* **icon:** add ic_info-menu icon ([#1054](https://github.com/spaceone-dev/spaceone-design-system/issues/1054)) ([71545b7](https://github.com/spaceone-dev/spaceone-design-system/commit/71545b7bcae765632320e5fecef43bae16a9d361))
+
 # [1.1.0-beta.367](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.366...v1.1.0-beta.367) (2022-08-09)
 
 
