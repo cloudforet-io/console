@@ -211,6 +211,17 @@ export default {
                 state.prevNoticePost = undefined;
             }
         };
+        const setUserConfig = async () => {
+            try {
+                await SpaceConnector.client.config.userConfig.set({
+                    user_id: store.state.user.userId,
+                    name: `console:board:${props.boardId}:${props.postId}`,
+                    data: { is_read: true },
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
 
         /* Event */
         const handleBackToListButtonClick = () => {
@@ -270,6 +281,10 @@ export default {
             if (state.noticePostData.created_at) {
                 await getNextPostData(state.noticePostData.created_at);
                 await getPrevPostData(state.noticePostData.created_at);
+            }
+            const isGetPostSuccess = !!state.noticePostData?.post_id;
+            if (isGetPostSuccess) {
+                await setUserConfig();
             }
             state.loading = false;
         };

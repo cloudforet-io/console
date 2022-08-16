@@ -15,7 +15,7 @@
                            :key="`notice-${item.post_id}-${index}`"
                            class="list-item"
                            :post="item"
-                           :is-new="false"
+                           :is-new="!isReadMap[item.post_id]"
                            :input-text="searchText"
                            @click.native="handleClickNotice(item.post_id)"
                 />
@@ -43,7 +43,9 @@
 
 <script lang="ts">
 
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from '@vue/composition-api';
 
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -56,6 +58,7 @@ import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation
 
 import type { QueryStoreFilter } from '@/query/type';
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
 import { getNoticeBoardId } from '@/lib/helper/notice-helper';
 
@@ -70,6 +73,17 @@ import { INFO_ROUTE } from '@/services/info/route-config';
 interface Props {
     noticeItems: any[];
     loading: boolean;
+}
+
+interface UserConfig {
+    name: string;
+    data?: {
+        is_read: boolean,
+        show_popup: boolean,
+    };
+    tags?: { [key: string]: string };
+    user_id?: string;
+    domain_id?: string;
 }
 
 const NOTICE_ITEM_LIMIT = 10;
@@ -108,6 +122,17 @@ export default defineComponent<Props>({
             noticeItemTotalCount: 0,
             boardId: undefined as undefined | string,
             searchText: undefined as undefined | string,
+            userConfigs: [] as UserConfig[],
+            isReadMap: computed<{ [key: string]: boolean }>(() => {
+                const isReadMap = {} as { [key: string]: boolean };
+                state.userConfigs.forEach((config) => {
+                    const nameList = config.name.split(':');
+                    const postId = nameList[nameList.length - 1];
+                    if (postId && config.data) isReadMap[postId] = config.data.is_read;
+                    else isReadMap[postId] = false;
+                });
+                return isReadMap;
+            }),
         });
 
         /* Api */
@@ -130,6 +155,29 @@ export default defineComponent<Props>({
                 state.noticeItemTotalCount = 0;
             } finally {
                 state.loading = false;
+            }
+        };
+        const listUserConfig = async () => {
+            const userConfigApiQuery = new ApiQueryHelper()
+                .setFilters([{
+                    k: 'user_id',
+                    v: store.state.user.userId,
+                    o: '=',
+                },
+                {
+                    k: 'name',
+                    v: `console:board:${state.boardId}:`,
+                    o: '',
+                }])
+                .setOnly('data', 'user_id');
+            try {
+                const { results } = await SpaceConnector.client.config.userConfig.list({
+                    query: userConfigApiQuery.data,
+                });
+                state.userConfigs = results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.userConfigs = [];
             }
         };
 
@@ -172,7 +220,10 @@ export default defineComponent<Props>({
         (async () => {
             state.loading = true;
             state.boardId = await getNoticeBoardId();
-            if (state.boardId) await listNotice();
+            if (state.boardId) {
+                await listNotice();
+                await listUserConfig();
+            }
             state.loading = false;
         })();
 
