@@ -3,7 +3,10 @@
         <ul class="tab-item-wrapper" :class="{stretch}">
             <li v-for="(tab, idx) in tabItems" :key="tab.name"
                 :class="{active: activeTab === tab.name}"
-                @click="handleClickTab(tab, idx)"
+                role="tab"
+                :tabindex="0"
+                @keydown.enter="selectTab(tab, idx)"
+                @click="selectTab(tab, idx)"
             >
                 <span class="label">
                     {{ tab.label }}
@@ -24,6 +27,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed, defineComponent,
 } from '@vue/composition-api';
@@ -41,7 +45,7 @@ export default defineComponent<TabProps>({
     props: {
         /* tab item props */
         tabs: {
-            type: Array,
+            type: Array as PropType<Array<string|TabItem>>,
             default: () => [],
         },
         activeTab: {
@@ -54,7 +58,7 @@ export default defineComponent<TabProps>({
             default: false,
         },
     },
-    setup(props: TabProps, { emit }) {
+    setup(props, { emit }) {
         const {
             tabItems,
             keepAliveTabNames,
@@ -65,8 +69,7 @@ export default defineComponent<TabProps>({
             activeTab: computed(() => props.activeTab),
         });
 
-        /* event */
-        const handleClickTab = (tab: TabItem, idx: number) => {
+        const selectTab = (tab: TabItem, idx: number) => {
             if (props.activeTab !== tab.name) {
                 emit('update:activeTab', tab.name);
                 emit('change', tab.name, idx);
@@ -78,7 +81,7 @@ export default defineComponent<TabProps>({
             keepAliveTabNames,
             nonKeepAliveTabNames,
             currentTabItem,
-            handleClickTab,
+            selectTab,
         };
     },
 });
@@ -106,8 +109,11 @@ export default defineComponent<TabProps>({
             border-bottom-width: 4px;
             border-color: transparent;
             padding: 0 1rem;
-            &:hover {
-                @apply text-gray-900;
+
+            @media (hover: hover) {
+                &:hover {
+                    @apply text-gray-900;
+                }
             }
             &.active {
                 @apply text-primary border-primary;
