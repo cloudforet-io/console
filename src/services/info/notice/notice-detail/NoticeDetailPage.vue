@@ -43,21 +43,19 @@
             </p-data-loader>
         </p-pane-layout>
         <p-pane-layout class="post-router">
-            <div class="post-router-item">
-                <list-item class="" :title="nextNoticePost.title"
-                           post-direction="next"
-                           :notice-type="nextNoticePost.scope"
-                           :is-pinned="nextNoticePost.options.is_pinned"
+            <router-link :to="nextPostRoute" class="post-router-item">
+                <list-item class="" post-direction="next"
+                           :post="nextNoticePost"
                 />
-            </div>
+            </router-link>
             <p-divider />
-            <div class="post-router-item">
-                <list-item class="" :title="nextNoticePost.title"
-                           post-direction="prev"
-                           :notice-type="nextNoticePost.scope"
-                           :is-pinned="nextNoticePost.options.is_pinned"
+            <router-link :to="prevPostRoute"
+                         class="post-router-item"
+            >
+                <list-item class="" post-direction="prev"
+                           :post="prevNoticePost"
                 />
-            </div>
+            </router-link>
         </p-pane-layout>
         <section class="back-to-list-button-section">
             <p-button class="back-to-list-button" :outline="true"
@@ -94,10 +92,13 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PBadge, PButton, PDataLoader, PDivider, PI, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
@@ -145,36 +146,18 @@ export default {
     setup(props) {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            loading: true,
-            noticePostData: {} as NoticePostModel|unknown,
-            prevNoticePost: {
-                board_id: 'board-14a09a71f504',
-                post_id: 'post-d4e6373b3c3f',
-                title: '[작업 공지] 시스템 안정화를 위해 작업을 진행합니다.',
-                contents: '',
-                view_count: 1,
-                writer: 'sulmo',
-                scope: 'DOMAIN',
-                created_at: '2022-08-05T10:53:04.918Z',
-                updated_at: '2022-08-05T10:53:04.918Z',
-                options: {
-                    is_pinned: true,
-                },
-            },
-            nextNoticePost: {
-                board_id: 'board-14a09a71f504',
-                post_id: 'post-d4e6373b3c3f',
-                title: '[작업 공지] 시스템 안정화를 위해 작업을 진행합니다.',
-                contents: '',
-                view_count: 1,
-                writer: 'sulmo',
-                scope: 'DOMAIN',
-                created_at: '2022-08-05T10:53:04.918Z',
-                updated_at: '2022-08-05T10:53:04.918Z',
-                options: {
-                    is_pinned: true,
-                },
-            },
+            loading: false,
+            noticePostData: {} as NoticePostModel,
+            prevNoticePost: undefined as NoticePostModel | undefined,
+            prevPostRoute: computed(() => ({
+                name: INFO_ROUTE.NOTICE.DETAIL._NAME,
+                params: { boardId: props.boardId, postId: state.prevNoticePost?.post_id },
+            })),
+            nextNoticePost: undefined as NoticePostModel | undefined,
+            nextPostRoute: computed(() => ({
+                name: INFO_ROUTE.NOTICE.DETAIL._NAME,
+                params: { boardId: props.boardId, postId: state.nextNoticePost?.post_id },
+            })),
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
             noticeTypeBadgeInfo: computed<{ label?: TranslateResult; style?: string }>(() => getPostBadgeInfo(state.noticePostData?.scope)),
         });
@@ -186,12 +169,46 @@ export default {
         /* Api */
         const getNoticePostData = async () => {
             try {
-                state.noticePostData = await SpaceConnector.client.board.post.get({
+                const results = await SpaceConnector.client.board.post.get({
                     board_id: props.boardId,
                     post_id: props.postId,
                 });
+                state.noticePostData = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
+                state.noticePostData = {};
+            }
+        };
+        const getNextPostData = async (createdAt) => {
+            try {
+                const nextPostApiQueryHelper = new ApiQueryHelper()
+                    .setPage(1, 1)
+                    .setSort('created_at', false)
+                    .setFilters([{ k: 'created_at', v: createdAt, o: '>' }]);
+                const { results } = await SpaceConnector.client.board.post.list({
+                    board_id: props.boardId,
+                    query: nextPostApiQueryHelper.data,
+                });
+                state.nextNoticePost = results.length ? results[0] : undefined;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.nextNoticePost = undefined;
+            }
+        };
+        const getPrevPostData = async (createdAt) => {
+            try {
+                const prevPostApiQueryHelper = new ApiQueryHelper()
+                    .setPage(1, 1)
+                    .setSort('created_at', true)
+                    .setFilters([{ k: 'created_at', v: createdAt, o: '<' }]);
+                const { results } = await SpaceConnector.client.board.post.list({
+                    board_id: props.boardId,
+                    query: prevPostApiQueryHelper.data,
+                });
+                state.prevNoticePost = results.length ? results[0] : undefined;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.prevNoticePost = undefined;
             }
         };
 
@@ -231,12 +248,14 @@ export default {
                 modalState.deleteModalVisible = false;
             }
         };
+
         const handleClickEditButton = () => {
             SpaceRouter.router.push({
                 name: INFO_ROUTE.NOTICE.UPDATE._NAME,
                 params: { boardId: props.boardId, postId: props.postId },
             });
         };
+
         // TODO: 이미지 URL 이슈로 인해 v1.10.1에서 제외
         // const handleSendEmailModalOpen = () => {
         //     modalState.sendEmailModalVisible = true;
@@ -245,11 +264,18 @@ export default {
             modalState.deleteModalVisible = true;
         };
 
-        (async () => {
+        const initPage = async () => {
             state.loading = true;
             await getNoticePostData();
+            if (state.noticePostData.created_at) {
+                await getNextPostData(state.noticePostData.created_at);
+                await getPrevPostData(state.noticePostData.created_at);
+            }
             state.loading = false;
-        })();
+        };
+        watch(() => props.postId, () => {
+            initPage();
+        }, { immediate: true });
         return {
             ...toRefs(state),
             ...toRefs(modalState),
@@ -288,6 +314,7 @@ export default {
 .post-router {
     margin-top: 1.5rem;
     .post-router-item {
+        display: block;
         margin: 0.5rem 0;
     }
 }

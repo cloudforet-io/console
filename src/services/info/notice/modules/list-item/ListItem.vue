@@ -2,7 +2,7 @@
     <component :is="postDirection ? 'div' : 'li'" class="list-item">
         <!-- song-lang -->
         <div v-if="postDirection" class="post-direction">
-            <span>{{ postDirectionLabel }}</span><p-i name="ic_arrow-top-alt" width="1rem" />
+            <span>{{ postDirectionLabel }}</span><p-i :name="postDirectionIcon" width="1rem" />
         </div>
         <div v-if="isPostExist">
             <div class="title">
@@ -43,16 +43,13 @@ import { i18n } from '@/translations';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 
-import type { NoticeType } from '@/services/info/notice/config';
 import { getPostBadgeInfo } from '@/services/info/notice/helper';
 import type { NoticePostModel } from '@/services/info/notice/type';
 
 
 interface Props {
-    noticeType: string;
     inputText: string;
     isNew: boolean;
-    isPinned: boolean;
     postDirection: 'prev' | 'next' | undefined;
     post: NoticePostModel;
 }
@@ -67,12 +64,8 @@ export default defineComponent<Props>({
     },
     props: {
         post: {
-            type: Object as PropType<NoticePostModel>,
-            default: () => ({}),
-        },
-        noticeType: {
-            type: String as PropType<NoticeType>,
-            default: '',
+            type: Object as PropType<NoticePostModel|undefined>,
+            default: undefined,
         },
         inputText: {
             type: String,
@@ -82,14 +75,6 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
-        isPinned: {
-            type: Boolean,
-            default: false,
-        },
-        isPostExist: {
-            type: Boolean,
-            default: true,
-        },
         postDirection: {
             type: String as PropType<'prev' | 'next' | undefined>,
             default: undefined,
@@ -97,12 +82,15 @@ export default defineComponent<Props>({
     },
     setup(props) {
         const state = reactive({
-            noticeTypeBadge: computed<{ label?: TranslateResult; style?: string }>(() => getPostBadgeInfo(props.noticeType)),
+            noticeTypeBadge: computed<{ label?: TranslateResult; style?: string }>(() => getPostBadgeInfo(props.post?.scope)),
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
             // song-lang
             postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? i18n.t('Prev') : i18n.t('Next'))),
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             date: computed(() => dateFormatter(props.post?.created_at)),
+            isPinned: computed(() => props.post?.options?.is_pinned),
+            isPostExist: computed(() => props.post),
+            postDirectionIcon: computed(() => ((props.postDirection === 'prev') ? 'ic_arrow-bottom-alt' : 'ic_arrow-top-alt')),
         });
 
         const dateFormatter = date => dayjs.tz(dayjs.utc(date), state.timezone).format('YYYY-MM-DD');

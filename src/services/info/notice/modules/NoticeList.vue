@@ -2,7 +2,7 @@
     <div class="notice-list">
         <div class="notice-header">
             <p-toolbox :pagination-visible="false" :page-size-changeable="false" :refreshable="false"
-                       @change="handleChange"
+                       @change="handleToolboxChange"
             >
                 <template #left-area>
                     <p-select-dropdown :items="dropdownItems" :selected.sync="selectedScope" />
@@ -15,9 +15,8 @@
                            :key="`notice-${item.post_id}-${index}`"
                            class="list-item"
                            :post="item"
-                           :notice-type="item.scope"
                            :is-new="false"
-                           :is-pinned="item.options.is_pinned"
+                           :input-text="searchText"
                            @click.native="handleClickNotice(item.post_id)"
                 />
             </ul>
@@ -108,13 +107,16 @@ export default defineComponent<Props>({
             noticeItems: [] as NoticePostModel[],
             noticeItemTotalCount: 0,
             boardId: undefined as undefined | string,
+            searchText: undefined as undefined | string,
         });
 
         /* Api */
-        let noticeApiHelper = new ApiQueryHelper()
+        const initNoticeApiHelper = () => new ApiQueryHelper()
             .setPage(1, NOTICE_ITEM_LIMIT)
             .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
+        let noticeApiHelper = initNoticeApiHelper();
         const listNotice = async () => {
+            state.loading = true;
             try {
                 const { results, total_count } = await SpaceConnector.client.board.post.list({
                     board_id: state.boardId,
@@ -126,24 +128,31 @@ export default defineComponent<Props>({
                 ErrorHandler.handleError(e);
                 state.noticeItems = [];
                 state.noticeItemTotalCount = 0;
+            } finally {
+                state.loading = false;
             }
         };
 
         /* Util */
-        function getSearchFilter(options: ToolboxOptions) {
+        const getSearchFilter = () => {
             const filterHelper = new ApiQueryHelper()
                 .setPage(1, NOTICE_ITEM_LIMIT)
                 .setSort('created_at', true);
             const filter = [] as QueryStoreFilter[];
             if (state.selectedScope !== 'ALL') filter.push({ k: 'scope', v: state.selectedScope, o: '=' });
-            if (options?.searchText) filter.push({ k: 'title', v: options?.searchText, o: '' });
+            if (state.searchText) filter.push({ k: 'title', v: state.searchText, o: '' });
             filterHelper.setFilters(filter);
             return filterHelper;
-        }
+        };
 
         /* event */
-        const handleChange = async (options: ToolboxOptions = {}) => {
-            noticeApiHelper = getSearchFilter(options);
+        const handleToolboxChange = async (options: ToolboxOptions = {}) => {
+            state.searchText = options?.searchText;
+            if (!state.searchText) {
+                noticeApiHelper = initNoticeApiHelper();
+            } else {
+                noticeApiHelper = getSearchFilter();
+            }
             if (state.boardId) await listNotice();
         };
         const handleClickNotice = (postId: string) => {
@@ -169,7 +178,7 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            handleChange,
+            handleToolboxChange,
             handleClickNotice,
             handlePageChange,
         };
