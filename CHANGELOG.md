@@ -1,3 +1,10 @@
+# [1.1.0-beta.369](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.368...v1.1.0-beta.369) (2022-08-16)
+
+
+### Features
+
+* improve a11y of Tab component ([#1055](https://github.com/spaceone-dev/spaceone-design-system/issues/1055)) ([4f2c216](https://github.com/spaceone-dev/spaceone-design-system/commit/4f2c216d14efda0c69d2de6a2797fa3d9d5dbfd6))
+
 # [1.1.0-beta.368](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.367...v1.1.0-beta.368) (2022-08-12)
 
 
