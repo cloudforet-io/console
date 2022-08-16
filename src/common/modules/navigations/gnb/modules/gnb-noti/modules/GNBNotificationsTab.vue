@@ -194,9 +194,11 @@ export default {
         const convertNotificationItem = (rawData: any[]) => {
             const results: NotificationItem[] = [];
             rawData.forEach((d, idx) => {
+                let previousCreatedAt = rawData[idx - 1]?.created_at;
+                if (idx === 0) previousCreatedAt = state.items[state.items.length - 1]?.createdAt;
                 const result: NotificationItem = {
                     notificationId: d.notification_id,
-                    dateHeader: getDateHeader(d.created_at, rawData[idx - 1]?.created_at),
+                    dateHeader: getDateHeader(d.created_at, previousCreatedAt),
                     createdAt: d.created_at,
                     isRead: d.is_read,
                     title: d.message?.title,
