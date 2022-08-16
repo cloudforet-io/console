@@ -1,8 +1,15 @@
 <template>
-    <div ref="profileMenuRef" v-click-outside="hideProfileMenu" class="gnb-profile">
-        <div class="menu-button" :tabindex="0" @click.stop="handleClickButton">
+    <div ref="profileMenuRef" v-click-outside="hideProfileMenu" class="gnb-profile"
+         @keydown.esc="hideProfileMenu"
+    >
+        <span class="menu-button"
+              role="button"
+              tabindex="0"
+              @click.stop="handleProfileButtonClick"
+              @keydown.enter="openProfileMenu"
+        >
             <p-i :name="userIcon" class="menu-icon" />
-        </div>
+        </span>
         <div v-if="visible"
              class="profile-menu-wrapper"
         >
@@ -118,8 +125,10 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { INFO_ROUTE } from '@/services/info/route-config';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
-
-export default defineComponent({
+interface Props {
+    visible: boolean
+}
+export default defineComponent<Props>({
     name: 'GNBProfile',
     components: {
         PDivider,
@@ -129,10 +138,14 @@ export default defineComponent({
     directives: {
         clickOutside: vOnClickOutside as DirectiveFunction,
     },
-    props: {},
+    props: {
+        visible: {
+            type: Boolean,
+            default: false,
+        },
+    },
     setup(props, { emit, root }) {
         const state = reactive({
-            visible: false,
             userIcon: computed(() => {
                 if (state.isDomainOwner) return 'root-account';
                 if (state.hasDomainRole) return 'admin';
@@ -166,9 +179,7 @@ export default defineComponent({
         });
 
         const setVisible = (visible: boolean) => {
-            state.visible = visible;
-            if (visible) emit('open-menu');
-            else emit('hide-menu');
+            emit('update:visible', visible);
         };
         const openProfileMenu = () => {
             setVisible(true);
@@ -180,8 +191,8 @@ export default defineComponent({
         const setLanguageMenuVisible = (visible: boolean) => {
             state.languageMenuVisible = visible;
         };
-        const handleClickButton = () => {
-            setVisible(!state.visible);
+        const handleProfileButtonClick = () => {
+            setVisible(!props.visible);
         };
         const handleClickOutsideLanguageMenu = (e: PointerEvent) => {
             const profileMenuRef = state.profileMenuRef;
@@ -231,7 +242,7 @@ export default defineComponent({
             ...toRefs(state),
             openProfileMenu,
             hideProfileMenu,
-            handleClickButton,
+            handleProfileButtonClick,
             handleClickOutsideLanguageMenu,
             handleLanguageDropdownClick,
             handleClickGoToMyPage,
@@ -248,6 +259,7 @@ export default defineComponent({
 .gnb-profile {
     position: relative;
     margin-left: 1.5rem;
+    outline: none;
 
     &:first-of-type {
         margin-left: 0;

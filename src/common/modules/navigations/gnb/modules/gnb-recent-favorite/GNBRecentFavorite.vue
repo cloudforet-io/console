@@ -1,24 +1,28 @@
 <template>
-    <div v-click-outside="handleClickOutside" class="gnb-recent-favorite" @click.stop>
-        <span class="menu-button" tabindex="0">
+    <div v-click-outside="hideRecentFavoriteMenu" class="gnb-recent-favorite" @click.stop
+         @keydown.esc="hideRecentFavoriteMenu"
+    >
+        <span class="menu-button" tabindex="0" role="button"
+              @keydown.enter="showRecentFavoriteMenu"
+              @click.stop="handleRecentFavoriteButtonClick"
+        >
             <p-i class="menu-icon"
                  name="ic_recent_and_favorite"
                  height="1.5rem" width="1.5rem"
                  color="inherit"
-                 @click.stop="handleClickButton"
             />
         </span>
-        <p-tab v-show="visibleDropdown"
+        <p-tab v-show="visible"
                :tabs="tabs"
                :active-tab.sync="activeTab"
         >
             <template #recent>
-                <g-n-b-recent :visible="visibleDropdown && activeTab === 'recent'"
-                              @close="handleCloseDropdown"
+                <g-n-b-recent :visible="visible && activeTab === 'recent'"
+                              @close="hideRecentFavoriteMenu"
                 />
             </template>
             <template #favorite>
-                <g-n-b-favorite @close="handleCloseDropdown" />
+                <g-n-b-favorite @close="hideRecentFavoriteMenu" />
             </template>
         </p-tab>
     </div>
@@ -41,7 +45,10 @@ import { i18n } from '@/translations';
 import GNBFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBFavorite.vue';
 import GNBRecent from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBRecent.vue';
 
-export default defineComponent({
+interface Props {
+    visible: boolean
+}
+export default defineComponent<Props>({
     name: 'GNBRecentFavorite',
     components: {
         GNBRecent,
@@ -52,9 +59,14 @@ export default defineComponent({
     directives: {
         clickOutside: vOnClickOutside as DirectiveFunction,
     },
+    props: {
+        visible: {
+            type: Boolean,
+            default: false,
+        },
+    },
     setup(props, { emit }) {
         const state = reactive({
-            visibleDropdown: false,
             tabs: computed(() => ([
                 { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
                 { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
@@ -62,28 +74,26 @@ export default defineComponent({
             activeTab: 'recent',
         });
 
-        const setVisibleDropdown = (visible: boolean) => {
-            state.visibleDropdown = visible;
-            if (visible) emit('open-menu');
-            else emit('hide-menu');
+        const setVisible = (visible: boolean) => {
+            emit('update:visible', visible);
+        };
+        const hideRecentFavoriteMenu = () => {
+            setVisible(false);
+        };
+        const showRecentFavoriteMenu = () => {
+            setVisible(true);
         };
 
         /* Event */
-        const handleClickOutside = () => {
-            setVisibleDropdown(false);
-        };
-        const handleClickButton = () => {
-            setVisibleDropdown(!state.visibleDropdown);
-        };
-        const handleCloseDropdown = () => {
-            setVisibleDropdown(false);
+        const handleRecentFavoriteButtonClick = () => {
+            setVisible(!props.visible);
         };
 
         return {
             ...toRefs(state),
-            handleClickOutside,
-            handleClickButton,
-            handleCloseDropdown,
+            hideRecentFavoriteMenu,
+            showRecentFavoriteMenu,
+            handleRecentFavoriteButtonClick,
         };
     },
 });

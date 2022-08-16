@@ -1,42 +1,62 @@
 <template>
-    <div class="sitemap-container" :class="{'disabled': disabled}">
-        <div class="sitemap-button" :class="visible ? 'visible' : ''" @click="toggleMenu">
+    <div v-click-outside="hideSiteMap" class="sitemap-container" :class="{'disabled': disabled}"
+         @click.stop
+    >
+        <div class="sitemap-button" :class="visible ? 'visible' : ''"
+             role="button" tabindex="0"
+             @click="handleSiteMapButtonClick"
+             @keydown.enter="showSiteMap"
+             @keydown.esc="hideSiteMap"
+        >
             <p-i class="sitemap-icon" :name="visible ? 'ic_delete' : 'ic_gnb_menu'"
                  color="inherit"
                  width="2rem" height="2rem"
             />
         </div>
-        <div v-if="visible" v-click-outside="hideMenu" class="sitemap">
-            <ul v-for="(menu, aIdx) in menuList"
-                :key="aIdx"
-            >
+        <ul v-if="visible" class="sitemap">
+            <template v-for="(menu, menuIdx) in menuList">
                 <template v-if="menu.show !== false">
-                    <router-link :to="menu.to">
-                        <li class="menu" @click="hideMenu">
-                            <p-i :name="menu.icon"
-                                 color="inherit inherit"
-                                 height="1.5rem" width="1.5rem"
-                            /> {{ menu.label }}
-                        </li>
-                    </router-link>
-                    <div v-if="menu.subMenuList && menu.subMenuList.length > 0">
-                        <div v-for="(subMenu, sIdx) in menu.subMenuList"
-                             :key="sIdx"
-                        >
-                            <div v-if="subMenu.show !== false">
-                                <router-link v-if="subMenu" :to="subMenu.to">
-                                    <li class="submenu" @click="hideMenu">
-                                        {{ subMenu.label }}
-                                        <new-mark v-if="subMenu.isNew" />
-                                        <beta-mark v-if="subMenu.isBeta" />
-                                    </li>
-                                </router-link>
-                            </div>
-                        </div>
-                    </div>
+                    <li :key="menuIdx">
+                        <router-link :to="menu.to" custom>
+                            <template #default="{href, navigate}">
+                                <a class="menu"
+                                   :href="href"
+                                   @click.stop="navigateToMenu(navigate, $event)"
+                                   @keydown.enter="navigateToMenu(navigate, $event)"
+                                >
+                                    <p-i :name="menu.icon"
+                                         color="inherit inherit"
+                                         height="1.5rem" width="1.5rem"
+                                    /> {{ menu.label }}
+                                </a>
+                            </template>
+                        </router-link>
+                    </li>
+
+                    <template v-if="menu.subMenuList && menu.subMenuList.length > 0">
+                        <template v-for="(subMenu, subMenuIdx) in menu.subMenuList">
+                            <template v-if="subMenu.show !== false">
+                                <li v-if="subMenu" :key="`${menuIdx}-${subMenuIdx}`">
+                                    <router-link :to="subMenu.to" custom>
+                                        <template #default="{href, navigate}">
+                                            <a class="submenu"
+                                               :href="href"
+                                               @click.stop="navigateToMenu(navigate, $event)"
+                                               @keydown.enter="navigateToMenu(navigate, $event)"
+                                            >
+                                                {{ subMenu.label }}
+                                                <new-mark v-if="subMenu.isNew" />
+                                                <beta-mark v-if="subMenu.isBeta" />
+                                            </a>
+                                        </template>
+                                    </router-link>
+                                </li>
+                            </template>
+                        </template>
+                    </template>
                 </template>
-            </ul>
-        </div>
+            </template>
+        </ul>
     </div>
 </template>
 
@@ -77,18 +97,27 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const hideMenu = () => {
+        const showSiteMap = () => {
+            emit('update:visible', true);
+        };
+        const hideSiteMap = () => {
             emit('update:visible', false);
         };
-        const toggleMenu = () => {
+        const handleSiteMapButtonClick = () => {
             if (!props.disabled) {
                 emit('update:visible', !props.visible);
             }
         };
+        const navigateToMenu = (navigate, e) => {
+            navigate(e);
+            hideSiteMap();
+        };
 
         return {
-            hideMenu,
-            toggleMenu,
+            showSiteMap,
+            hideSiteMap,
+            handleSiteMapButtonClick,
+            navigateToMenu,
         };
     },
 };
@@ -126,23 +155,24 @@ export default {
         z-index: 999;
         padding: 1.5rem 0;
         margin-left: -0.5rem;
-        ul:first-child .menu {
-            margin-top: 0;
-        }
         li {
             @apply cursor-pointer;
             display: block;
             font-size: 0.875rem;
+            &:first-child > .menu {
+                margin-top: 0;
+            }
             &:hover {
                 @apply text-violet-600;
                 transition: color ease 0.4s;
-                &.menu .p-i-icon {
+                > .menu .p-i-icon {
                     @apply text-violet-600;
                     transition: color ease 0.4s;
                 }
             }
-            &.menu {
+            > .menu {
                 @apply font-bold;
+                display: block;
                 line-height: 2rem;
                 padding-left: 1.5rem;
                 margin-top: 1.5rem;
@@ -158,8 +188,9 @@ export default {
                     }
                 }
             }
-            &.submenu {
+            > .submenu {
                 @apply text-gray-500;
+                display: block;
                 line-height: 1.75rem;
                 padding-left: 3.5rem;
 

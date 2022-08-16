@@ -1,19 +1,19 @@
 <template>
     <div class="gnb-toolset" @click.stop>
         <g-n-b-search v-if="!isDomainOwner"
-                      @open-menu="openMenu('search')"
-                      @hide-menu="hideMenu"
+                      :visible="openedMenu === 'search'"
+                      @update:visible="updateOpenedMenu('search', $event)"
         />
         <g-n-b-recent-favorite v-if="!isDomainOwner"
-                               @open-menu="openMenu('recentFavorite')"
-                               @hide-menu="hideMenu"
+                               :visible="openedMenu === 'recentFavorite'"
+                               @update:visible="updateOpenedMenu('recentFavorite', $event)"
         />
         <g-n-b-noti v-if="!isDomainOwner"
-                    @open-menu="openMenu('notifications')"
-                    @hide-menu="hideMenu"
+                    :visible="openedMenu === 'notifications'"
+                    @update:visible="updateOpenedMenu('notifications', $event)"
         />
-        <g-n-b-profile @open-menu="openMenu('profile')"
-                       @hide-menu="hideMenu"
+        <g-n-b-profile :visible="openedMenu === 'profile'"
+                       @update:visible="updateOpenedMenu('profile', $event)"
         />
     </div>
 </template>
@@ -53,12 +53,15 @@ export default defineComponent({
             timezone: computed(() => store.state.user.timezone),
         });
 
-        /* event */
         const hideMenu = () => {
             emit('hide-menu');
         };
-        const openMenu = (menu) => {
+        const openMenu = (menu: string) => {
             emit('open-menu', menu);
+        };
+        const updateOpenedMenu = (menu: string, visible: boolean) => {
+            if (visible) openMenu(menu);
+            else hideMenu();
         };
 
         return {
@@ -66,6 +69,7 @@ export default defineComponent({
             MY_PAGE_ROUTE,
             hideMenu,
             openMenu,
+            updateOpenedMenu,
         };
     },
 });

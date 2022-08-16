@@ -7,9 +7,11 @@
                  opened: subMenuList.length > 0 && isOpened,
                  selected: isSelected,
              }]"
-             @click.stop="openMenu"
         >
-            <span v-if="subMenuList.length > 0" tabindex="0">
+            <span v-if="subMenuList.length > 0" tabindex="0"
+                  @click.stop="openMenu"
+                  @keydown.enter="openMenu"
+            >
                 <span>{{ label }}</span>
                 <p-i class="arrow-button"
                      :name="isOpened ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
@@ -17,15 +19,12 @@
                      color="inherit transparent"
                 />
             </span>
-
-            <component :is="hasPermission ? 'router-link' : 'span'"
-                       v-else
-                       :to="to"
-                       class="block"
-                       tabindex="0"
+            <router-link v-else
+                         :to="to"
+                         tabindex="0"
             >
                 <span>{{ label }}</span>
-            </component>
+            </router-link>
 
             <div v-if="isOpened && subMenuList.length > 0"
                  class="sub-menu-wrapper"

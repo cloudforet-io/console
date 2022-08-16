@@ -1,24 +1,26 @@
 <template>
-    <div v-click-outside="handleClickOutside" class="gnb-search" @click.stop>
+    <div v-click-outside="hideSearchMenu" class="gnb-search" @click.stop>
         <g-n-b-search-input v-if="isOverLaptopSize" v-model="inputText"
                             :is-focused.sync="isFocusOnInput"
-                            @click="showSuggestion"
-                            @esc="hideSuggestion"
+                            @click="showSearchMenu"
+                            @esc="hideSearchMenu"
                             @arrow-up="moveFocusToSuggestion('UPWARD')"
                             @arrow-down="moveFocusToSuggestion('DOWNWARD')"
                             @input="handleUpdateInput"
         />
 
-        <span v-else
-              class="menu-button" tabindex="0"
+        <span v-else class="menu-button" tabindex="0"
+              role="button"
+              @click.stop="handleSearchButtonClick"
+              @keydown.esc="hideSearchMenu"
+              @keydown.enter="showSearchMenu"
         >
             <p-i name="ic_search--bold"
                  height="1.5rem" width="1.5rem"
                  color="inherit"
-                 @click.stop="handleClickButton"
             />
         </span>
-        <g-n-b-search-dropdown v-show="visibleSuggestion"
+        <g-n-b-search-dropdown v-show="visible"
                                :input-text="trimmedInputText"
                                :loading="loading"
                                :items="dataState.dropdownItems"
@@ -27,15 +29,15 @@
                                :is-recent="showRecent"
                                :search-limit="SEARCH_LIMIT"
                                @move-focus-end="handleMoveFocusEnd"
-                               @close="hideSuggestion"
+                               @close="hideSearchMenu"
                                @select="handleSelect"
         >
             <template #search-input>
                 <g-n-b-search-input v-if="!isOverLaptopSize"
                                     v-model="inputText"
                                     :is-focused.sync="isFocusOnInput"
-                                    @click="showSuggestion"
-                                    @esc="hideSuggestion"
+                                    @click="showSearchMenu"
+                                    @esc="hideSearchMenu"
                                     @arrow-up="moveFocusToSuggestion('UPWARD')"
                                     @arrow-down="moveFocusToSuggestion('DOWNWARD')"
                                     @input="handleUpdateInput"
@@ -105,7 +107,10 @@ const LAPTOP_WINDOW_SIZE = laptop.max;
 const RECENT_LIMIT = 5;
 const SEARCH_LIMIT = 15;
 
-export default defineComponent({
+interface Props {
+    visible: boolean
+}
+export default defineComponent<Props>({
     name: 'GNBSearch',
     components: {
         GNBSearchDropdown,
@@ -115,9 +120,14 @@ export default defineComponent({
     directives: {
         clickOutside: vOnClickOutside as DirectiveFunction,
     },
+    props: {
+        visible: {
+            type: Boolean,
+            default: false,
+        },
+    },
     setup(props, { emit }) {
         const state = reactive({
-            visibleSuggestion: false,
             isFocusOnInput: false,
             isFocusOnSuggestion: false,
             focusingDirection: 'DOWNWARD',
@@ -189,10 +199,8 @@ export default defineComponent({
             }),
         });
 
-        const setVisibleSuggestion = (visible: boolean) => {
-            state.visibleSuggestion = visible;
-            if (visible) emit('open-menu');
-            else emit('hide-menu');
+        const setVisible = (visible: boolean) => {
+            emit('update:visible', visible);
         };
 
         const filterMenuItemsBySearchTerm = (menu: SuggestionMenu[], searchTerm?: string): SuggestionMenu[] => {
@@ -275,19 +283,19 @@ export default defineComponent({
         };
 
         /* Event */
-        const showSuggestion = async () => {
+        const showSearchMenu = async () => {
             state.isFocusOnSuggestion = false;
             if (!state.isFocusOnInput) state.isFocusOnInput = true;
-            if (!state.visibleSuggestion) {
+            if (!props.visible) {
                 state.loading = true;
                 state.loading = false;
-                setVisibleSuggestion(true);
+                setVisible(true);
             }
         };
 
-        const hideSuggestion = () => {
-            if (state.visibleSuggestion) {
-                setVisibleSuggestion(false);
+        const hideSearchMenu = () => {
+            if (props.visible) {
+                setVisible(false);
                 state.inputText = '';
                 state.isFocusOnInput = false;
                 state.isFocusOnSuggestion = false;
@@ -297,15 +305,15 @@ export default defineComponent({
         };
 
         const moveFocusToSuggestion = (focusingDirection: FocusingDirection) => {
-            if (!state.visibleSuggestion) setVisibleSuggestion(true);
+            if (!props.visible) setVisible(true);
             state.focusingDirection = focusingDirection;
             state.isFocusOnInput = false;
             state.isFocusOnSuggestion = true;
         };
 
-        const handleClickButton = () => {
-            if (!state.visibleSuggestion) showSuggestion();
-            else hideSuggestion();
+        const handleSearchButtonClick = () => {
+            if (!props.visible) showSearchMenu();
+            else hideSearchMenu();
         };
 
         const handleMoveFocusEnd = () => {
@@ -330,7 +338,7 @@ export default defineComponent({
                 const menuInfo: MenuInfo = MENU_INFO_MAP[menuId];
                 if (menuInfo && SpaceRouter.router.currentRoute.name !== menuId) {
                     SpaceRouter.router.push({ name: menuId }).catch(() => {});
-                    createSearchRecent(type, menuId);
+                    if (!state.showRecent) createSearchRecent(type, menuId);
                 }
             } else {
                 let cloudServiceTypekey;
@@ -352,14 +360,10 @@ export default defineComponent({
                         },
                     }).catch(() => {
                     });
-                    createSearchRecent(type, cloudServiceTypekey);
+                    if (!state.showRecent) createSearchRecent(type, cloudServiceTypekey);
                 }
             }
-            hideSuggestion();
-        };
-
-        const handleClickOutside = () => {
-            hideSuggestion();
+            hideSearchMenu();
         };
 
         const onWindowResize = throttle(() => {
@@ -381,7 +385,7 @@ export default defineComponent({
         })();
 
         /* Watcher */
-        watch(() => state.visibleSuggestion, async (visible) => {
+        watch(() => props.visible, async (visible) => {
             if (visible) {
                 await Promise.allSettled([
                     listSearchRecent(SUGGESTION_TYPE.MENU),
@@ -394,14 +398,13 @@ export default defineComponent({
             ...toRefs(state),
             dataState,
             SEARCH_LIMIT,
-            showSuggestion,
-            hideSuggestion,
+            showSearchMenu,
+            hideSearchMenu,
             moveFocusToSuggestion,
-            handleClickButton,
+            handleSearchButtonClick,
             handleMoveFocusEnd,
             handleUpdateInput,
             handleSelect,
-            handleClickOutside,
         };
     },
 });

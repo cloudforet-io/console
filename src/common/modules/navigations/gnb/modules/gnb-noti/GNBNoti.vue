@@ -1,13 +1,18 @@
 <template>
-    <div v-click-outside="handleClickOutside" class="gnb-notifications-notice" @click.stop>
-        <span class="menu-button" tabindex="0">
+    <div v-click-outside="hideNotiMenu" class="gnb-notifications-notice" @click.stop
+         @keydown.esc="hideNotiMenu"
+    >
+        <span class="menu-button" tabindex="0"
+              role="button"
+              @click.stop="handleNotiButtonClick"
+              @keydown.enter="showNotiMenu"
+        >
             <p-i class="menu-icon"
                  :name="hasNotifications ? 'ic_bell_noti' : 'ic_bell'"
                  :color="hasNotifications ? undefined : 'inherit'"
-                 @click.stop="handleClickButton"
             />
         </span>
-        <p-tab v-show="visibleDropdown"
+        <p-tab v-show="visible"
                :tabs="tabs"
                :active-tab.sync="activeTab"
         >
@@ -17,13 +22,13 @@
                 </p-badge>
             </template>
             <template #notifications>
-                <g-n-b-notifications-tab :visible="visibleDropdown && activeTab === 'notifications'"
+                <g-n-b-notifications-tab :visible="visible && activeTab === 'notifications'"
                                          :count.sync="count.notifications"
                 />
             </template>
             <template #notice>
                 <g-n-b-notice-tab :count.sync="count.notice"
-                                  @close="handleCloseDropdown"
+                                  @close="hideNotiMenu"
                 />
             </template>
         </p-tab>
@@ -48,8 +53,10 @@ import { store } from '@/store';
 import GNBNoticeTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNoticeTab.vue';
 import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationsTab.vue';
 
-
-export default defineComponent({
+interface Props {
+    visible: boolean
+}
+export default defineComponent<Props>({
     name: 'GNBNoti',
     components: {
         GNBNoticeTab,
@@ -61,9 +68,14 @@ export default defineComponent({
     directives: {
         clickOutside: vOnClickOutside as DirectiveFunction,
     },
+    props: {
+        visible: {
+            type: Boolean,
+            default: false,
+        },
+    },
     setup(props, { emit }) {
         const state = reactive({
-            visibleDropdown: false,
             hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
             tabs: computed(() => ([
                 // song-lang
@@ -77,26 +89,24 @@ export default defineComponent({
             },
         });
 
-        const setVisibleDropdown = (visible: boolean) => {
-            state.visibleDropdown = visible;
+        const setVisible = (visible: boolean) => {
+            emit('update:visible', visible);
             if (visible) {
-                emit('open-menu');
                 store.dispatch('display/stopCheckNotification');
             } else {
-                emit('hide-menu');
                 store.dispatch('display/startCheckNotification');
             }
         };
+        const showNotiMenu = () => {
+            setVisible(true);
+        };
+        const hideNotiMenu = () => {
+            setVisible(false);
+        };
 
         /* Event */
-        const handleClickOutside = () => {
-            setVisibleDropdown(false);
-        };
-        const handleClickButton = () => {
-            setVisibleDropdown(!state.visibleDropdown);
-        };
-        const handleCloseDropdown = () => {
-            setVisibleDropdown(false);
+        const handleNotiButtonClick = () => {
+            setVisible(!props.visible);
         };
 
         onMounted(() => {
@@ -112,9 +122,9 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
-            handleClickOutside,
-            handleClickButton,
-            handleCloseDropdown,
+            showNotiMenu,
+            hideNotiMenu,
+            handleNotiButtonClick,
             commaFormatter,
         };
     },
