@@ -60,10 +60,22 @@ export default {
             }
         };
 
+        const getNoticeBoard = async (): Promise<string|undefined> => {
+            try {
+                const { results } = await SpaceConnector.client.board.board.list();
+                return results.filter(d => d.name === 'Notice')[0]?.board_id;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return undefined;
+            }
+        };
+
         const getPostList = async () => {
             try {
+                const noticeBoard = await getNoticeBoard();
+                if (!noticeBoard) return;
                 const { results } = await SpaceConnector.client.board.post.list({
-                    board_id: store.state.domain.domainId,
+                    board_id: noticeBoard,
                     query: {
                         filter: [{
                             k: 'options.is_popup',

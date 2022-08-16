@@ -149,7 +149,7 @@ export default {
             isAllDomainSelected: false,
             boardIdState: '',
             domainList: [] as Array<DomainItem>,
-            selectedDomain: [] as Array<DomainItem>,
+            selectedDomain: [{ name: store.state.domain.domainId, label: store.state.domain.domainId }] as Array<DomainItem>,
             postId: '',
         });
 
