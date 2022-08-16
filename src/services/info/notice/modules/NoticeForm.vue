@@ -136,23 +136,21 @@ export default {
         },
         noticePostData: {
             default: () => {},
-            type: Object as PropType<NoticePostModel>,
+            type: Object as PropType<Partial<NoticePostModel>>,
         },
     },
     setup(props) {
         const state = reactive({
             hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
             userName: computed<string>(() => store.state.user.name),
-            // FIXME:: below props.noticePostData could be undefined because of async get method
-            isPinned: props.noticePostData?.options.is_pinned ?? false,
-            isPopup: props.noticePostData?.options.is_popup ?? false,
-            contents: props.noticePostData?.contents ?? '',
-            isAllDomainSelected: !!props.noticePostData?.domain_id,
-            boardIdState: props.noticePostData?.board_id ?? '',
+            isPinned: false,
+            isPopup: false,
+            contents: '',
+            isAllDomainSelected: false,
+            boardIdState: '',
             domainList: [] as Array<DomainItem>,
-            selectedDomain: props.noticePostData?.selectedDomain?.length
-                ? [{ name: props.noticePostData.domain_id, label: props.noticePostData.domain_id }]
-                : [{ name: store.state.domain.domainId, label: store.state.domain.domainId }] as Array<DomainItem>,
+            selectedDomain: [] as Array<DomainItem>,
+            postId: '',
         });
 
         const {
@@ -207,8 +205,16 @@ export default {
         const handleEditNotice = async () => {
             try {
                 await SpaceConnector.client.board.post.update(
-                    state.isAllDomainSelected ? formData.value
-                        : { ...formData.value, domain_id: state.selectedDomain[0].name },
+                    state.isAllDomainSelected
+                        ? {
+                            ...formData.value,
+                            post_id: state.postId,
+                        }
+                        : {
+                            ...formData.value,
+                            domain_id: state.selectedDomain[0].name,
+                            post_id: state.postId,
+                        },
                 );
                 // song-lang
                 showSuccessMessage('Successfully edited notice', '');
@@ -263,6 +269,21 @@ export default {
 
         watch(() => state.isAllDomainSelected, (isAllDomain: boolean) => {
             if (isAllDomain) state.selectedDomain = [];
+        });
+
+        watch(() => props.noticePostData, (d: Partial<NoticePostModel>) => {
+            if (!Object.keys(d).length) return;
+            state.isPinned = d.options?.is_pinned ?? false;
+            state.isPopup = d.options?.is_popup ?? false;
+            state.contents = d.contents ?? '';
+            state.isAllDomainSelected = !!d.domain_id;
+            state.boardIdState = d?.board_id ?? '';
+            state.selectedDomain = d?.domain_id
+                ? [{ name: d.domain_id, label: d.domain_id }]
+                : [{ name: store.state.domain.domainId, label: store.state.domain.domainId }];
+            state.postId = d.post_id ?? '';
+            setForm('writerName', d.writer);
+            setForm('noticeTitle', d.title);
         });
 
         (async () => {
