@@ -11,7 +11,7 @@
                         </template>
                         <span class="label-text">ID: </span>
                         <p-copy-button>
-                            {{ cloudServiceId }}
+                            {{ resourceId }}
                         </p-copy-button>
                     </div>
                 </template>
@@ -175,6 +175,7 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const state = reactive({
+            resourceId: computed(() => props.cloudServiceItem.reference.resource_id),
             cloudServiceId: computed(() => props.cloudServiceItem.cloud_service_id),
             timelineWrapperRef: null as null | HTMLElement,
             selectedHistoryRecordId: '',
