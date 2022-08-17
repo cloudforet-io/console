@@ -1,3 +1,10 @@
+# [1.1.0-beta.370](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.369...v1.1.0-beta.370) (2022-08-17)
+
+
+### Bug Fixes
+
+* **button-modal:** fix scrollbar issue and remove scrollable props ([#1056](https://github.com/spaceone-dev/spaceone-design-system/issues/1056)) ([731d1c2](https://github.com/spaceone-dev/spaceone-design-system/commit/731d1c22c391a7fca12d8aa953db54490c6dbfd3))
+
 # [1.1.0-beta.369](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.368...v1.1.0-beta.369) (2022-08-16)
 
 
