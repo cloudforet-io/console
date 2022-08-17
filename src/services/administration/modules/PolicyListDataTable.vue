@@ -37,7 +37,7 @@
             </template>
             <template #col-policy_type-format="{ value }">
                 <p-badge outline :style-type="policyTypeBadgeColorFormatter(value)">
-                    {{ value ? value : POLICY_TYPES.MANAGED }}
+                    {{ capitalize(value ? value : POLICY_TYPES.MANAGED) }}
                 </p-badge>
             </template>
             <template #col-policy_id-format="{ value, item }">
@@ -79,7 +79,7 @@ import {
 } from '@spaceone/design-system';
 import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
-import { filter } from 'lodash';
+import { filter, capitalize } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -279,6 +279,7 @@ export default {
             handleChangePolicyType,
             handleUpdateSelectIndex,
             keyItemSets,
+            capitalize,
         };
     },
 };
