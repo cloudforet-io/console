@@ -96,21 +96,23 @@ export default {
                 }
                 return results;
             }),
-            menuSet: computed<LNBMenu[]>(() => filterLNBMenuByPermission([
+            menuSet: computed<LNBMenu[]>(() => [
                 ...state.dashboardMenuSet,
-                {
-                    type: 'item',
-                    id: MENU_ID.COST_EXPLORER_COST_ANALYSIS,
-                    label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
-                    to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
-                },
-                {
-                    type: 'item',
-                    id: MENU_ID.COST_EXPLORER_BUDGET,
-                    label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_BUDGET].translationId),
-                    to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
-                },
-            ], store.getters['user/pagePermissionList'])),
+                filterLNBMenuByPermission([
+                    {
+                        type: 'item',
+                        id: MENU_ID.COST_EXPLORER_COST_ANALYSIS,
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
+                        to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
+                    },
+                    {
+                        type: 'item',
+                        id: MENU_ID.COST_EXPLORER_BUDGET,
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_BUDGET].translationId),
+                        to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
+                    },
+                ], store.getters['user/pagePermissionList']),
+            ]),
             selectedMenu: {} as LNBItem,
             homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters?.homeDashboardId),
         });
