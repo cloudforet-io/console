@@ -24,13 +24,11 @@
         </template>
         <template #footer-extra>
             <p-check-box v-model="neverShowPopup">
-                <!--            song-lang-->
-                Don't show me again
+                {{ $t('COMMON.POPUP.NOTICE.DO_NOT_SHOW') }}
             </p-check-box>
         </template>
         <template #confirm-button>
-            <!--            song-lang-->
-            <span>Close</span>
+            <span>{{ $t('COMMON.POPUP.NOTICE.CLOSE') }}</span>
         </template>
     </p-button-modal>
 </template>

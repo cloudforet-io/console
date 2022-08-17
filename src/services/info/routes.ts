@@ -39,24 +39,21 @@ const infoRoute: RouteConfig = {
                 {
                     path: 'create',
                     name: INFO_ROUTE.NOTICE.CREATE._NAME,
-                    // song-lang
-                    meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { translationId: 'INFO.NOTICE.FORM.CREATE_NOTICE', lnbVisible: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                     component: NoticeCreatePage as any,
                 },
                 {
                     path: 'update/:boardId/:postId',
                     name: INFO_ROUTE.NOTICE.UPDATE._NAME,
-                    // song-lang
-                    meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { translationId: 'INFO.NOTICE.FORM.EDIT_TITLE', lnbVisible: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                     component: NoticeUpdatePage as any,
                     props: true,
                 },
                 {
                     path: ':boardId/:postId',
                     name: INFO_ROUTE.NOTICE.DETAIL._NAME,
-                    // song-lang
                     meta: {
-                        lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION, label: ({ params }) => params.id, copiable: true,
+                        translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION, label: ({ params }) => params.id, copiable: true,
                     },
                     component: NoticeDetailPage as any,
                     props: true,

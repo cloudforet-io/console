@@ -49,6 +49,7 @@ import { vOnClickOutside } from '@vueuse/components';
 import type { DirectiveFunction } from 'vue';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import GNBNoticeTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNoticeTab.vue';
 import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationsTab.vue';
@@ -78,9 +79,8 @@ export default defineComponent<Props>({
         const state = reactive({
             hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
             tabs: computed(() => ([
-                // song-lang
-                { label: 'Notifications', name: 'notifications', keepAlive: true },
-                { label: 'Notice', name: 'notice', keepAlive: true },
+                { label: i18n.t('COMMON.GNB.NOTIFICATION.TITLE'), name: 'notifications', keepAlive: true },
+                { label: i18n.t('COMMON.GNB.NOTICE.TITLE'), name: 'notice', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'notifications',
             count: {

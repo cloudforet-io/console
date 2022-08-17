@@ -11,8 +11,7 @@
                              width="1rem" height="1rem"
                              class="mr-1"
                         />
-                        <!--song-lang-->
-                        <span class="label">Pinned notice</span>
+                        <span class="label">{{ $t('COMMON.GNB.NOTICE.PINNED_NOTICE') }}</span>
                     </div>
                     <g-n-b-noti-item v-for="(item, idx) in pinnedItems" :key="`${item.postId}-${idx}`"
                                      :title="item.title"
@@ -32,21 +31,18 @@
                 />
             </div>
             <div class="view-all-button-wrapper">
-                <!--song-lang-->
                 <div class="view-all-button" @click="handleClickViewAllNotice">
-                    View all notice
+                    {{ $t('COMMON.GNB.NOTICE.VIEW_ALL') }}
                 </div>
             </div>
             <template #no-data>
                 <div class="no-data">
                     <img class="img" src="@/assets/images/illust_ghost.svg">
                     <p class="title">
-                        <!--song-lang-->
-                        No Notice
+                        {{ $t('COMMON.GNB.NOTICE.NO_NOTICE') }}
                     </p>
                     <p class="desc">
-                        <!--song-lang-->
-                        <span>Any new notice will appear here.</span>
+                        <span>{{ $t('COMMON.GNB.NOTICE.NO_NOTICE_DESC') }}</span>
                     </p>
                 </div>
             </template>

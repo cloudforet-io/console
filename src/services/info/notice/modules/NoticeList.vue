@@ -24,8 +24,7 @@
                 <div class="no-data">
                     <img src="@/assets/images/illust_satellite.svg" class="no-data-img">
                     <p class="no-data-text">
-                        <!--song-lang-->
-                        {{ $t('No notices') }}
+                        {{ $t('INFO.NOTICE.NO_NOTICES') }}
                     </p>
                 </div>
             </template>
@@ -59,6 +58,7 @@ import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation
 import type { QueryStoreFilter } from '@/query/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { getNoticeBoardId } from '@/lib/helper/notice-helper';
 
@@ -101,18 +101,15 @@ export default defineComponent<Props>({
         const state = reactive({
             dropdownItems: [
                 {
-                    // song-lang
-                    label: '전체 공지',
+                    label: i18n.t('INFO.NOTICE.MAIN.LABEL_ALL_NOTI'),
                     name: 'ALL',
                 },
                 {
-                    // song-lang
-                    label: '시스템 공지',
+                    label: i18n.t('INFO.NOTICE.MAIN.LABEL_SYSTEM_NOTI'),
                     name: NOTICE_TYPE.SYSTEM,
                 },
                 {
-                    // song-lang
-                    label: '내부 공지',
+                    label: i18n.t('INFO.NOTICE.MAIN.LABEL_DOMAIN_NOTI'),
                     name: NOTICE_TYPE.DOMAIN,
                 },
             ],

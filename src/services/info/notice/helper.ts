@@ -8,14 +8,12 @@ export const getPostBadgeInfo = (noticeType): { label?: TranslateResult; style?:
     switch (noticeType) {
     case NOTICE_TYPE.SYSTEM:
         return {
-            // song-lang
-            label: i18n.t('시스템 공지'),
+            label: i18n.t('INFO.NOTICE.SYSTEM_NOTICE'),
             style: 'primary',
         };
     case NOTICE_TYPE.DOMAIN:
         return {
-            // song-lang
-            label: i18n.t('내부 공지'),
+            label: i18n.t('INFO.NOTICE.DOMAIN_NOTICE'),
             style: 'gray',
         };
     default: return {};

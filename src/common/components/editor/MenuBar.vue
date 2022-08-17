@@ -89,10 +89,9 @@
                            name="ic_image" :class="{selected: imagePopoverVisible}"
             />
             <template #content>
-                <!-- song-lang -->
                 <div class="image-popover">
                     <p>
-                        Copy&Paste or Drag&Drop images directly into body content.
+                        {{ $t('COMMON.EDITOR.COPY_PASTE_DRAG_DROP') }}
                     </p>
                     <img src="@/assets/images/illust_insert-image.svg">
                 </div>
@@ -127,6 +126,8 @@ import {
     PDivider, PI, PIconButton, PPopover, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { Editor } from '@tiptap/vue-2';
+
+import { i18n } from '@/translations';
 
 import ColorPicker from '@/common/components/editor/ColorPicker.vue';
 
@@ -168,18 +169,16 @@ export default defineComponent<Props>({
     setup(props) {
         const state = reactive({
             textStyleItems: computed(() => [
-                // song-lang
-                { name: 'normal', label: 'Normal text' },
-                { name: 'heading1', label: 'Heading 1' },
-                { name: 'heading2', label: 'Heading 2' },
-                { name: 'heading3', label: 'Heading 3' },
+                { name: 'normal', label: i18n.t('COMMON.EDITOR.NORMAL_TEXT') },
+                { name: 'heading1', label: i18n.t('COMMON.EDITOR.HEADING1') },
+                { name: 'heading2', label: i18n.t('COMMON.EDITOR.HEADING2') },
+                { name: 'heading3', label: i18n.t('COMMON.EDITOR.HEADING3') },
             ]),
             textAlignItems: computed(() => [
-                // song-lang
-                { name: 'left', label: 'Left' },
-                { name: 'center', label: 'Center' },
-                { name: 'right', label: 'Right' },
-                { name: 'justify', label: 'Justify' },
+                { name: 'left', label: i18n.t('COMMON.EDITOR.ALIGN_LEFT') },
+                { name: 'center', label: i18n.t('COMMON.EDITOR.ALIGN_CENTER') },
+                { name: 'right', label: i18n.t('COMMON.EDITOR.ALIGN_RIGHT') },
+                { name: 'justify', label: i18n.t('COMMON.EDITOR.ALIGN_JUSTIFY') },
             ]),
             selectedTextStyle: computed(() => {
                 if (props.editor.isActive('paragraph')) return 'normal';

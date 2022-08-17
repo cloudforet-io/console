@@ -1,40 +1,33 @@
 <template>
     <div class="notice-form">
         <p-pane-layout class="notice-form-wrapper">
-            <!--                song-lang-->
-            <p-field-group class="notice-label-wrapper writer-name-input" label="Writer Name" required>
+            <p-field-group class="notice-label-wrapper writer-name-input" :label="$t('INFO.NOTICE.FORM.LABEL_WRITER_NAME')" required>
                 <template #default="{invalid}">
-                    <!--                    song-lang-->
                     <p-text-input :value="writerName" :invalid="invalid"
-                                  :placeholder="$store.state.user.name || 'Required'"
+                                  :placeholder="$store.state.user.name || $t('INFO.NOTICE.FORM.PLACEHOLDER_REQUIRED')"
                                   @input="setForm('writerName', $event)"
                     />
                 </template>
             </p-field-group>
-            <!--                song-lang-->
-            <p-field-group v-if="hasSystemRole" class="notice-label-wrapper" label="Viewer"
+            <p-field-group v-if="hasSystemRole" class="notice-label-wrapper" :label="$t('INFO.NOTICE.FORM.LABEL_VIEWER')"
                            required
             >
                 <p-radio :selected="isAllDomainSelected" class="mr-4" @click="handleClickAllDomainRadio">
-                    <!--                    song-lang-->
-                    <span>All Domains</span>
+                    <span>{{ $t('INFO.NOTICE.FORM.ALL_DOMAINS') }}</span>
                 </p-radio>
                 <p-radio :selected="!isAllDomainSelected" @click="handleClickSelectDomainRadio">
-                    <!--                    song-lang-->
-                    <span>Selected Domain</span>
+                    <span>{{ $t('INFO.NOTICE.FORM.SELECTED_DOMAIN') }}</span>
                 </p-radio>
                 <br>
-                <!--               song-lang -->
                 <p-search-dropdown class="mt-2 w-1/2"
                                    :menu="domainList"
                                    :selected="selectedDomain"
                                    :disabled="isAllDomainSelected"
-                                   :placeholder="isAllDomainSelected ? 'All' : ''"
+                                   :placeholder="isAllDomainSelected ? $t('INFO.NOTICE.FORM.PLACEHOLDER_ALL') : ''"
                                    @update:selected="handleSelectDomain"
                 />
             </p-field-group>
-            <!--            song-lang-->
-            <p-field-group class="notice-label-wrapper" label="Title" required
+            <p-field-group class="notice-label-wrapper" :label="$t('INFO.NOTICE.FORM.LABEL_TITLE')" required
                            :invalid="invalidState.noticeTitle"
                            :invalid-text="invalidTexts.noticeTitle"
             >
@@ -45,17 +38,15 @@
                     />
                 </template>
             </p-field-group>
-            <p-field-group class="notice-label-wrapper" label="Content" required>
+            <p-field-group class="notice-label-wrapper" :label="$t('INFO.NOTICE.FORM.LABEL_CONTENT')" required>
                 <text-editor v-model.lazy="contents" :image-uploader="uploadImage" />
             </p-field-group>
             <div class="notice-create-options-wrapper">
                 <p-check-box v-model="isPinned">
-                    <!--                song-lang-->
-                    <span>Pin Notice</span>
+                    <span>{{ $t('INFO.NOTICE.FORM.PIN_NOTICE') }}</span>
                 </p-check-box>
                 <p-check-box v-model="isPopup">
-                    <!--                song-lang-->
-                    <span>Display in pop-up</span>
+                    <span>{{ $t('INFO.NOTICE.FORM.IN_POP_UP') }}</span>
                 </p-check-box>
             </div>
         </p-pane-layout>
@@ -65,8 +56,7 @@
                 size="lg"
                 @click="$router.go(-1)"
             >
-                <!--                song-lang-->
-                Cancel
+                {{ $t('INFO.NOTICE.FORM.CANCEL') }}
             </p-button>
             <p-button
                 style-type="primary-dark"
@@ -74,8 +64,7 @@
                 :disabled="!isAllValid"
                 @click="handleConfirm"
             >
-                <!--                song-lang-->
-                Confirm
+                {{ $t('INFO.NOTICE.FORM.CONFIRM') }}
             </p-button>
         </div>
     </div>
@@ -95,6 +84,7 @@ import {
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -168,10 +158,8 @@ export default {
             noticeTitle: props.noticePostData?.title ?? '',
             writerName: props.noticePostData?.writer || state.userName || '',
         }, {
-            // song-lang
-            noticeTitle(value: string) { return value.trim().length ? '' : 'Title is required'; },
-            // song-lang
-            writerName(value: string) { return value.trim().length ? '' : 'Writer name is required'; },
+            noticeTitle(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.TITLE_REQUIRED'); },
+            writerName(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.WRITER_REQUIRED'); },
         });
 
         const formData:ComputedRef = computed(() => ({
@@ -196,12 +184,10 @@ export default {
                     state.isAllDomainSelected ? formData.value
                         : { ...formData.value, domain_id: state.selectedDomain[0].name },
                 );
-                // song-lang
-                showSuccessMessage('Successfully created notice', '');
+                showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
                 await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME, query: {} });
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, 'Failed to create notice');
+                ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_CREATE_NOTICE'));
             }
         };
         const handleEditNotice = async () => {
@@ -218,12 +204,10 @@ export default {
                             post_id: state.postId,
                         },
                 );
-                // song-lang
-                showSuccessMessage('Successfully edited notice', '');
+                showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
                 await SpaceRouter.router.back();
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, 'Failed to edit notice');
+                ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_UPDATE_NOTICE'));
             }
         };
 

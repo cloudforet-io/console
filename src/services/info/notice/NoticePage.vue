@@ -1,14 +1,12 @@
 <template>
     <div class="notice-page">
-        <!--song-lang-->
-        <p-page-title :title="$t('Notice')">
+        <p-page-title :title="$t('INFO.NOTICE.MAIN.NOTICE_TITLE')">
             <template #extra>
                 <p-button v-if="hasDomainRoleUser || hasSystemRoleUser" :outline="true" style-type="primary-dark"
                           icon="ic_plus_bold"
                           @click="handleCreateNotice"
                 >
-                    <!--song-lang-->
-                    {{ $t('Create Notice') }}
+                    {{ $t('INFO.NOTICE.FORM.CREATE_NOTICE') }}
                 </p-button>
             </template>
         </p-page-title>

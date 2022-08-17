@@ -6,18 +6,17 @@
         >
             <template #extra>
                 <div v-if="hasDomainRoleUser" class="button-group">
-                    <!--                    song-lang-->
                     <p-button :outline="true" style-type="gray-border" icon="ic_edit"
                               @click="handleClickEditButton"
                     >
-                        {{ $t('Edit') }}
+                        {{ $t('INFO.NOTICE.FORM.EDIT') }}
                     </p-button>
                     <!--        TODO: 이미지 URL 이슈로 인해 v1.10.1에서 제외-->
                     <!--                    <p-button :outline="true" style-type="gray-border" icon="ic_send">-->
                     <!--                        {{ $t('Send Email') }}-->
                     <!--                    </p-button>-->
                     <p-button :outline="true" style-type="alert" @click="handleDeleteModalOpen">
-                        {{ $t('Delete') }}
+                        {{ $t('INFO.NOTICE.FORM.DELETE') }}
                     </p-button>
                 </div>
             </template>
@@ -62,18 +61,17 @@
                       style-type="gray-border"
                       @click="handleBackToListButtonClick"
             >
-                <!-- song-lang-->
-                {{ $t('Back to List') }}
+                {{ $t('INFO.NOTICE.DETAIL.BACK_TO_LIST') }}
             </p-button>
         </section>
         <!--        TODO: 이미지 URL 이슈로 인해 v1.10.1에서 제외-->
-        <!--        <p-button-modal :header-title="$t('Send the mail')"-->
+        <!--        <p-button-modal :header-title="$t('INFO.NOTICE.FORM.SEND_EMAIL_MODAL_TITLE')"-->
         <!--                        :visible.sync="sendEmailModalVisible"-->
         <!--                        size="sm"-->
         <!--                        @confirm="handleSendEmailConfirm"-->
         <!--        >-->
         <!--            <template #body>-->
-        <!--                <i18n path="song-lang" tag="p" class="desc">-->
+        <!--                <i18n path="INFO.NOTICE.FORM.SEND_EMAIL_MODAL_DESC" tag="p" class="desc">-->
         <!--                    <template #domainText>-->
         <!--                        <strong>{{ domainName }}</strong>-->
         <!--                    </template>-->
@@ -81,10 +79,9 @@
         <!--            </template>-->
         <!--        </p-button-modal>-->
 
-        <!--song-lang-->
-        <delete-modal :header-title="$t('Delete Notice')"
+        <delete-modal :header-title="$t('INFO.NOTICE.FORM.DELETE_MODAL_TITLE')"
                       :visible.sync="deleteModalVisible"
-                      :contents="$t('Are you sure you want to delete the notice?')"
+                      :contents="$t('INFO.NOTICE.FORM.DELETE_MODAL_CONTENTS')"
                       @confirm="handleDeleteNoticeConfirm"
         />
     </section>
@@ -233,11 +230,9 @@ export default {
         //             post_id: props.postId,
         //             board_id: props.boardId,
         //         });
-        //         // song-lang
-        //         showSuccessMessage(i18n.t('Successfully Sent Email'), '');
+        //         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_SEND_EMAIL'), '');
         //     } catch (e) {
-        //         // song-lang
-        //         ErrorHandler.handleRequestError(e, i18n.t('에러 메시지!'));
+        //         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_SEND_EMAIL'));
         //     } finally {
         //         modalState.sendEmailModalVisible = false;
         //     }
@@ -248,12 +243,10 @@ export default {
                     post_id: props.postId,
                     board_id: props.boardId,
                 });
-                // song-lang
-                showSuccessMessage(i18n.t('Successfully Deleted Notice'), '');
+                showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_DELETE_NOTICE'), '');
                 SpaceRouter.router.go(-1);
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, i18n.t('에러 메시지!'));
+                ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_DELETE_NOTICE'));
             } finally {
                 modalState.deleteModalVisible = false;
             }

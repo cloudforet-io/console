@@ -1,6 +1,5 @@
 <template>
     <component :is="postDirection ? 'div' : 'li'" class="list-item">
-        <!-- song-lang -->
         <div v-if="postDirection" class="post-direction">
             <span>{{ postDirectionLabel }}</span><p-i :name="postDirectionIcon" width="1rem" />
         </div>
@@ -21,8 +20,7 @@
             </div>
         </div>
         <div v-else class="not-exist-item">
-            <!-- song-lang -->
-            {{ $t('다음 게시물이 없습니다. Next notice does not exist.') }}
+            {{ $t('INFO.NOTICE.MAIN.NO_NEXT_LIST') }}
         </div>
     </component>
 </template>
@@ -84,8 +82,7 @@ export default defineComponent<Props>({
         const state = reactive({
             noticeTypeBadge: computed<{ label?: TranslateResult; style?: string }>(() => getPostBadgeInfo(props.post?.scope)),
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
-            // song-lang
-            postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? i18n.t('Prev') : i18n.t('Next'))),
+            postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? i18n.t('INFO.NOTICE.MAIN.PREV') : i18n.t('INFO.NOTICE.MAIN.NEXT'))),
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             date: computed(() => dateFormatter(props.post?.created_at)),
             isPinned: computed(() => props.post?.options?.is_pinned),

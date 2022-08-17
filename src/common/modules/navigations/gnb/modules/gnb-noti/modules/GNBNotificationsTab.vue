@@ -56,13 +56,11 @@
             <template #body>
                 <div class="meta-data-wrapper">
                     <div>
-                        <!--song-lang-->
-                        <b>Occurred Time: </b>
+                        <b>{{ $t('COMMON.GNB.NOTICE.OCCURED_TIME') }}</b>
                         <span>{{ iso8601Formatter(selectedItem.createdAt, timezone) }}</span>
                     </div>
                     <div v-if="selectedItem.message.link">
-                        <!--song-lang-->
-                        <b>Detail Link: </b>
+                        <b>{{ $t('COMMON.GNB.NOTICE.DETAIL_LINK') }}</b>
                         <p-anchor :href="selectedItem.message.link">
                             {{ selectedItem.message.link }}
                         </p-anchor>
