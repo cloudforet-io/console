@@ -5,6 +5,15 @@
                        :class="{ loading: loading && !items.length }"
         >
             <div ref="notificationItemsRef" class="content-wrapper">
+                <p-button style-type="transparent"
+                          size="sm"
+                          font-weight="normal"
+                          class="clear-all-button"
+                          @click="handleClearAll"
+                >
+                    <!--song-lang-->
+                    Clear all
+                </p-button>
                 <g-n-b-noti-item v-for="(item, idx) in items" :key="`${item.notificationId}-${idx}`"
                                  :is-read="item.isRead"
                                  :title="item.title"
@@ -87,7 +96,7 @@ import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PDataLoader, PButtonModal, PI, PAnchor, PDefinitionTable,
+    PDataLoader, PButtonModal, PI, PAnchor, PDefinitionTable, PButton,
 } from '@spaceone/design-system';
 import { useInfiniteScroll } from '@vueuse/core';
 import type { Dayjs } from 'dayjs';
@@ -132,6 +141,7 @@ export default {
         PI,
         PAnchor,
         PDefinitionTable,
+        PButton,
     },
     props: {
         visible: {
@@ -250,15 +260,17 @@ export default {
                 ErrorHandler.handleError(e);
             }
         };
-        const deleteNotification = async (notificationId: string) => {
+        const deleteNotification = async (notificationIds: string[]): Promise<boolean> => {
             try {
                 await SpaceConnector.client.notification.notification.delete({
-                    notification_id: notificationId,
+                    notifications: notificationIds,
                 });
-                state.items = state.items.filter(d => d.notificationId !== notificationId);
-                state.proxyCount -= 1;
+                state.items = state.items.filter(d => !notificationIds.includes(d.notificationId));
+                state.proxyCount -= notificationIds.length;
+                return true;
             } catch (e) {
                 ErrorHandler.handleError(e);
+                return false;
             }
         };
 
@@ -276,11 +288,22 @@ export default {
             state.modalVisible = true;
         };
         const handleDeleteNotification = async (notificationId: string) => {
-            await deleteNotification(notificationId);
+            const deletedIndex = state.items.findIndex(d => d.notificationId === notificationId);
+            const deleted = await deleteNotification([notificationId]);
+            if (deleted) {
+                const item = state.items[deletedIndex];
+                const previousItem = state.items[deletedIndex - 1];
+                item.dateHeader = getDateHeader(item.createdAt, previousItem?.createdAt);
+            }
         };
         const handleCloseNotificationModal = () => {
             state.selectedItem = {};
             state.modalVisible = false;
+        };
+        const handleClearAll = async () => {
+            const notificationIds = state.items.map(d => d.notificationId);
+            const deleted = await deleteNotification(notificationIds);
+            if (deleted) await init();
         };
 
         /* Init */
@@ -309,6 +332,7 @@ export default {
             handleSelectNotification,
             handleDeleteNotification,
             handleCloseNotificationModal,
+            handleClearAll,
             iso8601Formatter,
         };
     },
@@ -333,8 +357,15 @@ export default {
     }
     .content-wrapper {
         max-height: calc(100vh - $gnb-height - 1.5rem - 2.75rem);
+        position: relative;
         overflow-y: scroll;
         padding: 0.25rem 0.5rem 0.5rem 0.5rem;
+
+        .clear-all-button {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.5rem;
+        }
     }
     .no-data {
         text-align: center;
