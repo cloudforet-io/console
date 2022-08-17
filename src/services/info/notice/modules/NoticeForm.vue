@@ -39,7 +39,7 @@
                 </template>
             </p-field-group>
             <p-field-group class="notice-label-wrapper" :label="$t('INFO.NOTICE.FORM.LABEL_CONTENT')" required>
-                <text-editor v-model.lazy="contents" :image-uploader="uploadImage" />
+                <text-editor v-model.lazy="contents" :attachments.sync="attachments" :image-uploader="uploadFileAndGetFileInfo" />
             </p-field-group>
             <div class="notice-create-options-wrapper">
                 <p-check-box v-model="isPinned">
@@ -89,6 +89,7 @@ import { i18n } from '@/translations';
 import { uploadFileAndGetFileInfo } from '@/lib/file-manager';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -137,6 +138,7 @@ export default {
             isPinned: false,
             isPopup: false,
             contents: '',
+            attachments: [] as Attachment[],
             isAllDomainSelected: !!store.getters['user/hasSystemRole'],
             boardIdState: '',
             domainList: [] as Array<DomainItem>,
@@ -168,6 +170,7 @@ export default {
             title: noticeTitle.value,
             writer: writerName.value,
             contents: state.contents,
+            files: state.attachments.map(({ fileId }) => fileId) as string[],
             options: {
                 is_pinned: state.isPinned,
                 is_popup: state.isPopup,
@@ -183,7 +186,10 @@ export default {
             try {
                 await SpaceConnector.client.board.post.create(
                     state.isAllDomainSelected ? formData.value
-                        : { ...formData.value, domain_id: state.selectedDomain[0].name },
+                        : {
+                            ...formData.value,
+                            domain_id: state.selectedDomain[0].name,
+                        },
                 );
                 showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
                 await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME, query: {} });
@@ -247,11 +253,6 @@ export default {
             }
         };
 
-        const uploadImage = async (file: File): Promise<string> => {
-            const { downloadUrl } = await uploadFileAndGetFileInfo(file);
-            return downloadUrl;
-        };
-
         watch(() => state.isAllDomainSelected, (isAllDomain: boolean) => {
             if (isAllDomain) state.selectedDomain = [];
         });
@@ -261,6 +262,7 @@ export default {
             state.isPinned = d.options?.is_pinned ?? false;
             state.isPopup = d.options?.is_popup ?? false;
             state.contents = d.contents ?? '';
+            state.attachments = d.files?.map(file => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
             state.isAllDomainSelected = !!d.domain_id;
             state.boardIdState = d?.board_id ?? '';
             state.selectedDomain = d?.domain_id
@@ -288,7 +290,7 @@ export default {
             invalidState,
             invalidTexts,
             isAllValid,
-            uploadImage,
+            uploadFileAndGetFileInfo,
         };
     },
 };

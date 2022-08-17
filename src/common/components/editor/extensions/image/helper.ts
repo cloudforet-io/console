@@ -23,7 +23,6 @@ export const setAttachmentsToContents = (contents: string, attachments: Attachme
 
     const contentsEl = document.createElement('div');
     contentsEl.innerHTML = contents.trim();
-    if (!contentsEl) return '';
 
     const attachmentsMap = {};
     attachments.forEach(({ fileId, downloadUrl }) => {

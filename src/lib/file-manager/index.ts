@@ -1,6 +1,9 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import axios from 'axios';
 
+import type { FileInfo } from '@/lib/file-manager/type';
+
+import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const getUploadInfo = async (file: File): Promise<[fileId: string, uploadUrl: string, options: object]> => {
@@ -22,19 +25,16 @@ const uploadFile = async (uploadUrl: string, options: object, file: File) => {
 };
 
 
-const getDownloadUrl = async (fileId: string): Promise<string> => {
-    const result = await SpaceConnector.client.fileManager.file.getDownloadUrl({
+export const getDownloadUrl = async (fileId: string): Promise<string> => {
+    const result: FileInfo = await SpaceConnector.client.fileManager.file.getDownloadUrl({
         file_id: fileId,
     });
     if (!result.download_url) throw new Error('[File Manager] No download url in response of update file state api');
     return result.download_url;
 };
 
-interface FileInfo {
-    downloadUrl: string;
-    fileId?: string;
-}
-export const uploadFileAndGetFileInfo = async (file: File): Promise<FileInfo> => {
+
+export const uploadFileAndGetFileInfo = async (file: File): Promise<Attachment> => {
     try {
         const [fileId, uploadUrl, options] = await getUploadInfo(file);
         await uploadFile(uploadUrl, options, file);
@@ -45,7 +45,7 @@ export const uploadFileAndGetFileInfo = async (file: File): Promise<FileInfo> =>
         // TODO: change it to default error image
         return {
             downloadUrl: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/spaceone.svg',
-            fileId: undefined,
+            fileId: '',
         };
     }
 };

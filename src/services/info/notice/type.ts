@@ -1,5 +1,7 @@
 import type { TimeStamp } from '@/models';
 
+import type { FileInfo } from '@/lib/file-manager/type';
+
 import type { NoticeType } from '@/services/info/notice/config';
 
 export interface NoticePostModel {
@@ -8,6 +10,7 @@ export interface NoticePostModel {
     category?: string;
     title: string;
     contents: string;
+    files: FileInfo[];
     options: {
         is_popup: boolean;
         is_pinned: boolean;

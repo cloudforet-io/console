@@ -20,7 +20,7 @@
                 <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, $store.state.user.timezone) }} · {{ item.writer }}</span>
             </div>
             <p-divider class="my-4" />
-            <text-editor-viewer :contents="item.contents" />
+            <text-editor-viewer :contents="item.contents" :attachments="attachments" />
         </template>
         <template #footer-extra>
             <p-check-box v-model="neverShowPopup">
@@ -42,14 +42,16 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PCheckBox, PBadge, PDivider,
 } from '@spaceone/design-system';
-
+import { computedAsync } from '@vueuse/core';
 
 import { store } from '@/store';
 
+import type { FileInfo } from '@/lib/file-manager/type';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFileAttachments } from '@/common/composables/file-attachments';
 
 import type { NoticePostModel } from '@/services/info/notice/type';
 
@@ -78,6 +80,16 @@ export default {
             popupVisible: true,
             neverShowPopup: false,
         });
+        const files = computedAsync<FileInfo[]>(async () => {
+            const notice = props.item;
+            if (!notice) return [];
+            const result: NoticePostModel = await SpaceConnector.client.board.post.get({
+                board_id: notice.board_id,
+                post_id: notice.post_id,
+            });
+            return result.files;
+        });
+        const { attachments } = useFileAttachments(files);
 
         const handleClose = async () => {
             state.popupVisible = false;
@@ -98,6 +110,7 @@ export default {
 
         return {
             ...toRefs(state),
+            attachments,
             handleClose,
             isMobile,
             iso8601Formatter,

@@ -37,7 +37,7 @@
                 </div>
                 <p-divider />
                 <div class="text-editor-wrapper">
-                    <text-editor-viewer :contents="noticePostData.contents" />
+                    <text-editor-viewer :contents="noticePostData.contents" :attachments="attachments" />
                 </div>
             </p-data-loader>
         </p-pane-layout>
@@ -109,6 +109,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFileAttachments } from '@/common/composables/file-attachments';
 
 import { getPostBadgeInfo } from '@/services/info/notice/helper';
 import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
@@ -162,6 +163,9 @@ export default {
             deleteModalVisible: false,
             // TODO: send email open state
         });
+
+
+        const { attachments } = useFileAttachments(computed(() => state.noticePostData.files));
 
         /* Api */
         const getNoticePostData = async () => {
@@ -287,6 +291,7 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(modalState),
+            attachments,
             iso8601Formatter,
             handleBackToListButtonClick,
             handleDeleteNoticeConfirm,
