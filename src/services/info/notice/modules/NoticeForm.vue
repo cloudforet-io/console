@@ -146,10 +146,12 @@ export default {
             isPinned: false,
             isPopup: false,
             contents: '',
-            isAllDomainSelected: false,
+            isAllDomainSelected: !!store.getters['user/hasSystemRole'],
             boardIdState: '',
             domainList: [] as Array<DomainItem>,
-            selectedDomain: [{ name: store.state.domain.domainId, label: store.state.domain.domainId }] as Array<DomainItem>,
+            selectedDomain: store.getters['user/hasSystemRole']
+                ? []
+                : [{ name: store.state.domain.domainId, label: store.state.domain.domainId }] as Array<DomainItem>,
             postId: '',
         });
 

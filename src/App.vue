@@ -45,7 +45,7 @@
                           :outline="false"
                           @clickButton="goToSignIn"
             />
-            <notice-popup />
+            <notice-popup v-if="!$store.getters['user/hasSystemRole']" />
             <!--            <survey-modal />-->
         </template>
         <!-- Iframe for file download -->
