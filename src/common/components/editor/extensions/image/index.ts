@@ -1,6 +1,7 @@
 import { Node, nodeInputRule } from '@tiptap/core';
 
-import type { UploadFn } from './plugins/drop-image';
+import type { ImageUploader } from '@/common/components/editor/extensions/image/type';
+
 import { dropImagePlugin } from './plugins/drop-image';
 
 /**
@@ -13,7 +14,7 @@ import { dropImagePlugin } from './plugins/drop-image';
  */
 const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 
-export const createImageExtension = (uploadFn: UploadFn) => Node.create({
+export const createImageExtension = (uploadFn: ImageUploader) => Node.create({
     name: 'image',
     inline: true,
     group: 'inline',
@@ -22,6 +23,7 @@ export const createImageExtension = (uploadFn: UploadFn) => Node.create({
         src: {},
         alt: { default: null },
         title: { default: null },
+        'file-id': {},
     }),
     parseHTML: () => [
         {
@@ -33,6 +35,7 @@ export const createImageExtension = (uploadFn: UploadFn) => Node.create({
                     src: element.getAttribute('src'),
                     title: element.getAttribute('title'),
                     alt: element.getAttribute('alt'),
+                    'file-id': element.getAttribute('file-id'),
                 };
             },
         },

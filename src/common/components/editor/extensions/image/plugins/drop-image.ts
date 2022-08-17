@@ -1,8 +1,9 @@
 import { Plugin } from 'prosemirror-state';
 
-export type UploadFn = (image: File) => Promise<string>;
+import type { ImageUploader } from '@/common/components/editor/extensions/image/type';
 
-export const dropImagePlugin = (upload: UploadFn) => new Plugin({
+
+export const dropImagePlugin = (upload: ImageUploader) => new Plugin({
     props: {
         handleDOMEvents: {
             paste: (view, _event: Event) => {
@@ -18,9 +19,10 @@ export const dropImagePlugin = (upload: UploadFn) => new Plugin({
                         event.preventDefault();
 
                         if (upload && image) {
-                            upload(image).then((src) => {
+                            upload(image).then(({ downloadUrl, fileId }) => {
                                 const node = schema.nodes.image.create({
-                                    src,
+                                    src: downloadUrl,
+                                    'file-id': fileId,
                                 });
                                 const transaction = view.state.tr.replaceSelectionWith(node);
                                 view.dispatch(transaction);
@@ -68,8 +70,10 @@ export const dropImagePlugin = (upload: UploadFn) => new Plugin({
                     const reader = new FileReader();
 
                     if (upload) {
+                        const { downloadUrl, fileId } = await upload(image);
                         const node = schema.nodes.image.create({
-                            src: await upload(image),
+                            src: downloadUrl,
+                            'file-id': fileId,
                         });
                         const transaction = view.state.tr.insert(coordinates.pos, node);
                         view.dispatch(transaction);

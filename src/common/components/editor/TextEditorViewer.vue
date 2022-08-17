@@ -1,18 +1,24 @@
 <template>
     <!--        eslint-disable-next-line vue/no-v-html-->
-    <div class="text-editor-contents" v-html="contents" />
+    <div class="text-editor-contents" v-html="refinedContents" />
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
+    computed,
     defineComponent,
 } from '@vue/composition-api';
+
+import { setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
+import type { Attachment } from '@/common/components/editor/extensions/image/type';
 
 import { loadMonospaceFonts } from '@/styles/fonts';
 
 
 interface Props {
-    contents: string
+    contents: string,
+    attachments: Attachment[]
 }
 
 export default defineComponent<Props>({
@@ -23,10 +29,17 @@ export default defineComponent<Props>({
             type: String,
             default: '',
         },
+        attachments: {
+            type: Array as PropType<Attachment[]>,
+            default: () => [],
+        },
     },
-    setup() {
+    setup(props) {
         loadMonospaceFonts();
-        return {};
+        const refinedContents = computed(() => setAttachmentsToContents(props.contents, props.attachments));
+        return {
+            refinedContents,
+        };
     },
 });
 </script>

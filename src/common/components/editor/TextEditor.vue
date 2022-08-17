@@ -20,15 +20,16 @@ import StarterKit from '@tiptap/starter-kit';
 import { Editor, EditorContent } from '@tiptap/vue-2';
 
 import { createImageExtension } from '@/common/components/editor/extensions/image';
-import type { UploadFn } from '@/common/components/editor/extensions/plugins/drop-image';
+import { getAttachments, setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
+import type { Attachment, ImageUploader } from '@/common/components/editor/extensions/image/type';
 import MenuBar from '@/common/components/editor/MenuBar.vue';
 
 import { loadMonospaceFonts } from '@/styles/fonts';
 
-
 interface Props {
     value: string;
-    imageUploader: UploadFn;
+    imageUploader: ImageUploader;
+    attachments: Attachment[];
 }
 
 export default defineComponent<Props>({
@@ -47,8 +48,12 @@ export default defineComponent<Props>({
             default: '',
         },
         imageUploader: {
-            type: Function as PropType<UploadFn>,
+            type: Function as PropType<ImageUploader>,
             default: () => Promise.resolve(''),
+        },
+        attachments: {
+            type: Array as PropType<Attachment[]>,
+            default: () => [],
         },
     },
     setup(props, { emit }) {
@@ -60,7 +65,7 @@ export default defineComponent<Props>({
 
         onMounted(() => {
             state.editor = new Editor({
-                content: props.value,
+                content: setAttachmentsToContents(props.value, props.attachments),
                 extensions: [
                     StarterKit.configure({
                         heading: {
@@ -81,7 +86,10 @@ export default defineComponent<Props>({
                     }),
                     createImageExtension(props.imageUploader),
                 ],
-                onUpdate: () => { emit('update:value', state.editor?.getHTML() ?? ''); },
+                onUpdate: () => {
+                    emit('update:value', state.editor?.getHTML() ?? '');
+                    emit('update:attachments', state.editor ? getAttachments(state.editor as Editor) : []);
+                },
             });
         });
 
@@ -89,11 +97,13 @@ export default defineComponent<Props>({
             if (state.editor) state.editor.destroy();
         });
 
-        watch(() => props.value, (value) => {
+        watch([() => props.value, () => props.attachments], ([value, attachments], prev) => {
             if (!state.editor) return;
             const isSame = state.editor.getHTML() === value;
             if (isSame) return;
-            state.editor.commands.setContent(value, false);
+            let newContents = value;
+            if (attachments !== prev[1]) newContents = setAttachmentsToContents(value, attachments);
+            state.editor.commands.setContent(newContents, false);
         });
 
         return {
