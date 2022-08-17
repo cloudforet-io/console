@@ -185,7 +185,8 @@ export default {
                 const nextPostApiQueryHelper = new ApiQueryHelper()
                     .setPage(1, 1)
                     .setSort('created_at', false)
-                    .setFilters([{ k: 'created_at', v: createdAt, o: '>' }]);
+                    .setTimezone('UTC')
+                    .setFilters([{ k: 'created_at', v: createdAt, o: '>t' }]);
                 const { results } = await SpaceConnector.client.board.post.list({
                     board_id: props.boardId,
                     query: nextPostApiQueryHelper.data,
@@ -201,7 +202,8 @@ export default {
                 const prevPostApiQueryHelper = new ApiQueryHelper()
                     .setPage(1, 1)
                     .setSort('created_at', true)
-                    .setFilters([{ k: 'created_at', v: createdAt, o: '<' }]);
+                    .setTimezone('UTC')
+                    .setFilters([{ k: 'created_at', v: createdAt, o: '<t' }]);
                 const { results } = await SpaceConnector.client.board.post.list({
                     board_id: props.boardId,
                     query: prevPostApiQueryHelper.data,
