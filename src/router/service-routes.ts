@@ -1,8 +1,11 @@
 import type { RouteConfig } from 'vue-router';
 
 // Routes
+import { store } from '@/store';
+
 import { errorRoutes } from '@/router/error-routes';
 
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import administrationRoute from '@/services/administration/routes';
 import alertManagerRoute from '@/services/alert-manager/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes';
@@ -24,7 +27,10 @@ export const serviceRoutes: RouteConfig[] = [
     {
         path: '/',
         name: ROOT_ROUTE._NAME,
-        redirect: () => ({ name: DASHBOARD_ROUTE._NAME }),
+        redirect: () => {
+            if (store.getters['user/isDomainOwner']) return { name: ADMINISTRATION_ROUTE._NAME };
+            return ({ name: DASHBOARD_ROUTE._NAME });
+        },
         component: { template: '<router-view />' },
         children: [
             dashboardRoute,
