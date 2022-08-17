@@ -17,12 +17,10 @@
                 <p-badge outline>
                     {{ item.scope }}
                 </p-badge>
-                <span class="notice-popup-author">{{ item.updated_at }} · {{ item.writer }}</span>
+                <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, $store.state.user.timezone) }} · {{ item.writer }}</span>
             </div>
             <p-divider class="my-4" />
-            <p class="notice-popup-contents">
-                {{ item.contents }}
-            </p>
+            <text-editor-viewer :contents="item.contents" />
         </template>
         <template #footer-extra>
             <p-check-box v-model="neverShowPopup">
@@ -41,15 +39,18 @@
 import type { PropType } from '@vue/composition-api';
 import { reactive, toRefs } from '@vue/composition-api';
 
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PCheckBox, PBadge, PDivider,
 } from '@spaceone/design-system';
 
+
 import { store } from '@/store';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
+import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { NoticePostModel } from '@/services/info/notice/type';
@@ -62,6 +63,7 @@ export default {
         PCheckBox,
         PBadge,
         PDivider,
+        TextEditorViewer,
     },
     props: {
         popupIndex: {
@@ -100,6 +102,7 @@ export default {
             ...toRefs(state),
             handleClose,
             isMobile,
+            iso8601Formatter,
         };
     },
 };
@@ -114,9 +117,6 @@ export default {
     }
     .notice-popup-author {
         @apply text-sm ml-1 text-gray-600;
-    }
-    .notice-popup-contents {
-        @apply whitespace-pre-line text-sm leading-normal text-gray-900;
     }
 }
 </style>
