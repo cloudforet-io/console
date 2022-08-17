@@ -755,6 +755,17 @@
 			"TAG_COL": "Tag columns",
 			"TITLE": "Set columns"
 		},
+		"EDITOR": {
+			"ALIGN_CENTER": "Center",
+			"ALIGN_JUSTIFY": "Justify",
+			"ALIGN_LEFT": "Left",
+			"ALIGN_RIGHT": "Right",
+			"COPY_PASTE_DRAG_DROP": "Copy&Paste or Drag&Drop images directly into body content.",
+			"HEADING1": "Heading 1",
+			"HEADING2": "Heading 2",
+			"HEADING3": "Heading 3",
+			"NORMAL_TEXT": "Normal text"
+		},
 		"ERROR": {
 			"404_GO_BACK_1": "Try going",
 			"404_MSG": "Sorry, we can’t seem to find what you’re looking for.",
@@ -795,6 +806,15 @@
 				"GO_TO_PROJECT": "Go to Project",
 				"MENU": "MENU",
 				"SHOW_ALL": "Show all"
+			},
+			"NOTICE": {
+				"DETAIL_LINK": "Detail Link: ",
+				"NO_NOTICE": "No Notice",
+				"NO_NOTICE_DESC": "Any new notice will appear here.",
+				"OCCURED_TIME": "Occurred Time: ",
+				"PINNED_NOTICE": "Pinned notice",
+				"TITLE": "Notice",
+				"VIEW_ALL": "View all notice"
 			},
 			"NOTIFICATION": {
 				"ALT_E_LIST_NOTIFICATION": "Failed to List Notifications",
@@ -842,6 +862,12 @@
 			"RESOURCE": "Resources",
 			"STATISTICS": "Statistics",
 			"TIME_RANGE": "Time Range"
+		},
+		"POPUP": {
+			"NOTICE": {
+				"CLOSE": "Close",
+				"DO_NOT_SHOW": "Don't show me again"
+			}
 		},
 		"PROFILE": {
 			"ALT_E_UPDATE": "Failed to Update Profile",
@@ -1483,6 +1509,58 @@
 				"TYPE": "Type",
 				"VOICE": "Voice Call"
 			}
+		}
+	},
+	"INFO": {
+		"NOTICE": {
+			"DETAIL": {
+				"BACK_TO_LIST": "Back to List",
+				"DETAIL_TITLE": "Notice Detail"
+			},
+			"DOMAIN_NOTICE": "내부 공지",
+			"FORM": {
+				"ALL_DOMAINS": "All Domains",
+				"ALT_E_CREATE_NOTICE": "Failed to create notice",
+				"ALT_E_DELETE_NOTICE": "Failed to delete notice",
+				"ALT_E_SEND_EMAIL": "Failed to send email",
+				"ALT_E_UPDATE_NOTICE": "Failed to edit notice",
+				"ALT_S_CREATE_NOTICE": "Successfully created notice",
+				"ALT_S_DELETE_NOTICE": "Successfully Deleted Notice",
+				"ALT_S_SEND_EMAIL": "Successfully Sent Email",
+				"ALT_S_UPDATE_NOTICE": "Successfully edited notice",
+				"CANCEL": "Cancel",
+				"CONFIRM": "Confirm",
+				"CREATE_NOTICE": "Create Notice",
+				"DELETE": "Delete",
+				"DELETE_MODAL_CONTENTS": "Are you sure you want to delete the notice?",
+				"DELETE_MODAL_TITLE": "Delete Notice",
+				"EDIT": "Edit",
+				"EDIT_TITLE": "Edit Notice",
+				"IN_POP_UP": "Display in pop-up",
+				"LABEL_CONTENT": "Content",
+				"LABEL_TITLE": "Title",
+				"LABEL_VIEWER": "Viewer",
+				"LABEL_WRITER_NAME": "Writer Name",
+				"PIN_NOTICE": "Pin Notice",
+				"PLACEHOLDER_ALL": "All",
+				"PLACEHOLDER_REQUIRED": "Required",
+				"SELECTED_DOMAIN": "Selected Domain",
+				"SEND_EMAIL_MODAL_DESC": "{domainText}",
+				"SEND_EMAIL_MODAL_TITLE": "Send the mail",
+				"TITLE_REQUIRED": "Title is required",
+				"WRITER_REQUIRED": "Writer name is required"
+			},
+			"MAIN": {
+				"LABEL_ALL_NOTI": "All",
+				"LABEL_DOMAIN_NOTI": "내부 공지",
+				"LABEL_SYSTEM_NOTI": "시스템 공지",
+				"NEXT": "Next",
+				"NOTICE_TITLE": "Notice",
+				"NO_NEXT_LIST": "Next notice does not exist.",
+				"PREV": "Prev"
+			},
+			"NO_NOTICES": "No notices",
+			"SYSTEM_NOTICE": "시스템 공지"
 		}
 	},
 	"INVENTORY": {

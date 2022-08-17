@@ -755,6 +755,17 @@
 			"TAG_COL": "タグフィールド",
 			"TITLE": "フィールドを変更する"
 		},
+		"EDITOR": {
+			"ALIGN_CENTER": "",
+			"ALIGN_JUSTIFY": "",
+			"ALIGN_LEFT": "",
+			"ALIGN_RIGHT": "",
+			"COPY_PASTE_DRAG_DROP": "",
+			"HEADING1": "",
+			"HEADING2": "",
+			"HEADING3": "",
+			"NORMAL_TEXT": ""
+		},
 		"ERROR": {
 			"404_GO_BACK_1": "前のページに戻る",
 			"404_MSG": "内容が見つかりません",
@@ -795,6 +806,15 @@
 				"GO_TO_PROJECT": "プロジェクト",
 				"MENU": "メニュー",
 				"SHOW_ALL": "すべて表示"
+			},
+			"NOTICE": {
+				"DETAIL_LINK": "",
+				"NO_NOTICE": "",
+				"NO_NOTICE_DESC": "",
+				"OCCURED_TIME": "",
+				"PINNED_NOTICE": "",
+				"TITLE": "",
+				"VIEW_ALL": ""
 			},
 			"NOTIFICATION": {
 				"ALT_E_LIST_NOTIFICATION": "通知の一覧表示に失敗",
@@ -842,6 +862,12 @@
 			"RESOURCE": "リソース",
 			"STATISTICS": "統計",
 			"TIME_RANGE": "時間範囲"
+		},
+		"POPUP": {
+			"NOTICE": {
+				"CLOSE": "",
+				"DO_NOT_SHOW": ""
+			}
 		},
 		"PROFILE": {
 			"ALT_E_UPDATE": "個人情報編集に失敗",
@@ -1483,6 +1509,58 @@
 				"TYPE": "タイプ",
 				"VOICE": "ボイスコール"
 			}
+		}
+	},
+	"INFO": {
+		"NOTICE": {
+			"DETAIL": {
+				"BACK_TO_LIST": "",
+				"DETAIL_TITLE": ""
+			},
+			"DOMAIN_NOTICE": "",
+			"FORM": {
+				"ALL_DOMAINS": "",
+				"ALT_E_CREATE_NOTICE": "",
+				"ALT_E_DELETE_NOTICE": "",
+				"ALT_E_SEND_EMAIL": "",
+				"ALT_E_UPDATE_NOTICE": "",
+				"ALT_S_CREATE_NOTICE": "",
+				"ALT_S_DELETE_NOTICE": "",
+				"ALT_S_SEND_EMAIL": "",
+				"ALT_S_UPDATE_NOTICE": "",
+				"CANCEL": "",
+				"CONFIRM": "",
+				"CREATE_NOTICE": "",
+				"DELETE": "",
+				"DELETE_MODAL_CONTENTS": "",
+				"DELETE_MODAL_TITLE": "",
+				"EDIT": "",
+				"EDIT_TITLE": "",
+				"IN_POP_UP": "",
+				"LABEL_CONTENT": "",
+				"LABEL_TITLE": "",
+				"LABEL_VIEWER": "",
+				"LABEL_WRITER_NAME": "",
+				"PIN_NOTICE": "",
+				"PLACEHOLDER_ALL": "",
+				"PLACEHOLDER_REQUIRED": "",
+				"SELECTED_DOMAIN": "",
+				"SEND_EMAIL_MODAL_DESC": "",
+				"SEND_EMAIL_MODAL_TITLE": "",
+				"TITLE_REQUIRED": "",
+				"WRITER_REQUIRED": ""
+			},
+			"MAIN": {
+				"LABEL_ALL_NOTI": "",
+				"LABEL_DOMAIN_NOTI": "",
+				"LABEL_SYSTEM_NOTI": "",
+				"NEXT": "",
+				"NOTICE_TITLE": "",
+				"NO_NEXT_LIST": "",
+				"PREV": ""
+			},
+			"NO_NOTICES": "",
+			"SYSTEM_NOTICE": ""
 		}
 	},
 	"INVENTORY": {

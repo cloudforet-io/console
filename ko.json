@@ -755,6 +755,17 @@
 			"TAG_COL": "태그 필드",
 			"TITLE": "필드 변경하기"
 		},
+		"EDITOR": {
+			"ALIGN_CENTER": "",
+			"ALIGN_JUSTIFY": "",
+			"ALIGN_LEFT": "",
+			"ALIGN_RIGHT": "",
+			"COPY_PASTE_DRAG_DROP": "",
+			"HEADING1": "",
+			"HEADING2": "",
+			"HEADING3": "",
+			"NORMAL_TEXT": ""
+		},
 		"ERROR": {
 			"404_GO_BACK_1": "이전 페이지로 돌아가기 >> 버튼으로 처리 (108번 라인과 동일하게)",
 			"404_MSG": "요청한 페이지를 찾을 수 없습니다.",
@@ -795,6 +806,15 @@
 				"GO_TO_PROJECT": "프로젝트",
 				"MENU": "메뉴",
 				"SHOW_ALL": "모두 보기"
+			},
+			"NOTICE": {
+				"DETAIL_LINK": "",
+				"NO_NOTICE": "",
+				"NO_NOTICE_DESC": "",
+				"OCCURED_TIME": "",
+				"PINNED_NOTICE": "",
+				"TITLE": "",
+				"VIEW_ALL": ""
 			},
 			"NOTIFICATION": {
 				"ALT_E_LIST_NOTIFICATION": "알림 목록 가져오기 실패",
@@ -842,6 +862,12 @@
 			"RESOURCE": "리소스",
 			"STATISTICS": "통계",
 			"TIME_RANGE": "시간 범위"
+		},
+		"POPUP": {
+			"NOTICE": {
+				"CLOSE": "",
+				"DO_NOT_SHOW": ""
+			}
 		},
 		"PROFILE": {
 			"ALT_E_UPDATE": "개인 정보 수정 실패",
@@ -1483,6 +1509,58 @@
 				"TYPE": "유형",
 				"VOICE": "보이스 콜"
 			}
+		}
+	},
+	"INFO": {
+		"NOTICE": {
+			"DETAIL": {
+				"BACK_TO_LIST": "",
+				"DETAIL_TITLE": ""
+			},
+			"DOMAIN_NOTICE": "내부 공지",
+			"FORM": {
+				"ALL_DOMAINS": "",
+				"ALT_E_CREATE_NOTICE": "",
+				"ALT_E_DELETE_NOTICE": "삭제 실패",
+				"ALT_E_SEND_EMAIL": "",
+				"ALT_E_UPDATE_NOTICE": "",
+				"ALT_S_CREATE_NOTICE": "",
+				"ALT_S_DELETE_NOTICE": "\b삭제 완료",
+				"ALT_S_SEND_EMAIL": "",
+				"ALT_S_UPDATE_NOTICE": "",
+				"CANCEL": "",
+				"CONFIRM": "",
+				"CREATE_NOTICE": "",
+				"DELETE": "",
+				"DELETE_MODAL_CONTENTS": "",
+				"DELETE_MODAL_TITLE": "",
+				"EDIT": "",
+				"EDIT_TITLE": "",
+				"IN_POP_UP": "",
+				"LABEL_CONTENT": "",
+				"LABEL_TITLE": "",
+				"LABEL_VIEWER": "",
+				"LABEL_WRITER_NAME": "",
+				"PIN_NOTICE": "",
+				"PLACEHOLDER_ALL": "",
+				"PLACEHOLDER_REQUIRED": "",
+				"SELECTED_DOMAIN": "",
+				"SEND_EMAIL_MODAL_DESC": "{domainText} 도메인에 등록된 계정으로 메일을 전송합니다.",
+				"SEND_EMAIL_MODAL_TITLE": "",
+				"TITLE_REQUIRED": "",
+				"WRITER_REQUIRED": ""
+			},
+			"MAIN": {
+				"LABEL_ALL_NOTI": "전체 공지",
+				"LABEL_DOMAIN_NOTI": "내부 공지",
+				"LABEL_SYSTEM_NOTI": "시스템 공지",
+				"NEXT": "",
+				"NOTICE_TITLE": "공지사항",
+				"NO_NEXT_LIST": "다음 게시물이 없습니다.",
+				"PREV": ""
+			},
+			"NO_NOTICES": "",
+			"SYSTEM_NOTICE": "시스템 공지"
 		}
 	},
 	"INVENTORY": {
