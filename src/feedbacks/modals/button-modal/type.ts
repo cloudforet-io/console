@@ -24,7 +24,6 @@ export type ModalThemeColor = typeof THEME_COLORS[number];
 
 export interface ButtonModalProps {
     visible: boolean; // sync
-    scrollable: boolean;
     size: ModalSizeType;
     backdrop: boolean;
     themeColor: ModalThemeColor;

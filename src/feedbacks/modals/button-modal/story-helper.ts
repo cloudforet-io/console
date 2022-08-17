@@ -22,24 +22,6 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    scrollable: {
-        name: 'scrollable',
-        type: { name: 'boolean' },
-        description: 'Scrollable',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false,
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
     backdrop: {
         name: 'backdrop',
         type: { name: 'boolean' },

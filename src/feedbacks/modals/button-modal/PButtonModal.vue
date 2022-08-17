@@ -108,10 +108,6 @@ export default defineComponent<ButtonModalProps>({
             type: Boolean,
             default: false,
         },
-        scrollable: {
-            type: Boolean,
-            default: false,
-        },
         size: {
             type: String,
             default: 'md',
@@ -175,12 +171,10 @@ export default defineComponent<ButtonModalProps>({
             allBodyClass: computed(() => {
                 const res: string[] = [];
                 if (props.size) res.push(props.size);
-                if (props.scrollable) res.push('scrollable');
                 return res;
             }),
         });
         const dialogClassObject = computed(() => [
-            { scrollable: props.scrollable },
             props.size,
         ]);
         const hide = () => {
@@ -296,6 +290,7 @@ export default defineComponent<ButtonModalProps>({
             max-height: $body-max-height;
             min-height: 1.25rem;
             overflow: auto;
+            line-height: normal;
         }
 
         .modal-footer {

@@ -20,7 +20,6 @@ export const Template = (args, {argTypes} ) => ({
     template: `<div>
                 <p-button :styleType="themeColor" @click="launchModal">Launch a modal</p-button>
                 <p-button-modal :visible.sync="_visible"
-                                :scrollable="scrollable"
                                 :size="size"
                                 :backdrop="backdrop"
                                 :theme-color="themeColor"
