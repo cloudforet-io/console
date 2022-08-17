@@ -86,6 +86,7 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { uploadFileAndGetFileInfo } from '@/lib/file-manager';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TextEditor from '@/common/components/editor/TextEditor.vue';
@@ -246,12 +247,10 @@ export default {
             }
         };
 
-        // TODO: api binding. must return Promise<string>
-        const uploadImage = (): Promise<string> => new Promise((resolve) => {
-            setTimeout(() => {
-                resolve('https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/spaceone.svg');
-            }, 1000);
-        });
+        const uploadImage = async (file: File): Promise<string> => {
+            const { downloadUrl } = await uploadFileAndGetFileInfo(file);
+            return downloadUrl;
+        };
 
         watch(() => state.isAllDomainSelected, (isAllDomain: boolean) => {
             if (isAllDomain) state.selectedDomain = [];
