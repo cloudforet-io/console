@@ -5,7 +5,7 @@
                       @goBack="$router.go(-1)"
         >
             <template #extra>
-                <div v-if="hasDomainRoleUser" class="button-group">
+                <div v-if="hasDomainRoleUser || hasSystemRoleUser" class="button-group">
                     <p-button :outline="true" style-type="gray-border" icon="ic_edit"
                               @click="handleClickEditButton"
                     >
@@ -30,8 +30,8 @@
                     <span>{{ iso8601Formatter(noticePostData.created_at, timezone) }}
                     </span><p-i width="0.125rem" name="ic_divider-dot" />
                     <span> {{ noticePostData.writer }}</span>
-                    <p-i v-if="hasDomainRoleUser" width="0.125rem" name="ic_divider-dot" />
-                    <span v-if="hasDomainRoleUser" class="view-count">
+                    <p-i v-if="hasDomainRoleUser || hasSystemRoleUser" width="0.125rem" name="ic_divider-dot" />
+                    <span v-if="hasDomainRoleUser || hasSystemRoleUser" class="view-count">
                         <p-i name="ic_view" width="1.125rem" /> {{ noticePostData.view_count }}
                     </span>
                 </div>
@@ -155,6 +155,7 @@ export default {
                 params: { boardId: props.boardId, postId: state.nextNoticePost?.post_id },
             })),
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
+            hasSystemRoleUser: computed(() => store.getters['user/hasSystemRole']),
             noticeTypeBadgeInfo: computed<{ label?: TranslateResult; style?: string }>(() => getPostBadgeInfo(state.noticePostData?.scope)),
         });
         const modalState = reactive({
