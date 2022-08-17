@@ -4,7 +4,6 @@
         centered
         size="sm"
         fade
-        :scrollable="false"
         backdrop
         :visible.sync="proxyVisible"
         :disabled="invalid"

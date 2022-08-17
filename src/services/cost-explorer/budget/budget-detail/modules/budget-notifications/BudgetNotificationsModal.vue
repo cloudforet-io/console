@@ -4,7 +4,6 @@
         centered
         size="md"
         fade
-        :scrollable="false"
         backdrop
         :visible.sync="proxyVisible"
         class="budget-notifications-modal"

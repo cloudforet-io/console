@@ -1,7 +1,6 @@
 <template>
     <p-button-modal :visible="proxyVisible"
                     :header-title="header"
-                    :scrollable="false"
                     hide-footer-close-button
                     size="lg"
                     class="cloud-service-usage-overview-detail-modal"

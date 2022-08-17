@@ -1,7 +1,6 @@
 <template>
     <p-button-modal :header-title="updateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
                     centered
-                    :scrollable="false"
                     size="sm"
                     fade
                     backdrop

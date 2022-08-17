@@ -70,7 +70,6 @@
         <!--        <p-button-modal :header-title="$t('Send the mail')"-->
         <!--                        :visible.sync="sendEmailModalVisible"-->
         <!--                        size="sm"-->
-        <!--                        :scrollable="true"-->
         <!--                        @confirm="handleSendEmailConfirm"-->
         <!--        >-->
         <!--            <template #body>-->

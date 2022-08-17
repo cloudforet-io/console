@@ -1,7 +1,6 @@
 <template>
     <p-button-modal class="user-form-modal"
                     :header-title="headerTitle"
-                    :scrollable="true"
                     size="md"
                     :fade="true"
                     :backdrop="true"

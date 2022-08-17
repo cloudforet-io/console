@@ -3,7 +3,6 @@
                     size="lg"
                     fade
                     backdrop
-                    :scrollable="false"
                     :loading="loading"
                     :visible.sync="proxyVisible"
                     @confirm="onClickCollectConfirm"

@@ -4,7 +4,6 @@
                     size="sm"
                     fade
                     backdrop
-                    scrollable
                     :loading="loading"
                     :visible.sync="proxyVisible"
                     @confirm="onClickCollectConfirm"

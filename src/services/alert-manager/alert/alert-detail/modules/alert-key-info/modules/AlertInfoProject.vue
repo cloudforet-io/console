@@ -45,7 +45,6 @@
             centered
             size="sm"
             fade
-            :scrollable="false"
             backdrop
             theme-color="alert"
             :visible.sync="modalVisible"

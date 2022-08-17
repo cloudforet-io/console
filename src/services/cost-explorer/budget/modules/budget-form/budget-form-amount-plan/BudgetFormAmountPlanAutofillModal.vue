@@ -1,7 +1,6 @@
 <template>
     <p-button-modal :visible="_visible"
                     :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL')"
-                    :scrollable="false"
                     :disabled="!isAllValid"
                     size="sm"
                     @confirm="handleConfirm"

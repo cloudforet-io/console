@@ -1,6 +1,5 @@
 <template>
     <p-button-modal class="delete-modal" :header-title="headerTitle"
-                    :scrollable="false"
                     :size="size"
                     :fade="true"
                     :backdrop="true"
