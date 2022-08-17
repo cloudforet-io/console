@@ -96,6 +96,10 @@
     /* image */
     img {
         padding-top: 0.75rem;
+        margin: 2px 0;
+        &.ProseMirror-selectednode, &:active {
+            outline: theme('colors.blue.300') solid 2px;
+        }
     }
 
     /* code block */
