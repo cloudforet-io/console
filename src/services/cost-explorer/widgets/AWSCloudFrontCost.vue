@@ -35,7 +35,6 @@ import {
 import * as am4charts from '@amcharts/amcharts4/charts';
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { byteFormatter } from '@spaceone/console-core-lib';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
@@ -49,6 +48,7 @@ import { i18n } from '@/translations';
 import { CURRENCY } from '@/store/modules/display/config';
 
 import config from '@/lib/config';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -219,11 +219,12 @@ export default {
             series.tooltip.label.fontSize = 14;
             series.adapter.add('tooltipText', (tooltipText, target) => {
                 if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                    const rawNumber = Number(target.tooltipDataItem.dataContext[legend.name] ?? 0);
-                    if (legend.name === 'data-transfer.out') {
-                        return getTooltipText('name', undefined, byteFormatter(rawNumber));
+                    const cost = Number(target.tooltipDataItem.dataContext[legend.name] ?? 0);
+                    let currencyMoney: string | number = cost;
+                    if (cost !== 0) {
+                        currencyMoney = currencyMoneyFormatter(cost, props.currency, undefined, true);
                     }
-                    return getTooltipText('name', undefined, rawNumber);
+                    return getTooltipText('name', undefined, currencyMoney);
                 }
                 return tooltipText;
             });
@@ -306,7 +307,7 @@ export default {
                 const resourceId = item[state.groupBy];
                 const existData = results.find(d => d.resourceId === resourceId);
                 if (existData) {
-                    existData[item.usage_type] = usageQuantity;
+                    existData[item.usage_type] = item.usd_cost;
                     existData[usageType[item.usage_type]] = {
                         usd_cost: item.usd_cost,
                         usage_quantity: usageQuantity,
@@ -316,7 +317,7 @@ export default {
                     results.push({
                         resourceId,
                         groupBy: getReferenceLabel(resourceId, state.groupBy),
-                        [item.usage_type]: usageQuantity,
+                        [item.usage_type]: item.usd_cost,
                         [usageType[item.usage_type]]: {
                             usd_cost: item.usd_cost,
                             usage_quantity: usageQuantity,
@@ -358,6 +359,11 @@ export default {
         };
 
         /* Watcher */
+        watch(() => props.currency, (currency) => {
+            if (state.chart) {
+                state.chart.data = getCurrencyAppliedChartData(state.chartData, currency, props.currencyRates);
+            }
+        });
         watch([() => props.period, () => props.filters, () => state.chartRef], async ([period, filters, chartContext]) => {
             if (chartContext) {
                 const rawData = await listData(period, filters);
