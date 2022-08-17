@@ -6,7 +6,7 @@
                                  :disabled="manageDisabled"
                                  @change="onToggleChange"
                 />
-                <span class="card-title">{{ channelData.protocol_name }}</span>
+                <span class="card-title" :class="{ inactivated: !isActivated }">{{ channelData.protocol_name }}</span>
             </div>
             <p-icon-button name="ic_trashcan" width="1.5rem" height="1.5rem"
                            :disabled="manageDisabled"
@@ -279,6 +279,9 @@ export default {
         line-height: 160%;
         margin-left: 1rem;
         margin-right: 0.5rem;
+        &.inactivated {
+            @apply text-gray-300;
+        }
     }
 }
 .card-body {
