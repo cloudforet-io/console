@@ -144,13 +144,14 @@ export default defineComponent<Props>({
         font-size: 0.875rem;
         padding: 0.8125rem 0;
         line-height: 1.25;
+        margin-left: 4.3125rem;
     }
 
     .post-direction {
         @apply flex items-center text-gray-700;
         font-size: 0.75rem;
         line-height: 1.25;
-        padding: 1rem;
+        padding: 1rem 1rem 1rem 0.5rem;
     }
 }
 
