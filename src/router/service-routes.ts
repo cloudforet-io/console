@@ -28,7 +28,7 @@ export const serviceRoutes: RouteConfig[] = [
         path: '/',
         name: ROOT_ROUTE._NAME,
         redirect: () => {
-            if (store.getters['user/isDomainOwner']) return { name: ADMINISTRATION_ROUTE._NAME };
+            if (store.getters['user/isDomainOwner'] || store.getters['user/hasSystemRole']) return { name: ADMINISTRATION_ROUTE._NAME };
             return ({ name: DASHBOARD_ROUTE._NAME });
         },
         component: { template: '<router-view />' },
