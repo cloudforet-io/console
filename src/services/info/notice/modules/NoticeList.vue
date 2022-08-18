@@ -99,6 +99,7 @@ export default defineComponent<Props>({
     },
     setup() {
         const state = reactive({
+            hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
             dropdownItems: [
                 {
                     label: i18n.t('INFO.NOTICE.MAIN.LABEL_ALL_NOTI'),
@@ -143,6 +144,8 @@ export default defineComponent<Props>({
                 const { results, total_count } = await SpaceConnector.client.board.post.list({
                     board_id: state.boardId,
                     query: noticeApiHelper.data,
+                    domain_id: null,
+                    ...(state.hasSystemRole && { user_domain_id: store.state.domain.domainId }),
                 });
                 state.noticeItems = results;
                 state.noticeItemTotalCount = total_count;

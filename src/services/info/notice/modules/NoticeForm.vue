@@ -184,13 +184,10 @@ export default {
 
         const handleCreateNotice = async () => {
             try {
-                await SpaceConnector.client.board.post.create(
-                    state.isAllDomainSelected ? formData.value
-                        : {
-                            ...formData.value,
-                            domain_id: state.selectedDomain[0].name,
-                        },
-                );
+                await SpaceConnector.client.board.post.create({
+                    ...formData.value,
+                    domain_id: state.isAllDomainSelected ? null : state.selectedDomain[0].name,
+                });
                 showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
                 await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME, query: {} });
             } catch (e) {
