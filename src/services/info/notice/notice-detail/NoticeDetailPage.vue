@@ -43,14 +43,14 @@
         </p-pane-layout>
         <p-pane-layout class="post-router">
             <div class="post-router-item">
-                <list-item post-direction="next"
+                <list-item :post-direction="nextNoticePost ? 'next' : undefined"
                            :post="nextNoticePost"
                            @click.native="handlePostClick('next')"
                 />
             </div>
             <p-divider />
             <div class="post-router-item">
-                <list-item post-direction="prev"
+                <list-item :post-direction="prevNoticePost ? 'prev' : undefined"
                            :post="prevNoticePost"
                            @click.native="handlePostClick('prev')"
                 />
@@ -316,7 +316,7 @@ export default {
 </script>
 <style scoped lang="postcss">
 .button-group {
-    @apply flex flex-wrap gap-2;
+    @apply flex gap-2;
 }
 
 .notice-detail-page-layout {
@@ -334,6 +334,7 @@ export default {
     }
     .text-editor-wrapper {
         margin-top: 1rem;
+        margin-left: 0.125rem;
     }
 }
 
