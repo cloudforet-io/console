@@ -41,7 +41,7 @@
             <p-field-group class="notice-label-wrapper" :label="$t('INFO.NOTICE.FORM.LABEL_CONTENT')" required>
                 <text-editor v-model.lazy="contents" :attachments.sync="attachments" :image-uploader="uploadFileAndGetFileInfo" />
             </p-field-group>
-            <div class="notice-create-options-wrapper">
+            <div v-if="hasSystemRole" class="notice-create-options-wrapper">
                 <p-check-box v-model="isPinned">
                     <span>{{ $t('INFO.NOTICE.FORM.PIN_NOTICE') }}</span>
                 </p-check-box>
