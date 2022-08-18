@@ -42,7 +42,7 @@ export default defineComponent({
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const onSignIn = async () => {
-            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasPermission']);
+            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
 
             if (!props.nextPath) {
                 await vm.$router.push(defaultRoute);

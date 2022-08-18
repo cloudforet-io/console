@@ -190,7 +190,7 @@ export default {
             await updateUser();
             await signIn();
 
-            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasPermission']);
+            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
             await vm.$router.push(defaultRoute);
         };
         const handleGoToLoginPage = async () => {
