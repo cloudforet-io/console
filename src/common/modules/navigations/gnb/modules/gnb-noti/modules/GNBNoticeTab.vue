@@ -232,6 +232,7 @@ export default {
         .view-all-button {
             display: flex;
             cursor: pointer;
+            font-size: 0.875rem;
             width: 100%;
             height: 100%;
             align-items: center;
