@@ -1517,7 +1517,7 @@
 				"BACK_TO_LIST": "Back to List",
 				"DETAIL_TITLE": "Notice Detail"
 			},
-			"DOMAIN_NOTICE": "내부 공지",
+			"DOMAIN_NOTICE": "Internal Notice",
 			"FORM": {
 				"ALL_DOMAINS": "All Domains",
 				"ALT_E_CREATE_NOTICE": "Failed to create notice",
@@ -1546,21 +1546,21 @@
 				"PLACEHOLDER_REQUIRED": "Required",
 				"SELECTED_DOMAIN": "Selected Domain",
 				"SEND_EMAIL_MODAL_DESC": "{domainText}",
-				"SEND_EMAIL_MODAL_TITLE": "Send the mail",
+				"SEND_EMAIL_MODAL_TITLE": "Send Email",
 				"TITLE_REQUIRED": "Title is required",
 				"WRITER_REQUIRED": "Writer name is required"
 			},
 			"MAIN": {
 				"LABEL_ALL_NOTI": "All",
-				"LABEL_DOMAIN_NOTI": "내부 공지",
-				"LABEL_SYSTEM_NOTI": "시스템 공지",
+				"LABEL_DOMAIN_NOTI": "Internal Notice",
+				"LABEL_SYSTEM_NOTI": "System Notice",
 				"NEXT": "Next",
 				"NOTICE_TITLE": "Notice",
 				"NO_NEXT_LIST": "Next notice does not exist.",
 				"PREV": "Prev"
 			},
-			"NO_NOTICES": "No notices",
-			"SYSTEM_NOTICE": "시스템 공지"
+			"NO_NOTICES": "There are no notices yet.",
+			"SYSTEM_NOTICE": "System Notice"
 		}
 	},
 	"INVENTORY": {

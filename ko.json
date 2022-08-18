@@ -756,15 +756,15 @@
 			"TITLE": "필드 변경하기"
 		},
 		"EDITOR": {
-			"ALIGN_CENTER": "",
-			"ALIGN_JUSTIFY": "",
-			"ALIGN_LEFT": "",
-			"ALIGN_RIGHT": "",
-			"COPY_PASTE_DRAG_DROP": "",
-			"HEADING1": "",
-			"HEADING2": "",
-			"HEADING3": "",
-			"NORMAL_TEXT": ""
+			"ALIGN_CENTER": "가운데 정렬",
+			"ALIGN_JUSTIFY": "양쪽 정렬",
+			"ALIGN_LEFT": "왼쪽 정렬",
+			"ALIGN_RIGHT": "오른쪽 정렬",
+			"COPY_PASTE_DRAG_DROP": "본문 내용에 바로 '복사/붙여넣기' 또는 '드래그 앤 드롭'을 통해 이미지를 삽입할 수 있습니다.",
+			"HEADING1": "개요 1",
+			"HEADING2": "개요 2",
+			"HEADING3": "개요 3",
+			"NORMAL_TEXT": "바탕 글"
 		},
 		"ERROR": {
 			"404_GO_BACK_1": "이전 페이지로 돌아가기 >> 버튼으로 처리 (108번 라인과 동일하게)",
@@ -808,13 +808,13 @@
 				"SHOW_ALL": "모두 보기"
 			},
 			"NOTICE": {
-				"DETAIL_LINK": "",
-				"NO_NOTICE": "",
-				"NO_NOTICE_DESC": "",
-				"OCCURED_TIME": "",
-				"PINNED_NOTICE": "",
-				"TITLE": "",
-				"VIEW_ALL": ""
+				"DETAIL_LINK": "상세 링크:",
+				"NO_NOTICE": "\b아직 등록된 공지사항이 없습니다.",
+				"NO_NOTICE_DESC": "관리자로 부터 작성된 공지사항이 이 곳에 보여집니다.",
+				"OCCURED_TIME": "발생 시간:",
+				"PINNED_NOTICE": "상단 고정",
+				"TITLE": "공지사항",
+				"VIEW_ALL": "전체 공지사항"
 			},
 			"NOTIFICATION": {
 				"ALT_E_LIST_NOTIFICATION": "알림 목록 가져오기 실패",
@@ -865,8 +865,8 @@
 		},
 		"POPUP": {
 			"NOTICE": {
-				"CLOSE": "",
-				"DO_NOT_SHOW": ""
+				"CLOSE": "닫기",
+				"DO_NOT_SHOW": "다시 보지 않기"
 			}
 		},
 		"PROFILE": {
@@ -1514,52 +1514,52 @@
 	"INFO": {
 		"NOTICE": {
 			"DETAIL": {
-				"BACK_TO_LIST": "",
-				"DETAIL_TITLE": ""
+				"BACK_TO_LIST": "목록",
+				"DETAIL_TITLE": "상세 내용 확인"
 			},
 			"DOMAIN_NOTICE": "내부 공지",
 			"FORM": {
-				"ALL_DOMAINS": "",
-				"ALT_E_CREATE_NOTICE": "",
-				"ALT_E_DELETE_NOTICE": "삭제 실패",
-				"ALT_E_SEND_EMAIL": "",
-				"ALT_E_UPDATE_NOTICE": "",
-				"ALT_S_CREATE_NOTICE": "",
-				"ALT_S_DELETE_NOTICE": "\b삭제 완료",
-				"ALT_S_SEND_EMAIL": "",
-				"ALT_S_UPDATE_NOTICE": "",
-				"CANCEL": "",
-				"CONFIRM": "",
-				"CREATE_NOTICE": "",
-				"DELETE": "",
-				"DELETE_MODAL_CONTENTS": "",
-				"DELETE_MODAL_TITLE": "",
-				"EDIT": "",
-				"EDIT_TITLE": "",
-				"IN_POP_UP": "",
-				"LABEL_CONTENT": "",
-				"LABEL_TITLE": "",
-				"LABEL_VIEWER": "",
-				"LABEL_WRITER_NAME": "",
-				"PIN_NOTICE": "",
-				"PLACEHOLDER_ALL": "",
-				"PLACEHOLDER_REQUIRED": "",
-				"SELECTED_DOMAIN": "",
+				"ALL_DOMAINS": "전체 고객사",
+				"ALT_E_CREATE_NOTICE": "공지사항 생성 실패",
+				"ALT_E_DELETE_NOTICE": "공지사항 삭제 실패",
+				"ALT_E_SEND_EMAIL": "이메일 발송 실패",
+				"ALT_E_UPDATE_NOTICE": "공지사항 편집 실패",
+				"ALT_S_CREATE_NOTICE": "공지사항 생성\b 완료",
+				"ALT_S_DELETE_NOTICE": "공지사항 삭제 완료",
+				"ALT_S_SEND_EMAIL": "이메일 발송 성공",
+				"ALT_S_UPDATE_NOTICE": "공지사항 편집 성공",
+				"CANCEL": "취소",
+				"CONFIRM": "확인",
+				"CREATE_NOTICE": "새 공지사항 등록",
+				"DELETE": "삭제",
+				"DELETE_MODAL_CONTENTS": "본 공지사항을 삭제 하시겠습니까?",
+				"DELETE_MODAL_TITLE": "공지사항 삭제",
+				"EDIT": "수정",
+				"EDIT_TITLE": "공지사항 수정",
+				"IN_POP_UP": "팝업으로 노출하기",
+				"LABEL_CONTENT": "본문",
+				"LABEL_TITLE": "제목",
+				"LABEL_VIEWER": "노출 대상",
+				"LABEL_WRITER_NAME": "작성자명",
+				"PIN_NOTICE": "상단 고정",
+				"PLACEHOLDER_ALL": "전체",
+				"PLACEHOLDER_REQUIRED": "필수입력",
+				"SELECTED_DOMAIN": "선택된 고객사",
 				"SEND_EMAIL_MODAL_DESC": "{domainText} 도메인에 등록된 계정으로 메일을 전송합니다.",
-				"SEND_EMAIL_MODAL_TITLE": "",
-				"TITLE_REQUIRED": "",
-				"WRITER_REQUIRED": ""
+				"SEND_EMAIL_MODAL_TITLE": "이메일 전송",
+				"TITLE_REQUIRED": "제목을 입력해 주세요.",
+				"WRITER_REQUIRED": "작성자명을 입력해 주세요."
 			},
 			"MAIN": {
 				"LABEL_ALL_NOTI": "전체 공지",
 				"LABEL_DOMAIN_NOTI": "내부 공지",
 				"LABEL_SYSTEM_NOTI": "시스템 공지",
-				"NEXT": "",
+				"NEXT": "다음글",
 				"NOTICE_TITLE": "공지사항",
 				"NO_NEXT_LIST": "다음 게시물이 없습니다.",
-				"PREV": ""
+				"PREV": "이전글"
 			},
-			"NO_NOTICES": "",
+			"NO_NOTICES": "\b아직 등록된 공지사항이 없습니다.",
 			"SYSTEM_NOTICE": "시스템 공지"
 		}
 	},
