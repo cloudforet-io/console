@@ -9,9 +9,9 @@
 
         <!-- Read Mode of Left section(Key) -->
         <div v-else class="content-title">
-            <p v-for="(item, index) in keyListForRead" :key="`channel-data-key-${index}`">
+            <span v-for="(item, index) in keyListForRead" :key="`channel-data-key-${index}`">
                 {{ item.replace(/\_/g, ' ') }}
-            </p>
+            </span>
         </div>
 
         <!-- Edit Mode of Content -->
@@ -56,9 +56,7 @@
                     </p-badge>
                 </div>
                 <div v-else-if="isSecretData" class="inline">
-                    <p v-for="(item, index) in keyListForRead" :key="`channel-secret-data-key-${index}`">
-                        *********
-                    </p>
+                    <span v-for="(item, index) in keyListForRead" :key="`channel-secret-data-key-${index}`">*********</span>
                 </div>
                 <div v-else>
                     <p v-for="(item, index) in Object.values(valueList)" :key="`channel-data-value-${index}`">
