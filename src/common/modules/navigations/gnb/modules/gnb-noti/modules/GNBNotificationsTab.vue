@@ -47,8 +47,8 @@
             <template #header>
                 <div class="header-wrapper">
                     <p-i v-if="selectedItem.icon" :name="selectedItem.icon"
-                         width="1.5rem" height="1.5rem"
-                         class="mr-2"
+                         width="1.5rem"
+                         class="icon"
                     />
                     <span>{{ selectedItem.title }}</span>
                 </div>
@@ -56,11 +56,11 @@
             <template #body>
                 <div class="meta-data-wrapper">
                     <div>
-                        <b>{{ $t('COMMON.GNB.NOTICE.OCCURED_TIME') }}</b>
+                        <b>{{ $t('COMMON.GNB.NOTICE.OCCURED_TIME') }} </b>
                         <span>{{ iso8601Formatter(selectedItem.createdAt, timezone) }}</span>
                     </div>
                     <div v-if="selectedItem.message.link">
-                        <b>{{ $t('COMMON.GNB.NOTICE.DETAIL_LINK') }}</b>
+                        <b>{{ $t('COMMON.GNB.NOTICE.DETAIL_LINK') }} </b>
                         <p-anchor :href="selectedItem.message.link">
                             {{ selectedItem.message.link }}
                         </p-anchor>
@@ -389,10 +389,15 @@ export default {
     .notification-modal {
         .header-wrapper {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             font-size: 1.375rem;
             line-height: 1.25;
             margin-bottom: 1rem;
+            .icon {
+                min-width: 1.5rem;
+                margin-right: 0.5rem;
+                margin-top: 0.25rem;
+            }
         }
         .meta-data-wrapper {
             display: grid;

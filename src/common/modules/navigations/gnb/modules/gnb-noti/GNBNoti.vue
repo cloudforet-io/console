@@ -17,7 +17,7 @@
                :active-tab.sync="activeTab"
         >
             <template #extra="tab">
-                <p-badge v-if="count[tab.name] !== 0" style-type="primary3">
+                <p-badge v-if="count[tab.name] !== 0" :style-type="tab.name === activeTab ? 'primary3' : 'gray200'">
                     {{ commaFormatter(count[tab.name]) }}
                 </p-badge>
             </template>

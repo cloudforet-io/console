@@ -4,7 +4,7 @@
             {{ dateHeader }}
         </p>
         <div class="item-wrapper" @click="handleClickItem">
-            <span v-if="!isRead" class="new-icon" />
+            <span class="new-icon" :class="{ invisible: isRead }" />
             <div class="contents-wrapper">
                 <p class="title">
                     <p-i v-if="icon" :name="icon" width="1rem"
@@ -145,6 +145,7 @@ export default defineComponent<Props>({
         }
         .new-icon {
             @apply bg-blue-500;
+            min-width: 0.5rem;
             width: 0.5rem;
             height: 0.5rem;
             border-radius: 50%;
@@ -159,12 +160,6 @@ export default defineComponent<Props>({
                 text-transform: capitalize;
                 vertical-align: middle;
                 margin-bottom: 0.125rem;
-
-                @media (hover: hover) {
-                    &:hover {
-                        text-decoration: underline;
-                    }
-                }
             }
             .additional-text {
                 @apply text-gray-400;
