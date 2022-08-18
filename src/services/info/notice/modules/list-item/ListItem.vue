@@ -1,5 +1,5 @@
 <template>
-    <component :is="postDirection ? 'div' : 'li'" class="list-item">
+    <component :is="postDirection ? 'div' : 'li'" class="list-item" :class="{ 'pointer': !!post }">
         <div v-if="postDirection" class="post-direction">
             <span>{{ postDirectionLabel }}</span><p-i :name="postDirectionIcon" width="1rem" />
         </div>
@@ -103,10 +103,12 @@ export default defineComponent<Props>({
     @apply border-b border-gray-200 flex;
     padding: 1rem;
 
-    @media (hover: hover) {
-        &:hover {
-            @apply bg-blue-100;
-            cursor: pointer;
+    &.pointer {
+        @media (hover: hover) {
+            &:hover {
+                @apply bg-blue-100;
+                cursor: pointer;
+            }
         }
     }
 

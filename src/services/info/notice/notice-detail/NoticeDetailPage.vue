@@ -42,19 +42,19 @@
             </p-data-loader>
         </p-pane-layout>
         <p-pane-layout class="post-router">
-            <router-link :to="nextPostRoute" class="post-router-item">
-                <list-item class="" post-direction="next"
+            <div class="post-router-item">
+                <list-item post-direction="next"
                            :post="nextNoticePost"
+                           @click.native="handlePostClick('next')"
                 />
-            </router-link>
+            </div>
             <p-divider />
-            <router-link :to="prevPostRoute"
-                         class="post-router-item"
-            >
-                <list-item class="" post-direction="prev"
+            <div class="post-router-item">
+                <list-item post-direction="prev"
                            :post="prevNoticePost"
+                           @click.native="handlePostClick('prev')"
                 />
-            </router-link>
+            </div>
         </p-pane-layout>
         <section class="back-to-list-button-section">
             <p-button class="back-to-list-button" :outline="true"
@@ -274,6 +274,16 @@ export default {
             modalState.deleteModalVisible = true;
         };
 
+        const handlePostClick = (direction: 'next'|'prev') => {
+            if (direction === 'next') {
+                if (!state.nextNoticePost) return;
+                SpaceRouter.router.push(state.nextPostRoute);
+            } else {
+                if (!state.prevNoticePost) return;
+                SpaceRouter.router.push(state.prevPostRoute);
+            }
+        };
+
         const initPage = async () => {
             state.loading = true;
             await getNoticePostData();
@@ -299,6 +309,7 @@ export default {
             handleDeleteNoticeConfirm,
             handleClickEditButton,
             handleDeleteModalOpen,
+            handlePostClick,
         };
     },
 };
