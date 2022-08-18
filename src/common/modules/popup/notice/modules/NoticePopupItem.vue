@@ -23,9 +23,11 @@
             <text-editor-viewer :contents="item.contents" :attachments="attachments" />
         </template>
         <template #footer-extra>
-            <p-check-box v-model="neverShowPopup">
+            <p-button style-type="gray-border" :outline="true" size="lg"
+                      @click="handleClose(true)"
+            >
                 {{ $t('COMMON.POPUP.NOTICE.DO_NOT_SHOW') }}
-            </p-check-box>
+            </p-button>
         </template>
         <template #confirm-button>
             <span>{{ $t('COMMON.POPUP.NOTICE.CLOSE') }}</span>
@@ -40,7 +42,7 @@ import { reactive, toRefs } from '@vue/composition-api';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PButtonModal, PCheckBox, PBadge, PDivider,
+    PButtonModal, PBadge, PDivider, PButton,
 } from '@spaceone/design-system';
 import { computedAsync } from '@vueuse/core';
 
@@ -60,10 +62,10 @@ export default {
     name: 'NoticePopupItem',
     components: {
         PButtonModal,
-        PCheckBox,
         PBadge,
         PDivider,
         TextEditorViewer,
+        PButton,
     },
     props: {
         popupIndex: {
@@ -78,7 +80,6 @@ export default {
     setup(props) {
         const state = reactive({
             popupVisible: true,
-            neverShowPopup: false,
         });
         const files = computedAsync<FileInfo[]>(async () => {
             const notice = props.item;
@@ -91,9 +92,9 @@ export default {
         });
         const { attachments } = useFileAttachments(files);
 
-        const handleClose = async () => {
+        const handleClose = async (neverShowPopup?: boolean) => {
             state.popupVisible = false;
-            if (state.neverShowPopup) {
+            if (neverShowPopup) {
                 try {
                     await SpaceConnector.client.config.userConfig.set({
                         user_id: store.state.user.userId,
