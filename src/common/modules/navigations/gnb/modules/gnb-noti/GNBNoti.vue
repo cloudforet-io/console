@@ -41,6 +41,8 @@ import {
 } from '@vue/composition-api';
 
 import { commaFormatter } from '@spaceone/console-core-lib';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PI, PTab, PBadge,
 } from '@spaceone/design-system';
@@ -51,8 +53,12 @@ import type { DirectiveFunction } from 'vue';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { getNoticeBoardId } from '@/lib/helper/notice-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import GNBNoticeTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNoticeTab.vue';
 import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationsTab.vue';
+
 
 interface Props {
     visible: boolean
@@ -77,6 +83,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }) {
         const state = reactive({
+            hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
             hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
             tabs: computed(() => ([
                 { label: i18n.t('COMMON.GNB.NOTIFICATION.TITLE'), name: 'notifications', keepAlive: true },
@@ -89,6 +96,7 @@ export default defineComponent<Props>({
             },
         });
 
+        /* Util */
         const setVisible = (visible: boolean) => {
             emit('update:visible', visible);
             if (visible) {
@@ -104,6 +112,24 @@ export default defineComponent<Props>({
             setVisible(false);
         };
 
+        /* Api */
+        const noticeApiHelper = new ApiQueryHelper().setCountOnly();
+        const listNotice = async () => {
+            try {
+                const boardId = await getNoticeBoardId();
+                const { total_count } = await SpaceConnector.client.board.post.list({
+                    board_id: boardId,
+                    query: noticeApiHelper.data,
+                    domain_id: null,
+                    ...(state.hasSystemRole && { user_domain_id: store.state.domain.domainId }),
+                });
+                state.count.notice = total_count;
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
+                state.count.notice = 0;
+            }
+        };
+
         /* Event */
         const handleNotiButtonClick = () => {
             setVisible(!props.visible);
@@ -111,6 +137,7 @@ export default defineComponent<Props>({
 
         onMounted(() => {
             store.dispatch('display/startCheckNotification');
+            listNotice();
         });
         onUnmounted(() => {
             store.dispatch('display/stopCheckNotification');
