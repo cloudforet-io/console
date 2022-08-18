@@ -108,6 +108,7 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             loading: true,
+            hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
             timezone: computed(() => store.state.user.timezone),
             boardId: undefined as undefined | string,
             noticeItemsRef: null as HTMLElement|null,
@@ -141,6 +142,8 @@ export default {
                 const { results, total_count } = await SpaceConnector.client.board.post.list({
                     board_id: state.boardId,
                     query: noticeApiHelper.data,
+                    domain_id: null,
+                    ...(state.hasSystemRole && { user_domain_id: store.state.domain.domainId }),
                 });
                 state.proxyCount = total_count;
                 state.noticeData = results;
