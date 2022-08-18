@@ -97,7 +97,7 @@ export default {
         });
         const onSignIn = async () => {
             try {
-                const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasPermission']);
+                const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
 
                 if (!props.nextPath) {
                     await vm.$router.push(defaultRoute);

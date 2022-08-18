@@ -44,8 +44,8 @@ export const DOMAIN_OWNER_DEFAULT_ROUTE = Object.freeze({
     name: MENU_ID.ADMINISTRATION_USER,
 });
 
-export const getDefaultRouteAfterSignIn = (isDomainOwner: boolean, hasAnyPermissions: boolean): Location => {
-    if (isDomainOwner) return DOMAIN_OWNER_DEFAULT_ROUTE;
+export const getDefaultRouteAfterSignIn = (isDomainOwner: boolean, hasSystemRole: boolean, hasAnyPermissions: boolean): Location => {
+    if (isDomainOwner || hasSystemRole) return DOMAIN_OWNER_DEFAULT_ROUTE;
     if (hasAnyPermissions) return GENERAL_USER_DEFAULT_ROUTE;
     return NO_ROLE_USER_DEFAULT_ROUTE;
 };
