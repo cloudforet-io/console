@@ -15,11 +15,11 @@
             </h1>
             <div class="notice-popup-info">
                 <p-badge outline>
-                    {{ item.scope }}
+                    {{ noticeTypeBadge(item.scope) }}
                 </p-badge>
                 <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, $store.state.user.timezone) }} · {{ item.writer }}</span>
             </div>
-            <p-divider class="my-4" />
+            <p-divider class="!my-4" />
             <text-editor-viewer :contents="item.contents" :attachments="attachments" />
         </template>
         <template #footer-extra>
@@ -45,8 +45,10 @@ import {
     PButtonModal, PBadge, PDivider, PButton,
 } from '@spaceone/design-system';
 import { computedAsync } from '@vueuse/core';
+import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { FileInfo } from '@/lib/file-manager/type';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
@@ -55,6 +57,7 @@ import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileAttachments } from '@/common/composables/file-attachments';
 
+import type { NoticeType } from '@/services/info/notice/config';
 import type { NoticePostModel } from '@/services/info/notice/type';
 
 
@@ -92,6 +95,12 @@ export default {
         });
         const { attachments } = useFileAttachments(files);
 
+        const noticeTypeBadge = (type: NoticeType): TranslateResult => {
+            if (type === 'SYSTEM') return i18n.t('INFO.NOTICE.SYSTEM_NOTICE');
+            if (type === 'DOMAIN') return i18n.t('INFO.NOTICE.DOMAIN_NOTICE');
+            return '';
+        };
+
         const handleClose = async (neverShowPopup?: boolean) => {
             state.popupVisible = false;
             if (neverShowPopup) {
@@ -115,6 +124,7 @@ export default {
             handleClose,
             isMobile,
             iso8601Formatter,
+            noticeTypeBadge,
         };
     },
 };
