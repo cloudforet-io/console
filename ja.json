@@ -1530,6 +1530,7 @@
 				"ALT_S_UPDATE_NOTICE": "お知らせの編集に成功しました",
 				"CANCEL": "キャンセル",
 				"CONFIRM": "確認",
+				"CONTENT_REQUIRED": "内容入力してください。",
 				"CREATE_NOTICE": "お知らせの作成",
 				"DELETE": "削除する",
 				"DELETE_MODAL_CONTENTS": "お知らせを削除してもよろしいですか？",

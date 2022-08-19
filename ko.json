@@ -1530,6 +1530,7 @@
 				"ALT_S_UPDATE_NOTICE": "공지사항 편집 성공",
 				"CANCEL": "취소",
 				"CONFIRM": "확인",
+				"CONTENT_REQUIRED": "본문을 입력해 주세요.",
 				"CREATE_NOTICE": "새 공지사항 등록",
 				"DELETE": "삭제",
 				"DELETE_MODAL_CONTENTS": "본 공지사항을 삭제 하시겠습니까?",
