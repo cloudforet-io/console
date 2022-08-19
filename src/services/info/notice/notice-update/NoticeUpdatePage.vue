@@ -1,6 +1,6 @@
 <template>
     <div class="notice-update-page">
-        <p-page-title :title="$t('INFO.NOTICE.FORM.EDIT_TITLE')" @go-back="$router.go(-1)" />
+        <p-page-title :title="$t('INFO.NOTICE.FORM.EDIT_TITLE')" child @goBack="$router.go(-1)" />
         <notice-form :board-id="boardId"
                      type="EDIT"
                      :notice-post-data="noticePostData"

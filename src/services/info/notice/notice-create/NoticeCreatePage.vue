@@ -1,6 +1,6 @@
 <template>
     <div class="notice-create-page">
-        <p-page-title :title="$t('INFO.NOTICE.FORM.CREATE_NOTICE')" @go-back="$router.go(-1)" />
+        <p-page-title :title="$t('INFO.NOTICE.FORM.CREATE_NOTICE')" child @goBack="$router.go(-1)" />
         <notice-form type="CREATE" />
     </div>
 </template>
