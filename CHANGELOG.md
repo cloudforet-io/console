@@ -1,3 +1,10 @@
+# [1.1.0-beta.371](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.370...v1.1.0-beta.371) (2022-08-19)
+
+
+### Bug Fixes
+
+* **button-modal:** styles ([#1059](https://github.com/spaceone-dev/spaceone-design-system/issues/1059)) ([4c6aa22](https://github.com/spaceone-dev/spaceone-design-system/commit/4c6aa2267f1087545138d4feb593dcf601ddc94d))
+
 # [1.1.0-beta.370](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.369...v1.1.0-beta.370) (2022-08-17)
 
 
