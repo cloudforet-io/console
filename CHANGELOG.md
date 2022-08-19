@@ -1,3 +1,10 @@
+# [1.1.0-beta.372](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.371...v1.1.0-beta.372) (2022-08-19)
+
+
+### Bug Fixes
+
+* **button-modal:** set `max-height` at `absolute` modal ([#1060](https://github.com/spaceone-dev/spaceone-design-system/issues/1060)) ([6796523](https://github.com/spaceone-dev/spaceone-design-system/commit/6796523ee3e294b1fb31109891da2586bafd1970))
+
 # [1.1.0-beta.371](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.370...v1.1.0-beta.371) (2022-08-19)
 
 
