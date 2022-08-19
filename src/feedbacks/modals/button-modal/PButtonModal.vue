@@ -11,7 +11,13 @@
                      aria-labelledby="headerTitle"
                      tabindex="1"
                 >
-                    <article class="modal-content" :class="[`modal-${themeColor}`, {'no-footer': hideFooter}]">
+                    <article class="modal-content"
+                             :class="[
+                                 `modal-${themeColor}`,
+                                 {'no-footer': hideFooter},
+                                 absolute ? {'max-height': `calc(100vh - 4rem - ${absolute}rem`} : {}
+                             ]"
+                    >
                         <h3 class="header">
                             <slot v-if="!hideHeader" name="header">
                                 <div class="modal-header">
