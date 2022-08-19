@@ -31,13 +31,13 @@
 		"RESET_PASSWORD_PAGE": {
 			"ALREADY_RESET_TEXT": "パスワードが既に変更されました。変更されたパスワードでログインしください。",
 			"GO_TO_LOGIN_PAGE": "ログインページへ移動",
-			"GO_TO_LOGIN_WITHOUT_CHANGE": "",
+			"GO_TO_LOGIN_WITHOUT_CHANGE": "パスワードを変更せずにログインに戻る",
 			"HELP_TEXT": "アカウントの新しいパスワード入力:",
-			"INVALID_LINK": "",
-			"MOBILE_GUIDE_MODAL_DESC_1": "",
-			"MOBILE_GUIDE_MODAL_DESC_2": "",
-			"MOBILE_GUIDE_MODAL_DESC_3": "",
-			"MOBILE_GUIDE_MODAL_TITLE": "",
+			"INVALID_LINK": "無効なリンクです",
+			"MOBILE_GUIDE_MODAL_DESC_1": "初期ログインの時に",
+			"MOBILE_GUIDE_MODAL_DESC_2": "PC環境でまずパスワードを再設定した後、",
+			"MOBILE_GUIDE_MODAL_DESC_3": "ご利用いただけます。",
+			"MOBILE_GUIDE_MODAL_TITLE": "モバイル環境では利用不可",
 			"RESET_PASSWORD": "パスワード再設定"
 		}
 	},
@@ -756,20 +756,20 @@
 			"TITLE": "フィールドを変更する"
 		},
 		"EDITOR": {
-			"ALIGN_CENTER": "",
-			"ALIGN_JUSTIFY": "",
-			"ALIGN_LEFT": "",
-			"ALIGN_RIGHT": "",
-			"COPY_PASTE_DRAG_DROP": "",
-			"HEADING1": "",
-			"HEADING2": "",
-			"HEADING3": "",
-			"NORMAL_TEXT": ""
+			"ALIGN_CENTER": "中央寄せ",
+			"ALIGN_JUSTIFY": "両端揃え",
+			"ALIGN_LEFT": "左揃え",
+			"ALIGN_RIGHT": "右揃え",
+			"COPY_PASTE_DRAG_DROP": "画像を「コピー/貼り付け」または「ドラッグ&ドロップ」で本文に直接挿入できます",
+			"HEADING1": "見出し1",
+			"HEADING2": "見出し2",
+			"HEADING3": "見出し3",
+			"NORMAL_TEXT": "通常のテキスト"
 		},
 		"ERROR": {
 			"404_GO_BACK_1": "前のページに戻る",
 			"404_MSG": "内容が見つかりません",
-			"GO_BACK": "",
+			"GO_BACK": "戻る",
 			"NO_RESOURCE_GO_MAIN": "{service}メインに移動",
 			"NO_RESOURCE_MSG": "リソースが見つかりません",
 			"NO_RESOURCE_TITLE": "リソースがありません。"
@@ -808,13 +808,13 @@
 				"SHOW_ALL": "すべて表示"
 			},
 			"NOTICE": {
-				"DETAIL_LINK": "",
-				"NO_NOTICE": "",
-				"NO_NOTICE_DESC": "",
-				"OCCURED_TIME": "",
-				"PINNED_NOTICE": "",
-				"TITLE": "",
-				"VIEW_ALL": ""
+				"DETAIL_LINK": "詳細リンク",
+				"NO_NOTICE": "まだ登録されたお知らせがありません。",
+				"NO_NOTICE_DESC": "管理者から作成されたお知らせがここに表示されます。",
+				"OCCURED_TIME": "発生時間",
+				"PINNED_NOTICE": "ピン留め",
+				"TITLE": "お知らせ",
+				"VIEW_ALL": "すべてのお知らせを見る"
 			},
 			"NOTIFICATION": {
 				"ALT_E_LIST_NOTIFICATION": "通知の一覧表示に失敗",
@@ -865,8 +865,8 @@
 		},
 		"POPUP": {
 			"NOTICE": {
-				"CLOSE": "",
-				"DO_NOT_SHOW": ""
+				"CLOSE": "閉じる",
+				"DO_NOT_SHOW": "次から表示しない"
 			}
 		},
 		"PROFILE": {
@@ -1514,53 +1514,53 @@
 	"INFO": {
 		"NOTICE": {
 			"DETAIL": {
-				"BACK_TO_LIST": "",
-				"DETAIL_TITLE": ""
+				"BACK_TO_LIST": "一覧に戻る",
+				"DETAIL_TITLE": "お知らせ詳細"
 			},
-			"DOMAIN_NOTICE": "",
+			"DOMAIN_NOTICE": "内部通知",
 			"FORM": {
-				"ALL_DOMAINS": "",
-				"ALT_E_CREATE_NOTICE": "",
-				"ALT_E_DELETE_NOTICE": "",
-				"ALT_E_SEND_EMAIL": "",
-				"ALT_E_UPDATE_NOTICE": "",
-				"ALT_S_CREATE_NOTICE": "",
-				"ALT_S_DELETE_NOTICE": "",
-				"ALT_S_SEND_EMAIL": "",
-				"ALT_S_UPDATE_NOTICE": "",
-				"CANCEL": "",
-				"CONFIRM": "",
-				"CREATE_NOTICE": "",
-				"DELETE": "",
-				"DELETE_MODAL_CONTENTS": "",
-				"DELETE_MODAL_TITLE": "",
-				"EDIT": "",
-				"EDIT_TITLE": "",
-				"IN_POP_UP": "",
-				"LABEL_CONTENT": "",
-				"LABEL_TITLE": "",
-				"LABEL_VIEWER": "",
-				"LABEL_WRITER_NAME": "",
-				"PIN_NOTICE": "",
-				"PLACEHOLDER_ALL": "",
-				"PLACEHOLDER_REQUIRED": "",
-				"SELECTED_DOMAIN": "",
-				"SEND_EMAIL_MODAL_DESC": "",
-				"SEND_EMAIL_MODAL_TITLE": "",
-				"TITLE_REQUIRED": "",
-				"WRITER_REQUIRED": ""
+				"ALL_DOMAINS": "全顧客",
+				"ALT_E_CREATE_NOTICE": "お知らせの作成に失敗しました",
+				"ALT_E_DELETE_NOTICE": "お知らせの削除に失敗しました",
+				"ALT_E_SEND_EMAIL": "電子メール送信に失敗しました",
+				"ALT_E_UPDATE_NOTICE": "お知らせの編集に失敗しました",
+				"ALT_S_CREATE_NOTICE": "お知らせの作成に成功しました",
+				"ALT_S_DELETE_NOTICE": "お知らせの削除に成功しました",
+				"ALT_S_SEND_EMAIL": "電子メール送信に成功しました",
+				"ALT_S_UPDATE_NOTICE": "お知らせの編集に成功しました",
+				"CANCEL": "キャンセル",
+				"CONFIRM": "確認",
+				"CREATE_NOTICE": "お知らせの作成",
+				"DELETE": "削除する",
+				"DELETE_MODAL_CONTENTS": "お知らせを削除してもよろしいですか？",
+				"DELETE_MODAL_TITLE": "お知らせを削除する",
+				"EDIT": "編集する",
+				"EDIT_TITLE": "お知らせを編集する",
+				"IN_POP_UP": "ポップアップで表示",
+				"LABEL_CONTENT": "内容",
+				"LABEL_TITLE": "タイトル",
+				"LABEL_VIEWER": "ビューア",
+				"LABEL_WRITER_NAME": "作成者名",
+				"PIN_NOTICE": "ピン留めする",
+				"PLACEHOLDER_ALL": "全体",
+				"PLACEHOLDER_REQUIRED": "入力必須",
+				"SELECTED_DOMAIN": "選択された顧客会社",
+				"SEND_EMAIL_MODAL_DESC": "{domainText}ドメインに登録されたアカウントでメールを送信します。",
+				"SEND_EMAIL_MODAL_TITLE": "Eメール転送",
+				"TITLE_REQUIRED": "タイトルを入力してください。",
+				"WRITER_REQUIRED": "作成者名を入力してください。"
 			},
 			"MAIN": {
-				"LABEL_ALL_NOTI": "",
-				"LABEL_DOMAIN_NOTI": "",
-				"LABEL_SYSTEM_NOTI": "",
-				"NEXT": "",
-				"NOTICE_TITLE": "",
-				"NO_NEXT_LIST": "",
-				"PREV": ""
+				"LABEL_ALL_NOTI": "すべての通知",
+				"LABEL_DOMAIN_NOTI": "内部通知",
+				"LABEL_SYSTEM_NOTI": "システムのお知らせ",
+				"NEXT": "次のページへ",
+				"NOTICE_TITLE": "お知らせ",
+				"NO_NEXT_LIST": "次のお知らせがありません。",
+				"PREV": "以前のページ"
 			},
-			"NO_NOTICES": "",
-			"SYSTEM_NOTICE": ""
+			"NO_NOTICES": "まだ登録されたお知らせがありません。",
+			"SYSTEM_NOTICE": "システムのお知らせ"
 		}
 	},
 	"INVENTORY": {
@@ -1760,8 +1760,8 @@
 		"COST_EXPLORER_COST_ANALYSIS": "コスト分析",
 		"COST_EXPLORER_DASHBOARD": "ダッシュボード",
 		"DASHBOARD": "ダッシュボード",
-		"INFO": "",
-		"INFO_NOTICE": "",
+		"INFO": "情報",
+		"INFO_NOTICE": "お知らせ",
 		"MY_PAGE": "マイページ",
 		"MY_PAGE_ACCOUNT": "マイアカウント",
 		"MY_PAGE_ACCOUNT_PROFILE": "アカウント&プロフィール",
