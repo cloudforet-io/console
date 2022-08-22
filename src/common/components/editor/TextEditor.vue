@@ -1,5 +1,5 @@
 <template>
-    <div v-if="editor" class="text-editor">
+    <div v-if="editor" class="text-editor" :class="{invalid: invalid}">
         <menu-bar :editor="editor" />
         <editor-content class="editor-content" :editor="editor" />
     </div>
@@ -54,6 +54,10 @@ export default defineComponent<Props>({
         attachments: {
             type: Array as PropType<Attachment[]>,
             default: () => [],
+        },
+        invalid: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {
@@ -138,6 +142,9 @@ export default defineComponent<Props>({
     }
     &:focus-within {
         @apply border-secondary;
+    }
+    &.invalid {
+        @apply border-alert;
     }
 }
 </style>

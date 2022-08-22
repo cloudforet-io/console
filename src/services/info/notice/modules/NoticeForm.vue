@@ -38,8 +38,15 @@
                     />
                 </template>
             </p-field-group>
-            <p-field-group class="notice-label-wrapper" :label="$t('INFO.NOTICE.FORM.LABEL_CONTENT')" required>
-                <text-editor v-model.lazy="contents" :attachments.sync="attachments" :image-uploader="uploadFileAndGetFileInfo" />
+            <p-field-group class="notice-label-wrapper" :label="$t('INFO.NOTICE.FORM.LABEL_CONTENT')" required
+                           :invalid="invalidState.contents"
+                           :invalid-text="invalidTexts.contents"
+            >
+                <template #default="{invalid}">
+                    <text-editor :value="contents" :attachments.sync="attachments" :image-uploader="uploadFileAndGetFileInfo"
+                                 :invalid="invalid" @update:value="(d) => setForm('contents', d)"
+                    />
+                </template>
             </p-field-group>
             <div v-if="hasSystemRole" class="notice-create-options-wrapper">
                 <p-check-box v-model="isPinned">
@@ -89,6 +96,7 @@ import { i18n } from '@/translations';
 import { uploadFileAndGetFileInfo } from '@/lib/file-manager';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import { emptyHtmlRegExp } from '@/common/components/editor/extensions/image/helper';
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -137,7 +145,6 @@ export default {
             userName: computed<string>(() => store.state.user.name),
             isPinned: false,
             isPopup: false,
-            contents: '',
             attachments: [] as Attachment[],
             isAllDomainSelected: !!store.getters['user/hasSystemRole'],
             boardIdState: '',
@@ -152,6 +159,7 @@ export default {
             forms: {
                 noticeTitle,
                 writerName,
+                contents,
             },
             setForm,
             invalidState,
@@ -160,16 +168,20 @@ export default {
         } = useFormValidator({
             noticeTitle: props.noticePostData?.title ?? '',
             writerName: props.noticePostData?.writer || state.userName || '',
+            contents: props.noticePostData?.contents || '',
         }, {
             noticeTitle(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.TITLE_REQUIRED'); },
             writerName(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.WRITER_REQUIRED'); },
+            contents(value: string) {
+                return value.replace(emptyHtmlRegExp, '').length ? '' : i18n.t('INFO.NOTICE.FORM.CONTENT_REQUIRED');
+            },
         });
 
         const formData:ComputedRef = computed(() => ({
             board_id: state.boardIdState,
             title: noticeTitle.value,
             writer: writerName.value,
-            contents: state.contents,
+            contents: contents.value,
             files: state.attachments.map(({ fileId }) => fileId) as string[],
             options: {
                 is_pinned: state.isPinned,
@@ -258,7 +270,6 @@ export default {
             if (!Object.keys(d).length) return;
             state.isPinned = d.options?.is_pinned ?? false;
             state.isPopup = d.options?.is_popup ?? false;
-            state.contents = d.contents ?? '';
             state.attachments = d.files?.map(file => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
             state.isAllDomainSelected = !!d.domain_id;
             state.boardIdState = d?.board_id ?? '';
@@ -268,6 +279,7 @@ export default {
             state.postId = d.post_id ?? '';
             setForm('writerName', d.writer);
             setForm('noticeTitle', d.title);
+            setForm('contents', d.contents);
         });
 
         (async () => {
@@ -283,6 +295,7 @@ export default {
             handleSelectDomain,
             noticeTitle,
             writerName,
+            contents,
             setForm,
             invalidState,
             invalidTexts,
