@@ -98,7 +98,6 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PBadge, PButton, PDataLoader, PDivider, PI, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
-import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -113,7 +112,7 @@ import { useFileAttachments } from '@/common/composables/file-attachments';
 
 import { getPostBadgeInfo } from '@/services/info/notice/helper';
 import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
-import type { NoticePostModel } from '@/services/info/notice/type';
+import type { NoticePostModel, NoticePostBadgeInfo } from '@/services/info/notice/type';
 import { INFO_ROUTE } from '@/services/info/route-config';
 
 export default {
@@ -157,7 +156,7 @@ export default {
             })),
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
             hasSystemRoleUser: computed(() => store.getters['user/hasSystemRole']),
-            noticeTypeBadgeInfo: computed<{ label?: TranslateResult; style?: string }>(() => getPostBadgeInfo(state.noticePostData?.scope)),
+            noticeTypeBadgeInfo: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(state.noticePostData?.scope)),
         });
         const modalState = reactive({
             deleteModalVisible: false,

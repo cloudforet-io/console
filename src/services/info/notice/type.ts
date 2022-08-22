@@ -1,3 +1,5 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import type { TimeStamp } from '@/models';
 
 import type { FileInfo } from '@/lib/file-manager/type';
@@ -24,4 +26,9 @@ export interface NoticePostModel {
     user_domain_id: string;
     created_at: TimeStamp;
     updated_at: TimeStamp;
+}
+
+export interface NoticePostBadgeInfo {
+    label: TranslateResult;
+    style: string;
 }

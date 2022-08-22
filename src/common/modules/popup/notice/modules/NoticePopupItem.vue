@@ -14,8 +14,8 @@
                 {{ item.title }}
             </h1>
             <div class="notice-popup-info">
-                <p-badge outline>
-                    {{ noticeTypeBadge(item.scope) }}
+                <p-badge outline :style-type="noticeTypeBadgeInfo.style">
+                    {{ noticeTypeBadgeInfo.label }}
                 </p-badge>
                 <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, $store.state.user.timezone) }} · {{ item.writer }}</span>
             </div>
@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import type { PropType } from '@vue/composition-api';
-import { reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -45,10 +45,8 @@ import {
     PButtonModal, PBadge, PDivider, PButton,
 } from '@spaceone/design-system';
 import { computedAsync } from '@vueuse/core';
-import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import type { FileInfo } from '@/lib/file-manager/type';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
@@ -57,8 +55,8 @@ import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileAttachments } from '@/common/composables/file-attachments';
 
-import type { NoticeType } from '@/services/info/notice/config';
-import type { NoticePostModel } from '@/services/info/notice/type';
+import { getPostBadgeInfo } from '@/services/info/notice/helper';
+import type { NoticePostBadgeInfo, NoticePostModel } from '@/services/info/notice/type';
 
 
 export default {
@@ -82,6 +80,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
+            noticeTypeBadgeInfo: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.item?.scope)),
             popupVisible: true,
         });
         const files = computedAsync<FileInfo[]>(async () => {
@@ -94,12 +93,6 @@ export default {
             return result.files;
         });
         const { attachments } = useFileAttachments(files);
-
-        const noticeTypeBadge = (type: NoticeType): TranslateResult => {
-            if (type === 'SYSTEM') return i18n.t('INFO.NOTICE.SYSTEM_NOTICE');
-            if (type === 'DOMAIN') return i18n.t('INFO.NOTICE.DOMAIN_NOTICE');
-            return '';
-        };
 
         const handleClose = async (neverShowPopup?: boolean) => {
             state.popupVisible = false;
@@ -124,7 +117,6 @@ export default {
             handleClose,
             isMobile,
             iso8601Formatter,
-            noticeTypeBadge,
         };
     },
 };
