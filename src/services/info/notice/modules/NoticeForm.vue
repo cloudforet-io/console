@@ -33,7 +33,7 @@
             >
                 <template #default="{invalid}">
                     <p-text-input :value="noticeTitle" :invalid="invalid"
-                                  class="w-full"
+                                  class="!w-full"
                                   @input="setForm('noticeTitle', $event)"
                     />
                 </template>
