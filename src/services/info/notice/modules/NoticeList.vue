@@ -5,7 +5,7 @@
                        @change="handleToolboxChange"
             >
                 <template #left-area>
-                    <p-select-dropdown :items="dropdownItems" :selected.sync="selectedScope" />
+                    <p-select-dropdown :items="dropdownItems" :selected="selectedScope" @update:selected="handleSearchScopeChange" />
                 </template>
             </p-toolbox>
         </div>
@@ -192,16 +192,24 @@ export default defineComponent<Props>({
             filterHelper.setFilters(filter);
             return filterHelper;
         };
-
-        /* event */
-        const handleToolboxChange = async (options: ToolboxOptions = {}) => {
-            state.searchText = options?.searchText;
+        const loadSearchListSet = async () => {
             if (!state.searchText) {
                 noticeApiHelper = initNoticeApiHelper();
+                if (state.selectedScope !== 'ALL') noticeApiHelper.setFilters([{ k: 'scope', v: state.selectedScope, o: '=' }]);
             } else {
                 noticeApiHelper = getSearchFilter();
             }
             if (state.boardId) await listNotice();
+        };
+
+        /* event */
+        const handleToolboxChange = (options: ToolboxOptions = {}) => {
+            state.searchText = options?.searchText;
+            loadSearchListSet();
+        };
+        const handleSearchScopeChange = (searchScope: string) => {
+            state.selectedScope = searchScope;
+            loadSearchListSet();
         };
         const handleClickNotice = (postId: string) => {
             SpaceRouter.router.push({
@@ -232,6 +240,7 @@ export default defineComponent<Props>({
             handleToolboxChange,
             handleClickNotice,
             handlePageChange,
+            handleSearchScopeChange,
         };
     },
 });
