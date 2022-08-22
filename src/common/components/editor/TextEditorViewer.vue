@@ -48,5 +48,9 @@ export default defineComponent<Props>({
 @import './text-editor-nodes.pcss';
 .text-editor-contents::v-deep {
     @mixin all-nodes-style;
+
+    img:active {
+        outline: none;
+    }
 }
 </style>
