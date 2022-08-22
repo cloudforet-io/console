@@ -2,6 +2,9 @@ import type { Editor } from '@tiptap/vue-2';
 
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
 
+// such as <p></p>
+export const emptyHtmlRegExp = /<[^/>][^>]*><\/[^>]+>/;
+
 export const getAttachments = (editor: Editor): Attachment[] => {
     const contentsEl = editor.contentComponent?.$el;
     if (!contentsEl) return [];
