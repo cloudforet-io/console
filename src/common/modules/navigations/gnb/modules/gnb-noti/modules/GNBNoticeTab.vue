@@ -16,7 +16,7 @@
                     <g-n-b-noti-item v-for="(item, idx) in pinnedItems" :key="`${item.postId}-${idx}`"
                                      :title="item.title"
                                      :created-at="item.createdAt"
-                                     :is-read="true"
+                                     :is-read="isReadMap[item.postId]"
                                      :writer="item.writer"
                                      @select="handleSelectNotice(item.postId)"
                     />
@@ -25,7 +25,7 @@
                 <g-n-b-noti-item v-for="(item, idx) in items" :key="`${item.postId}-${idx}`"
                                  :title="item.title"
                                  :created-at="item.createdAt"
-                                 :is-read="true"
+                                 :is-read="isReadMap[item.postId]"
                                  :writer="item.writer"
                                  @select="handleSelectNotice(item.postId)"
                 />
@@ -65,6 +65,8 @@ import type { TimeStamp } from '@/models';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useNoticeStore } from '@/store/notice';
 
 import { getNoticeBoardId } from '@/lib/helper/notice-helper';
 
@@ -133,6 +135,12 @@ export default {
             isPinned: d.options.is_pinned,
         }));
 
+        const {
+            isReadMap, fetchNoticeReadState,
+        } = useNoticeStore({
+            userId: computed(() => store.state.user.userId),
+        });
+
         /* Api */
         const noticeApiHelper = new ApiQueryHelper()
             .setPage(1, NOTICE_ITEM_LIMIT)
@@ -167,11 +175,14 @@ export default {
             SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME }).catch(() => {});
         };
 
+
         /* Init */
         const init = async () => {
             state.loading = true;
             state.boardId = await getNoticeBoardId();
-            if (state.boardId) await listNotice();
+            if (state.boardId) {
+                await Promise.allSettled([fetchNoticeReadState(state.boardId), listNotice()]);
+            }
             state.loading = false;
         };
         (async () => {
@@ -180,6 +191,7 @@ export default {
 
         return {
             ...toRefs(state),
+            isReadMap,
             ADMINISTRATION_ROUTE,
             handleSelectNotice,
             handleClickViewAllNotice,
