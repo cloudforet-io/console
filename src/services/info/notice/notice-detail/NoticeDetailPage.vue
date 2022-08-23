@@ -103,6 +103,8 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useNoticeStore } from '@/store/notice';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
@@ -213,17 +215,13 @@ export default {
                 state.prevNoticePost = undefined;
             }
         };
-        const setUserConfig = async () => {
-            try {
-                await SpaceConnector.client.config.userConfig.set({
-                    user_id: store.state.user.userId,
-                    name: `console:board:${props.boardId}:${props.postId}`,
-                    data: { is_read: true },
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
+
+        const {
+            updateNoticeReadState,
+        } = useNoticeStore({
+            userId: computed(() => store.state.user.userId),
+        });
+
 
         /* Event */
         const handleBackToListButtonClick = () => {
@@ -292,7 +290,7 @@ export default {
             }
             const isGetPostSuccess = !!state.noticePostData?.post_id;
             if (isGetPostSuccess) {
-                await setUserConfig();
+                await updateNoticeReadState(props.boardId, props.postId);
             }
             state.loading = false;
         };

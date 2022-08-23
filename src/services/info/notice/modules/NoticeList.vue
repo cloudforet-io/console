@@ -71,6 +71,8 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useNoticeStore } from '@/store/notice';
+
 import { getNoticeBoardId } from '@/lib/helper/notice-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -85,17 +87,6 @@ import { INFO_ROUTE } from '@/services/info/route-config';
 interface Props {
     noticeItems: any[];
     loading: boolean;
-}
-
-interface UserConfig {
-    name: string;
-    data?: {
-        is_read: boolean,
-        show_popup: boolean,
-    };
-    tags?: { [key: string]: string };
-    user_id?: string;
-    domain_id?: string;
 }
 
 const NOTICE_ITEM_LIMIT = 10;
@@ -133,17 +124,12 @@ export default defineComponent<Props>({
             noticeItemTotalCount: 0,
             boardId: undefined as undefined | string,
             searchText: undefined as undefined | string,
-            userConfigs: [] as UserConfig[],
-            isReadMap: computed<{ [key: string]: boolean }>(() => {
-                const isReadMap = {} as { [key: string]: boolean };
-                state.userConfigs.forEach((config) => {
-                    const nameList = config.name.split(':');
-                    const postId = nameList[nameList.length - 1];
-                    if (postId && config.data) isReadMap[postId] = config.data.is_read;
-                    else isReadMap[postId] = false;
-                });
-                return isReadMap;
-            }),
+        });
+
+        const {
+            isReadMap, fetchNoticeReadState,
+        } = useNoticeStore({
+            userId: computed(() => store.state.user.userId),
         });
 
         /* Api */
@@ -168,29 +154,6 @@ export default defineComponent<Props>({
                 state.noticeItemTotalCount = 0;
             } finally {
                 state.loading = false;
-            }
-        };
-        const listUserConfig = async () => {
-            const userConfigApiQuery = new ApiQueryHelper()
-                .setFilters([{
-                    k: 'user_id',
-                    v: store.state.user.userId,
-                    o: '=',
-                },
-                {
-                    k: 'name',
-                    v: `console:board:${state.boardId}:`,
-                    o: '',
-                }])
-                .setOnly('data', 'user_id');
-            try {
-                const { results } = await SpaceConnector.client.config.userConfig.list({
-                    query: userConfigApiQuery.data,
-                });
-                state.userConfigs = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.userConfigs = [];
             }
         };
 
@@ -242,14 +205,14 @@ export default defineComponent<Props>({
             state.loading = true;
             state.boardId = await getNoticeBoardId();
             if (state.boardId) {
-                await listNotice();
-                await listUserConfig();
+                await Promise.allSettled([fetchNoticeReadState(state.boardId), listNotice()]);
             }
             state.loading = false;
         })();
 
         return {
             ...toRefs(state),
+            isReadMap,
             handleToolboxChange,
             handleClickNotice,
             handlePageChange,
