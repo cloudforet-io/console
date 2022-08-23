@@ -8,6 +8,7 @@
               @keydown.enter="showNotiMenu"
         >
             <p-i class="menu-icon"
+                 :class="{ disabled: isNoRoleUser }"
                  :name="hasNotifications ? 'ic_bell_noti' : 'ic_bell'"
                  :color="hasNotifications ? undefined : 'inherit'"
             />
@@ -85,6 +86,7 @@ export default defineComponent<Props>({
         const state = reactive({
             hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
             hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
+            isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
             tabs: computed(() => ([
                 { label: i18n.t('COMMON.GNB.NOTIFICATION.TITLE'), name: 'notifications', keepAlive: true },
                 { label: i18n.t('COMMON.GNB.NOTICE.TITLE'), name: 'notice', keepAlive: true },
@@ -132,6 +134,7 @@ export default defineComponent<Props>({
 
         /* Event */
         const handleNotiButtonClick = () => {
+            if (state.isNoRoleUser) return;
             setVisible(!props.visible);
         };
 
@@ -175,6 +178,10 @@ export default defineComponent<Props>({
             &:hover {
                 @apply text-violet-400;
             }
+        }
+
+        .disabled {
+            cursor: not-allowed;
         }
     }
     .p-tab::v-deep {
