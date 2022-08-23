@@ -80,7 +80,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            noticeTypeBadgeInfo: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.item?.scope)),
+            noticeTypeBadgeInfo: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.item?.post_type)),
             popupVisible: true,
         });
         const files = computedAsync<FileInfo[]>(async () => {

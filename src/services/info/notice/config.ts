@@ -1,5 +1,5 @@
-export const NOTICE_TYPE = {
+export const NOTICE_POST_TYPE = {
     SYSTEM: 'SYSTEM',
-    DOMAIN: 'DOMAIN',
+    INTERNAL: 'INTERNAL',
 } as const;
-export type NoticeType = typeof NOTICE_TYPE[keyof typeof NOTICE_TYPE];
+export type NoticePostType = typeof NOTICE_POST_TYPE[keyof typeof NOTICE_POST_TYPE];

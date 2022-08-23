@@ -33,7 +33,6 @@ import {
 
 import { PBadge, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -42,7 +41,7 @@ import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 
 import { getPostBadgeInfo } from '@/services/info/notice/helper';
-import type { NoticePostModel } from '@/services/info/notice/type';
+import type { NoticePostBadgeInfo, NoticePostModel } from '@/services/info/notice/type';
 
 
 interface Props {
@@ -80,7 +79,7 @@ export default defineComponent<Props>({
     },
     setup(props) {
         const state = reactive({
-            noticeTypeBadge: computed<{ label?: TranslateResult; style?: string }>(() => getPostBadgeInfo(props.post?.scope)),
+            noticeTypeBadge: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.post?.post_type)),
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
             postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? i18n.t('INFO.NOTICE.MAIN.PREV') : i18n.t('INFO.NOTICE.MAIN.NEXT'))),
             timezone: computed(() => store.state.user.timezone || 'UTC'),
