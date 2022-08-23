@@ -156,7 +156,7 @@ export default {
             })),
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
             hasSystemRoleUser: computed(() => store.getters['user/hasSystemRole']),
-            noticeTypeBadgeInfo: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(state.noticePostData?.scope)),
+            noticeTypeBadgeInfo: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(state.noticePostData?.post_type)),
         });
         const modalState = reactive({
             deleteModalVisible: false,

@@ -35,9 +35,11 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import { reactive, toRefs } from '@vue/composition-api';
 
 import { PButtonModal, PButton } from '@spaceone/design-system';
+import type { TranslateResult } from 'vue-i18n';
 
 import type { Size } from '@/common/components/modals/config';
 import { SIZE } from '@/common/components/modals/config';
@@ -59,11 +61,11 @@ export default {
             default: false,
         },
         headerTitle: {
-            type: String,
+            type: String as PropType<TranslateResult>,
             default: '',
         },
         contents: {
-            type: String,
+            type: String as PropType<TranslateResult>,
             default: '',
         },
         confirmText: {

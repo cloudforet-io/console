@@ -75,7 +75,7 @@ import { getNoticeBoardId } from '@/lib/helper/notice-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { NOTICE_TYPE } from '@/services/info/notice/config';
+import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
 import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
 import type { NoticePostModel } from '@/services/info/notice/type';
 import { INFO_ROUTE } from '@/services/info/route-config';
@@ -119,11 +119,11 @@ export default defineComponent<Props>({
                 },
                 {
                     label: i18n.t('INFO.NOTICE.MAIN.LABEL_SYSTEM_NOTI'),
-                    name: NOTICE_TYPE.SYSTEM,
+                    name: NOTICE_POST_TYPE.SYSTEM,
                 },
                 {
                     label: i18n.t('INFO.NOTICE.MAIN.LABEL_DOMAIN_NOTI'),
-                    name: NOTICE_TYPE.DOMAIN,
+                    name: NOTICE_POST_TYPE.INTERNAL,
                 },
             ],
             selectedScope: 'ALL',
