@@ -5,7 +5,7 @@
                        @change="handleToolboxChange"
             >
                 <template #left-area>
-                    <p-select-dropdown :items="dropdownItems" :selected="selectedScope" @update:selected="handleSearchScopeChange" />
+                    <p-select-dropdown :items="dropdownItems" :selected="selectedPostType" @update:selected="handleSearchPostTypeChange" />
                 </template>
             </p-toolbox>
         </div>
@@ -75,6 +75,7 @@ import { getNoticeBoardId } from '@/lib/helper/notice-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { NoticePostType } from '@/services/info/notice/config';
 import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
 import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
 import type { NoticePostModel } from '@/services/info/notice/type';
@@ -112,7 +113,7 @@ export default defineComponent<Props>({
     setup() {
         const state = reactive({
             hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
-            dropdownItems: [
+            dropdownItems: computed(() => [
                 {
                     label: i18n.t('INFO.NOTICE.MAIN.LABEL_ALL_NOTI'),
                     name: 'ALL',
@@ -125,8 +126,8 @@ export default defineComponent<Props>({
                     label: i18n.t('INFO.NOTICE.MAIN.LABEL_DOMAIN_NOTI'),
                     name: NOTICE_POST_TYPE.INTERNAL,
                 },
-            ],
-            selectedScope: 'ALL',
+            ]),
+            selectedPostType: 'ALL' as NoticePostType | 'ALL',
             loading: false,
             noticeItems: [] as NoticePostModel[],
             noticeItemTotalCount: 0,
@@ -199,7 +200,7 @@ export default defineComponent<Props>({
                 .setPage(1, NOTICE_ITEM_LIMIT)
                 .setSort('created_at', true);
             const filter = [] as QueryStoreFilter[];
-            if (state.selectedScope !== 'ALL') filter.push({ k: 'scope', v: state.selectedScope, o: '=' });
+            if (state.selectedPostType !== 'ALL') filter.push({ k: 'post_type', v: state.selectedPostType, o: '=' });
             if (state.searchText) filter.push({ k: 'title', v: state.searchText, o: '' });
             filterHelper.setFilters(filter);
             return filterHelper;
@@ -207,7 +208,7 @@ export default defineComponent<Props>({
         const loadSearchListSet = async () => {
             if (!state.searchText) {
                 noticeApiHelper = initNoticeApiHelper();
-                if (state.selectedScope !== 'ALL') noticeApiHelper.setFilters([{ k: 'scope', v: state.selectedScope, o: '=' }]);
+                if (state.selectedPostType !== 'ALL') noticeApiHelper.setFilters([{ k: 'post_type', v: state.selectedPostType, o: '=' }]);
             } else {
                 noticeApiHelper = getSearchFilter();
             }
@@ -219,8 +220,8 @@ export default defineComponent<Props>({
             state.searchText = options?.searchText;
             loadSearchListSet();
         };
-        const handleSearchScopeChange = (searchScope: string) => {
-            state.selectedScope = searchScope;
+        const handleSearchPostTypeChange = (searchScope: NoticePostType|'ALL') => {
+            state.selectedPostType = searchScope;
             loadSearchListSet();
         };
         const handleClickNotice = (postId: string) => {
@@ -252,7 +253,7 @@ export default defineComponent<Props>({
             handleToolboxChange,
             handleClickNotice,
             handlePageChange,
-            handleSearchScopeChange,
+            handleSearchPostTypeChange,
         };
     },
 });
