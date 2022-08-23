@@ -17,6 +17,7 @@ import { GTag } from '@/lib/gtag';
 import { Gtm } from '@/lib/gtm';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
+import { initApiClient } from '@/lib/site-initializer/api-client';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -26,41 +27,6 @@ import { loadAuth } from '@/services/auth/authenticator/loader';
 
 const initConfig = async () => {
     await config.init();
-};
-
-const initApiClient = async () => {
-    await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
-        // Add session expiration process
-        store.dispatch('user/setIsSessionExpired', true);
-        store.dispatch('error/showSessionExpiredError');
-    }, { endpoint: config.get('MOCK.ENDPOINT'), all: config.get('MOCK.ALL') }, {
-        '/inventory/cloud-service-type/create': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
-        '/inventory/cloud-service-type/update': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
-        '/inventory/collector/create': (data) => { store.dispatch('reference/collector/sync', data); },
-        '/inventory/collector/update': (data) => { store.dispatch('reference/collector/sync', data); },
-        '/repository/plugin/create': (data) => { store.dispatch('reference/plugin/sync', data); },
-        '/repository/plugin/update': (data) => { store.dispatch('reference/plugin/sync', data); },
-        '/identity/project/create': (data) => { store.dispatch('reference/project/sync', data); },
-        '/identity/project/update': (data) => { store.dispatch('reference/project/sync', data); },
-        '/identity/project-group/create': (data) => { store.dispatch('reference/projectGroup/sync', data); },
-        '/identity/project-group/update': (data) => { store.dispatch('reference/projectGroup/sync', data); },
-        '/notification/protocol/create': (data) => { store.dispatch('reference/protocol/sync', data); },
-        '/notification/protocol/update': (data) => { store.dispatch('reference/protocol/sync', data); },
-        '/identity/provider/create': (data) => { store.dispatch('reference/provider/sync', data); },
-        '/identity/provider/update': (data) => { store.dispatch('reference/provider/sync', data); },
-        '/inventory/region/create': (data) => { store.dispatch('reference/region/sync', data); },
-        '/inventory/region/update': (data) => { store.dispatch('reference/region/sync', data); },
-        '/secret/secret/create': (data) => { store.dispatch('reference/secret/sync', data); },
-        '/secret/secret/update': (data) => { store.dispatch('reference/secret/sync', data); },
-        '/identity/service-account/create': (data) => { store.dispatch('reference/serviceAccount/sync', data); },
-        '/identity/service-account/update': (data) => { store.dispatch('reference/serviceAccount/sync', data); },
-        '/identity/user/create': (data) => { store.dispatch('reference/user/sync', data); },
-        '/identity/user/update': (data) => { store.dispatch('reference/user/sync', data); },
-        '/monitoring/webhook/create': (data) => { store.dispatch('reference/webhook/sync', data); },
-        '/monitoring/webhook/update': (data) => { store.dispatch('reference/webhook/sync', data); },
-    });
-    const isTokenAlive = SpaceConnector.isTokenAlive;
-    store.dispatch('user/setIsSessionExpired', !isTokenAlive);
 };
 
 const initDomain = async (): Promise<string|undefined> => {
@@ -73,7 +39,10 @@ const initDomain = async (): Promise<string|undefined> => {
     }
 
     try {
-        await store.dispatch('domain/load', domainName);
+        await Promise.allSettled([
+            store.dispatch('domain/load', domainName),
+            store.dispatch('domain/setBillingEnabled'),
+        ]);
         return store.state.domain.name;
     } catch (e) {
         console.error(e);
@@ -167,7 +136,7 @@ const removeInitializer = () => {
 const init = async () => {
     /* Init SpaceONE Console */
     await initConfig();
-    await initApiClient();
+    await initApiClient(store, config);
     const domainName = await initDomain();
 
     if (domainName) {

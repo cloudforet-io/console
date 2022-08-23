@@ -33,6 +33,15 @@ export const load = async ({ commit }, name: string): Promise<void|Error> => {
             authOptions: getAuthOptions(domainResponse.plugin_info),
         });
     } else {
-        throw new Error(`Can not found '${name}' domain.`);
+        throw new Error(`Can not find '${name}' domain.`);
+    }
+};
+
+export const setBillingEnabled = async ({ commit }) => {
+    try {
+        const { total_count } = await SpaceConnector.client.costAnalysis.dataSource.list();
+        commit('setBillingEnabled', total_count > 0);
+    } catch (e) {
+        commit('setBillingEnabled', false);
     }
 };

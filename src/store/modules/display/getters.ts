@@ -12,7 +12,6 @@ import type {
 } from '@/store/modules/display/type';
 
 import type { PagePermissionTuple } from '@/lib/access-control/config';
-import config from '@/lib/config';
 import type { Menu, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
@@ -97,9 +96,7 @@ const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d)
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
-    const billingAccessibleDomainList: string[] = config.get('BILLING_ENABLED') ?? [];
-    const _showBilling = billingAccessibleDomainList.includes(rootState.domain.domainId);
-    const menuList = _showBilling ? MENU_LIST : MENU_LIST.filter(d => d.id !== MENU_ID.COST_EXPLORER);
+    const menuList = rootState.domain.billingEnabled ? MENU_LIST : MENU_LIST.filter(d => d.id !== MENU_ID.COST_EXPLORER);
 
     let _allGnbMenuList: DisplayMenu[] = getDisplayMenuList(menuList);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
