@@ -5,4 +5,5 @@ export interface DomainState {
     name?: string;
     extendedAuthType?: ExtendedAuthType;
     authOptions?: Record<string, any>;
+    billingEnabled: boolean;
 }
