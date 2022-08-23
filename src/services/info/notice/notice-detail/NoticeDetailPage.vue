@@ -158,6 +158,7 @@ export default {
                 name: INFO_ROUTE.NOTICE.DETAIL._NAME,
                 params: { boardId: props.boardId, postId: state.nextNoticePost?.post_id },
             })),
+            domainName: computed(() => store.state.domain.name),
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
             hasSystemRoleUser: computed(() => store.getters['user/hasSystemRole']),
             hasPermissionToEditOrDelete: computed(() => {
@@ -194,7 +195,14 @@ export default {
                     .setSort('created_at', false)
                     .setTimezone('UTC')
                     .setFilters([{ k: 'created_at', v: createdAt, o: '>t' }]);
+                if (state.domainName === 'root') {
+                    nextPostApiQueryHelper.setFilters([
+                        { k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' },
+                        { k: 'created_at', v: createdAt, o: '>t' },
+                    ]);
+                }
                 const { results } = await SpaceConnector.client.board.post.list({
+                    domain_id: null,
                     board_id: props.boardId,
                     query: nextPostApiQueryHelper.data,
                 });
@@ -211,7 +219,14 @@ export default {
                     .setSort('created_at', true)
                     .setTimezone('UTC')
                     .setFilters([{ k: 'created_at', v: createdAt, o: '<t' }]);
+                if (state.domainName === 'root') {
+                    prevPostApiQueryHelper.setFilters([
+                        { k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' },
+                        { k: 'created_at', v: createdAt, o: '<t' },
+                    ]);
+                }
                 const { results } = await SpaceConnector.client.board.post.list({
+                    domain_id: null,
                     board_id: props.boardId,
                     query: prevPostApiQueryHelper.data,
                 });
