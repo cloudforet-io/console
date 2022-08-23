@@ -9,6 +9,7 @@
                 </template>
             </p-toolbox>
         </div>
+        <p-divider />
         <p-data-loader :data="noticeItems" :loading="loading">
             <ul class="list-wrapper">
                 <list-item v-for="(item, index) in noticeItems"
@@ -21,22 +22,32 @@
                 />
             </ul>
             <template #no-data>
-                <div class="no-data">
+                <div v-if="!searchText || !searchText.length" class="no-data">
                     <img src="@/assets/images/illust_satellite.svg" class="no-data-img">
                     <p class="no-data-text">
                         {{ $t('INFO.NOTICE.NO_NOTICES') }}
                     </p>
                 </div>
+                <div v-else class="no-data">
+                    <img src="@/assets/images/illust_ghost.svg" class="img-no-data-ghost">
+                    <p class="no-data-text">
+                        <i18n path="COMMON.GNB.SEARCH.NO_RESULT_1">
+                            <template #inputText>
+                                <em>{{ searchText }}</em>
+                            </template>
+                        </i18n>
+                    </p>
+                </div>
             </template>
-            <div class="pagination-wrapper">
-                <p-pagination class="pagination"
-                              :total-count="noticeItemTotalCount"
-                              :page-size="10"
-                              :current-page="1"
-                              @change="handlePageChange"
-                />
-            </div>
         </p-data-loader>
+        <div class="pagination-wrapper">
+            <p-pagination class="pagination"
+                          :total-count="noticeItemTotalCount"
+                          :page-size="10"
+                          :current-page="1"
+                          @change="handlePageChange"
+            />
+        </div>
     </div>
 </template>
 
@@ -50,7 +61,7 @@ import { getPageStart } from '@spaceone/console-core-lib/component-util/paginati
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PDataLoader,
+    PDataLoader, PDivider,
     PPagination, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
@@ -95,6 +106,7 @@ export default defineComponent<Props>({
         PSelectDropdown,
         PPagination,
         PDataLoader,
+        PDivider,
         ListItem,
     },
     setup() {
@@ -248,33 +260,45 @@ export default defineComponent<Props>({
 <style lang="postcss" scoped>
 .notice-list {
     @apply border border-gray-200 bg-white rounded-lg;
-}
-.notice-header {
-    padding: 0 1rem;
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-.list-wrapper {
-    @apply border-t border-b border-gray-200 rounded-none;
-}
-.pagination-wrapper {
-    @apply flex justify-center;
-    padding: 0.75rem 0 1rem 0;
-}
-.no-data {
-    @apply border-t border-b border-gray-200 rounded-none;
-    padding: 6rem 0;
-    .no-data-img {
-        @apply ml-auto mr-auto;
-        width: 12rem;
+    .notice-header {
+        padding: 0 1rem;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .list-wrapper {
+        @apply rounded-none;
+    }
+    .pagination-wrapper {
+        @apply flex justify-center border-t border-gray-200;
+        padding: 0.75rem 0 1rem 0;
     }
 
-    .no-data-text {
-        @apply text-gray-300;
-        text-align: center;
-        margin-top: 2rem;
-        font-size: 1rem;
-        line-height: 1.25;
+    &::v-deep .no-data-wrapper {
+        max-height: none;
+    }
+
+    .no-data {
+        @apply rounded-none;
+        padding: 6rem 0;
+        .no-data-img {
+            @apply ml-auto mr-auto;
+            width: 12rem;
+        }
+
+        .no-data-text {
+            @apply text-gray-300;
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 1rem;
+            line-height: 1.25;
+            em {
+                @apply font-bold text-gray-500;
+            }
+        }
+
+        .img-no-data-ghost {
+            display: inline-block;
+        }
     }
 }
 
