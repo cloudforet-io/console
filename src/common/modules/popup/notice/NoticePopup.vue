@@ -37,7 +37,8 @@ export default {
         });
 
 
-        const apiQuery = new ApiQueryHelper().setFilters([{
+        // helper
+        const apiQueryForPostIdList = new ApiQueryHelper().setFilters([{
             k: 'name',
             v: 'console:board',
             o: '',
@@ -46,11 +47,18 @@ export default {
             v: false,
             o: '=',
         }]).data;
+        const apiQueryForPostList = new ApiQueryHelper().setFilters([{
+            k: 'options.is_popup',
+            v: true,
+            o: '=',
+        }]).setSort('created_at', false).data;
+
+        // API
         const getUserConfigBoardPostIdList = async (): Promise<Array<string>> => {
             try {
                 const { results } = await SpaceConnector.client.config.userConfig.list({
                     user_id: store.state.user.userId,
-                    query: apiQuery,
+                    query: apiQueryForPostIdList,
                 });
                 // console:board:{boardId}:{postId}
                 return results.map(d => d.name.split(':')[3]);
@@ -76,13 +84,7 @@ export default {
                 if (!noticeBoard) return;
                 const { results } = await SpaceConnector.client.board.post.list({
                     board_id: noticeBoard,
-                    query: {
-                        filter: [{
-                            k: 'options.is_popup',
-                            v: true,
-                            o: 'eq',
-                        }],
-                    },
+                    query: apiQueryForPostList,
                 });
                 const postIdList = await getUserConfigBoardPostIdList();
                 state.popupList = results.filter(d => !postIdList.includes(d.post_id));
