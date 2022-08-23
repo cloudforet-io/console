@@ -75,6 +75,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
 import type { NoticePostModel } from '@/services/info/notice/type';
 import { INFO_ROUTE } from '@/services/info/route-config';
 
@@ -110,7 +111,6 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             loading: true,
-            hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
             timezone: computed(() => store.state.user.timezone),
             boardId: undefined as undefined | string,
             noticeItemsRef: null as HTMLElement|null,
@@ -124,6 +124,7 @@ export default {
                 return convertNoticeItem(filteredData);
             }),
             proxyCount: useProxyValue('count', props, emit),
+            domainName: computed(() => store.state.domain.name),
         });
 
         /* Util */
@@ -145,13 +146,15 @@ export default {
         const noticeApiHelper = new ApiQueryHelper()
             .setPage(1, NOTICE_ITEM_LIMIT)
             .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
+        if (state.domainName === 'root') {
+            noticeApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
+        }
         const listNotice = async () => {
             try {
                 const { results, total_count } = await SpaceConnector.client.board.post.list({
                     board_id: state.boardId,
                     query: noticeApiHelper.data,
                     domain_id: null,
-                    ...(state.hasSystemRole && { user_domain_id: store.state.domain.domainId }),
                 });
                 state.proxyCount = total_count;
                 state.noticeData = results;

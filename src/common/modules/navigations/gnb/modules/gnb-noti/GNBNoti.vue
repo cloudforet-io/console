@@ -60,6 +60,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import GNBNoticeTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNoticeTab.vue';
 import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationsTab.vue';
 
+import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
+
 
 interface Props {
     visible: boolean
@@ -84,8 +86,8 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }) {
         const state = reactive({
-            hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
             hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
+            domainName: computed(() => store.state.domain.name),
             isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
             tabs: computed(() => ([
                 { label: i18n.t('COMMON.GNB.NOTIFICATION.TITLE'), name: 'notifications', keepAlive: true },
@@ -116,6 +118,9 @@ export default defineComponent<Props>({
 
         /* Api */
         const noticeApiHelper = new ApiQueryHelper().setCountOnly();
+        if (state.domainName === 'root') {
+            noticeApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
+        }
         const listNotice = async () => {
             try {
                 const boardId = await getNoticeBoardId();
@@ -123,7 +128,6 @@ export default defineComponent<Props>({
                     board_id: boardId,
                     query: noticeApiHelper.data,
                     domain_id: null,
-                    ...(state.hasSystemRole && { user_domain_id: store.state.domain.domainId }),
                 });
                 state.count.notice = total_count;
             } catch (e) {
