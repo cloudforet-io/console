@@ -103,7 +103,7 @@ export default defineComponent<Props>({
     },
     setup() {
         const state = reactive({
-            hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
+            domainName: computed(() => store.state.domain.name),
             dropdownItems: computed(() => [
                 {
                     label: i18n.t('INFO.NOTICE.MAIN.LABEL_ALL_NOTI'),
@@ -133,9 +133,15 @@ export default defineComponent<Props>({
         });
 
         /* Api */
-        const initNoticeApiHelper = () => new ApiQueryHelper()
-            .setPage(1, NOTICE_ITEM_LIMIT)
-            .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
+        const initNoticeApiHelper = () => {
+            const initApiHelper = new ApiQueryHelper()
+                .setPage(1, NOTICE_ITEM_LIMIT)
+                .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
+            if (state.domainName === 'root') {
+                return initApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
+            }
+            return initApiHelper;
+        };
         let noticeApiHelper = initNoticeApiHelper();
         const listNotice = async () => {
             state.loading = true;
@@ -144,7 +150,6 @@ export default defineComponent<Props>({
                     board_id: state.boardId,
                     query: noticeApiHelper.data,
                     domain_id: null,
-                    ...(state.hasSystemRole && { user_domain_id: store.state.domain.domainId }),
                 });
                 state.noticeItems = results;
                 state.noticeItemTotalCount = total_count;
