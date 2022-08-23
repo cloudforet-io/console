@@ -21,7 +21,7 @@ const inconsolataConfig: FontConfig = {
 export const notoSansConfigMap: Record<string, FontConfig> = {
     en: {
         family: 'Noto Sans',
-        urlPrefix: 'fonts/noto-sans/en/noto-sans-v12-latin-',
+        urlPrefix: 'fonts/noto-sans/en/noto-sans-v27-latin-',
         formats: ['woff2', 'woff'],
     },
     ko: {
