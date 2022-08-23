@@ -33,6 +33,7 @@ export default {
     setup() {
         const state = reactive({
             isSessionExpired: computed(() => store.state.user.isSessionExpired),
+            isNoRoleUser: computed(() => store.getters['user/isNoRoleUser']),
             popupList: [] as Array<NoticePostModel>,
         });
 
@@ -83,6 +84,7 @@ export default {
                 const noticeBoard = await getNoticeBoard();
                 if (!noticeBoard) return;
                 const { results } = await SpaceConnector.client.board.post.list({
+                    domain_id: null,
                     board_id: noticeBoard,
                     query: apiQueryForPostList,
                 });
@@ -95,7 +97,7 @@ export default {
         };
 
         watch(() => state.isSessionExpired, async (isSessionExpired) => {
-            if (isSessionExpired === false) await getPostList();
+            if (isSessionExpired === false && !state.isNoRoleUser) await getPostList();
         }, { immediate: true });
 
         return {
