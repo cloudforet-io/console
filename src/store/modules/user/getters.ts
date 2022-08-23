@@ -43,6 +43,7 @@ export const roleNames = (state: UserState): Array<string> => {
     }
     return ['No Role'];
 };
+export const isNoRoleUser = (state: UserState): boolean => !state.roles?.length;
 
 export const hasDomainRole = (state: UserState): boolean => {
     if (state.roles) {
