@@ -5,7 +5,7 @@
                       @goBack="$router.go(-1)"
         >
             <template #extra>
-                <div v-if="hasDomainRoleUser || hasSystemRoleUser" class="button-group">
+                <div v-if="hasPermissionToEditOrDelete" class="button-group">
                     <p-button :outline="true" style-type="gray-border" icon="ic_edit"
                               @click="handleClickEditButton"
                     >
@@ -112,6 +112,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileAttachments } from '@/common/composables/file-attachments';
 
+import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
 import { getPostBadgeInfo } from '@/services/info/notice/helper';
 import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
 import type { NoticePostModel, NoticePostBadgeInfo } from '@/services/info/notice/type';
@@ -146,6 +147,7 @@ export default {
             timezone: computed(() => store.state.user.timezone),
             loading: false,
             noticePostData: {} as NoticePostModel,
+            postType: computed(() => state.noticePostData.post_type),
             prevNoticePost: undefined as NoticePostModel | undefined,
             prevPostRoute: computed(() => ({
                 name: INFO_ROUTE.NOTICE.DETAIL._NAME,
@@ -158,6 +160,10 @@ export default {
             })),
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
             hasSystemRoleUser: computed(() => store.getters['user/hasSystemRole']),
+            hasPermissionToEditOrDelete: computed(() => {
+                if (state.postType === NOTICE_POST_TYPE.SYSTEM) return state.hasSystemRoleUser;
+                return state.hasDomainRoleUser || state.hasSystemRoleUser;
+            }),
             noticeTypeBadgeInfo: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(state.noticePostData?.post_type)),
         });
         const modalState = reactive({
@@ -248,7 +254,7 @@ export default {
                     board_id: props.boardId,
                 });
                 showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_DELETE_NOTICE'), '');
-                SpaceRouter.router.go(-1);
+                await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_DELETE_NOTICE'));
             } finally {
