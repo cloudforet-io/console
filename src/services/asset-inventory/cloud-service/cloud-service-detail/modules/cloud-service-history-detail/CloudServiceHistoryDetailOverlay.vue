@@ -9,7 +9,7 @@
                             {{ cloudServiceItem.name }}
                             <p-divider :vertical="true" />
                         </template>
-                        <span class="label-text">ID: </span>
+                        <span class="label-text">Resource ID: </span>
                         <p-copy-button>
                             {{ resourceId }}
                         </p-copy-button>
@@ -258,11 +258,13 @@ export default defineComponent<Props>({
         flex-grow: 1;
 
         .p-page-title::v-deep {
-            height: 4rem;
+            min-height: 3.5rem;
+            height: auto;
             padding: 1.5rem 1.5rem 0 1.5rem;
             margin: 0;
             .title-right-extra {
                 display: flex;
+                flex-flow: wrap;
                 align-items: center;
                 float: right;
                 font-size: 0.875rem;
