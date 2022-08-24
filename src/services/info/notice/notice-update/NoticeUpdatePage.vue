@@ -9,10 +9,13 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PPageTitle } from '@spaceone/design-system';
+
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -53,6 +56,16 @@ export default {
                 state.noticePostData = {};
             }
         };
+
+        watch(() => state.noticePostData, (d) => {
+            // System can access to every update page
+            if (store.getters['user/hasSystemRole']) return;
+            // Domain can access to only their update page
+            if (
+                d.scope === 'PUBLIC'
+                || !(d.scope === 'DOMAIN' && store.getters['user/hasDomainRole'])
+            ) SpaceRouter.router.back();
+        });
 
         /* Init */
         (async () => {
