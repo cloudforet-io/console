@@ -1,8 +1,9 @@
 /* eslint-disable camelcase */
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import type { Action } from 'vuex';
 
-import type { ExtendedAuthType } from './type';
+import type { DomainState, ExtendedAuthType } from './type';
 
 const EXTENDED_AUTH_TYPE_MAP = {
     google_oauth2: 'GOOGLE_OAUTH2',
@@ -37,11 +38,19 @@ export const load = async ({ commit }, name: string): Promise<void|Error> => {
     }
 };
 
-export const setBillingEnabled = async ({ commit }) => {
+export const setBillingEnabled: Action<DomainState, any> = async ({ commit, rootState }) => {
     try {
-        const { total_count } = await SpaceConnector.client.costAnalysis.dataSource.list();
-        commit('setBillingEnabled', total_count > 0);
+        if (!rootState.user.isSessionExpired) {
+            const { total_count } = await SpaceConnector.client.costAnalysis.dataSource.list();
+            commit('setBillingEnabled', total_count > 0);
+        } else {
+            commit('setBillingEnabled', false);
+        }
     } catch (e) {
         commit('setBillingEnabled', false);
     }
+};
+
+export const resetBillingEnabled: Action<DomainState, any> = async ({ commit }) => {
+    commit('setBillingEnabled', false);
 };

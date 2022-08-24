@@ -4,7 +4,7 @@ import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
 
-export const addAmchartsLicense = (licenses?: any[]) => {
+const addAmchartsLicense = (licenses?: any[]) => {
     if (Array.isArray(licenses)) {
         licenses.forEach((license) => {
             am4core.addLicense(license);
@@ -18,8 +18,19 @@ const customColorTheme = (target) => {
     }
 };
 
-export const applyAmchartsGlobalSettings = () => {
+const applyAmchartsGlobalSettings = () => {
     am4core.useTheme(customColorTheme);
     am4core.useTheme(am4themesAnimated);
     am4core.options.autoSetClassName = true;
+};
+
+export const initAmcharts = (config) => {
+    if (config.get('AMCHARTS_LICENSE.ENABLED')) {
+        addAmchartsLicense([
+            config.get('AMCHARTS_LICENSE.CHARTS'),
+            config.get('AMCHARTS_LICENSE.MAPS'),
+            config.get('AMCHARTS_LICENSE.TIMELINE'),
+        ]);
+    }
+    applyAmchartsGlobalSettings();
 };
