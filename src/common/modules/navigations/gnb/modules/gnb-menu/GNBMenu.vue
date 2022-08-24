@@ -1,6 +1,8 @@
 <template>
     <div v-if="show" v-click-outside="hideMenu" class="gnb-menu"
          :class="{disabled: !hasPermission}"
+         @click.stop="handleMenu"
+         @keydown.enter="handleMenu"
     >
         <div class="menu-button"
              :class="[{
@@ -8,23 +10,15 @@
                  selected: isSelected,
              }]"
         >
-            <span v-if="subMenuList.length > 0" tabindex="0"
-                  @click.stop="openMenu"
-                  @keydown.enter="openMenu"
-            >
+            <span tabindex="0">
                 <span>{{ label }}</span>
-                <p-i class="arrow-button"
+                <p-i v-if="subMenuList.length > 0"
+                     class="arrow-button"
                      :name="isOpened ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
                      width="0.5rem" height="0.5rem"
                      color="inherit transparent"
                 />
             </span>
-            <router-link v-else
-                         :to="to"
-                         tabindex="0"
-            >
-                <span>{{ label }}</span>
-            </router-link>
 
             <div v-if="isOpened && subMenuList.length > 0"
                  class="sub-menu-wrapper"
@@ -50,6 +44,8 @@ import { defineComponent } from '@vue/composition-api';
 import { PI } from '@spaceone/design-system';
 import { vOnClickOutside } from '@vueuse/components';
 import type { DirectiveFunction } from 'vue';
+
+import { SpaceRouter } from '@/router';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 
@@ -100,8 +96,14 @@ export default defineComponent({
         },
     },
     setup(props, { emit }) {
-        const openMenu = () => {
-            emit('open-menu', props.name);
+        const handleMenu = () => {
+            if (props.subMenuList?.length > 0) {
+                emit('open-menu', props.name);
+            } else {
+                const isDuplicatePath = SpaceRouter.router.currentRoute.name === props.name;
+                if (isDuplicatePath) return;
+                SpaceRouter.router.push(props.to);
+            }
         };
 
         const hideMenu = () => {
@@ -109,7 +111,7 @@ export default defineComponent({
         };
 
         return {
-            openMenu,
+            handleMenu,
             hideMenu,
         };
     },
