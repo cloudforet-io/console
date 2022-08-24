@@ -13,8 +13,9 @@ abstract class Authenticator {
                 userType: userType || 'USER',
                 userId,
             });
-        } catch (e: any) {
-            throw new Error(e);
+            await store.dispatch('domain/setBillingEnabled');
+        } catch (e: unknown) {
+            throw e;
         }
     }
 
@@ -23,8 +24,9 @@ abstract class Authenticator {
             if (SpaceRouter.router) {
                 await store.dispatch('user/signOut');
                 await store.dispatch('error/resetErrorState');
+                await store.dispatch('domain/resetBillingEnabled');
             }
-        } catch (e) {
+        } catch (e: unknown) {
             console.error('user sign out failed', e);
         }
     }
