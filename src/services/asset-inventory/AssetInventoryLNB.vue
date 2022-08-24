@@ -60,34 +60,23 @@ export default defineComponent({
             }),
             cloudServiceTypeList: computed<CloudServiceTypeInfo[]>(() => assetInventoryStore.state.cloudServiceDetail.cloudServiceTypeList),
             selectedItem: computed(() => assetInventoryStore.state.cloudServiceDetail.selectedItem),
-            cloudServiceDetailMenuItems: computed<LNBItem[]>(() => {
-                const results: LNBItem[] = state.cloudServiceTypeList.map(d => (
-                    {
-                        type: 'item',
-                        label: d.name,
-                        id: d.cloud_service_type_key,
-                        to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
-                        favoriteType: FAVORITE_TYPE.CLOUD_SERVICE,
-                    }
-                ));
-                return results;
-            }),
-            menuSet: computed<LNBMenu[]>(() => {
-                const menuItems: LNBMenu[] = [];
-                if (state.isCloudServiceDetailPage) {
-                    menuItems.push([...state.cloudServiceDetailMenuItems, { type: 'divider' }]);
-                } else {
-                    menuItems.push(
-                        {
-                            type: 'item',
-                            id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE,
-                            label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].translationId),
-                            to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
-                        },
-                    );
+            cloudServiceDetailMenuSet: computed<LNBItem[]>(() => [...state.cloudServiceTypeList.map(d => (
+                {
+                    type: 'item',
+                    label: d.name,
+                    id: d.cloud_service_type_key,
+                    to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
+                    favoriteType: FAVORITE_TYPE.CLOUD_SERVICE,
                 }
-
-                menuItems.push(
+            )), { type: 'divider' }]),
+            menuSet: computed<LNBMenu[]>(() => [
+                (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : {
+                    type: 'item',
+                    id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE,
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].translationId),
+                    to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
+                }),
+                ...filterLNBMenuByPermission([
                     {
                         type: 'item',
                         id: MENU_ID.ASSET_INVENTORY_SERVER,
@@ -106,9 +95,8 @@ export default defineComponent({
                         label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT].translationId),
                         to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
                     },
-                );
-                return filterLNBMenuByPermission(menuItems, store.getters['user/pagePermissionList']);
-            }),
+                ], store.getters['user/pagePermissionList']),
+            ]),
         });
 
         const initCloudServiceDetailLNB = async (params: CloudServiceDetailPageParams) => {
