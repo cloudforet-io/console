@@ -24,3 +24,8 @@ export interface ReferenceState<Items = Record<string, any>> {
 export interface ReferenceRootState {
     isAllLoaded: boolean;
 }
+
+export interface ReferenceLoadOptions {
+    lazyLoad?: boolean;
+    force?: boolean;
+}

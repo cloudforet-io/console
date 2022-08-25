@@ -16,7 +16,7 @@ import serviceAccount from './service-account';
 import user from './user';
 import webhook from './webhook';
 
-// TODO: This is temporary state. It must be change to check each modules' items state is null.
+// TODO: This is a temporary state. It must be changed to check each modules' items state is null.
 const state: ReferenceRootState = {
     isAllLoaded: false,
 };

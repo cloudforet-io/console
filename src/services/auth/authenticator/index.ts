@@ -13,7 +13,11 @@ abstract class Authenticator {
                 userType: userType || 'USER',
                 userId,
             });
-            await store.dispatch('domain/setBillingEnabled');
+            await Promise.allSettled([
+                store.dispatch('domain/setBillingEnabled'),
+                // INIT REFERENCE STORE
+                store.dispatch('reference/loadAll', { force: true }),
+            ]);
         } catch (e: unknown) {
             throw e;
         }

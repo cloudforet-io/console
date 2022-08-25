@@ -3,6 +3,7 @@ import type { Action } from 'vuex';
 
 import type { CollectorReferenceMap, CollectorReferenceState } from '@/store/modules/reference/collector/type';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
+import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -11,12 +12,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 let lastLoadedTime = 0;
 
-export const load: Action<CollectorReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<CollectorReferenceState, any> = async (
+    { state, commit }, options: ReferenceLoadOptions,
+): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
-        (lazyLoad && Object.keys(state.items).length > 0)
+        ((options?.lazyLoad && Object.keys(state.items).length > 0)
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
+        ) && !options?.force
     ) return;
     lastLoadedTime = currentTime;
 

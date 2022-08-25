@@ -3,17 +3,21 @@ import type { Action } from 'vuex';
 
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { ProjectReferenceMap, ProjectReferenceState } from '@/store/modules/reference/project/type';
+import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 let lastLoadedTime = 0;
 
-export const load: Action<ProjectReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<ProjectReferenceState, any> = async (
+    { state, commit }, options: ReferenceLoadOptions,
+): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
-        (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
-        || (lazyLoad && state.items)
+        ((lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
+        || (options?.lazyLoad && state.items)
+        ) && !options?.force
     ) return;
     lastLoadedTime = currentTime;
 
