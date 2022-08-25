@@ -1,3 +1,10 @@
+# [1.1.0-beta.375](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.374...v1.1.0-beta.375) (2022-08-25)
+
+
+### Bug Fixes
+
+* **data-table:** add tableCustomStyle prop to Data Table ([#1064](https://github.com/spaceone-dev/spaceone-design-system/issues/1064)) ([da8a807](https://github.com/spaceone-dev/spaceone-design-system/commit/da8a80741c96ac38b8a57f0deef88f8086973fc9))
+
 # [1.1.0-beta.374](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.373...v1.1.0-beta.374) (2022-08-25)
 
 
