@@ -677,6 +677,7 @@ export default defineComponent<Props>({
             color: inherit;
             width: 1rem;
             font-size: 1rem;
+            flex-shrink: 0;
         }
         .icon {
             @apply flex-shrink-0 flex-grow-0;
