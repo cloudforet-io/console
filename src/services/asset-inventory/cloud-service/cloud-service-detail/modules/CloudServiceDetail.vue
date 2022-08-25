@@ -78,10 +78,6 @@ export default {
             type: String,
             required: true,
         },
-        provider: {
-            type: String,
-            required: true,
-        },
         cloudServiceGroup: {
             type: String,
             required: true,
