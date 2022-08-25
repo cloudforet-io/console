@@ -16,6 +16,7 @@
                             :loading="tableState.loading"
                             :items="tableState.items"
                             :select-index.sync="tableState.selectIndex"
+                            :table-custom-style="{ maxHeight: '35.25rem', height: 'calc(100vh - 22.5rem)' }"
                             @change="handleChangeDataTable"
                         />
                     </template>
