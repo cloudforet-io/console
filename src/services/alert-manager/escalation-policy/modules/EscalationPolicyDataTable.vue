@@ -6,6 +6,7 @@
                   :select-index.sync="proxySelectIndex"
                   :sort-by.sync="sortBy"
                   :sort-desc.sync="sortDesc"
+                  :table-custom-style="tableCustomStyle"
                   @changeSort="onChangeSort"
     >
         <template #col-name-format="{ value }">
@@ -79,6 +80,10 @@ export default {
         selectIndex: {
             type: Array,
             default: () => [],
+        },
+        tableCustomStyle: {
+            type: Object,
+            default: () => ({}),
         },
     },
     setup(props, { emit }) {
