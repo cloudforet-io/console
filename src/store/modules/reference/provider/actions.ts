@@ -3,7 +3,7 @@ import type { Action } from 'vuex';
 
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { ProviderReferenceMap, ProviderReferenceState } from '@/store/modules/reference/provider/type';
-
+import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -14,12 +14,15 @@ import { indigo } from '@/styles/colors';
 
 let lastLoadedTime = 0;
 
-export const load: Action<ProviderReferenceState, any> = async ({ commit, state }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<ProviderReferenceState, any> = async (
+    { commit, state }, options: ReferenceLoadOptions,
+): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
-        (lazyLoad && Object.keys(state.items).length > 0)
+        ((options?.lazyLoad && Object.keys(state.items).length > 0)
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
+        ) && !options?.force
     ) return;
     lastLoadedTime = currentTime;
 

@@ -3,6 +3,7 @@ import type { Action } from 'vuex';
 
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { RegionReferenceMap, RegionReferenceState } from '@/store/modules/reference/region/type';
+import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -11,12 +12,15 @@ import { RegionMap } from '@/services/cost-explorer/widgets/lib/config';
 
 let lastLoadedTime = 0;
 
-export const load: Action<RegionReferenceState, any> = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+export const load: Action<RegionReferenceState, any> = async (
+    { state, commit }, options: ReferenceLoadOptions,
+): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
-        (lazyLoad && Object.keys(state.items).length > 0)
+        ((options?.lazyLoad && Object.keys(state.items).length > 0)
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
+        ) && !options?.force
     ) return;
     lastLoadedTime = currentTime;
 
