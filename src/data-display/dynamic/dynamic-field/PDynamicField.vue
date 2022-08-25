@@ -1,5 +1,5 @@
 <template>
-    <fragment>
+    <span>
         <p-text-list v-if="type !== 'list' && Array.isArray(data)"
                      :items="data"
                      :delimiter="options.delimiter === undefined ? '<br>' : options.delimiter"
@@ -24,7 +24,7 @@
                    :handler="proxyHandler"
                    v-on="$listeners"
         />
-    </fragment>
+    </span>
 </template>
 
 <script lang="ts">

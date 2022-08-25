@@ -7,7 +7,7 @@ export interface DefinitionData {
 
 export interface DefinitionTableProps {
     fields: DefinitionField[];
-    data?: DefinitionData;
+    data?: DefinitionData|DefinitionData[];
     loading?: boolean;
     skeletonRows?: number;
     disableCopy?: boolean;

@@ -55,13 +55,15 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { every, range, get } from 'lodash';
+import { every, range } from 'lodash';
 
 
+import { getValueByPath } from '@/data-display/dynamic/helper';
 import PEmpty from '@/data-display/empty/PEmpty.vue';
 import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
 import PDefinition from '@/data-display/tables/definition-table/definition/PDefinition.vue';
@@ -71,9 +73,9 @@ import type {
 } from '@/data-display/tables/definition-table/type';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 
-const makeDefItems = (fields: DefinitionField[], data?: DefinitionData): DefinitionProps[] => fields.map(field => ({
+const makeDefItems = (fields: DefinitionField[], data?: DefinitionData|DefinitionData[]): DefinitionProps[] => fields.map(field => ({
     ...field,
-    data: get(data, field.name, ''),
+    data: getValueByPath(data, field.name) ?? '',
 }));
 
 
@@ -88,7 +90,7 @@ export default defineComponent<DefinitionTableProps>({
             default: () => [],
         },
         data: {
-            type: Object,
+            type: [Object, Array] as PropType<DefinitionData|DefinitionData[]>,
             default: undefined,
         },
         loading: {

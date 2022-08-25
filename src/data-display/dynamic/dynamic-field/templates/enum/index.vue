@@ -1,27 +1,38 @@
+<template>
+    <p-dynamic-field :type="enumItem.type"
+                     :options="enumItem.options"
+                     :data="enumItem.name"
+                     :type-options="typeOptions"
+                     :handler="handler"
+                     :extra-data="extraData"
+    />
+</template>
 <script lang="ts">
-import type { VNodeData } from 'vue';
-
-import { get } from 'lodash';
+import type { PropType } from '@vue/composition-api';
+import {
+    computed, defineComponent,
+} from '@vue/composition-api';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
-import type { EnumDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/enum/type';
-import type { EnumItem } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { EnumTypeOptions, EnumDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/enum/type';
+import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
+import type { EnumItem, EnumOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import { getValueByPath } from '@/data-display/dynamic/helper';
 
-export default {
+export default defineComponent<EnumDynamicFieldProps>({
     name: 'PDynamicFieldEnum',
-    functional: true,
     components: { PDynamicField },
     props: {
         options: {
-            type: Object,
+            type: Object as PropType<EnumOptions>,
             default: () => ({}),
         },
         data: {
-            type: [String, Object, Array, Boolean, Number],
+            type: [String, Object, Array, Boolean, Number] as PropType<any>,
             default: undefined,
         },
         typeOptions: {
-            type: Object,
+            type: Object as PropType<EnumTypeOptions>,
             default: () => ({}),
         },
         extraData: {
@@ -29,40 +40,32 @@ export default {
             default: () => ({}),
         },
         handler: {
-            type: Function,
+            type: Function as PropType<DynamicFieldHandler|undefined>,
             default: undefined,
         },
     },
-    render(h, { props, listeners }: {props: EnumDynamicFieldProps; listeners: any}) {
-        let option: EnumItem;
+    setup(props) {
+        const enumItem = computed<EnumItem>(() => {
+            const path = props.data === undefined ? props.options.default : props.data;
+            const item = getValueByPath(props.options.items || props.options, path);
 
-        const path = props.data === undefined ? props.options.default : props.data;
-        const item = get(
-            props.options.items || props.options,
-            path,
-            undefined,
-        );
+            let result;
+            if (typeof item === 'string') result = { type: 'text', name: item };
+            else if (typeof item === 'object' && item !== null) {
+                result = { ...item };
+                if (item.name === undefined) result.name = path;
+                if (item.type === undefined) result.type = 'text';
+            } else {
+                result = { type: 'text', name: path };
+            }
 
-        if (item === undefined) {
-            option = { type: 'text', name: path };
-        } else if (typeof item === 'string') {
-            option = { type: 'text', name: item };
-        } else {
-            option = item;
-            if (option.name === undefined) option.name = path;
-        }
+            return result;
+        });
 
-        return h(PDynamicField, {
-            props: {
-                type: option.type,
-                options: option.options,
-                data: option.name,
-                typeOptions: props.typeOptions,
-                handler: props.handler,
-                extraData: props.extraData,
-            },
-            on: listeners,
-        } as VNodeData);
+
+        return {
+            enumItem,
+        };
     },
-};
+});
 </script>

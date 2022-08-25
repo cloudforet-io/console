@@ -27,7 +27,7 @@ export const getDefinitionTableArgTypes = (): ArgTypes => ({
     },
     data: {
         name: 'data',
-        type: { name: 'object' },
+        type: { name: 'object, array' },
         description: 'Data object of definition table.',
         defaultValue: {
             collector_id: 'collector-6746d641c98b',
@@ -36,7 +36,7 @@ export const getDefinitionTableArgTypes = (): ArgTypes => ({
         },
         table: {
             type: {
-                summary: 'object',
+                summary: 'object, object',
             },
             category: 'props',
             defaultValue: {
