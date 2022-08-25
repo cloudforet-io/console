@@ -1,3 +1,10 @@
+# [1.1.0-beta.374](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.373...v1.1.0-beta.374) (2022-08-25)
+
+
+### Bug Fixes
+
+* **tree:** do not flicker when hovering over long tree node data ([#1063](https://github.com/spaceone-dev/spaceone-design-system/issues/1063)) ([0fc5bd3](https://github.com/spaceone-dev/spaceone-design-system/commit/0fc5bd3e00d5668095562ff1df66f498bdc18d83))
+
 # [1.1.0-beta.373](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.372...v1.1.0-beta.373) (2022-08-25)
 
 
