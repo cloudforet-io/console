@@ -39,6 +39,7 @@ export const Template = (args, { argTypes }) => ({
             :rowClickMultiSelectMode="rowClickMultiSelectMode"
             :useCursorLoading="useCursorLoading"
             :tableStyleType="tableStyleType"
+            :tableCustomStyle="tableCustomStyle"
             :striped="striped"
             :bordered="bordered"
             :disableHover="disableHover"
@@ -469,6 +470,45 @@ To enable multi selection on row click, give `true` to `rowClickMultiSelectionMo
     <div class="mt-6">
         <p class="mb-4 font-xl font-bold">Style Type: {{DATA_TABLE_STYLE_TYPE.simple}}</p>
         <p-data-table :fields="fields" :items="items" selectable :table-style-type="DATA_TABLE_STYLE_TYPE.simple" />
+    </div>
+</div>
+`,
+    setup() {
+        return {
+            fields: getUserFields(),
+            items: getUsers(5, 5),
+            DATA_TABLE_STYLE_TYPE
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Table Custom Style
+
+Although Binding Inline Styles supports **kebab-cased** CSS property keys, **camelCase keys** are **strongly recommended**. <br/>
+Unexpected results can occur when using **kebab-case keys**.
+
+e.g.
+
+```javascript
+:table-custom-style="{
+    background: '#999FAB',
+    maxHeight: '200px',
+}"
+```
+
+<Canvas>
+    <Story name="Table Custom Style">
+{{
+    components: { PDataTable },
+    template: `
+<div>
+    <div>
+        <p-data-table :fields="fields" :items="items" selectable :table-custom-style="{ background: '#999FAB', maxHeight: '200px' }"/>
     </div>
 </div>
 `,

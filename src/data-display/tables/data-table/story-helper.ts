@@ -239,6 +239,24 @@ export const getDataTableArgsType = (): ArgTypes => ({
             options: Object.values(DATA_TABLE_STYLE_TYPE),
         },
     },
+    tableCustomStyle: {
+        name: 'tableCustomStyle',
+        type: { name: 'object' },
+        description: "Custom inline style for table. HTML element's style properties are available.",
+        defaultValue: {},
+        table: {
+            type: {
+                summary: 'object',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '{}',
+            },
+        },
+        control: {
+            type: 'object',
+        },
+    },
     striped: {
         name: 'striped',
         type: { name: 'boolean' },

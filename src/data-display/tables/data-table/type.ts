@@ -39,6 +39,7 @@ export interface DataTableProps {
     rowClickMultiSelectMode?: boolean;
     useCursorLoading?: boolean;
     tableStyleType?: DataTableStyleType;
+    tableCustomStyle?: {[key: string]: string};
     striped?: boolean;
     bordered?: boolean|null|unknown;
     disableHover?: boolean;

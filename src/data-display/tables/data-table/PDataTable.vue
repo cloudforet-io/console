@@ -5,8 +5,9 @@
              bordered: bordered,
              [tableStyleType]: true,
          }"
+         :style="tableCustomStyle"
     >
-        <div class="table-container">
+        <div class="table-container" :style="tableCustomStyle.maxHeight && { maxHeight: 'inherit', height: 'inherit' }">
             <table>
                 <thead>
                     <slot name="head" v-bind="getDefaultSlotProps()">
@@ -151,7 +152,7 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import type { ComponentRenderProxy, PropType } from '@vue/composition-api';
 import {
     toRefs, computed, reactive, watch, getCurrentInstance, defineComponent,
 } from '@vue/composition-api';
@@ -240,6 +241,10 @@ export default defineComponent<DataTableProps>({
             validator(value: any) {
                 return Object.values(DATA_TABLE_STYLE_TYPE).includes(value);
             },
+        },
+        tableCustomStyle: {
+            type: Object as PropType<{ [key: string]: string }>,
+            default: () => ({}),
         },
         striped: {
             type: Boolean,
