@@ -1,3 +1,10 @@
+# [1.1.0-beta.373](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.372...v1.1.0-beta.373) (2022-08-25)
+
+
+### Bug Fixes
+
+* **dynamic-field:** do not use fragment ([#1061](https://github.com/spaceone-dev/spaceone-design-system/issues/1061)) ([40ddf41](https://github.com/spaceone-dev/spaceone-design-system/commit/40ddf414f9228e93d66638c8ef3d62178f207f75))
+
 # [1.1.0-beta.372](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.371...v1.1.0-beta.372) (2022-08-19)
 
 
