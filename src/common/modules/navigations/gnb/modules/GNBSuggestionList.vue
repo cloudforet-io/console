@@ -167,6 +167,7 @@ export default defineComponent<Props>({
         .suggestion-item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             width: 100%;
             .image {
                 margin-right: 0.25rem;
