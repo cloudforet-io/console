@@ -6,6 +6,7 @@
                     <p-button style-type="secondary-dark"
                               icon="ic_plus_bold"
                               :disabled="disableCreateBtn"
+                              :loading="modalState.loading"
                               @click="openAPIKeyConfirmModal"
                               @confirm="confirm"
                     >
