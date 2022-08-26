@@ -123,7 +123,7 @@ export default {
 <style lang="postcss" scoped>
 .policy-delete-modal {
     .modal-delete-disabled-title {
-        @apply inline-flex;
+        @apply inline-flex items-center;
         vertical-align: middle;
         & > span {
             margin-right: 0.25rem;
