@@ -191,7 +191,7 @@ export default {
             users: computed(() => store.state.reference.user.items),
             maintenanceWindowFormVisible: false,
             counts: computed(() => ({
-                TRIGGERED: find(store.state.service.projectDetail.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
+                TRIGGERED: find(store.state.service.projectDetail.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
             })),
             maintenanceHappeningListRef: null as null|Vue,
         });

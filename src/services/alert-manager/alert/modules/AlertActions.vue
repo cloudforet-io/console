@@ -66,7 +66,7 @@
         <alert-resolve-modal
             :visible.sync="visibleResolveModal"
             :alerts="selectedItems"
-            @confirm="$emit('refresh')"
+            @confirm="onConfirmResolve"
         />
     </div>
 </template>
@@ -188,6 +188,7 @@ export default {
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_DELETE'), '', root);
                 state.visibleDeleteModal = false;
                 emit('refresh');
+                await store.dispatch('service/projectDetail/getAlertCounts');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_DELETE'));
             } finally {
@@ -205,6 +206,11 @@ export default {
             }
         };
 
+        const onConfirmResolve = () => {
+            emit('refresh');
+            store.dispatch('service/projectDetail/getAlertCounts');
+        };
+
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
@@ -220,6 +226,7 @@ export default {
             alertDurationFormatter,
             alertStateBadgeStyleTypeFormatter,
             iso8601Formatter,
+            onConfirmResolve,
             TABLE_FIELDS,
             ALERT_URGENCY,
             ALERT_STATE,
