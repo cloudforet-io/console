@@ -155,11 +155,17 @@ export default {
             selectedItems: computed(() => state.selectedIndex.map(i => state.items[i])),
             dropdownMenu: computed(() => ([
                 {
-                    type: 'item', name: 'enable', label: vm.$t('IDENTITY.USER.MAIN.ENABLE'), disabled: state.selectedIndex.length !== 1,
+                    type: 'item',
+                    name: 'enable',
+                    label: vm.$t('IDENTITY.USER.MAIN.ENABLE'),
+                    disabled: state.selectedIndex.length !== 1 || state.selectedItems[0].state === 'ENABLED',
                 },
                 { type: 'divider' },
                 {
-                    type: 'item', name: 'disable', label: vm.$t('IDENTITY.USER.MAIN.DISABLE'), disabled: state.selectedIndex.length !== 1,
+                    type: 'item',
+                    name: 'disable',
+                    label: vm.$t('IDENTITY.USER.MAIN.DISABLE'),
+                    disabled: state.selectedIndex.length !== 1 || state.selectedItems[0].state === 'DISABLED',
                 },
                 { type: 'divider' },
                 {
