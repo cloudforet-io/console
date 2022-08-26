@@ -18,7 +18,7 @@
                     />
                 </span>
                 <div v-if="type === POLICY_TYPES.CUSTOM" class="policy-modify-buttons">
-                    <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="gray-border">
+                    <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="gray-border" @click="$router.back()">
                         {{ $t('IAM.POLICY.FORM.CANCEL') }}
                     </p-button>
                     <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="primary-dark" @click="handleSaveChanges">
