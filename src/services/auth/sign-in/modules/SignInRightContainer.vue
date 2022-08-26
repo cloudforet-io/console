@@ -165,6 +165,7 @@ export default {
             height: 2.25rem;
             padding: 0.5rem;
             margin-top: -2.75rem;
+            margin-bottom: 0.5rem;
 
             .error-msg {
                 font-size: 0.875rem;
