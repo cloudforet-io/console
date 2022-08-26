@@ -12,17 +12,19 @@
             <p-field-group v-if="hasSystemRole" class="notice-label-wrapper" :label="$t('INFO.NOTICE.FORM.LABEL_VIEWER')"
                            required
             >
-                <p-radio :selected="isAllDomainSelected" class="mr-4" @click="handleClickAllDomainRadio">
+                <p-radio :disabled="type === 'EDIT'" :selected="isAllDomainSelected" class="mr-4"
+                         @click="handleClickAllDomainRadio"
+                >
                     <span>{{ $t('INFO.NOTICE.FORM.ALL_DOMAINS') }}</span>
                 </p-radio>
-                <p-radio :selected="!isAllDomainSelected" @click="handleClickSelectDomainRadio">
+                <p-radio :disabled="type === 'EDIT'" :selected="!isAllDomainSelected" @click="handleClickSelectDomainRadio">
                     <span>{{ $t('INFO.NOTICE.FORM.SELECTED_DOMAIN') }}</span>
                 </p-radio>
                 <br>
                 <p-search-dropdown class="mt-2 w-1/2"
                                    :menu="domainList"
                                    :selected="selectedDomain"
-                                   :disabled="isAllDomainSelected"
+                                   :disabled="isAllDomainSelected || type === 'EDIT'"
                                    :placeholder="isAllDomainSelected ? $t('INFO.NOTICE.FORM.PLACEHOLDER_ALL') : ''"
                                    @update:selected="handleSelectDomain"
                 />
@@ -153,6 +155,7 @@ export default {
                 ? []
                 : [{ name: store.state.domain.domainId, label: store.state.domain.domainId }] as Array<DomainItem>,
             postId: '',
+            domainName: '',
         });
 
         const {
@@ -266,15 +269,21 @@ export default {
             if (isAllDomain) state.selectedDomain = [];
         });
 
-        watch(() => props.noticePostData, (d: Partial<NoticePostModel>) => {
+        watch(() => props.noticePostData, async (d: Partial<NoticePostModel>) => {
             if (!Object.keys(d).length) return;
+            if (d?.domain_id) {
+                const { name } = await SpaceConnector.client.identity.domain.get({ domain_id: d.domain_id });
+                state.domainName = name;
+            }
+
+            // INIT STATES
             state.isPinned = d.options?.is_pinned ?? false;
             state.isPopup = d.options?.is_popup ?? false;
             state.attachments = d.files?.map(file => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
             state.isAllDomainSelected = !d.domain_id;
             state.boardIdState = d?.board_id ?? '';
             state.selectedDomain = d?.domain_id
-                ? [{ name: d.domain_id, label: d.domain_id }]
+                ? [{ name: d.domain_id, label: state.domainName || d.domain_id }]
                 : [{ name: store.state.domain.domainId, label: store.state.domain.domainId }];
             state.postId = d.post_id ?? '';
             setForm('writerName', d.writer);
