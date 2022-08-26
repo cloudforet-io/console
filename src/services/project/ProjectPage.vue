@@ -366,6 +366,7 @@ export default {
 <style lang="postcss" scoped>
 .sidebar-container {
     @apply h-full relative;
+    overflow: auto;
 }
 .sidebar-item-wrapper {
     .count {

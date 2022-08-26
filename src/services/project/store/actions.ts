@@ -82,6 +82,8 @@ export const createProjectGroup: Action<ProjectPageState, any> = async ({ state,
                 // fetch child data to show children nodes
                 await state.rootNode.fetchData(targetNode);
                 state.rootNode.unfold(targetNode);
+                // update target node's has_children to show toggle even after toggle is folded
+                state.rootNode.updateNodeByPath(getters.actionTargetNodePath, { ...targetNode.data, has_child: true });
                 // update selected item to prevent the case that selected node is updated by fetchData
                 const selectedNode = state.rootNode.getNodeByPath(getters.selectedNodePath);
                 state.rootNode.changeSelectState(selectedNode, getters.selectedNodePath);
