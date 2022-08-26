@@ -7,46 +7,50 @@
                   :enable-scroll="true"
                   @confirm="handleDelete"
     >
-        <div v-if="!isDeletable" class="mb-4">
-            {{ $t('IAM.ROLE.MODAL.DELETE_HELP_TEXT') }}
-        </div>
-        <p-data-table v-if="isDeletable"
-                      class="role-data-table"
-                      :items="roles"
-                      :fields="fields"
-                      :loading="loading"
-        >
-            <template #col-role_type-format="{ value }">
-                <p-badge v-if="value" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType">
-                    {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
-                </p-badge>
-            </template>
-            <template #col-tags.description-format="{ value }">
-                {{ value ? value : '--' }}
-            </template>
-        </p-data-table>
-        <p-data-table v-else
-                      :items="unDeletableRoles"
-                      :fields="unDeletableRoleFields"
-                      :loading="loading"
-        >
-            <template #col-roleDescription-format="{ value }">
-                {{ value ? value : '--' }}
-            </template>
-            <template #col-roleType-format="{ value }">
-                <p-badge v-if="value" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType">
-                    {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
-                </p-badge>
-            </template>
-            <template #col-assignTo-format="{ value }">
-                {{ users[value.resource_id] ? users[value.resource_id].label : '--' }}
-            </template>
-            <template #col-project-format="{ value }">
-                <p-anchor v-if="value" :highlight="true" :href="getProjectLink(value)">
-                    {{ projectFieldHandler(value, projects) }}
-                </p-anchor>
-            </template>
-        </p-data-table>
+        <template #delete-modal-body>
+            <div v-if="!isDeletable" class="mb-4">
+                {{ $t('IAM.ROLE.MODAL.DELETE_HELP_TEXT') }}
+            </div>
+            <p-data-table v-if="isDeletable"
+                          class="role-data-table"
+                          :items="roles"
+                          :fields="fields"
+                          :loading="loading"
+                          :table-custom-style="{ maxHeight: 'calc(100vh - 17.5rem)' }"
+            >
+                <template #col-role_type-format="{ value }">
+                    <p-badge v-if="value" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType">
+                        {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
+                    </p-badge>
+                </template>
+                <template #col-tags.description-format="{ value }">
+                    {{ value ? value : '--' }}
+                </template>
+            </p-data-table>
+            <p-data-table v-else
+                          :items="unDeletableRoles"
+                          :fields="unDeletableRoleFields"
+                          :loading="loading"
+                          :table-custom-style="{ maxHeight: 'calc(100vh - 19.5rem)' }"
+            >
+                <template #col-roleDescription-format="{ value }">
+                    {{ value ? value : '--' }}
+                </template>
+                <template #col-roleType-format="{ value }">
+                    <p-badge v-if="value" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType">
+                        {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
+                    </p-badge>
+                </template>
+                <template #col-assignTo-format="{ value }">
+                    {{ users[value.resource_id] ? users[value.resource_id].label : '--' }}
+                </template>
+                <template #col-project-format="{ value }">
+                    <p-anchor v-if="value" :highlight="true" :href="getProjectLink(value)">
+                        {{ projectFieldHandler(value, projects) }}
+                    </p-anchor>
+                </template>
+            </p-data-table>
+        </template>
     </delete-modal>
 </template>
 
