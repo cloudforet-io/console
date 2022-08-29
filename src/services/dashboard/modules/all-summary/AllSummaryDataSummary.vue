@@ -3,10 +3,10 @@
         <div class="title col-span-3">
             {{ title }}
         </div>
-        <template v-if="!loading && !!summaryData.length">
-            <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
+        <p-data-loader :loading="loading" :data="summaryData">
+            <div class="summary-content-wrapper">
                 <router-link :to="getAllServiceLocation()"
-                             class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
+                             class="summary-row"
                              :class="{'link-text': activeTab !== 'billing'}"
                 >
                     <div class="text-group">
@@ -16,7 +16,7 @@
                 </router-link>
                 <router-link v-for="(data, idx) of summaryData" :key="idx"
                              :to="data.to"
-                             class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
+                             class="summary-row"
                              :class="{'link-text': !!data.to.name}"
                 >
                     <div class="text-group">
@@ -28,22 +28,20 @@
                     <span class="count">{{ data.count }}</span>
                 </router-link>
             </div>
-        </template>
-        <template v-else-if="!loading">
-            <div class="summary-content-wrapper no-data-wrapper grid">
+            <template #loader>
+                <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
+                    <p-skeleton class="flex-grow" />
+                </div>
+            </template>
+            <template #no-data>
                 <div class="m-auto">
-                    <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
+                    <img src="@/assets/images/illust_cloud.svg" class="empty-image">
                     <p class="text">
                         {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: label }) }}
                     </p>
                 </div>
-            </div>
-        </template>
-        <template v-else>
-            <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
-                <p-skeleton class="flex-grow" />
-            </div>
-        </template>
+            </template>
+        </p-data-loader>
     </div>
 </template>
 
@@ -55,7 +53,7 @@ import {
 import { byteFormatter, commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { PSkeleton } from '@spaceone/design-system';
+import { PSkeleton, PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 import type { Location } from 'vue-router';
@@ -85,6 +83,7 @@ export default {
     name: 'AllSummaryDataSummary',
     components: {
         PSkeleton,
+        PDataLoader,
     },
     props: {
         extraParams: {
@@ -293,78 +292,108 @@ export default {
 <style lang="postcss" scoped>
 .all-summary-data-summary {
     .title {
+        font-weight: 700;
+        font-size: 1rem;
+        line-height: 1.6;
         padding: 0 0.5rem;
-        margin-bottom: 1.25rem;
+        margin-bottom: 0.75rem;
     }
 
     .summary-content-wrapper {
+        display: block;
         height: 12rem;
         overflow-y: auto;
         overflow-x: hidden;
 
         @screen tablet {
-            height: 5rem;
+            @apply grid grid-cols-3;
+            height: 3.5rem;
         }
 
-        &.no-data-wrapper {
-            .empty-image {
-                margin: 0 auto 0.5rem auto;
-            }
-
-            .text {
-                @apply text-primary2;
-                font-size: 0.875rem;
-                font-weight: bold;
-                line-height: 1.5;
-                text-align: center;
-                opacity: 0.7;
-                margin-bottom: 0.625rem;
-            }
-
-            .p-button {
-                min-width: auto;
-                height: 1.25rem;
-                font-size: 0.75rem;
-                line-height: 1.2;
-                padding: 0.5rem;
-            }
+        @screen mobile {
+            display: block;
+            height: 8rem;
         }
     }
-
     .summary-row {
+        @apply col-span-3;
         position: relative;
-        display: block;
+        display: flex;
+        justify-content: space-between;
         font-size: 0.875rem;
-        line-height: 1.2;
-        cursor: default;
+        height: auto;
+        line-height: 1.5;
         padding: 0.25rem 0.5rem;
         margin: auto 0;
 
-        &.link-text:hover {
-            @apply bg-secondary2;
-            cursor: pointer;
-            .text-group, .provider, .type, .count {
-                text-decoration: underline;
+        @screen tablet {
+            @apply col-span-1;
+            height: 1.75rem;
+        }
+
+        @screen mobile {
+            @apply col-span-3;
+            height: auto;
+        }
+
+        &.link-text {
+            @media (hover: hover) {
+                &:hover {
+                    @apply bg-secondary2;
+                    cursor: pointer;
+                    .text-group, .provider, .type, .count {
+                        text-decoration: underline;
+                    }
+                }
             }
         }
 
         .text-group {
-            display: inline-block;
-            width: 80%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            vertical-align: text-top;
+            @apply truncate;
+            padding-right: 0.125rem;
 
             .type {
-                padding-left: 0.5rem;
+                padding-left: 0.25rem;
             }
         }
 
         .count {
             @apply text-gray-600;
-            position: absolute;
-            right: 0.5rem;
+            flex-shrink: 0;
+        }
+    }
+
+    .p-data-loader::v-deep {
+        .no-data-wrapper {
+            display: grid;
+            height: 13rem;
+
+            @screen tablet {
+                height: 5rem;
+            }
+
+            @screen mobile {
+                height: 8rem;
+            }
+
+            .empty-image {
+                @apply block;
+                margin: 0 auto 0.5rem auto;
+
+                @screen tablet {
+                    @apply hidden;
+                }
+            }
+
+            .text {
+                @apply text-primary2;
+                font-size: 0.875rem;
+                font-weight: 700;
+                line-height: 1.5;
+                text-align: center;
+                opacity: 0.7;
+                margin-bottom: 0.625rem;
+            }
         }
     }
 }
