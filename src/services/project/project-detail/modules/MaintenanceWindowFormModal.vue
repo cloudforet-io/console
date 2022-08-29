@@ -297,7 +297,7 @@ export default {
         /* Handlers */
         const onFirstInputTitle = (e) => {
             state.showValidation = true;
-            state.title = e.target.value;
+            state.title = e.target?.value ?? '';
         };
 
         const onChangeStartTime = (e) => {
