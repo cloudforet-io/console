@@ -177,7 +177,7 @@ export default {
                 if (props.editMode) state.showValidation = true;
                 const timeDiff = dayjs(state.startTimeInput).diff(state.endTimeInput, 'minute');
                 // eslint-disable-next-line no-restricted-globals
-                if (timeDiff > 0 || isNaN(timeDiff)) return true;
+                if (timeDiff >= 0 || isNaN(timeDiff)) return true;
 
                 if (dayjs().isAfter(dayjs(state.endTimeInput))) return true;
                 return false;
