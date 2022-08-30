@@ -15,8 +15,9 @@
                 <p-badge outline :style-type="noticeTypeBadge.style">
                     {{ noticeTypeBadge.label }}
                 </p-badge><span>{{ date }}</span><p-i width="0.125rem" name="ic_divider-dot" />
-                <span>{{ post.writer }}</span><p-i v-if="hasDomainRoleUser" width="0.125rem" name="ic_divider-dot" />
-                <span v-if="hasDomainRoleUser" class="view-count"><p-i name="ic_view" width="1.125rem" /> {{ post.view_count }}</span>
+                <span>{{ post.writer }}</span><p-i v-if="hasDomainRoleUser || hasSystemRoleUser" width="0.125rem" name="ic_divider-dot" />
+                <span v-if="hasDomainRoleUser || hasSystemRoleUser" class="view-count"><p-i name="ic_view" width="1.125rem" /> {{ post.view_count }}</span>
+                <span v-if="hasSystemRoleUser" class="view-count">| {{ domainName }}</span>
             </div>
         </div>
         <div v-else class="not-exist-item">
@@ -31,6 +32,7 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PBadge, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -39,6 +41,7 @@ import { i18n } from '@/translations';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { getPostBadgeInfo } from '@/services/info/notice/helper';
 import type { NoticePostBadgeInfo, NoticePostModel } from '@/services/info/notice/type';
@@ -80,16 +83,38 @@ export default defineComponent<Props>({
     setup(props) {
         const state = reactive({
             noticeTypeBadge: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.post?.post_type)),
-            hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
+            hasDomainRoleUser: computed<boolean>(() => store.getters['user/hasDomainRole']),
+            hasSystemRoleUser: computed<boolean>(() => store.getters['user/hasSystemRole']),
             postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? i18n.t('INFO.NOTICE.MAIN.PREV') : i18n.t('INFO.NOTICE.MAIN.NEXT'))),
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             date: computed(() => dateFormatter(props.post?.created_at)),
             isPinned: computed(() => props.post?.options?.is_pinned),
             isPostExist: computed(() => props.post),
             postDirectionIcon: computed(() => ((props.postDirection === 'prev') ? 'ic_arrow-bottom-alt' : 'ic_arrow-top-alt')),
+            domainName: '',
         });
 
         const dateFormatter = date => dayjs.tz(dayjs.utc(date), state.timezone).format('YYYY-MM-DD');
+
+        const getDomainName = async () => {
+            if (!Object.keys(props.post).length || !state.hasSystemRoleUser) return;
+            if (!props.post.domain_id) {
+                state.domainName = 'All Domains';
+                return;
+            }
+            try {
+                const { name } = await SpaceConnector.client.identity.domain.get({ domain_id: props.post.domain_id });
+                state.domainName = name;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.domainName = '';
+            }
+        };
+
+        (async () => {
+            await getDomainName();
+        })();
+
         return {
             ...toRefs(state),
         };

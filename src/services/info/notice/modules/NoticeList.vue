@@ -5,7 +5,9 @@
                        @change="handleToolboxChange"
             >
                 <template #left-area>
-                    <p-select-dropdown :items="dropdownItems" :selected="selectedPostType" @update:selected="handleSearchPostTypeChange" />
+                    <p-select-dropdown v-if="domainName !== 'root'" :items="dropdownItems" :selected="selectedPostType"
+                                       @update:selected="handleSearchPostTypeChange"
+                    />
                 </template>
             </p-toolbox>
         </div>
@@ -103,7 +105,7 @@ export default defineComponent<Props>({
     },
     setup() {
         const state = reactive({
-            domainName: computed(() => store.state.domain.name),
+            domainName: computed<string|undefined>(() => store.state.domain.name),
             dropdownItems: computed(() => [
                 {
                     label: i18n.t('INFO.NOTICE.MAIN.LABEL_ALL_NOTI'),
