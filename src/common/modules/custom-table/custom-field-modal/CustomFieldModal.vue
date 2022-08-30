@@ -65,7 +65,7 @@
                         <keep-alive>
                             <select-tag-columns :all-tags="tagState.allTags"
                                                 :loading="tagState.loading"
-                                                :proxy-selected-keys.sync="selectedAllColumnKeys"
+                                                :selected-keys.sync="selectedAllColumnKeys"
                             />
                         </keep-alive>
                     </section>
@@ -82,13 +82,12 @@ import {
 } from '@vue/composition-api';
 
 
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PButton, PButtonModal, PCheckBox, PDataLoader, PSearch,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import { camelCase, uniq } from 'lodash';
 import draggable from 'vuedraggable';
 
 import { i18n } from '@/translations';
@@ -318,26 +317,26 @@ export default {
             allTags: [] as string[],
         });
 
-        const tagsApiQueryHelper = new ApiQueryHelper().setOnly('tags.key');
+        const tagsQueryHelper = new QueryHelper();
         const getTags = async () => {
             tagState.loading = true;
             try {
-                let api = SpaceConnector.client;
-                props.resourceType.split('.').forEach((d) => {
-                    api = api?.[camelCase(d)];
-                });
-
-                tagsApiQueryHelper.setFilters([]);
+                tagsQueryHelper.setFilters([]);
                 const { provider, cloudServiceGroup, cloudServiceType } = props.options;
-                if (provider) tagsApiQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
-                if (cloudServiceGroup) tagsApiQueryHelper.addFilter({ k: 'cloud_service_group', v: cloudServiceGroup, o: '=' });
-                if (cloudServiceType) tagsApiQueryHelper.addFilter({ k: 'cloud_service_type', v: cloudServiceType, o: '=' });
+                if (provider) tagsQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
+                if (cloudServiceGroup) tagsQueryHelper.addFilter({ k: 'cloud_service_group', v: cloudServiceGroup, o: '=' });
+                if (cloudServiceType) tagsQueryHelper.addFilter({ k: 'cloud_service_type', v: cloudServiceType, o: '=' });
 
-                const { results } = await api.list({
-                    query: tagsApiQueryHelper.data,
+                const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
+                    resource_type: props.resourceType,
+                    distinct_key: 'tags',
+                    options: {
+                        search_type: 'key',
+                        filter: tagsQueryHelper.apiQuery.filter,
+                    },
                 });
 
-                tagState.allTags = uniq(results.map(d => Object.keys(d.tags)).flat());
+                tagState.allTags = results.map(d => d.name);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 tagState.allTags = [];
