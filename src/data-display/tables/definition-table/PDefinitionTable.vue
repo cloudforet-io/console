@@ -60,7 +60,7 @@ import {
     computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { every, range } from 'lodash';
+import { every, get, range } from 'lodash';
 
 
 import { getValueByPath } from '@/data-display/dynamic/helper';
@@ -75,7 +75,7 @@ import PLottie from '@/foundation/lottie/PLottie.vue';
 
 const makeDefItems = (fields: DefinitionField[], data?: DefinitionData|DefinitionData[]): DefinitionProps[] => fields.map(field => ({
     ...field,
-    data: getValueByPath(data, field.name) ?? '',
+    data: get(data, field.name) ?? getValueByPath(data, field.name) ?? '',
 }));
 
 
