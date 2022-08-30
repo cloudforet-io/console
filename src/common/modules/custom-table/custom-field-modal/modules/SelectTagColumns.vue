@@ -26,9 +26,9 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import type { ComponentRenderProxy, PropType } from '@vue/composition-api';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -45,7 +45,7 @@ interface Props {
     loading: boolean;
 }
 
-export default {
+export default defineComponent<Props>({
     name: 'SelectTagColumns',
     components: {
         PAutocompleteSearch,
@@ -54,11 +54,11 @@ export default {
     },
     props: {
         selectedKeys: {
-            type: Array,
+            type: Array as PropType<string[]>,
             default: () => [],
         },
         allTags: {
-            type: Array,
+            type: Array as PropType<string[]>,
             default: () => [],
         },
         loading: {
@@ -66,7 +66,7 @@ export default {
             default: true,
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props, { emit }) {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
 
         const state = reactive({
@@ -117,7 +117,7 @@ export default {
             TAGS_PREFIX,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
