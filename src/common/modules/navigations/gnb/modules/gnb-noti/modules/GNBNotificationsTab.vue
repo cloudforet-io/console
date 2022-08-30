@@ -2,17 +2,17 @@
     <div class="gnb-notifications-tab">
         <p-data-loader :data="items"
                        :loading="loading"
-                       :class="{ loading: loading && !items.length }"
+                       :disable-empty-case="loading"
         >
-            <div ref="notificationItemsRef" class="content-wrapper">
-                <p-button style-type="transparent"
+            <div ref="notificationItemsRef" class="content-wrapper" :class="{ loading }">
+                <p-button v-if="!loading"
+                          style-type="transparent"
                           size="sm"
                           font-weight="normal"
                           class="clear-all-button"
                           @click="handleClearAll"
                 >
-                    <!--song-lang-->
-                    Clear all
+                    {{ $t('COMMON.CUSTOM_FIELD_MODAL.CLEAR_ALL') }}
                 </p-button>
                 <g-n-b-noti-item v-for="(item, idx) in items" :key="`${item.notificationId}-${idx}`"
                                  :is-read="item.isRead"
@@ -354,6 +354,9 @@ export default {
         }
     }
     .content-wrapper {
+        &.loading {
+            min-height: 13rem;
+        }
         max-height: calc(100vh - $gnb-height - 1.5rem - 2.75rem);
         position: relative;
         overflow-y: scroll;
