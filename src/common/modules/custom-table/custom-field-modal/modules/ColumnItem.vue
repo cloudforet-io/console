@@ -19,7 +19,10 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import type { PropType } from '@vue/composition-api';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from '@vue/composition-api';
 
 import { PCheckBox, PI } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
@@ -32,7 +35,7 @@ interface Props {
     selectedKeys: string[];
     searchText: string;
 }
-export default {
+export default defineComponent<Props>({
     name: 'ColumnItem',
     components: {
         PI,
@@ -44,14 +47,14 @@ export default {
     },
     props: {
         item: {
-            type: Object,
+            type: Object as PropType<DynamicField>,
             default: () => ({}),
-            validator(item) {
+            validator(item: DynamicField) {
                 return typeof item === 'object' && typeof item.name === 'string' && typeof item.key === 'string';
             },
         },
         selectedKeys: {
-            type: Array,
+            type: Array as PropType<string[]>,
             default: () => [],
         },
         searchText: {
@@ -59,7 +62,7 @@ export default {
             default: '',
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props, { emit }) {
         const state = reactive({
             regex: computed(() => new RegExp(props.searchText || '', 'i')),
             proxySelectedKeys: useProxyValue('selectedKeys', props, emit),
@@ -77,7 +80,7 @@ export default {
             TAGS_PREFIX,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

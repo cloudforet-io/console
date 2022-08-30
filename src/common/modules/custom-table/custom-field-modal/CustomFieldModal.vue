@@ -78,7 +78,7 @@
 <script lang="ts">
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 
@@ -103,7 +103,11 @@ import SelectTagColumns from '@/common/modules/custom-table/custom-field-modal/m
 interface Props {
     visible: boolean;
     resourceType: string;
-    options: any;
+    options: {
+        provider?: string;
+        cloudServiceGroup?: string;
+        cloudServiceType?: string;
+    };
     isServerPage: boolean;
 }
 
@@ -123,7 +127,7 @@ const mergeFields = (fieldsA: DynamicField[], fieldsB: DynamicField[]): DynamicF
     return allColumns;
 };
 
-export default {
+export default defineComponent<Props>({
     name: 'CustomFieldModal',
     components: {
         ColumnItem,
@@ -158,7 +162,7 @@ export default {
             default: false,
         },
     },
-    setup(props: Props, { emit, root }) {
+    setup(props, { emit, root }) {
         let schema: any = {};
 
         const state = reactive({
@@ -346,10 +350,18 @@ export default {
             }
         };
 
-        watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
+        watch([() => props.visible, () => props.resourceType, () => props.options], ([visible, resourceType, options], prev) => {
             if (visible && resourceType) {
                 initColumns();
-                if (tagState.allTags.length === 0) getTags();
+                if (!prev && tagState.allTags.length === 0) {
+                    getTags();
+                    return;
+                }
+
+                const [, prevResourceType, prevOptions] = prev;
+                if (tagState.allTags.length === 0
+                    || resourceType !== prevResourceType
+                    || options !== prevOptions) getTags();
             }
         }, { immediate: true });
 
@@ -365,7 +377,7 @@ export default {
             TAGS_PREFIX,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
