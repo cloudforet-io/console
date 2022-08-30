@@ -66,6 +66,12 @@ import AddNotificationSchedule from '@/services/notification/modules/AddNotifica
 import AddNotificationTopic from '@/services/notification/modules/AddNotificationTopic.vue';
 import AddNotificationData from '@/services/notification/notification-add/modules/AddNotificationData.vue';
 
+interface NotificationSchedule {
+    day_of_week: [],
+    start_hour: number;
+    end_hour: number;
+}
+
 export default {
     name: 'NotificationAddForm',
     components: {
@@ -113,7 +119,7 @@ export default {
             topicList: [],
             isTopicValid: true,
             //
-            schedule: null,
+            schedule: null as NotificationSchedule | null,
             isScheduled: false,
             isScheduleValid: true,
         });
