@@ -31,6 +31,7 @@
         </form>
         <p-button :style-type="buttonStyleType" type="submit" size="lg"
                   class="sign-in-btn"
+                  :loading="loading"
                   @click="signIn"
         >
             {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
@@ -76,6 +77,7 @@ export default defineComponent({
         const state = reactive({
             userId: '' as string | undefined,
             password: '',
+            loading: false,
         });
 
         const validationState = reactive({
@@ -111,9 +113,11 @@ export default defineComponent({
 
 
         const signIn = async () => {
+            state.loading = true;
             checkUserId();
             await checkPassword();
             if (!validationState.isIdValid || !validationState.isPasswordValid) {
+                state.loading = false;
                 return;
             }
             const credentials = {
@@ -131,6 +135,8 @@ export default defineComponent({
                 ErrorHandler.handleError(e);
                 state.password = '';
                 await store.dispatch('display/showSignInErrorMessage');
+            } finally {
+                state.loading = false;
             }
         };
 
