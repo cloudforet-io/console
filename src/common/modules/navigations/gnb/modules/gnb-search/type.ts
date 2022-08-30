@@ -3,7 +3,7 @@ import type { SuggestionItem, SuggestionType } from '@/common/modules/navigation
 export interface DropdownItem {
     itemType: SuggestionType;
     totalCount: number;
-    suggestionItems: SuggestionItem[];
+    suggestionItems: SuggestionItem[]|null;
 }
 
 export const focusingDirection = ['UPWARD', 'DOWNWARD'] as const;
