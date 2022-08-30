@@ -145,7 +145,6 @@ export default {
         return {
             ...toRefs(state),
             onSignIn,
-
         };
     },
 };
