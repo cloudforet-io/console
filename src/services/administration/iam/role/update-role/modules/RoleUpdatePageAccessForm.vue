@@ -120,14 +120,14 @@ export default {
         /* Event */
         const handleUpdate = (menuId: string, key: 'isViewed' | 'isManaged', val: boolean) => {
             const item = find(formState.menuItems, { id: menuId });
+            const allItem = find(formState.menuItems, { id: 'all' }) as PageAccessMenuItem;
             if (item) {
                 if (item.id === 'all') {
                     formState.menuItems.forEach((menu) => {
                         updateMenuItems(menu, key, val);
                     });
                 } else {
-                    const parentItem = find(formState.menuItems, { id: 'all' });
-                    updateMenuItems(item, key, val, parentItem);
+                    updateMenuItems(item, key, val, allItem);
                 }
             } else {
                 formState.menuItems.forEach((menuItem) => {
@@ -135,9 +135,17 @@ export default {
                         const subItem = find(menuItem.subMenuList, { id: menuId });
                         if (subItem) {
                             updateMenuItems(subItem, key, val, menuItem);
+                            if (menuItem.subMenuList.every(d => d[key])) updateMenuItems(menuItem, key, val);
+                            if (!val) updateMenuItems(allItem, key, val); // deactivate 'all' menu
                         }
                     }
                 });
+            }
+
+            // activate 'all' menu if every menu were activated
+            const menus = formState.menuItems.filter(d => d.id !== 'all');
+            if (menus.every(d => d[key])) {
+                updateMenuItems(allItem, key, val);
             }
         };
 
