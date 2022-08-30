@@ -2,9 +2,9 @@
     <div>
         <p-radio v-for="(item, i) in scheduleMode" :key="i"
                  :selected="item.value" :value="proxyIsScheduled" class="mr-4"
-                 @click="changeScheduleMode(item.value)"
+                 @click="handleScheduleMode(item.value)"
         >
-            <span class="radio-label" @click="changeScheduleMode(item.value)">{{ item.label }}</span>
+            <span class="radio-label" @click="handleScheduleMode(item.value)">{{ item.label }}</span>
         </p-radio>
         <article v-if="proxyIsScheduled" class="schedule-wrapper">
             <info-message style-type="secondary"
@@ -15,29 +15,29 @@
                 {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
             </h5>
             <p-select-button v-for="day in weekDay" :key="day.value"
-                             v-model="proxySchedule.day_of_week"
+                             :selected="dayOfWeek"
                              multi-selectable
                              :value="day.value"
                              class="select-button-wrapper"
-                             @change="onSelectDay"
+                             @change="handleSelectDay"
             >
                 {{ day.label }}
             </p-select-button>
             <div class="dropdown-wrapper">
-                <p-select-dropdown :selected="proxySchedule.start_hour"
+                <p-select-dropdown :selected="timePeriod.startHour"
                                    :items="startTimeList"
-                                   :invalid="!isScheduleValid"
+                                   :invalid="invalidState.timePeriod"
                                    class="dropdown"
                                    use-fixed-menu-style
-                                   @select="onSelectStartHour"
+                                   @select="handleSelectStartHour"
                 />
                 <span class="text">{{ $t('IDENTITY.USER.NOTIFICATION.FORM.TO') }}</span>
-                <p-select-dropdown v-model="proxySchedule.end_hour"
+                <p-select-dropdown :selected="timePeriod.endHour"
                                    :items="endTimeList"
-                                   :invalid="!isScheduleValid"
+                                   :invalid="invalidState.timePeriod"
                                    class="dropdown"
                                    use-fixed-menu-style
-                                   @select="onSelectEndHour"
+                                   @select="handleSelectEndHour"
                 />
                 <span class="timezone-text">{{ $t('COMMON.PROFILE.TIMEZONE') }}: {{ timezone }}</span>
             </div>
@@ -59,8 +59,9 @@ import { range } from 'lodash';
 import { store } from '@/store';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
+import { useFormValidator } from '@/common/composables/form-validator';
 
-import { timezoneToUtcFormatter } from '@/services/administration/iam/user/lib/helper';
+import { timezoneToUtcFormatter, utcToTimezoneFormatter } from '@/services/administration/iam/user/lib/helper';
 
 const START_TIME_LIST = range(0, 24);
 const END_TIME_LIST = range(1, 25);
@@ -75,6 +76,10 @@ export default {
         PSelectDropdown,
     },
     props: {
+        isScheduledValid: {
+            type: Boolean,
+            default: true,
+        },
         isScheduled: {
             type: Boolean,
             default: false,
@@ -87,12 +92,27 @@ export default {
     setup(props, { emit }) {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
         const timezoneForFormatter = computed(() => store.state.user.timezone).value;
-
-        const checkInvalidByHour = (startHour: number, endHour: number) => {
-            if (startHour === 0 && endHour === 0) return true;
-            return startHour !== endHour;
-        };
-
+        const {
+            forms: {
+                dayOfWeek, timePeriod,
+            },
+            invalidState,
+            setForm,
+        } = useFormValidator({
+            dayOfWeek: ['MON', 'TUE', 'WED', 'THU', 'FRI'] as string[],
+            timePeriod: {
+                startHour: props.schedule === null ? timezoneToUtcFormatter(9, timezoneForFormatter) : props.schedule.start_hour,
+                endHour: props.schedule === null ? timezoneToUtcFormatter(18, timezoneForFormatter) : props.schedule.end_hour,
+            },
+        }, {
+            dayOfWeek(value: string[]) {
+                return value.length > 0;
+            },
+            timePeriod(value: { startHour: number, endHour: number }) {
+                if (utcToTimezoneFormatter(value.endHour, timezoneForFormatter) === 0) return true;
+                return utcToTimezoneFormatter(value.startHour, timezoneForFormatter) < utcToTimezoneFormatter(value.endHour, timezoneForFormatter);
+            },
+        });
         const state = reactive({
             scheduleMode: computed(() => [{
                 label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME'), value: false,
@@ -110,58 +130,61 @@ export default {
             endTimeList: END_TIME_LIST.map(d => ({
                 type: 'item', label: `${d}:00`, name: timezoneToUtcFormatter(d, timezoneForFormatter),
             })),
-            proxySchedule: props.schedule ? props.schedule : {
-                day_of_week: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
-                start_hour: timezoneToUtcFormatter(9, timezoneForFormatter),
-                end_hour: timezoneToUtcFormatter(18, timezoneForFormatter),
-            },
+            proxyIsScheduledValid: computed(() => !state.proxyIsScheduled || (!invalidState.dayOfWeek && !invalidState.timePeriod)),
             timezone: computed(() => store.state.user.timezone),
-            // isScheduleValid: computed(() => (state.proxySchedule.start_hour !== state.proxySchedule.end_hour) || !state.proxyIsScheduled),
-            isScheduleValid: computed(() => checkInvalidByHour(state.proxySchedule.start_hour, state.proxySchedule.end_hour) || !state.proxyIsScheduled),
         });
+
 
         const emitChange = () => {
             if (state.proxyIsScheduled) {
                 emit('change', {
-                    schedule: state.proxySchedule,
+                    schedule: {
+                        day_of_week: dayOfWeek.value,
+                        start_hour: timePeriod.value.startHour,
+                        end_hour: timePeriod.value.endHour,
+                    },
                     is_scheduled: state.proxyIsScheduled,
-                    isScheduleValid: state.isScheduleValid,
+                    isScheduleValid: state.proxyIsScheduledValid,
                 });
             } else {
                 emit('change', {
                     schedule: {},
                     is_scheduled: state.proxyIsScheduled,
-                    isScheduleValid: state.isScheduleValid,
+                    isScheduleValid: state.proxyIsScheduledValid,
                 });
             }
         };
 
-        const changeScheduleMode = (value) => {
+        const handleScheduleMode = (value) => {
             state.proxyIsScheduled = value;
             emitChange();
         };
 
-        const onSelectDay = () => {
+        const handleSelectDay = (value) => {
+            setForm('dayOfWeek', value);
             emitChange();
         };
 
-        const onSelectStartHour = (value) => {
-            state.proxySchedule.start_hour = value;
+        const handleSelectStartHour = (value) => {
+            setForm('timePeriod', { ...timePeriod.value, startHour: value });
             emitChange();
         };
 
-        const onSelectEndHour = (value) => {
-            state.proxySchedule.end_hour = value;
+        const handleSelectEndHour = (value) => {
+            setForm('timePeriod', { ...timePeriod.value, endHour: value });
             emitChange();
         };
 
 
         return {
             ...toRefs(state),
-            changeScheduleMode,
-            onSelectDay,
-            onSelectStartHour,
-            onSelectEndHour,
+            handleScheduleMode,
+            handleSelectDay,
+            handleSelectStartHour,
+            handleSelectEndHour,
+            dayOfWeek,
+            timePeriod,
+            invalidState,
         };
     },
 };

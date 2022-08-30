@@ -108,7 +108,6 @@ export default {
 
         });
 
-
         const onChangeSchedule = async (value) => {
             state.scheduleModeForEdit = value.is_scheduled;
             state.scheduleForEdit = value.schedule;
