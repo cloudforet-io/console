@@ -326,6 +326,7 @@ export default {
                 if (provider) tagsQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
                 if (cloudServiceGroup) tagsQueryHelper.addFilter({ k: 'cloud_service_group', v: cloudServiceGroup, o: '=' });
                 if (cloudServiceType) tagsQueryHelper.addFilter({ k: 'cloud_service_type', v: cloudServiceType, o: '=' });
+                if (props.isServerPage) tagsQueryHelper.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' });
 
                 const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
                     resource_type: props.resourceType,
