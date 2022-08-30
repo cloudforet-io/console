@@ -5,7 +5,7 @@
                     :visible.sync="proxyVisible"
                     :loading="loading"
                     :disabled="showValidation && (!!titleInvalidText || isTimePeriodInvalid)"
-                    @confirm="onClickConfirm"
+                    @confirm="handleClickConfirm"
     >
         <template #body>
             <p class="form-desc">
@@ -16,7 +16,7 @@
                            :invalid-text="titleInvalidText"
             >
                 <p-text-input v-model="title" class="w-full" :invalid="showValidation && !!titleInvalidText"
-                              block @input.once="onFirstInputTitle"
+                              block @input.once="handleFirstInputTitle"
                 />
             </p-field-group>
             <p-field-group class="schedule-field" :label="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_SCHEDULE')"
@@ -52,7 +52,7 @@
                                 </td>
                                 <td class="time-selection-group">
                                     <input id="start-time" v-model="startTimeInput" type="datetime-local"
-                                           :min="minTime" @change="onChangeStartTime"
+                                           :min="minTime" @change="handleChangeStartTime"
                                     >
                                 </td>
                             </tr>
@@ -81,7 +81,7 @@
         </template>
         <template v-if="editMode" #footer-extra>
             <p-button style-type="alert" size="lg" :outline="true"
-                      @click="onClickClose(maintenanceWindowId)"
+                      @click="handleClickClose(maintenanceWindowId)"
             >
                 {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CLOSE_NOW') }}
             </p-button>
@@ -97,7 +97,7 @@ import {
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PRadio, PSelectButton, PTextInput, PButton,
+    PButton, PButtonModal, PFieldGroup, PRadio, PSelectButton, PTextInput,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -178,6 +178,8 @@ export default {
                 const timeDiff = dayjs(state.startTimeInput).diff(state.endTimeInput, 'minute');
                 // eslint-disable-next-line no-restricted-globals
                 if (timeDiff > 0 || isNaN(timeDiff)) return true;
+
+                if (dayjs().isAfter(dayjs(state.endTimeInput))) return true;
                 return false;
             }),
             scheduleRadioItems: computed(() => {
@@ -200,12 +202,9 @@ export default {
             timezone: computed(() => store.state.user.timezone),
             startTimeInput: dayjs().format(DATE_TIME_FORMAT),
             endTimeInput: dayjs().add(1, 'hour').format(DATE_TIME_FORMAT),
-            minTime: dayjs().format(DATE_TIME_FORMAT),
+            minTime: computed(() => dayjs.utc().tz(state.timezone).format(DATE_TIME_FORMAT)),
             showValidation: false,
-            timePeriod: computed(() => {
-                const timePeriod = state.durationItems.find(d => d.name === state.selectedDuration)?.label;
-                return timePeriod;
-            }),
+            timePeriod: computed(() => state.durationItems.find(d => d.name === state.selectedDuration)?.label),
         });
 
 
@@ -223,10 +222,8 @@ export default {
         };
 
         const getTimeParams = () => ({
-            // eslint-disable-next-line camelcase
-            start_time: dayjs.tz(dayjs(state.startTimeInput, DATE_TIME_FORMAT), state.timezone).utc().toISOString(),
-            // eslint-disable-next-line camelcase
-            end_time: dayjs.tz(dayjs(state.endTimeInput, DATE_TIME_FORMAT), state.timezone).utc().toISOString(),
+            start_time: dayjs.tz(state.startTimeInput, state.timezone).utc().toISOString(),
+            end_time: dayjs.tz(state.endTimeInput, state.timezone).utc().toISOString(),
         });
 
         const timePeriodFormatter = (startTimeInput, endTimeInput) => {
@@ -295,19 +292,19 @@ export default {
 
 
         /* Handlers */
-        const onFirstInputTitle = (e) => {
+        const handleFirstInputTitle = (e) => {
             state.showValidation = true;
             state.title = e.target?.value ?? '';
         };
 
-        const onChangeStartTime = (e) => {
+        const handleChangeStartTime = (e) => {
             const start = dayjs(e.target.value);
             if (start.isAfter(dayjs(state.endTimeInput))) {
                 state.endTimeInput = start.add(1, 'hour').format(DATE_TIME_FORMAT);
             }
         };
 
-        const onClickConfirm = async () => {
+        const handleClickConfirm = async () => {
             if (!state.showValidation) state.showValidation = true;
 
             if (state.titleInvalidText) return;
@@ -332,7 +329,7 @@ export default {
             }
         };
 
-        const onClickClose = (maintenanceWindowId) => {
+        const handleClickClose = (maintenanceWindowId) => {
             emit('close', maintenanceWindowId);
             state.proxyVisible = false;
         };
@@ -353,9 +350,11 @@ export default {
 
             state.title = originMaintenanceWindow.title || '';
             state.selectedDuration = DURATION.m15;
-            const current = dayjs();
-            state.startTimeInput = originMaintenanceWindow.start_time ? dayjs(originMaintenanceWindow.start_time).format(DATE_TIME_FORMAT) : current.format(DATE_TIME_FORMAT);
-            state.endTimeInput = originMaintenanceWindow.end_time ? dayjs(originMaintenanceWindow.end_time).format(DATE_TIME_FORMAT) : current.add(1, 'hour').format(DATE_TIME_FORMAT);
+            const current = dayjs.utc().tz(state.timezone);
+            const startTime = originMaintenanceWindow.start_time;
+            const endTime = originMaintenanceWindow.end_time;
+            state.startTimeInput = startTime ? dayjs.tz(dayjs.utc(startTime), state.timezone).format(DATE_TIME_FORMAT) : current.format(DATE_TIME_FORMAT);
+            state.endTimeInput = endTime ? dayjs.tz(dayjs.utc(endTime), state.timezone).format(DATE_TIME_FORMAT) : current.add(1, 'hour').format(DATE_TIME_FORMAT);
 
             state.loading = false;
         };
@@ -367,10 +366,10 @@ export default {
 
         return {
             ...toRefs(state),
-            onFirstInputTitle,
-            onChangeStartTime,
-            onClickConfirm,
-            onClickClose,
+            handleFirstInputTitle,
+            handleChangeStartTime,
+            handleClickConfirm,
+            handleClickClose,
             timePeriodFormatter,
             SCHEDULE_TYPE,
         };
