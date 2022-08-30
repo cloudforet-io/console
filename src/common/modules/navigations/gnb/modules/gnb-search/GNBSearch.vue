@@ -231,6 +231,7 @@ export default defineComponent<Props>({
             resourceToken = axios.CancelToken.source();
 
             try {
+                state.loading = true;
                 const { results, total_count } = await SpaceConnector.client.addOns.autocomplete.resource({
                     resource_type: 'inventory.CloudServiceType',
                     search: inputText,
@@ -250,10 +251,13 @@ export default defineComponent<Props>({
                 }
                 dataState._cloudServiceTotalCount = 0;
                 return [];
+            } finally {
+                state.loading = false;
             }
         };
         const listSearchRecent = async (type: SuggestionType) => {
             try {
+                state.loading = true;
                 const { results } = await SpaceConnector.client.addOns.recent.search.list({
                     type,
                     limit: RECENT_LIMIT,
@@ -269,6 +273,8 @@ export default defineComponent<Props>({
                 ErrorHandler.handleError(e);
                 if (type === SUGGESTION_TYPE.MENU) dataState.recentMenuList = [];
                 else if (type === SUGGESTION_TYPE.CLOUD_SERVICE) dataState.recentCloudServices = [];
+            } finally {
+                state.loading = false;
             }
         };
         const createSearchRecent = async (type: SuggestionType, id: string) => {
@@ -322,13 +328,17 @@ export default defineComponent<Props>({
             state.isFocusOnInput = true;
         };
 
-        const handleUpdateInput = debounce(async () => {
+        const handleUpdateInput = debounce(async (e) => {
+            if (!e.length) return;
+            state.loading = true;
             if (state.trimmedInputText) {
                 const results = await getCloudServiceResources(state.trimmedInputText);
                 dataState.filteredCloudServices = results.map(d => d.data);
                 dataState.filteredMenuList = filterMenuItemsBySearchTerm(dataState.allMenuList, state.trimmedInputText);
             }
-        }, 300);
+        }, 300, {
+            leading: true,
+        });
 
         const handleSelect = (index: number, type: SuggestionType) => {
             if (type === 'MENU') {

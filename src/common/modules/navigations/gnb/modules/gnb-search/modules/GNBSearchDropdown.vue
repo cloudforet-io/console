@@ -37,7 +37,7 @@
                         {{ $t('COMMON.GNB.SEARCH.HELP_TEXT') }}
                     </p>
                 </div>
-                <div v-else class="no-data">
+                <div v-else-if="!loading" class="no-data">
                     <img src="@/assets/images/illust_ghost.svg" class="img-no-data">
                     <p class="no-data-text">
                         <i18n path="COMMON.GNB.SEARCH.NO_RESULT_1">
@@ -48,6 +48,7 @@
                         <br>{{ $t('COMMON.GNB.SEARCH.NO_RESULT_2') }}
                     </p>
                 </div>
+                <div v-else style="height: 16.25rem;" />
             </template>
         </p-data-loader>
     </div>
@@ -96,7 +97,7 @@ export default defineComponent<Props>({
         },
         loading: {
             type: Boolean,
-            default: false,
+            default: true,
         },
         items: {
             type: Array as PropType<DropdownItem[]>,
