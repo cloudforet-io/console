@@ -1,12 +1,11 @@
 <template>
     <div class="gnb-search-dropdown">
         <slot name="search-input" />
-        <p-data-loader :data="[...menuSuggestionItems, ...cloudServiceSuggestionItems]"
+        <p-data-loader :data="allItems"
                        :loading="loading"
-                       :disable-empty-case="loading"
         >
-            <g-n-b-suggestion-list v-show="!!menuSuggestionItems.length"
-                                   :items="menuSuggestionItems"
+            <g-n-b-suggestion-list v-show="menuSuggestionItems && menuSuggestionItems.length > 0"
+                                   :items="menuSuggestionItems || []"
                                    :input-text="inputText"
                                    :is-focused="focusingType === SUGGESTION_TYPE.MENU ? isFocused : false"
                                    :focusing-direction="focusingDirection"
@@ -18,8 +17,8 @@
                 <div class="dim-wrapper" />
                 <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
             </div>
-            <g-n-b-suggestion-list v-show="!!cloudServiceSuggestionItems.length"
-                                   :items="cloudServiceSuggestionItems"
+            <g-n-b-suggestion-list v-show="cloudServiceSuggestionItems && cloudServiceSuggestionItems.length > 0"
+                                   :items="cloudServiceSuggestionItems || []"
                                    :input-text="inputText"
                                    :is-focused="focusingType === SUGGESTION_TYPE.CLOUD_SERVICE ? isFocused : false"
                                    :focusing-direction="focusingDirection"
@@ -38,7 +37,7 @@
                         {{ $t('COMMON.GNB.SEARCH.HELP_TEXT') }}
                     </p>
                 </div>
-                <div v-else-if="!loading" class="no-data">
+                <div class="no-data">
                     <img src="@/assets/images/illust_ghost.svg" class="img-no-data">
                     <p class="no-data-text">
                         <i18n path="COMMON.GNB.SEARCH.NO_RESULT_1">
@@ -124,24 +123,32 @@ export default defineComponent<Props>({
         const state = reactive({
             menuTotalCount: computed<undefined|number>(() => props.items?.find(d => d.itemType === SUGGESTION_TYPE.MENU)?.totalCount),
             cloudServiceTotalCount: computed<undefined|number>(() => props.items?.find(d => d.itemType === SUGGESTION_TYPE.CLOUD_SERVICE)?.totalCount),
-            menuSuggestionItems: computed<SuggestionItem[]>(() => {
-                let results: SuggestionItem[] = [];
+            menuSuggestionItems: computed<SuggestionItem[]|null>(() => {
                 const menuItems = props.items?.find(d => d.itemType === SUGGESTION_TYPE.MENU);
-                if (menuItems && menuItems.suggestionItems.length) {
+                if (!menuItems?.suggestionItems) return null;
+
+                let results: SuggestionItem[] = [];
+                if (menuItems.suggestionItems.length) {
                     results.push({ name: 'title', label: props.isRecent ? i18n.t('COMMON.GNB.SEARCH.RECENT_MENU') : i18n.t('COMMON.GNB.SEARCH.MENU'), type: 'header' });
                     results = results.concat(menuItems.suggestionItems);
                 }
                 return results;
             }),
-            cloudServiceSuggestionItems: computed<SuggestionItem[]>(() => {
-                let results: SuggestionItem[] = [];
+            cloudServiceSuggestionItems: computed<SuggestionItem[]|null>(() => {
                 const cloudServiceItems = props.items?.find(d => d.itemType === SUGGESTION_TYPE.CLOUD_SERVICE);
-                if (cloudServiceItems && cloudServiceItems.suggestionItems.length) {
-                    if (state.menuSuggestionItems.length) results.push({ type: 'divider' });
+                if (!cloudServiceItems?.suggestionItems) return null;
+
+                let results: SuggestionItem[] = [];
+                if (cloudServiceItems.suggestionItems.length) {
+                    if (state.menuSuggestionItems?.length) results.push({ type: 'divider' });
                     results.push({ name: 'title', label: props.isRecent ? i18n.t('COMMON.GNB.SEARCH.RECENT_CLOUD_SERVICE') : i18n.t('COMMON.GNB.SEARCH.CLOUD_SERVICE'), type: 'header' });
                     results = results.concat(cloudServiceItems.suggestionItems);
                 }
                 return results;
+            }),
+            allItems: computed(() => {
+                if (state.cloudServiceSuggestionItems && state.menuSuggestionItems) return [...state.cloudServiceSuggestionItems, ...state.menuSuggestionItems];
+                return null;
             }),
             // focus
             proxyFocusingDirection: useProxyValue('focusingDirection', props, emit),
@@ -151,19 +158,19 @@ export default defineComponent<Props>({
         /* Event */
         const handleSelect = (item: SuggestionItem, index: number) => {
             let itemIndex = index - 1; // extract header
-            if (item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE && state.menuSuggestionItems.length) itemIndex -= 1; // extract divider
+            if (item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE && state.menuSuggestionItems?.length) itemIndex -= 1; // extract divider
             emit('select', itemIndex, item.itemType);
         };
         const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
             if (type === SUGGESTION_TYPE.MENU) {
-                if (direction === 'DOWNWARD' && state.cloudServiceSuggestionItems.length) {
+                if (direction === 'DOWNWARD' && state.cloudServiceSuggestionItems?.length) {
                     state.proxyFocusingDirection = direction;
                     state.focusingType = SUGGESTION_TYPE.CLOUD_SERVICE;
                 } else {
                     emit('move-focus-end');
                 }
             } else if (type === SUGGESTION_TYPE.CLOUD_SERVICE) {
-                if (direction === 'UPWARD' && state.menuSuggestionItems.length) {
+                if (direction === 'UPWARD' && state.menuSuggestionItems?.length) {
                     state.proxyFocusingDirection = direction;
                     state.focusingType = SUGGESTION_TYPE.MENU;
                 } else {

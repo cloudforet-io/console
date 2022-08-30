@@ -143,11 +143,12 @@ export default defineComponent<Props>({
 
         const dataState = reactive({
             // menu
-            recentMenuList: [] as RecentConfig[],
+            recentMenuList: null as RecentConfig[]|null,
             allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allMenuList'])),
             filteredMenuList: [] as SuggestionMenu[],
             _menuTotalCount: 0,
-            _menuSuggestions: computed<SuggestionItem[]>(() => {
+            _menuSuggestions: computed<SuggestionItem[]|null>(() => {
+                if (!dataState.recentMenuList) return null;
                 if (state.showRecent) {
                     return convertMenuConfigToReferenceData(dataState.recentMenuList, store.getters['display/allMenuList']);
                 }
