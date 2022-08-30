@@ -1,3 +1,10 @@
+# [1.1.0-beta.376](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.375...v1.1.0-beta.376) (2022-08-30)
+
+
+### Bug Fixes
+
+* **definition-table:** get def items with get helper first ([#1066](https://github.com/spaceone-dev/spaceone-design-system/issues/1066)) ([5876d22](https://github.com/spaceone-dev/spaceone-design-system/commit/5876d22e75452a688b8a4a56610c0e6c00114a13))
+
 # [1.1.0-beta.375](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.374...v1.1.0-beta.375) (2022-08-25)
 
 
