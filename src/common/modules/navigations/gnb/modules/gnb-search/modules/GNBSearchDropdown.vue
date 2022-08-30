@@ -3,6 +3,7 @@
         <slot name="search-input" />
         <p-data-loader :data="[...menuSuggestionItems, ...cloudServiceSuggestionItems]"
                        :loading="loading"
+                       :disable-empty-case="loading"
         >
             <g-n-b-suggestion-list v-show="!!menuSuggestionItems.length"
                                    :items="menuSuggestionItems"
@@ -48,7 +49,6 @@
                         <br>{{ $t('COMMON.GNB.SEARCH.NO_RESULT_2') }}
                     </p>
                 </div>
-                <div v-else style="height: 16.25rem;" />
             </template>
         </p-data-loader>
     </div>
