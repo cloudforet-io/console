@@ -7,7 +7,7 @@
              class="input-container"
              :class="{invalid: isInvalid || invalid, disabled}"
         >
-            <template v-if="proxySelectedValue.length && multiInput">
+            <div v-if="proxySelectedValue.length && multiInput" class="tag-container">
                 <p-tag v-for="(tag, index) in proxySelectedValue" :key="index"
                        :deletable="!disabled"
                        :selected="index === deleteTargetIdx"
@@ -17,9 +17,20 @@
                 >
                     {{ tag.label || tag.value }}
                 </p-tag>
-            </template>
-            <slot name="default" v-bind="{ value }">
+                <slot name="default" v-bind="{ value }">
+                    <input v-model="proxyValue"
+                           v-bind="$attrs"
+                           :disabled="disabled"
+                           :type="type"
+                           :placeholder="placeholder"
+                           size="1"
+                           v-on="inputListeners"
+                    >
+                </slot>
+            </div>
+            <slot v-else name="default" v-bind="{ value }">
                 <input v-model="proxyValue"
+                       v-bind="$attrs"
                        :disabled="disabled"
                        :type="type"
                        :placeholder="placeholder"
@@ -355,7 +366,7 @@ export default {
         @apply w-full;
     }
     > .input-container {
-        @apply relative inline-flex flex-wrap border bg-white text-gray-900 rounded items-center;
+        @apply relative inline-flex border bg-white text-gray-900 rounded items-center;
         width: inherit;
         min-height: 2rem;
         height: auto;
@@ -382,9 +393,17 @@ export default {
         &:hover:not(.disabled):not(.invalid) {
             @apply border-secondary;
         }
-        > .tag {
-            height: 1.25rem;
-            min-width: 2.5rem;
+        > .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+            padding: 0.375rem 0;
+            gap: 0.5rem;
+            > .tag {
+                height: 1.25rem;
+                min-width: 2.5rem;
+                margin: 0;
+            }
         }
 
         input {
