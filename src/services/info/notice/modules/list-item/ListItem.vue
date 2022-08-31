@@ -112,7 +112,7 @@ export default defineComponent<Props>({
         };
 
         (async () => {
-            await getDomainName();
+            if (props.post && state.hasSystemRoleUser) await getDomainName();
         })();
 
         return {

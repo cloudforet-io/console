@@ -34,6 +34,7 @@
                     <span v-if="hasDomainRoleUser || hasSystemRoleUser" class="view-count">
                         <p-i name="ic_view" width="1.125rem" /> {{ noticePostData.view_count }}
                     </span>
+                    <span v-if="hasSystemRoleUser" class="view-count">| {{ postDomainName }}</span>
                 </div>
                 <p-divider />
                 <div class="text-editor-wrapper">
@@ -159,6 +160,7 @@ export default {
                 params: { boardId: props.boardId, postId: state.nextNoticePost?.post_id },
             })),
             domainName: computed(() => store.state.domain.name),
+            postDomainName: '',
             hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
             hasSystemRoleUser: computed(() => store.getters['user/hasSystemRole']),
             hasPermissionToEditOrDelete: computed(() => {
@@ -236,6 +238,19 @@ export default {
                 state.prevNoticePost = undefined;
             }
         };
+        const getPostDomainName = async () => {
+            if (!state.noticePostData?.domain_id) {
+                state.postDomainName = 'All Domains';
+                return;
+            }
+            try {
+                const { name } = await SpaceConnector.client.identity.domain.get({ domain_id: state.noticePostData.domain_id });
+                state.postDomainName = name;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.postDomainName = '';
+            }
+        };
 
         const {
             updateNoticeReadState,
@@ -305,6 +320,7 @@ export default {
         const initPage = async () => {
             state.loading = true;
             await getNoticePostData();
+            if (state.hasSystemRoleUser) await getPostDomainName();
             if (state.noticePostData.created_at) {
                 await getNextPostData(state.noticePostData.created_at);
                 await getPrevPostData(state.noticePostData.created_at);
