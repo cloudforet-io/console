@@ -1,5 +1,6 @@
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { setI18nLocale } from '@/translations';
 
 type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
 
@@ -17,6 +18,7 @@ abstract class Authenticator {
                 store.dispatch('domain/setBillingEnabled'),
                 // INIT REFERENCE STORE
                 store.dispatch('reference/loadAll', { force: true }),
+                setI18nLocale(store.state.user.language),
             ]);
         } catch (e: unknown) {
             throw e;
