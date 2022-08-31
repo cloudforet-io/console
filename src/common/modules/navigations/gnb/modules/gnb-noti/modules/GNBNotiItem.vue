@@ -45,7 +45,7 @@ import { store } from '@/store';
 interface Props {
     isRead: boolean;
     title: string;
-    createdAt: string;
+    createdAt?: string;
     dateHeader?: TranslateResult | string;
     icon?: string;
     writer?: string;
