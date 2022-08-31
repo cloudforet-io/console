@@ -16,7 +16,10 @@
             </div>
         </template>
         <template #item--format="{ item }">
-            <p-tooltip class="suggestion-item" :contents="`${item.parents.map(d => `${d.label} > `).join('')}${item.label}`">
+            <p-tooltip class="suggestion-item"
+                       :contents="`${item.parents ? item.parents.map(d => `${d.label} > `).join('') : ''}${item.label}`"
+                       position="bottom"
+            >
                 <span class="image">
                     <p-lazy-img v-if="item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE"
                                 :src="item.icon || ''"
