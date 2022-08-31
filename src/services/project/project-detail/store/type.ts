@@ -5,8 +5,14 @@ export interface AlertCount {
     count: number;
 }
 
+export interface MaintenanceHappening {
+    title: string;
+    startTime: string;
+    endTime: string;
+}
+
 export interface ProjectDetailState {
     projectId: string;
-
     alertCounts: AlertCount[];
+    maintenanceHappenings: MaintenanceHappening[];
 }

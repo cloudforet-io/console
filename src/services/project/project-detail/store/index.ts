@@ -6,6 +6,7 @@ import type { ProjectDetailState } from '@/services/project/project-detail/store
 const state: ProjectDetailState = {
     projectId: '',
     alertCounts: [],
+    maintenanceHappenings: [],
 };
 
 export default {

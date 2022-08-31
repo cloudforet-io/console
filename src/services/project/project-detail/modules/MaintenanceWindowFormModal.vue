@@ -128,9 +128,7 @@ const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
 interface MaintenanceWindow {
     maintenance_window_id: string;
     title: string;
-    // eslint-disable-next-line camelcase
     start_time: string;
-    // eslint-disable-next-line camelcase
     end_time: string;
     projects: string[];
 }
@@ -175,6 +173,8 @@ export default {
             isTimePeriodInvalid: computed(() => {
                 // eslint-disable-next-line vue/no-side-effects-in-computed-properties
                 if (props.editMode) state.showValidation = true;
+
+                if (dayjs.utc().tz(state.timezone).isAfter(dayjs.tz(state.startTimeInput, state.timezone))) return true;
                 const timeDiff = dayjs(state.startTimeInput).diff(state.endTimeInput, 'minute');
                 // eslint-disable-next-line no-restricted-globals
                 if (timeDiff >= 0 || isNaN(timeDiff)) return true;
@@ -322,6 +322,7 @@ export default {
 
                 state.proxyVisible = false;
                 emit('confirm', maintenanceWindowId);
+                await store.dispatch('service/projectDetail/loadMaintenanceHappenings');
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {

@@ -1,6 +1,6 @@
 <template>
-    <p-list-card v-if="visible && !loading && items.length !== 0"
-                 :loading="loading" :items="items"
+    <p-list-card v-if="visible && !loading && maintenanceHappenings.length !== 0"
+                 :loading="loading" :items="maintenanceHappenings"
                  style-type="yellow500"
     >
         <template #header>
@@ -18,8 +18,8 @@
             <div>
                 <span class="title">{{ item.title }}</span>
                 <span>
-                    {{ iso8601Formatter(item.start_time, timezone, TIME_FORMAT) }} ~
-                    {{ iso8601Formatter(item.end_time, timezone, TIME_FORMAT) }}
+                    {{ iso8601Formatter(item.startTime, timezone, TIME_FORMAT) }} ~
+                    {{ iso8601Formatter(item.endTime, timezone, TIME_FORMAT) }}
                 </span>
             </div>
         </template>
@@ -30,13 +30,12 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { PListCard, PI } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import type { MaintenanceHappening } from '@/services/project/project-detail/store/type';
+
 
 const TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 export default {
@@ -45,43 +44,13 @@ export default {
         PListCard,
         PI,
     },
-    props: {
-        projectId: {
-            type: String,
-            default: '',
-        },
-    },
-    setup(props) {
+    setup() {
         const state = reactive({
             loading: false,
-            items: [],
+            maintenanceHappenings: computed<MaintenanceHappening[]>(() => store.state.service.projectDetail.maintenanceHappenings),
             timezone: computed(() => store.state.user.timezone),
             visible: true,
         });
-
-        /* API calls */
-        const queryHelper = new ApiQueryHelper().setFilters([{
-            k: 'state', v: 'OPEN', o: '=',
-        }]);
-        const query = queryHelper.data;
-        const getMaintenanceWindows = async () => {
-            if (state.loading) return;
-
-            state.loading = true;
-            try {
-                const { results } = await SpaceConnector.client.monitoring.maintenanceWindow.list({
-                    project_id: props.projectId,
-                    query,
-                });
-
-                state.items = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.items = [];
-            } finally {
-                state.loading = false;
-            }
-        };
 
         const onClickHeader = () => {
             state.visible = false;
@@ -89,7 +58,9 @@ export default {
 
         /* Init */
         (async () => {
-            await getMaintenanceWindows();
+            state.loading = true;
+            await store.dispatch('service/projectDetail/loadMaintenanceHappenings');
+            state.loading = false;
         })();
 
         return {
@@ -97,10 +68,6 @@ export default {
             onClickHeader,
             iso8601Formatter,
             TIME_FORMAT,
-            reload: () => {
-                state.visible = true;
-                getMaintenanceWindows();
-            },
         };
     },
 };
