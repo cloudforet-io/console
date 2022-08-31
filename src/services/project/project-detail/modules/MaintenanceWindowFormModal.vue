@@ -52,7 +52,7 @@
                                 </td>
                                 <td class="time-selection-group">
                                     <input id="start-time" v-model="startTimeInput" type="datetime-local"
-                                           :min="minTime" @change="handleChangeStartTime"
+                                           @change="handleChangeStartTime"
                                     >
                                 </td>
                             </tr>
@@ -174,7 +174,6 @@ export default {
                 // eslint-disable-next-line vue/no-side-effects-in-computed-properties
                 if (props.editMode) state.showValidation = true;
 
-                if (dayjs.utc().tz(state.timezone).isAfter(dayjs.tz(state.startTimeInput, state.timezone))) return true;
                 const timeDiff = dayjs(state.startTimeInput).diff(state.endTimeInput, 'minute');
                 // eslint-disable-next-line no-restricted-globals
                 if (timeDiff >= 0 || isNaN(timeDiff)) return true;
@@ -202,7 +201,6 @@ export default {
             timezone: computed(() => store.state.user.timezone),
             startTimeInput: dayjs().format(DATE_TIME_FORMAT),
             endTimeInput: dayjs().add(1, 'hour').format(DATE_TIME_FORMAT),
-            minTime: computed(() => dayjs.utc().tz(state.timezone).format(DATE_TIME_FORMAT)),
             showValidation: false,
             timePeriod: computed(() => state.durationItems.find(d => d.name === state.selectedDuration)?.label),
         });
