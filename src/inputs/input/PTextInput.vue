@@ -21,7 +21,6 @@
                     <input v-model="proxyValue"
                            v-bind="$attrs"
                            :disabled="disabled"
-                           :type="type"
                            :placeholder="placeholder"
                            size="1"
                            v-on="inputListeners"
@@ -32,7 +31,6 @@
                 <input v-model="proxyValue"
                        v-bind="$attrs"
                        :disabled="disabled"
-                       :type="type"
                        :placeholder="placeholder"
                        size="1"
                        v-on="inputListeners"
@@ -67,7 +65,7 @@
 <script lang="ts">
 import type { PropType } from '@vue/composition-api';
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import vClickOutside from 'v-click-outside';
@@ -80,11 +78,28 @@ import { useProxyValue } from '@/hooks/proxy-state';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import type { SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
-import { inputTypes } from '@/inputs/input/config';
-import type { SelectedItem } from '@/inputs/input/type';
+import type { SelectedItem, TextInputHandler } from '@/inputs/input/type';
 
 
-export default {
+interface TextInputProps {
+    value?: string|number;
+    disabled: boolean;
+    block: boolean;
+    invalid: boolean;
+    placeholder: string;
+    multiInput: boolean;
+    selected: SelectedItem[];
+    visibleMenu?: boolean;
+    useFixedMenuStyle: boolean;
+    menu: MenuItem[];
+    loading: boolean;
+    handler?: TextInputHandler;
+    disableHandler: boolean;
+    exactMode: boolean;
+    useAutoComplete: boolean;
+}
+
+export default defineComponent<TextInputProps>({
     name: 'PTextInput',
     components: {
         PTag,
@@ -107,11 +122,6 @@ export default {
         disabled: {
             type: Boolean,
             default: false,
-        },
-        type: {
-            type: String,
-            default: 'text',
-            validator: value => inputTypes.includes(value),
         },
         block: {
             type: Boolean,
@@ -354,7 +364,7 @@ export default {
             handleSelectMenuItem,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
@@ -366,7 +376,7 @@ export default {
         @apply w-full;
     }
     > .input-container {
-        @apply relative inline-flex border bg-white text-gray-900 rounded items-center;
+        @apply inline-flex border bg-white text-gray-900 rounded items-center;
         width: inherit;
         min-height: 2rem;
         height: auto;
@@ -383,12 +393,6 @@ export default {
         }
         &.focused, &:focus-within:not(.disabled):not(.invalid) {
             @apply border-secondary bg-blue-100;
-            > input {
-                padding-right: 1rem;
-            }
-            > .right-extra {
-                padding-right: 1rem;
-            }
         }
         &:hover:not(.disabled):not(.invalid) {
             @apply border-secondary;
@@ -410,7 +414,6 @@ export default {
             @apply truncate;
             display: inline-block;
             flex-grow: 1;
-            padding-right: 0.5rem;
             border-width: 0;
             height: 100%;
             appearance: none;
@@ -440,8 +443,7 @@ export default {
 
         .delete-all-icon {
             @apply text-gray-400 cursor-pointer;
-            position: absolute;
-            right: 0.5rem;
+            flex-shrink: 0;
         }
     }
     .p-context-menu {
