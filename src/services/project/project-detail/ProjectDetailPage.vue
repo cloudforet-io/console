@@ -45,7 +45,7 @@
                 </p-page-title>
             </div>
 
-            <maintenance-happening-list ref="maintenanceHappeningListRef" class="maintenance-happening-list" :project-id="projectId" />
+            <maintenance-happening-list class="maintenance-happening-list" :project-id="projectId" />
 
             <p-tab v-if="item"
                    :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
@@ -106,7 +106,6 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { find } from 'lodash';
-import type Vue from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 
@@ -193,7 +192,6 @@ export default {
             counts: computed(() => ({
                 TRIGGERED: find(store.state.service.projectDetail.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
             })),
-            maintenanceHappeningListRef: null as null|Vue,
         });
 
         /* api */
@@ -295,7 +293,6 @@ export default {
             singleItemTabState.activeTab = PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME;
             urlQueryHelper.setFilters([{ k: 'maintenance_window_id', v: maintenanceWindowId }]);
             vm.$router.replace({ name: singleItemTabState.activeTab, query: { filters: urlQueryHelper.rawQueryStrings } });
-            if (state.maintenanceHappeningListRef) state.maintenanceHappeningListRef.reload();
         };
 
         /* Watchers */
