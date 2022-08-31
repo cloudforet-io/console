@@ -97,7 +97,7 @@ export default defineComponent<Props>({
         const dateFormatter = date => dayjs.tz(dayjs.utc(date), state.timezone).format('YYYY-MM-DD');
 
         const getDomainName = async () => {
-            if (!Object.keys(props.post).length || !state.hasSystemRoleUser) return;
+            if (!Object.keys(props.post ?? {}).length || !state.hasSystemRoleUser) return;
             if (!props.post.domain_id) {
                 state.domainName = 'All Domains';
                 return;
