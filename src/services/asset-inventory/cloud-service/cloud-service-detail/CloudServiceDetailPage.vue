@@ -262,8 +262,6 @@ export default {
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [] as number[],
-            keyItemSets: computed(() => keyItemSets.value),
-            valueHandlerMap: computed(() => valueHandlerMap.value),
         });
 
         const tableHeight = store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX) ?? 0;
@@ -296,7 +294,7 @@ export default {
         const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSearchSchema(
             computed(() => tableState.schema?.options?.search ?? []),
             'inventory.CloudService',
-            props.isServerPage
+            computed(() => (props.isServerPage
                 ? schemaQueryHelper.setFilters([
                     { k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' },
                 ]).apiQuery.filter
@@ -304,9 +302,8 @@ export default {
                     { k: 'provider', o: '=', v: props.provider },
                     { k: 'cloud_service_group', o: '=', v: props.group },
                     { k: 'cloud_service_type', o: '=', v: props.name },
-                ]).apiQuery.filter,
+                ]).apiQuery.filter)),
         );
-
 
         const checkTableModalState = reactive({
             visible: false,

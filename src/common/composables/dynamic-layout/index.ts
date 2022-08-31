@@ -70,7 +70,7 @@ const getValueHandlerMap = (schemaList: ConsoleSearchSchema[], resourceType: str
 export function useQuerySearchPropsWithSearchSchema(
     searchSchema: ComputedRef<ConsoleSearchSchema[]>,
     resourceType: string,
-    filters?: Filter[],
+    filters?: ComputedRef<Filter[]>,
 ): { keyItemSets: ComputedRef<KeyItemSet[]>, valueHandlerMap: ComputedRef<ValueHandlerMap>, isAllLoaded: ComputedRef<boolean> } {
     (async () => {
         await store.dispatch('reference/loadAll');
@@ -92,6 +92,7 @@ export function useQuerySearchPropsWithSearchSchema(
 
     const state = reactive({
         keyItemSets: [] as KeyItemSet[],
+        valueHandlerMap: {} as ValueHandlerMap,
     });
 
 
@@ -100,12 +101,13 @@ export function useQuerySearchPropsWithSearchSchema(
         const [schema, isAllLoaded] = watchValue;
         if (isAllLoaded && schema.length) {
             state.keyItemSets = getKeyItemSets(schema, storeState);
+            state.valueHandlerMap = getValueHandlerMap(searchSchema.value, resourceType, filters?.value);
         }
     }, { immediate: true, debounce: 200 });
 
     return {
         isAllLoaded: computed(() => store.state.reference.isAllLoaded),
         keyItemSets: computed(() => state.keyItemSets),
-        valueHandlerMap: computed(() => getValueHandlerMap(searchSchema.value, resourceType, filters)),
+        valueHandlerMap: computed(() => state.valueHandlerMap),
     };
 }
