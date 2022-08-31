@@ -1,3 +1,10 @@
+# [1.1.0-beta.378](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.377...v1.1.0-beta.378) (2022-08-31)
+
+
+### Bug Fixes
+
+* **text-input:** remove padding from input and refactor ([#1068](https://github.com/spaceone-dev/spaceone-design-system/issues/1068)) ([d38a2c3](https://github.com/spaceone-dev/spaceone-design-system/commit/d38a2c34fec9fbf40b2d88439205519c4302c7a4))
+
 # [1.1.0-beta.377](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.376...v1.1.0-beta.377) (2022-08-31)
 
 
