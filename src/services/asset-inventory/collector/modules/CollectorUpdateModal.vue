@@ -197,6 +197,7 @@ export default {
             formState.showValidation = false;
             formState.inputModel.name = get(state.collector, 'name', '');
             formState.inputModel.version = get(state.collector, 'plugin_info.version', state.versions[0]);
+            formState.inputModel.isAutoUpgrade = UPGRADE_MODE.AUTO === get(state.collector, 'plugin_info.upgrade_mode', UPGRADE_MODE.MANUAL);
         };
         const onClickConfirm = async (): Promise<void> => {
             formState.showValidation = true;
