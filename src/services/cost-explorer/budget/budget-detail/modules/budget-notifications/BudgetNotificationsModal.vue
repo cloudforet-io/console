@@ -7,6 +7,7 @@
         backdrop
         :visible.sync="proxyVisible"
         class="budget-notifications-modal"
+        :disabled="!isAllValid"
         @confirm="handleConfirm"
     >
         <template #body>
@@ -44,8 +45,13 @@
                         <span class="align-middle">&gt;</span>
                         <p-text-input v-model="condition.threshold"
                                       class="condition"
+                                      type="number"
+                                      :max="condition.unit === NOTIFICATION_UNIT.PERCENT ? 100 : undefined"
+                                      :min="0"
                                       :placeholder="condition.unit === NOTIFICATION_UNIT.ACTUAL_COST
                                           ? '$1000' : '50'"
+                                      :invalid="thresholdValidations[idx] === false"
+                                      @input="handleThresholdInput(idx, $event)"
                         >
                             <template #right-extra>
                                 <span v-if="condition.unit === NOTIFICATION_UNIT.PERCENT" class="text-gray-400">%</span>
@@ -153,22 +159,35 @@ export default {
                     label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.CRITICAL'),
                 },
             ])),
-            thresholdPlaceholder: '',
             budgetId: computed(() => costExplorerStore.state.budget.budgetData?.budget_id),
+            thresholdValidations: costExplorerStore.state.budget.budgetData?.notifications?.map(d => !!d) ?? [] as Array<boolean|undefined>,
+            isAllValid: computed(() => state.thresholdValidations.every(d => !!d)),
         });
 
         const handleAddCondition = () => {
             state.conditions.push({
-                unit: 'ACTUAL_COST',
+                unit: NOTIFICATION_UNIT.ACTUAL_COST,
                 threshold: null,
-                notification_type: 'WARNING',
+                notification_type: NOTIFICATION_TYPE.WARNING,
             });
+            state.thresholdValidations.push(undefined);
         };
 
         const handleDeleteCondition = (idx) => {
             const conditions = [...state.conditions];
             conditions.splice(idx, 1);
+            state.thresholdValidations.splice(idx, 1);
             state.conditions = conditions;
+        };
+
+        const handleThresholdInput = (idx, threshold?: string) => {
+            let isValid;
+            const numberThreshold = Number(threshold);
+            if (!threshold || Number.isNaN(numberThreshold)) isValid = false;
+            else if (numberThreshold < 0) isValid = false;
+            else if (state.conditions[idx]?.unit === NOTIFICATION_UNIT.PERCENT && numberThreshold > 100) isValid = false;
+            else isValid = true;
+            state.thresholdValidations.splice(idx, 1, isValid);
         };
 
         const setBudgetAlert = async () => {
@@ -183,6 +202,7 @@ export default {
         };
 
         const handleConfirm = async () => {
+            if (!state.isAllValid) return;
             await setBudgetAlert();
             state.proxyVisible = false;
             emit('confirm');
@@ -193,6 +213,7 @@ export default {
             handleAddCondition,
             handleConfirm,
             handleDeleteCondition,
+            handleThresholdInput,
             NOTIFICATION_UNIT,
             NOTIFICATION_TYPE,
             PROJECT_ROUTE,

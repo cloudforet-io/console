@@ -24,7 +24,7 @@ export const updateBudgetData = async ({ commit }, params: UpdateBudgetParams): 
         });
         commit('setBudgetData', budget);
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, '');
     }
 };
 
@@ -36,7 +36,7 @@ export const updateBudgetNotifications = async ({ commit }, params: { budgetId: 
         });
         commit('setBudgetData', budget);
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, '');
     }
 };
 
