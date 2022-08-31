@@ -1,3 +1,10 @@
+# [1.1.0-beta.377](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.376...v1.1.0-beta.377) (2022-08-31)
+
+
+### Bug Fixes
+
+* **text-input:** fix style issue in right extra slot & tags ([#1067](https://github.com/spaceone-dev/spaceone-design-system/issues/1067)) ([51955da](https://github.com/spaceone-dev/spaceone-design-system/commit/51955da0bbadc0d62c392cc6654f23d88aab2e7e))
+
 # [1.1.0-beta.376](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.375...v1.1.0-beta.376) (2022-08-30)
 
 
