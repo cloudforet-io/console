@@ -18,7 +18,7 @@
                                  :is-read="item.isRead"
                                  :title="item.title"
                                  :icon="item.icon"
-                                 :created-at="item.createdAt"
+                                 :created-at="item ? item.createdAt : undefined"
                                  :date-header="item.dateHeader"
                                  :deletable="true"
                                  @select="handleSelectNotification(item)"
