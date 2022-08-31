@@ -16,7 +16,7 @@
             </div>
         </template>
         <template #item--format="{ item }">
-            <div class="suggestion-item">
+            <p-tooltip class="suggestion-item" :contents="`<p>${item.parents.map(d => `${d.label} > `).join('')}${item.label}</p>`">
                 <span class="image">
                     <p-lazy-img v-if="item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE"
                                 :src="item.icon || ''"
@@ -30,7 +30,7 @@
                 <span class="texts">
                     <template v-if="item.parents">
                         <template v-for="(parent, pIdx) in item.parents">
-                            <text-highlighting :key="`parent-${parent.label}-${pIdx}`"
+                            <text-highlighting :key="`parent-${parent.label}-${pIdx}`" class="text-item"
                                                :term="inputText"
                                                :text="parent.label"
                             />
@@ -41,7 +41,7 @@
                             </span>
                         </template>
                     </template>
-                    <text-highlighting :key="`leaf-${item.label}`"
+                    <text-highlighting :key="`leaf-${item.label}`" class="text-item"
                                        :term="inputText"
                                        :text="item.label"
                     />
@@ -53,7 +53,7 @@
                                      scale="0.65"
                     />
                 </span>
-            </div>
+            </p-tooltip>
         </template>
         <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
             <slot :name="slot" v-bind="scope" />
@@ -68,7 +68,9 @@ import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PContextMenu, PI, PLazyImg } from '@spaceone/design-system';
+import {
+    PContextMenu, PI, PLazyImg, PTooltip,
+} from '@spaceone/design-system';
 
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -93,6 +95,7 @@ export default defineComponent<Props>({
         PContextMenu,
         PLazyImg,
         PI,
+        PTooltip,
     },
     props: {
         items: {
@@ -174,7 +177,14 @@ export default defineComponent<Props>({
                 flex-shrink: 0;
             }
             .texts {
+                display: flex;
                 flex-grow: 1;
+                .text-item {
+                    max-width: 10rem;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
             }
             .favorite-button {
                 flex-shrink: 0;
