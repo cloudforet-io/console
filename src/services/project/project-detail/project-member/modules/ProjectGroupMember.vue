@@ -1,5 +1,5 @@
 <template>
-    <div class="page-mask">
+    <overlay-page-layout :visible="visible" class="project-group-member">
         <p-pane-layout class="page-wrapper">
             <div class="page-navigation">
                 <div class="title-wrapper">
@@ -18,26 +18,29 @@
                                 class="mt-8"
             />
         </p-pane-layout>
-        <f-n-b class="fnb" />
-    </div>
+    </overlay-page-layout>
 </template>
 
 <script lang="ts">
 import { PPaneLayout, PIconButton } from '@spaceone/design-system';
 
-import FNB from '@/common/modules/navigations/FNB.vue';
+import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.vue';
 
 import ProjectMemberTab from '@/services/project/project-detail/project-member/modules/ProjectMemberTab.vue';
 
 export default {
     name: 'ProjectGroupMember',
     components: {
-        FNB,
         PPaneLayout,
         PIconButton,
         ProjectMemberTab,
+        OverlayPageLayout,
     },
     props: {
+        visible: {
+            type: Boolean,
+            default: false,
+        },
         groupId: {
             type: String,
             required: true,
@@ -60,20 +63,13 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.page-mask {
-    position: absolute;
-    display: flex;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    flex-direction: column;
-
+.project-group-member {
+    @apply bg-gray-100;
     .page-wrapper {
+        @apply bg-gray-100;
         width: 100%;
         border: none;
         flex-grow: 1;
-        padding: 2rem 1.5rem;
         .page-navigation {
             .title-wrapper {
                 display: flex;
@@ -97,9 +93,6 @@ export default {
             padding-left: 1rem;
             margin: 1.5rem 0;
         }
-    }
-    .fnb {
-        @apply flex-grow-0 border-none bg-white;
     }
 }
 </style>
