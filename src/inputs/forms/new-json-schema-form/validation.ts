@@ -5,12 +5,14 @@ import {
 
 import type { ErrorObject, ValidateFunction } from 'ajv';
 import Ajv from 'ajv';
+import type { Localize } from 'ajv-i18n/localize/types';
 import { isEmpty } from 'lodash';
 
 import type { JsonSchemaFormProps, InnerJsonSchema } from '@/inputs/forms/new-json-schema-form/type';
 
-export const useValidation = (props: JsonSchemaFormProps, { formData }: {
+export const useValidation = (props: JsonSchemaFormProps, { formData, localize }: {
     formData: Ref<object>;
+    localize: Ref<Localize|null>;
 }) => {
     const ajv = new Ajv({
         allErrors: true,
@@ -27,6 +29,10 @@ export const useValidation = (props: JsonSchemaFormProps, { formData }: {
             const errorObj = {};
 
             if (state.validatorErrors) {
+                if (localize.value) {
+                    localize.value(state.validatorErrors);
+                }
+
                 state.validatorErrors.forEach((error) => {
                     if (!error.instancePath) {
                         /*

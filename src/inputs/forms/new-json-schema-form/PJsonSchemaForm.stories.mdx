@@ -12,6 +12,7 @@ import {
 import {
     getDefaultFormData, getDefaultSchema
 } from "@/inputs/forms/new-json-schema-form/mock";
+import {supportLanguages} from "@/translations";
 
 
 <Meta title='Inputs/Forms/Json Schema Form' parameters={{
@@ -28,6 +29,7 @@ export const Template = (args, { argTypes }) => ({
         <p-json-schema-form
             :schema="schema"
             :form-data.sync="proxyFormData"
+            :language="language"
         />
     `,
     setup(props) {
@@ -81,6 +83,49 @@ export const Template = (args, { argTypes }) => ({
 
 <br/>
 <br/>
+
+## Language
+
+<Canvas>
+    <Story name="Language" >
+        {{
+            components: { PJsonSchemaForm, PTextEditor, PSelectDropdown },
+            template: `
+<div class="grid grid-cols-12">
+    <p-json-schema-form
+        class="col-span-6"
+        :schema="schema"
+        :form-data="formData"
+        :language="language"
+    />
+    <div class="col-span-6">
+        <p-select-dropdown class="mb-4"
+                           :selected.sync="language" :items="languages" />
+        <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                       mode="readOnly"
+                       folded
+        />
+    </div>
+</div>
+`,
+            setup(props) {
+                const state = reactive({
+                    schema: getDefaultSchema(),
+                    formData: getDefaultFormData(),
+                    language: 'en',
+                    languages: supportLanguages.map(d => ({name: d, label: d}))
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Playground
 

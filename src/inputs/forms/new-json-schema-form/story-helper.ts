@@ -1,6 +1,7 @@
 import type { ArgTypes } from '@storybook/addons';
 
 import { getDefaultFormData, getDefaultSchema } from '@/inputs/forms/new-json-schema-form/mock';
+import { supportLanguages } from '@/translations';
 
 export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
     schema: {
@@ -37,6 +38,24 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'object',
+        },
+    },
+    language: {
+        name: 'language',
+        type: { name: 'string' },
+        defaultValue: supportLanguages[0],
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: supportLanguages[0],
+            },
+        },
+        control: {
+            type: 'select',
+            options: supportLanguages,
         },
     },
     // events

@@ -36,6 +36,7 @@ import {
     NUMERIC_TYPES,
     refineValueByProperty,
 } from '@/inputs/forms/new-json-schema-form/helper';
+import { useLocalize } from '@/inputs/forms/new-json-schema-form/localize';
 import type {
     InnerJsonSchema,
     JsonSchema,
@@ -44,6 +45,8 @@ import type {
 import { TEXT_INPUT_TYPES } from '@/inputs/forms/new-json-schema-form/type';
 import { useValidation } from '@/inputs/forms/new-json-schema-form/validation';
 import PTextInput from '@/inputs/input/PTextInput.vue';
+import type { SupportLanguage } from '@/translations';
+import { supportLanguages } from '@/translations';
 
 
 export default defineComponent<JsonSchemaFormProps>({
@@ -60,6 +63,13 @@ export default defineComponent<JsonSchemaFormProps>({
         formData: {
             type: Object,
             default: undefined,
+        },
+        language: {
+            type: String as PropType<SupportLanguage>,
+            default: 'en',
+            validator(lang?: SupportLanguage) {
+                return lang === undefined || supportLanguages.includes(lang);
+            },
         },
     },
     setup(props, { emit }) {
@@ -79,11 +89,12 @@ export default defineComponent<JsonSchemaFormProps>({
             contextKey: Math.floor(Math.random() * Date.now()),
         });
 
+        const { localize } = useLocalize(props);
         const {
             invalidMessages, inputOccurred,
             validateFormData, getPropertyInvalidState,
         } = useValidation(props, {
-            formData: computed(() => state.proxyFormData),
+            localize, formData: computed(() => state.proxyFormData),
         });
 
         const getInputTypeBySchemaProperty = (schemaProperty: InnerJsonSchema) => {

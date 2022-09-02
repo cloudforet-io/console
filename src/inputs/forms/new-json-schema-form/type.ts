@@ -1,3 +1,5 @@
+import type { SupportLanguage } from '@/translations';
+
 export const TEXT_INPUT_TYPES = ['string', 'number', 'integer'] as const;
 
 type JsonSchemaType = typeof TEXT_INPUT_TYPES[number]
@@ -24,4 +26,5 @@ export interface InnerJsonSchema extends JsonSchema {
 export interface JsonSchemaFormProps {
     schema?: JsonSchema;
     formData?: object;
+    language?: SupportLanguage;
 }
