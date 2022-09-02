@@ -30,6 +30,5 @@ export interface JsonSchemaFormProps {
     schema?: JsonSchema;
     formData?: object;
     language?: SupportLanguage;
-    resetOnSchemaChange?: boolean;
     validationMode?: ValidationMode; // default: input
 }

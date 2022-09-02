@@ -10,7 +10,6 @@
         >
             <template #default="{invalid}">
                 <p-text-input v-if="TEXT_INPUT_TYPES.includes(schemaProperty.type)"
-                              :key="`field-${contextKey}-${schemaProperty.id}`"
                               :value="proxyFormData[schemaProperty.id]"
                               :type="getInputTypeBySchemaProperty(schemaProperty)"
                               :invalid="invalid"
@@ -71,10 +70,6 @@ export default defineComponent<JsonSchemaFormProps>({
             validator(lang?: SupportLanguage) {
                 return lang === undefined || supportLanguages.includes(lang);
             },
-        },
-        resetOnSchemaChange: {
-            type: Boolean,
-            default: false,
         },
         validationMode: {
             type: String as PropType<ValidationMode>,
@@ -142,7 +137,7 @@ export default defineComponent<JsonSchemaFormProps>({
         /* Watchers */
         watch(() => props.schema, () => {
             state.contextKey = Math.floor(Math.random() * Date.now());
-            if (props.resetOnSchemaChange) reset(props.formData ?? {});
+            reset(props.formData ?? {});
         });
         watch(() => props.formData, (formData) => {
             if (formData === state.proxyFormData) return;

@@ -33,7 +33,6 @@ export const Template = (args, { argTypes }) => ({
             :schema="schema"
             :form-data.sync="proxyFormData"
             :language="language"
-            :reset-on-schema-change="resetOnSchemaChange"
             :validation-mode="validationMode"
         />
     `,
@@ -144,7 +143,6 @@ export const Template = (args, { argTypes }) => ({
         class="col-span-6"
         :schema="schema"
         :form-data="formData"
-        reset-on-schema-change
     />
     <div class="col-span-6">
         <p-button style-type="primary"
