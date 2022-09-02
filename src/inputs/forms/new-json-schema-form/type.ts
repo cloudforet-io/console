@@ -19,6 +19,9 @@ export interface JsonSchema<T extends JsonSchemaType = JsonSchemaType> {
     required?: string[];
 }
 
+export const VALIDATION_MODES = ['input', 'all', 'none'] as const;
+export type ValidationMode = typeof VALIDATION_MODES[number]
+
 export interface InnerJsonSchema extends JsonSchema {
     id: string;
 }
@@ -27,4 +30,6 @@ export interface JsonSchemaFormProps {
     schema?: JsonSchema;
     formData?: object;
     language?: SupportLanguage;
+    resetOnSchemaChange?: boolean;
+    validationMode?: ValidationMode; // default: input
 }

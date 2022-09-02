@@ -41,8 +41,9 @@ import type {
     InnerJsonSchema,
     JsonSchema,
     JsonSchemaFormProps,
+    ValidationMode,
 } from '@/inputs/forms/new-json-schema-form/type';
-import { TEXT_INPUT_TYPES } from '@/inputs/forms/new-json-schema-form/type';
+import { TEXT_INPUT_TYPES, VALIDATION_MODES } from '@/inputs/forms/new-json-schema-form/type';
 import { useValidation } from '@/inputs/forms/new-json-schema-form/validation';
 import PTextInput from '@/inputs/input/PTextInput.vue';
 import type { SupportLanguage } from '@/translations';
@@ -71,6 +72,17 @@ export default defineComponent<JsonSchemaFormProps>({
                 return lang === undefined || supportLanguages.includes(lang);
             },
         },
+        resetOnSchemaChange: {
+            type: Boolean,
+            default: false,
+        },
+        validationMode: {
+            type: String as PropType<ValidationMode>,
+            default: 'input',
+            validator(mode?: ValidationMode) {
+                return mode === undefined || VALIDATION_MODES.includes(mode);
+            },
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -91,7 +103,7 @@ export default defineComponent<JsonSchemaFormProps>({
 
         const { localize } = useLocalize(props);
         const {
-            invalidMessages, inputOccurred,
+            invalidMessages, validatorErrors, inputOccurred,
             validateFormData, getPropertyInvalidState,
         } = useValidation(props, {
             localize, formData: computed(() => state.proxyFormData),
@@ -110,6 +122,11 @@ export default defineComponent<JsonSchemaFormProps>({
             });
             state.proxyFormData = newFormData;
         };
+        const reset = (formData?: object) => {
+            setFormData(formData);
+            validatorErrors.value = null;
+            inputOccurred.value = {};
+        };
 
         /* Event Handlers */
         const handleTextInput = (property: InnerJsonSchema, val?: string) => {
@@ -125,6 +142,7 @@ export default defineComponent<JsonSchemaFormProps>({
         /* Watchers */
         watch(() => props.schema, () => {
             state.contextKey = Math.floor(Math.random() * Date.now());
+            if (props.resetOnSchemaChange) reset(props.formData ?? {});
         });
         watch(() => props.formData, (formData) => {
             if (formData === state.proxyFormData) return;

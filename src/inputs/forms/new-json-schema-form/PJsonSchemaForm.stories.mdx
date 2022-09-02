@@ -13,6 +13,9 @@ import {
     getDefaultFormData, getDefaultSchema
 } from "@/inputs/forms/new-json-schema-form/mock";
 import {supportLanguages} from "@/translations";
+import {
+    VALIDATION_MODES
+} from "@/inputs/forms/new-json-schema-form/type";
 
 
 <Meta title='Inputs/Forms/Json Schema Form' parameters={{
@@ -30,6 +33,8 @@ export const Template = (args, { argTypes }) => ({
             :schema="schema"
             :form-data.sync="proxyFormData"
             :language="language"
+            :reset-on-schema-change="resetOnSchemaChange"
+            :validation-mode="validationMode"
         />
     `,
     setup(props) {
@@ -114,6 +119,102 @@ export const Template = (args, { argTypes }) => ({
                     formData: getDefaultFormData(),
                     language: 'en',
                     languages: supportLanguages.map(d => ({name: d, label: d}))
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Reset on Schema Change
+
+<Canvas>
+    <Story name="Reset on Schema Change" >
+        {{
+            components: { PJsonSchemaForm, PTextEditor, PButton },
+            template: `
+<div class="grid grid-cols-12">
+    <p-json-schema-form
+        class="col-span-6"
+        :schema="schema"
+        :form-data="formData"
+        reset-on-schema-change
+    />
+    <div class="col-span-6">
+        <p-button style-type="primary"
+            class="mb-4"
+            @click="resetSchema">Reset Schema</p-button>
+        <p-button style-type="secondary"
+                  class="mb-4"
+                  @click="changeFormData">Change Form Data</p-button>
+        <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                       mode="readOnly"
+                       folded
+        />
+    </div>
+</div>
+`,
+            setup(props) {
+                const state = reactive({
+                    schema: getDefaultSchema(),
+                    formData: {}
+                })
+                const resetSchema = () => {
+                    state.schema = getDefaultSchema()
+                }
+                const changeFormData = () => {
+                    state.formData = getDefaultFormData()
+                }
+                return {
+                    ...toRefs(state),
+                    resetSchema,
+                    changeFormData
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Validation Mode
+
+<Canvas>
+    <Story name="Validation Mode" >
+        {{
+            components: { PJsonSchemaForm, PTextEditor, PSelectDropdown },
+            template: `
+<div class="grid grid-cols-12">
+    <p-json-schema-form
+        class="col-span-6"
+        :schema="schema"
+        :form-data="formData"
+        :validation-mode="validationMode"
+    />
+    <div class="col-span-6">
+        <span class="font-lg font-bold mb-2">Validation Mode: </span>
+        <p-select-dropdown class="mb-4"
+            :selected.sync="validationMode" :items="validationModes" />
+        <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                       mode="readOnly"
+                       folded
+        />
+    </div>
+</div>
+`,
+            setup(props) {
+                const state = reactive({
+                    schema: getDefaultSchema(),
+                    formData: {},
+                    validationModes: VALIDATION_MODES.map(d => ({name: d, label: d})),
+                    validationMode: VALIDATION_MODES[0]
                 })
                 return {
                     ...toRefs(state),

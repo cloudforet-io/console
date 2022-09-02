@@ -1,6 +1,6 @@
 import type { Ref } from '@vue/composition-api';
 import {
-    computed, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import type { ErrorObject, ValidateFunction } from 'ajv';
@@ -68,7 +68,15 @@ export const useValidation = (props: JsonSchemaFormProps, { formData, localize }
         return valid;
     };
 
-    const getPropertyInvalidState = (property: InnerJsonSchema): boolean|undefined => state.inputOccurred[property.id] && !!state.invalidMessages[property.id];
+    const getPropertyInvalidState = (property: InnerJsonSchema): boolean|undefined => {
+        if (props.validationMode === 'all') return !!state.invalidMessages[property.id];
+        if (props.validationMode === 'input' && state.inputOccurred[property.id]) return !!state.invalidMessages[property.id];
+        return undefined;
+    };
+
+    watch(() => props.validationMode, (validationMode) => {
+        if (validationMode === 'all') validateFormData();
+    }, { immediate: true });
 
     return {
         ...toRefs(state),

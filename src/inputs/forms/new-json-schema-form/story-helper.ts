@@ -1,6 +1,7 @@
 import type { ArgTypes } from '@storybook/addons';
 
 import { getDefaultFormData, getDefaultSchema } from '@/inputs/forms/new-json-schema-form/mock';
+import { VALIDATION_MODES } from '@/inputs/forms/new-json-schema-form/type';
 import { supportLanguages } from '@/translations';
 
 export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
@@ -56,6 +57,47 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
         control: {
             type: 'select',
             options: supportLanguages,
+        },
+    },
+    resetOnSchemaChange: {
+        name: 'resetOnSchemaChange',
+        type: { name: 'boolean' },
+        description: 'Whether to reset validation state and input occurred state when schema prop is changed.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    validationMode: {
+        name: 'validationMode',
+        type: { name: 'string' },
+        description: `Validation mode. ${VALIDATION_MODES} are available. <br/>
+        \`input\`:  Show validation results only for fields where input occurred.  <br/>
+        \`all\`:  Show the validation results of all fields.  <br/>
+        \`none\`:  Do not show validation results.  <br/>
+        `,
+        defaultValue: VALIDATION_MODES[0],
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'input',
+            },
+        },
+        control: {
+            type: 'select',
+            options: VALIDATION_MODES,
         },
     },
     // events
