@@ -1,3 +1,10 @@
+# [1.1.0-beta.382](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.381...v1.1.0-beta.382) (2022-09-02)
+
+
+### Features
+
+* **json-schema-form:** make reset on schema change as built-in spec ([#1074](https://github.com/spaceone-dev/spaceone-design-system/issues/1074)) ([bdefa93](https://github.com/spaceone-dev/spaceone-design-system/commit/bdefa93298337e0ba51cc89511a66db41b190d76))
+
 # [1.1.0-beta.381](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.380...v1.1.0-beta.381) (2022-09-02)
 
 
