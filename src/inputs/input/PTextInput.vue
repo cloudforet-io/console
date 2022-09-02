@@ -18,7 +18,8 @@
                     {{ tag.label || tag.value }}
                 </p-tag>
                 <slot name="default" v-bind="{ value }">
-                    <input :type="inputType"
+                    <input v-bind="$attrs"
+                           :type="inputType"
                            :value="proxyValue"
                            :disabled="disabled"
                            :placeholder="placeholder"
@@ -28,7 +29,8 @@
                 </slot>
             </div>
             <slot v-else name="default" v-bind="{ value }">
-                <input :type="inputType"
+                <input v-bind="$attrs"
+                       :type="inputType"
                        :value="proxyValue"
                        :disabled="disabled"
                        :placeholder="placeholder"
@@ -41,12 +43,12 @@
                     {{ value }}
                 </slot>
             </span>
-            <p-button v-if="($attrs.type === 'password') && visiblePassword"
+            <p-button v-if="(initialInputType === 'password') && passwordVisibilityMode"
                       size="sm"
                       style-type="transparent"
                       font-weight="normal"
                       :disabled="disabled"
-                      @click="handleTogglePassword"
+                      @click.stop.prevent="handleTogglePassword"
             >
                 {{ isPasswordVisible ? $t('COMPONENT.TEXT_INPUT.HIDE') : $t('COMPONENT.TEXT_INPUT.SHOW') }}
             </p-button>
@@ -88,7 +90,7 @@ import PButton from '@/inputs/buttons/button/PButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import type { SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
-import type { HTMLInputTypeAttribute, SelectedItem, TextInputHandler } from '@/inputs/input/type';
+import type { SelectedItem, TextInputHandler } from '@/inputs/input/type';
 
 
 interface TextInputProps {
@@ -107,7 +109,7 @@ interface TextInputProps {
     disableHandler: boolean;
     exactMode: boolean;
     useAutoComplete: boolean;
-    visiblePassword: boolean;
+    passwordVisibilityMode: boolean;
 }
 
 export default defineComponent<TextInputProps>({
@@ -190,7 +192,7 @@ export default defineComponent<TextInputProps>({
             type: Boolean,
             default: false,
         },
-        visiblePassword: {
+        passwordVisibilityMode: {
             type: Boolean,
             default: false,
         },
@@ -211,8 +213,9 @@ export default defineComponent<TextInputProps>({
             menuRef: null,
             targetRef: null,
             isFocused: false,
-            inputType: (attrs?.type) ?? 'text' as HTMLInputTypeAttribute,
-            isPasswordVisible: false,
+            initialInputType: attrs.type,
+            inputType: useProxyValue('type', attrs, emit),
+            isPasswordVisible: computed(() => state.inputType !== 'password'),
             proxyValue: useProxyValue('value', props, emit),
             proxySelectedValue: useProxyValue('selected', props, emit),
             deleteTarget: undefined as string | undefined,
@@ -300,8 +303,7 @@ export default defineComponent<TextInputProps>({
         };
 
         const handleTogglePassword = () => {
-            state.isPasswordVisible = !state.isPasswordVisible;
-            state.inputType = state.isPasswordVisible ? 'text' : 'password';
+            state.inputType = state.isPasswordVisible ? 'password' : 'text';
         };
 
         const deleteSelectedTags = () => {
