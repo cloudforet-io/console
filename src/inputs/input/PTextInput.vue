@@ -18,8 +18,8 @@
                     {{ tag.label || tag.value }}
                 </p-tag>
                 <slot name="default" v-bind="{ value }">
-                    <input v-model="proxyValue"
-                           v-bind="$attrs"
+                    <input v-bind="$attrs"
+                           :value="proxyValue"
                            :disabled="disabled"
                            :placeholder="placeholder"
                            size="1"
@@ -28,8 +28,8 @@
                 </slot>
             </div>
             <slot v-else name="default" v-bind="{ value }">
-                <input v-model="proxyValue"
-                       v-bind="$attrs"
+                <input v-bind="$attrs"
+                       :value="proxyValue"
                        :disabled="disabled"
                        :placeholder="placeholder"
                        size="1"
@@ -195,7 +195,7 @@ export default defineComponent<TextInputProps>({
             menuRef: null,
             targetRef: null,
             isFocused: false,
-            proxyValue: useProxyValue('value', props, emit, 'input'),
+            proxyValue: useProxyValue('value', props, emit),
             proxySelectedValue: useProxyValue('selected', props, emit),
             deleteTarget: undefined as string | undefined,
             deleteTargetIdx: -1,
