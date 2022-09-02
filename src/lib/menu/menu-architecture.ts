@@ -44,7 +44,7 @@ export const MENU_LIST: Menu[] = [
                 ],
             },
             {
-                id: MENU_ID.ADMINISTRATION_PROVIDER,
+                id: MENU_ID.ADMINISTRATION_SETTINGS,
                 subMenuList: [
                     { id: MENU_ID.ADMINISTRATION_PROVIDER },
                 ],
