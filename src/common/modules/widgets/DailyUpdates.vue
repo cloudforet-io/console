@@ -46,7 +46,7 @@
                         <p v-if="item.createdCount || item.deletedCount" class="daily-service">
                             {{ item.title }}<br> <span class="font-bold text-sm">{{ item.totalCount || 0 }}</span>
                         </p>
-                        <router-link v-if="item.createdCount" :to="item.href" class="daily-created-count">
+                        <router-link v-if="item.createdCount" :to="item.createdHref" class="daily-created-count">
                             {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
                             <span class="text-blue-600 font-bold text-sm">{{ item.createdCount || 0 }}
                                 <p-i v-if="item.isCreateWarning" name="ic_state_duplicated" width="0.75rem"
@@ -54,7 +54,7 @@
                                 />
                             </span>
                         </router-link>
-                        <router-link v-if="item.deletedCount" :to="item.href" class="daily-deleted-count">
+                        <router-link v-if="item.deletedCount" :to="item.deletedHref" class="daily-deleted-count">
                             {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
                             <span class="text-red-500 font-bold text-sm"> {{ item.deletedCount || 0 }}
                                 <p-i v-if="item.isDeleteWarning" name="ic_state_duplicated" width="0.75rem"
@@ -132,7 +132,8 @@ interface Item {
     totalCount: number;
     createdCount: number;
     deletedCount: number;
-    href?: Location;
+    createdHref?: Location;
+    deletedHref?: Location;
 }
 
 export default {
@@ -184,12 +185,6 @@ export default {
             const results: Item[] = [];
             rawData.forEach((d) => {
                 const filters: QueryStoreFilter[] = [];
-                if (d.created_count) {
-                    filters.push({ k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' });
-                } else {
-                    filters.push({ k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' });
-                    filters.push({ k: 'state', v: 'DELETED', o: '=' });
-                }
                 if (props.projectId) {
                     filters.push({ k: 'project_id', v: props.projectId, o: '=' });
                 }
@@ -202,7 +197,7 @@ export default {
                     totalCount: d.total_count,
                     createdCount: d.created_count,
                     deletedCount: d.deleted_count,
-                    href: {
+                    createdHref: {
                         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
@@ -210,7 +205,25 @@ export default {
                             name: d.cloud_service_type,
                         },
                         query: {
-                            filters: queryHelper.setFilters(filters).rawQueryStrings,
+                            filters: queryHelper.setFilters([
+                                ...filters,
+                                { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                            ]).rawQueryStrings,
+                        },
+                    },
+                    deletedHref: {
+                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                        params: {
+                            provider: d.provider,
+                            group: d.cloud_service_group,
+                            name: d.cloud_service_type,
+                        },
+                        query: {
+                            filters: queryHelper.setFilters([
+                                ...filters,
+                                { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                                { k: 'state', v: 'DELETED', o: '=' },
+                            ]).rawQueryStrings,
                         },
                     },
                 };
