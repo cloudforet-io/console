@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-import type { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 import VueI18n from 'vue-i18n';
 import type { Location } from 'vue-router';
 
@@ -14,11 +12,11 @@ export const USER_TYPE = Object.freeze({
 export type UserType = typeof USER_TYPE[keyof typeof USER_TYPE];
 
 interface UserData {
-	created_at: Timestamp;
+	created_at: TimeStamp;
 	domain_id?: string;
 	email?: string;
 	language: string;
-	last_accessed_at: Timestamp;
+	last_accessed_at: TimeStamp;
 	name: string;
 	state: string;
 	tags?: Tags;

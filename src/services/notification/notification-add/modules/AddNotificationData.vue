@@ -15,9 +15,10 @@
         </p-field-group>
         <add-notification-level v-if="projectId" @change="onChangeLevel" />
         <p-json-schema-form v-if="isJsonSchema" :key="protocolId"
-                            :model="schemaModel" :schema="schema" :is-valid.sync="isSchemaModelValid"
+                            :form-data="schemaForm" :schema="schema"
+                            :language="$store.state.user.language"
                             class="schema-form"
-                            @update:model="onChangeModel"
+                            @change="handleSchemaFormChange"
         />
         <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER">
             <p-field-group :label="$t('MENU.ADMINISTRATION_USER')" required>
@@ -94,9 +95,9 @@ export default {
         const state = reactive({
             channelName: undefined,
             notificationLevel: 'LV1',
-            schemaModel: {},
+            schemaForm: {},
             schema: null as null|object,
-            isSchemaModelValid: false,
+            isSchemaFormValid: false,
             nameInvalidText: computed(() => {
                 if (state.channelName !== undefined && state.channelName.length === 0) {
                     return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
@@ -109,8 +110,8 @@ export default {
             isNameInvalid: computed(() => !!state.nameInvalidText),
             //
             isJsonSchema: computed(() => (state.schema ? Object.keys(state.schema).length !== 0 : false)),
-            isInputNotEmpty: computed(() => state.channelName !== undefined && Object.keys(state.schemaModel).length !== 0),
-            isInputValid: computed(() => state.isInputNotEmpty && (state.isSchemaModelValid && !state.isNameInvalid)),
+            isInputNotEmpty: computed(() => state.channelName !== undefined && Object.keys(state.schemaForm).length !== 0),
+            isInputValid: computed(() => state.isInputNotEmpty && (state.isSchemaFormValid && !state.isNameInvalid)),
             isDataValid: computed(() => (!state.isJsonSchema && !state.isNameInvalid) || (state.isJsonSchema && state.isInputValid)),
             selectedMember: [],
         });
@@ -132,7 +133,7 @@ export default {
         const emitChange = () => {
             emit('change', {
                 channelName: state.channelName,
-                data: (props.protocolType === PROTOCOL_TYPE.EXTERNAL) ? state.schemaModel : { users: state.selectedMember },
+                data: (props.protocolType === PROTOCOL_TYPE.EXTERNAL) ? state.schemaForm : { users: state.selectedMember },
                 level: state.notificationLevel,
                 isValid: state.isDataValid,
             });
@@ -143,8 +144,9 @@ export default {
             emitChange();
         };
 
-        const onChangeModel = (value) => {
-            state.schemaModel = value;
+        const handleSchemaFormChange = (isValid, form) => {
+            state.isSchemaFormValid = isValid;
+            state.schemaForm = form;
             emitChange();
         };
 
@@ -162,8 +164,8 @@ export default {
         const initStates = () => {
             state.channelName = undefined;
             state.notificationLevel = 'LV1';
-            state.schemaModel = {};
-            state.isSchemaModelValid = false;
+            state.schemaForm = {};
+            state.isSchemaFormValid = false;
             state.selectedMember = [];
             state.schema = null;
         };
@@ -181,7 +183,7 @@ export default {
             CHANNEL_TYPE,
             ...toRefs(state),
             onChangeChannelName,
-            onChangeModel,
+            handleSchemaFormChange,
             onChangeMember,
             onChangeLevel,
         };

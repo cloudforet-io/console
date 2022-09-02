@@ -1,8 +1,7 @@
 import type { DefinitionField } from '@spaceone/design-system/dist/src/data-display/tables/definition-table/type';
-import type { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 import type { TranslateResult } from 'vue-i18n';
 
-import type { Tags } from '@/models';
+import type { Tags, TimeStamp } from '@/models';
 
 import type { PagePermissionType, RawPagePermission } from '@/lib/access-control/config';
 
@@ -14,8 +13,8 @@ export interface Policy {
 }
 
 export interface RoleData {
-    created_at: Timestamp;
-    deleted_at?: Timestamp;
+    created_at: TimeStamp;
+    deleted_at?: TimeStamp;
     domain_id: string;
     name: string;
     policies?: Policy[];

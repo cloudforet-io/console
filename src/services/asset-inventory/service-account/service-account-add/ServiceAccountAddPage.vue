@@ -43,8 +43,9 @@
                     />
                 </template>
             </p-field-group>
-            <p-json-schema-form v-if="accountSchema" :model.sync="accountModel" :schema="accountSchema"
-                                :is-valid.sync="isAccountModelValid"
+            <p-json-schema-form v-if="accountSchema" :form-data.sync="accountForm" :schema="accountSchema"
+                                :language="$store.state.user.language"
+                                @validate="handleAccountValidate"
             />
             <div class="tag-title">
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_LABEL') }}
@@ -97,8 +98,10 @@
                 </p-field-group>
                 <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" stretch>
                     <template #input>
-                        <p-json-schema-form :model.sync="credentialModel" :schema="credentialSchema" :is-valid.sync="isCredentialModelValid"
+                        <p-json-schema-form :form-data.sync="credentialForm" :schema="credentialSchema"
+                                            :language="$store.state.user.language"
                                             class="custom-schema-box"
+                                            @validate="handleCredentialValidate"
                         />
                     </template>
                     <template #json>
@@ -228,31 +231,30 @@ export default {
             isTagsValid: true,
             //
             /* schema input */
-            accountModel: {},
+            accountForm: {},
             accountSchema: null as any|null,
-            isAccountModelValid: false,
+            isAccountSchemaFormValid: false,
             //
-            credentialModel: {},
+            credentialForm: {},
             credentialSchema: {},
-            isCredentialModelValid: false,
+            isCredentialFormValid: false,
             //
             jsonForCredential: '',
             //
             selectedProject: null as ProjectGroup|null,
             //
             isValid: computed(() => {
-                const isAccountModelValid = formState.accountSchema ? formState.isAccountModelValid : true;
-                if (tabState.activeTab === 'json' && state.hasCredentialKey) return formState.isAccountNameValid && isAccountModelValid && formState.jsonForCredential;
-                if (state.hasCredentialKey && state.enableCredentialInput) return formState.isAccountNameValid && isAccountModelValid && formState.isCredentialModelValid;
-                return formState.isAccountNameValid && isAccountModelValid;
+                const isAccountSchemaFormValid = formState.accountSchema ? formState.isAccountSchemaFormValid : true;
+                if (tabState.activeTab === 'json' && state.hasCredentialKey) return formState.isAccountNameValid && isAccountSchemaFormValid && formState.jsonForCredential;
+                if (state.hasCredentialKey && state.enableCredentialInput) return formState.isAccountNameValid && isAccountSchemaFormValid && formState.isCredentialFormValid;
+                return formState.isAccountNameValid && isAccountSchemaFormValid;
             }),
         });
 
         const getProvider = async () => {
             state.providerLoading = true;
             try {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars,no-unused-vars
-                const [_, res] = await Promise.all([
+                const [, res] = await Promise.all([
                     store.dispatch('reference/provider/load'),
                     await SpaceConnector.client.identity.provider.get({
                         provider: props.provider,
@@ -295,7 +297,7 @@ export default {
             Object.keys(res.schema.properties).forEach((key) => {
                 defaultCredentialModal[key] = undefined;
             });
-            formState.credentialModel = defaultCredentialModal;
+            formState.credentialForm = defaultCredentialModal;
         };
 
         const deleteServiceAccount = async () => {
@@ -308,7 +310,7 @@ export default {
             const item: any = {
                 name: formState.accountName,
                 provider: props.provider,
-                data: formState.accountModel,
+                data: formState.accountForm,
                 tags: formState.tags,
             };
 
@@ -325,7 +327,7 @@ export default {
         const createSecretWithForm = async () => {
             await SpaceConnector.client.secret.secret.create({
                 name: formState.accountName + state.serviceAccountId,
-                data: formState.credentialModel,
+                data: formState.credentialForm,
                 schema: state.selectedSecretType,
                 secret_type: 'CREDENTIALS',
                 service_account_id: state.serviceAccountId,
@@ -361,6 +363,12 @@ export default {
             return isSucceed;
         };
 
+        const handleAccountValidate = (isValid) => {
+            formState.isAccountSchemaFormValid = isValid;
+        };
+        const handleCredentialValidate = (isValid) => {
+            formState.isCredentialFormValid = isValid;
+        };
         const handleSave = async () => {
             if (!formState.isValid) {
                 ErrorHandler.handleRequestError(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
@@ -370,7 +378,7 @@ export default {
 
             await createServiceAccount();
             if (state.serviceAccountId && state.hasCredentialKey && state.enableCredentialInput) {
-                if (formState.credentialModel.private_key) formState.credentialModel.private_key = formState.credentialModel.private_key.replace(/\\n/g, '\n');
+                if (formState.credentialForm.private_key) formState.credentialForm.private_key = formState.credentialForm.private_key.replace(/\\n/g, '\n');
                 const isSecretCreationSuccess = await createSecret();
                 if (!isSecretCreationSuccess) return;
             }
@@ -405,6 +413,8 @@ export default {
             ...toRefs(state),
             ...toRefs(formState),
             tabState,
+            handleAccountValidate,
+            handleCredentialValidate,
             handleSave,
             handleGoBack,
             handleSelectedProject,

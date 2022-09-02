@@ -22,8 +22,10 @@
                 </p>
                 <div>
                     <p-json-schema-form
-                        :model.sync="dataForEdit" :schema="schema" :is-valid.sync="isSchemaDataValid"
+                        :form-data.sync="dataForEdit" :schema="schema"
+                        :language="$store.state.user.language"
                         class="schema-form"
+                        @validate="handleSchemaValidate"
                     />
                 </div>
             </div>
@@ -185,6 +187,10 @@ export default {
             notificationItemState.dataForEdit.users = value.users;
         };
 
+        const handleSchemaValidate = (isValid) => {
+            state.isSchemaDataValid = isValid;
+        };
+
         (async () => {
             await Promise.allSettled([
                 setKeyListForEdit(), setKeyListForRead(), setValueList(),
@@ -204,6 +210,7 @@ export default {
             updateUserChannel,
             updateProjectChannel,
             onChangeUser,
+            handleSchemaValidate,
         };
     },
 };
