@@ -18,7 +18,7 @@
                     {{ tag.label || tag.value }}
                 </p-tag>
                 <slot name="default" v-bind="{ value }">
-                    <input v-bind="$attrs"
+                    <input :type="inputType"
                            :value="proxyValue"
                            :disabled="disabled"
                            :placeholder="placeholder"
@@ -28,7 +28,7 @@
                 </slot>
             </div>
             <slot v-else name="default" v-bind="{ value }">
-                <input v-bind="$attrs"
+                <input :type="inputType"
                        :value="proxyValue"
                        :disabled="disabled"
                        :placeholder="placeholder"
@@ -41,13 +41,22 @@
                     {{ value }}
                 </slot>
             </span>
-            <p-i
-                v-show="(isFocused || isInvalid)"
-                class="delete-all-icon"
-                name="ic_delete" height="1rem" width="1rem"
-                color="inherit transparent"
-                @mousedown.native.prevent
-                @click="handleDeleteAllTags"
+            <p-button v-if="($attrs.type === 'password') && visiblePassword"
+                      size="sm"
+                      style-type="transparent"
+                      font-weight="normal"
+                      :disabled="disabled"
+                      @click="handleTogglePassword"
+            >
+                {{ isPasswordVisible ? $t('COMPONENT.TEXT_INPUT.HIDE') : $t('COMPONENT.TEXT_INPUT.SHOW') }}
+            </p-button>
+            <p-i v-else
+                 v-show="(isFocused || isInvalid)"
+                 class="delete-all-icon"
+                 name="ic_delete" height="1rem" width="1rem"
+                 color="inherit transparent"
+                 @mousedown.native.prevent
+                 @click="handleDeleteAllTags"
             />
         </div>
         <p-context-menu v-if="proxyVisibleMenu && useAutoComplete"
@@ -75,10 +84,11 @@ import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import { useProxyValue } from '@/hooks/proxy-state';
+import PButton from '@/inputs/buttons/button/PButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import type { SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
-import type { SelectedItem, TextInputHandler } from '@/inputs/input/type';
+import type { HTMLInputTypeAttribute, SelectedItem, TextInputHandler } from '@/inputs/input/type';
 
 
 interface TextInputProps {
@@ -97,6 +107,7 @@ interface TextInputProps {
     disableHandler: boolean;
     exactMode: boolean;
     useAutoComplete: boolean;
+    visiblePassword: boolean;
 }
 
 export default defineComponent<TextInputProps>({
@@ -105,6 +116,7 @@ export default defineComponent<TextInputProps>({
         PTag,
         PI,
         PContextMenu,
+        PButton,
     },
     directives: {
         focus,
@@ -178,9 +190,13 @@ export default defineComponent<TextInputProps>({
             type: Boolean,
             default: false,
         },
+        visiblePassword: {
+            type: Boolean,
+            default: false,
+        },
     },
 
-    setup(props, { emit, listeners }) {
+    setup(props, { emit, listeners, attrs }) {
         const {
             proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
         } = useContextMenuFixedStyle({
@@ -195,6 +211,8 @@ export default defineComponent<TextInputProps>({
             menuRef: null,
             targetRef: null,
             isFocused: false,
+            inputType: (attrs?.type) ?? 'text' as HTMLInputTypeAttribute,
+            isPasswordVisible: false,
             proxyValue: useProxyValue('value', props, emit),
             proxySelectedValue: useProxyValue('selected', props, emit),
             deleteTarget: undefined as string | undefined,
@@ -281,6 +299,11 @@ export default defineComponent<TextInputProps>({
             hideMenu();
         };
 
+        const handleTogglePassword = () => {
+            state.isPasswordVisible = !state.isPasswordVisible;
+            state.inputType = state.isPasswordVisible ? 'text' : 'password';
+        };
+
         const deleteSelectedTags = () => {
             if (state.proxyValue.length > 0) return;
             const lastIdx = state.proxySelectedValue.length - 1;
@@ -362,6 +385,7 @@ export default defineComponent<TextInputProps>({
             handleDeleteAllTags,
             handleFocusMenuItem,
             handleSelectMenuItem,
+            handleTogglePassword,
         };
     },
 });
