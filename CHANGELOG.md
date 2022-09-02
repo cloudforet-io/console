@@ -1,3 +1,10 @@
+# [1.1.0-beta.381](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.380...v1.1.0-beta.381) (2022-09-02)
+
+
+### Features
+
+* **json-schema-form:** add validation mode & reset on schema change props ([#1073](https://github.com/spaceone-dev/spaceone-design-system/issues/1073)) ([13fa833](https://github.com/spaceone-dev/spaceone-design-system/commit/13fa8332c6b25ab53ce9fbf1df62b1157d0bf4be))
+
 # [1.1.0-beta.380](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.379...v1.1.0-beta.380) (2022-09-02)
 
 
