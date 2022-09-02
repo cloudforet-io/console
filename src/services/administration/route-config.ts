@@ -26,4 +26,13 @@ export const ADMINISTRATION_ROUTE = Object.freeze({
             },
         },
     },
+    SETTINGS: {
+        _NAME: MENU_ID.ADMINISTRATION_SETTINGS,
+        PROVIDER: {
+            _NAME: MENU_ID.ADMINISTRATION_PROVIDER,
+            ADD: {
+                _NAME: `${MENU_ID.ADMINISTRATION_PROVIDER}.add`,
+            },
+        },
+    },
 });

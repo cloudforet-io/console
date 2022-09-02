@@ -20,6 +20,8 @@ export const MENU_ID = Object.freeze({
     ADMINISTRATION_USER: 'administration.user',
     ADMINISTRATION_ROLE: 'administration.role',
     ADMINISTRATION_POLICY: 'administration.policy',
+    ADMINISTRATION_SETTINGS: 'administration.settings',
+    ADMINISTRATION_PROVIDER: 'administration.provider',
     MY_PAGE: 'my_page',
     MY_PAGE_ACCOUNT: 'my_page.account',
     MY_PAGE_ACCOUNT_PROFILE: 'my_page.account_profile',

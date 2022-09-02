@@ -31,20 +31,31 @@ export default defineComponent({
     setup() {
         return {
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION].translationId)),
-            menuSet: computed<LNBMenu[]>(() => filterLNBMenuByPermission([
-                {
-                    type: 'title', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_IAM].translationId), id: MENU_ID.ADMINISTRATION_IAM, foldable: false,
-                },
-                {
-                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_USER].translationId), id: MENU_ID.ADMINISTRATION_USER, to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME },
-                },
-                {
-                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_ROLE].translationId), id: MENU_ID.ADMINISTRATION_ROLE, to: { name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME },
-                },
-                {
-                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_POLICY].translationId), id: MENU_ID.ADMINISTRATION_POLICY, to: { name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME },
-                },
-            ], store.getters['user/pagePermissionList'])),
+            menuSet: computed<LNBMenu[]>(() => [
+                ...filterLNBMenuByPermission([
+                    {
+                        type: 'title', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_IAM].translationId), id: MENU_ID.ADMINISTRATION_IAM, foldable: false,
+                    },
+                    {
+                        type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_USER].translationId), id: MENU_ID.ADMINISTRATION_USER, to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME },
+                    },
+                    {
+                        type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_ROLE].translationId), id: MENU_ID.ADMINISTRATION_ROLE, to: { name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME },
+                    },
+                    {
+                        type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_POLICY].translationId), id: MENU_ID.ADMINISTRATION_POLICY, to: { name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME },
+                    },
+                ], store.getters['user/pagePermissionList']),
+                { type: 'divider' },
+                ...filterLNBMenuByPermission([
+                    {
+                        type: 'title', label: 'Additional Settings', id: MENU_ID.ADMINISTRATION_SETTINGS, foldable: false,
+                    },
+                    {
+                        type: 'item', label: 'Provider', id: MENU_ID.ADMINISTRATION_PROVIDER, to: { name: ADMINISTRATION_ROUTE.SETTINGS.PROVIDER._NAME },
+                    },
+                ], store.getters['user/pagePermissionList']),
+            ]),
         };
     },
 });
