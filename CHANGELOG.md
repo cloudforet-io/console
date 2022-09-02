@@ -1,3 +1,15 @@
+# [1.1.0-beta.379](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.378...v1.1.0-beta.379) (2022-09-02)
+
+
+### Bug Fixes
+
+* **text-input:** do not execute input handler twice ([#1069](https://github.com/spaceone-dev/spaceone-design-system/issues/1069)) ([fbbd471](https://github.com/spaceone-dev/spaceone-design-system/commit/fbbd471dbca58bebb65d4f9228b15f2e7d7da077))
+
+
+### Features
+
+* **json-schema-form:** update specs and refactor  ([#1070](https://github.com/spaceone-dev/spaceone-design-system/issues/1070)) ([3a51b63](https://github.com/spaceone-dev/spaceone-design-system/commit/3a51b63b20c95caeb84143908587a4c8759926f3))
+
 # [1.1.0-beta.378](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.377...v1.1.0-beta.378) (2022-08-31)
 
 
