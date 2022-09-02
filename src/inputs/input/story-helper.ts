@@ -247,6 +247,24 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
+        visiblePassword: {
+            name: 'visiblePassword',
+            type: { name: 'boolean' },
+            description: 'Use this prop when you want to control show/hide button of password input.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         // attrs
         inputAttrs: {
             name: 'all input attributes',
@@ -263,6 +281,23 @@ export const getTextInputArgTypes = (): ArgTypes => {
             },
             control: {
                 type: 'object',
+            },
+        },
+        type: {
+            name: 'type',
+            description: 'type of input tag (e.g. text, password, date ...)',
+            defaultValue: 'text',
+            table: {
+                type: {
+                    summary: null,
+                },
+                defaultValue: {
+                    summary: 'text',
+                },
+                category: 'attrs',
+            },
+            control: {
+                type: 'text',
             },
         },
         // model
