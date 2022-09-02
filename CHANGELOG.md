@@ -1,3 +1,10 @@
+# [1.1.0-beta.380](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.379...v1.1.0-beta.380) (2022-09-02)
+
+
+### Features
+
+* **json-schema-form:** add language prop to support i18n ([#1071](https://github.com/spaceone-dev/spaceone-design-system/issues/1071)) ([0750e9f](https://github.com/spaceone-dev/spaceone-design-system/commit/0750e9fcc56c769f0dc3fd812cc9bd009b69090a))
+
 # [1.1.0-beta.379](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.378...v1.1.0-beta.379) (2022-09-02)
 
 
