@@ -19,7 +19,8 @@ export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PTextInput },
     template: `
-        <p-text-input :value="value" :invalid="invalid"
+        <p-text-input v-bind="inputAttrs"
+                      :value="value" :invalid="invalid"
                       :disabled="disabled" :block="block"
                       :menu="menu" :use-fixed-menu-style="useFixedMenuStyle"
                       :loading="loading"

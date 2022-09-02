@@ -251,7 +251,7 @@ export const getTextInputArgTypes = (): ArgTypes => {
         inputAttrs: {
             name: 'all input attributes',
             description: 'All input attributes are allowed. e.g. type',
-            defaultValue: false,
+            defaultValue: {},
             table: {
                 type: {
                     summary: null,
@@ -261,7 +261,9 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 },
                 category: 'attrs',
             },
-            control: null,
+            control: {
+                type: 'object',
+            },
         },
         // model
         'v-model': {
