@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="service-account-add-page">
         <p-page-title class="mb-6"
                       child
                       :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE')"
@@ -13,7 +13,7 @@
             </template>
             <template #extra>
                 <info-button v-if="description" :visible="!!description"
-                             class="flex-shrink-0"
+                             class="info-button"
                 >
                     <template #contents>
                         <p-markdown :markdown="description.options.markdown"
@@ -26,53 +26,16 @@
             </template>
         </p-page-title>
 
-        <p-pane-layout>
-            <div class="title">
-                {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE') }}
-            </div>
-            <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
-                           :invalid-text="accountNameInvalidText"
-                           :invalid="accountName && !isAccountNameValid"
-                           :required="true"
-            >
-                <template #default="{invalid}">
-                    <p-text-input v-model="accountName"
-                                  class="account-name-input block"
-                                  :invalid="invalid"
-                                  :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_NAME_PLACEHOLDER')"
-                    />
-                </template>
-            </p-field-group>
-            <p-json-schema-form v-if="accountSchema" :form-data.sync="accountForm" :schema="accountSchema"
-                                :language="$store.state.user.language"
-                                @validate="handleAccountValidate"
-            />
-            <div class="tag-title">
-                {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_LABEL') }}
-            </div>
-            <div class="tag-help-msg">
-                <i18n path="IDENTITY.SERVICE_ACCOUNT.ADD.TAG_DESC_1">
-                    <template #name>
-                        <span v-if="accountName" class="font-bold">[{{ accountName }}]</span>
-                        <span v-else>{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.ACCOUNT') }}</span>
-                    </template>
-                </i18n>
-                <br>
-                {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_DESC_2') }}
-            </div>
-            <tags-input-group :tags="tags"
-                              show-validation
-                              :is-valid.sync="isTagsValid"
-                              @update-tags="handleUpdateTags"
-            />
-        </p-pane-layout>
-
+        <service-account-base-information mode="EDIT"
+                                          :provider-data="providerObj"
+                                          :is-valid.sync="isBaseInformationValid"
+                                          @change="handleChangeBaseInformation"
+        />
         <project-tree-panel class="tree-panel"
-                            :target-name="accountName"
                             @select="handleSelectedProject"
         />
 
-        <p-pane-layout v-if="enableCredentialInput">
+        <p-pane-layout v-if="enableCredentialInput" class="form-wrapper">
             <div class="title">
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIALS_TITLE') }}
             </div>
@@ -113,7 +76,7 @@
 
         <div class="button-group">
             <p-button class="text-button" style-type="primary-dark" size="lg"
-                      :disabled="!isValid || !isTagsValid"
+                      :disabled="!isValid"
                       @click="handleSave"
             >
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.SAVE') }}
@@ -133,39 +96,37 @@ import {
     reactive, computed, toRefs, watch,
 } from '@vue/composition-api';
 
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPageTitle, PJsonSchemaForm, PTab, PFieldGroup, PLazyImg,
-    PPaneLayout, PButton, PRadio, PMarkdown, PTextEditor, PTextInput,
+    PPaneLayout, PButton, PRadio, PMarkdown, PTextEditor,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { get } from 'lodash';
-import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import InfoButton from '@/common/modules/portals/InfoButton.vue';
 
+import ServiceAccountBaseInformation
+    from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformation.vue';
 import ProjectTreePanel from '@/services/asset-inventory/service-account/service-account-add/modules/ProjectTreePanel.vue';
-import type { ProjectGroup, ProviderModel } from '@/services/asset-inventory/service-account/type';
+import type { BaseInformationData, ProjectGroup, ProviderModel } from '@/services/asset-inventory/service-account/type';
 
 
 export default {
     name: 'AddServiceAccountPage',
     components: {
+        ServiceAccountBaseInformation,
         InfoButton,
         PLazyImg,
         PTab,
-        PTextInput,
         PJsonSchemaForm,
         PTextEditor,
         PMarkdown,
@@ -174,7 +135,6 @@ export default {
         PPaneLayout,
         PButton,
         PRadio,
-        TagsInputGroup,
         ProjectTreePanel,
     },
     props: {
@@ -192,8 +152,6 @@ export default {
             description: computed(() => get(state.providerObj, 'metadata.view.layouts.help:service_account:create', undefined)),
             selectedSecretType: '',
             hasCredentialKey: true,
-            serviceAccountNames: [] as string[],
-            credentialNames: [] as string[],
             secretTypes: computed<any[]>(() => get(state.providerObj, 'capability.supported_schema', [])),
             enableCredentialInput: computed<boolean>(() => state.secretTypes.length > 0),
         });
@@ -207,33 +165,8 @@ export default {
         });
 
         const formState = reactive({
-            /* static input */
-            accountName: undefined as undefined | string,
-            accountNameInvalidText: computed(() => {
-                let invalidText: TranslateResult = '';
-                if (typeof formState.accountName === 'string') {
-                    if (formState.accountName.length < 2) {
-                        invalidText = i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
-                    } else if (state.serviceAccountNames.includes(formState.accountName)) {
-                        invalidText = i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_DUPLICATED');
-                    }
-                }
-                return invalidText;
-            }),
-            isAccountNameValid: computed(() => {
-                if (formState.accountName) {
-                    return !(formState.accountName.length < 2 || state.serviceAccountNames.includes(formState.accountName));
-                }
-                return false;
-            }),
-            //
-            tags: {},
-            isTagsValid: true,
-            //
-            /* schema input */
-            accountForm: {},
-            accountSchema: null as any|null,
-            isAccountSchemaFormValid: false,
+            baseInformationForm: {} as BaseInformationData,
+            isBaseInformationValid: false,
             //
             credentialForm: {},
             credentialSchema: {},
@@ -244,10 +177,10 @@ export default {
             selectedProject: null as ProjectGroup|null,
             //
             isValid: computed(() => {
-                const isAccountSchemaFormValid = formState.accountSchema ? formState.isAccountSchemaFormValid : true;
-                if (tabState.activeTab === 'json' && state.hasCredentialKey) return formState.isAccountNameValid && isAccountSchemaFormValid && formState.jsonForCredential;
-                if (state.hasCredentialKey && state.enableCredentialInput) return formState.isAccountNameValid && isAccountSchemaFormValid && formState.isCredentialFormValid;
-                return formState.isAccountNameValid && isAccountSchemaFormValid;
+                if (!formState.isBaseInformationValid) return false;
+                if (tabState.activeTab === 'json' && state.hasCredentialKey) return formState.jsonForCredential;
+                if (state.hasCredentialKey && state.enableCredentialInput) return formState.isCredentialFormValid;
+                return true;
             }),
         });
 
@@ -271,21 +204,6 @@ export default {
                 state.providerLoading = false;
             }
         };
-        const getCredentialNames = async () => {
-            const res = await SpaceConnector.client.secret.secret.list({
-                only: 'name',
-            });
-            state.credentialNames = res.results.map(v => v.name);
-        };
-        const getServiceAccountNames = async () => {
-            const res = await SpaceConnector.client.identity.serviceAccount.list({
-                only: 'name',
-            });
-            state.serviceAccountNames = res.results.map(v => v.name);
-        };
-        const getServiceAccountSchema = async () => {
-            formState.accountSchema = state.providerObj.template?.service_account?.schema ?? null;
-        };
         const getCredentialSchema = async (selectedSecretType) => {
             const res = await SpaceConnector.client.repository.schema.get({
                 name: selectedSecretType,
@@ -308,10 +226,10 @@ export default {
         };
         const createServiceAccount = async () => {
             const item: any = {
-                name: formState.accountName,
                 provider: props.provider,
-                data: formState.accountForm,
-                tags: formState.tags,
+                name: formState.baseInformationForm.accountName,
+                data: formState.baseInformationForm.customSchemaForm,
+                tags: formState.baseInformationForm.tags,
             };
 
             if (formState.selectedProject) {
@@ -326,7 +244,7 @@ export default {
         };
         const createSecretWithForm = async () => {
             await SpaceConnector.client.secret.secret.create({
-                name: formState.accountName + state.serviceAccountId,
+                name: formState.baseInformationForm.accountName + state.serviceAccountId,
                 data: formState.credentialForm,
                 schema: state.selectedSecretType,
                 secret_type: 'CREDENTIALS',
@@ -336,7 +254,7 @@ export default {
         };
         const createSecretWithJson = async (jsonData) => {
             await SpaceConnector.client.secret.secret.create({
-                name: formState.accountName + state.serviceAccountId,
+                name: formState.baseInformationForm.accountName + state.serviceAccountId,
                 data: jsonData,
                 schema: state.selectedSecretType,
                 secret_type: 'CREDENTIALS',
@@ -363,9 +281,6 @@ export default {
             return isSucceed;
         };
 
-        const handleAccountValidate = (isValid) => {
-            formState.isAccountSchemaFormValid = isValid;
-        };
         const handleCredentialValidate = (isValid) => {
             formState.isCredentialFormValid = isValid;
         };
@@ -374,7 +289,6 @@ export default {
                 ErrorHandler.handleRequestError(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
                 return;
             }
-            if (!formState.isTagsValid) return;
 
             await createServiceAccount();
             if (state.serviceAccountId && state.hasCredentialKey && state.enableCredentialInput) {
@@ -391,7 +305,10 @@ export default {
         };
         const handleSelectedProject = (selectedProject) => { formState.selectedProject = selectedProject; };
         const handleUpdateTags = (tags: Tag) => {
-            formState.tags = tags;
+            formState.baseInformationForm.tags = tags;
+        };
+        const handleChangeBaseInformation = (baseInformationForm) => {
+            formState.baseInformationForm = baseInformationForm;
         };
 
         watch(() => state.selectedSecretType, async (after, before) => {
@@ -402,10 +319,6 @@ export default {
 
         const init = async () => {
             await getProvider();
-            await getServiceAccountNames();
-            await getCredentialNames();
-            //
-            await getServiceAccountSchema();
         };
         init();
 
@@ -413,12 +326,12 @@ export default {
             ...toRefs(state),
             ...toRefs(formState),
             tabState,
-            handleAccountValidate,
             handleCredentialValidate,
             handleSave,
             handleGoBack,
             handleSelectedProject,
             handleUpdateTags,
+            handleChangeBaseInformation,
         };
     },
 };
@@ -427,9 +340,10 @@ export default {
 
 <style lang="postcss" scoped>
 .info-button {
+    flex-shrink: 0;
     line-height: 2rem;
 }
-.p-pane-layout::v-deep {
+.form-wrapper {
     width: 100%;
     padding: 2rem 1rem;
     margin-bottom: 1rem;
@@ -440,23 +354,6 @@ export default {
         font-size: 1.5rem;
         line-height: 120%;
         margin-bottom: 2rem;
-    }
-    .tag-title {
-        font-size: 0.875rem;
-        font-weight: bold;
-        line-height: 120%;
-        margin-top: 1rem;
-        margin-bottom: 0.5rem;
-    }
-    .tag-help-msg {
-        font-size: 0.875rem;
-        line-height: 150%;
-        margin-bottom: 1.5rem;
-    }
-    .account-name-input {
-        @screen lg {
-            max-width: 50%;
-        }
     }
     .radio-text {
         margin-right: 1.125rem;
