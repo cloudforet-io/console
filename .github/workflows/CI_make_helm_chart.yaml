@@ -6,7 +6,7 @@ on:
 
 jobs:
   helm_spaceone:
-    if: github.repository_owner == 'spaceone-dev'
+    if: github.repository_owner == 'cloudforet-io'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -36,8 +36,8 @@ jobs:
           echo "SERVICE=${SERVICE}" >> $GITHUB_ENV
 
           helm package deploy/helm --destination .deploy
-          cr upload -o spaceone-dev -r charts -p .deploy --token ${{ secrets.PAT_TOKEN }}
-          cr index -i ./index.yaml -p .deploy/ -o spaceone-dev -r charts -c https://spaceone-dev.github.io/charts --token ${{ secrets.PAT_TOKEN }}
+          cr upload -o spaceone-dev -r charts -p .deploy --token ${{ secrets.SPACEONE_PAT_TOKEN }}
+          cr index -i ./index.yaml -p .deploy/ -o spaceone-dev -r charts -c https://spaceone-dev.github.io/charts --token ${{ secrets.SPACEONE_PAT_TOKEN }}
           cp index.yaml /tmp/index.yaml
 
       - name: Check out chart repo
@@ -45,7 +45,7 @@ jobs:
         with:
           repository: spaceone-dev/charts
           ref: gh-pages
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.SPACEONE_PAT_TOKEN }}
       - name: Update Helm repository index.yaml
         run: |
           git config --global user.email admin@spaceone.dev
@@ -57,7 +57,7 @@ jobs:
           git push origin gh-pages
 
   helm_cloudforet:
-    if: github.repository_owner == 'spaceone-dev'
+    if: github.repository_owner == 'cloudforet-io'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -87,8 +87,8 @@ jobs:
           echo "SERVICE=${SERVICE}" >> $GITHUB_ENV
 
           helm package deploy/helm --destination .deploy
-          cr upload -o cloudforet-io -r charts -p .deploy --token ${{ secrets.CLOUDFORET_PAT_TOKEN }}
-          cr index -i ./index.yaml -p .deploy/ -o cloudforet-io -r charts -c https://cloudforet-io.github.io/charts --token ${{ secrets.CLOUDFORET_PAT_TOKEN }}
+          cr upload -o cloudforet-io -r charts -p .deploy --token ${{ secrets.PAT_TOKEN }}
+          cr index -i ./index.yaml -p .deploy/ -o cloudforet-io -r charts -c https://cloudforet-io.github.io/charts --token ${{ secrets.PAT_TOKEN }}
           cp index.yaml /tmp/index.yaml
 
       - name: Check out chart repo
@@ -96,7 +96,7 @@ jobs:
         with:
           repository: cloudforet-io/charts
           ref: gh-pages
-          token: ${{ secrets.CLOUDFORET_PAT_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
       - name: Update Helm repository index.yaml
         run: |
           git config --global user.email admin@cloudforet.io
@@ -108,7 +108,7 @@ jobs:
           git push origin gh-pages
 
   notify_to_slack:
-    if: github.repository_owner == 'spaceone-dev'
+    if: github.repository_owner == 'cloudforet-io'
     needs: [helm_spaceone, helm_cloudforet]
     runs-on: ubuntu-latest
     steps:
