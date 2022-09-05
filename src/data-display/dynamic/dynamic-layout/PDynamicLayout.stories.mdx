@@ -44,6 +44,7 @@ export const Template = (args, { argTypes }) => ({
                               @select="onSelect"
                               @export="onExport"
                               @click-settings="onClickSettings"
+                              @click-row="onClickRow"
                               @update-popup-visible="onUpdatePopupVisible"
             >
             </p-dynamic-layout>
@@ -199,6 +200,7 @@ interface DynamicLayoutTypeOptions {
 | select | Emitted when row(item) has been selected. |
 | export | Emitted when clicked export button. |
 | click-settings | Emitted when clicked settings button. |
+| click-row | Emitted when clicked row. |
 | update-popup-visible | Emitted when popupVisible typeOptions is updated. |
 
 <br/>
@@ -212,6 +214,7 @@ interface DynamicLayoutEventListeners {
     select: (selectIndex: number[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     export: (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     'click-settings': (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    'click-row': (selectIndex: number[]) => void|Promise<void>;
     'update-popup-visible': (popupVisible?: boolean) => void|Promise<void>;
 }
 ```
@@ -234,7 +237,7 @@ interface DynamicLayoutEventListeners {
 | simple-table | - |
 | table | fetch, select, export |
 | raw-table | fetch, select, export |
-| query-search-table | fetch, select, export |
+| query-search-table | fetch, select, export, click-row, click-settings |
 | raw | - |
 | markdown | - |
 | html | - |

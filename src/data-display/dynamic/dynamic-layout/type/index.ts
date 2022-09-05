@@ -63,4 +63,5 @@ export interface DynamicLayoutEventListener {
     select: (selectIndex: number[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     export: (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     'click-settings': (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    'click-row': (selectIndex: number[]) => void|Promise<void>;
 }

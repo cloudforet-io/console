@@ -34,5 +34,6 @@ export const getDynamicLayoutQuerySearchTableArgTypes = (): ArgTypes => {
         onSelect: argTypes.onSelect,
         onExport: argTypes.onExport,
         onClickSettings: argTypes.onClickSettings,
+        onClickRow: argTypes.onClickRow,
     };
 };
