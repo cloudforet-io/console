@@ -82,7 +82,7 @@ export default defineComponent<JsonSchemaFormProps>({
     setup(props, { emit }) {
         const state = reactive({
             schemaProperties: computed<InnerJsonSchema[]>(() => {
-                const properties = props.schema?.properties;
+                const properties: object|undefined = props.schema?.properties;
                 if (properties && !isEmpty(properties)) {
                     return Object.entries(properties).map(([k, v]) => ({
                         ...v,

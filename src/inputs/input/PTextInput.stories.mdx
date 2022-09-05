@@ -1,5 +1,8 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PTextInput from '@/inputs/input/PTextInput.vue';
+import PButton from "@/inputs/buttons/button/PButton";
+import PTextEditor from "@/inputs/text-editor/PTextEditor";
+import PFieldGroup from "@/inputs/forms/field-group/PFieldGroup";
 import { reactive, toRefs } from '@vue/composition-api';
 import {
     getTextInputArgTypes
@@ -19,7 +22,8 @@ export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PTextInput },
     template: `
-        <p-text-input :value="value" :invalid="invalid"
+        <p-text-input v-bind="inputAttrs"
+                      :value="value" :invalid="invalid"
                       :disabled="disabled" :block="block"
                       :menu="menu" :use-fixed-menu-style="useFixedMenuStyle"
                       :loading="loading"
@@ -301,6 +305,50 @@ export const Template = (args, { argTypes }) => ({
                 })
                 return {
                     ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Input Attributes
+
+<Canvas>
+    <Story name="Input Attributes">
+        {{
+            components: { PTextInput, PTextEditor, PButton, PFieldGroup },
+            template: `
+                <div>
+                    <p-text-input v-bind="attributes" />
+                    <p-field-group label="Attributes" class="mt-4" required
+                        :invalid="!!errorMessage"
+                        :invalid-text="errorMessage"
+                    >
+                        <p-text-editor :code="JSON.stringify(attributes, null, 2)"
+                                       @update:code="handleUpdateCode"
+                        />
+                </p-field-group>
+                </div>
+            `,
+            setup() {
+                const state = reactive({
+                    attributes: {type: 'number', min: 0, max: 10},
+                    errorMessage: ''
+                });
+                const handleUpdateCode = (code) => {
+                    try {
+                        state.attributes = JSON.parse(code);
+                        state.errorMessage = '';
+                    } catch (e) {
+                        state.errorMessage = e.message
+                    }
+                };
+                return {
+                    ...toRefs(state),
+                    handleUpdateCode,
                 }
             }
         }}
