@@ -26,7 +26,7 @@ export default create({
     inputTextColor: 'black',
     inputBorderRadius: 4,
 
-    brandTitle: 'SpaceONE Design System',
-    brandUrl: 'https://github.com/spaceone-dev/spaceone-design-system',
+    brandTitle: 'Mirinae Design System',
+    brandUrl: 'https://github.com/cloudforet-io/mirinae',
     brandImage: './images/SpaceONE_logoTypeA.svg',
 });
