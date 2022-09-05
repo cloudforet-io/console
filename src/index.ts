@@ -7,7 +7,7 @@ const mirinaeOptions: PluginObject<MirinaeOptions> = {
     install: MirinaeInstaller.install,
 };
 
-
+/* Plugin */
 export default mirinaeOptions;
 
 /* Languages */
