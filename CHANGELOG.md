@@ -1,3 +1,16 @@
+# [1.1.0-beta.383](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.382...v1.1.0-beta.383) (2022-09-05)
+
+
+### Bug Fixes
+
+* this commit is for semantic-release ci/cd test ([70b28a0](https://github.com/cloudforet-io/mirinae/commit/70b28a0caecaf5de7c9532dafaa1ea6724c79fe1))
+
+
+### Reverts
+
+* Revert "chore(release): 1.1.0-beta.1 [skip ci]" (#8) ([1dbb07f](https://github.com/cloudforet-io/mirinae/commit/1dbb07f5495c5ee65b93d42cd32049022d283f6c)), closes [#8](https://github.com/cloudforet-io/mirinae/issues/8)
+* Revert previous commits (#6) ([c7be821](https://github.com/cloudforet-io/mirinae/commit/c7be821480e134f9bf9d17f3967c7682df110eac)), closes [#6](https://github.com/cloudforet-io/mirinae/issues/6) [#4](https://github.com/cloudforet-io/mirinae/issues/4) [#2](https://github.com/cloudforet-io/mirinae/issues/2)
+
 # [1.1.0-beta.382](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.381...v1.1.0-beta.382) (2022-09-02)
 
 
