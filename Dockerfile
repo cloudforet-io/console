@@ -1,9 +1,9 @@
 FROM node:16
 
 ENV PORT 80
-ENV BUILD_PATH /tmp/spaceone/build
+ENV BUILD_PATH /tmp/cloudforet/build
 ENV ROOT_PATH /var/www
-ENV LOG_PATH /var/log/spaceone
+ENV LOG_PATH /var/log/cloudforet
 ENV NGINX_CONF_PATH /etc/nginx/conf.d
 
 EXPOSE ${PORT}
@@ -15,7 +15,7 @@ RUN mkdir -p ${BUILD_PATH} \
     && rm -f /etc/nginx/sites-enabled/default \
     && mkdir -p ${BUILD_PATH} && mkdir -p ${LOG_PATH}/nginx
 
-COPY pkg/nginx.conf ${NGINX_CONF_PATH}/spaceone_console.conf
+COPY pkg/nginx.conf ${NGINX_CONF_PATH}/cloudforet_console.conf
 COPY public ${BUILD_PATH}/public
 COPY package.json package-lock.json *.js ${BUILD_PATH}/
 COPY packages ${BUILD_PATH}/packages

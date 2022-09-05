@@ -1,9 +1,9 @@
 {
-  "name": "spaceone-console",
+  "name": "cloudforet-console",
   "version": "1.8.11",
   "private": true,
-  "description": "SpaceONE Web Console",
-  "author": "SpaceONE",
+  "description": "Cloudforet Web Console",
+  "author": "Cloudforet",
   "scripts": {
     "serve": "vue-cli-service serve",
     "serve:init": "npm install && npm run build --workspace=@spaceone/console-core-lib && npm run serve",
@@ -19,7 +19,7 @@
     "postcss": "node build/reset-css.js",
     "serve:docker": "docker build --tag spaceone/console . && docker run -p 80:80 spaceone/console"
   },
-  "main": "dist/spaceone-component.common.js",
+  "main": "dist/cloudforet-component.common.js",
   "dependencies": {
     "@amcharts/amcharts4": "^4.10.10",
     "@amcharts/amcharts4-geodata": "^4.1.18",
