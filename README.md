@@ -1,12 +1,12 @@
 
-<h1 align="center">SpaceONE Console</h1>  
+<h1 align="center">Cloudforet Console</h1>  
   
 <br/>  
 <div align="center" style="display:flex;">  
   <img width="245" src="https://user-images.githubusercontent.com/35549653/76694897-de236300-66bb-11ea-9ace-b9edde9c12da.png">  
   <p> <br>
 <img  alt="Version"  src="https://img.shields.io/badge/version-0.9-blue.svg?cacheSeconds=2592000"  />  
-<a  href="https://www.spaceone.org/docs/guides"  target="_blank">  
+<a  href="https://cloudforet.io/"  target="_blank">  
 <img  alt="Documentation"  src="https://img.shields.io/badge/documentation-yes-brightgreen.svg"  />  
 </a>  
 <a  href="https://www.apache.org/licenses/LICENSE-2.0"  target="_blank">  
@@ -23,7 +23,7 @@
 &nbsp;  
 &nbsp;
   
-> Front-end Project for SpaceONE project. Components made with Vue2 Composition API.  
+> Front-end Project for Cloudforet. Components made with Vue2 Composition API.  
 
 
 [![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/0)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/0)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/1)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/1)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/2)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/2)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/3)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/3)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/4)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/4)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/5)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/5)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/6)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/6)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/7)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/7)
@@ -59,14 +59,14 @@ follow the instructions below.
 ```
 
 
-## 🧩 SpaceOne Design System  
-[SpaceOne storybook](http://storybook.developer.spaceone.dev/)  
+## 🧩 Mirinae - Cloudforet Design System  
+[Mirinae storybook](http://storybook.developer.spaceone.dev/)  
   
  &nbsp;  
  &nbsp;   
 ## 👨‍👩‍👧 Author  
   
-See our [OWNERS](https://github.com/spaceone-dev/console/blob/master/AUTHORS) file.   
+See our [OWNERS](https://github.com/cloudforet-io/console/blob/master/AUTHORS) file.   
   
 &nbsp;  
 &nbsp;  
