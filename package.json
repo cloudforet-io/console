@@ -1,23 +1,23 @@
 {
   "name": "@spaceone/design-system",
   "version": "1.1.0-beta.382",
-  "description": "SpaceONE Design System",
+  "description": "Mirinae - Design System for Multi Cloud Management Platform, Cloudforet",
   "keywords": [
-    "spaceone",
+    "mirinae",
     "design system",
     "vue",
     "vuejs",
     "ui library",
     "component"
   ],
-  "homepage": "https://github.com/spaceone-dev/spaceone-design-system#readme",
+  "homepage": "https://github.com/cloudforet-io/mirinae#readme",
   "bugs": {
-    "url": "https://github.com/spaceone-dev/spaceone-design-system/issues",
+    "url": "https://github.com/cloudforet-io/mirinae/issues",
     "email": "admin@spaceone.dev"
   },
-  "author": "SpaceONE",
+  "author": "Cloudforet",
   "license": "Apache-2.0",
-  "main": "dist/spaceone-design-system.umd.js",
+  "main": "dist/mirinae.umd.js",
   "typings": "dist/src/index.d.ts",
   "files": [
     "/dist/*",
@@ -27,21 +27,21 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/spaceone-dev/spaceone-design-system.git"
+    "url": "https://github.com/cloudforet-io/mirinae.git"
   },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "build": "vue-cli-service build --target lib --mode production --name spaceone-design-system --formats umd src/index.ts",
-    "build:watch": "vue-cli-service build --watch --mode development --target lib --name spaceone-design-system --formats umd src/index.ts",
+    "build": "vue-cli-service build --target lib --mode production --name mirinae --formats umd src/index.ts",
+    "build:watch": "vue-cli-service build --watch --mode development --target lib --name mirinae --formats umd src/index.ts",
     "build:storybook": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook -o .out -s public",
     "storybook": "start-storybook -p 6006 -s public",
     "icon": "vsvg -s ./src/assets/icons -t src/foundation/icons/p-icons --es6",
     "lottie": "node build/lottie.js",
     "css": "node build/css.js",
-    "analyze": "VUE_APP_ANALYZE_MOD=true vue-cli-service build --target lib --mode production --name spaceone-design-system --formats umd src/index.ts",
-    "analyze:watch": "VUE_APP_ANALYZE_MOD=true vue-cli-service build --watch --mode development --target lib --name spaceone-design-system --formats umd src/index.ts",
+    "analyze": "VUE_APP_ANALYZE_MOD=true vue-cli-service build --target lib --mode production --name mirinae --formats umd src/index.ts",
+    "analyze:watch": "VUE_APP_ANALYZE_MOD=true vue-cli-service build --watch --mode development --target lib --name mirinae --formats umd src/index.ts",
     "eslint": "eslint --ext .js,.vue,.ts .",
     "stylelint": "stylelint \"src/**/*.{css,vue,pcss,scss}\"",
     "lint": "npm run eslint && npm run stylelint",
