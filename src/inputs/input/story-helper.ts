@@ -247,10 +247,10 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
-        passwordVisibilityMode: {
-            name: 'passwordVisibilityMode',
+        maskingMode: {
+            name: 'maskingMode',
             type: { name: 'boolean' },
-            description: 'Use this prop when you want to control show/hide button of password input.',
+            description: 'Whether to use input masking or not.',
             defaultValue: false,
             table: {
                 type: {
@@ -259,6 +259,24 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 category: 'props',
                 defaultValue: {
                     summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
+        showPassword: {
+            name: 'showPassword',
+            type: { name: 'boolean' },
+            description: 'Whether to display password or not.',
+            defaultValue: true,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'true',
                 },
             },
             control: {

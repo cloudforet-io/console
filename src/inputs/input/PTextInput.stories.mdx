@@ -27,7 +27,8 @@ export const Template = (args, { argTypes }) => ({
                       :disabled="disabled" :block="block"
                       :menu="menu" :use-fixed-menu-style="useFixedMenuStyle"
                       :loading="loading"
-                      :password-visibility-mode="passwordVisibilityMode"
+                      :masking-mode="maskingMode"
+                      :show-password="showPassword"
                       :type="type"
         >
             <template v-if="rightExtraSlot" #right-extra>
@@ -179,7 +180,7 @@ export const Template = (args, { argTypes }) => ({
         {{
             components: { PTextInput },
             template: `
-                <p-text-input v-model="value" type="password" password-visibility-mode />
+                <p-text-input v-model="value" type="password" masking-mode />
             `,
             setup() {
                 const state = reactive({
