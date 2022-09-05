@@ -33,6 +33,7 @@
                          @select="onSelect"
                          @export="onExport"
                          @click-settings="$emit('click-settings')"
+                         @rowLeftClick="onClickRow"
         >
             <template v-for="(dynamicField, slotName) of dynamicFieldSlots" #[slotName]="{item, field}">
                 <p-dynamic-field v-if="slotName.startsWith('col')" :key="slotName"
@@ -229,11 +230,16 @@ export default defineComponent<QuerySearchTableDynamicLayoutProps>({
             emit('fetch', options);
         };
 
+        const onClickRow = (_, index) => {
+            emit('click-row', index);
+        };
+
         return {
             ...toRefs(state),
             onChange,
             onSelect,
             onExport,
+            onClickRow,
             getFieldData,
         };
     },

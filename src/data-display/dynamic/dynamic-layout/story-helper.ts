@@ -523,6 +523,19 @@ export const getDynamicLayoutArgTypes = (): ArgTypes => ({
             },
         },
     },
+    onClickRow: {
+        name: 'click-row',
+        description: 'An event emitted when table row is clicked.',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+            defaultValue: {
+                summary: null,
+            },
+        },
+    },
     onUpdatePopupVisible: {
         name: 'update-popup-visible',
         description: 'An event emitted when popupVisible typeOptions is updated.',
