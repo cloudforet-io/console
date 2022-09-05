@@ -26,6 +26,7 @@
             </template>
         </p-page-title>
 
+        <service-account-account-type mode="CREATE" />
         <service-account-base-information mode="CREATE"
                                           :provider-data="providerObj"
                                           :is-valid.sync="isBaseInformationFormValid"
@@ -77,6 +78,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import InfoButton from '@/common/modules/portals/InfoButton.vue';
 
+import ServiceAccountAccountType
+    from '@/services/asset-inventory/service-account/modules/ServiceAccountAccountType.vue';
 import ServiceAccountBaseInformation
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformation.vue';
 import ServiceAccountCredentials
@@ -90,6 +93,7 @@ import type {
 export default {
     name: 'AddServiceAccountPage',
     components: {
+        ServiceAccountAccountType,
         ServiceAccountCredentials,
         ServiceAccountBaseInformation,
         InfoButton,
