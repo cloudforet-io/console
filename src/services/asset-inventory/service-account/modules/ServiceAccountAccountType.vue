@@ -1,10 +1,10 @@
 <template>
     <p-pane-layout class="service-account-account-type">
-        <div class="title">
-            <!--song-lang-->
-            Account Type
+        <!--song-lang-->
+        <p-panel-top title="Account Type" />
+        <div class="content-wrapper">
+            Read, Create만 있음
         </div>
-        Read, Create만 있음
     </p-pane-layout>
 </template>
 
@@ -12,7 +12,7 @@
 import type { PropType } from '@vue/composition-api';
 
 import {
-    PPaneLayout,
+    PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
 
 import type { PageMode } from '@/services/asset-inventory/service-account/type';
@@ -22,6 +22,7 @@ export default {
     name: 'ServiceAccountAccountType',
     components: {
         PPaneLayout,
+        PPanelTop,
     },
     props: {
         mode: {
@@ -36,11 +37,8 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .service-account-account-type {
-    padding: 2rem 1rem;
-    .title {
-        font-size: 1.5rem;
-        line-height: 120%;
-        margin-bottom: 2rem;
+    .content-wrapper {
+        padding: 0.5rem 1rem 2.5rem 1rem;
     }
 }
 </style>
