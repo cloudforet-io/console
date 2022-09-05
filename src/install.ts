@@ -12,7 +12,7 @@ import SvgIcon from 'vue-svgicon';
 
 import { applyAmchartsGlobalSettings } from './plugins/amcharts';
 
-export interface MirinaeOptions {
+export interface SpaceoneDSOptions {
     installVueRouter?: boolean;
     installVueI18n?: boolean;
     installVueCompositionApi?: boolean;
@@ -32,15 +32,15 @@ declare module 'vue/types/vue' {
 }
 
 
-export class MirinaeInstaller {
-    private static _options: MirinaeOptions;
+export class SpaceDSInstaller {
+    private static _options: SpaceoneDSOptions;
 
     static get options() {
-        return MirinaeInstaller._options;
+        return SpaceDSInstaller._options;
     }
 
     private static _install(vueConstructor: VueConstructor) {
-        const options = MirinaeInstaller._options;
+        const options = SpaceDSInstaller._options;
         if (options?.installVueRouter) vueConstructor.use(VueRouter);
         if (options?.installVueI18n) vueConstructor.use(VueI18n);
         if (options?.installVueCompositionApi) vueConstructor.use(VueCompositionApi);
@@ -54,8 +54,8 @@ export class MirinaeInstaller {
         applyAmchartsGlobalSettings(options?.amchartsLicenses);
     }
 
-    static install: PluginFunction<MirinaeOptions> = (vueConstructor: VueConstructor, options: MirinaeOptions = {}) => {
-        MirinaeInstaller._options = options;
-        MirinaeInstaller._install(vueConstructor);
+    static install: PluginFunction<SpaceoneDSOptions> = (vueConstructor: VueConstructor, options: SpaceoneDSOptions = {}) => {
+        SpaceDSInstaller._options = options;
+        SpaceDSInstaller._install(vueConstructor);
     }
 }

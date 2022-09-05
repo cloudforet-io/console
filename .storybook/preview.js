@@ -18,7 +18,7 @@ import { fontUrls, webFonts } from '@/styles/web-fonts';
 import tailwindConfig from './tailwind.config';
 import VTooltip from 'v-tooltip';
 
-import SpaceOneTheme from './CloudforetTheme';
+import SpaceOneTheme from './SpaceOneTheme';
 import {i18n} from '@/translations'
 import { applyAmchartsGlobalSettings } from '@/plugins/amcharts';
 

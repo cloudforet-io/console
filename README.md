@@ -1,4 +1,4 @@
-<h1 align="center">Mirinae - Cloudforet Design System</h1>  
+<h1 align="center">SpaceONE Design System</h1>  
 
 <br/>
 
@@ -12,7 +12,7 @@
 <img  alt="License: Apache 2.0"  src="https://img.shields.io/badge/License-Apache 2.0-yellow.svg"  />  
 </a> 
 <a href="http://storybook.developer.spaceone.dev/"  target="_blank">  
-    <img alt="mirinae storybook" src="https://img.shields.io/badge/Design System-SpaceOne-blueviolet.svg?logo=storybook" />  
+    <img alt="spaceone storybook" src="https://img.shields.io/badge/Design System-SpaceOne-blueviolet.svg?logo=storybook" />  
 </a> 
 </div>
 
@@ -31,15 +31,15 @@
 
 <br/>
 
-## 🧩 Mirinae Design System  
-[Mirinae Storybook](http://storybook.developer.spaceone.dev/)  
+## 🧩 SpaceOne Design System  
+[SpaceOne storybook](http://storybook.developer.spaceone.dev/)  
 
 <br/> 
 <br/>
 
 ## 👨‍👩‍👧 Author
 
-See our [OWNERS](https://github.com/cloudforet-io/mirinae/blob/master/AUTHORS) file.
+See our [OWNERS](https://github.com/spaceone-dev/spaceone-design-system/blob/master/AUTHORS) file.
 
 <br/>
 <br/>
@@ -52,7 +52,7 @@ This project is [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) licens
 <br/>
 
 ### Chart License
-Mirinae design system internally uses amCharts for Dynamic Chart. <br/>
+SpaceONE design system internally uses amCharts for Dynamic Chart. <br/>
 Before using the design system, look carefully at amCharts' license. <br/>
 If you want to purchase the amCharts license that suits you and use it on your application,
 see the license FAQ.
@@ -73,9 +73,9 @@ npm install @spaceone/design-system vue @vue/composition-api vue-router vue-i18n
 Add following lines to ```main.js``` file. <br/>
 
 ```javascript
-import MirinaeDesignSystem from '@spaceone/design-system';
+import SpaceDesignSystem from '@spaceone/design-system';
 
-Vue.use(MirinaeDesignSystem, pluginOptions);
+Vue.use(SpaceDesignSystem, pluginOptions);
 ```
 
 #### Plugin Options
@@ -89,7 +89,7 @@ Vue.use(MirinaeDesignSystem, pluginOptions);
 | amchartsLicenses | If you use the amcharts library such as Dynamic Chart, license the amcharts as a string array. |
 
 ```typescript
-interface MirinaeDSOptions {
+interface SpaceoneDSOptions {
     installVueRouter?: boolean;
     installVueI18n?: boolean;
     installVueCompositionApi?: boolean;
@@ -118,7 +118,7 @@ export default {
 
 ## How to Apply Styles
 
-Mirinae Design System is based on Tailwindcss.<br/>
+SpaceONE Design System is based on Tailwindcss.<br/>
 
 ### Global Styles
 
@@ -134,18 +134,18 @@ If your project use tailwindcss, you don't need to import all styles. <br/>
 In that case, add codes below to your ```tailwind.config.js```.
 
 ```javascript
-const mirinaeTailwind = require('@spaceone/design-system/tailwind.config.js')
+const spaceoneTailwind = require('@spaceone/design-system/tailwind.config.js')
 
 module.exports = {
     theme: {
-        ...mirinaeTailwind.theme,
+        ...spaceoneTailwind.theme,
         // your customized theme
     },
-    variants: [...mirinaeTailwind.variants, 
+    variants: [...spaceoneTailwind.variants, 
     //your customized variants 
     ],
     plugins: [
-        ...mirinaeTailwind.plugins,
+        ...spaceoneTailwind.plugins,
         //your customized plugins 
     ]
 }

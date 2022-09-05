@@ -1,14 +1,14 @@
 import type { PluginObject } from 'vue';
 
-import type { MirinaeOptions } from './install';
-import { MirinaeInstaller } from './install';
+import type { SpaceoneDSOptions } from './install';
+import { SpaceDSInstaller } from './install';
 
-const mirinaeOptions: PluginObject<MirinaeOptions> = {
-    install: MirinaeInstaller.install,
+const SpaceoneDS: PluginObject<SpaceoneDSOptions> = {
+    install: SpaceDSInstaller.install,
 };
 
 
-export default mirinaeOptions;
+export default SpaceoneDS;
 
 /* Languages */
 export { messages } from './translations';
