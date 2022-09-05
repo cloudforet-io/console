@@ -1,3 +1,11 @@
+# [1.1.0-beta.384](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.383...v1.1.0-beta.384) (2022-09-05)
+
+
+### Features
+
+* **p-dynamic-layout:** add `click-row` event to query search table ([86be26c](https://github.com/cloudforet-io/mirinae/commit/86be26c21f3fee52af251dab95b4e39d7a0beafd))
+* **p-dynamic-layout:** add `click-row` event to query search table ([e0565c7](https://github.com/cloudforet-io/mirinae/commit/e0565c7caf93bb700238038f8174b45ebf04ff27))
+
 # [1.1.0-beta.383](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.382...v1.1.0-beta.383) (2022-09-05)
 
 
