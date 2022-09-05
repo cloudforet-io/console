@@ -32,7 +32,7 @@ jobs:
           echo "::set-output name=VERSION::$(cat src/VERSION | cut -c 2-).${{ env.TIME }}"
 
   docker:
-    if: github.repository_owner == 'spaceone-dev'
+    if: github.repository_owner == 'cloudforet-io'
     needs: versioning
     runs-on: ubuntu-latest
     env:
