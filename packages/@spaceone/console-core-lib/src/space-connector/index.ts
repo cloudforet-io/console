@@ -1,4 +1,5 @@
 import type { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import { camelCase } from 'lodash';
 
 import API from '@/space-connector/api';
@@ -89,7 +90,16 @@ export class SpaceConnector {
 
     protected async loadAPI(): Promise<void> {
         try {
-            const response: AxiosPostResponse = await this.api.instance.post(API_REFLECTION_URL);
+            let reflectionApi;
+            if (this.mockInfo.reflection && this.mockInfo.endpoint) {
+                reflectionApi = axios.create({
+                    headers: { 'Content-Type': 'application/json' },
+                    baseURL: this.mockInfo.endpoint,
+                });
+            } else {
+                reflectionApi = this.api.instance;
+            }
+            const response: AxiosPostResponse = await reflectionApi.post(API_REFLECTION_URL);
             response.data.apis.forEach((apiInfo: APIInfo) => {
                 this.bindAPIHandler(apiInfo);
             });

@@ -1,4 +1,5 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import type { MockInfo } from '@spaceone/console-core-lib/space-connector/type';
 
 const getAfterCallApiMap = store => ({
     '/inventory/cloud-service-type/create': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
@@ -33,7 +34,11 @@ const getSessionTimeoutCallback = store => () => {
     store.dispatch('error/showSessionExpiredError');
 };
 const getApiEndpoint = config => config.get('CONSOLE_API.ENDPOINT');
-const getMockInfo = config => ({ endpoint: config.get('MOCK.ENDPOINT'), all: config.get('MOCK.ALL') });
+const getMockInfo = (config): MockInfo => ({
+    endpoint: config.get('MOCK.ENDPOINT'),
+    all: config.get('MOCK.ALL'),
+    reflection: config.get('MOCK.REFLECTION'),
+});
 
 export const initApiClient = async (store, config) => {
     await SpaceConnector.init(
