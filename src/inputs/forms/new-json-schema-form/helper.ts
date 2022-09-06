@@ -1,4 +1,4 @@
-import type { JsonSchema } from '@/inputs/forms/new-json-schema-form/type';
+import type { JsonSchema, InnerJsonSchema } from '@/inputs/forms/new-json-schema-form/type';
 
 export const NUMERIC_TYPES = ['number', 'integer'];
 
@@ -24,3 +24,12 @@ export const initFormDataWithSchema = (schema?: JsonSchema, formData: object = {
     });
     return result;
 };
+
+export const getInputTypeBySchemaProperty = (schemaProperty: InnerJsonSchema) => {
+    if (schemaProperty.format === 'password') return 'password';
+    if (schemaProperty.type === 'string') return 'text';
+    if (NUMERIC_TYPES.includes(schemaProperty.type)) return 'number';
+    return 'text';
+};
+
+export const getInputPlaceholderBySchemaProperty = (schemaProperty: InnerJsonSchema) => schemaProperty.examples?.[0] ?? '';
