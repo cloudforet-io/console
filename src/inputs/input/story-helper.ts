@@ -247,6 +247,42 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
+        maskingMode: {
+            name: 'maskingMode',
+            type: { name: 'boolean' },
+            description: 'Whether to use input masking or not.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
+        showPassword: {
+            name: 'showPassword',
+            type: { name: 'boolean' },
+            description: 'Whether to display password or not.',
+            defaultValue: true,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'true',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         // attrs
         inputAttrs: {
             name: 'all input attributes',
