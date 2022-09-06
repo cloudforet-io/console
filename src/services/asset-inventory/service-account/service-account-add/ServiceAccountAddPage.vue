@@ -28,16 +28,17 @@
 
         <service-account-account-type mode="CREATE" />
         <service-account-base-information mode="CREATE"
-                                          :provider-data="providerObj"
+                                          :provider-data="providerData"
                                           :is-valid.sync="isBaseInformationFormValid"
                                           @change="handleChangeBaseInformationForm"
         />
-        <project-tree-panel class="tree-panel"
-                            @select="handleSelectedProject"
+        <service-account-project mode="CREATE"
+                                 :is-valid.sync="isProjectFormValid"
+                                 @change="handleChangeProjectForm"
         />
         <service-account-credentials v-if="enableCredentialInput"
                                      mode="CREATE"
-                                     :provider-data="providerObj"
+                                     :provider-data="providerData"
                                      :is-valid.sync="isCredentialFormValid"
                                      @change="handleChangeCredentialForm"
         />
@@ -59,13 +60,11 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, computed, toRefs,
-} from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PPageTitle, PLazyImg, PButton, PMarkdown,
+    PButton, PLazyImg, PMarkdown, PPageTitle,
 } from '@spaceone/design-system';
 import { get } from 'lodash';
 
@@ -84,15 +83,16 @@ import ServiceAccountBaseInformation
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformation.vue';
 import ServiceAccountCredentials
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentials.vue';
-import ProjectTreePanel from '@/services/asset-inventory/service-account/service-account-add/modules/ProjectTreePanel.vue';
+import ServiceAccountProject from '@/services/asset-inventory/service-account/modules/ServiceAccountProject.vue';
 import type {
-    BaseInformationData, CredentialData, ProjectGroup, ProviderModel,
+    BaseInformationForm, CredentialForm, ProjectForm, ProviderModel,
 } from '@/services/asset-inventory/service-account/type';
 
 
 export default {
     name: 'AddServiceAccountPage',
     components: {
+        ServiceAccountProject,
         ServiceAccountAccountType,
         ServiceAccountCredentials,
         ServiceAccountBaseInformation,
@@ -101,7 +101,6 @@ export default {
         PMarkdown,
         PPageTitle,
         PButton,
-        ProjectTreePanel,
     },
     props: {
         provider: {
@@ -112,42 +111,41 @@ export default {
     setup(props, { root }) {
         const state = reactive({
             providerLoading: true,
-            providerObj: {} as ProviderModel,
+            providerData: {} as ProviderModel,
             serviceAccountId: '',
-            providerIcon: computed(() => store.state.reference.provider.items[state.providerObj?.provider]?.icon),
-            description: computed(() => get(state.providerObj, 'metadata.view.layouts.help:service_account:create', undefined)),
+            providerIcon: computed(() => store.state.reference.provider.items[state.providerData?.provider]?.icon),
+            description: computed(() => get(state.providerData, 'metadata.view.layouts.help:service_account:create', undefined)),
             enableCredentialInput: computed<boolean>(() => {
-                const secretTypes = get(state.providerObj, 'capability.supported_schema', []);
+                const secretTypes = get(state.providerData, 'capability.supported_schema', []);
                 return secretTypes.length > 0;
             }),
         });
 
         const formState = reactive({
-            baseInformationForm: {} as BaseInformationData,
+            baseInformationForm: {} as BaseInformationForm,
             isBaseInformationFormValid: false,
-            credentialForm: {} as CredentialData,
+            credentialForm: {} as CredentialForm,
             isCredentialFormValid: false,
-            selectedProject: null as ProjectGroup|null,
+            projectForm: {} as ProjectForm,
+            isProjectFormValid: undefined,
             isValid: computed(() => {
                 if (!formState.isBaseInformationFormValid) return false;
                 if (!formState.isCredentialFormValid) return false;
+                if (!formState.isProjectFormValid) return false;
                 return true;
             }),
         });
 
+        /* Api */
         const getProvider = async () => {
             state.providerLoading = true;
             try {
-                const [, res] = await Promise.all([
-                    store.dispatch('reference/provider/load'),
-                    await SpaceConnector.client.identity.provider.get({
-                        provider: props.provider,
-                    }),
-                ]);
-                state.providerObj = res;
+                state.providerData = await SpaceConnector.client.identity.provider.get({
+                    provider: props.provider,
+                });
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.providerObj = {};
+                state.providerData = {};
             } finally {
                 state.providerLoading = false;
             }
@@ -167,8 +165,8 @@ export default {
                 tags: formState.baseInformationForm.tags,
             };
 
-            if (formState.selectedProject) {
-                item.project_id = formState.selectedProject.id;
+            if (formState.projectForm.selectedProject) {
+                item.project_id = formState.projectForm.selectedProject.id;
             }
             try {
                 const res = await SpaceConnector.client.identity.serviceAccount.create(item);
@@ -184,7 +182,7 @@ export default {
                 schema: formState.credentialForm.selectedSecretType,
                 secret_type: 'CREDENTIALS',
                 service_account_id: state.serviceAccountId,
-                project_id: formState.selectedProject?.id || null,
+                project_id: formState.projectForm.selectedProject?.id || null,
             });
         };
         const createSecretWithJson = async (jsonData) => {
@@ -194,7 +192,7 @@ export default {
                 schema: formState.credentialForm.selectedSecretType,
                 secret_type: 'CREDENTIALS',
                 service_account_id: state.serviceAccountId,
-                project_id: formState.selectedProject?.id || null,
+                project_id: formState.projectForm.selectedProject?.id || null,
             });
         };
         const createSecret = async (): Promise<boolean> => {
@@ -216,9 +214,7 @@ export default {
             return isSucceed;
         };
 
-        const handleCredentialValidate = (isValid) => {
-            formState.isCredentialFormValid = isValid;
-        };
+        /* Event */
         const handleSave = async () => {
             if (!formState.isValid) {
                 ErrorHandler.handleRequestError(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
@@ -240,28 +236,30 @@ export default {
             if (nextPath) SpaceRouter.router.push(nextPath);
             else SpaceRouter.router.back();
         };
-        const handleSelectedProject = (selectedProject) => { formState.selectedProject = selectedProject; };
         const handleChangeBaseInformationForm = (baseInformationForm) => {
             formState.baseInformationForm = baseInformationForm;
         };
         const handleChangeCredentialForm = (credentialForm) => {
             formState.credentialForm = credentialForm;
         };
-
-        const init = async () => {
-            await getProvider();
+        const handleChangeProjectForm = (projectForm) => {
+            formState.projectForm = projectForm;
         };
-        init();
+
+        /* Init */
+        (async () => {
+            await store.dispatch('reference/provider/load');
+            await getProvider();
+        })();
 
         return {
             ...toRefs(state),
             ...toRefs(formState),
-            handleCredentialValidate,
             handleSave,
             handleGoBack,
-            handleSelectedProject,
             handleChangeBaseInformationForm,
             handleChangeCredentialForm,
+            handleChangeProjectForm,
         };
     },
 };
@@ -272,15 +270,6 @@ export default {
 .info-button {
     flex-shrink: 0;
     line-height: 2rem;
-}
-
-.tree-panel {
-    width: 100%;
-    padding: 2rem 1rem;
-    margin-bottom: 1rem;
-    &:nth-last-child(1) {
-        margin-bottom: 0;
-    }
 }
 
 .button-group {

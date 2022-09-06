@@ -30,17 +30,21 @@ export type ProjectGroup = ProjectItemResp;
 
 // Service Account Forms
 export type PageMode = 'CREATE' | 'UPDATE' | 'READ';
-export interface BaseInformationData {
+export interface BaseInformationForm {
     accountName: string;
     customSchemaForm: { [key: string]: any; };
     tags: Tag;
 }
 
 export type ActiveDataType = 'input' | 'json';
-export interface CredentialData {
+export interface CredentialForm {
     hasCredentialKey: boolean;
     selectedSecretType: string;
     customSchemaForm: { [key: string]: any; };
     credentialJson: string;
     activeDataType: ActiveDataType;
+}
+
+export interface ProjectForm {
+    selectedProject: ProjectGroup | null;
 }
