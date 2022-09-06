@@ -1,38 +1,41 @@
 <template>
     <p-pane-layout class="service-account-base-information">
-        <div class="title">
-            {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE') }}
-        </div>
-        <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
-                       :invalid="invalidState.serviceAccountName"
-                       :invalid-text="invalidTexts.serviceAccountName"
-                       :required="true"
-        >
-            <template #default="{invalid}">
-                <p-text-input :value="serviceAccountName"
-                              class="account-name-input block"
-                              :invalid="invalid"
-                              :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_NAME_PLACEHOLDER')"
-                              @input="setForm('serviceAccountName', $event)"
+        <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')" />
+        <div class="content-wrapper">
+            <template v-if="mode === 'CREATE'">
+                <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
+                               :invalid="invalidState.serviceAccountName"
+                               :invalid-text="invalidTexts.serviceAccountName"
+                               :required="true"
+                >
+                    <template #default="{invalid}">
+                        <p-text-input :value="serviceAccountName"
+                                      class="account-name-input block"
+                                      :invalid="invalid"
+                                      :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_NAME_PLACEHOLDER')"
+                                      @input="setForm('serviceAccountName', $event)"
+                        />
+                    </template>
+                </p-field-group>
+                <p-json-schema-form v-if="serviceAccountSchema"
+                                    class="p-json-schema-form"
+                                    :form-data.sync="customSchemaForm"
+                                    :schema="serviceAccountSchema"
+                                    :language="$store.state.user.language"
+                                    @validate="handleAccountValidate"
                 />
-            </template>
-        </p-field-group>
-        <p-json-schema-form v-if="serviceAccountSchema"
-                            :form-data.sync="customSchemaForm"
-                            :schema="serviceAccountSchema"
-                            :language="$store.state.user.language"
-                            @validate="handleAccountValidate"
-        />
-        <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_LABEL')"
-                       help-text="Set Account's tag.
+                <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_LABEL')"
+                               help-text="Set Account's tag.
 The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed."
-        >
-            <tags-input-group :tags="tags"
-                              show-validation
-                              :is-valid.sync="isTagsValid"
-                              @update-tags="handleUpdateTags"
-            />
-        </p-field-group>
+                >
+                    <tags-input-group :tags="tags"
+                                      show-validation
+                                      :is-valid.sync="isTagsValid"
+                                      @update-tags="handleUpdateTags"
+                    />
+                </p-field-group>
+            </template>
+        </div>
     </p-pane-layout>
 </template>
 
@@ -44,7 +47,7 @@ import {
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PJsonSchemaForm, PFieldGroup, PPaneLayout, PTextInput,
+    PJsonSchemaForm, PFieldGroup, PPaneLayout, PTextInput, PPanelTop,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -64,6 +67,7 @@ export default {
         PFieldGroup,
         PPaneLayout,
         PTextInput,
+        PPanelTop,
     },
     props: {
         mode: {
@@ -157,11 +161,38 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .service-account-base-information {
-    padding: 2rem 1rem;
-    .title {
-        font-size: 1.5rem;
-        line-height: 120%;
-        margin-bottom: 2rem;
+    .content-wrapper {
+        padding: 0.5rem 1rem 2.5rem 1rem;
+        .account-name-input::v-deep {
+            .input-container {
+                width: 50%;
+            }
+        }
+        .p-json-schema-form::v-deep {
+            .p-text-input {
+                width: 100%;
+                .input-container {
+                    width: 50%;
+                }
+            }
+        }
+    }
+
+    @screen tablet {
+        .content-wrapper {
+            .account-name-input::v-deep {
+                .input-container {
+                    width: 100%;
+                }
+            }
+            .p-json-schema-form::v-deep {
+                .p-text-input {
+                    .input-container {
+                        width: 100%;
+                    }
+                }
+            }
+        }
     }
 }
 </style>
