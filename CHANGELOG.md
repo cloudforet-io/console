@@ -1,3 +1,10 @@
+# [1.1.0-beta.386](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.385...v1.1.0-beta.386) (2022-09-06)
+
+
+### Features
+
+* **p-dynamic-layout:** add `click-row` event to table ([#11](https://github.com/cloudforet-io/mirinae/issues/11)) ([286da64](https://github.com/cloudforet-io/mirinae/commit/286da6400306cf10c1b0c49587b965cb852a6ee6))
+
 # [1.1.0-beta.385](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.384...v1.1.0-beta.385) (2022-09-06)
 
 
