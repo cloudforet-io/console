@@ -37,6 +37,7 @@ The Key - Value pair is a required field. Only underscores (_), characters, and 
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -52,7 +53,7 @@ import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInput
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type { BaseInformationData } from '@/services/asset-inventory/service-account/type';
+import type { BaseInformationForm, PageMode } from '@/services/asset-inventory/service-account/type';
 
 
 export default {
@@ -66,7 +67,7 @@ export default {
     },
     props: {
         mode: {
-            type: String,
+            type: String as PropType<PageMode>,
             default: 'READ',
         },
         providerData: {
@@ -103,7 +104,7 @@ export default {
             isCustomSchemaFormValid: undefined,
             tags: {},
             isTagsValid: true,
-            formData: computed<BaseInformationData>(() => ({
+            formData: computed<BaseInformationForm>(() => ({
                 accountName: serviceAccountName.value,
                 customSchemaForm: state.customSchemaForm,
                 tags: state.tags,
@@ -112,8 +113,6 @@ export default {
                 && state.isTagsValid
                 && (state.serviceAccountSchema ? state.isCustomSchemaFormValid : true)),
         });
-
-        /* Util */
 
         /* Api */
         const listServiceAccounts = async () => {
@@ -136,6 +135,7 @@ export default {
             await listServiceAccounts();
         })();
 
+        /* Watcher */
         watch(() => state.isAllValid, (isAllValid) => {
             emit('update:isValid', isAllValid);
         });

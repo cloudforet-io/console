@@ -42,6 +42,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from '@vue/composition-api';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -55,7 +56,7 @@ import { get } from 'lodash';
 
 import { i18n } from '@/translations';
 
-import type { ActiveDataType, CredentialData } from '@/services/asset-inventory/service-account/type';
+import type { ActiveDataType, CredentialForm, PageMode } from '@/services/asset-inventory/service-account/type';
 
 
 export default {
@@ -70,7 +71,7 @@ export default {
     },
     props: {
         mode: {
-            type: String,
+            type: String as PropType<PageMode>,
             default: 'READ',
         },
         providerData: {
@@ -95,7 +96,7 @@ export default {
             credentialSchema: {},
             isCustomSchemaFormValid: false,
             credentialJson: '',
-            formData: computed<CredentialData>(() => ({
+            formData: computed<CredentialForm>(() => ({
                 hasCredentialKey: state.hasCredentialKey,
                 selectedSecretType: state.selectedSecretType,
                 customSchemaForm: state.customSchemaForm,
