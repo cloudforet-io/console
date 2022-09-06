@@ -7,26 +7,106 @@
             @goBack="$router.go(-1)"
         />
         <p-divider />
-        <p>Add Page</p>
+        <p-data-loader class="flex-grow" :data="providerList" :loading="loading">
+            <div class="provider-item-wrapper">
+                <provider-list-card v-for="item in providerList" :key="item.name" :provider-item="item"
+                                    :visible.sync="visibleInstallModal"
+                                    :selected-provider.sync="selectedProvider"
+                                    @select="handleSelectProvider"
+                />
+            </div>
+        </p-data-loader>
+        <!--song-lang-->
+        <p-button-modal
+            :header-title="$t('Would you like to install', {provider: selectedProvider})"
+            :visible.sync="visibleInstallModal"
+            size="sm"
+            @confirm="handleConfirmInstallProvider"
+        />
+        <!--song-lang-->
+        <p-icon-modal
+            :visible.sync="visibleResultModal"
+            icon-name="ic_done"
+            :header-title="$t('has been successfully added.', {provider: selectedProvider})"
+            :button-text="$t('Done')"
+            size="md"
+        />
     </section>
 </template>
 
 <script lang="ts">
 
 
-import { PPageTitle, PDivider } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs,
+} from '@vue/composition-api';
 
+import {
+    PPageTitle, PDivider, PDataLoader, PButtonModal, PIconModal,
+} from '@spaceone/design-system';
+
+import { store } from '@/store';
+
+import ProviderListCard from '@/services/administration/additional-settings/provider/provider-add/modules/ProviderListCard.vue';
 
 export default {
     name: 'ProviderAddPage',
     components: {
         PPageTitle,
         PDivider,
+        PDataLoader,
+        ProviderListCard,
+        PButtonModal,
+        PIconModal,
     },
     setup() {
-        return {
+        const state = reactive({
+            providerList: computed(() => Object.keys(store.state.reference.provider.items).map(k => ({
+                name: k,
+                icon: store.state.reference.provider.items[k].icon,
+                label: k,
+                color: store.state.reference.provider.items[k].color,
+                installed: false,
+            }))),
+            selectedProvider: '',
+            loading: false,
+            visibleInstallModal: false,
+            visibleResultModal: false,
+        });
 
+        const handleConfirmInstallProvider = () => {
+            state.visibleInstallModal = false;
+            state.visibleResultModal = true;
+        };
+
+        const handleSelectProvider = (value) => {
+            state.selectedProvider = value;
+        };
+
+        const init = async () => {
+            await Promise.allSettled([
+                store.dispatch('reference/provider/load'),
+            ]);
+        };
+        init();
+
+        return {
+            ...toRefs(state),
+            handleConfirmInstallProvider,
+            handleSelectProvider,
         };
     },
 };
 </script>
+
+<style lang="postcss" scoped>
+.provider-item-wrapper {
+    @apply grid w-full gap-4 ;
+    padding-top: 1.5rem;
+    grid-template-columns: repeat(2, minmax(22rem, 1fr));
+
+    @screen mobile {
+        grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+    }
+}
+</style>
