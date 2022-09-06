@@ -1,3 +1,10 @@
+# [1.1.0-beta.387](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.386...v1.1.0-beta.387) (2022-09-06)
+
+
+### Features
+
+* **json-schema-form:** support ajv-formats & imporove performance ([#12](https://github.com/cloudforet-io/mirinae/issues/12)) ([7dc462c](https://github.com/cloudforet-io/mirinae/commit/7dc462cbe124a017efe2998579177a9ac3770687))
+
 # [1.1.0-beta.386](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.385...v1.1.0-beta.386) (2022-09-06)
 
 
