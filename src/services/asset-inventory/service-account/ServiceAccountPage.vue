@@ -282,6 +282,7 @@ export default {
             }),
             visibleCustomFieldModal: false,
             accountTypeList: computed(() => [
+                // song-lang
                 { name: 'all', label: i18n.t('All') },
                 { name: 'trustAccount', label: i18n.t('Trust Account') },
                 { name: 'generalAccount', label: i18n.t('General Account') },
