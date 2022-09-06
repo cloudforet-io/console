@@ -1,13 +1,12 @@
 <template>
-    <div>
+    <section class="service-account-page">
         <p-page-title :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: selectedProviderName})"
+                      use-total-count
+                      :total-count="typeOptionState.totalCount"
                       class="page-title"
         >
             <template #title-right-extra>
                 <service-provider-dropdown v-model="selectedProvider" class="provider-dropdown" />
-                <div class="total-result-wrapper">
-                    <span class="total-result">Total Result</span><span class="total-result-value">{{ typeOptionState.totalCount }}</span>
-                </div>
             </template>
         </p-page-title>
         <p-horizontal-layout>
@@ -22,7 +21,7 @@
                                   :field-handler="fieldHandler"
                                   @fetch="fetchTableData"
                                   @export="exportServiceAccountData"
-                                  @click-settings="onClickSettings"
+                                  @click-settings="handleClickSettings"
                                   @click-row="handleClickRow"
                 >
                     <template #toolbox-left>
@@ -34,13 +33,6 @@
                         >
                             {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
                         </p-button>
-                        <p-select-dropdown class="left-toolbox-item"
-                                           :items="tableState.dropdown"
-                                           :disabled="!tableState.hasManagePermission"
-                                           @select="onSelectDropdown"
-                        >
-                            {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ACTION') }}
-                        </p-select-dropdown>
                     </template>
                     <template #toolbox-bottom>
                         <div class="account-type-filter">
@@ -59,93 +51,36 @@
                 </p-dynamic-layout>
             </template>
         </p-horizontal-layout>
-        <p-tab v-if="typeOptionState.selectIndex.length === 1"
-               :tabs="singleItemTabState.tabs"
-               :active-tab.sync="singleItemTabState.activeTab"
-        >
-            <template #details>
-                <service-account-details :selected-provider="selectedProvider"
-                                         :service-account-id="tableState.selectedAccountIds[0]"
-                />
-            </template>
-            <template #tag>
-                <tags-panel :resource-id="tableState.selectedAccountIds[0]"
-                            resource-type="identity.ServiceAccount"
-                            resource-key="service_account_id"
-                            :disabled="!tableState.hasManagePermission"
-                />
-            </template>
-            <template #credentials>
-                <service-account-credentials :service-account-id="tableState.selectedAccountIds[0]" />
-            </template>
-            <template #member>
-                <service-account-member :service-accounts="tableState.selectedAccountIds" />
-            </template>
-        </p-tab>
-        <p-tab v-else-if="typeOptionState.selectIndex.length > 1"
-               :tabs="multiItemTabState.tabs"
-               :active-tab.sync="multiItemTabState.activeTab"
-        >
-            <template #data>
-                <p-dynamic-layout v-if="tableState.multiSchema"
-                                  type="simple-table"
-                                  :options="tableState.multiSchema.options"
-                                  :type-options="{ colCopy: true, timezone: typeOptionState.timezone }"
-                                  :data="tableState.selectedItems"
-                                  :field-handler="fieldHandler"
-                                  class="selected-data-tab"
-                />
-            </template>
-        </p-tab>
-        <div v-else class="empty-space">
-            <p-empty>{{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.NO_SELECTED_ACCOUNT') }}</p-empty>
-        </div>
-        <p-double-check-modal :visible.sync="doubleCheckModalState.visible"
-                              :header-title="doubleCheckModalState.title"
-                              :sub-title="doubleCheckModalState.subTitle"
-                              :verification-text="doubleCheckModalState.verificationText"
-                              :theme-color="doubleCheckModalState.themeColor"
-                              size="sm"
-                              @confirm="deleteServiceAccount"
-        />
-        <project-change-modal :visible.sync="changeProjectState.visible"
-                              :project-id="changeProjectState.projectId"
-                              :loading="changeProjectState.loading"
-                              @confirm="changeProject"
-        />
         <custom-field-modal v-model="tableState.visibleCustomFieldModal"
                             resource-type="identity.ServiceAccount"
                             :options="{provider: selectedProvider}"
                             @complete="reloadTable"
         />
-    </div>
+    </section>
 </template>
 <script lang="ts">
 /* external library */
-import type { ComponentRenderProxy, Ref } from '@vue/composition-api';
+import type { Ref } from '@vue/composition-api';
 import {
-    computed, getCurrentInstance, reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PPageTitle, PHorizontalLayout, PButton,
-    PTab, PDynamicLayout, PEmpty, PDoubleCheckModal, PSelectDropdown, PSelectStatus,
+    PPageTitle,
+    PDynamicLayout,
+    PHorizontalLayout,
+    PButton,
+    PSelectStatus,
 } from '@spaceone/design-system';
 import type {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import { render } from 'ejs';
-import { get } from 'lodash';
-import type { TranslateResult } from 'vue-i18n';
-
-/* spaceone design system */
 
 /* components */
 import { SpaceRouter } from '@/router';
@@ -155,9 +90,6 @@ import { i18n } from '@/translations';
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import {
-    showSuccessMessage,
-} from '@/lib/helper/notice-alert-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -166,53 +98,24 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
-import ProjectChangeModal from '@/common/modules/project/ProjectChangeModal.vue';
-import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
 /* page modules */
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import ServiceAccountCredentials from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentials.vue';
-import ServiceAccountDetails from '@/services/asset-inventory/service-account/modules/ServiceAccountDetails.vue';
-import ServiceAccountMember from '@/services/asset-inventory/service-account/modules/ServiceAccountMember.vue';
-
-
-/* utils */
-
-
-/* types */
-
-
-interface ProjectItemResp {
-    id: string;
-    name: string;
-    // eslint-disable-next-line camelcase
-    has_child: boolean;
-    item_type: 'PROJECT_GROUP'|'PROJECT';
-}
 
 export default {
     name: 'ServiceAccountPage',
     components: {
         CustomFieldModal,
-        ProjectChangeModal,
-        PDoubleCheckModal,
-        PSelectDropdown,
-        PButton,
-        ServiceAccountDetails,
-        PEmpty,
-        ServiceAccountMember,
-        ServiceAccountCredentials,
         ServiceProviderDropdown,
-        TagsPanel,
         PDynamicLayout,
-        PHorizontalLayout,
         PPageTitle,
-        PTab,
+        PHorizontalLayout,
+        PButton,
         PSelectStatus,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
-        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const { query, fullPath } = SpaceRouter.router.currentRoute;
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
         /** Provider(located at sidebar) & Page Title * */
         const selectedProvider: Ref<string> = ref('aws');
@@ -248,39 +151,8 @@ export default {
             hasManagePermission: useManagePermissionState(),
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
-            consoleLink: '',
-            dropdown: computed<MenuItem[]>(() => [
-                {
-                    name: 'delete', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.DELETE'), type: 'item', disabled: tableState.selectedItems.length !== 1,
-                },
-                {
-                    type: 'divider',
-                },
-                {
-                    name: 'project', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHANGE_PROJECT'), type: 'item', disabled: tableState.selectedItems.length === 0,
-                },
-                {
-                    type: 'divider',
-                },
-                {
-                    name: 'link', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CONSOLE'), type: 'item', disabled: !tableState.consoleLink, link: tableState.consoleLink, target: '_blank',
-                },
-            ]),
             selectedAccountIds: computed(() => tableState.selectedItems.map(d => d?.service_account_id)),
             schema: null as null|DynamicLayout,
-            multiSchema: computed<null|DynamicLayout>(() => {
-                if (!tableState.schema) return null;
-
-                const res: DynamicLayout = { ...tableState.schema };
-                if (tableState.schema.options.fields) {
-                    res.options = {
-                        ...tableState.schema.options,
-                        fields: [{ name: 'Account ID', key: 'service_account_id' }, ...tableState.schema.options.fields],
-                    };
-                }
-
-                return res;
-            }),
             visibleCustomFieldModal: false,
             accountTypeList: computed(() => [
                 // song-lang
@@ -290,30 +162,6 @@ export default {
             ]),
             selectedAccountType: 'all',
         });
-
-        const getLinkTemplate = (data) => {
-            let link = '';
-            const providerInfo = providerState.items.map(d => ({
-                provider: d.provider,
-                template: d.linkTemplate,
-            }));
-            const linkTemplate = providerInfo.find(item => item.provider === selectedProvider.value)?.template;
-            if (linkTemplate !== undefined) link = render(linkTemplate, data);
-            return link;
-        };
-
-        const getConsoleLink = () => {
-            if (tableState.selectedItems.length === 1) {
-                tableState.consoleLink = getLinkTemplate(tableState.selectedItems[0]);
-            } else {
-                tableState.consoleLink = '';
-            }
-        };
-
-        const onSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
-            typeOptionState.selectIndex = selectIndex;
-            getConsoleLink();
-        };
 
         /** Handling API with SpaceConnector * */
 
@@ -392,119 +240,36 @@ export default {
 
         /** Add & Delete Service Accounts Action (Dropdown) * */
         const clickAddServiceAccount = () => {
-            vm.$router.push({
+            SpaceRouter.router.push({
                 name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
                 params: { provider: selectedProvider.value },
-                query: { nextPath: vm.$route.fullPath },
+                query: { nextPath: fullPath },
             });
         };
 
-        const doubleCheckModalState = reactive({
-            visible: false,
-            item: null,
-            title: '' as TranslateResult,
-            subTitle: '' as TranslateResult,
-            verificationText: '',
-            themeColor: undefined as string | undefined,
-            api: null as any,
-            params: null as any,
-        });
-
-        const deleteApi = SpaceConnector.client.identity.serviceAccount.delete;
-
-        const clickDeleteServiceAccount = () => {
-            const nameOfSelectedServiceAccount = tableState.selectedItems[0]?.name;
-            doubleCheckModalState.visible = true;
-            doubleCheckModalState.title = vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_TITLE');
-            doubleCheckModalState.subTitle = vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_DESC', { account: nameOfSelectedServiceAccount });
-            doubleCheckModalState.verificationText = nameOfSelectedServiceAccount;
-            doubleCheckModalState.themeColor = 'alert';
-            doubleCheckModalState.api = deleteApi;
-        };
-
-        const deleteServiceAccount = async () => {
-            try {
-                await doubleCheckModalState.api({
-                    ...doubleCheckModalState,
-                    // eslint-disable-next-line camelcase
-                    service_account_id: tableState.selectedAccountIds[0],
-                });
-                typeOptionState.selectIndex = [];
-                showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_DELETE_ACCOUNT'), '', vm.$root);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_DELETE_ACCOUNT'));
-            } finally {
-                doubleCheckModalState.visible = false;
-                await listServiceAccountData();
-            }
-        };
-
-        const onClickSettings = () => {
+        const handleClickSettings = () => {
             tableState.visibleCustomFieldModal = true;
         };
 
-
-        /** Change Project & Release Project Action */
-        const changeProjectState = reactive({
-            visible: false,
-            loading: false,
-            projectId: computed(() => {
-                if (tableState.selectedItems.length > 1) return '';
-                return get(tableState.selectedItems[0], 'project_info.project_id', '');
-            }),
+        /** Tabs */
+        const singleItemTabState = reactive({
+            tabs: computed<TabItem[]>(() => [
+                { name: 'details', label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_DETAILS') },
+                { name: 'tag', label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_TAG') },
+                { name: 'credentials', label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS') },
+                { name: 'member', label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_MEMBER') },
+            ]),
+            activeTab: 'details',
         });
 
-        const clickProject = () => { changeProjectState.visible = true; };
+        const multiItemTabState = reactive({
+            tabs: computed<TabItem[]>(() => [
+                { name: 'data', label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_SELECTED_DATA') },
+            ]),
+            activeTab: 'data',
+        });
 
-        const releaseProject = async (action) => {
-            try {
-                await action({
-                    // eslint-disable-next-line camelcase
-                    service_accounts: tableState.selectedAccountIds,
-                    // eslint-disable-next-line camelcase
-                    release_project: true,
-                });
-                showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_RELEASE_PROJECT'), '', vm.$root);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_RELEASE_PROJECT'));
-            } finally {
-                await listServiceAccountData();
-            }
-        };
-
-        const changeProject = async (data?: ProjectItemResp|null) => {
-            changeProjectState.loading = true;
-            const action = SpaceConnector.client.identity.serviceAccount.changeProject;
-            if (data) {
-                try {
-                    await action({
-                        // eslint-disable-next-line camelcase
-                        service_accounts: tableState.selectedAccountIds,
-                        // eslint-disable-next-line camelcase
-                        project_id: data.id,
-                    });
-                    showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_CHANGE_PROJECT'), '', vm.$root);
-                } catch (e) {
-                    ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_CHANGE_PROJECT'));
-                } finally {
-                    await store.dispatch('reference/project/load');
-                    await listServiceAccountData();
-                }
-            } else {
-                await releaseProject(action);
-            }
-            changeProjectState.loading = false;
-            changeProjectState.visible = false;
-        };
-
-        const onSelectDropdown = (name) => {
-            switch (name) {
-            case 'delete': clickDeleteServiceAccount(); break;
-            case 'project': clickProject(); break;
-            default: break;
-            }
-        };
-
+        const handleSelectServiceAccountType = (accountType) => { tableState.selectedAccountType = accountType; };
         const handleClickRow = (index) => {
             const item = tableState.items[index];
             SpaceRouter.router.push({
@@ -512,26 +277,6 @@ export default {
                 params: { serviceAccountId: item.service_account_id },
             });
         };
-
-        /** Tabs */
-        const singleItemTabState = reactive({
-            tabs: computed<TabItem[]>(() => [
-                { name: 'details', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_DETAILS') },
-                { name: 'tag', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_TAG') },
-                { name: 'credentials', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS') },
-                { name: 'member', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_MEMBER') },
-            ]),
-            activeTab: 'details',
-        });
-
-        const multiItemTabState = reactive({
-            tabs: computed<TabItem[]>(() => [
-                { name: 'data', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_SELECTED_DATA') },
-            ]),
-            activeTab: 'data',
-        });
-
-
         /** ******* Page Init ******* */
         const getTableSchema = async () => {
             try {
@@ -554,18 +299,12 @@ export default {
             await listServiceAccountData();
         };
 
-        const handleSelectServiceAccountType = (accountType) => { tableState.selectedAccountType = accountType; };
-
-        watch(() => tableState.selectedItems, () => {
-            getConsoleLink();
-        });
-
         const init = async () => {
             await Promise.allSettled([
                 store.dispatch('reference/project/load'),
                 store.dispatch('reference/provider/load'),
             ]);
-            const providerFilter = Array.isArray(vm.$route.query.provider) ? vm.$route.query.provider[0] : vm.$route.query.provider;
+            const providerFilter = Array.isArray(query.provider) ? query.provider[0] : query.provider;
             if (providerState.items.length > 0) {
                 selectedProvider.value = providerFilter || providerState.items[0].provider;
                 watch(selectedProvider, async (after, before) => {
@@ -588,107 +327,47 @@ export default {
             tableState,
             fetchOptionState,
             typeOptionState,
-            onSelect,
             exportServiceAccountData,
             listServiceAccountData,
             fetchTableData,
             fieldHandler,
             reloadTable,
-            onClickSettings,
-            onSelectDropdown,
-            handleClickRow,
-
-            changeProjectState,
-            clickProject,
+            handleClickSettings,
             clickAddServiceAccount,
-
-            doubleCheckModalState,
-            deleteServiceAccount,
-            clickDeleteServiceAccount,
-            changeProject,
-
-            handleSelectServiceAccountType,
 
             singleItemTabState,
             multiItemTabState,
+
+            handleSelectServiceAccountType,
+            handleClickRow,
         };
     },
 };
 </script>
 <style lang="postcss" scoped>
-.provider-dropdown {
-    @apply font-normal;
-}
-.total-result-wrapper {
-    @apply text-sm inline-flex flex-wrap gap-2 self-end;
-    float: right;
-    line-height: 2rem;
-    min-width: 5.875rem;
-    .total-result {
-        @apply text-gray-600;
+.service-account-page {
+    .provider-dropdown {
+        @apply font-normal;
     }
-    .total-result-value {
-        @apply text-gray-800;
-    }
-}
-.sidebar-title {
-    @apply text-gray-900 text-sm font-bold;
-    padding-top: 2rem;
-    padding-left: 1rem;
-}
-.sidebar-divider {
-    @apply w-full;
-    padding-left: 0;
-    margin-top: 0.5625rem;
-    margin-bottom: 1rem;
-}
-.provider-wrapper {
-    @apply border-b border-gray-100;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 0.5rem 0.5rem 0.5rem 0.25rem;
-    margin: 0 0.75rem;
-    &:first-of-type {
-        margin-top: -0.69rem;
-    }
-    &:last-of-type {
-        @apply border-b-0;
-    }
-    .provider-name {
-        display: inline-block;
-        margin-left: 0.5rem;
-        flex-grow: 1;
+
+    .account-type-filter {
+        @apply flex gap-4 items-center border-t border-gray-200;
+        padding: 0.75rem 1rem;
         font-size: 0.875rem;
-        line-height: 1.5;
+        line-height: 125%;
+
+        .label {
+            @apply text-gray-500;
+            font-size: 0.875rem;
+        }
     }
-}
-.selected-data-tab {
-    @apply mt-8;
-}
-.empty-space {
-    @apply text-primary2 mt-6;
-    text-align: center;
-    margin-bottom: 0.5rem;
-    font-size: 1.5rem;
-}
 
-.account-type-filter {
-    @apply flex gap-4 items-center border-t border-gray-200;
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-    line-height: 125%;
-
-    .label {
-        @apply text-gray-500;
-        font-size: 0.875rem;
+    >>> .p-dynamic-layout-table .p-toolbox-table {
+        @apply border border-gray-200 rounded-lg;
+        .p-data-table {
+            min-height: unset;
+        }
     }
 }
 
->>> .p-dynamic-layout-table .p-toolbox-table {
-    @apply border border-gray-200 rounded-lg;
-    .p-data-table {
-        min-height: unset;
-    }
-}
 </style>
