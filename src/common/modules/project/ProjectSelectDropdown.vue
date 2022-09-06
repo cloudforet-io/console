@@ -48,6 +48,15 @@
                         </span>
                     </template>
                 </p-tree>
+                <div class="button-wrapper">
+                    <p-button name="ic_plus_bold" class="create-button"
+                              style-type="gray-border"
+                              @click="handleClickCreateButton"
+                    >
+                        <!--song-lang-->
+                        Create Project
+                    </p-button>
+                </div>
             </template>
         </p-search-dropdown>
     </div>
@@ -60,11 +69,12 @@ import {
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PCheckBox, PI, PRadio, PSearchDropdown, PSelectDropdown, PTag, PTree,
+    PCheckBox, PI, PRadio, PSearchDropdown, PSelectDropdown, PTag, PTree, PButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -73,6 +83,7 @@ import type { ReferenceMap } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { ProjectGroup } from '@/services/asset-inventory/service-account/type';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 import type { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/type';
 
 export default {
@@ -85,6 +96,7 @@ export default {
         PRadio,
         PCheckBox,
         PI,
+        PButton,
     },
     props: {
         selectedProjectIds: {
@@ -252,6 +264,10 @@ export default {
             if (!value) emit('close');
         };
 
+        const handleClickCreateButton = () => {
+            window.open(SpaceRouter.router.resolve({ name: PROJECT_ROUTE._NAME }).href);
+        };
+
         /* Watchers */
         watch(() => props.selectedProjectIds, async (after, before) => {
             if (after !== state._selectedProjectIds) {
@@ -293,6 +309,7 @@ export default {
             handleChangeSelectState,
             handleDeleteTag,
             handleUpdateVisibleMenu,
+            handleClickCreateButton,
         };
     },
 };
@@ -300,29 +317,18 @@ export default {
 
 <style lang="postcss" scoped>
 .project-select-dropdown {
-    .p-select-dropdown::v-deep {
-        display: block;
-        width: 100%;
-        .dropdown-button {
-            width: 100%;
+    .p-search-dropdown::v-deep {
+        .button-wrapper {
+            padding: 0.5rem;
+            .create-button {
+                width: 100%;
+            }
         }
-    }
-    .tag-wrapper {
-        display: flex;
-        flex-wrap: wrap;
     }
     .p-tree::v-deep {
         padding: 0.25rem;
         .toggle-right {
             @apply flex-shrink-0;
-        }
-    }
-
-    .tag-box {
-        @apply text-gray-900;
-        margin-top: 0.625rem;
-        .p-tag {
-            margin-bottom: 0.5rem;
         }
     }
 }
