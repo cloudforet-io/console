@@ -31,6 +31,7 @@
                          @select="onSelect"
                          @export="onExport"
                          @click-settings="$emit('click-settings')"
+                         @rowLeftClick="onClickRow"
         >
             <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" #[headerSlot]>
                 {{ text }}
@@ -217,12 +218,17 @@ export default defineComponent<TableDynamicLayoutProps>({
             emit('fetch', options);
         };
 
+        const onClickRow = (_, index) => {
+            emit('click-row', index);
+        };
+
         return {
             ...toRefs(state),
             onChange,
             onSelect,
             onExport,
             getFieldData,
+            onClickRow,
         };
     },
 });
