@@ -134,12 +134,12 @@ export default defineComponent({
 
 <style lang="postcss">
 #app {
-    @apply bg-gray-100;
     display: flex;
     flex-direction: column;
     overflow-y: hidden;
     width: 100vw;
     height: 100vh;
+    background-color: $bg-color;
 
     .gnb {
         position: fixed;
