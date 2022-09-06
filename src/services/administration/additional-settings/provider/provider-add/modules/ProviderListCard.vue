@@ -74,7 +74,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 .provider-list-card {
     height: 6rem;
 }

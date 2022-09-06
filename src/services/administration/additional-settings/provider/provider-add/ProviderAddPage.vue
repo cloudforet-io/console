@@ -99,7 +99,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 .provider-item-wrapper {
     @apply grid w-full gap-4 ;
     padding-top: 1.5rem;
