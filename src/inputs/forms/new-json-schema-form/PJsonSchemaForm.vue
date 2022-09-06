@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="p-json-schema-form">
         <p-field-group v-for="schemaProperty in schemaProperties"
                        :key="`field-${contextKey}-${schemaProperty.id}`"
                        class="input-form-wrapper"
