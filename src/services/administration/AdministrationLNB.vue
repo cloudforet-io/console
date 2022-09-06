@@ -46,15 +46,16 @@ export default defineComponent({
                         type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_POLICY].translationId), id: MENU_ID.ADMINISTRATION_POLICY, to: { name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME },
                     },
                 ], store.getters['user/pagePermissionList']),
-                { type: 'divider' },
-                ...filterLNBMenuByPermission([
-                    {
-                        type: 'title', label: 'Additional Settings', id: MENU_ID.ADMINISTRATION_SETTINGS, foldable: false,
-                    },
-                    {
-                        type: 'item', label: 'Provider', id: MENU_ID.ADMINISTRATION_PROVIDER, to: { name: ADMINISTRATION_ROUTE.SETTINGS.PROVIDER._NAME },
-                    },
-                ], store.getters['user/pagePermissionList']),
+                // TODO: provider 부분이 1.10.2 스프린트에서 제외되어 주석 처리
+                // { type: 'divider' },
+                // ...filterLNBMenuByPermission([
+                //     {
+                //         type: 'title', label: 'Additional Settings', id: MENU_ID.ADMINISTRATION_SETTINGS, foldable: false,
+                //     },
+                //     {
+                //         type: 'item', label: 'Provider', id: MENU_ID.ADMINISTRATION_PROVIDER, to: { name: ADMINISTRATION_ROUTE.SETTINGS.PROVIDER._NAME },
+                //     },
+                // ], store.getters['user/pagePermissionList']),
             ]),
         };
     },
