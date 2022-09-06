@@ -53,7 +53,8 @@
                               style-type="gray-border"
                               @click="handleClickCreateButton"
                     >
-                        {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_CREATE') }}
+                        <!--song-lang-->
+                        Create Project
                     </p-button>
                 </div>
             </template>
