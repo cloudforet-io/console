@@ -1,3 +1,19 @@
+# [1.1.0-beta.385](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.384...v1.1.0-beta.385) (2022-09-06)
+
+
+### Bug Fixes
+
+* add useProxyValue to inputText state ([a40311b](https://github.com/cloudforet-io/mirinae/commit/a40311b0650e1ed946006dcfd677765f4e516896))
+* fix and add props name (maskingMode, showPassword) ([aa0729f](https://github.com/cloudforet-io/mirinae/commit/aa0729f29d99f816f47ba625c5184ceafaa71635))
+* remove HTMLInputTypeAttribute ([1553baa](https://github.com/cloudforet-io/mirinae/commit/1553baa807a427c3876041e1701c840a372ffc87))
+* remove type of attrs in story-helper ([c204bd6](https://github.com/cloudforet-io/mirinae/commit/c204bd6cd99efd4d334389974347d8c09be66592))
+
+
+### Features
+
+* **text-input:** add show/hide button when type is password ([06aece8](https://github.com/cloudforet-io/mirinae/commit/06aece8b86902f9ee5271ff2808f867f21a2f049))
+* **text-input:** add show/hide button when type is password ([b38d09c](https://github.com/cloudforet-io/mirinae/commit/b38d09ccf9569043c77b99d82ce2d8efc9db2b34))
+
 # [1.1.0-beta.384](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.383...v1.1.0-beta.384) (2022-09-05)
 
 
