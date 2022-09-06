@@ -42,6 +42,20 @@
                             {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ACTION') }}
                         </p-select-dropdown>
                     </template>
+                    <template #toolbox-bottom>
+                        <div class="account-type-filter">
+                            <!-- song-lang -->
+                            <span class="label">{{ $t('Account Type') }}</span>
+                            <p-select-status v-for="(status, idx) in tableState.accountTypeList" :key="`${status.name}-${idx}`"
+                                             :selected="tableState.selectedAccountType"
+                                             :value="status.name"
+                                             :multi-selectable="false"
+                                             @change="handleSelectServiceAccountType"
+                            >
+                                {{ status.label }}
+                            </p-select-status>
+                        </div>
+                    </template>
                 </p-dynamic-layout>
             </template>
         </p-horizontal-layout>
@@ -118,7 +132,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PPageTitle, PHorizontalLayout, PButton,
-    PTab, PDynamicLayout, PEmpty, PDoubleCheckModal, PSelectDropdown,
+    PTab, PDynamicLayout, PEmpty, PDoubleCheckModal, PSelectDropdown, PSelectStatus,
 } from '@spaceone/design-system';
 import type {
     DynamicLayoutEventListener,
@@ -135,6 +149,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 /* components */
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
@@ -192,6 +207,7 @@ export default {
         PHorizontalLayout,
         PPageTitle,
         PTab,
+        PSelectStatus,
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
@@ -265,6 +281,13 @@ export default {
                 return res;
             }),
             visibleCustomFieldModal: false,
+            accountTypeList: computed(() => [
+                // song-lang
+                { name: 'all', label: i18n.t('All') },
+                { name: 'trustAccount', label: i18n.t('Trust Account') },
+                { name: 'generalAccount', label: i18n.t('General Account') },
+            ]),
+            selectedAccountType: 'all',
         });
 
         const getLinkTemplate = (data) => {
@@ -522,6 +545,8 @@ export default {
             await listServiceAccountData();
         };
 
+        const handleSelectServiceAccountType = (accountType) => { tableState.selectedAccountType = accountType; };
+
         watch(() => tableState.selectedItems, () => {
             getConsoleLink();
         });
@@ -571,6 +596,8 @@ export default {
             deleteServiceAccount,
             clickDeleteServiceAccount,
             changeProject,
+
+            handleSelectServiceAccountType,
 
             singleItemTabState,
             multiItemTabState,
@@ -635,6 +662,19 @@ export default {
     margin-bottom: 0.5rem;
     font-size: 1.5rem;
 }
+
+.account-type-filter {
+    @apply flex gap-4 items-center border-t border-gray-200;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    line-height: 125%;
+
+    .label {
+        @apply text-gray-500;
+        font-size: 0.875rem;
+    }
+}
+
 >>> .p-dynamic-layout-table .p-toolbox-table {
     @apply border border-gray-200 rounded-lg;
     .p-data-table {
