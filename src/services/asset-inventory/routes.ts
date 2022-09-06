@@ -24,6 +24,7 @@ const CollectorPluginPage = () => import(/* webpackChunkName: "CollectorPlugin" 
 const CreateCollectorPage = () => import(/* webpackChunkName: "CreateCollector" */ '@/services/asset-inventory/collector/create-collector/CreateCollectorPage.vue');
 
 const ServiceAccountPage = () => import(/* webpackChunkName: "ServiceAccountPage" */ '@/services/asset-inventory/service-account/ServiceAccountPage.vue');
+const ServiceAccountDetailPage = () => import(/* webpackChunkName: "ServiceAccountDetailPage" */ '@/services/asset-inventory/service-account/service-account-detail/ServiceAccountDetailPage.vue');
 const ServiceAccountAddPage = () => import(/* webpackChunkName: "ServiceAccountAddPage" */ '@/services/asset-inventory/service-account/service-account-add/ServiceAccountAddPage.vue');
 const ServiceAccountSearchPage = () => import(/* webpackChunkName: "ServiceAccountSearchPage" */ '@/services/asset-inventory/service-account/service-account-search/ServiceAccountSearchPage.vue');
 
@@ -154,6 +155,13 @@ const assetInventoryRoute: RouteConfig = {
                     meta: { lnbVisible: true },
                     props: true,
                     component: ServiceAccountPage as any,
+                },
+                {
+                    path: ':serviceAccountId',
+                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+                    meta: { lnbVisible: true, label: ({ params }) => params.serviceAccountId, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    props: true,
+                    component: ServiceAccountDetailPage,
                 },
                 {
                     path: 'search/:id',

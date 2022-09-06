@@ -21,9 +21,9 @@
                                   :style="{height: `${height}px`}"
                                   :field-handler="fieldHandler"
                                   @fetch="fetchTableData"
-                                  @select="onSelect"
                                   @export="exportServiceAccountData"
                                   @click-settings="onClickSettings"
+                                  @click-row="handleClickRow"
                 >
                     <template #toolbox-left>
                         <p-button style-type="primary-dark"
@@ -148,6 +148,7 @@ import type { TranslateResult } from 'vue-i18n';
 /* spaceone design system */
 
 /* components */
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -238,7 +239,7 @@ export default {
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [] as number[],
-            selectable: true,
+            selectable: false,
             colCopy: false,
             settingsVisible: true,
         });
@@ -504,6 +505,14 @@ export default {
             }
         };
 
+        const handleClickRow = (index) => {
+            const item = tableState.items[index];
+            SpaceRouter.router.push({
+                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+                params: { serviceAccountId: item.service_account_id },
+            });
+        };
+
         /** Tabs */
         const singleItemTabState = reactive({
             tabs: computed<TabItem[]>(() => [
@@ -587,6 +596,7 @@ export default {
             reloadTable,
             onClickSettings,
             onSelectDropdown,
+            handleClickRow,
 
             changeProjectState,
             clickProject,
