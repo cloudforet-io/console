@@ -1,5 +1,5 @@
 <template>
-    <general-page-layout>
+    <general-page-layout overflow="scroll">
         <p-data-loader class="page-inner" :loading="loading" :loader-backdrop-color="BACKGROUND_COLOR">
             <p-breadcrumbs :routes="pageNavigation" />
             <div v-if="item" class="top-wrapper">
@@ -49,10 +49,11 @@
 
             <p-tab v-if="item"
                    :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
-                   :class="[singleItemTabState.activeTab]"
                    @change="onChangeTab"
             >
-                <keep-alive><router-view /></keep-alive>
+                <keep-alive>
+                    <router-view />
+                </keep-alive>
                 <template #extra="tab">
                     <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0" style-type="primary3">
                         {{ commaFormatter(counts[ALERT_STATE.TRIGGERED]) }}
@@ -373,12 +374,8 @@ export default {
     }
 }
 
-.p-tab::v-deep {
+.p-tab {
     @apply rounded-lg;
-    margin: auto;
-    .extra {
-        display: flex;
-    }
 }
 
 .delete-btn {

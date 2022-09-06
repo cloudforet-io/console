@@ -1,5 +1,5 @@
 <template>
-    <div class="page-mask">
+    <div class="tags-overlay">
         <p-pane-layout class="page-wrapper">
             <div class="page-nav">
                 <div class="left">
@@ -158,27 +158,26 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.page-mask {
-    position: absolute;
-    display: flex;
-    width: 100%;
-    height: 100%;
-    top: 0;
+.tags-overlay {
+    position: fixed;
+    width: 100vw;
+    height: calc(100vh - $(gnb-height));
+    top: $gnb-height;
     left: 0;
-    flex-direction: column;
     z-index: 99;
-
-    /* transition: opacity 0.3s ease; */
-    max-height: 100%;
-    min-height: 100%;
-    max-width: 100vw;
+    background-color: $bg-color;
 
     .page-wrapper {
+        display: flex;
+        flex-direction: column;
+        background-color: transparent;
         width: 100%;
+        max-height: 100%;
+        min-height: 100%;
         border: none;
-        flex-grow: 1;
         .page-nav {
             @apply my-6 ml-8;
+            flex-shrink: 0;
             .left {
                 @apply flex;
                 .go-back-button {
@@ -203,11 +202,12 @@ export default {
             }
         }
         .tag-panel {
-            @apply pl-4 pr-6 m-6 overflow-y-auto;
-            height: 60vh;
+            @apply pl-4 pr-6 m-6;
+            flex-grow: 1;
+            overflow-y: auto;
         }
         .buttons {
-            @apply flex mt-8 pr-12 justify-end;
+            @apply flex mt-8 mb-8 pr-12 justify-end;
             .p-button {
                 @apply ml-4;
             }

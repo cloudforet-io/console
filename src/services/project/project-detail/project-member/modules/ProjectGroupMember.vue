@@ -43,7 +43,7 @@ export default {
         },
         groupId: {
             type: String,
-            required: true,
+            default: '',
         },
         manageDisabled: {
             type: Boolean,
