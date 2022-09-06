@@ -27,7 +27,6 @@
                     <template #toolbox-left>
                         <p-button style-type="primary-dark"
                                   icon="ic_plus_bold"
-                                  class="mr-4"
                                   :disabled="!tableState.hasManagePermission"
                                   @click="clickAddServiceAccount"
                         >
