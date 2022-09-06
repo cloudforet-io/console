@@ -1,5 +1,5 @@
 <template>
-    <div class="general-page-layout">
+    <div class="general-page-layout" :class="overflow">
         <div class="header" :class="{'without-breadcrumbs': !breadcrumbs.length}">
             <p-breadcrumbs v-if="breadcrumbs.length" :routes="breadcrumbs" :copiable="copiable" />
             <slot name="handbook" />
@@ -32,6 +32,10 @@ export default {
             type: Array as PropType<Breadcrumb[]>,
             default: () => [],
         },
+        overflow: {
+            type: String as PropType<'auto'|'scroll'>,
+            default: 'auto',
+        },
     },
     setup(props) {
         return {
@@ -49,8 +53,13 @@ export default {
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow: auto;
     justify-content: stretch;
+    &.auto {
+        overflow: auto;
+    }
+    &.scroll {
+        overflow: scroll;
+    }
 
     .header {
         @apply flex justify-between;
