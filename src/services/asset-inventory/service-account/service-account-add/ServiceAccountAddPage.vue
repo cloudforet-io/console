@@ -26,24 +26,26 @@
             </template>
         </p-page-title>
 
-        <service-account-account-type mode="CREATE" />
-        <service-account-base-information mode="CREATE"
-                                          :provider-data="providerData"
-                                          :is-valid.sync="isBaseInformationFormValid"
-                                          @change="handleChangeBaseInformationForm"
-        />
-        <service-account-project mode="CREATE"
-                                 :is-valid.sync="isProjectFormValid"
-                                 @change="handleChangeProjectForm"
-        />
-        <service-account-credentials v-if="enableCredentialInput"
-                                     mode="CREATE"
-                                     :provider-data="providerData"
-                                     :is-valid.sync="isCredentialFormValid"
-                                     @change="handleChangeCredentialForm"
-        />
+        <div class="content-wrapper">
+            <service-account-account-type mode="CREATE" />
+            <service-account-base-information mode="CREATE"
+                                              :provider-data="providerData"
+                                              :is-valid.sync="isBaseInformationFormValid"
+                                              @change="handleChangeBaseInformationForm"
+            />
+            <service-account-project mode="CREATE"
+                                     :is-valid.sync="isProjectFormValid"
+                                     @change="handleChangeProjectForm"
+            />
+            <service-account-credentials v-if="enableCredentialInput"
+                                         mode="CREATE"
+                                         :provider-data="providerData"
+                                         :is-valid.sync="isCredentialFormValid"
+                                         @change="handleChangeCredentialForm"
+            />
+        </div>
 
-        <div class="button-group">
+        <div class="button-wrapper">
             <p-button class="text-button" style-type="primary-dark" size="lg"
                       :disabled="!isValid"
                       @click="handleSave"
@@ -267,17 +269,22 @@ export default {
 
 
 <style lang="postcss" scoped>
-.info-button {
-    flex-shrink: 0;
-    line-height: 2rem;
-}
-
-.button-group {
-    display: flex;
-    flex-direction: row-reverse;
-    margin-top: 1rem;
-    .text-button {
-        margin-left: 1rem;
+.service-account-add-page {
+    .content-wrapper {
+        display: grid;
+        gap: 1rem;
+    }
+    .info-button {
+        flex-shrink: 0;
+        line-height: 2rem;
+    }
+    .button-wrapper {
+        display: flex;
+        flex-direction: row-reverse;
+        margin-top: 1rem;
+        .text-button {
+            margin-left: 1rem;
+        }
     }
 }
 </style>

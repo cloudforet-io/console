@@ -78,9 +78,16 @@ export default {
 .service-account-project {
     .content-wrapper {
         padding: 0.5rem 1rem 2.5rem 1rem;
-
         .project-select-dropdown {
             width: 50%;
+        }
+    }
+
+    @screen tablet {
+        .content-wrapper {
+            .project-select-dropdown {
+                width: 100%;
+            }
         }
     }
 }
