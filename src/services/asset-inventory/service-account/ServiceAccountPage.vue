@@ -4,11 +4,8 @@
                       use-total-count
                       :total-count="typeOptionState.totalCount"
                       class="page-title"
-        >
-            <template #title-right-extra>
-                <service-provider-dropdown v-model="selectedProvider" class="provider-dropdown" />
-            </template>
-        </p-page-title>
+        />
+        <service-account-provider-list :provider-list="providerState.items" :selected-provider.sync="selectedProvider" />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-dynamic-layout v-if="tableState.schema"
@@ -96,16 +93,18 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
-import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import ServiceAccountProviderList
+    from '@/services/asset-inventory/service-account/modules/ServiceAccountProviderList.vue';
 
 /* page modules */
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 export default {
     name: 'ServiceAccountPage',
     components: {
         CustomFieldModal,
-        ServiceProviderDropdown,
+        ServiceAccountProviderList,
         PDynamicLayout,
         PPageTitle,
         PHorizontalLayout,
@@ -121,6 +120,7 @@ export default {
         const providerState = reactive({
             items: computed(() => Object.keys(store.state.reference.provider.items).map(k => ({
                 ...store.state.reference.provider.items[k],
+                name: store.state.reference.provider.items[k].label,
                 provider: k,
                 icon: assetUrlConverter(store.state.reference.provider.items[k].icon),
             }))),
