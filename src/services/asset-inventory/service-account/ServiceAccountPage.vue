@@ -120,8 +120,8 @@ export default {
         const providerState = reactive({
             items: computed(() => Object.keys(store.state.reference.provider.items).map(k => ({
                 ...store.state.reference.provider.items[k],
-                name: k,
-                provider: store.state.reference.provider.items[k].label,
+                name: store.state.reference.provider.items[k].label,
+                provider: k,
                 icon: assetUrlConverter(store.state.reference.provider.items[k].icon),
             }))),
         });

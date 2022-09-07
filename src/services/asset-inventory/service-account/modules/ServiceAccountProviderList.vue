@@ -1,13 +1,13 @@
 <template>
     <div class="service-account-provider-list">
-        <div v-for="item in providerList" :key="item.provider" :class="{'provider-button': true, 'selected-button' : item.name === selectedProvider}"
-             @click="() => handleSelectProvider(item.name)"
+        <div v-for="item in providerList" :key="item.provider" :class="{'provider-button': true, 'selected-button' : item.provider === selectedProvider}"
+             @click="() => handleSelectProvider(item.provider)"
         >
             <p-lazy-img :src="item.icon"
                         width="1rem" height="1rem"
             />
-            <p :class="{'provider-name': true, 'selected': item.name === selectedProvider }">
-                {{ item.provider }}
+            <p :class="{'provider-name': true, 'selected': item.provider === selectedProvider }">
+                {{ item.name }}
             </p>
         </div>
     </div>
