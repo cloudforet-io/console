@@ -1,76 +1,21 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PMarkdown from './PMarkdown.vue';
 import mock from './mock.ts';
+import {getMarkdownArgTypes} from "@/data-display/markdown/story-helper";
 
 <Meta title='Data Display/Markdown' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5718%3A9288',
     },
-}} component={PMarkdown} argTypes={{
-    markdown: {
-        name: 'markdown',
-        type: {name: 'string'},
-        description: 'Markdown data',
-        defaultValue: mock.markdown,
-        table: {
-            type: {
-                summary: '`string` or `object`'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: ''
-            },
-        },
-        control: {
-            type: 'object'
-        }
-    },
-    data: {
-        name: 'data',
-        type: {name: 'object'},
-        description: 'Variable data to be rendered combined with markdown. Use the ejs.render function internally.',
-        defaultValue: mock.data,
-        table: {
-            type: {
-                summary: 'object'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: undefined
-            },
-        },
-        control: {
-            type: 'object',
-        }
-    },
-    language: {
-        name: 'language',
-        type: {name: 'string'},
-        description: 'Language for display markdown',
-        defaultValue: 'en',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'en'
-            },
-        },
-        control: {
-            type: 'select',
-            options: ['en', 'ko']
-        }
-    },
-}}/>
+}} argTypes={getMarkdownArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PMarkdown },
     template: `
-        <p-markdown :markdown="markdown" :language="language" :data="data" >
+        <p-markdown :markdown="markdown" :language="language" :data="data" :remove-spacing="removeSpacing" >
         </p-markdown>
     `,
     setup() {

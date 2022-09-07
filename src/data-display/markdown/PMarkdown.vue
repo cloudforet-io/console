@@ -1,10 +1,10 @@
 <template>
     <!-- eslint-disable -->
-    <div class="p-markdown" v-html="md" />
+    <div class="p-markdown" v-html="md" :class="{'remove-spacing': removeSpacing}" />
 </template>
 
 <script lang="ts">
-import { computed } from '@vue/composition-api';
+import { computed, defineComponent } from '@vue/composition-api';
 
 import DOMPurify from 'dompurify';
 import { render } from 'ejs';
@@ -28,7 +28,7 @@ marked.setOptions({
 });
 const DEFAULT_LANGUAGE = 'en';
 
-export default {
+export default defineComponent<MarkdownProps>({
     name: 'PMarkdown',
     props: {
         markdown: {
@@ -43,8 +43,12 @@ export default {
             type: String,
             default: 'en',
         },
+        removeSpacing: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: MarkdownProps) {
+    setup(props) {
         const getI18nMd = (md: any) => get(md, props.language, md[DEFAULT_LANGUAGE] || Object.values(md)[0] || '');
         const md = computed(() => {
             let doc = typeof props.markdown === 'object' ? getI18nMd(props.markdown) : props.markdown || '';
@@ -58,16 +62,24 @@ export default {
             md,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
 @import 'highlight.js/scss/atom-one-dark.scss';
 .p-markdown {
-    @apply w-full border-black text-gray-900;
-    padding-top: 1.5rem;
-    padding-bottom: 1rem;
-    padding-left: 1rem;
+    @apply text-gray-900;
+    &:not(.remove-spacing) {
+        @apply w-full border-black;
+        padding-top: 1.5rem;
+        padding-bottom: 1rem;
+        padding-left: 1rem;
+    }
+    &.remove-spacing {
+        p:last-child {
+            margin-bottom: 0;
+        }
+    }
     table {
         td,th {
             @apply px-4 py-2;
