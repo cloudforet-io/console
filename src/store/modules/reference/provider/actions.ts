@@ -39,6 +39,7 @@ export const load: Action<ProviderReferenceState, any> = async (
 
         response.results.forEach((providerInfo: any): void => {
             providers[providerInfo.provider] = {
+                key: providerInfo.provider,
                 label: providerInfo.tags.label || providerInfo.name,
                 name: providerInfo.name,
                 icon: assetUrlConverter(providerInfo.tags.icon),
