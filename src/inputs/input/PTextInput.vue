@@ -316,7 +316,7 @@ export default defineComponent<TextInputProps>({
         };
 
         const deleteSelectedTags = () => {
-            if (state.proxyValue.length > 0) return;
+            if (state.proxyValue?.length > 0) return;
             const lastIdx = state.proxySelectedValue.length - 1;
             if (state.deleteTargetIdx === -1) { // Select the item if there is no selection
                 state.deleteTargetIdx = lastIdx;
@@ -335,7 +335,7 @@ export default defineComponent<TextInputProps>({
             ...listeners,
             input(event) {
                 state.proxyValue = event.target.value;
-                if (state.proxyValue.length && props.useAutoComplete) {
+                if (state.proxyValue?.length && props.useAutoComplete) {
                     showMenu();
                     filterMenu(state.proxyValue);
                 }
@@ -355,7 +355,7 @@ export default defineComponent<TextInputProps>({
                     if (state.menuRef) state.menuRef.focus();
                 }
                 if (event.code === 'Enter') {
-                    if (event.target.value.length > 0 && props.multiInput) {
+                    if (event.target.value?.length > 0 && props.multiInput) {
                         handleSelectMenuItem({ label: event.target.value, name: event.target.value });
                     }
                 }
@@ -363,7 +363,7 @@ export default defineComponent<TextInputProps>({
             },
             keydown(event) {
                 if (event.code === 'Backspace') {
-                    const isInputEmpty = state.proxySelectedValue.length <= 1 && state.proxyValue.length <= 1;
+                    const isInputEmpty = state.proxySelectedValue.length <= 1 && state.proxyValue?.length <= 1;
                     if (isInputEmpty && props.useAutoComplete) hideMenu();
                     if (props.multiInput) deleteSelectedTags();
                 }
