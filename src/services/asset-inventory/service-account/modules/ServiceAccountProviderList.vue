@@ -15,13 +15,13 @@
 
 <script lang="ts">
 
-import { reactive, toRefs } from '@vue/composition-api';
+import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 
 import { PLazyImg } from '@spaceone/design-system';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-export default {
+export default defineComponent({
     name: 'ServiceAccountProviderList',
     components: {
         PLazyImg,
@@ -48,7 +48,7 @@ export default {
             handleSelectProvider,
         };
     },
-};
+});
 
 
 </script>
