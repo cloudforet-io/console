@@ -36,7 +36,7 @@ const myPageRoutes: RouteConfig = {
                     path: 'profile',
                     name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME,
                     meta: { lnbVisible: true, menuId: MENU_ID.MY_PAGE_ACCOUNT_PROFILE },
-                    component: UserAccountPage,
+                    component: UserAccountPage as any,
                 },
                 {
                     path: 'api-key',
