@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

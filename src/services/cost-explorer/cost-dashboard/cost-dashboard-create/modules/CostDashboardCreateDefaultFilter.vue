@@ -18,12 +18,12 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
     PButton, PCheckBox,
 } from '@spaceone/design-system';
 import { has } from 'lodash';
+import { computed, reactive, toRefs } from 'vue';
 
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';

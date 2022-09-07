@@ -116,16 +116,16 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    computed,
-    defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
-
 import {
     PDivider, PI, PIconButton, PPopover, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { Editor } from '@tiptap/vue-2';
+import type { PropType } from 'vue';
+import {
+    computed,
+    defineComponent, reactive, toRefs,
+} from 'vue';
+
 
 import { i18n } from '@/translations';
 

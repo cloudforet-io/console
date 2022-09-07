@@ -33,12 +33,11 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import { PDivider, PPaneLayout, PSkeleton } from '@spaceone/design-system';
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
-
-import { PDivider, PPaneLayout, PSkeleton } from '@spaceone/design-system';
+} from 'vue';
 import type { Location } from 'vue-router';
 
 import type { CurrencySymbol } from '@/store/modules/display/config';

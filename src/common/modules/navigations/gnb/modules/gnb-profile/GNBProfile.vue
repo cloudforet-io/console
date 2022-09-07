@@ -98,16 +98,16 @@
 </template>
 
 <script lang="ts">
-import {
-    computed,
-    defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
 
 import {
     PI, PDivider, PButton,
 } from '@spaceone/design-system';
 import { vOnClickOutside } from '@vueuse/components';
 import ejs from 'ejs';
+import {
+    computed,
+    defineComponent, reactive, toRefs,
+} from 'vue';
 import type { DirectiveFunction } from 'vue';
 import type { Location } from 'vue-router';
 

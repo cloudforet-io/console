@@ -70,9 +70,6 @@
 
 <script lang="ts">
 
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import type { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
@@ -85,6 +82,9 @@ import {
     PBadge, PButton, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import {
+    computed, defineComponent, reactive, toRefs, watch,
+} from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

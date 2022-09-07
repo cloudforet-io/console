@@ -59,9 +59,6 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, toRefs, computed,
-} from '@vue/composition-api';
 
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
@@ -75,6 +72,9 @@ import {
     PPageTitle, PButton, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import {
+    reactive, toRefs, computed,
+} from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

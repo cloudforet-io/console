@@ -5,8 +5,8 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
+import type { ComponentRenderProxy } from 'vue';
+import { getCurrentInstance, reactive, toRefs } from 'vue';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 

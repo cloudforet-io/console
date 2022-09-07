@@ -73,11 +73,6 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
@@ -88,6 +83,10 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import numeral from 'numeral';
+import {
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 
 import { store } from '@/store';
 

@@ -16,10 +16,10 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButton, PPageTitle } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';

@@ -23,14 +23,14 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive,
-    // computed,
-} from '@vue/composition-api';
-
-import {
     PRadio,
     // PCheckBox, PDivider
 } from '@spaceone/design-system';
+import {
+    toRefs, reactive,
+    // computed,
+} from 'vue';
+
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

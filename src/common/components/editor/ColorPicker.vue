@@ -25,13 +25,13 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
-
 import { PI, PSelectDropdown } from '@spaceone/design-system';
 import type { Editor } from '@tiptap/core';
+import type { PropType } from 'vue';
+import {
+    defineComponent, reactive, toRefs,
+} from 'vue';
+
 
 import {
     blue, coral, gray, green, peacock, red, violet, yellow,

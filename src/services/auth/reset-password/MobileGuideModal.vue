@@ -21,9 +21,9 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
-
 import { PButtonModal } from '@spaceone/design-system';
+import { reactive, toRefs } from 'vue';
+
 
 import { SpaceRouter } from '@/router';
 

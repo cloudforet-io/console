@@ -21,11 +21,11 @@
 </template>
 
 <script lang="ts">
+import { PPageTitle, PButton } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { PPageTitle, PButton } from '@spaceone/design-system';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 

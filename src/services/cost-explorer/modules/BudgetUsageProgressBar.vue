@@ -8,9 +8,9 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
-
 import { PProgressBar } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
+
 
 import { indigo, red, yellow } from '@/styles/colors';
 

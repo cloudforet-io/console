@@ -23,12 +23,12 @@
 
 <script lang="ts">
 
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { PDataLoader } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
+import {
+    computed, defineComponent, reactive, toRefs, watch,
+} from 'vue';
 
 
 import { SpaceRouter } from '@/router';

@@ -31,15 +31,15 @@
 
 <script lang="ts">
 
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
 import { uniqBy } from 'lodash';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

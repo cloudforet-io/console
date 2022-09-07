@@ -45,12 +45,12 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDataLoader, PIconButton, PButton, PLabel,
 } from '@spaceone/design-system';
+import { reactive, toRefs } from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

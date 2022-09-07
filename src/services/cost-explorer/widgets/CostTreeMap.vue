@@ -44,9 +44,6 @@
 
 <script lang="ts">
 
-import {
-    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import type { TreeMap } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -59,6 +56,9 @@ import {
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { sum } from 'lodash';
+import {
+    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';

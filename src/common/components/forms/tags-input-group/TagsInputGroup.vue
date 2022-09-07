@@ -57,12 +57,15 @@
 
 import {
     computed, defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import {
     PButton, PFieldGroup, PIconButton, PTextInput,
 } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

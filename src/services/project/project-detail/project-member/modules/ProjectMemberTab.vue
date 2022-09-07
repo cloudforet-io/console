@@ -72,9 +72,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import type { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
@@ -91,6 +88,9 @@ import {
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

@@ -19,12 +19,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { PButton } from '@spaceone/design-system';
+import type { ComponentRenderProxy } from 'vue';
 import {
     defineComponent, getCurrentInstance, computed, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { PButton } from '@spaceone/design-system';
 
 export default defineComponent({
     name: 'KBSignIn',

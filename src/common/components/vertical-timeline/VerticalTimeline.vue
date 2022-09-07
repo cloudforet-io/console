@@ -28,13 +28,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     PBadge,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import { defineComponent } from 'vue';
 
 
 interface Props {

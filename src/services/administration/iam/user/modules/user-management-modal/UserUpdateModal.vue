@@ -91,15 +91,14 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    reactive, toRefs, computed, getCurrentInstance,
-} from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PSelectDropdown, PFieldGroup, PTextInput, PDivider,
 } from '@spaceone/design-system';
+import type { ComponentRenderProxy } from 'vue';
+import {
+    reactive, toRefs, computed, getCurrentInstance,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 

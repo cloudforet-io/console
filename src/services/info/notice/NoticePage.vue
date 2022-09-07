@@ -15,11 +15,11 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
-
 import {
     PButton, PPageTitle,
 } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
+
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

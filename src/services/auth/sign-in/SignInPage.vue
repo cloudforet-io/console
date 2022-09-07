@@ -35,12 +35,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { isEmpty } from 'lodash';
+import type { ComponentRenderProxy } from 'vue';
 import {
     toRefs, reactive, computed, getCurrentInstance, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { isEmpty } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

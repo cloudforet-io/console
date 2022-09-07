@@ -35,9 +35,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
 
 import {
     PSearchDropdown,
@@ -45,6 +42,9 @@ import {
 import type {
     SearchDropdownMenuItem,
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
 
 import { store } from '@/store';
 

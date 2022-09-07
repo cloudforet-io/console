@@ -5,7 +5,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy, defineComponent, getCurrentInstance, onMounted,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

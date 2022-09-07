@@ -55,9 +55,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -69,6 +66,9 @@ import {
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
+import {
+    computed, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
 import type { Location } from 'vue-router';
 
 import { i18n } from '@/translations';

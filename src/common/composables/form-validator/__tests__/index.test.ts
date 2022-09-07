@@ -1,11 +1,10 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 
-import CompositionApi, { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import { defineComponent, reactive, toRefs } from 'vue';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
 const localVue = createLocalVue();
-localVue.use(CompositionApi);
 
 describe('Form Validator Composable', () => {
     const mockComponent = defineComponent({

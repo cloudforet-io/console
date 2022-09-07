@@ -55,9 +55,6 @@
 
 <script lang="ts">
 
-import {
-    computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -67,6 +64,9 @@ import {
     PPagination, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
 
 import type { QueryStoreFilter } from '@/query/type';
 import { SpaceRouter } from '@/router';

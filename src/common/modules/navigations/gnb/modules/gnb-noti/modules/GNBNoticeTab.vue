@@ -51,15 +51,15 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PDataLoader, PI, PDivider,
 } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 
 import type { TimeStamp } from '@/models';
 import { SpaceRouter } from '@/router';

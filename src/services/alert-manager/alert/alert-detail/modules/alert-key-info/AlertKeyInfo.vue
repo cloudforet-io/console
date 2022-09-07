@@ -67,16 +67,16 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPaneLayout, PDefinitionTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
+import type { PropType } from 'vue';
 
 
 import { store } from '@/store';

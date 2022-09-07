@@ -15,10 +15,10 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import { computed } from '@vue/composition-api';
-
 import { PBreadcrumbs } from '@spaceone/design-system';
+import type { PropType } from 'vue';
+import { computed } from 'vue';
+
 
 import FNB from '@/common/modules/navigations/FNB.vue';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';

@@ -120,10 +120,6 @@
 
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -136,6 +132,10 @@ import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import bytes from 'bytes';
 import { range, uniq } from 'lodash';
+import {
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

@@ -51,14 +51,14 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 import {
     PPanelTop, PCard, PContextMenu, PI,
 } from '@spaceone/design-system';
+import type { PropType } from 'vue';
+import {
+    computed, defineComponent, reactive, toRefs, watch,
+} from 'vue';
+
 
 import vueDiff from '@/common/components/forms/vue-diff/Diff.vue';
 

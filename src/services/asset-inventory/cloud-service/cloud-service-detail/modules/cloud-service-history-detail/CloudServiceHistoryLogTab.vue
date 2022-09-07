@@ -52,9 +52,6 @@
     </p-data-loader>
 </template>
 <script lang="ts">
-import {
-    reactive, toRefs, computed, defineComponent, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
@@ -65,6 +62,9 @@ import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-displa
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+import {
+    reactive, toRefs, computed, defineComponent, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';

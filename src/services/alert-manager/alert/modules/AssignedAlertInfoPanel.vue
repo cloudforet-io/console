@@ -15,12 +15,12 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
 
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import { find } from 'lodash';
+import { computed, reactive, toRefs } from 'vue';
 
 
 import { store } from '@/store';

@@ -31,14 +31,14 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, onMounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPageTitle,
 } from '@spaceone/design-system';
+import {
+    computed, onMounted, reactive, toRefs, watch,
+} from 'vue';
 
 import { store } from '@/store';
 

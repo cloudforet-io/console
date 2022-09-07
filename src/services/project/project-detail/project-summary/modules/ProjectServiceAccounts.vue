@@ -37,15 +37,15 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { byteFormatter } from '@spaceone/console-core-lib';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataTable } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 import type { Location } from 'vue-router';
 
 import { store } from '@/store';

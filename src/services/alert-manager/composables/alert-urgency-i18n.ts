@@ -1,6 +1,5 @@
-import type { ComputedRef } from '@vue/composition-api';
-import { computed } from '@vue/composition-api';
-
+import type { ComputedRef } from 'vue';
+import { computed } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';

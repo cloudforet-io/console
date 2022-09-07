@@ -48,15 +48,15 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton, PPaneLayout,
 } from '@spaceone/design-system';
+import type { ComponentRenderProxy } from 'vue';
+import {
+    getCurrentInstance, reactive, toRefs,
+} from 'vue';
+
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 

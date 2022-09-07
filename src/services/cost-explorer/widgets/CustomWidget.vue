@@ -58,9 +58,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -70,6 +67,9 @@ import type {
 } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 
 import { i18n } from '@/translations';

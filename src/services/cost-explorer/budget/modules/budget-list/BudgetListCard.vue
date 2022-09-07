@@ -75,13 +75,11 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
-
-
-import {
     PDivider, PI, PSkeleton,
 } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 import type { Location } from 'vue-router';
 
 

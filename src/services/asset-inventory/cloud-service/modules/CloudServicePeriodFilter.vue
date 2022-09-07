@@ -8,13 +8,13 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, defineComponent,
-    reactive, toRefs,
-} from '@vue/composition-api';
 
 import { PTag } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    computed, defineComponent,
+    reactive, toRefs,
+} from 'vue';
 
 import type { Period } from '@/services/cost-explorer/type';
 

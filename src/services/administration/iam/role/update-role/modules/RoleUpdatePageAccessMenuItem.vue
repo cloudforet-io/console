@@ -42,14 +42,14 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
-
 import {
     PCheckBox, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
+import type { PropType } from 'vue';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
+
 
 import { i18n } from '@/translations';
 

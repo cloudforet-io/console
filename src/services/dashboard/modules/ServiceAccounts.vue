@@ -49,9 +49,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch, onUnmounted,
-} from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -60,6 +57,9 @@ import {
     PDataLoader, PDataTable, PI, PSkeleton,
 } from '@spaceone/design-system';
 import { forEach, range, isEmpty } from 'lodash';
+import {
+    computed, reactive, toRefs, watch, onUnmounted,
+} from 'vue';
 import type { Location } from 'vue-router';
 
 

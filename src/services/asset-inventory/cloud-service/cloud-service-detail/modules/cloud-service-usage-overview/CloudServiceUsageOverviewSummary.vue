@@ -24,12 +24,12 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, toRefs,
-} from '@vue/composition-api';
 
 import { PDataLoader, PDynamicWidget, PSkeleton } from '@spaceone/design-system';
 import type { DynamicWidgetFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
+import {
+    reactive, toRefs,
+} from 'vue';
 
 import { store } from '@/store';
 

@@ -42,14 +42,14 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, onActivated, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { PAnchor, PLazyImg, PPaneLayout } from '@spaceone/design-system';
+import {
+    computed, onActivated, reactive, toRefs,
+} from 'vue';
 
 
 import { store } from '@/store';

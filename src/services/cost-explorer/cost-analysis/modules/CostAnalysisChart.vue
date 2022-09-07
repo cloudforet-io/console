@@ -110,9 +110,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import type { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -126,6 +123,9 @@ import dayjs from 'dayjs';
 import {
     cloneDeep, debounce, sum, isEmpty,
 } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 
 import { store } from '@/store';

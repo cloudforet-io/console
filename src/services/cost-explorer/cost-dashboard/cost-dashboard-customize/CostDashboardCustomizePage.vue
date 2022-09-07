@@ -29,14 +29,14 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, onBeforeUnmount, onMounted, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton, PTextInput, PIconButton,
 } from '@spaceone/design-system';
+import {
+    computed, onBeforeUnmount, onMounted, reactive, toRefs,
+} from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

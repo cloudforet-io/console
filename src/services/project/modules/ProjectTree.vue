@@ -95,15 +95,14 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PI, PIconButton, PTree, PButton, PDataLoader,
 } from '@spaceone/design-system';
+import type { ComponentRenderProxy } from 'vue';
+import {
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
 
 
 import { store } from '@/store';

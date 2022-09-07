@@ -10,10 +10,10 @@
 
 <script lang="ts">
 
-import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDynamicLayout } from '@spaceone/design-system';
+import { reactive, toRefs, watch } from 'vue';
 
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 

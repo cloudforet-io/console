@@ -16,7 +16,7 @@
 <script lang="ts">
 import {
     computed, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { CURRENCY } from '@/store/modules/display/config';
 

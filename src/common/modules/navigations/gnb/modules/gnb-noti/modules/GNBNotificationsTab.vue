@@ -85,10 +85,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed,
-    onMounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -99,6 +95,10 @@ import {
 import { useInfiniteScroll } from '@vueuse/core';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+import {
+    computed,
+    onMounted, reactive, toRefs, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';

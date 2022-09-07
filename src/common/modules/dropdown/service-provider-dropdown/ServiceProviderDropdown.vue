@@ -29,9 +29,9 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
-
 import { PSelectDropdown, PLazyImg } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
+
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

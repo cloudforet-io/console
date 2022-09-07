@@ -20,11 +20,11 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
-
 import {
     PPanelTop, PCard,
 } from '@spaceone/design-system';
+import { reactive, toRefs } from 'vue';
+
 
 export default {
     name: 'CollectionRule',

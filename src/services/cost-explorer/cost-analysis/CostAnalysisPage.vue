@@ -11,8 +11,7 @@
 <script lang="ts">
 import {
     computed, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
+} from 'vue';
 import type { Location } from 'vue-router';
 
 import { SpaceRouter } from '@/router';

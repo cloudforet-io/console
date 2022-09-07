@@ -28,10 +28,10 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, ref, toRaw,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { useVirtualScroll, useRender } from './hooks';
 import vueDiffLine from './Line.vue';

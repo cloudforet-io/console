@@ -100,16 +100,16 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, onActivated, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PI, PIconButton, PPaneLayout, PButton,
 } from '@spaceone/design-system';
 import { get } from 'lodash';
+import {
+    computed, getCurrentInstance, onActivated, reactive, toRefs, watch,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 
 import { i18n } from '@/translations';
 

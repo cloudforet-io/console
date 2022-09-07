@@ -30,10 +30,6 @@
     </p-list-card>
 </template>
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
 
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -43,6 +39,10 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 
 import { store } from '@/store';
 

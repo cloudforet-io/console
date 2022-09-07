@@ -21,13 +21,13 @@
 </template>
 
 <script lang="ts">
-import {
-    defineComponent,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
+import {
+    defineComponent,
+    reactive, toRefs, watch,
+} from 'vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';

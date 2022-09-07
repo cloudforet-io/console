@@ -8,7 +8,7 @@
 import {
     computed,
     defineComponent,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

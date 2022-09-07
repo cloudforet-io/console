@@ -87,14 +87,14 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import {
     PAnchor, PFieldGroup, PRadio, PTextInput,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 
 import { store } from '@/store';

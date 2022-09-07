@@ -77,10 +77,6 @@
 
 <script lang="ts">
 
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -88,6 +84,9 @@ import {
     PButton, PButtonModal, PCheckBox, PDataLoader, PSearch,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import {
+    computed, defineComponent, reactive, toRefs, watch,
+} from 'vue';
 import draggable from 'vuedraggable';
 
 import { i18n } from '@/translations';

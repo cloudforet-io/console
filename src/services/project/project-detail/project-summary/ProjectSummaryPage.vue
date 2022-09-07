@@ -23,11 +23,11 @@
 </template>
 
 <script lang="ts">
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import { store } from '@/store';
 

@@ -34,7 +34,9 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
+import type { ComponentRenderProxy } from 'vue';
 import {
     computed,
     getCurrentInstance,
@@ -42,11 +44,8 @@ import {
     onDeactivated,
     reactive,
     toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
-
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

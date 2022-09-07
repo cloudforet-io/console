@@ -45,9 +45,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -55,6 +52,9 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectCard,
 } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 
 import { store } from '@/store';

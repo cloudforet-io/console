@@ -60,9 +60,9 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
-
 import { PRadio, PLabel, PTextPagination } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
+
 
 import CostDashboardCustomizeWidgetConfig
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';

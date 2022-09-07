@@ -15,7 +15,7 @@
 import {
     computed,
     reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { i18n } from '@/translations';
 

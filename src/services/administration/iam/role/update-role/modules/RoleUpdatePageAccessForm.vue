@@ -31,13 +31,13 @@
 
 <script lang="ts">
 
-import type { PropType } from '@vue/composition-api';
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import { find } from 'lodash';
+import type { PropType } from 'vue';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+
 
 import type { RawPagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';

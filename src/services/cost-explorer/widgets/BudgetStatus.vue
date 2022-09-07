@@ -36,11 +36,6 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -49,6 +44,10 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
+import {
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 import type { Location } from 'vue-router';
 
 import { i18n } from '@/translations';

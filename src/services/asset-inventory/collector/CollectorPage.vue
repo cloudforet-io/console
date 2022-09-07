@@ -183,10 +183,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    reactive, toRefs, computed, watch, getCurrentInstance,
-} from '@vue/composition-api';
 
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
@@ -201,6 +197,10 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import {
+    reactive, toRefs, computed, watch, getCurrentInstance,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Component } from 'vue/types/umd';
 

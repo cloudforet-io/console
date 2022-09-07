@@ -55,12 +55,12 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import { useResizeObserver, useThrottleFn } from '@vueuse/core';
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, ref,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { useResizeObserver, useThrottleFn } from '@vueuse/core';
 
 import vueDiffCode from './Code.vue';
 import type {

@@ -38,12 +38,11 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import { defineComponent } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
 import { vOnClickOutside } from '@vueuse/components';
-import type { DirectiveFunction } from 'vue';
+import { defineComponent } from 'vue';
+import type { PropType, DirectiveFunction } from 'vue';
 
 import { SpaceRouter } from '@/router';
 

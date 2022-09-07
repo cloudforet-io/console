@@ -50,11 +50,6 @@
 <script lang="ts">
 
 
-import {
-    computed, defineComponent, onMounted, onUnmounted,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PI } from '@spaceone/design-system';
 import { laptop } from '@spaceone/design-system/src/styles/screens';
@@ -62,6 +57,10 @@ import { vOnClickOutside } from '@vueuse/components';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce, throttle } from 'lodash';
+import {
+    computed, defineComponent, onMounted, onUnmounted,
+    reactive, toRefs, watch,
+} from 'vue';
 import type { DirectiveFunction } from 'vue';
 
 import { SpaceRouter } from '@/router';

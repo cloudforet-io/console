@@ -10,12 +10,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { PTab } from '@spaceone/design-system';
+import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { PTab } from '@spaceone/design-system';
 
 import JobTaskErrorList from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskErrorList.vue';
 import type { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';

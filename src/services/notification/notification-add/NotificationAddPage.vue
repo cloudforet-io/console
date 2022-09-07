@@ -10,14 +10,13 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, onActivated, reactive, toRefs,
-} from '@vue/composition-api';
-
 import {
     PPageTitle,
 } from '@spaceone/design-system';
+import type { ComponentRenderProxy } from 'vue';
+import {
+    computed, getCurrentInstance, onActivated, reactive, toRefs,
+} from 'vue';
 import VueI18n from 'vue-i18n';
 
 import NotificationAddForm from '@/services/notification/notification-add/modules/NotificationAddForm.vue';

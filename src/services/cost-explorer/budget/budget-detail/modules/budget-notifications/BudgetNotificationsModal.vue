@@ -78,14 +78,14 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 
 import {
     PButtonModal, PTextInput, PAnchor, PButton, PSelectDropdown, PIconButton,
 } from '@spaceone/design-system';
 import cloneDeep from 'lodash/cloneDeep';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

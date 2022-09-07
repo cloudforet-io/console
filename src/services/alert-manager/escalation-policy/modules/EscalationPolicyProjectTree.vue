@@ -29,12 +29,12 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PTree, PI, PRadio,
 } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

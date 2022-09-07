@@ -70,10 +70,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy, UnwrapRef } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -82,6 +78,10 @@ import {
     PButton, PDataTable, PPaneLayout, PTableCheckModal, PStatus, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import {
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { ComponentRenderProxy, UnwrapRef } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 

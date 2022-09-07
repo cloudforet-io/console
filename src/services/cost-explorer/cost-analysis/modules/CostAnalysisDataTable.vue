@@ -52,9 +52,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
@@ -72,6 +69,9 @@ import dayjs from 'dayjs';
 import { get } from 'lodash';
 // eslint-disable-next-line import/extensions,import/no-unresolved
 import type { Table } from 'pdfmake/interfaces';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 import type { Location } from 'vue-router';
 
 import { store } from '@/store';

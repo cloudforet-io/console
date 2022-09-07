@@ -21,7 +21,7 @@
 <script lang="ts">
 import {
     defineComponent,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { store } from '@/store';
 

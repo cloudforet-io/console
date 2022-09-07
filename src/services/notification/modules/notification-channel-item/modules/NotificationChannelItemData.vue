@@ -82,12 +82,12 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
     PBadge, PButton, PI, PJsonSchemaForm,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
+import { computed, reactive, toRefs } from 'vue';
 
 import { store } from '@/store';
 

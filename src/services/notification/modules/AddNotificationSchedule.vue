@@ -46,15 +46,15 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
-
 import {
     PRadio, PSelectButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import { range } from 'lodash';
+import type { ComponentRenderProxy } from 'vue';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+
 
 import { store } from '@/store';
 

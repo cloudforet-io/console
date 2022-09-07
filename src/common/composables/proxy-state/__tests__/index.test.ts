@@ -3,12 +3,11 @@
 
 import { mount, createLocalVue } from '@vue/test-utils';
 
-import CompositionApi, { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import { defineComponent, reactive, toRefs } from 'vue';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 const localVue = createLocalVue();
-localVue.use(CompositionApi);
 
 describe('Proxy State Composable', () => {
     // eslint-disable-next-line vue/one-component-per-file

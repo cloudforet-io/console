@@ -63,15 +63,15 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     PButton, PPaneLayout, PSelectDropdown, PI, PBadge,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

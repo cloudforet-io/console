@@ -102,10 +102,6 @@
 
 <script lang="ts">
 
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 
 import { commaFormatter } from '@spaceone/console-core-lib';
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
@@ -117,6 +113,9 @@ import {
 } from '@spaceone/design-system';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { find, sum } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

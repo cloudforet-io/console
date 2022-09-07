@@ -114,9 +114,6 @@
     </fragment>
 </template>
 <script lang="ts">
-import {
-    computed, onActivated, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { durationFormatter, iso8601Formatter, commaFormatter } from '@spaceone/console-core-lib';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
@@ -133,6 +130,9 @@ import {
     PAnchor,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    computed, onActivated, reactive, toRefs,
+} from 'vue';
 
 import { store } from '@/store';
 

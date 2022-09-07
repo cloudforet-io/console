@@ -8,7 +8,7 @@
 <script lang="ts">
 import {
     reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import BudgetForm from '@/services/cost-explorer/budget/modules/budget-form/BudgetForm.vue';
 

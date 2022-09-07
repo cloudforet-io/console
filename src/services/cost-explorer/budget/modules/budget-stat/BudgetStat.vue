@@ -27,11 +27,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 
 import { commaFormatter, isNotEmpty } from '@spaceone/console-core-lib';
@@ -40,6 +35,11 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
+import {
+    computed, getCurrentInstance,
+    reactive, toRefs, watch,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';

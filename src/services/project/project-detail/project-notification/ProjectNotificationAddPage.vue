@@ -11,14 +11,13 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, onActivated, reactive, toRefs,
-} from '@vue/composition-api';
-
 import {
     PBreadcrumbs, PPageTitle,
 } from '@spaceone/design-system';
+import type { ComponentRenderProxy } from 'vue';
+import {
+    computed, getCurrentInstance, onActivated, reactive, toRefs,
+} from 'vue';
 import VueI18n from 'vue-i18n';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';

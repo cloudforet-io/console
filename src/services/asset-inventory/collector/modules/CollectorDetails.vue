@@ -26,17 +26,16 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, watch,
-} from '@vue/composition-api';
-
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPanelTop, PDefinitionTable, PLazyImg, PStatus, PTextList,
 } from '@spaceone/design-system';
+import {
+    computed, getCurrentInstance, reactive, watch,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 
 import { store } from '@/store';
 

@@ -72,7 +72,6 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { durationFormatter, iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -80,6 +79,7 @@ import {
     PButton, PSelectDropdown, PTableCheckModal, PI, PBadge,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import { computed, reactive, toRefs } from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

@@ -96,9 +96,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -114,6 +111,9 @@ import {
 import type { Unit } from 'bytes';
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
+import {
+    computed, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 

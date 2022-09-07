@@ -34,15 +34,14 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, reactive, toRefs, watch, getCurrentInstance,
-} from '@vue/composition-api';
-
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataTable, PPanelTop, PButton } from '@spaceone/design-system';
 import { get, camelCase } from 'lodash';
+import {
+    computed, reactive, toRefs, watch, getCurrentInstance,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';

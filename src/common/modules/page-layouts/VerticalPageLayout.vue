@@ -24,10 +24,10 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import { computed, ref } from '@vue/composition-api';
-
 import { PBreadcrumbs, PVerticalLayout } from '@spaceone/design-system';
+import type { PropType } from 'vue';
+import { computed, ref } from 'vue';
+
 
 import FNB from '@/common/modules/navigations/FNB.vue';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';

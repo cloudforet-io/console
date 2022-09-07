@@ -38,12 +38,12 @@
 
 
 import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
-
-import {
     PPageTitle, PDivider, PDataLoader, PButtonModal, PIconModal,
 } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
+
 
 import { store } from '@/store';
 

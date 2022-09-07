@@ -28,12 +28,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { PRadio, PCheckBox } from '@spaceone/design-system';
+import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { PRadio, PCheckBox } from '@spaceone/design-system';
 
 const TOPIC_LIST = [
     { label: 'Alert', value: 'monitoring.Alert' },

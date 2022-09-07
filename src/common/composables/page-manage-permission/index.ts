@@ -1,7 +1,7 @@
-import type { ComponentRenderProxy, ComputedRef } from '@vue/composition-api';
-import { computed, getCurrentInstance } from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import type { ComponentRenderProxy, ComputedRef } from 'vue';
+import { computed, getCurrentInstance } from 'vue';
+
 
 import { getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';

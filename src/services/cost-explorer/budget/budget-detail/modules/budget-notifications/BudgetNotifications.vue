@@ -93,12 +93,12 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { commaFormatter } from '@spaceone/console-core-lib';
 import {
     PAnchor, PBadge, PButton, PCard, PIconButton, PLottie,
 } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
 
 import { i18n } from '@/translations';
 

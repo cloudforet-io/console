@@ -5,16 +5,16 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { get } from 'lodash';
+import type { ComponentRenderProxy } from 'vue';
 import {
     computed,
     defineComponent,
     getCurrentInstance,
     reactive, toRefs,
     watch,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { get } from 'lodash';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

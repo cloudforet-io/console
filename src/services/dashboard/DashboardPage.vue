@@ -33,7 +33,7 @@
 <script lang="ts">
 import {
     computed, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { store } from '@/store';
 

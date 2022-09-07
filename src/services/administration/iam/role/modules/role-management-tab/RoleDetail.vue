@@ -56,9 +56,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
@@ -67,6 +64,9 @@ import {
     PAnchor, PBadge, PDataTable, PDefinitionTable, PPanelTop,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';

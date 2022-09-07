@@ -142,13 +142,13 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PAnchor, PBadge, PIconButton, PSelectDropdown, PI, PButton, PTextInput, PRadio,
 } from '@spaceone/design-system';
+import { reactive, toRefs, watch } from 'vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';

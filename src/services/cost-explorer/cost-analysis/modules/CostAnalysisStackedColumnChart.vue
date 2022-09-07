@@ -8,11 +8,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    getCurrentInstance,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -23,6 +18,11 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
+import {
+    getCurrentInstance,
+    reactive, toRefs, watch,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 
 
 import { CURRENCY } from '@/store/modules/display/config';

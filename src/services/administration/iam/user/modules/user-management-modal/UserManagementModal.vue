@@ -34,16 +34,16 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PStatus, PTableCheckModal,
 } from '@spaceone/design-system';
 import { map } from 'lodash';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 

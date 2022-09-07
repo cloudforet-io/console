@@ -58,8 +58,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import { reactive, toRefs } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
@@ -67,6 +65,8 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
+import { reactive, toRefs } from 'vue';
+import type { PropType } from 'vue';
 
 import { i18n } from '@/translations';
 

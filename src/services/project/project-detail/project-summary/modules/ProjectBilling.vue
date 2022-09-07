@@ -105,10 +105,6 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -126,6 +122,10 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { orderBy, range } from 'lodash';
+import {
+    computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 import type { NumberFormatOptions } from 'vue-i18n';
 
 

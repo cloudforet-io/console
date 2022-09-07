@@ -1,6 +1,5 @@
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import { computed, getCurrentInstance } from '@vue/composition-api';
-
+import type { ComponentRenderProxy } from 'vue';
+import { computed, getCurrentInstance } from 'vue';
 import type { Location } from 'vue-router';
 
 import { i18n } from '@/translations';

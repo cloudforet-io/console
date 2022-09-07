@@ -43,14 +43,14 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
-
 import {
     PDivider, PI, PLazyImg,
 } from '@spaceone/design-system';
+import type { ComponentRenderProxy } from 'vue';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+
 
 import { getUUID } from '@/lib/component-util/getUUID';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

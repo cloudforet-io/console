@@ -38,16 +38,16 @@
 </template>
 
 <script lang="ts">
-import {
-    computed,
-    defineComponent,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PCheckBox, PFieldGroup, PRadio, PTextInput,
 } from '@spaceone/design-system';
+import {
+    computed,
+    defineComponent,
+    reactive, toRefs, watch,
+} from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';

@@ -18,7 +18,7 @@
 import {
     computed, defineComponent,
     reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import config from '@/lib/config';
 

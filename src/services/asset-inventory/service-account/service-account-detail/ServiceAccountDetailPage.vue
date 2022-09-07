@@ -39,13 +39,16 @@
 <script lang="ts">
 import {
     computed, defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PAnchor, PButton, PIconButton, PPageTitle, PLazyImg,
 } from '@spaceone/design-system';
 import { render } from 'ejs';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { store } from '@/store';
 

@@ -59,11 +59,6 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    toRefs, reactive, computed, getCurrentInstance, watch,
-} from '@vue/composition-api';
-
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -71,6 +66,10 @@ import {
     PButtonModal, PSelectDropdown, PLazyImg, PFieldGroup, PButton, PTextInput, PToggleButton,
 } from '@spaceone/design-system';
 import { get } from 'lodash';
+import {
+    toRefs, reactive, computed, getCurrentInstance, watch,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 
 
 import { store } from '@/store';

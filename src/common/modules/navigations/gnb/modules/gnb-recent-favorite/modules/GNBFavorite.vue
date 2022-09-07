@@ -61,11 +61,10 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
-
 import {
     PButton, PI, PIconButton, PDataLoader,
 } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceRouter } from '@/router';

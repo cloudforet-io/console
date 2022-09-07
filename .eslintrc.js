@@ -137,10 +137,6 @@ module.exports = {
                         position: 'before',
                     },
                     {
-                        pattern: '@vue/composition-api',
-                        group: 'builtin',
-                    },
-                    {
                         pattern: '@spaceone/design-system/**',
                         group: 'external',
                     },
@@ -188,7 +184,7 @@ module.exports = {
                         position: 'after',
                     },
                 ],
-                pathGroupsExcludedImportTypes: ['@vue/composition-api', '@vue/test-utils'],
+                pathGroupsExcludedImportTypes: ['@vue/test-utils'],
                 alphabetize: {
                     order: 'asc',
                     caseInsensitive: true,

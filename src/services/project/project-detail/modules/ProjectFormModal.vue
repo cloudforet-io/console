@@ -26,15 +26,15 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
 
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 import VueI18n from 'vue-i18n';
 
 import { store } from '@/store';

@@ -68,16 +68,16 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { byteFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import {
     PDataTable, PTextPagination, PStatus, PI,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
+import type { PropType } from 'vue';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 

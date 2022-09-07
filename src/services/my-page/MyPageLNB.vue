@@ -17,11 +17,11 @@
 </template>
 
 <script lang="ts">
+import { PI } from '@spaceone/design-system';
 import {
     computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { PI } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

@@ -16,10 +16,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch } from '@vue/composition-api';
 
 import { PFieldGroup } from '@spaceone/design-system';
 import { debounce } from 'lodash';
+import { defineComponent, watch } from 'vue';
 
 import { i18n } from '@/translations';
 

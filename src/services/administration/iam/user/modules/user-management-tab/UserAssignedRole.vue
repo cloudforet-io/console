@@ -36,16 +36,15 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPanelTop, PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
+import type { ComponentRenderProxy } from 'vue';
+import {
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+
 
 import type { Tags } from '@/models';
 import { store } from '@/store';

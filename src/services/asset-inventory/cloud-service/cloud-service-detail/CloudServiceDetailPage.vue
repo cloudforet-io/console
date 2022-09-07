@@ -146,11 +146,6 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    reactive, computed, getCurrentInstance, watch,
-} from '@vue/composition-api';
-
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
@@ -168,6 +163,10 @@ import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-displa
 import { debouncedWatch } from '@vueuse/core';
 import dayjs from 'dayjs';
 import { isEmpty, get } from 'lodash';
+import {
+    reactive, computed, getCurrentInstance, watch,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';

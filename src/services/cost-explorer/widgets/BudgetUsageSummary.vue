@@ -11,10 +11,10 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { computed, reactive, toRefs } from 'vue';
 
 import { CURRENCY } from '@/store/modules/display/config';
 

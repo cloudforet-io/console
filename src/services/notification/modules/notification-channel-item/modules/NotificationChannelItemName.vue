@@ -42,11 +42,11 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
-
 import {
     PButton, PI, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
+
 
 import { i18n } from '@/translations';
 

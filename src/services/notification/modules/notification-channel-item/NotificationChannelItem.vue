@@ -54,14 +54,14 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, toRefs,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDivider, PIconButton, PPaneLayout, PToggleButton,
 } from '@spaceone/design-system';
+import {
+    reactive, toRefs,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

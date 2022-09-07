@@ -76,12 +76,12 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
 
 import {
     PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PAnchor, PTextEditor,
 } from '@spaceone/design-system';
 import yaml from 'js-yaml';
+import { reactive, toRefs } from 'vue';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

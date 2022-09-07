@@ -38,12 +38,12 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch, onMounted, onUnmounted, defineComponent,
-} from '@vue/composition-api';
-
-import {
     PI, PCheckBox, PTab,
 } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs, watch, onMounted, onUnmounted, defineComponent,
+} from 'vue';
+
 
 import { store } from '@/store';
 

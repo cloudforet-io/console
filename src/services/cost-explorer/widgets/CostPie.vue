@@ -43,9 +43,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import type { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
@@ -54,6 +51,9 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PSkeleton, PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

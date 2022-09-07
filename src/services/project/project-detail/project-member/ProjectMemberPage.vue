@@ -7,12 +7,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import type { ComponentRenderProxy } from 'vue';
 import {
     getCurrentInstance, onActivated, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 

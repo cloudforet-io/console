@@ -9,12 +9,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
+import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

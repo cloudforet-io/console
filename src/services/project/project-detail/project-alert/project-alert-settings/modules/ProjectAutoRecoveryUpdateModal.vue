@@ -22,14 +22,14 @@
 
 <script lang="ts">
 
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PSelectCard,
 } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

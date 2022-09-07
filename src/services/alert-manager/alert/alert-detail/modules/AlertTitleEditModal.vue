@@ -26,11 +26,11 @@
 </template>
 
 <script lang="ts">
+import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 

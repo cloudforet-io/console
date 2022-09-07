@@ -1,10 +1,10 @@
-import type { ComputedRef } from '@vue/composition-api';
-import {
-    computed, ref,
-} from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import type { ComputedRef } from 'vue';
+import {
+    computed, ref,
+} from 'vue';
+
 
 import { store } from '@/store';
 

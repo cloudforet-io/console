@@ -30,12 +30,11 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { includes } from 'lodash';
+import type { ComponentRenderProxy } from 'vue';
 import {
     reactive, toRefs, computed, getCurrentInstance, defineComponent,
-} from '@vue/composition-api';
-
-import { includes } from 'lodash';
+} from 'vue';
 
 
 import { store } from '@/store';

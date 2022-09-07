@@ -55,9 +55,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import {
     makeDistinctValueHandler,
@@ -76,6 +73,9 @@ import {
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import {
+    computed, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

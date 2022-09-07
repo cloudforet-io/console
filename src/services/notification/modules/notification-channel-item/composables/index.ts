@@ -1,8 +1,8 @@
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import { getCurrentInstance, reactive } from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { cloneDeep } from 'lodash';
+import type { ComponentRenderProxy } from 'vue';
+import { getCurrentInstance, reactive } from 'vue';
+
 
 import { i18n } from '@/translations';
 

@@ -86,11 +86,6 @@
 <script lang="ts">
 
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    reactive, toRefs, computed, watch, getCurrentInstance,
-} from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PSearchDropdown, PFieldGroup, PRadio, PButton, PTextInput, PI, PSelectDropdown,
@@ -101,6 +96,10 @@ import dayjs from 'dayjs';
 import {
     range, get, forEach, size, map,
 } from 'lodash';
+import {
+    reactive, toRefs, computed, watch, getCurrentInstance,
+} from 'vue';
+import type { ComponentRenderProxy } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';

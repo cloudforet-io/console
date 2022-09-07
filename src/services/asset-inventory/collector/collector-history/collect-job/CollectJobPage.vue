@@ -19,12 +19,12 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, onActivated,
-} from '@vue/composition-api';
-
-import {
     PHorizontalLayout, PPageTitle,
 } from '@spaceone/design-system';
+import {
+    reactive, toRefs, onActivated,
+} from 'vue';
+
 
 import JobBasicInformation from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobBasicInformation.vue';
 import JobStatusChart from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobStatusChart.vue';

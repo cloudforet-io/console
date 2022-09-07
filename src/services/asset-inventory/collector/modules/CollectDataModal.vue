@@ -51,17 +51,16 @@
 
 <script lang="ts">
 
-import type { SetupContext, ComponentRenderProxy } from '@vue/composition-api';
-import {
-    toRefs, reactive, computed, watch, getCurrentInstance,
-} from '@vue/composition-api';
-
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PLazyImg, PDefinition,
 } from '@spaceone/design-system';
 import { get } from 'lodash';
+import {
+    toRefs, reactive, computed, watch, getCurrentInstance,
+} from 'vue';
+import type { SetupContext, ComponentRenderProxy } from 'vue';
 
 import type { TimeStamp } from '@/models';
 import { store } from '@/store';
