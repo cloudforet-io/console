@@ -64,6 +64,7 @@ module.exports = {
             symlinks: false,
             alias: {
                 '@spaceone/console-core-lib': path.resolve(__dirname, './packages/@spaceone/console-core-lib/dist/'),
+                vue: path.resolve('./node_modules/vue'),
             },
         },
         plugins: [
