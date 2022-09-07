@@ -215,7 +215,7 @@ export default {
             @apply border-gray-300;
         }
         &:hover {
-            @apply bg-white text-blue-600 border-blue-600;
+            @apply bg-gray-dark text-white border-gray-dark;
         }
         &.disabled {
             @apply bg-transparent text-gray-300 border-gray-300;
