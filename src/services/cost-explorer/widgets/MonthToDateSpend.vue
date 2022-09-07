@@ -54,7 +54,7 @@ import dayjs from 'dayjs';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import type { Currency } from '@/store/modules/display/config';
@@ -114,7 +114,7 @@ export default defineComponent<WidgetProps>({
         },
     },
     setup(props: WidgetProps, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const checkThisMonth = () => dayjs.utc(props.period?.end).format('MM') === thisMonth;
         const thisMonthFormatter = (targetDate: Dayjs) => {
             if (checkThisMonth()) {

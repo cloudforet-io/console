@@ -96,7 +96,7 @@ import localeData from 'dayjs/plugin/localeData';
 import {
     computed, getCurrentInstance, onMounted, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -145,7 +145,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             timelineWrapperRef: null as null | HTMLElement,

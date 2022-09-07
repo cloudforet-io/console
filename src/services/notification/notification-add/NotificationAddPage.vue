@@ -13,11 +13,11 @@
 import {
     PPageTitle,
 } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from 'vue';
 import VueI18n from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import NotificationAddForm from '@/services/notification/notification-add/modules/NotificationAddForm.vue';
 
@@ -31,7 +31,7 @@ export default {
     },
 
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             pageTitle: '' as TranslateResult,
             //

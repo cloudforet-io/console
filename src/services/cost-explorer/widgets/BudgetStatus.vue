@@ -47,8 +47,8 @@ import { range } from 'lodash';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
 import type { Location } from 'vue-router';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -108,7 +108,7 @@ export default defineComponent<WidgetProps>({
         },
     },
     setup(props: WidgetProps, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const budgetQueryHelper = new QueryHelper();
         const state = reactive({
             loading: false,

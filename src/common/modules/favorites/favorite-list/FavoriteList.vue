@@ -46,10 +46,10 @@
 
 <script lang="ts">
 import { PI, PIconButton } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import type { FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
@@ -78,7 +78,7 @@ export default {
         },
     },
     setup(props: FavoriteListProps) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             displayItems: computed<FavoriteItem[]>(() => {
                 if (state.isExpanded) return props.items;

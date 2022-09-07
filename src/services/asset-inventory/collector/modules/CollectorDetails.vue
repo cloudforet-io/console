@@ -35,7 +35,7 @@ import {
 import {
     computed, getCurrentInstance, reactive, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -55,7 +55,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const baseState = reactive({
             name: computed(() => vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_TITLE')),
             timezone: computed(() => vm.$store.state.user.timezone) as unknown as string,

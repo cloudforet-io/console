@@ -99,10 +99,10 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PI, PIconButton, PTree, PButton, PDataLoader,
 } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { store } from '@/store';
@@ -141,7 +141,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             hasRootProjectGroupManagePermission: computed(() => !props.manageDisabled && store.getters['user/hasDomainRole']),

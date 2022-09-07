@@ -106,8 +106,8 @@ import { find } from 'lodash';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 
 import { store } from '@/store';
@@ -165,7 +165,7 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         registerServiceStore<ProjectDetailState>('projectDetail', ProjectDetailStoreModule);
 

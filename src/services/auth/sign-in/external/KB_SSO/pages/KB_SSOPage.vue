@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, defineComponent, getCurrentInstance, onMounted,
+    defineComponent, getCurrentInstance, onMounted,
 } from 'vue';
 
 import { SpaceRouter } from '@/router';
@@ -39,7 +39,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const onSignIn = async () => {
             const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);

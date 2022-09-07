@@ -11,10 +11,10 @@
 
 <script lang="ts">
 import { PTab } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import JobTaskErrorList from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskErrorList.vue';
@@ -35,7 +35,7 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             tabs: computed(() => [
                 { name: 'error-list', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST'), keepAlive: true },

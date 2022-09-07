@@ -34,7 +34,7 @@ import {
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
@@ -55,7 +55,7 @@ export default {
         PButton,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const queryHelper = new QueryHelper();
 

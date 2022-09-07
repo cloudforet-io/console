@@ -48,8 +48,8 @@ import dayjs from 'dayjs';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -121,7 +121,7 @@ export default {
         },
     },
     setup(props: WidgetProps, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const budgetQueryHelper = new QueryHelper();
 
         const state = reactive({

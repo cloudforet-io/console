@@ -105,7 +105,7 @@ import { debounce, get } from 'lodash';
 import {
     reactive, toRefs, computed, watch, getCurrentInstance,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -137,7 +137,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             totalCount: 0,

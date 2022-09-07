@@ -29,10 +29,10 @@
 
 <script lang="ts">
 import { PRadio, PCheckBox } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 const TOPIC_LIST = [
@@ -57,7 +57,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             topicModeList: computed(() => [{
                 label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL'), value: false,

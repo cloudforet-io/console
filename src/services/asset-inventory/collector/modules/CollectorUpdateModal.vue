@@ -69,7 +69,7 @@ import { get } from 'lodash';
 import {
     toRefs, reactive, computed, getCurrentInstance, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { store } from '@/store';
@@ -112,7 +112,7 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             collector: null,

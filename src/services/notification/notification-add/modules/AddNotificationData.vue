@@ -41,7 +41,7 @@ import {
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -89,7 +89,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const protocol = vm.$route.params.protocol;
 
         const state = reactive({

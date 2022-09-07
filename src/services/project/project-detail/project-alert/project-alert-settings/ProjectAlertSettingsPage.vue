@@ -109,7 +109,7 @@ import { get } from 'lodash';
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -157,7 +157,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
             notificationUrgencyList: computed(() => ([

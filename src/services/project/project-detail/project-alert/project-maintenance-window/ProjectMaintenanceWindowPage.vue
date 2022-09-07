@@ -82,7 +82,7 @@ import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -139,7 +139,7 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const tagQueryHandler = new QueryHelper()
             .setKeyItemSets(keyItemSets)

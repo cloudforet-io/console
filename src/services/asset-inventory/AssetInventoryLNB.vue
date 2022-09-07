@@ -6,7 +6,6 @@
 
 <script lang="ts">
 import { get } from 'lodash';
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed,
     defineComponent,
@@ -14,6 +13,7 @@ import {
     reactive, toRefs,
     watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { store } from '@/store';
@@ -42,7 +42,7 @@ export default defineComponent({
     name: 'AssetInventoryLNB',
     components: { LNB },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             isCloudServiceDetailPage: computed(() => vm.$route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME),
             detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {

@@ -102,7 +102,7 @@ import {
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { store } from '@/store';
@@ -161,7 +161,7 @@ export default {
         },
     },
     setup(props: MonitoringProps) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             showLoader: computed(() => props.loading || state.metricsLoading),
             timezone: computed(() => store.state.user.timezone),

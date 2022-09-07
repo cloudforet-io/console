@@ -81,8 +81,9 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy, UnwrapRef } from 'vue';
+import type { UnwrapRef } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 
 import type { TimeStamp } from '@/models';
@@ -143,7 +144,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: false,
             fields: [

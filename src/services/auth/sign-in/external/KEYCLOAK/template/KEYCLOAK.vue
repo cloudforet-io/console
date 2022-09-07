@@ -13,10 +13,10 @@
 
 <script lang="ts">
 import { PButton } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
@@ -27,7 +27,7 @@ export default defineComponent({
         PButton,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             keycloakVisible: false,
         });

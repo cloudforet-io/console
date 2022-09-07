@@ -59,7 +59,7 @@ import { get, some } from 'lodash';
 import {
     reactive, toRefs, computed, getCurrentInstance,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -85,7 +85,7 @@ export default {
         PToggleButton,
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             plugin: {},

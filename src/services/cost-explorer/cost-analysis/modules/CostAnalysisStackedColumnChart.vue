@@ -22,7 +22,7 @@ import {
     getCurrentInstance,
     reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { CURRENCY } from '@/store/modules/display/config';
@@ -113,7 +113,7 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             chartRef: null as HTMLElement | null,

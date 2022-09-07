@@ -125,8 +125,8 @@ import { orderBy, range } from 'lodash';
 import {
     computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
 import type { NumberFormatOptions } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 
 import { CURRENCY } from '@/store/modules/display/config';
@@ -180,7 +180,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const queryHelper = new QueryHelper();
         const state = reactive({
             loading: false,

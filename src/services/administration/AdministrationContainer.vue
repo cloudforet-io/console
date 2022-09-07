@@ -28,10 +28,10 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, reactive, defineComponent,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { registerServiceStore } from '@/common/composables/register-service-store';
@@ -56,7 +56,7 @@ export default defineComponent({
     },
     setup() {
         registerServiceStore<any>('administration', administrationStoreModule, administrationStore);
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const { breadcrumbs } = useBreadcrumbs();
         const handbookState = reactive({
             isVisible: computed((): boolean => (vm?.$route.name === ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME || vm?.$route.name === ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME)),

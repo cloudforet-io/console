@@ -48,8 +48,8 @@
 import {
     PPaneLayout, PButton, PRadio,
 } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import { getCurrentInstance, reactive, toRefs } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
@@ -74,7 +74,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             selectedProject: [] as ProjectGroupTreeItem[],

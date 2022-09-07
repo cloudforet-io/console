@@ -67,10 +67,10 @@
 
 <script lang="ts">
 import { PDataLoader, PIconButton, PButton } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { i18n } from '@/translations';
@@ -139,7 +139,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             widgetCount: computed<number>(() => props.layout.flat().length),
             renderedCount: 0,

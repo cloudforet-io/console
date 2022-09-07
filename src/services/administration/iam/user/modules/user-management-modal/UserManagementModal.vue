@@ -43,7 +43,7 @@ import { map } from 'lodash';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -78,7 +78,7 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             fields: computed(() => ([
                 { name: 'user_id', label: 'User ID' },

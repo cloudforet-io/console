@@ -78,7 +78,7 @@ import {
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -114,7 +114,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             protocolList: undefined as unknown as ProtocolItem[],
             loading: true,

@@ -30,11 +30,11 @@ import {
     PAutocompleteSearch, PCheckBox, PTag,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import type { ComponentRenderProxy, PropType } from 'vue';
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from 'vue';
-
+import type { Vue } from 'vue/types/vue';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
@@ -67,7 +67,7 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             search: '',

@@ -126,7 +126,7 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -180,7 +180,7 @@ export default {
         ProjectGroupFormModal,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         registerServiceStore<ProjectPageState>('project', ProjectPageStoreModule);
 

@@ -94,7 +94,8 @@ import { useInfiniteScroll } from '@vueuse/core';
 import {
     computed, defineComponent, getCurrentInstance, onMounted, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy, PropType } from 'vue';
+import type { PropType } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -173,7 +174,7 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             resourceId: computed(() => props.cloudServiceItem.reference.resource_id),
             cloudServiceId: computed(() => props.cloudServiceItem.cloud_service_id),

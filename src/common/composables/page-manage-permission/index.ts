@@ -1,5 +1,5 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import type { ComponentRenderProxy, ComputedRef } from 'vue';
+import type { ComputedRef } from 'vue';
 import { computed, getCurrentInstance } from 'vue';
 
 
@@ -14,7 +14,7 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
  * @param routeName
  */
 export const useManagePermissionState = (routeName?: string): ComputedRef<boolean> => {
-    const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+    const vm = getCurrentInstance()?.proxy as Vue;
     if (routeName) {
         return computed<boolean>(() => {
             const userAccessLevel = getUserAccessLevel(routeName, vm.$store.getters['user/pagePermissionList'], SpaceConnector.isTokenAlive);

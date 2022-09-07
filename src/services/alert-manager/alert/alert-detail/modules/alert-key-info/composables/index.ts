@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
-import type { ComponentRenderProxy } from 'vue';
 import { getCurrentInstance, reactive } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { i18n } from '@/translations';
@@ -29,7 +29,7 @@ interface ParamType {
 }
 
 export const useAlertInfoItem = (obj: AlertDetailItemState) => {
-    const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+    const vm = getCurrentInstance()?.proxy as Vue;
     const state = reactive<AlertDetailItemState>(obj);
     const cancelEdit = (initialData) => {
         state.isEditMode = false;

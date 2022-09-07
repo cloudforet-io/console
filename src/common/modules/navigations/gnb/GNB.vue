@@ -31,10 +31,10 @@
 
 <script lang="ts">
 import { includes } from 'lodash';
-import type { ComponentRenderProxy } from 'vue';
 import {
     reactive, toRefs, computed, getCurrentInstance, defineComponent,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { store } from '@/store';
@@ -63,7 +63,7 @@ export default defineComponent({
         GNBToolset,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             openedMenu: '',

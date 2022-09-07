@@ -58,7 +58,7 @@ import { debounce } from 'lodash';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { store } from '@/store';
@@ -124,7 +124,7 @@ export default {
         PTextHighlighting,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             groupId: computed(() => store.getters['service/project/groupId']),

@@ -42,7 +42,6 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     getCurrentInstance,
     reactive,
@@ -50,6 +49,7 @@ import {
     defineComponent, computed,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -72,7 +72,7 @@ export default defineComponent({
         },
     },
     setup(props, context) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             userId: '' as string | undefined,
             password: '',

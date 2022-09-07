@@ -24,7 +24,6 @@
 
 <script lang="ts">
 import { PI, PAnchor } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed,
     getCurrentInstance,
@@ -32,6 +31,7 @@ import {
     reactive,
     toRefs, watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 export default {
@@ -54,7 +54,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             tag: computed(() => (props.href ? PAnchor : 'span')),
             childProps: computed(() => {

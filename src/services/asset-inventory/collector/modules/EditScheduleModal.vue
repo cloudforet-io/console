@@ -99,8 +99,8 @@ import {
 import {
     reactive, toRefs, computed, watch, getCurrentInstance,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -160,7 +160,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const formState = reactive({
             name: '',

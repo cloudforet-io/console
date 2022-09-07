@@ -68,7 +68,8 @@ import { keys, forEach, get } from 'lodash';
 import {
     toRefs, reactive, computed, watch, getCurrentInstance,
 } from 'vue';
-import type { SetupContext, ComponentRenderProxy } from 'vue';
+import type { SetupContext } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -105,7 +106,7 @@ export default {
         },
     },
     setup(props: CollectModalProps, context: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             loading: true,

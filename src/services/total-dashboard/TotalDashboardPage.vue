@@ -64,10 +64,10 @@
 <script lang="ts">
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButton, PDataLoader } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { store } from '@/store';
@@ -108,7 +108,7 @@ export default {
         CloudServices,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: false,
             domainList: [],

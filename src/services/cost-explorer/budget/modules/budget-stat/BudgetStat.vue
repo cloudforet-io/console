@@ -39,8 +39,8 @@ import {
     computed, getCurrentInstance,
     reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -98,7 +98,7 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const { i18nDayjs } = useI18nDayjs();
         const budgetUsageApiQueryHelper = new ApiQueryHelper();
         const state = reactive({

@@ -36,7 +36,6 @@
 /* eslint-disable camelcase */
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed,
     getCurrentInstance,
@@ -45,6 +44,7 @@ import {
     reactive,
     toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -72,7 +72,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             job: {},
             status: computed(() => state.job.job_status),

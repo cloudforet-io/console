@@ -40,10 +40,10 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPanelTop, PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import type { Tags } from '@/models';
@@ -85,7 +85,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const baseState = reactive({
             title: computed(() => i18n.t('IDENTITY.USER.MAIN.ASSIGNED_ROLES')),
             loading: true,

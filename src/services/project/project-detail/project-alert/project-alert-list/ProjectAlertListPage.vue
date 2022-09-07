@@ -16,11 +16,11 @@
 
 <script lang="ts">
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import type { ComponentRenderProxy } from 'vue';
 import {
     getCurrentInstance,
     onActivated, reactive, toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { store } from '@/store';
@@ -43,7 +43,7 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
             alertState: vm.$route.query.state ?? ALERT_STATE_FILTER.OPEN,

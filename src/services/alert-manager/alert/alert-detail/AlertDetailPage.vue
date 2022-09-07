@@ -72,10 +72,10 @@
 <script lang="ts">
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PIconButton, PPageTitle } from '@spaceone/design-system';
-import type { ComponentRenderProxy } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { i18n } from '@/translations';
@@ -122,7 +122,7 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             hasManagePermission: useManagePermissionState(),

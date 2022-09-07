@@ -28,7 +28,7 @@ import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/t
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs, watch,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -52,7 +52,7 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             isActivated: false,

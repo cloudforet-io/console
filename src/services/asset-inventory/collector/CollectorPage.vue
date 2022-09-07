@@ -200,9 +200,9 @@ import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/t
 import {
     reactive, toRefs, computed, watch, getCurrentInstance,
 } from 'vue';
-import type { ComponentRenderProxy } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Component } from 'vue/types/umd';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -248,7 +248,7 @@ export default {
         TagsPanel,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const queryHelper = new QueryHelper();
 
         const storeState = reactive({
