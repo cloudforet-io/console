@@ -1,3 +1,16 @@
+# [1.1.0-beta.388](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.387...v1.1.0-beta.388) (2022-09-07)
+
+
+### Bug Fixes
+
+* **text-input:** check if the value is undefined ([#15](https://github.com/cloudforet-io/mirinae/issues/15)) ([f84d28d](https://github.com/cloudforet-io/mirinae/commit/f84d28d323861fc3590950d835b65ed614c005f0))
+
+
+### Features
+
+* **button:** update gray-border style type's hover style ([#14](https://github.com/cloudforet-io/mirinae/issues/14)) ([2db055b](https://github.com/cloudforet-io/mirinae/commit/2db055be86741d29233ee1e9e73cffc06a3c6c3b))
+* **markdown:** add removeSpacing prop ([#16](https://github.com/cloudforet-io/mirinae/issues/16)) ([b6137c0](https://github.com/cloudforet-io/mirinae/commit/b6137c0096b942e1c0c043f9bd36e44b37832c61))
+
 # [1.1.0-beta.387](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.386...v1.1.0-beta.387) (2022-09-06)
 
 
