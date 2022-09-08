@@ -33,7 +33,7 @@
                     <template #toolbox-bottom>
                         <div class="account-type-filter">
                             <!-- song-lang -->
-                            <span class="label">{{ $t('Account Type') }}</span>
+                            <span class="label">{{ 'Account Type' }}</span>
                             <p-select-status v-for="(status, idx) in tableState.accountTypeList" :key="`${status.name}-${idx}`"
                                              :selected="tableState.selectedAccountType"
                                              :value="status.name"
@@ -79,7 +79,6 @@ import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-displa
 /* components */
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
@@ -149,9 +148,9 @@ export default {
             visibleCustomFieldModal: false,
             accountTypeList: computed(() => [
                 // song-lang
-                { name: 'all', label: i18n.t('All') },
-                { name: 'trustAccount', label: i18n.t('Trust Account') },
-                { name: 'generalAccount', label: i18n.t('General Account') },
+                { name: 'all', label: 'All' },
+                { name: 'trustAccount', label: 'Trust Account' },
+                { name: 'generalAccount', label: 'General Account' },
             ]),
             selectedAccountType: 'all',
         });
@@ -279,7 +278,6 @@ export default {
                 store.dispatch('reference/project/load'),
                 store.dispatch('reference/provider/load'),
             ]);
-            console.log(query);
             const providerFilter = Array.isArray(query.provider) ? query.provider[0] : query.provider;
             state.selectedProvider = providerFilter || state.providerList[0].key;
             watch(() => state.selectedProvider, async (after, before) => {
