@@ -4,7 +4,7 @@
                       @goBack="$router.go(-1)"
         >
             <template #title-left-extra>
-                <p-lazy-img class="icon" :src="providerIcon"
+                <p-lazy-img :src="providerIcon"
                             :loading="providerLoading"
                             error-icon="ic_provider_other"
                 />
@@ -27,6 +27,12 @@
                 </p-button>
             </template>
         </p-page-title>
+        <div class="content-wrapper">
+            <service-account-account-type :mode="pageModeMap.accountType" />
+            <service-account-project :mode="pageModeMap.project" :project-id="projectId" />
+            <service-account-base-information :mode="pageModeMap.baseInformation" />
+            <service-account-credentials :mode="pageModeMap.credentials" />
+        </div>
     </div>
 </template>
 
@@ -46,10 +52,23 @@ import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
+import ServiceAccountAccountType
+    from '@/services/asset-inventory/service-account/modules/ServiceAccountAccountType.vue';
+import ServiceAccountBaseInformation
+    from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformation.vue';
+import ServiceAccountCredentials
+    from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentials.vue';
+import ServiceAccountProject from '@/services/asset-inventory/service-account/modules/ServiceAccountProject.vue';
+import type { PageMode } from '@/services/asset-inventory/service-account/type';
+
 
 export default {
     name: 'ServiceAccountDetailPage',
     components: {
+        ServiceAccountCredentials,
+        ServiceAccountBaseInformation,
+        ServiceAccountProject,
+        ServiceAccountAccountType,
         PIconButton,
         PPageTitle,
         PButton,
@@ -83,6 +102,13 @@ export default {
                 if (state.provider?.linkTemplate) return render(state.provider.linkTemplate, state.item);
                 return '';
             }),
+            projectId: computed(() => state.item.project_info?.project_id),
+            pageModeMap: {
+                accountType: 'READ',
+                project: 'READ',
+                baseInformation: 'READ',
+                credentials: 'READ',
+            } as {[pageName: string]: PageMode},
         });
 
         /* Api */
@@ -130,6 +156,23 @@ export default {
 .service-account-detail-page {
     .title-right-wrapper {
         display: inline-flex;
+    }
+    .content-wrapper {
+        @apply grid-cols-12;
+        display: grid;
+        gap: 1rem;
+        .service-account-account-type {
+            @apply col-span-6;
+        }
+        .service-account-project {
+            @apply col-span-6;
+        }
+        .service-account-base-information {
+            @apply col-span-12;
+        }
+        .service-account-credentials {
+            @apply col-span-12;
+        }
     }
 }
 </style>
