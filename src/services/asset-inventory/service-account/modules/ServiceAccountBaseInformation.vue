@@ -42,7 +42,7 @@ The Key - Value pair is a required field. Only underscores (_), characters, and 
 <script lang="ts">
 import type { PropType } from '@vue/composition-api';
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -59,7 +59,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import type { BaseInformationForm, PageMode } from '@/services/asset-inventory/service-account/type';
 
 
-export default {
+export default defineComponent({
     name: 'ServiceAccountBaseInformation',
     components: {
         TagsInputGroup,
@@ -157,7 +157,7 @@ export default {
             handleAccountValidate,
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .service-account-base-information {
