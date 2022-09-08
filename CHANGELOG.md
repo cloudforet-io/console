@@ -1,3 +1,10 @@
+# [1.1.0-beta.390](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.389...v1.1.0-beta.390) (2022-09-08)
+
+
+### Bug Fixes
+
+* **json-schema-form:** show required error when value is deleted ([#18](https://github.com/cloudforet-io/mirinae/issues/18)) ([f702491](https://github.com/cloudforet-io/mirinae/commit/f70249109ef70efd176d53b0593b906f46f67d24))
+
 # [1.1.0-beta.389](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.388...v1.1.0-beta.389) (2022-09-08)
 
 
