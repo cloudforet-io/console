@@ -1,4 +1,5 @@
 export interface ReferenceItem<Data = Record<string, any>> {
+    key?: string;
     label?: string;
     name?: string;
     color?: string;

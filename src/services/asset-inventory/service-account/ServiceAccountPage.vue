@@ -5,7 +5,7 @@
                       :total-count="typeOptionState.totalCount"
                       class="page-title"
         />
-        <service-account-provider-list :provider-list="providerState.items" :selected-provider.sync="selectedProvider" />
+        <service-account-provider-list :provider-list="providerList" :selected-provider.sync="selectedProvider" />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-dynamic-layout v-if="tableState.schema"
@@ -33,7 +33,7 @@
                     <template #toolbox-bottom>
                         <div class="account-type-filter">
                             <!-- song-lang -->
-                            <span class="label">{{ $t('Account Type') }}</span>
+                            <span class="label">{{ 'Account Type' }}</span>
                             <p-select-status v-for="(status, idx) in tableState.accountTypeList" :key="`${status.name}-${idx}`"
                                              :selected="tableState.selectedAccountType"
                                              :value="status.name"
@@ -56,9 +56,8 @@
 </template>
 <script lang="ts">
 /* external library */
-import type { Ref } from '@vue/composition-api';
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -76,12 +75,10 @@ import type {
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 /* components */
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
@@ -98,8 +95,6 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ServiceAccountProviderList
     from '@/services/asset-inventory/service-account/modules/ServiceAccountProviderList.vue';
 
-/* page modules */
-
 export default {
     name: 'ServiceAccountPage',
     components: {
@@ -115,17 +110,15 @@ export default {
         const { query, fullPath } = SpaceRouter.router.currentRoute;
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
-        /** Provider(located at sidebar) & Page Title * */
-        const selectedProvider: Ref<string> = ref('aws');
-        const providerState = reactive({
-            items: computed(() => Object.keys(store.state.reference.provider.items).map(k => ({
-                ...store.state.reference.provider.items[k],
-                name: store.state.reference.provider.items[k].label,
-                provider: k,
-                icon: assetUrlConverter(store.state.reference.provider.items[k].icon),
+        const state = reactive({
+            selectedProvider: 'atlassian',
+            provider: computed(() => store.state.reference.provider.items),
+            providerList: computed(() => Object.keys(state.provider).map(k => ({
+                ...state.provider[k],
+                icon: assetUrlConverter(state.provider[k].icon),
             }))),
+            selectedProviderName: computed(() => state.provider[state.selectedProvider]?.label),
         });
-        const selectedProviderName = computed(() => store.state.reference.provider.items[selectedProvider.value]?.label || selectedProvider.value);
 
         /** States for Dynamic Layout(search table type) * */
         const fetchOptionState = reactive({
@@ -155,9 +148,9 @@ export default {
             visibleCustomFieldModal: false,
             accountTypeList: computed(() => [
                 // song-lang
-                { name: 'all', label: i18n.t('All') },
-                { name: 'trustAccount', label: i18n.t('Trust Account') },
-                { name: 'generalAccount', label: i18n.t('General Account') },
+                { name: 'all', label: 'All' },
+                { name: 'trustAccount', label: 'Trust Account' },
+                { name: 'generalAccount', label: 'General Account' },
             ]),
             selectedAccountType: 'all',
         });
@@ -168,7 +161,7 @@ export default {
         const getQuery = () => {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilters([{ k: 'provider', v: selectedProvider.value, o: '=' }])
+                .setFilters([{ k: 'provider', v: state.selectedProvider, o: '=' }])
                 .addFilter(...queryHelper.filters);
 
             const fields = tableState.schema?.options?.fields;
@@ -241,7 +234,7 @@ export default {
         const clickAddServiceAccount = () => {
             SpaceRouter.router.push({
                 name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
-                params: { provider: selectedProvider.value },
+                params: { provider: state.selectedProvider },
                 query: { nextPath: fullPath },
             });
         };
@@ -249,24 +242,6 @@ export default {
         const handleClickSettings = () => {
             tableState.visibleCustomFieldModal = true;
         };
-
-        /** Tabs */
-        const singleItemTabState = reactive({
-            tabs: computed<TabItem[]>(() => [
-                { name: 'details', label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_DETAILS') },
-                { name: 'tag', label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_TAG') },
-                { name: 'credentials', label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS') },
-                { name: 'member', label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_MEMBER') },
-            ]),
-            activeTab: 'details',
-        });
-
-        const multiItemTabState = reactive({
-            tabs: computed<TabItem[]>(() => [
-                { name: 'data', label: i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_SELECTED_DATA') },
-            ]),
-            activeTab: 'data',
-        });
 
         const handleSelectServiceAccountType = (accountType) => { tableState.selectedAccountType = accountType; };
         const handleClickRow = (index) => {
@@ -284,7 +259,7 @@ export default {
                     resource_type: 'identity.ServiceAccount',
                     schema: 'table',
                     options: {
-                        provider: selectedProvider.value,
+                        provider: state.selectedProvider,
                     },
                 });
                 tableState.schema = schema;
@@ -304,25 +279,21 @@ export default {
                 store.dispatch('reference/provider/load'),
             ]);
             const providerFilter = Array.isArray(query.provider) ? query.provider[0] : query.provider;
-            if (providerState.items.length > 0) {
-                selectedProvider.value = providerFilter || providerState.items[0].provider;
-                watch(selectedProvider, async (after, before) => {
-                    if (after !== before) {
-                        replaceUrlQuery('provider', after);
-                        await getTableSchema();
-                        await listServiceAccountData();
-                        typeOptionState.selectIndex = [];
-                    }
-                }, { immediate: true });
-            }
+            state.selectedProvider = providerFilter || state.providerList[0].key;
+            watch(() => state.selectedProvider, async (after, before) => {
+                if (after !== before) {
+                    replaceUrlQuery('provider', after);
+                    await getTableSchema();
+                    await listServiceAccountData();
+                    typeOptionState.selectIndex = [];
+                }
+            }, { immediate: true });
         };
         init();
         /** ************************* */
 
         return {
-            selectedProvider,
-            providerState,
-            selectedProviderName,
+            ...toRefs(state),
             tableState,
             fetchOptionState,
             typeOptionState,
@@ -333,9 +304,6 @@ export default {
             reloadTable,
             handleClickSettings,
             clickAddServiceAccount,
-
-            singleItemTabState,
-            multiItemTabState,
 
             handleSelectServiceAccountType,
             handleClickRow,
