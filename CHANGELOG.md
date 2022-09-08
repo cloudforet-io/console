@@ -1,3 +1,10 @@
+# [1.1.0-beta.389](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.388...v1.1.0-beta.389) (2022-09-08)
+
+
+### Features
+
+* **json-schema-form:** add generate_id format & markdown keyword ([#17](https://github.com/cloudforet-io/mirinae/issues/17)) ([6cfea3c](https://github.com/cloudforet-io/mirinae/commit/6cfea3c7d6399161179e329779b865ea4fabf651))
+
 # [1.1.0-beta.388](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.387...v1.1.0-beta.388) (2022-09-07)
 
 
