@@ -56,7 +56,7 @@
 <script lang="ts">
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -83,7 +83,7 @@ const arrayToDict = (arr: TagItem[]): Tag => {
     return dict;
 };
 
-export default {
+export default defineComponent({
     name: 'TagsInputGroup',
     components: {
         PIconButton,
@@ -193,7 +193,7 @@ export default {
             handleInputValue,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -62,7 +62,7 @@ import ServiceAccountProject from '@/services/asset-inventory/service-account/mo
 import type { PageMode } from '@/services/asset-inventory/service-account/type';
 
 
-export default {
+export default defineComponent({
     name: 'ServiceAccountDetailPage',
     components: {
         ServiceAccountCredentials,
@@ -149,7 +149,7 @@ export default {
             handleOpenDeleteModal,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
