@@ -3,22 +3,33 @@ import { faker } from '@faker-js/faker';
 export const getDefaultSchema = () => ({
     type: 'object',
     properties: {
-        channel: {
+        user_id: {
+            title: 'ID',
+            format: 'generate_id',
+            markdown: '[How to generate ID?](https://www.google.com)',
+        },
+        password: {
+            title: 'Password',
+            minLength: 8,
+            format: 'password',
+            default: '12345678',
+        },
+        user_name: {
             minLength: 4,
-            title: 'Slack Channel',
+            title: 'Name',
             examples: [
-                'everyone',
+                'Wanjin',
             ],
-            description: 'Slack channel to be received messages in your workspace',
+            description: 'Your name',
             type: 'string',
         },
-        chat_id: {
-            title: 'Chat ID',
-            description: 'Chat ID of the group to receive messages in your chats. The Chat ID will most likely be a negative number in the form of -#########.',
+        user_nickname: {
+            title: 'Nickname',
+            description: 'Nick name',
             minLength: 1,
             type: 'string',
             examples: [
-                '-514081686',
+                'Genie',
             ],
         },
         country_code: {
@@ -28,54 +39,51 @@ export const getDefaultSchema = () => ({
             pattern: '^[0-9\\-]{1,5}$',
             minLength: 1,
             type: 'string',
+            default: '82',
         },
-        required_number: {
-            title: 'Required Number',
+        age: {
+            title: 'Age',
             type: 'number',
-            examples: ['0'],
+            examples: ['27'],
         },
-        email: {
-            description: 'Email address to receive notifications',
-            title: 'Email Address',
+        emails: {
+            description: 'Email addresses',
+            title: 'Email Addresses',
             minLength: 10,
-            type: 'string',
+            type: 'array',
             pattern: '^[\\W]*([\\w+\\-.%]+@[\\w\\-.]+\\.[A-Za-z]{2,4}[\\W]*,{1}[\\W]*)*([\\w+\\-.%]+@[\\w\\-.]+\\.[A-Za-z]{2,4})[\\W]*$',
+            items: [{ type: 'string' }],
             examples: [
                 'user1@test.com, user2@test.com',
             ],
         },
-        url: {
+        homepage: {
             type: 'string',
             minLength: 4,
             examples: [
                 'https://myjira.atlassian.net',
             ],
-            title: 'JIRA URL',
-            description: 'Atlassian JIRA URL',
+            title: 'Homepage',
+            description: 'Homepage URL',
         },
-        phone_number: {
+        phone: {
             pattern: '^(01([0|1|6|7|8|9]?)\\d{7,8}(, |,|$))*',
             description: 'The phone number to receive alerts. Must insert the cell phone numbers format without special characters.',
-            title: 'Phone Number',
+            title: 'Phone',
             examples: [
                 '0104445566, 01077778888',
             ],
             type: 'string',
             minLength: 10,
         },
-        google_cert_url: {
-            title: 'Google Cloud Auth Provider X509 Cert URL',
-            minLength: 4,
-            type: 'string',
-            default: 'https://www.googleapis.com/oauth2/v1/certs',
-        },
+
     },
-    required: ['channel', 'required_number', 'url', 'phone_number', 'google_cert_url'],
+    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone'],
 });
 
 export const getDefaultFormData = () => ({
-    channel: faker.lorem.word(3),
-    chat_id: faker.random.word(),
-    phone_number: faker.phone.number(),
-    required_number: faker.datatype.number(),
+    user_name: faker.name.firstName(),
+    user_nickname: faker.random.word(),
+    age: faker.datatype.number(),
+    phone: faker.phone.number(),
 });

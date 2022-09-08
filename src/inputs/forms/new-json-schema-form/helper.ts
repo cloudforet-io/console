@@ -1,4 +1,6 @@
-import type { JsonSchema, InnerJsonSchema } from '@/inputs/forms/new-json-schema-form/type';
+import type {
+    JsonSchema, InnerJsonSchema, ComponentName, TextInputType,
+} from '@/inputs/forms/new-json-schema-form/type';
 
 export const NUMERIC_TYPES = ['number', 'integer'];
 
@@ -8,7 +10,7 @@ export const refineValueByProperty = ({ type }: JsonSchema, val?: string) => {
         dataValue = Number(val);
         if (Number.isNaN(dataValue)) dataValue = undefined;
     } else {
-        dataValue = val?.trim() ?? '';
+        dataValue = val?.trim() || undefined;
     }
     return dataValue;
 };
@@ -25,7 +27,12 @@ export const initFormDataWithSchema = (schema?: JsonSchema, formData: object = {
     return result;
 };
 
-export const getInputTypeBySchemaProperty = (schemaProperty: InnerJsonSchema) => {
+export const getComponentNameBySchemaProperty = (schemaProperty: InnerJsonSchema): ComponentName => {
+    if (schemaProperty.format === 'generate_id') return 'GenerateIdFormat';
+    return 'PTextInput';
+};
+
+export const getInputTypeBySchemaProperty = (schemaProperty: InnerJsonSchema): TextInputType => {
     if (schemaProperty.format === 'password') return 'password';
     if (schemaProperty.type === 'string') return 'text';
     if (NUMERIC_TYPES.includes(schemaProperty.type)) return 'number';

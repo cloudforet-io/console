@@ -1,5 +1,5 @@
 <template>
-    <form class="p-json-schema-form">
+    <form class="p-json-schema-form" @submit.prevent>
         <p-field-group v-for="schemaProperty in schemaProperties"
                        :key="`field-${contextKey}-${schemaProperty.id}`"
                        class="input-form-wrapper"
@@ -8,15 +8,22 @@
                        :invalid="getPropertyInvalidState(schemaProperty)"
                        :invalid-text="invalidMessages[schemaProperty.id]"
         >
+            <template v-if="schemaProperty.markdown" #help>
+                <p-markdown :markdown="schemaProperty.markdown" :language="language" remove-spacing />
+            </template>
             <template #default="{invalid}">
-                <p-text-input v-if="TEXT_INPUT_TYPES.includes(schemaProperty.inputType)"
+                <generate-id-format v-if="schemaProperty.componentName === 'GenerateIdFormat'"
+                                    :value="proxyFormData[schemaProperty.id]"
+                                    @update:value="handleUpdateValue(schemaProperty, ...arguments)"
+                />
+                <p-text-input v-else
                               :value="proxyFormData[schemaProperty.id]"
                               :type="schemaProperty.inputType"
                               :invalid="invalid"
                               :placeholder="schemaProperty.inputPlaceholder"
                               :masking-mode="schemaProperty.inputType === 'password'"
-                              autocomplete="off"
-                              @input="handleTextInput(schemaProperty, ...arguments)"
+                              :autocomplete="false"
+                              @input="handleUpdateValue(schemaProperty, ...arguments)"
                 />
             </template>
         </p-field-group>
@@ -33,8 +40,12 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import { isEmpty } from 'lodash';
 
+import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
+import GenerateIdFormat from '@/inputs/forms/new-json-schema-form/components/GenerateIdFormat.vue';
+import { addCustomFormats, addCustomKeywords } from '@/inputs/forms/new-json-schema-form/custom-schema';
 import {
+    getComponentNameBySchemaProperty,
     getInputPlaceholderBySchemaProperty,
     getInputTypeBySchemaProperty,
     initFormDataWithSchema,
@@ -47,7 +58,7 @@ import type {
     JsonSchemaFormProps,
     ValidationMode,
 } from '@/inputs/forms/new-json-schema-form/type';
-import { TEXT_INPUT_TYPES, VALIDATION_MODES } from '@/inputs/forms/new-json-schema-form/type';
+import { VALIDATION_MODES } from '@/inputs/forms/new-json-schema-form/type';
 import { useValidation } from '@/inputs/forms/new-json-schema-form/validation';
 import PTextInput from '@/inputs/input/PTextInput.vue';
 import type { SupportLanguage } from '@/translations';
@@ -56,6 +67,8 @@ import { supportLanguages } from '@/translations';
 export default defineComponent<JsonSchemaFormProps>({
     name: 'PJsonSchemaForm',
     components: {
+        GenerateIdFormat,
+        PMarkdown,
         PFieldGroup,
         PTextInput,
     },
@@ -88,6 +101,8 @@ export default defineComponent<JsonSchemaFormProps>({
             allErrors: true,
         });
         addFormats(ajv);
+        addCustomFormats(ajv);
+        addCustomKeywords(ajv);
 
         const state = reactive({
             schemaProperties: computed<InnerJsonSchema[]>(() => {
@@ -97,6 +112,7 @@ export default defineComponent<JsonSchemaFormProps>({
                         const refined: InnerJsonSchema = {
                             ...schemaProperty,
                             id: k,
+                            componentName: getComponentNameBySchemaProperty(schemaProperty),
                             inputType: getInputTypeBySchemaProperty(schemaProperty),
                             inputPlaceholder: getInputPlaceholderBySchemaProperty(schemaProperty),
                         };
@@ -134,7 +150,7 @@ export default defineComponent<JsonSchemaFormProps>({
         };
 
         /* Event Handlers */
-        const handleTextInput = (property: InnerJsonSchema, val?: string) => {
+        const handleUpdateValue = (property: InnerJsonSchema, val?: string) => {
             const { id } = property;
             state.proxyFormData[id] = refineValueByProperty(property, val);
             const isValid = validateFormData();
@@ -164,8 +180,7 @@ export default defineComponent<JsonSchemaFormProps>({
             ...toRefs(state),
             invalidMessages,
             getPropertyInvalidState,
-            handleTextInput,
-            TEXT_INPUT_TYPES,
+            handleUpdateValue,
         };
     },
 });

@@ -34,15 +34,16 @@ export const useValidation = (props: JsonSchemaFormProps, { ajv, formData, local
                 state.validatorErrors.forEach((error) => {
                     if (!error.instancePath) {
                         /*
-                         when the formData value is undefined, dataPath is empty string.
-                         so before user input nothing, get required error property names from error.params' value.
+                         when the formData value is undefined, instancePath is empty string.
+                         get property names that have 'required' error from error.params' value.
                          */
                         Object.values(error.params).forEach((property) => {
                             errorObj[property] = error.message;
                         });
                     } else {
                         const dataKey = error.instancePath.slice(1);
-                        errorObj[dataKey] = error.message;
+                        // 'required' error has high priority
+                        if (!errorObj[dataKey]) errorObj[dataKey] = error.message;
                     }
                 });
             }
