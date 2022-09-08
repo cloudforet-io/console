@@ -4,11 +4,15 @@ import type {
 
 export const NUMERIC_TYPES = ['number', 'integer'];
 
-export const refineValueByProperty = ({ type }: JsonSchema, val?: string) => {
+export const refineValueByProperty = ({ type }: JsonSchema, val?: any) => {
     let dataValue: string|number|undefined;
     if (NUMERIC_TYPES.includes(type)) {
-        dataValue = Number(val);
-        if (Number.isNaN(dataValue)) dataValue = undefined;
+        if (val === undefined || val?.trim() === '') {
+            dataValue = undefined;
+        } else {
+            dataValue = Number(val);
+            if (Number.isNaN(dataValue)) dataValue = undefined;
+        }
     } else {
         dataValue = val?.trim() || undefined;
     }

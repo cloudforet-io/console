@@ -54,10 +54,7 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
                 summary: supportLanguages[0],
             },
         },
-        control: {
-            type: 'select',
-            options: supportLanguages,
-        },
+        control: null,
     },
     validationMode: {
         name: 'validationMode',

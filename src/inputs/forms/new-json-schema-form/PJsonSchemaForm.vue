@@ -23,7 +23,7 @@
                               :placeholder="schemaProperty.inputPlaceholder"
                               :masking-mode="schemaProperty.inputType === 'password'"
                               :autocomplete="false"
-                              @input="handleUpdateValue(schemaProperty, ...arguments)"
+                              @update:value="handleUpdateValue(schemaProperty, ...arguments)"
                 />
             </template>
         </p-field-group>
@@ -43,6 +43,8 @@ import { isEmpty } from 'lodash';
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import GenerateIdFormat from '@/inputs/forms/new-json-schema-form/components/GenerateIdFormat.vue';
+import { useLocalize } from '@/inputs/forms/new-json-schema-form/composables/localize';
+import { useValidation } from '@/inputs/forms/new-json-schema-form/composables/validation';
 import { addCustomFormats, addCustomKeywords } from '@/inputs/forms/new-json-schema-form/custom-schema';
 import {
     getComponentNameBySchemaProperty,
@@ -51,7 +53,6 @@ import {
     initFormDataWithSchema,
     refineValueByProperty,
 } from '@/inputs/forms/new-json-schema-form/helper';
-import { useLocalize } from '@/inputs/forms/new-json-schema-form/localize';
 import type {
     InnerJsonSchema,
     JsonSchema,
@@ -59,7 +60,6 @@ import type {
     ValidationMode,
 } from '@/inputs/forms/new-json-schema-form/type';
 import { VALIDATION_MODES } from '@/inputs/forms/new-json-schema-form/type';
-import { useValidation } from '@/inputs/forms/new-json-schema-form/validation';
 import PTextInput from '@/inputs/input/PTextInput.vue';
 import type { SupportLanguage } from '@/translations';
 import { supportLanguages } from '@/translations';
@@ -150,7 +150,7 @@ export default defineComponent<JsonSchemaFormProps>({
         };
 
         /* Event Handlers */
-        const handleUpdateValue = (property: InnerJsonSchema, val?: string) => {
+        const handleUpdateValue = (property: InnerJsonSchema, val?: any) => {
             const { id } = property;
             state.proxyFormData[id] = refineValueByProperty(property, val);
             const isValid = validateFormData();
