@@ -132,7 +132,7 @@ export default {
 
             state.proxyVisible = false;
         };
-        const handleSelectGranularity = (granularity: string) => {
+        const handleSelectGranularity = (granularity: Granularity) => {
             state.granularity = granularity;
         };
         const handleSelectCurrency = (currency: Currency) => {

@@ -71,7 +71,7 @@ export default defineComponent<Props>({
         watch([() => selectedTargets.value, () => isAllValid.value], debounce(([targets, isValid]) => {
             const target: string[]|string = props.multiSelectable ? targets : targets[0];
             emit('update', target, isValid);
-        }, 300), { immediate: true });
+        }, 300) as any, { immediate: true });
 
         return {
             selectedTargets,

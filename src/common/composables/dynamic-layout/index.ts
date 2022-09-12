@@ -1,4 +1,3 @@
-
 import { makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import type { KeyItem, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 import type { Filter } from '@spaceone/console-core-lib/space-connector/type';
@@ -96,6 +95,8 @@ export function useQuerySearchPropsWithSearchSchema(
     });
 
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     debouncedWatch([() => searchSchema.value, () => store.state.reference.isAllLoaded], (watchValue) => {
         if (!watchValue) return;
         const [schema, isAllLoaded] = watchValue;

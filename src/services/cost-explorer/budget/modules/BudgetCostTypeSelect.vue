@@ -188,7 +188,7 @@ export default defineComponent<Props>({
 
         watch([() => state.costTypeInfo, () => isAllValid.value], debounce(([costTypeInfo, isValid]) => {
             emit('update', costTypeInfo, isValid);
-        }, 300), { immediate: true });
+        }, 300) as any, { immediate: true });
 
         // LOAD REFERENCE STORE
         (async () => {
